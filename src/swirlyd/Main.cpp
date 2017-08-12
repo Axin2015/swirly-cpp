@@ -27,7 +27,7 @@
 #include <swirly/util/Conf.hpp>
 #include <swirly/util/Exception.hpp>
 #include <swirly/util/Log.hpp>
-#include <swirly/util/MemPool.hpp>
+#include <swirly/util/MemCtx.hpp>
 #include <swirly/util/System.hpp>
 
 #pragma GCC diagnostic push
@@ -180,7 +180,7 @@ void getOpts(int argc, char* argv[], Opts& opts)
     }
 }
 
-MemPool memPool;
+MemCtx memCtx;
 
 } // anonymous
 
@@ -188,12 +188,12 @@ namespace swirly {
 
 void* alloc(size_t size)
 {
-    return memPool.alloc(size);
+    return memCtx.alloc(size);
 }
 
 void dealloc(void* ptr, size_t size) noexcept
 {
-    return memPool.dealloc(ptr, size);
+    return memCtx.dealloc(ptr, size);
 }
 
 } // swirly
@@ -219,7 +219,7 @@ int main(int argc, char* argv[])
             conf.read(is);
         }
 
-        memPool.reserve(conf.get<size_t>("mem_pool", 1) << 20);
+        memCtx = MemCtx{conf.get<size_t>("mem_size", 1) << 20};
 
         const char* const logLevel{conf.get("log_level", nullptr)};
         if (logLevel) {
@@ -288,7 +288,7 @@ int main(int argc, char* argv[])
         SWIRLY_INFO(logMsg() << "start_time:    " << opts.startTime);
         SWIRLY_INFO(logMsg() << "test_mode:     " << (opts.test ? "yes" : "no"));
 
-        SWIRLY_INFO(logMsg() << "mem_pool:      " << (memPool.capacity() >> 20) << "MiB");
+        SWIRLY_INFO(logMsg() << "mem_size:      " << (memCtx.maxSize() >> 20) << "MiB");
         SWIRLY_INFO(logMsg() << "file_mode:     " << setfill('0') << setw(3) << oct
                              << swirly::fileMode());
         SWIRLY_INFO(logMsg() << "run_dir:       " << runDir);

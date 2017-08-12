@@ -17,128 +17,201 @@
 #ifndef SWIRLY_UTIL_MEMPOOL_HPP
 #define SWIRLY_UTIL_MEMPOOL_HPP
 
-#include <swirly/util/Defs.hpp>
+#include <swirly/util/Math.hpp>
 
-#include <cstddef> // size_t
-#include <new>
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
 
 namespace swirly {
 
-namespace detail {
+// Assumptions:
+// sysconf(_SC_LEVEL1_DCACHE_LINESIZE) == 64
+// sysconf(_SC_PAGESIZE) == 4096
 
-/**
- * Memory region. Used to reserve large block of virtual memory for pool allocator.
- */
-class SWIRLY_API MemRegion {
-  public:
-    explicit MemRegion(std::size_t capacity);
-    MemRegion() noexcept;
-    ~MemRegion() noexcept;
-
-    // Copy.
-    MemRegion(const MemRegion& rhs) noexcept = delete;
-    MemRegion& operator=(const MemRegion& rhs) noexcept = delete;
-
-    // Move.
-    MemRegion(MemRegion&& rhs) noexcept;
-    MemRegion& operator=(MemRegion&& rhs) noexcept;
-
-    auto capacity() const noexcept { return capacity_; }
-    auto used() const noexcept { return used_; }
-    void* alloc(std::size_t size)
-    {
-        const auto newUsed = used_ + size;
-        if (newUsed > capacity_) {
-            throw std::bad_alloc{};
-        }
-        // Allocate block from virtual memory.
-        void* const addr{static_cast<char*>(addr_) + used_};
-        used_ = newUsed;
-        return addr;
-    }
-
-  private:
-    std::size_t capacity_{0};
-    void* addr_{nullptr};
-    std::size_t used_{0};
+enum : std::size_t {
+    CacheLineBits = 6,
+    CacheLineSize = 1 << CacheLineBits,
+    PageBits = 12,
+    PageSize = 1 << PageBits
 };
+static_assert(isPow2(CacheLineSize));
+static_assert(isPow2(PageSize));
 
-} // detail
-
-class SWIRLY_API MemPool {
-    template <std::size_t SizeN>
-    struct MemBlock {
-        union {
-            MemBlock* next;
-            char storage[SizeN];
-        };
-    };
-
-  public:
-    explicit MemPool(std::size_t capacity);
-    MemPool() noexcept;
-    ~MemPool() noexcept;
-
-    // Copy.
-    MemPool(const MemPool& rhs) noexcept = delete;
-    MemPool& operator=(const MemPool& rhs) noexcept = delete;
-
-    MemPool(MemPool&&) noexcept;
-    MemPool& operator=(MemPool&&) noexcept;
-
-    auto capacity() const noexcept { return region_.capacity(); }
-
-    void reserve(std::size_t capacity)
-    {
-        region_ = detail::MemRegion{capacity};
-        head1_ = nullptr;
-        head2_ = nullptr;
-        head3_ = nullptr;
-        head4_ = nullptr;
-        head5_ = nullptr;
-    }
-    void* alloc(std::size_t size);
-
-    void dealloc(void* ptr, std::size_t size) noexcept;
-
-  private:
-    template <std::size_t SizeN>
-    void* allocBlock(MemBlock<SizeN>*& head)
-    {
-        using Block = MemBlock<SizeN>;
-        Block* block;
-        if (head) {
-            // Pop from free-list.
-            block = head;
-            head = block->next;
-        } else {
-            block = static_cast<Block*>(region_.alloc(sizeof(Block)));
-        }
-        return block;
-    }
-    template <std::size_t SizeN>
-    void deallocBlock(MemBlock<SizeN>*& head, void* ptr) noexcept
-    {
-        using Block = MemBlock<SizeN>;
-        Block* const block{static_cast<Block*>(ptr)};
-        if (block) {
-            // Push onto free-list.
-            block->next = head;
-            head = block;
-        }
-    }
-
-    detail::MemRegion region_;
-    MemBlock<(1 << 6)>* head1_{nullptr};
-    MemBlock<(2 << 6)>* head2_{nullptr};
-    MemBlock<(3 << 6)>* head3_{nullptr};
-    MemBlock<(4 << 6)>* head4_{nullptr};
-    MemBlock<(5 << 6)>* head5_{nullptr};
-};
+template <int BitsN>
+constexpr std::size_t ceilPow2(std::size_t size) noexcept
+{
+    enum { Max = (1 << BitsN) - 1 };
+    return ((size + Max) >> BitsN) << BitsN;
+}
 
 constexpr std::size_t ceilCacheLine(std::size_t size) noexcept
 {
-    return ((size + 63) >> 6) << 6;
+    return ceilPow2<CacheLineBits>(size);
+}
+
+constexpr std::size_t ceilPage(std::size_t size) noexcept
+{
+    return ceilPow2<PageBits>(size);
+}
+
+/**
+ * Size type used for 32bit index or offset into shared memory segment.
+ */
+using MemSize = std::uint32_t;
+
+/**
+ * Tag type used as work-around for ABA problem.
+ */
+using MemTag = std::uint32_t;
+
+/**
+ * Link type comprising a tag in the upper 32bits and an index or offset in the lower 32 bits. Links
+ * are used to represent "offset pointers"
+ */
+using MemLink = std::uint64_t;
+
+constexpr MemSize linkToOffset(MemLink link) noexcept
+{
+    return link & 0xffffffff;
+}
+
+constexpr MemLink makeLink(MemTag tag, MemSize offset) noexcept
+{
+    return (static_cast<MemLink>(tag) << 32) | offset;
+}
+
+template <std::size_t SizeN>
+struct SWIRLY_PACKED MemNode {
+    union {
+        MemLink next;
+        char storage[SizeN];
+    };
+};
+static_assert(std::is_pod<MemNode<1>>::value);
+static_assert(sizeof(MemNode<256>) == 256);
+
+template <std::size_t SizeN>
+struct alignas(CacheLineSize) MemStack {
+    struct SWIRLY_PACKED {
+        MemLink head;
+        MemTag tag;
+    };
+};
+static_assert(std::is_pod<MemStack<1>>::value);
+static_assert(sizeof(MemStack<1>) == CacheLineSize);
+
+struct MemPool {
+    union {
+        char pad[PageSize];
+        struct {
+            MemStack<(1 << 6)> free1;
+            MemStack<(2 << 6)> free2;
+            MemStack<(3 << 6)> free3;
+            MemStack<(4 << 6)> free4;
+            MemStack<(5 << 6)> free5;
+            MemStack<(6 << 6)> free6;
+            MemSize offset;
+        };
+    };
+    char storage[];
+};
+static_assert(std::is_pod<MemPool>::value);
+static_assert(offsetof(MemPool, storage) == PageSize);
+
+constexpr void* offsetToPtr(const MemPool& pool, MemSize offset) noexcept
+{
+    return const_cast<char*>(&pool.storage[offset]);
+}
+
+template <typename PtrT>
+constexpr PtrT offsetToPtr(const MemPool& pool, MemSize offset) noexcept
+{
+    return static_cast<PtrT>(offsetToPtr(pool, offset));
+}
+
+inline MemSize ptrToOffset(const MemPool& pool, void* ptr) noexcept
+{
+    assert(ptr >= &pool.storage[0]);
+    return static_cast<char*>(ptr) - &pool.storage[0];
+}
+
+template <std::size_t SizeN>
+inline void push(const MemPool& pool, MemStack<SizeN>& stack, MemNode<SizeN>* node)
+{
+    // Add then fetch.
+    const auto tag = __atomic_add_fetch(&stack.tag, 1, __ATOMIC_RELAXED);
+    const auto newHead = makeLink(tag, ptrToOffset(pool, node));
+
+    decltype(stack.head) oldHead;
+    __atomic_load(&stack.head, &oldHead, __ATOMIC_RELAXED);
+    do {
+        node->next = oldHead;
+    } while (!__atomic_compare_exchange_n(&stack.head,
+                                          &oldHead, // Expected.
+                                          newHead, // Desired.
+                                          1, // Weak.
+                                          __ATOMIC_RELEASE, // Success.
+                                          __ATOMIC_RELAXED // Failure.
+                                          ));
+}
+
+template <std::size_t SizeN>
+inline MemNode<SizeN>* pop(const MemPool& pool, MemStack<SizeN>& stack)
+{
+    MemNode<SizeN>* node;
+
+    decltype(stack.head) oldHead;
+    __atomic_load(&stack.head, &oldHead, __ATOMIC_ACQUIRE);
+    do {
+        if (oldHead == 0) {
+            return nullptr;
+        }
+        node = offsetToPtr<decltype(node)>(pool, linkToOffset(oldHead));
+    } while (!__atomic_compare_exchange_n(&stack.head,
+                                          &oldHead, // Expected.
+                                          node->next, // Desired.
+                                          1, // Weak.
+                                          __ATOMIC_ACQUIRE, // Success.
+                                          __ATOMIC_ACQUIRE // Failure.
+                                          ));
+    return node;
+}
+
+inline MemSize reserve(MemPool& pool, MemSize size, MemSize maxSize)
+{
+    MemSize newOffset, oldOffset;
+    __atomic_load(&pool.offset, &oldOffset, __ATOMIC_RELAXED);
+    do {
+        newOffset = oldOffset + size;
+        if (newOffset > maxSize) {
+            throw std::bad_alloc{};
+        }
+    } while (!__atomic_compare_exchange_n(&pool.offset,
+                                          &oldOffset, // Expected.
+                                          newOffset, // Desired.
+                                          1, // Weak.
+                                          __ATOMIC_RELAXED, // Success.
+                                          __ATOMIC_RELAXED // Failure.
+                                          ));
+    return oldOffset;
+}
+
+template <std::size_t SizeN>
+inline void* allocBlock(MemPool& pool, MemStack<SizeN>& stack, MemSize maxSize)
+{
+    void* addr = pop(pool, stack);
+    if (!addr) {
+        const auto offset = reserve(pool, SizeN, maxSize);
+        addr = offsetToPtr(pool, offset);
+    }
+    return addr;
+}
+
+template <std::size_t SizeN>
+inline void deallocBlock(MemPool& pool, MemStack<SizeN>& stack, void* addr)
+{
+    push(pool, stack, static_cast<MemNode<SizeN>*>(addr));
 }
 
 } // swirly

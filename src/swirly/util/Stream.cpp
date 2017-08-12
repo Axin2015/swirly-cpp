@@ -22,7 +22,7 @@ using namespace std;
 
 namespace swirly {
 
-SWIRLY_API void reset(ostream& os) noexcept
+void reset(ostream& os) noexcept
 {
     os.clear();
     os.fill(os.widen(' '));

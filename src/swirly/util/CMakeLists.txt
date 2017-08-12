@@ -29,6 +29,7 @@ set(util_SOURCES
   Log.cpp
   Math.cpp
   MemAlloc.cpp
+  MemCtx.cpp
   MemMap.cpp
   MemPool.cpp
   Numeric.cpp
@@ -69,7 +70,7 @@ set(util_test_SOURCES
   IntWrapperTest.cxx
   LogTest.cxx
   MathTest.cxx
-  MemPoolTest.cxx
+  MemCtxTest.cxx
   PipeTest.cxx
   RefCountedTest.cxx
   RingBufferTest.cxx
