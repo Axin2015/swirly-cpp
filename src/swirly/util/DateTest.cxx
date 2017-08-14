@@ -34,6 +34,11 @@ SWIRLY_TEST_CASE(YmdToJd)
     SWIRLY_CHECK(2443711_jd == ymdToJd(1978, 6, 21));
 }
 
+SWIRLY_TEST_CASE(JdToIso)
+{
+    SWIRLY_CHECK(20140314_ymd == jdToIso(ymdToJd(2014, 2, 14)));
+}
+
 SWIRLY_TEST_CASE(JdToTime)
 {
     SWIRLY_CHECK(1394798400000ms == jdToTime(ymdToJd(2014, 2, 14)).time_since_epoch());

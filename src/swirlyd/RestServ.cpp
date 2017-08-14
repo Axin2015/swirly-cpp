@@ -66,7 +66,7 @@ uint32_t getPerm(const HttpRequest& req)
 Time getTime(const HttpRequest& req) noexcept
 {
     const string_view val{req.time()};
-    return val.empty() ? UnixClock::now() : msToTime(stou64(val));
+    return val.empty() ? UnixClock::now() : toTime(Millis{stou64(val)});
 }
 
 string_view getAdmin(const HttpRequest& req)
