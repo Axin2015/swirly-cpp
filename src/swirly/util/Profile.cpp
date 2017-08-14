@@ -52,8 +52,8 @@ void Profile::record(double val) noexcept
         const auto z = zscore(var_.mean(), sd, val);
         // NORMSINV(0.999) = 3.0902323
         if (z > 3.0902323) {
-            SWIRLY_WARNING(logMsg() << '<' << name_ << "> outlier " << val << " with z-score "
-                                    << z);
+            SWIRLY_WARNING(logMsg()
+                           << '<' << name_ << "> outlier " << val << " with z-score " << z);
         }
     }
 }

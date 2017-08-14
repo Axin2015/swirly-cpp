@@ -106,8 +106,8 @@ struct Serv::Impl {
     {
         auto it = instrs_.find(symbol);
         if (it == instrs_.end()) {
-            throw MarketNotFoundException{errMsg() << "instrument '" << symbol
-                                                   << "' does not exist"};
+            throw MarketNotFoundException{errMsg()
+                                          << "instrument '" << symbol << "' does not exist"};
         }
         return *it;
     }

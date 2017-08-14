@@ -130,7 +130,7 @@ class SWIRLY_API Exec : public RefCounted<Exec>, public Request, public MemAlloc
     Symbol cpty_;
 };
 
-static_assert(sizeof(Exec) <= 5 * 64, "mempool size exceeded");
+static_assert(sizeof(Exec) <= 5 * 64, "no greater than specified cache-lines");
 
 inline std::ostream& operator<<(std::ostream& os, const Exec& exec)
 {

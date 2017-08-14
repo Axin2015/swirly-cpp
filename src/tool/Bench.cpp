@@ -23,7 +23,7 @@
 
 #include <swirly/util/Conf.hpp>
 #include <swirly/util/Log.hpp>
-#include <swirly/util/MemPool.hpp>
+#include <swirly/util/MemCtx.hpp>
 #include <swirly/util/Profile.hpp>
 #include <swirly/util/Time.hpp>
 
@@ -63,7 +63,7 @@ class Archiver {
     vector<Id64> ids_;
 };
 
-MemPool memPool;
+MemCtx memCtx;
 
 } // anonymous
 
@@ -71,12 +71,12 @@ namespace swirly {
 
 void* alloc(size_t size)
 {
-    return memPool.alloc(size);
+    return memCtx.alloc(size);
 }
 
 void dealloc(void* ptr, size_t size) noexcept
 {
-    return memPool.dealloc(ptr, size);
+    return memCtx.dealloc(ptr, size);
 }
 
 } // swirly
@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
     int ret = 1;
     try {
 
-        memPool.reserve(1 << 20);
+        memCtx = MemCtx{1 << 20};
 
         unique_ptr<Journ> journ;
         unique_ptr<Model> model;

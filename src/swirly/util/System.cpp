@@ -76,7 +76,7 @@ void daemon()
     // Note that the standard output handles are unchanged.
 }
 
-SWIRLY_API mode_t fileMode() noexcept
+mode_t fileMode() noexcept
 {
     mode_t mode{umask(0)};
     umask(mode);

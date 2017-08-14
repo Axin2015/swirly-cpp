@@ -14,23 +14,27 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Stream.hpp"
+#include "MemMap.hpp"
 
-#include <sys/time.h>
+#include <system_error>
 
 using namespace std;
 
 namespace swirly {
 
-void reset(ostream& os) noexcept
+void MemMapDeleter::operator()(MemMapHandle h) noexcept
 {
-    os.clear();
-    os.fill(os.widen(' '));
-    os.flags(ios_base::skipws | ios_base::dec);
-    os.precision(6);
-    os.width(0);
-};
+    if (h) {
+        munmap(h.get(), h.size());
+    }
+}
 
-OStreamJoiner::~OStreamJoiner() noexcept = default;
-
-} // swirly
+MemMap openMemMap(void* addr, size_t len, int prot, int flags, FileHandle fh, off_t off)
+{
+    const MemMapHandle h{mmap(addr, len, prot, flags, fh.get(), off), len};
+    if (!h) {
+        throw system_error{errno, system_category(), "mmap failed"};
+    }
+    return MemMap{h};
+}
+}

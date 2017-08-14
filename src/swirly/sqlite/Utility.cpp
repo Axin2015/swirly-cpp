@@ -84,7 +84,10 @@ DbPtr openDb(const char* path, int flags, const Conf& conf)
         throw Error{errMsg() << "sqlite3_open_v2 failed: " << path << ": " << lastError(*db)};
     }
     if (conf.get("sqlite_enable_trace", false)) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
         sqlite3_trace(db, trace, nullptr);
+#pragma GCC diagnostic pop
     }
     if (conf.get("sqlite_enable_fkey", false)) {
         rc = sqlite3_db_config(db, SQLITE_DBCONFIG_ENABLE_FKEY, 1, nullptr);

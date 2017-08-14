@@ -158,7 +158,7 @@ pair<string_view, string_view> splitPair(string_view s, char delim) noexcept
     return {key, val};
 }
 
-SWIRLY_API pair<string, string> splitPair(const string& s, char delim)
+pair<string, string> splitPair(const string& s, char delim)
 {
     const auto pos = s.find_first_of(delim);
     string key, val;

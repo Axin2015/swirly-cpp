@@ -33,7 +33,7 @@ using experimental::string_view;
 
 namespace swirly {
 
-static_assert(MaxSymbol == 16, "unexpected max symbolonic");
+static_assert(MaxSymbol == 16, "must be specific size");
 
 /**
  * Memorable identifier.

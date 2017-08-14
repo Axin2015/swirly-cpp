@@ -22,7 +22,7 @@ using namespace std;
 
 namespace swirly {
 
-static_assert(sizeof(Level) <= 2 * 64, "crossed cache-line boundary");
+static_assert(sizeof(Level) <= 2 * 64, "no greater than specified cache-lines");
 
 Level::Level(const Order& firstOrder) noexcept
     : firstOrder_{&firstOrder},

@@ -346,9 +346,9 @@ struct SWIRLY_PACKED IntWrapper : IntBase {
   private:
     ValueType value_;
 };
-static_assert(std::is_pod<IntWrapper<Int32Policy>>::value, "int-wrapper must be pod");
-static_assert(sizeof(IntWrapper<Int32Policy>) == 4, "unexpected int-wrapper size");
-static_assert(sizeof(IntWrapper<Int64Policy>) == 8, "unexpected int-wrapper size");
+static_assert(std::is_pod<IntWrapper<Int32Policy>>::value);
+static_assert(sizeof(IntWrapper<Int32Policy>) == 4, "must be specific size");
+static_assert(sizeof(IntWrapper<Int64Policy>) == 8, "must be specific size");
 
 template <typename ValueT>
 constexpr bool isIntWrapper = std::is_base_of<IntBase, ValueT>::value;

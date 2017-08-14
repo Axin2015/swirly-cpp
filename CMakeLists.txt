@@ -17,12 +17,17 @@
 cmake_minimum_required(VERSION 3.1)
 project(swirly)
 
+# Configuration options:
+set(ENABLE_SHARED_LIBS ON CACHE BOOL "Enable shared libs.")
+set(SWIRLY_MAX_LEVELS  3 CACHE STRING "Maximum price levels.")
+set(TOOLS_HOME         "/opt/tools/latest" CACHE PATH "Toolset directory.")
+
+get_filename_component(TOOLS_HOME "${TOOLS_HOME}" REALPATH)
+set(CMAKE_PREFIX_PATH "${TOOLS_HOME}")
+message(STATUS "TOOLS_HOME: ${TOOLS_HOME}")
+
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${PROJECT_SOURCE_DIR}/etc")
 set(CMAKE_VERBOSE_MAKEFILE ON)
-
-# Configuration options:
-set(ENABLE_SHARED_LIBS ON  CACHE BOOL   "Enable shared libs.")
-set(SWIRLY_MAX_LEVELS  3   CACHE STRING "Maximum price levels.")
 
 # Intended for use with Linux Perf:
 # $ perf record -g swirly_bench
@@ -55,7 +60,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_FLAGS} ${COMMON_WARN} -fno-enforce-eh-specs -fnothrow-opt -fno-rtti")
 elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMMON_FLAGS} ${COMMON_WARN}")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_FLAGS} ${COMMON_WARN} -fno-rtti")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_FLAGS} ${COMMON_WARN} -fno-rtti -Wno-c++1z-extensions")
 endif()
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
 
@@ -84,7 +89,7 @@ find_program(ENV_EXECUTABLE env)
 find_program(RAGEL_EXECUTABLE ragel)
 
 set(Boost_USE_STATIC_LIBS ON)
-find_package(Boost   1.55  REQUIRED COMPONENTS date_time filesystem system)
+find_package(Boost 1.55 REQUIRED COMPONENTS date_time filesystem system)
 # The sqlite3_errstr() function was added in 3.7.15.
 find_package(SQLite3 3.7.15 REQUIRED)
 

@@ -24,7 +24,7 @@ using namespace std;
 
 namespace swirly {
 
-static_assert(sizeof(Market) <= 4 * 64, "crossed cache-line boundary");
+static_assert(sizeof(Market) <= 4 * 64, "no greater than specified cache-lines");
 
 namespace {
 template <typename FnT>

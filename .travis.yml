@@ -1,47 +1,55 @@
 language: cpp
 
-sudo: required
+sudo: false
 dist: trusty
 
 matrix:
   include:
     - os: linux
-      compiler: g++
+      compiler: clang
       addons:
         apt:
           sources:
             - boost-latest
             - travis-ci/sqlite3
             - ubuntu-toolchain-r-test
+            - sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-5.0 main'
+              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
           packages:
+            - clang-5.0
             - cmake
             - cmake-data
-            - g++-5
+            - g++-6
             - libboost1.55-all-dev
             - libsqlite3-dev
       env:
         - CMAKE_BUILD_TYPE=DEBUG
-        - CMAKE_C_COMPILER=gcc-5
-        - CMAKE_CXX_COMPILER=g++-5
+        - CMAKE_C_COMPILER=clang-5.0
+        - CMAKE_CXX_COMPILER=clang++-5.0
+        - ENABLE_SHARED_LIBS=ON
 
     - os: linux
-      compiler: g++
+      compiler: clang
       addons:
         apt:
           sources:
             - boost-latest
             - travis-ci/sqlite3
             - ubuntu-toolchain-r-test
+            - sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-5.0 main'
+              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
           packages:
+            - clang-5.0
             - cmake
             - cmake-data
-            - g++-5
+            - g++-6
             - libboost1.55-all-dev
             - libsqlite3-dev
       env:
         - CMAKE_BUILD_TYPE=RELEASE
-        - CMAKE_C_COMPILER=gcc-5
-        - CMAKE_CXX_COMPILER=g++-5
+        - CMAKE_C_COMPILER=clang-5.0
+        - CMAKE_CXX_COMPILER=clang++-5.0
+        - ENABLE_SHARED_LIBS=ON
 
     - os: linux
       compiler: g++
@@ -61,6 +69,7 @@ matrix:
         - CMAKE_BUILD_TYPE=DEBUG
         - CMAKE_C_COMPILER=gcc-6
         - CMAKE_CXX_COMPILER=g++-6
+        - ENABLE_SHARED_LIBS=ON
 
     - os: linux
       compiler: g++
@@ -80,35 +89,42 @@ matrix:
         - CMAKE_BUILD_TYPE=RELEASE
         - CMAKE_C_COMPILER=gcc-6
         - CMAKE_CXX_COMPILER=g++-6
+        - ENABLE_SHARED_LIBS=ON
 
     - os: osx
-      osx_image: xcode7.3
+      osx_image: xcode8.3
       compiler: clang++
       env:
         - CMAKE_BUILD_TYPE=DEBUG
-        - CMAKE_C_COMPILER=clang-3.7
-        - CMAKE_CXX_COMPILER=clang++-3.7
+        - CMAKE_C_COMPILER=clang
+        - CMAKE_CXX_COMPILER=clang++
+        - ENABLE_SHARED_LIBS=OFF
 
     - os: osx
-      osx_image: xcode7.3
+      osx_image: xcode8.3
       compiler: clang++
       env:
         - CMAKE_BUILD_TYPE=RELEASE
-        - CMAKE_C_COMPILER=clang-3.7
-        - CMAKE_CXX_COMPILER=clang++-3.7
+        - CMAKE_C_COMPILER=clang
+        - CMAKE_CXX_COMPILER=clang++
+        - ENABLE_SHARED_LIBS=OFF
 
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
       brew update;
-      brew install llvm37 sqlite3;
+      brew install sqlite3;
       brew outdated boost || brew upgrade boost;
     fi
 
 before_script:
   - mkdir build
   - cd build
-  - cmake -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER} -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER} ..
+  - cmake -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+          -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+          -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+          -DENABLE_SHARED_LIBS=${ENABLE_SHARED_LIBS}
+          ..
 
 script:
-  - make
+  - make -j2
   - make test

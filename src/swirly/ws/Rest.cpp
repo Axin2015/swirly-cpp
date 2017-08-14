@@ -54,8 +54,8 @@ void getExec(const Accnt& accnt, Page page, ostream& out)
         } else {
             last = execs.end();
         }
-        transform(first, last, OStreamJoiner(out, ','),
-                  [](const auto& ptr) -> const auto& { return *ptr; });
+        transform(first, last,
+                  OStreamJoiner(out, ','), [](const auto& ptr) -> const auto& { return *ptr; });
     }
     out << ']';
 }

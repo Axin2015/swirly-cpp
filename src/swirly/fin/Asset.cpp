@@ -20,7 +20,7 @@ using namespace std;
 
 namespace swirly {
 
-static_assert(sizeof(Asset) <= 3 * 64, "crossed cache-line boundary");
+static_assert(sizeof(Asset) <= 3 * 64, "no greater than specified cache-lines");
 
 Asset::~Asset() noexcept = default;
 
