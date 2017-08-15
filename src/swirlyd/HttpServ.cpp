@@ -41,7 +41,7 @@ HttpServ::~HttpServ() noexcept = default;
 
 void HttpServ::asyncAccept()
 {
-    auto sess = makeRefCounted<HttpSess>(ioServ_, restServ_);
+    auto sess = makeIntrusive<HttpSess>(ioServ_, restServ_);
     acceptor_.async_accept(sess->socket(), [this, sess](auto ec) {
         if (!ec) {
             sess->start();

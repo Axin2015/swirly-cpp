@@ -22,7 +22,7 @@ using namespace std;
 using namespace swirly;
 
 namespace {
-class Foo : public RefCounted<Foo>, public Request {
+class Foo : public RefCount<Foo, ThreadUnsafePolicy>, public Request {
   public:
     Foo(Id64 marketId, Id64 id, int& alive) noexcept
         : Request{{}, marketId, {}, 0_jd, id, {}, Side::Buy, 0_lts, {}}, alive_{alive}
@@ -48,7 +48,7 @@ SWIRLY_TEST_CASE(RequestIdSet)
 
         FooPtr foo1{&*s.emplace(1_id64, 2_id64, alive)};
         SWIRLY_CHECK(alive == 1);
-        SWIRLY_CHECK(foo1->refs() == 2);
+        SWIRLY_CHECK(foo1->refCount() == 2);
         SWIRLY_CHECK(foo1->marketId() == 1_id64);
         SWIRLY_CHECK(foo1->id() == 2_id64);
         SWIRLY_CHECK(s.find(1_id64, 2_id64) != s.end());
@@ -56,13 +56,13 @@ SWIRLY_TEST_CASE(RequestIdSet)
         // Duplicate.
         FooPtr foo2{&*s.emplace(1_id64, 2_id64, alive)};
         SWIRLY_CHECK(alive == 1);
-        SWIRLY_CHECK(foo2->refs() == 3);
+        SWIRLY_CHECK(foo2->refCount() == 3);
         SWIRLY_CHECK(foo2 == foo1);
 
         // Replace.
         FooPtr foo3{&*s.emplaceOrReplace(1_id64, 2_id64, alive)};
         SWIRLY_CHECK(alive == 2);
-        SWIRLY_CHECK(foo3->refs() == 2);
+        SWIRLY_CHECK(foo3->refCount() == 2);
         SWIRLY_CHECK(foo3 != foo1);
         SWIRLY_CHECK(foo3->marketId() == 1_id64);
         SWIRLY_CHECK(foo3->id() == 2_id64);

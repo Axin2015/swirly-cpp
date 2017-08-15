@@ -35,7 +35,7 @@ set(util_SOURCES
   Numeric.cpp
   Pipe.cpp
   Profile.cpp
-  RefCounted.cpp
+  RefCount.cpp
   RingBuffer.cpp
   Set.cpp
   Stream.cpp
@@ -72,7 +72,7 @@ set(util_test_SOURCES
   MathTest.cxx
   MemCtxTest.cxx
   PipeTest.cxx
-  RefCountedTest.cxx
+  RefCountTest.cxx
   RingBufferTest.cxx
   SetTest.cxx
   StreamTest.cxx

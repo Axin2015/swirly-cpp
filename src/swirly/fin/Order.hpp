@@ -31,7 +31,9 @@ class Level;
 /**
  * An instruction to buy or sell goods or services.
  */
-class SWIRLY_API Order : public RefCounted<Order>, public Request, public MemAlloc {
+class SWIRLY_API Order : public RefCount<Order, ThreadUnsafePolicy>,
+                         public Request,
+                         public MemAlloc {
   public:
     Order(Symbol accnt, Id64 marketId, Symbol instr, JDay settlDay, Id64 id, std::string_view ref,
           State state, Side side, Lots lots, Ticks ticks, Lots resdLots, Lots execLots,
@@ -68,7 +70,7 @@ class SWIRLY_API Order : public RefCounted<Order>, public Request, public MemAll
     template <typename... ArgsT>
     static OrderPtr make(ArgsT&&... args)
     {
-        return makeRefCounted<Order>(std::forward<ArgsT>(args)...);
+        return makeIntrusive<Order>(std::forward<ArgsT>(args)...);
     }
 
     void toJson(std::ostream& os) const;
@@ -243,17 +245,17 @@ class SWIRLY_API OrderRefSet {
     template <typename... ArgsT>
     Iterator emplace(ArgsT&&... args)
     {
-        return insert(makeRefCounted<Order>(std::forward<ArgsT>(args)...));
+        return insert(makeIntrusive<Order>(std::forward<ArgsT>(args)...));
     }
     template <typename... ArgsT>
     Iterator emplaceHint(ConstIterator hint, ArgsT&&... args)
     {
-        return insertHint(hint, makeRefCounted<Order>(std::forward<ArgsT>(args)...));
+        return insertHint(hint, makeIntrusive<Order>(std::forward<ArgsT>(args)...));
     }
     template <typename... ArgsT>
     Iterator emplaceOrReplace(ArgsT&&... args)
     {
-        return insertOrReplace(makeRefCounted<Order>(std::forward<ArgsT>(args)...));
+        return insertOrReplace(makeIntrusive<Order>(std::forward<ArgsT>(args)...));
     }
     ValuePtr remove(const Order& ref) noexcept
     {
