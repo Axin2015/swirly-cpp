@@ -152,7 +152,7 @@ constexpr Time jdToTime(JDay jd) noexcept
     const JDay jdUnixEpoc = 2440588_jd;
     const std::int64_t msInDay = 24 * 60 * 60 * 1000;
     // Add half day for 12pm.
-    return msToTime((jd - jdUnixEpoc).count() * msInDay + (msInDay >> 1));
+    return toTime(Millis{(jd - jdUnixEpoc).count() * msInDay + (msInDay >> 1)});
 }
 
 /**
@@ -171,6 +171,15 @@ constexpr JDay maybeIsoToJd(IsoDate iso) noexcept
     return iso != 0_ymd ? isoToJd(iso) : 0_jd;
 }
 
+inline bool isWeekDay(JDay jday) noexcept
+{
+    return (jday.count() % 7) < 5;
+}
+
+inline bool isWeekEndDay(JDay jday) noexcept
+{
+    return !isWeekDay(jday);
+}
 } // swirly
 
 #endif // SWIRLY_UTIL_DATE_HPP

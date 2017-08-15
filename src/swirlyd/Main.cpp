@@ -156,7 +156,7 @@ void getOpts(int argc, char* argv[], Opts& opts)
             printUsage(cout);
             exit(0);
         case 's':
-            opts.startTime = msToTime(stou64(optarg));
+            opts.startTime = toTime(Millis{stou64(optarg)});
             break;
         case 't':
             opts.test = true;

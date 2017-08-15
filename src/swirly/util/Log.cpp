@@ -90,7 +90,7 @@ void stdLogger(int level, string_view msg) noexcept
 {
     const auto now = UnixClock::now();
     const auto t = UnixClock::to_time_t(now);
-    const auto ms = timeToMs(now);
+    const auto ms = msSinceEpoch(now);
 
     struct tm tm;
     localtime_r(&t, &tm);

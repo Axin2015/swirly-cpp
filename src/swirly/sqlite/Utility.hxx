@@ -118,10 +118,13 @@ struct DbTraits<ValueT, std::enable_if_t<std::is_enum<ValueT>::value>> {
 template <>
 struct DbTraits<Time> {
     static constexpr bool isNull(Time val) noexcept { return val == Time{}; }
-    static void bind(sqlite3_stmt& stmt, int col, Time val) { bind64(stmt, col, timeToMs(val)); }
+    static void bind(sqlite3_stmt& stmt, int col, Time val)
+    {
+        bind64(stmt, col, msSinceEpoch(val));
+    }
     static Time column(sqlite3_stmt& stmt, int col) noexcept
     {
-        return msToTime(sqlite3_column_int64(&stmt, col));
+        return toTime(Millis{sqlite3_column_int64(&stmt, col)});
     }
 };
 

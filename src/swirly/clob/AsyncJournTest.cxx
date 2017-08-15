@@ -222,7 +222,7 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
         SWIRLY_CHECK(body.matchId == 0_id64);
         SWIRLY_CHECK(body.liqInd == LiqInd::None);
         SWIRLY_CHECK(strncmp(body.cpty, "", sizeof(body.cpty)) == 0);
-        SWIRLY_CHECK(body.created == timeToMs(Now));
+        SWIRLY_CHECK(body.created == msSinceEpoch(Now));
     }
     {
         Msg msg;
@@ -250,7 +250,7 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
         SWIRLY_CHECK(body.matchId == 4_id64);
         SWIRLY_CHECK(body.liqInd == LiqInd::Maker);
         SWIRLY_CHECK(strncmp(body.cpty, "GOSAYL", sizeof(body.cpty)) == 0);
-        SWIRLY_CHECK(body.created == timeToMs(Now + 1ms));
+        SWIRLY_CHECK(body.created == msSinceEpoch(Now + 1ms));
     }
 }
 
@@ -270,7 +270,7 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournArchiveTrade, AsyncJournFixture)
         SWIRLY_CHECK(msg.type == MsgType::ArchiveTrade);
         const auto& body = msg.archiveTrade;
         SWIRLY_CHECK(body.marketId == MarketId);
-        SWIRLY_CHECK(body.modified == timeToMs(Now));
+        SWIRLY_CHECK(body.modified == msSinceEpoch(Now));
         for (const auto id : body.ids) {
             if (it != ids.end()) {
                 SWIRLY_CHECK(id == *it++);

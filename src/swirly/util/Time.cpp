@@ -16,25 +16,50 @@
  */
 #include "Time.hpp"
 
-#include <iostream>
+#include <iomanip>
+#include <sstream>
 
-#include <sys/time.h>
+using namespace std;
 
 namespace swirly {
+namespace {
+constexpr size_t operator""_strlen(const char* data, size_t len) noexcept
+{
+    return len;
+}
+} // anonymous
 
 UnixClock::time_point UnixClock::now() noexcept
 {
-    using std::chrono::milliseconds;
-    timeval tv;
-    gettimeofday(&tv, nullptr);
-    std::int64_t ms{tv.tv_sec * 1000L};
-    ms += (tv.tv_usec + 500L) / 1000L;
-    return time_point{milliseconds{ms}};
+    using chrono::nanoseconds;
+    timespec ts;
+    clock_gettime(CLOCK_REALTIME, &ts);
+    return time_point{nanoseconds{ts.tv_sec * 1'000'000'000L + ts.tv_nsec}};
 }
 
-std::ostream& operator<<(std::ostream& os, Time time)
+void formatTime(Time time, ostream& os)
 {
-    return os << timeToMs(time);
+    const auto t = UnixClock::to_time_t(time);
+    const auto us = usSinceEpoch(time);
+    struct tm tm;
+    gmtime_r(&t, &tm);
+
+    char buf["2017-01-01 00:00:00"_strlen + 1];
+    strftime(buf, sizeof(buf), "%Y-%m-%dT%H:%M:%S", &tm);
+    os << buf << '.' << setfill('0') << setw(6) << (us % 1'000'000L);
+}
+
+string formatTime(Time time)
+{
+    stringstream ss;
+    formatTime(time, ss);
+    return ss.str();
+}
+
+ostream& operator<<(ostream& os, Time time)
+{
+    // TODO: change to a higher resolution.
+    return os << msSinceEpoch(time);
 }
 
 } // swirly

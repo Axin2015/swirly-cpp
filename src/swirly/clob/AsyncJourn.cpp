@@ -162,7 +162,7 @@ void AsyncJourn::doCreateExec(const Exec& exec, More more)
         body.matchId = exec.matchId();
         body.liqInd = exec.liqInd();
         setCString(body.cpty, exec.cpty());
-        body.created = timeToMs(exec.created());
+        body.created = msSinceEpoch(exec.created());
         body.more = more;
     });
 }
@@ -184,7 +184,7 @@ void AsyncJourn::doArchiveTrade(Id64 marketId, ArrayView<Id64> ids, Time modifie
         for (; i < MaxIds; ++i) {
             body.ids[i] = 0_id64;
         }
-        body.modified = timeToMs(modified);
+        body.modified = msSinceEpoch(modified);
         body.more = more;
     });
 }
