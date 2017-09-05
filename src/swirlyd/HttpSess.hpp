@@ -22,7 +22,7 @@
 #include <swirly/ws/HttpHandler.hpp>
 
 #include <swirly/util/Log.hpp>
-#include <swirly/util/RefCounted.hpp>
+#include <swirly/util/RefCount.hpp>
 #include <swirly/util/RingBuffer.hpp>
 
 #pragma GCC diagnostic push
@@ -35,7 +35,7 @@ namespace swirly {
 class HttpResponse;
 class RestServ;
 
-class HttpSess : public RefCounted<HttpSess>, public BasicHttpHandler<HttpSess> {
+class HttpSess : public RefCount<HttpSess, ThreadUnsafePolicy>, public BasicHttpHandler<HttpSess> {
 
     friend class BasicHttpHandler<HttpSess>;
     enum { IdleTimeout = 5, MaxData = 4096 };

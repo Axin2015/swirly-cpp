@@ -18,7 +18,7 @@
 #define SWIRLY_UTIL_SET_HPP
 
 #include <swirly/util/BasicTypes.hpp>
-#include <swirly/util/RefCounted.hpp>
+#include <swirly/util/RefCount.hpp>
 #include <swirly/util/Symbol.hpp>
 
 #include <boost/intrusive/set.hpp>
@@ -134,17 +134,17 @@ class IdSet {
     template <typename... ArgsT>
     Iterator emplace(ArgsT&&... args)
     {
-        return insert(makeRefCounted<ValueT>(std::forward<ArgsT>(args)...));
+        return insert(makeIntrusive<ValueT>(std::forward<ArgsT>(args)...));
     }
     template <typename... ArgsT>
     Iterator emplaceHint(ConstIterator hint, ArgsT&&... args)
     {
-        return insertHint(hint, makeRefCounted<ValueT>(std::forward<ArgsT>(args)...));
+        return insertHint(hint, makeIntrusive<ValueT>(std::forward<ArgsT>(args)...));
     }
     template <typename... ArgsT>
     Iterator emplaceOrReplace(ArgsT&&... args)
     {
-        return insertOrReplace(makeRefCounted<ValueT>(std::forward<ArgsT>(args)...));
+        return insertOrReplace(makeIntrusive<ValueT>(std::forward<ArgsT>(args)...));
     }
     ValuePtr remove(const ValueT& ref) noexcept
     {

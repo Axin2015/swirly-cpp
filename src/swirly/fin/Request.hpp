@@ -21,7 +21,7 @@
 
 #include <swirly/util/BasicTypes.hpp>
 #include <swirly/util/Date.hpp>
-#include <swirly/util/RefCounted.hpp>
+#include <swirly/util/RefCount.hpp>
 #include <swirly/util/Symbol.hpp>
 
 #include <boost/intrusive/set.hpp>
@@ -218,17 +218,17 @@ class RequestIdSet {
     template <typename... ArgsT>
     Iterator emplace(ArgsT&&... args)
     {
-        return insert(makeRefCounted<RequestT>(std::forward<ArgsT>(args)...));
+        return insert(makeIntrusive<RequestT>(std::forward<ArgsT>(args)...));
     }
     template <typename... ArgsT>
     Iterator emplaceHint(ConstIterator hint, ArgsT&&... args)
     {
-        return insertHint(hint, makeRefCounted<RequestT>(std::forward<ArgsT>(args)...));
+        return insertHint(hint, makeIntrusive<RequestT>(std::forward<ArgsT>(args)...));
     }
     template <typename... ArgsT>
     Iterator emplaceOrReplace(ArgsT&&... args)
     {
-        return insertOrReplace(makeRefCounted<RequestT>(std::forward<ArgsT>(args)...));
+        return insertOrReplace(makeIntrusive<RequestT>(std::forward<ArgsT>(args)...));
     }
     ValuePtr remove(const RequestT& ref) noexcept
     {

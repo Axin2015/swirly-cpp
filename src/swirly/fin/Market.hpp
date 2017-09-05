@@ -27,7 +27,7 @@ namespace swirly {
 using MarketPtr = boost::intrusive_ptr<Market>;
 using ConstMarketPtr = boost::intrusive_ptr<const Market>;
 
-class SWIRLY_API Market : public RefCounted<Market>, public Comparable<Market> {
+class SWIRLY_API Market : public RefCount<Market, ThreadUnsafePolicy>, public Comparable<Market> {
   public:
     Market(Id64 id, Symbol instr, JDay settlDay, MarketState state, Lots lastLots = 0_lts,
            Ticks lastTicks = 0_tks, Time lastTime = {}, Id64 maxId = 0_id64) noexcept
@@ -54,7 +54,7 @@ class SWIRLY_API Market : public RefCounted<Market>, public Comparable<Market> {
     template <typename... ArgsT>
     static MarketPtr make(ArgsT&&... args)
     {
-        return makeRefCounted<Market>(std::forward<ArgsT>(args)...);
+        return makeIntrusive<Market>(std::forward<ArgsT>(args)...);
     }
 
     void toJson(std::ostream& os) const;

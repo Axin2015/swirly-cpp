@@ -188,13 +188,13 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
 {
     ConstExecPtr execs[2];
     execs[0]
-        = makeRefCounted<Exec>("MARAYL"_sv, MarketId, "EURUSD"_sv, SettlDay, 1_id64, 2_id64,
-                               "REF"_sv, State::New, Side::Buy, 10_lts, 12345_tks, 10_lts, 0_lts,
-                               0_cst, 0_lts, 0_tks, 1_lts, 0_id64, LiqInd::None, Symbol{}, Now);
-    execs[1] = makeRefCounted<Exec>("MARAYL"_sv, MarketId, "EURUSD"_sv, SettlDay, 3_id64, 2_id64,
-                                    "REF"_sv, State::Trade, Side::Buy, 10_lts, 12345_tks, 5_lts,
-                                    5_lts, 61725_cst, 5_lts, 12345_tks, 1_lts, 4_id64,
-                                    LiqInd::Maker, "GOSAYL"_sv, Now + 1ms);
+        = makeIntrusive<Exec>("MARAYL"_sv, MarketId, "EURUSD"_sv, SettlDay, 1_id64, 2_id64,
+                              "REF"_sv, State::New, Side::Buy, 10_lts, 12345_tks, 10_lts, 0_lts,
+                              0_cst, 0_lts, 0_tks, 1_lts, 0_id64, LiqInd::None, Symbol{}, Now);
+    execs[1] = makeIntrusive<Exec>("MARAYL"_sv, MarketId, "EURUSD"_sv, SettlDay, 3_id64, 2_id64,
+                                   "REF"_sv, State::Trade, Side::Buy, 10_lts, 12345_tks, 5_lts,
+                                   5_lts, 61725_cst, 5_lts, 12345_tks, 1_lts, 4_id64, LiqInd::Maker,
+                                   "GOSAYL"_sv, Now + 1ms);
     asyncJourn.createExec(execs);
     {
         Msg msg;

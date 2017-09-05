@@ -22,14 +22,14 @@
 
 #include <swirly/util/BasicTypes.hpp>
 #include <swirly/util/Date.hpp>
-#include <swirly/util/RefCounted.hpp>
+#include <swirly/util/RefCount.hpp>
 #include <swirly/util/Symbol.hpp>
 
 #include <boost/intrusive/set.hpp>
 
 namespace swirly {
 
-class SWIRLY_API Posn : public RefCounted<Posn> {
+class SWIRLY_API Posn : public RefCount<Posn, ThreadUnsafePolicy> {
   public:
     Posn(Symbol accnt, Id64 marketId, Symbol instr, JDay settlDay, Lots buyLots, Cost buyCost,
          Lots sellLots, Cost sellCost) noexcept
@@ -60,7 +60,7 @@ class SWIRLY_API Posn : public RefCounted<Posn> {
     template <typename... ArgsT>
     static PosnPtr make(ArgsT&&... args)
     {
-        return makeRefCounted<Posn>(std::forward<ArgsT>(args)...);
+        return makeIntrusive<Posn>(std::forward<ArgsT>(args)...);
     }
 
     void toJson(std::ostream& os) const;
@@ -226,17 +226,17 @@ class SWIRLY_API PosnSet {
     template <typename... ArgsT>
     Iterator emplace(ArgsT&&... args)
     {
-        return insert(makeRefCounted<Posn>(std::forward<ArgsT>(args)...));
+        return insert(makeIntrusive<Posn>(std::forward<ArgsT>(args)...));
     }
     template <typename... ArgsT>
     Iterator emplaceHint(ConstIterator hint, ArgsT&&... args)
     {
-        return insertHint(hint, makeRefCounted<Posn>(std::forward<ArgsT>(args)...));
+        return insertHint(hint, makeIntrusive<Posn>(std::forward<ArgsT>(args)...));
     }
     template <typename... ArgsT>
     Iterator emplaceOrReplace(ArgsT&&... args)
     {
-        return insertOrReplace(makeRefCounted<Posn>(std::forward<ArgsT>(args)...));
+        return insertOrReplace(makeIntrusive<Posn>(std::forward<ArgsT>(args)...));
     }
     ValuePtr remove(Iterator it) noexcept
     {

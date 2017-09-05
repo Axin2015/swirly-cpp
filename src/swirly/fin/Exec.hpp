@@ -29,7 +29,7 @@ namespace swirly {
  *
  * Trade executions represent the exchange of goods or services between counter-parties.
  */
-class SWIRLY_API Exec : public RefCounted<Exec>, public Request, public MemAlloc {
+class SWIRLY_API Exec : public RefCount<Exec, ThreadUnsafePolicy>, public Request, public MemAlloc {
   public:
     Exec(Symbol accnt, Id64 marketId, Symbol instr, JDay settlDay, Id64 id, Id64 orderId,
          std::string_view ref, State state, Side side, Lots lots, Ticks ticks, Lots resdLots,
@@ -63,7 +63,7 @@ class SWIRLY_API Exec : public RefCounted<Exec>, public Request, public MemAlloc
     template <typename... ArgsT>
     static ExecPtr make(ArgsT&&... args)
     {
-        return makeRefCounted<Exec>(std::forward<ArgsT>(args)...);
+        return makeIntrusive<Exec>(std::forward<ArgsT>(args)...);
     }
     ExecPtr opposite(Id64 id) const;
 

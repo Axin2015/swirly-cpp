@@ -25,7 +25,7 @@ using namespace swirly;
 
 namespace {
 
-class Foo : public RefCounted<Foo> {
+class Foo : public RefCount<Foo, ThreadUnsafePolicy> {
   public:
     Foo(Symbol symbol, string_view display, int& alive) noexcept
         : symbol_{symbol}, display_{display}, alive_{alive}
@@ -44,7 +44,7 @@ class Foo : public RefCounted<Foo> {
     int& alive_;
 };
 
-class Bar : public RefCounted<Bar> {
+class Bar : public RefCount<Bar, ThreadUnsafePolicy> {
   public:
     Bar(Id64 id, string_view display, int& alive) noexcept
         : id_{id}, display_{display}, alive_{alive}
