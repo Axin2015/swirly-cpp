@@ -14,17 +14,4 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_UTIL_UTILITY_HPP
-#define SWIRLY_UTIL_UTILITY_HPP
-
-#include <swirly/Defs.hpp>
-
-#include <cstdint>
-
-namespace swirly {
-
-SWIRLY_API int hexDigits(int64_t i) noexcept;
-
-} // swirly
-
-#endif // SWIRLY_UTIL_UTILITY_HPP
+#include "System.hpp"

@@ -14,22 +14,4 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_UTIL_DEFS_HPP
-#define SWIRLY_UTIL_DEFS_HPP
-
-/**
- * Macro for packed structures.
- */
-#define SWIRLY_PACKED __attribute__((packed))
-
-/**
- * Macro for exporting weak symbols.
- */
-#define SWIRLY_WEAK __attribute__((visibility("default"), weak))
-
-/**
- * Macro for exporting classes and functions that compose the public API.
- */
-#define SWIRLY_API __attribute__((visibility("default")))
-
-#endif // SWIRLY_UTIL_DEFS_HPP
+#include "Util.hpp"

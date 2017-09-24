@@ -14,18 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "System.hpp"
+#include "Daemon.hpp"
 
-#include <string>
-#include <system_error>
-
-#include <cerrno>
-#include <cstdlib> // quick_exit()
-
-#include <fcntl.h> // open()
-#include <unistd.h> // fork()
-
-#include <sys/stat.h> // umask()
+#include <swirly/posix/File.hpp>
+#include <swirly/posix/System.hpp>
 
 using namespace std;
 
@@ -33,29 +25,19 @@ namespace swirly {
 
 void daemon()
 {
-    pid_t pid{fork()};
-    if (pid < 0) {
-        throw system_error{errno, system_category(), "fork failed"};
-    }
-
+    pid_t pid{posix::fork()};
     if (pid != 0) {
         // Exit parent process using system version of exit() to avoid flushing standard streams.
         // FIXME: use quick_exit() when available on OSX.
         _exit(0);
     }
 
-    // Detach from instrolling terminal by making process a session leader.
-    if (setsid() < 0) {
-        throw system_error{errno, system_category(), "setsid failed"};
-    }
+    // Detach from controlling terminal by making process a session leader.
+    posix::setsid();
 
     // Forking again ensures that the daemon process is not a session leader, and therefore cannot
-    // regain access to a instrolling terminal.
-    pid = fork();
-    if (pid < 0) {
-        throw system_error{errno, system_category(), "fork failed"};
-    }
-
+    // regain access to a controlling terminal.
+    pid = posix::fork();
     if (pid != 0) {
         // FIXME: use quick_exit() when available on OSX.
         _exit(0);
@@ -63,9 +45,7 @@ void daemon()
 
     // Re-open standard input.
     close(STDIN_FILENO);
-    if (open("/dev/null", O_RDONLY) < 0) {
-        throw system_error{errno, system_category(), "open failed"};
-    }
+    posix::open("/dev/null", O_RDONLY);
 
     // Close all non-standard file handles.
     const int fds{getdtablesize()};
@@ -74,13 +54,6 @@ void daemon()
     }
 
     // Note that the standard output handles are unchanged.
-}
-
-mode_t fileMode() noexcept
-{
-    mode_t mode{umask(0)};
-    umask(mode);
-    return mode;
 }
 
 } // swirly

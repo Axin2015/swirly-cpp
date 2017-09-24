@@ -18,8 +18,9 @@
 #define SWIRLY_UTIL_SYMBOL_HPP
 
 #include <swirly/util/Compare.hpp>
-#include <swirly/util/Defs.hpp>
 #include <swirly/util/Limits.hpp>
+
+#include <swirly/Defs.hpp>
 
 #include <experimental/string_view>
 

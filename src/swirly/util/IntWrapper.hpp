@@ -17,7 +17,7 @@
 #ifndef SWIRLY_UTIL_INTWRAPPER_HPP
 #define SWIRLY_UTIL_INTWRAPPER_HPP
 
-#include <swirly/util/Defs.hpp>
+#include <swirly/Defs.hpp>
 
 #include <cstdint>
 #include <iosfwd>

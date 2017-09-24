@@ -14,17 +14,20 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_UTIL_UTILITY_HPP
-#define SWIRLY_UTIL_UTILITY_HPP
+#ifndef SWIRLY_UTIL_DAEMON_HPP
+#define SWIRLY_UTIL_DAEMON_HPP
 
 #include <swirly/Defs.hpp>
 
-#include <cstdint>
+#include <sys/types.h>
 
 namespace swirly {
 
-SWIRLY_API int hexDigits(int64_t i) noexcept;
+/**
+ * Daemonise process. Detach from controlling terminal and run in the background as a system daemon.
+ */
+SWIRLY_API void daemon();
 
 } // swirly
 
-#endif // SWIRLY_UTIL_UTILITY_HPP
+#endif // SWIRLY_UTIL_DAEMON_HPP

@@ -18,8 +18,8 @@ set(util_SOURCES
   BasicTypes.cpp
   Compare.cpp
   Conf.cpp
+  Daemon.cpp
   Date.cpp
-  Defs.cpp
   Enum.cpp
   Exception.cpp
   File.cpp
@@ -30,7 +30,6 @@ set(util_SOURCES
   Math.cpp
   MemAlloc.cpp
   MemCtx.cpp
-  MemMap.cpp
   MemPool.cpp
   Numeric.cpp
   Pipe.cpp
@@ -41,7 +40,6 @@ set(util_SOURCES
   Stream.cpp
   String.cpp
   Symbol.cpp
-  System.cpp
   Time.cpp
   Tokeniser.cpp
   Types.cpp
@@ -50,13 +48,13 @@ set(util_SOURCES
 
 add_library(util_static STATIC ${util_SOURCES})
 set_target_properties(util_static PROPERTIES OUTPUT_NAME swirly_util)
-target_link_libraries(util_static pthread)
+target_link_libraries(util_static posix_static pthread)
 install(TARGETS util_static DESTINATION lib)
 
 if(ENABLE_SHARED_LIBS)
   add_library(util_shared SHARED ${util_SOURCES})
   set_target_properties(util_shared PROPERTIES OUTPUT_NAME swirly_util)
-  target_link_libraries(util_shared pthread)
+  target_link_libraries(util_shared posix_shared pthread)
   install(TARGETS util_shared DESTINATION lib)
 endif()
 

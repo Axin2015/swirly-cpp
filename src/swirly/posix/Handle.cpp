@@ -14,27 +14,4 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "MemMap.hpp"
-
-#include <system_error>
-
-using namespace std;
-
-namespace swirly {
-
-void MemMapDeleter::operator()(MemMapHandle h) noexcept
-{
-    if (h) {
-        munmap(h.get(), h.size());
-    }
-}
-
-MemMap openMemMap(void* addr, size_t len, int prot, int flags, FileHandle fh, off_t off)
-{
-    const MemMapHandle h{mmap(addr, len, prot, flags, fh.get(), off), len};
-    if (!h) {
-        throw system_error{errno, system_category(), "mmap failed"};
-    }
-    return MemMap{h};
-}
-}
+#include "Handle.hpp"

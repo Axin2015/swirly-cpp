@@ -14,25 +14,22 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_UTIL_SYSTEM_HPP
-#define SWIRLY_UTIL_SYSTEM_HPP
-
-#include <swirly/util/Defs.hpp>
-
-#include <sys/types.h>
-
-namespace swirly {
+#ifndef SWIRLY_DEFS_HPP
+#define SWIRLY_DEFS_HPP
 
 /**
- * Daemonise process. Detach from instrolling terminal and run in the background as a system daemon.
+ * Macro for packed structures.
  */
-SWIRLY_API void daemon();
+#define SWIRLY_PACKED __attribute__((packed))
 
 /**
- * Get current file mode.
+ * Macro for exporting weak symbols.
  */
-SWIRLY_API mode_t fileMode() noexcept;
+#define SWIRLY_WEAK __attribute__((visibility("default"), weak))
 
-} // swirly
+/**
+ * Macro for exporting classes and functions that compose the public API.
+ */
+#define SWIRLY_API __attribute__((visibility("default")))
 
-#endif // SWIRLY_UTIL_SYSTEM_HPP
+#endif // SWIRLY_DEFS_HPP
