@@ -32,8 +32,8 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # Intended for use with Linux Perf:
 # $ perf record -g swirly_bench
 # $ perf report -g "graph,0.5,caller"
-SET(CMAKE_C_FLAGS_PERF    "${CMAKE_C_FLAGS_RELEASE} -fno-omit-frame-pointer")
-SET(CMAKE_CXX_FLAGS_PERF  "${CMAKE_CXX_FLAGS_RELEASE} -fno-omit-frame-pointer")
+SET(CMAKE_C_FLAGS_PERF   "${CMAKE_C_FLAGS_RELEASE} -fno-omit-frame-pointer")
+SET(CMAKE_CXX_FLAGS_PERF "${CMAKE_CXX_FLAGS_RELEASE} -fno-omit-frame-pointer")
 
 if(NOT CMAKE_BUILD_TYPE)
   #set(CMAKE_BUILD_TYPE DEBUG)
@@ -51,16 +51,21 @@ endif()
 string(TOUPPER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE)
 
 set(COMMON_WARN "-Wall -Werror -Wextra -Wstrict-aliasing=2 -Wno-unused-parameter -Wno-unused-variable")
-set(COMMON_FLAGS "-fstrict-aliasing -fvisibility=hidden")
+set(COMMON_C_FLAGS "-fstrict-aliasing -fvisibility=hidden")
+set(COMMON_CXX_FLAGS "${COMMON_C_FLAGS} -fno-rtti")
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 14)
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMMON_FLAGS} ${COMMON_WARN}")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_FLAGS} ${COMMON_WARN} -fno-enforce-eh-specs -fnothrow-opt -fno-rtti")
+  if(NOT "${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS 7)
+    set(COMMON_WARN "${COMMON_WARN} -Wno-implicit-fallthrough")
+    set(COMMON_CXX_FLAGS "${COMMON_CXX_FLAGS} -faligned-new")
+  endif()
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMMON_C_FLAGS} ${COMMON_WARN}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_CXX_FLAGS} ${COMMON_WARN} -fno-enforce-eh-specs -fnothrow-opt")
 elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMMON_FLAGS} ${COMMON_WARN}")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_FLAGS} ${COMMON_WARN} -fno-rtti -Wno-c++1z-extensions")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMMON_C_FLAGS} ${COMMON_WARN}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_CXX_FLAGS} ${COMMON_WARN} -Wno-c++1z-extensions")
 endif()
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
 

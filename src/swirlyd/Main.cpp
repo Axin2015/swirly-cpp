@@ -191,6 +191,13 @@ void* alloc(size_t size)
     return memCtx.alloc(size);
 }
 
+#if __GNUC__ >= 7
+void* alloc(size_t size, align_val_t al)
+{
+    return memCtx.alloc(size, al);
+}
+#endif
+
 void dealloc(void* ptr, size_t size) noexcept
 {
     return memCtx.dealloc(ptr, size);

@@ -24,7 +24,7 @@ MarketSide::~MarketSide() noexcept = default;
 
 MarketSide::MarketSide(MarketSide&&) = default;
 
-void MarketSide::insertOrder(const OrderPtr& order) throw(bad_alloc)
+void MarketSide::insertOrder(const OrderPtr& order)
 {
     assert(order->level() == nullptr);
     assert(order->ticks() != 0_tks);
@@ -45,7 +45,7 @@ void MarketSide::insertOrder(const OrderPtr& order) throw(bad_alloc)
     }
 }
 
-LevelSet::Iterator MarketSide::insertLevel(const OrderPtr& order) throw(bad_alloc)
+LevelSet::Iterator MarketSide::insertLevel(const OrderPtr& order)
 {
     LevelSet::Iterator it;
     bool found;

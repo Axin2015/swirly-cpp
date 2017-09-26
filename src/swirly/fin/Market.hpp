@@ -74,12 +74,18 @@ class SWIRLY_API Market : public RefCount<Market, ThreadUnsafePolicy>, public Co
     void setState(MarketState state) noexcept { state_ = state; }
     MarketSide& bidSide() noexcept { return bidSide_; }
     MarketSide& offerSide() noexcept { return offerSide_; }
-    void insertOrder(const OrderPtr& order) throw(std::bad_alloc)
+    /**
+     * Throws std::bad_alloc.
+     */
+    void insertOrder(const OrderPtr& order)
     {
         side(order->side()).insertOrder(order);
     }
     void removeOrder(const Order& order) noexcept { side(order.side()).removeOrder(order); }
-    void createOrder(const OrderPtr& order, Time now) throw(std::bad_alloc)
+    /**
+     * Throws std::bad_alloc.
+     */
+    void createOrder(const OrderPtr& order, Time now)
     {
         side(order->side()).createOrder(order, now);
     }

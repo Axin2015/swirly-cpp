@@ -45,8 +45,10 @@ class SWIRLY_API MarketSide {
      * Insert order into side. Assumes that the order does not already belong to a side. I.e. it
      * assumes that level member is null. Assumes that order-id and reference are unique. This
      * function will only throw if a new level cannot be allocated.
+     *
+     * Throws std::bad_alloc.
      */
-    void insertOrder(const OrderPtr& order) throw(std::bad_alloc);
+    void insertOrder(const OrderPtr& order);
 
     /**
      * Remove order from side. Internal housekeeping aside, the state of the order is not affected
@@ -59,7 +61,10 @@ class SWIRLY_API MarketSide {
             removeOrder(*level, order);
         }
     }
-    void createOrder(const OrderPtr& order, Time now) throw(std::bad_alloc)
+    /**
+     * Throws std::bad_alloc.
+     */
+    void createOrder(const OrderPtr& order, Time now)
     {
         order->create(now);
         insertOrder(order);
@@ -102,8 +107,10 @@ class SWIRLY_API MarketSide {
   private:
     /**
      * Insert level. This function will only throw if a new level cannot be allocated.
+     *
+     * Throws std::bad_alloc.
      */
-    LevelSet::Iterator insertLevel(const OrderPtr& order) throw(std::bad_alloc);
+    LevelSet::Iterator insertLevel(const OrderPtr& order);
 
     void removeOrder(Level& level, const Order& order) noexcept;
 

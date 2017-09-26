@@ -137,6 +137,15 @@ void* MemCtx::alloc(size_t size)
     return impl_->alloc(size);
 }
 
+#if __GNUC__ >= 7
+void* MemCtx::alloc(std::size_t size, align_val_t al)
+{
+    assert(impl_);
+    assert(static_cast<size_t>(al) <= CacheLineSize);
+    return impl_->alloc(size);
+}
+#endif
+
 void MemCtx::dealloc(void* addr, size_t size) noexcept
 {
     assert(impl_);
