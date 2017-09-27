@@ -19,7 +19,7 @@
 
 #include <swirly/posix/Util.hpp>
 
-#include <swirly/Defs.hpp>
+#include <swirly/Config.hpp>
 
 #include <memory>
 #include <system_error>

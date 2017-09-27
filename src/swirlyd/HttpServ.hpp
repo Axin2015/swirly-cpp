@@ -17,7 +17,7 @@
 #ifndef SWIRLYD_HTTPSERV_HPP
 #define SWIRLYD_HTTPSERV_HPP
 
-#include <swirly/Defs.hpp>
+#include <swirly/Config.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"

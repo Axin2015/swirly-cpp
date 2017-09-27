@@ -17,7 +17,7 @@
 #ifndef SWIRLY_UTIL_REFCOUNT_HPP
 #define SWIRLY_UTIL_REFCOUNT_HPP
 
-#include <swirly/Defs.hpp>
+#include <swirly/Config.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 

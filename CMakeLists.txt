@@ -69,8 +69,6 @@ elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
 endif()
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
 
-add_definitions(-DSWIRLY_MAX_LEVELS=${SWIRLY_MAX_LEVELS})
-
 add_definitions(-DBOOST_NO_AUTO_PTR=1 -DBOOST_NO_RTTI=1 -DBOOST_NO_TYPEID=1)
 add_definitions(-DBOOST_ASIO_DISABLE_THREADS=1 -DBOOST_ASIO_HEADER_ONLY=1)
 
@@ -122,7 +120,7 @@ if(DOXYGEN_FOUND)
 endif()
 
 include_directories("${Boost_INCLUDE_DIRS}")
-include_directories("${PROJECT_SOURCE_DIR}/src")
+include_directories("${PROJECT_BINARY_DIR}/include" "${PROJECT_SOURCE_DIR}/src")
 
 if(ENABLE_SHARED_LIBS)
   set(unit_LIBRARY unit_shared)

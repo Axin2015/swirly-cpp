@@ -17,7 +17,7 @@
 #ifndef SWIRLY_FIN_JOURN_HPP
 #define SWIRLY_FIN_JOURN_HPP
 
-#include <swirly/Defs.hpp>
+#include <swirly/Config.hpp>
 
 #include <memory>
 

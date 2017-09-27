@@ -20,7 +20,7 @@
 #include <swirly/util/Compare.hpp>
 #include <swirly/util/Limits.hpp>
 
-#include <swirly/Defs.hpp>
+#include <swirly/Config.hpp>
 
 #include <experimental/string_view>
 

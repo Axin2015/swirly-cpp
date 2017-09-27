@@ -17,11 +17,9 @@
 #ifndef SWIRLY_FIN_LIMITS_HPP
 #define SWIRLY_FIN_LIMITS_HPP
 
-#include <cstddef> // size_t
+#include <swirly/Config.hpp>
 
-#ifndef SWIRLY_MAX_LEVELS
-#define SWIRLY_MAX_LEVELS 3
-#endif // SWIRLY_MAX_LEVELS
+#include <cstddef> // size_t
 
 namespace swirly {
 
