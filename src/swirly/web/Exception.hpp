@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_WS_EXCEPTION_HPP
-#define SWIRLY_WS_EXCEPTION_HPP
+#ifndef SWIRLY_WEB_EXCEPTION_HPP
+#define SWIRLY_WEB_EXCEPTION_HPP
 
 #include <swirly/util/Exception.hpp>
 
@@ -37,4 +37,4 @@ class SWIRLY_API ParseException : public Exception {
 
 } // swirly
 
-#endif // SWIRLY_WS_EXCEPTION_HPP
+#endif // SWIRLY_WEB_EXCEPTION_HPP

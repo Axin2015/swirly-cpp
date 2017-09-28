@@ -14,11 +14,11 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_WS_REST_HPP
-#define SWIRLY_WS_REST_HPP
+#ifndef SWIRLY_WEB_REST_HPP
+#define SWIRLY_WEB_REST_HPP
 
-#include <swirly/ws/EntitySet.hpp>
-#include <swirly/ws/Page.hpp>
+#include <swirly/web/EntitySet.hpp>
+#include <swirly/web/Page.hpp>
 
 #include <swirly/clob/Serv.hpp>
 
@@ -114,4 +114,4 @@ class SWIRLY_API Rest {
 
 } // swirly
 
-#endif // SWIRLY_WS_REST_HPP
+#endif // SWIRLY_WEB_REST_HPP

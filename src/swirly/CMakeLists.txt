@@ -18,7 +18,7 @@ add_subdirectory(posix)
 add_subdirectory(util)
 add_subdirectory(fin)
 add_subdirectory(clob)
-add_subdirectory(ws)
+add_subdirectory(web)
 
 # FIXME: the following libraries should be modules.
 add_subdirectory(sqlite)

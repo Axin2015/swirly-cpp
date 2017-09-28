@@ -19,7 +19,7 @@
 
 #include "HttpRequest.hpp"
 
-#include <swirly/ws/HttpHandler.hpp>
+#include <swirly/web/HttpHandler.hpp>
 
 #include <swirly/util/Log.hpp>
 #include <swirly/util/RefCount.hpp>

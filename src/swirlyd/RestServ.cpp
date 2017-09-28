@@ -19,7 +19,7 @@
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 
-#include <swirly/ws/Rest.hpp>
+#include <swirly/web/Rest.hpp>
 
 #include <swirly/fin/Exception.hpp>
 

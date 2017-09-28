@@ -15,7 +15,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/ws/RestBody.hpp>
+#include <swirly/web/RestBody.hpp>
 
 #include <swirly/fin/Exception.hpp>
 

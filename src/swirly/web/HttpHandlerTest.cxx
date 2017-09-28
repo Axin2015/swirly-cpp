@@ -16,7 +16,7 @@
  */
 #include "HttpHandler.hpp"
 
-#include <swirly/ws/Url.hpp>
+#include <swirly/web/Url.hpp>
 
 #include <swirly/util/String.hpp>
 
