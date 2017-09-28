@@ -19,7 +19,7 @@
 
 #include <swirly/clob/Test.hpp>
 
-#include <swirly/ws/Rest.hpp>
+#include <swirly/web/Rest.hpp>
 
 #include <swirly/fin/Journ.hpp>
 #include <swirly/fin/Model.hpp>

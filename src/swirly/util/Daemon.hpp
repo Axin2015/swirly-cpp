@@ -17,7 +17,7 @@
 #ifndef SWIRLY_UTIL_DAEMON_HPP
 #define SWIRLY_UTIL_DAEMON_HPP
 
-#include <swirly/Config.hpp>
+#include <swirly/Config.h>
 
 #include <sys/types.h>
 

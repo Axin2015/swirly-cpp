@@ -17,7 +17,7 @@
 #ifndef SWIRLY_UTIL_STREAM_HPP
 #define SWIRLY_UTIL_STREAM_HPP
 
-#include <swirly/Config.hpp>
+#include <swirly/Config.h>
 
 #include <experimental/string_view>
 

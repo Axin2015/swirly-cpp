@@ -13,6 +13,6 @@ Clob Library
 -----------
 ![Clob Depends](@ref ClobDepend.png)
 
-Ws Library
+Web Library
 -----------
-![Ws Depends](@ref WsDepend.png)
+![Web Depends](@ref WebDepend.png)

@@ -14,27 +14,27 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_WS_EXCEPTION_HPP
-#define SWIRLY_WS_EXCEPTION_HPP
+#ifndef SWIRLY_CONFIG_H
+#define SWIRLY_CONFIG_H
 
-#include <swirly/util/Exception.hpp>
+/**
+ * Macro for packed structures.
+ */
+#define SWIRLY_PACKED __attribute__((packed))
 
-namespace swirly {
+/**
+ * Macro for exporting weak symbols.
+ */
+#define SWIRLY_WEAK __attribute__((visibility("default"), weak))
 
-class SWIRLY_API ParseException : public Exception {
-  public:
-    explicit ParseException(std::string_view what) noexcept : Exception{what} {}
-    ~ParseException() noexcept override;
+/**
+ * Macro for exporting classes and functions that compose the public API.
+ */
+#define SWIRLY_API __attribute__((visibility("default")))
 
-    // Copy.
-    ParseException(const ParseException&) noexcept = default;
-    ParseException& operator=(const ParseException&) noexcept = default;
+/**
+ * Maximum number of price levels.
+ */
+#define SWIRLY_MAX_LEVELS ${SWIRLY_MAX_LEVELS}
 
-    // Move.
-    ParseException(ParseException&&) noexcept = default;
-    ParseException& operator=(ParseException&&) noexcept = default;
-};
-
-} // swirly
-
-#endif // SWIRLY_WS_EXCEPTION_HPP
+#endif // SWIRLY_CONFIG_H

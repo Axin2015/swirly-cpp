@@ -17,7 +17,7 @@
 #ifndef SWIRLY_UTIL_MEMCTX_HPP
 #define SWIRLY_UTIL_MEMCTX_HPP
 
-#include <swirly/Config.hpp>
+#include <swirly/Config.h>
 
 #include <cstddef>
 #include <memory>

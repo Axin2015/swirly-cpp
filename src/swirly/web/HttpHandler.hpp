@@ -14,12 +14,12 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_WS_HTTPHANDLER_HPP
-#define SWIRLY_WS_HTTPHANDLER_HPP
+#ifndef SWIRLY_WEB_HTTPHANDLER_HPP
+#define SWIRLY_WEB_HTTPHANDLER_HPP
 
-#include <swirly/ws/Exception.hpp>
+#include <swirly/web/Exception.hpp>
 
-#include <swirly/ws/http_parser.h>
+#include <swirly/web/http_parser.h>
 
 #include <experimental/string_view>
 
@@ -212,4 +212,4 @@ class BasicHttpHandler {
 
 } // swirly
 
-#endif // SWIRLY_WS_HTTPHANDLER_HPP
+#endif // SWIRLY_WEB_HTTPHANDLER_HPP

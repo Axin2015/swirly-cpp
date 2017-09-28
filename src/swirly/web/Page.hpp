@@ -14,27 +14,32 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_CONFIG_HPP
-#define SWIRLY_CONFIG_HPP
+#ifndef SWIRLY_WEB_PAGE_HPP
+#define SWIRLY_WEB_PAGE_HPP
 
-/**
- * Macro for packed structures.
- */
-#define SWIRLY_PACKED __attribute__((packed))
+#include <swirly/Config.h>
 
-/**
- * Macro for exporting weak symbols.
- */
-#define SWIRLY_WEAK __attribute__((visibility("default"), weak))
+#include <experimental/optional>
+#include <experimental/string_view>
 
-/**
- * Macro for exporting classes and functions that compose the public API.
- */
-#define SWIRLY_API __attribute__((visibility("default")))
+namespace std {
+template <typename T>
+using optional = experimental::optional<T>;
+using experimental::nullopt;
+using experimental::string_view;
+}
 
-/**
- * Maximum number of price levels.
- */
-#define SWIRLY_MAX_LEVELS ${SWIRLY_MAX_LEVELS}
+namespace swirly {
 
-#endif // SWIRLY_CONFIG_HPP
+struct Page {
+    std::size_t offset{0};
+    std::optional<std::size_t> limit;
+};
+
+// Parse Page arguments from URL Query String. Note that special characters and percent encodings
+// are not supported for simplicity.
+SWIRLY_API Page parseQuery(std::string_view query) noexcept;
+
+} // swirly
+
+#endif // SWIRLY_WEB_PAGE_HPP

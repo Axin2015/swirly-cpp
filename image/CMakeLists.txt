@@ -24,7 +24,7 @@ if(DOT_EXECUTABLE)
     Util
     Fin
     Clob
-    Ws
+    Web
   )
 
   foreach(name ${names})

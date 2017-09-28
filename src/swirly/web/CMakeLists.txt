@@ -22,7 +22,7 @@ if(RAGEL_EXECUTABLE)
     DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/RestBody.rl")
 endif(RAGEL_EXECUTABLE)
 
-set(ws_SOURCES
+set(web_SOURCES
   EntitySet.cpp
   Exception.cpp
   HttpHandler.cpp
@@ -32,29 +32,29 @@ set(ws_SOURCES
   Url.cpp
   http_parser.c)
 
-add_library(ws_static STATIC ${ws_SOURCES})
-set_target_properties(ws_static PROPERTIES OUTPUT_NAME swirly_ws)
-target_link_libraries(ws_static clob_static)
-install(TARGETS ws_static DESTINATION lib)
+add_library(web_static STATIC ${web_SOURCES})
+set_target_properties(web_static PROPERTIES OUTPUT_NAME swirly_web)
+target_link_libraries(web_static clob_static)
+install(TARGETS web_static DESTINATION lib)
 
 if(ENABLE_SHARED_LIBS)
-  add_library(ws_shared SHARED ${ws_SOURCES})
-  set_target_properties(ws_shared PROPERTIES OUTPUT_NAME swirly_ws)
-  target_link_libraries(ws_shared clob_shared)
-  install(TARGETS ws_shared DESTINATION lib)
+  add_library(web_shared SHARED ${web_SOURCES})
+  set_target_properties(web_shared PROPERTIES OUTPUT_NAME swirly_web)
+  target_link_libraries(web_shared clob_shared)
+  install(TARGETS web_shared DESTINATION lib)
 endif()
 
-set(ws_test_SOURCES
+set(web_test_SOURCES
   EntitySetTest.cxx
   HttpHandlerTest.cxx
   PageTest.cxx
   RestBodyTest.cxx
   UrlTest.cxx)
 
-foreach(file ${ws_test_SOURCES})
+foreach(file ${web_test_SOURCES})
   get_filename_component (name ${file} NAME_WE)
-  set(name "ws${name}")
+  set(name "web${name}")
   add_executable(${name} ${file})
-  target_link_libraries(${name} ${ws_LIBRARY} ${unit_LIBRARY})
+  target_link_libraries(${name} ${web_LIBRARY} ${unit_LIBRARY})
   add_test(NAME ${name} COMMAND ${name})
 endforeach()

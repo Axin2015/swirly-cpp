@@ -17,7 +17,7 @@
 #ifndef SWIRLY_UTIL_MEMALLOC_HPP
 #define SWIRLY_UTIL_MEMALLOC_HPP
 
-#include <swirly/Config.hpp>
+#include <swirly/Config.h>
 
 #include <new>
 

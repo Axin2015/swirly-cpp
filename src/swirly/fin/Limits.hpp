@@ -17,7 +17,7 @@
 #ifndef SWIRLY_FIN_LIMITS_HPP
 #define SWIRLY_FIN_LIMITS_HPP
 
-#include <swirly/Config.hpp>
+#include <swirly/Config.h>
 
 #include <cstddef> // size_t
 
