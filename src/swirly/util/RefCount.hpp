@@ -17,7 +17,7 @@
 #ifndef SWIRLY_UTIL_REFCOUNT_HPP
 #define SWIRLY_UTIL_REFCOUNT_HPP
 
-#include <swirly/util/Defs.hpp>
+#include <swirly/Config.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 
@@ -98,7 +98,11 @@ void intrusive_ptr_release(const RefCount<DerivedT, PolicyT>* ptr) noexcept
 template <typename ValueT, typename... ArgsT>
 boost::intrusive_ptr<ValueT> makeIntrusive(ArgsT&&... args)
 {
+#if __GNUC__ >= 7
+    return {new (std::align_val_t(alignof(ValueT))) ValueT{std::forward<ArgsT>(args)...}, false};
+#else
     return {new ValueT{std::forward<ArgsT>(args)...}, false};
+#endif
 }
 
 } // swirly

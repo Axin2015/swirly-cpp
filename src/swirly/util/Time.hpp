@@ -17,7 +17,7 @@
 #ifndef SWIRLY_UTIL_TIME_HPP
 #define SWIRLY_UTIL_TIME_HPP
 
-#include <swirly/util/Defs.hpp>
+#include <swirly/Config.hpp>
 
 #include <chrono>
 #include <iosfwd>

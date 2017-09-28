@@ -17,53 +17,29 @@
 #ifndef SWIRLY_UTIL_FILE_HPP
 #define SWIRLY_UTIL_FILE_HPP
 
-#include <swirly/util/Defs.hpp>
-
-#include <cassert>
-#include <cstddef> // nullptr_t
-#include <memory>
+#include <swirly/posix/File.hpp>
 
 namespace swirly {
 
 /**
- * Custom Handle type that satisfies the NullablePointer concept. This is intended to be used with
- * unique_ptr<>.
+ * Get file size.
  */
-class SWIRLY_API FileHandle {
-  public:
-    FileHandle(std::nullptr_t = nullptr) {}
-    FileHandle(int fd) : fd_{fd} { assert(fd >= -1); }
-    int get() const noexcept { return fd_; }
-    explicit operator bool() const noexcept { return fd_ != -1; }
-
-  private:
-    int fd_{-1};
-};
-
-inline bool operator==(FileHandle lhs, FileHandle rhs)
+inline std::size_t fileSize(int fd)
 {
-    return lhs.get() == rhs.get();
+    struct stat st;
+    posix::fstat(fd, st);
+    return st.st_size;
 }
 
-inline bool operator!=(FileHandle lhs, FileHandle rhs)
+/**
+ * Get current file mode.
+ */
+inline mode_t fileMode() noexcept
 {
-    return !(lhs == rhs);
+    mode_t mode{umask(0)};
+    umask(mode);
+    return mode;
 }
-
-struct SWIRLY_API FileDeleter {
-    using pointer = FileHandle;
-    void operator()(FileHandle h) noexcept;
-};
-
-using File = std::unique_ptr<FileHandle, FileDeleter>;
-
-SWIRLY_API File openFile(const char* path, int flags, mode_t mode);
-
-SWIRLY_API File openFile(const char* path, int flags);
-
-SWIRLY_API void resize(FileHandle h, std::size_t size);
-
-SWIRLY_API std::size_t size(FileHandle h);
 
 } // swirly
 

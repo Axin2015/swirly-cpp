@@ -26,7 +26,7 @@ Accnt::~Accnt() noexcept = default;
 
 Accnt::Accnt(Accnt&&) = default;
 
-PosnPtr Accnt::posn(Id64 marketId, Symbol instr, JDay settlDay) throw(bad_alloc)
+PosnPtr Accnt::posn(Id64 marketId, Symbol instr, JDay settlDay)
 {
     PosnSet::Iterator it;
     bool found;

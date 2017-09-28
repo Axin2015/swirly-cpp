@@ -17,7 +17,7 @@
 #ifndef SWIRLY_UTIL_MEMCTX_HPP
 #define SWIRLY_UTIL_MEMCTX_HPP
 
-#include <swirly/util/Defs.hpp>
+#include <swirly/Config.hpp>
 
 #include <cstddef>
 #include <memory>
@@ -49,6 +49,11 @@ class SWIRLY_API MemCtx {
     std::size_t maxSize() noexcept;
 
     void* alloc(std::size_t size);
+
+#if __GNUC__ >= 7
+    // Requested alignment must not be greater than the size of a cache-line.
+    void* alloc(std::size_t size, std::align_val_t al);
+#endif
 
     void dealloc(void* addr, std::size_t size) noexcept;
 

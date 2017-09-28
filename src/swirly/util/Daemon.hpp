@@ -14,44 +14,20 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_FIN_JOURN_HPP
-#define SWIRLY_FIN_JOURN_HPP
+#ifndef SWIRLY_UTIL_DAEMON_HPP
+#define SWIRLY_UTIL_DAEMON_HPP
 
 #include <swirly/Config.hpp>
 
-#include <memory>
+#include <sys/types.h>
 
 namespace swirly {
 
-class Conf;
-struct Msg;
-
-class SWIRLY_API Journ {
-  public:
-    Journ() noexcept = default;
-    virtual ~Journ() noexcept;
-
-    // Copy.
-    constexpr Journ(const Journ&) noexcept = default;
-    Journ& operator=(const Journ&) noexcept = default;
-
-    // Move.
-    constexpr Journ(Journ&&) noexcept = default;
-    Journ& operator=(Journ&&) noexcept = default;
-
-    void update(const Msg& msg) { doUpdate(msg); }
-
-  protected:
-    virtual void doUpdate(const Msg& msg) = 0;
-};
-
 /**
- * Make Journal. Forward declaration for Journal backend.
- *
- * @param conf Configuration.
+ * Daemonise process. Detach from controlling terminal and run in the background as a system daemon.
  */
-SWIRLY_API std::unique_ptr<Journ> makeJourn(const Conf& conf);
+SWIRLY_API void daemon();
 
 } // swirly
 
-#endif // SWIRLY_FIN_JOURN_HPP
+#endif // SWIRLY_UTIL_DAEMON_HPP

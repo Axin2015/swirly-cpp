@@ -25,10 +25,14 @@
 #include <swirly/fin/Model.hpp>
 
 #include <swirly/util/Conf.hpp>
+#include <swirly/util/Daemon.hpp>
 #include <swirly/util/Exception.hpp>
+#include <swirly/util/File.hpp>
 #include <swirly/util/Log.hpp>
 #include <swirly/util/MemCtx.hpp>
-#include <swirly/util/System.hpp>
+
+#include <swirly/posix/File.hpp>
+#include <swirly/posix/System.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
@@ -53,14 +57,9 @@ namespace {
 
 void openLogFile(const char* path)
 {
-    const int fd{open(path, O_RDWR | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR | S_IRGRP)};
-    if (fd < 0) {
-        throw system_error{errno, system_category(), "open failed"};
-    }
-
-    dup2(fd, STDOUT_FILENO);
-    dup2(fd, STDERR_FILENO);
-    close(fd);
+    const auto file = posix::open(path, O_RDWR | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR | S_IRGRP);
+    dup2(*file, STDOUT_FILENO);
+    dup2(*file, STDERR_FILENO);
 }
 
 class SigHandler {
@@ -191,6 +190,13 @@ void* alloc(size_t size)
     return memCtx.alloc(size);
 }
 
+#if __GNUC__ >= 7
+void* alloc(size_t size, align_val_t al)
+{
+    return memCtx.alloc(size, al);
+}
+#endif
+
 void dealloc(void* ptr, size_t size) noexcept
 {
     return memCtx.dealloc(ptr, size);
@@ -239,9 +245,7 @@ int main(int argc, char* argv[])
         if (!runDir.empty()) {
             // Change the current working directory if specified.
             runDir = fs::canonical(runDir, fs::current_path());
-            if (chdir(runDir.c_str()) < 0) {
-                throw system_error{errno, system_category(), "chdir failed"};
-            }
+            posix::chdir(runDir.c_str());
         } else if (opts.daemon) {
             // Default to root directory if daemon.
             runDir = fs::current_path().root_path();

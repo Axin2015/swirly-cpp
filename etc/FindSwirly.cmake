@@ -16,12 +16,12 @@
 # - Find Swirly
 # Find the native Swirly headers and libraries.
 #
-#  SWIRLY_INCLUDE_DIRS - Where to find swirly/util/Defs.hpp, etc.
+#  SWIRLY_INCLUDE_DIRS - Where to find swirly/Config.hpp, etc.
 #  SWIRLY_LIBRARIES    - List of Swirly libraries.
 #  SWIRLY_FOUND        - True if Swirly found.
 
 # Look for the header file.
-FIND_PATH(SWIRLY_INCLUDE_DIR NAMES swirly/util/Defs.hpp
+FIND_PATH(SWIRLY_INCLUDE_DIR NAMES swirly/Config.hpp
           HINTS "$ENV{SWIRLY_HOME}/include")
 
 # Look for the libraries.

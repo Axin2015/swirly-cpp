@@ -14,10 +14,15 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_UTIL_MEMMAP_HPP
-#define SWIRLY_UTIL_MEMMAP_HPP
+#ifndef SWIRLY_POSIX_MMAP_HPP
+#define SWIRLY_POSIX_MMAP_HPP
 
-#include <swirly/util/File.hpp>
+#include <swirly/posix/Util.hpp>
+
+#include <swirly/Config.hpp>
+
+#include <memory>
+#include <system_error>
 
 #include <sys/mman.h>
 
@@ -26,10 +31,10 @@ namespace swirly {
 /**
  * Memory-mapped addressed may be zero (in rare situations), but can never be MAP_FAILED.
  */
-class SWIRLY_API MemMapHandle {
+class SWIRLY_API MMapPointer {
   public:
-    MemMapHandle(std::nullptr_t = nullptr) noexcept {}
-    MemMapHandle(void* ptr, std::size_t size) noexcept : ptr_{ptr}, size_{size} {}
+    MMapPointer(std::nullptr_t = nullptr) noexcept {}
+    MMapPointer(void* ptr, std::size_t size) noexcept : ptr_{ptr}, size_{size} {}
     void* get() const noexcept { return ptr_; }
     void* data() const noexcept { return ptr_; }
     std::size_t size() const noexcept { return size_; }
@@ -40,26 +45,53 @@ class SWIRLY_API MemMapHandle {
     std::size_t size_{0};
 };
 
-inline bool operator==(MemMapHandle lhs, MemMapHandle rhs)
+inline bool operator==(MMapPointer lhs, MMapPointer rhs)
 {
     return lhs.get() == rhs.get() && lhs.size() == rhs.size();
 }
 
-inline bool operator!=(MemMapHandle lhs, MemMapHandle rhs)
+inline bool operator!=(MMapPointer lhs, MMapPointer rhs)
 {
     return !(lhs == rhs);
 }
 
-struct SWIRLY_API MemMapDeleter {
-    using pointer = MemMapHandle;
-    void operator()(MemMapHandle h) noexcept;
+struct SWIRLY_API MMapDeleter {
+    using pointer = MMapPointer;
+    void operator()(MMapPointer p) noexcept
+    {
+        if (p) {
+            munmap(p.get(), p.size());
+        }
+    }
 };
 
-using MemMap = std::unique_ptr<MemMapHandle, MemMapDeleter>;
+using MMap = std::unique_ptr<MMapPointer, MMapDeleter>;
 
-SWIRLY_API MemMap openMemMap(void* addr, std::size_t len, int prot, int flags, FileHandle fh,
-                             off_t off);
+namespace posix {
 
-} // swirly
+/**
+ * Map files or devices into memory.
+ */
+inline MMap mmap(void* addr, size_t len, int prot, int flags, int fd, off_t off,
+                 std::error_code& ec) noexcept
+{
+    const MMapPointer p{::mmap(addr, len, prot, flags, fd, off), len};
+    if (!p) {
+        ec = error(errno);
+    }
+    return MMap{p};
+}
 
-#endif // SWIRLY_UTIL_MEMMAP_HPP
+inline MMap mmap(void* addr, size_t len, int prot, int flags, int fd, off_t off)
+{
+    const MMapPointer p{::mmap(addr, len, prot, flags, fd, off), len};
+    if (!p) {
+        throw std::system_error{error(errno), "mmap"};
+    }
+    return MMap{p};
+}
+
+} // namespace posix
+} // namespace swirly
+
+#endif // SWIRLY_POSIX_MMAP_HPP

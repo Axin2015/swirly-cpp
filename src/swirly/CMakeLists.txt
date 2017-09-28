@@ -14,6 +14,7 @@
 # 02110-1301, USA.
 
 add_subdirectory(unit)
+add_subdirectory(posix)
 add_subdirectory(util)
 add_subdirectory(fin)
 add_subdirectory(clob)
@@ -21,6 +22,10 @@ add_subdirectory(ws)
 
 # FIXME: the following libraries should be modules.
 add_subdirectory(sqlite)
+
+configure_file(Config.hpp.in "${PROJECT_BINARY_DIR}/include/swirly/Config.hpp")
+install(FILES "${PROJECT_BINARY_DIR}/include/swirly/Config.hpp"
+              DESTINATION include/swirly)
 
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
                   DESTINATION include

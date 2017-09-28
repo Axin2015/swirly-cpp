@@ -21,7 +21,7 @@
 #ifndef http_parser_h
 #define http_parser_h
 
-#include <swirly/util/Defs.hpp>
+#include <swirly/Config.hpp>
 
 #ifdef __cplusplus
 extern "C" {
