@@ -17,7 +17,7 @@
 #ifndef SWIRLY_WS_PAGE_HPP
 #define SWIRLY_WS_PAGE_HPP
 
-#include <swirly/Config.hpp>
+#include <swirly/Config.h>
 
 #include <experimental/optional>
 #include <experimental/string_view>

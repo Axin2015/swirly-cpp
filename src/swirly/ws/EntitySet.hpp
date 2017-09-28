@@ -17,7 +17,7 @@
 #ifndef SWIRLY_WS_ENTITYSET_HPP
 #define SWIRLY_WS_ENTITYSET_HPP
 
-#include <swirly/Config.hpp>
+#include <swirly/Config.h>
 
 #include <experimental/string_view>
 

@@ -23,8 +23,8 @@ add_subdirectory(ws)
 # FIXME: the following libraries should be modules.
 add_subdirectory(sqlite)
 
-configure_file(Config.hpp.in "${PROJECT_BINARY_DIR}/include/swirly/Config.hpp")
-install(FILES "${PROJECT_BINARY_DIR}/include/swirly/Config.hpp"
+configure_file(Config.h.in "${PROJECT_BINARY_DIR}/include/swirly/Config.h")
+install(FILES "${PROJECT_BINARY_DIR}/include/swirly/Config.h"
               DESTINATION include/swirly)
 
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
