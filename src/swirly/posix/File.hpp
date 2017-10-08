@@ -17,8 +17,8 @@
 #ifndef SWIRLY_POSIX_FILE_HPP
 #define SWIRLY_POSIX_FILE_HPP
 
+#include <swirly/posix/Error.hpp>
 #include <swirly/posix/Handle.hpp>
-#include <swirly/posix/Util.hpp>
 
 #include <fcntl.h>
 #include <unistd.h>

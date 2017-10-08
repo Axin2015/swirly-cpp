@@ -14,11 +14,11 @@
 # 02110-1301, USA.
 
 set(posix_SOURCES
+  Error.cpp
   File.cpp
   Handle.cpp
   MMap.cpp
-  System.cpp
-  Util.cpp)
+  System.cpp)
 
 add_library(posix_static STATIC ${posix_SOURCES})
 set_target_properties(posix_static PROPERTIES OUTPUT_NAME swirly_posix)

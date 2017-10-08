@@ -14,20 +14,4 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_POSIX_UTIL_HPP
-#define SWIRLY_POSIX_UTIL_HPP
-
-#include <system_error>
-
-namespace swirly {
-namespace posix {
-
-inline std::error_code error(int err)
-{
-    return std::error_code{err, std::system_category()};
-}
-
-} // namespace posix
-} // namespace swirly
-
-#endif // SWIRLY_POSIX_UTIL_HPP
+#include "Error.hpp"
