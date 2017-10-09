@@ -18,6 +18,7 @@ set(posix_SOURCES
   File.cpp
   Handle.cpp
   MMap.cpp
+  Poll.cpp
   System.cpp)
 
 add_library(posix_static STATIC ${posix_SOURCES})
