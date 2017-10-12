@@ -14,10 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_POSIX_POLL_HPP
-#define SWIRLY_POSIX_POLL_HPP
+#ifndef SWIRLY_SYS_POLL_HPP
+#define SWIRLY_SYS_POLL_HPP
 
-#include <swirly/posix/Error.hpp>
+#include <swirly/sys/Error.hpp>
 
 #include <poll.h>
 
@@ -26,7 +26,7 @@
 #endif
 
 namespace swirly {
-namespace posix {
+namespace sys {
 
 inline int poll(pollfd* fds, nfds_t nfds, int timeout, std::error_code& ec) noexcept
 {
@@ -105,7 +105,7 @@ inline int epoll_wait(int epfd, epoll_event* events, int maxevents, int timeout)
 
 #endif
 
-} // namespace posix
+} // namespace sys
 } // namespace swirly
 
-#endif // SWIRLY_POSIX_POLL_HPP
+#endif // SWIRLY_SYS_POLL_HPP

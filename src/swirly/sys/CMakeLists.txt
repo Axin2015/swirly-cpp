@@ -13,7 +13,7 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-set(posix_SOURCES
+set(sys_SOURCES
   Error.cpp
   File.cpp
   Handle.cpp
@@ -21,25 +21,25 @@ set(posix_SOURCES
   Poll.cpp
   System.cpp)
 
-add_library(posix_static STATIC ${posix_SOURCES})
-set_target_properties(posix_static PROPERTIES OUTPUT_NAME swirly_posix)
-target_link_libraries(posix_static pthread)
-install(TARGETS posix_static DESTINATION lib)
+add_library(sys_static STATIC ${sys_SOURCES})
+set_target_properties(sys_static PROPERTIES OUTPUT_NAME swirly_sys)
+target_link_libraries(sys_static pthread)
+install(TARGETS sys_static DESTINATION lib)
 
 if(ENABLE_SHARED_LIBS)
-  add_library(posix_shared SHARED ${posix_SOURCES})
-  set_target_properties(posix_shared PROPERTIES OUTPUT_NAME swirly_posix)
-  target_link_libraries(posix_shared pthread)
-  install(TARGETS posix_shared DESTINATION lib)
+  add_library(sys_shared SHARED ${sys_SOURCES})
+  set_target_properties(sys_shared PROPERTIES OUTPUT_NAME swirly_sys)
+  target_link_libraries(sys_shared pthread)
+  install(TARGETS sys_shared DESTINATION lib)
 endif()
 
-set(posix_test_SOURCES
+set(sys_test_SOURCES
   HandleTest.cxx)
 
-foreach(file ${posix_test_SOURCES})
+foreach(file ${sys_test_SOURCES})
   get_filename_component (name ${file} NAME_WE)
-  set(name "posix${name}")
+  set(name "sys${name}")
   add_executable(${name} ${file})
-  target_link_libraries(${name} ${posix_LIBRARY} ${unit_LIBRARY})
+  target_link_libraries(${name} ${sys_LIBRARY} ${unit_LIBRARY})
   add_test(NAME ${name} COMMAND ${name})
 endforeach()

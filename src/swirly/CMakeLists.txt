@@ -14,7 +14,7 @@
 # 02110-1301, USA.
 
 add_subdirectory(unit)
-add_subdirectory(posix)
+add_subdirectory(sys)
 add_subdirectory(util)
 add_subdirectory(fin)
 add_subdirectory(clob)

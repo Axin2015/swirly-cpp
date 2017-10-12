@@ -14,11 +14,11 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_POSIX_FILE_HPP
-#define SWIRLY_POSIX_FILE_HPP
+#ifndef SWIRLY_SYS_FILE_HPP
+#define SWIRLY_SYS_FILE_HPP
 
-#include <swirly/posix/Error.hpp>
-#include <swirly/posix/Handle.hpp>
+#include <swirly/sys/Error.hpp>
+#include <swirly/sys/Handle.hpp>
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -36,7 +36,7 @@ struct FilePolicy {
 
 using File = Handle<FilePolicy>;
 
-namespace posix {
+namespace sys {
 
 /**
  * Open and possibly create a file.
@@ -130,7 +130,7 @@ inline void ftruncate(int fd, off_t length)
     }
 }
 
-} // namespace posix
+} // namespace sys
 } // namespace swirly
 
-#endif // SWIRLY_POSIX_FILE_HPP
+#endif // SWIRLY_SYS_FILE_HPP

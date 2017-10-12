@@ -18,8 +18,8 @@
 
 #include "MemPool.hpp"
 
-#include <swirly/posix/File.hpp>
-#include <swirly/posix/MMap.hpp>
+#include <swirly/sys/File.hpp>
+#include <swirly/sys/MMap.hpp>
 
 #include <fcntl.h>
 
@@ -30,8 +30,8 @@ namespace {
 
 File reserveFile(const char* path, size_t size)
 {
-    File file{posix::open(path, O_RDWR | O_CREAT, 0644)};
-    posix::ftruncate(file.get(), size);
+    File file{sys::open(path, O_RDWR | O_CREAT, 0644)};
+    sys::ftruncate(file.get(), size);
     return file;
 }
 
@@ -40,16 +40,16 @@ File reserveFile(const char* path, size_t size)
 struct MemCtx::Impl {
     explicit Impl(size_t maxSize)
         : maxSize{maxSize},
-          memMap{posix::mmap(nullptr, PageSize + maxSize, PROT_READ | PROT_WRITE,
-                             MAP_ANON | MAP_PRIVATE, -1, 0)},
+          memMap{sys::mmap(nullptr, PageSize + maxSize, PROT_READ | PROT_WRITE,
+                           MAP_ANON | MAP_PRIVATE, -1, 0)},
           pool(*static_cast<MemPool*>(memMap.get().data()))
     {
     }
     Impl(const char* path, size_t maxSize)
         : maxSize{maxSize},
           file{reserveFile(path, PageSize + maxSize)},
-          memMap{posix::mmap(nullptr, PageSize + maxSize, PROT_READ | PROT_WRITE, MAP_SHARED,
-                             file.get(), 0)},
+          memMap{sys::mmap(nullptr, PageSize + maxSize, PROT_READ | PROT_WRITE, MAP_SHARED,
+                           file.get(), 0)},
           pool(*static_cast<MemPool*>(memMap.get().data()))
     {
     }
