@@ -47,7 +47,7 @@ class InstrModel
     QVariant header_[instr::ColumnCount];
 };
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 #endif // SWIRLYUI_INSTRMODEL_HXX

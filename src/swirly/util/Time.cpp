@@ -27,7 +27,7 @@ constexpr size_t operator""_strlen(const char* data, size_t len) noexcept
 {
     return len;
 }
-} // anonymous
+} // namespace
 
 UnixClock::time_point UnixClock::now() noexcept
 {
@@ -62,4 +62,4 @@ ostream& operator<<(ostream& os, Time time)
     return os << msSinceEpoch(time);
 }
 
-} // swirly
+} // namespace swirly

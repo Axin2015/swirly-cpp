@@ -17,13 +17,13 @@
 #include <swirly/util/Log.hpp>
 
 namespace swirly {
-} // swirly
+} // namespace swirly
 
 using namespace std;
 using namespace swirly;
 
 namespace {
-} // anonymous
+} // namespace
 
 int main(int argc, char* argv[])
 {

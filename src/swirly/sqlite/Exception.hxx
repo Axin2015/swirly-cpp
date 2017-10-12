@@ -36,7 +36,7 @@ class Error : public Exception {
     Error& operator=(Error&&) noexcept = default;
 };
 
-} // sqlite
-} // swirly
+} // namespace sqlite
+} // namespace swirly
 
 #endif // SWIRLY_SQLITE_EXCEPTION_HXX

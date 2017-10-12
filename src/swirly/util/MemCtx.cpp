@@ -35,7 +35,7 @@ File reserveFile(const char* path, size_t size)
     return file;
 }
 
-} // anonymous
+} // namespace
 
 struct MemCtx::Impl {
     explicit Impl(size_t maxSize)
@@ -111,13 +111,9 @@ struct MemCtx::Impl {
     MemPool& pool;
 };
 
-MemCtx::MemCtx(size_t maxSize) : impl_{make_unique<Impl>(maxSize)}
-{
-}
+MemCtx::MemCtx(size_t maxSize) : impl_{make_unique<Impl>(maxSize)} {}
 
-MemCtx::MemCtx(const char* path, size_t maxSize) : impl_{make_unique<Impl>(path, maxSize)}
-{
-}
+MemCtx::MemCtx(const char* path, size_t maxSize) : impl_{make_unique<Impl>(path, maxSize)} {}
 
 MemCtx::MemCtx() = default;
 
@@ -154,4 +150,4 @@ void MemCtx::dealloc(void* addr, size_t size) noexcept
     impl_->dealloc(addr, size);
 }
 
-} // swirly
+} // namespace swirly

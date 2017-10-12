@@ -47,7 +47,7 @@ void testLogger(int level, string_view msg)
     lastMsg.assign(msg.data(), msg.size());
 }
 
-} // anonymous
+} // namespace
 
 SWIRLY_TEST_CASE(LogLabel)
 {

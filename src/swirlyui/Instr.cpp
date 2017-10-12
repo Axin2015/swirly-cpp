@@ -78,5 +78,5 @@ QDebug operator<<(QDebug debug, const Instr& instr)
     return debug;
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

@@ -56,4 +56,4 @@ void daemon()
     // Note that the standard output handles are unchanged.
 }
 
-} // swirly
+} // namespace swirly

@@ -48,7 +48,7 @@ constexpr auto UpdateExecSql = //
     "UPDATE exec_t SET archive = ?3" //
     " WHERE market_id = ?1 AND id = ?2"_sv;
 
-} // anonymous
+} // namespace
 
 Journ::Journ(const Conf& conf)
     : db_{openDb(conf.get("sqlite_journ", "swirly.db"), SQLITE_OPEN_READWRITE, conf)},
@@ -180,11 +180,11 @@ void Journ::onArchiveTrade(const ArchiveTradeBody& body)
     trans.commit();
 }
 
-} // sqlite
+} // namespace sqlite
 
 unique_ptr<Journ> makeJourn(const Conf& conf)
 {
     return make_unique<sqlite::Journ>(conf);
 }
 
-} // swirly
+} // namespace swirly

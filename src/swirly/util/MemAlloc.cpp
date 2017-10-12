@@ -43,4 +43,4 @@ void dealloc(void* ptr, size_t size) noexcept
     ::operator delete(ptr);
 }
 
-} // swirly
+} // namespace swirly

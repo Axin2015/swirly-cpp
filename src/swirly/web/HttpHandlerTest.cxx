@@ -103,7 +103,7 @@ class HttpHandler : public BasicHttpHandler<HttpHandler>, public BasicUrl<HttpHa
     string body_;
 };
 
-} // anonymous
+} // namespace
 
 SWIRLY_TEST_CASE(HttpInitialRequestLine)
 {

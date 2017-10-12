@@ -82,6 +82,6 @@ class SWIRLY_API EntitySet {
     int bs_;
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_WEB_ENTITYSET_HPP

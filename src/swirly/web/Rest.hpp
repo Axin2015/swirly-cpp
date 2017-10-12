@@ -112,6 +112,6 @@ class SWIRLY_API Rest {
     Serv serv_;
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_WEB_REST_HPP

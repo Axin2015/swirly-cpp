@@ -65,7 +65,7 @@ struct NumericTraits<unsigned long long> {
     static auto cast(const char* str) noexcept { return std::strtoull(str, nullptr, 0); }
 };
 
-} // detail
+} // namespace detail
 
 template <typename ValueT>
 inline ValueT numericCast(const char* str) noexcept
@@ -73,6 +73,6 @@ inline ValueT numericCast(const char* str) noexcept
     return detail::NumericTraits<ValueT>::cast(str);
 }
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_NUMERIC_HPP

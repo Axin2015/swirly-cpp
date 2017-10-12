@@ -32,7 +32,7 @@ inline auto makeDeleter(QObject* obj) noexcept
     return std::unique_ptr<QObject>{obj};
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 #endif // SWIRLYUI_UTILITY_HXX

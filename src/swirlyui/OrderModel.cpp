@@ -179,5 +179,5 @@ OrderKeys OrderModel::checked() const
     return keys;
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

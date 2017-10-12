@@ -23,7 +23,7 @@ using namespace swirly;
 
 namespace {
 constexpr string_view Name = "string_view"_sv;
-} // anonymous
+} // namespace
 
 SWIRLY_TEST_CASE(StringEmpty)
 {

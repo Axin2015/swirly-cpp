@@ -37,5 +37,5 @@ QDebug operator<<(QDebug debug, const Level& level)
     return debug;
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

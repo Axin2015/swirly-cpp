@@ -49,7 +49,7 @@ class OrderView : public QWidget {
     OrderModel& model_;
 };
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 #endif // SWIRLYUI_ORDERVIEW_HXX

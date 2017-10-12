@@ -56,7 +56,7 @@ class AsyncWindow {
     std::size_t index_{0};
 };
 
-} // detail
+} // namespace detail
 
 class SWIRLY_API AsyncJourn {
   public:
@@ -122,6 +122,6 @@ class SWIRLY_API AsyncJourn {
     std::thread thread_;
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_FIN_ASYNCJOURN_HPP

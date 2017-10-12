@@ -379,6 +379,6 @@ SWIRLY_API std::pair<std::string_view, std::string_view> splitPair(std::string_v
 
 SWIRLY_API std::pair<std::string, std::string> splitPair(const std::string& s, char delim);
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_STRING_HPP

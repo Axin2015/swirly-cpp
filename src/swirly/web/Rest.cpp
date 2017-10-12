@@ -76,8 +76,8 @@ void getPosn(const Accnt& accnt, ostream& out)
     out << ']';
 }
 
-} // anonymous
-} // detail
+} // namespace
+} // namespace detail
 
 Rest::~Rest() noexcept = default;
 
@@ -417,4 +417,4 @@ void Rest::deleteTrade(Symbol accntSymbol, Symbol instrSymbol, IsoDate settlDate
     serv_.archiveTrade(accnt, marketId, ids, now);
 }
 
-} // swirly
+} // namespace swirly

@@ -241,6 +241,6 @@ class RequestIdSet {
     Set set_;
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_FIN_REQUEST_HPP

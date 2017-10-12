@@ -36,7 +36,7 @@ enum class Column : int { //
 };
 constexpr int ColumnCount{unbox(Column::Type) + 1};
 
-} // asset
+} // namespace asset
 
 class Asset {
   public:
@@ -67,8 +67,8 @@ inline bool isModified(const Asset& prev, const Asset& next) noexcept
     return false;
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 Q_DECLARE_METATYPE(swirly::ui::Asset)
 

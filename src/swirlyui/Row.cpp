@@ -19,5 +19,5 @@
 namespace swirly {
 namespace ui {
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

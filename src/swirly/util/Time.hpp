@@ -185,6 +185,6 @@ inline timespec operator-(timespec lhs, timespec rhs) noexcept
     return ts;
 }
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_TIME_HPP

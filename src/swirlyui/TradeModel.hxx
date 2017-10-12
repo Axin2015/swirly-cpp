@@ -48,7 +48,7 @@ class TradeModel
     QVariant header_[exec::ColumnCount];
 };
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 #endif // SWIRLYUI_TRADEMODEL_HXX

@@ -47,7 +47,7 @@ class InstrView : public QWidget {
     QTableView* table_{nullptr};
 };
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 #endif // SWIRLYUI_INSTRVIEW_HXX

@@ -38,6 +38,6 @@ struct MarketIdTraits {
     static Id id(const ValueT& value) noexcept { return value.marketId(); }
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_FIN_MARKETID_HPP

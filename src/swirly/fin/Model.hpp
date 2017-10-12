@@ -83,6 +83,6 @@ class SWIRLY_API Model {
  */
 SWIRLY_API std::unique_ptr<Model> makeModel(const Conf& conf);
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_FIN_MODEL_HPP

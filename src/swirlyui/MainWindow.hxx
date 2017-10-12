@@ -60,7 +60,7 @@ class MainWindow : public QMainWindow {
     MarketView* marketView_{nullptr};
 };
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 #endif // SWIRLYUI_MAINWINDOW_HXX

@@ -38,7 +38,7 @@ class Foo : public RefCount<Foo, ThreadUnsafePolicy>, public Request {
 
 using FooPtr = boost::intrusive_ptr<Foo>;
 
-} // anonymous
+} // namespace
 
 SWIRLY_TEST_CASE(RequestIdSet)
 {

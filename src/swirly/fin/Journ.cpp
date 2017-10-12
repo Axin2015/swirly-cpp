@@ -22,4 +22,4 @@ namespace swirly {
 
 Journ::~Journ() noexcept = default;
 
-} // swirly
+} // namespace swirly

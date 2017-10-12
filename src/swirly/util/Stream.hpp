@@ -137,6 +137,6 @@ class SWIRLY_API OStreamJoiner {
     bool first_{true};
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_STREAM_HPP

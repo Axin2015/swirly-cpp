@@ -58,6 +58,6 @@ class SWIRLY_API Exception : public std::exception {
  */
 SWIRLY_API ErrMsg& errMsg() noexcept;
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_EXCEPTION_HPP

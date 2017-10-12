@@ -122,7 +122,7 @@ SWIRLY_API void sysLogger(int level, std::string_view msg) noexcept;
  */
 SWIRLY_API LogMsg& logMsg() noexcept;
 
-} // swirly
+} // namespace swirly
 
 // N.B. varargs help ensure that expressions such as the following work correctly:
 // SWIRLY_LOG(LogInfo, logMsg() << "test: " << Foo<int, int>{10, 20});

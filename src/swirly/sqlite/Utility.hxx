@@ -141,7 +141,7 @@ struct DbTraits<std::string_view> {
     }
 };
 
-} // detail
+} // namespace detail
 
 using DbPtr = std::unique_ptr<sqlite3, int (*)(sqlite3*)>;
 using StmtPtr = std::unique_ptr<sqlite3_stmt, int (*)(sqlite3_stmt*)>;
@@ -235,7 +235,7 @@ class ScopedStep {
     sqlite3_stmt& stmt_;
 };
 
-} // sqlite
-} // swirly
+} // namespace sqlite
+} // namespace swirly
 
 #endif // SWIRLY_SQLITE_UTILITY_HXX

@@ -106,6 +106,6 @@ class HttpSess : public RefCount<HttpSess, ThreadUnsafePolicy>, public BasicHttp
 
 using HttpSessPtr = boost::intrusive_ptr<HttpSess>;
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLYD_HTTPSESS_HPP

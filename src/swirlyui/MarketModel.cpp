@@ -164,5 +164,5 @@ int MarketModel::indexOf(Id64 id) const
     return i;
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

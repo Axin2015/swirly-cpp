@@ -45,7 +45,7 @@ void trace(void* unused, const char* sql)
     SWIRLY_INFO(sql);
 }
 
-} // anonymous
+} // namespace
 
 namespace detail {
 
@@ -73,7 +73,7 @@ void bindsv(sqlite3_stmt& stmt, int col, string_view val)
     }
 }
 
-} // detail
+} // namespace detail
 
 DbPtr openDb(const char* path, int flags, const Conf& conf)
 {
@@ -141,5 +141,5 @@ void bind(sqlite3_stmt& stmt, int col, nullptr_t)
     }
 }
 
-} // sqlite
-} // swirly
+} // namespace sqlite
+} // namespace swirly

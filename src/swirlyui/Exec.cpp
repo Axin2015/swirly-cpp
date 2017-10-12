@@ -102,5 +102,5 @@ QDebug operator<<(QDebug debug, const Exec& exec)
     return debug;
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

@@ -89,6 +89,6 @@ class RingBuffer {
     std::unique_ptr<ValueT[]> buf_;
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_RINGBUFFER_HPP

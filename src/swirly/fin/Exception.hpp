@@ -353,6 +353,6 @@ class SWIRLY_API UnauthorizedException : public ServException {
     const char* httpReason() const noexcept override;
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_FIN_EXCEPTION_HPP

@@ -47,7 +47,7 @@ class PosnView : public QWidget {
     PosnModel& model_;
 };
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 #endif // SWIRLYUI_POSNVIEW_HXX

@@ -53,7 +53,7 @@ int bit(string_view sv)
     return i;
 }
 
-} // anonymous
+} // namespace
 
 EntitySet::~EntitySet() noexcept = default;
 
@@ -68,4 +68,4 @@ EntitySet EntitySet::parse(string_view sv)
     return {bs};
 }
 
-} // swirly
+} // namespace swirly

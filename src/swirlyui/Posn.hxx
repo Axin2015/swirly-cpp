@@ -36,7 +36,7 @@ enum class Column : int { //
 };
 constexpr int ColumnCount{unbox(Column::SellAvgPrice) + 1};
 
-} // posn
+} // namespace posn
 
 class Posn {
   public:
@@ -87,8 +87,8 @@ inline bool isModified(const Posn& prev, const Posn& next) noexcept
         || prev.sellCost() != next.sellCost();
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 Q_DECLARE_METATYPE(swirly::ui::Posn)
 

@@ -77,10 +77,7 @@ class SWIRLY_API Market : public RefCount<Market, ThreadUnsafePolicy>, public Co
     /**
      * Throws std::bad_alloc.
      */
-    void insertOrder(const OrderPtr& order)
-    {
-        side(order->side()).insertOrder(order);
-    }
+    void insertOrder(const OrderPtr& order) { side(order->side()).insertOrder(order); }
     void removeOrder(const Order& order) noexcept { side(order.side()).removeOrder(order); }
     /**
      * Throws std::bad_alloc.
@@ -135,6 +132,6 @@ inline std::ostream& operator<<(std::ostream& os, const Market& market)
 
 using MarketSet = IdSet<Market>;
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_FIN_MARKET_HPP

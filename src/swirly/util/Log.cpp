@@ -50,7 +50,7 @@ inline Logger acquireLogger() noexcept
     return logger_.load(memory_order_acquire);
 }
 
-} // anonymous
+} // namespace
 
 const char* logLabel(int level) noexcept
 {
@@ -82,9 +82,7 @@ void writeLog(int level, string_view msg) noexcept
     acquireLogger()(level, msg);
 }
 
-void nullLogger(int level, string_view msg) noexcept
-{
-}
+void nullLogger(int level, string_view msg) noexcept {}
 
 void stdLogger(int level, string_view msg) noexcept
 {
@@ -151,4 +149,4 @@ LogMsg& logMsg() noexcept
     return logMsg_;
 }
 
-} // swirly
+} // namespace swirly

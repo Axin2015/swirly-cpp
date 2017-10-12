@@ -33,7 +33,7 @@ void producer(IntPipe& p)
     p.close();
 }
 
-} // anonymous
+} // namespace
 
 SWIRLY_TEST_CASE(Pipe)
 {

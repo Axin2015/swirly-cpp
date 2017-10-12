@@ -37,7 +37,7 @@ namespace {
 
 enum : int { GetRefData = 1, GetAccnt, PostMarket, PostOrder, PutOrder };
 
-} // anonymous
+} // namespace
 
 HttpClient::HttpClient(QObject* parent) : Client{parent}
 {
@@ -378,5 +378,5 @@ void HttpClient::onOrderReply(QNetworkReply& reply)
     }
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

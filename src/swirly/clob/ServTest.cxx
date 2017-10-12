@@ -52,7 +52,7 @@ struct ServFixture {
     Serv serv;
 };
 
-} // anonymous
+} // namespace
 
 SWIRLY_FIXTURE_TEST_CASE(ServAssets, ServFixture)
 {

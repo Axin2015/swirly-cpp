@@ -72,6 +72,6 @@ class RestServ {
     Profile profile_;
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLYD_RESTSERV_HPP

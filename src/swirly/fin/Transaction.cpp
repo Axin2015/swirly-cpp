@@ -41,4 +41,4 @@ Transaction::~Transaction() noexcept
     }
 }
 
-} // swirly
+} // namespace swirly

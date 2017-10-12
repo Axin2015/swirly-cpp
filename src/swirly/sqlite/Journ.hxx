@@ -72,7 +72,7 @@ class Journ : public Transactional, public swirly::Journ, BasicMsgHandler<Journ>
     StmtPtr updateExecStmt_;
 };
 
-} // sqlite
-} // swirly
+} // namespace sqlite
+} // namespace swirly
 
 #endif // SWIRLY_SQLITE_JOURN_HXX

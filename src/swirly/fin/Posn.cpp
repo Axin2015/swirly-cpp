@@ -100,4 +100,4 @@ PosnSet::Iterator PosnSet::insertOrReplace(const ValuePtr& value) noexcept
     return it;
 }
 
-} // swirly
+} // namespace swirly

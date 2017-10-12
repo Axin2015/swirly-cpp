@@ -42,7 +42,7 @@ enum class Column : int { //
 };
 constexpr int ColumnCount{unbox(Column::OfferCount) + 1};
 
-} // market
+} // namespace market
 
 class Market {
   public:
@@ -96,8 +96,8 @@ inline bool isModified(const Market& prev, const Market& next) noexcept
     return true;
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 Q_DECLARE_METATYPE(swirly::ui::Market)
 

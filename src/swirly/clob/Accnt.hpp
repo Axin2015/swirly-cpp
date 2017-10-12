@@ -150,6 +150,6 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
 
 using AccntSet = SymbolSet<Accnt>;
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_CLOB_ACCNT_HPP

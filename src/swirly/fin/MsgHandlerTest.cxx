@@ -38,7 +38,7 @@ struct MsgHandler : BasicMsgHandler<MsgHandler> {
     void onArchiveTrade(const ArchiveTradeBody& body) { ++archiveTradeCalls; }
 };
 
-} // anonymous
+} // namespace
 
 SWIRLY_TEST_CASE(BasicMsgHandler)
 {

@@ -21,7 +21,7 @@ using namespace std;
 namespace swirly {
 namespace {
 thread_local ErrMsg errMsg_;
-} // anonymous
+} // namespace
 
 Exception::Exception(string_view what) noexcept
 {
@@ -45,4 +45,4 @@ ErrMsg& errMsg() noexcept
     return errMsg_;
 }
 
-} // swirly
+} // namespace swirly

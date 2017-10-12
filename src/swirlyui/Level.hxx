@@ -46,8 +46,8 @@ class Level {
 
 QDebug operator<<(QDebug debug, const Level& level);
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 Q_DECLARE_METATYPE(swirly::ui::Level)
 

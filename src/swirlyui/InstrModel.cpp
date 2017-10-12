@@ -148,5 +148,5 @@ int InstrModel::indexOf(const QString& symbol) const
     return i;
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

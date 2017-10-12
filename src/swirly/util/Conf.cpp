@@ -42,4 +42,4 @@ void Conf::read(istream& is)
     });
 }
 
-} // swirly
+} // namespace swirly

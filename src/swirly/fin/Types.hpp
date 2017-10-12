@@ -72,6 +72,6 @@ using ConstPosnPtr = boost::intrusive_ptr<const Posn>;
 
 enum class More : int { No, Yes };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_FIN_TYPES_HPP

@@ -123,7 +123,7 @@ class TableModel : public QAbstractTableModel {
     boost::container::flat_map<KeyT, Row<ValueT>> rows_;
 };
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 #endif // SWIRLYUI_TABLEMODEL_HXX

@@ -71,6 +71,6 @@ inline std::ostream& operator<<(std::ostream& os, const Response& resp)
     return os;
 }
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_CLOB_RESPONSE_HPP

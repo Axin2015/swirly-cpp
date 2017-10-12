@@ -41,6 +41,6 @@ inline mode_t fileMode() noexcept
     return mode;
 }
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_FILE_HPP

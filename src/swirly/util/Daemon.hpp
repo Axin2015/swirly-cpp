@@ -28,6 +28,6 @@ namespace swirly {
  */
 SWIRLY_API void daemon();
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_DAEMON_HPP

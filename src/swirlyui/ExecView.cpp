@@ -77,5 +77,5 @@ void ExecView::slotClicked(const QModelIndex& index)
     emit setFields(exec.instr().symbol(), exec.settlDate(), lots, ticks);
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

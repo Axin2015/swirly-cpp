@@ -41,7 +41,7 @@ ValueT stou(string_view sv) noexcept
     return u;
 }
 
-} // anonymous
+} // namespace
 
 uint16_t stou16(string_view sv) noexcept
 {
@@ -171,4 +171,4 @@ pair<string, string> splitPair(const string& s, char delim)
     return {key, val};
 }
 
-} // swirly
+} // namespace swirly

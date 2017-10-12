@@ -38,4 +38,4 @@ Match::Match(const Match&) = default;
 
 Match::Match(Match&&) = default;
 
-} // swirly
+} // namespace swirly

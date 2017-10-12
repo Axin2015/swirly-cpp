@@ -75,6 +75,6 @@ class HttpResponse : public std::ostream {
     std::size_t lengthAt_{0};
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLYD_HTTPRESPONSE_HPP

@@ -60,6 +60,6 @@ struct BasicMsgHandler {
     ~BasicMsgHandler() noexcept = default;
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_FIN_MSGHANDLER_HPP

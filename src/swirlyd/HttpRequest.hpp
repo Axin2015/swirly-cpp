@@ -100,6 +100,6 @@ class HttpRequest : public BasicUrl<HttpRequest> {
     bool partial_{false};
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLYD_HTTPREQUEST_HPP

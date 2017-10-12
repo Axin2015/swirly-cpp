@@ -251,6 +251,6 @@ void setCString(char (&lhs)[SizeN], Symbol rhs) noexcept
     }
 }
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_SYMBOL_HPP

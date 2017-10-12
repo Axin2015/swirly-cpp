@@ -69,5 +69,5 @@ void PosnView::slotClicked(const QModelIndex& index)
     emit setFields(posn.instr().symbol(), posn.settlDate(), lots, ticks);
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

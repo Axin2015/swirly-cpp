@@ -97,6 +97,6 @@ class Pipe {
     RingBuffer<ValueT> buf_;
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_PIPE_HPP

@@ -122,5 +122,5 @@ void MarketView::slotClicked(const QModelIndex& index)
     }
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

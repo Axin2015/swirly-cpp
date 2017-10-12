@@ -89,7 +89,7 @@ string_view getTrader(const HttpRequest& req)
     return accnt;
 }
 
-} // anonymous
+} // namespace
 
 RestServ::~RestServ() noexcept = default;
 
@@ -806,4 +806,4 @@ void RestServ::posnRequest(const HttpRequest& req, Time now, HttpResponse& resp)
     }
 }
 
-} // swirly
+} // namespace swirly

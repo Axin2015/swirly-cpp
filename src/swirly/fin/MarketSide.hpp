@@ -120,6 +120,6 @@ class SWIRLY_API MarketSide {
     OrderList orders_;
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_FIN_MARKETSIDE_HPP

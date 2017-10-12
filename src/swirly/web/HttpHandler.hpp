@@ -210,6 +210,6 @@ class BasicHttpHandler {
     enum { None = 0, Field, Value } lastHeaderElem_;
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_WEB_HTTPHANDLER_HPP

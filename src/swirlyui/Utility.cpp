@@ -21,5 +21,5 @@ using namespace std;
 namespace swirly {
 namespace ui {
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

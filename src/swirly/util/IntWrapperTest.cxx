@@ -35,7 +35,7 @@ constexpr Test operator""_test(unsigned long long val) noexcept
     return Test{val};
 }
 
-} // swirly
+} // namespace
 
 SWIRLY_TEST_CASE(IntAddAssign)
 {

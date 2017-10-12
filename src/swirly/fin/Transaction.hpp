@@ -130,6 +130,6 @@ class SWIRLY_API Transaction {
     bool done_{false};
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_FIN_TRANSACTIONAL_HPP

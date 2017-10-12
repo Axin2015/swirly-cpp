@@ -27,7 +27,7 @@ template <typename T>
 using optional = experimental::optional<T>;
 using experimental::nullopt;
 using experimental::string_view;
-}
+} // namespace std
 
 namespace swirly {
 
@@ -40,6 +40,6 @@ struct Page {
 // are not supported for simplicity.
 SWIRLY_API Page parseQuery(std::string_view query) noexcept;
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_WEB_PAGE_HPP

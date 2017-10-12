@@ -33,7 +33,7 @@ struct Bar {
     char data[5 << 6];
 };
 
-} // anonymous
+} // namespace
 
 SWIRLY_TEST_CASE(MemCtx)
 {

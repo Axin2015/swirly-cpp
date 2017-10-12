@@ -47,7 +47,7 @@ class ExecView : public QWidget {
     ExecModel& model_;
 };
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 #endif // SWIRLYUI_EXECVIEW_HXX

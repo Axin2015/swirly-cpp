@@ -46,7 +46,7 @@ enum class Column : int { //
 };
 constexpr int ColumnCount{unbox(Column::MaxLots) + 1};
 
-} // instr
+} // namespace instr
 
 // Cheap copies.
 class Instr {
@@ -166,8 +166,8 @@ inline QString ticksToAvgPriceString(Lots lots, Cost cost, const Instr& instr)
     return QString::number(price, 'f', instr.priceDp() + 1);
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 Q_DECLARE_METATYPE(swirly::ui::Instr)
 

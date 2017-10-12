@@ -20,4 +20,4 @@ namespace swirly {
 
 ParseException::~ParseException() noexcept = default;
 
-} // swirly
+} // namespace swirly

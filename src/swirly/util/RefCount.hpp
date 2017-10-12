@@ -105,6 +105,6 @@ boost::intrusive_ptr<ValueT> makeIntrusive(ArgsT&&... args)
 #endif
 }
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_REFCOUNT_HPP

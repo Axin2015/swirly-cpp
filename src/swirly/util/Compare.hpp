@@ -81,6 +81,6 @@ constexpr int compare(ValueT lhs, ValueT rhs) noexcept
     return i;
 }
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_COMPARE_HPP

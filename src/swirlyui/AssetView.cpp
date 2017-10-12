@@ -68,5 +68,5 @@ void AssetView::slotClicked(const QModelIndex& index)
     }
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

@@ -56,7 +56,7 @@ class MarketView : public QWidget {
     MarketForm* marketForm_{nullptr};
 };
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 #endif // SWIRLYUI_MARKETVIEW_HXX

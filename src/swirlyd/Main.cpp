@@ -181,7 +181,7 @@ void getOpts(int argc, char* argv[], Opts& opts)
 
 MemCtx memCtx;
 
-} // anonymous
+} // namespace
 
 namespace swirly {
 
@@ -202,7 +202,7 @@ void dealloc(void* ptr, size_t size) noexcept
     return memCtx.dealloc(ptr, size);
 }
 
-} // swirly
+} // namespace swirly
 
 int main(int argc, char* argv[])
 {

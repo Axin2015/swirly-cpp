@@ -62,4 +62,4 @@ JDay BusinessDay::operator()(Time time) const
     return jd;
 }
 
-} // swirly
+} // namespace swirly

@@ -20,4 +20,4 @@ namespace swirly {
 
 static_assert(Symbol{}.empty(), "default constructor must be constexpr");
 static_assert(Symbol{Symbol{}}.empty(), "copy constructor must be constexpr");
-}
+} // namespace swirly

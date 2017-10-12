@@ -22,4 +22,4 @@ Request::Request(Request&&) = default;
 
 Request::~Request() noexcept = default;
 
-} // swirly
+} // namespace swirly

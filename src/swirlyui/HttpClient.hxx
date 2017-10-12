@@ -66,7 +66,7 @@ class HttpClient : public Client {
     int pending_{0};
 };
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 #endif // SWIRLYUI_HTTPCLIENT_HXX

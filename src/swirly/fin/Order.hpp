@@ -321,6 +321,6 @@ inline std::ostream& operator<<(std::ostream& os, const Order& order)
     return os;
 }
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_FIN_ORDER_HPP

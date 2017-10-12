@@ -149,4 +149,4 @@ OrderList::ValuePtr OrderList::remove(const Order& ref) noexcept
     return value;
 }
 
-} // swirly
+} // namespace swirly

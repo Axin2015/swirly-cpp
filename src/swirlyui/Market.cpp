@@ -33,7 +33,7 @@ void toLevels(const QJsonArray& ticks, const QJsonArray& resd, const QJsonArray&
     }
 }
 
-} // anonymous
+} // namespace
 
 Market Market::fromJson(const Instr& instr, const QJsonObject& obj)
 {
@@ -72,5 +72,5 @@ QDebug operator<<(QDebug debug, const Market& market)
     return debug;
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

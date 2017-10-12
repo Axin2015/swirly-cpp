@@ -47,7 +47,7 @@ string getVar(const string& name)
     return val;
 }
 
-} // anonymous
+} // namespace
 
 SWIRLY_TEST_CASE(VarSubBasic)
 {

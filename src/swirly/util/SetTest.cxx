@@ -63,7 +63,7 @@ class Bar : public RefCount<Bar, ThreadUnsafePolicy> {
     int& alive_;
 };
 
-} // anonymous
+} // namespace
 
 SWIRLY_TEST_CASE(SymbolSet)
 {

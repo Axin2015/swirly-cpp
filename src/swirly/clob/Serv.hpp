@@ -127,6 +127,6 @@ class SWIRLY_API Serv {
     std::unique_ptr<Impl> impl_;
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_CLOB_SERV_HPP
