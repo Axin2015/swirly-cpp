@@ -18,6 +18,7 @@ set(sys_SOURCES
   File.cpp
   Handle.cpp
   MMap.cpp
+  Muxer.cpp
   Poll.cpp
   System.cpp)
 
