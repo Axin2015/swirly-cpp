@@ -40,6 +40,6 @@ std::ostream& operator<<(std::ostream& os, EnumT val)
     return os << unbox(val);
 }
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_ENUM_HPP

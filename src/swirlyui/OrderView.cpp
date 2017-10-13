@@ -74,5 +74,5 @@ void OrderView::slotClicked(const QModelIndex& index)
     emit setFields(order.instr().symbol(), order.settlDate(), lots, ticks);
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

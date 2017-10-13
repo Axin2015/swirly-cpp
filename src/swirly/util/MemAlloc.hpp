@@ -40,6 +40,6 @@ struct MemAlloc {
     ~MemAlloc() noexcept = default;
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_MEMALLOC_HPP

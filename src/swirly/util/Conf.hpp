@@ -95,6 +95,6 @@ class SWIRLY_API Conf {
     boost::container::flat_map<std::string, std::string> map_;
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_CONF_HPP

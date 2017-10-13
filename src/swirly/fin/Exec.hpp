@@ -140,6 +140,6 @@ inline std::ostream& operator<<(std::ostream& os, const Exec& exec)
 
 using ExecIdSet = RequestIdSet<Exec>;
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_FIN_EXEC_HPP

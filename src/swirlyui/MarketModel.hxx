@@ -47,7 +47,7 @@ class MarketModel
     QVariant header_[market::ColumnCount];
 };
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 #endif // SWIRLYUI_MARKETMODEL_HXX

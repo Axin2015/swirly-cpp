@@ -35,7 +35,7 @@ namespace std {
 template <typename T>
 using optional = experimental::optional<T>;
 using experimental::nullopt;
-}
+} // namespace std
 
 // This is acceptable in private header that is only visible to and under the instrol of the Swirly
 // build.
@@ -68,10 +68,11 @@ struct TypeTraits<unsigned> {
 };
 
 template <typename ValueT>
-struct TypeTraits<ValueT, typename std::enable_if_t< //
-                              isIntWrapper<ValueT> //
-                              && (sizeof(typename ValueT::ValueType) <= 4) //
-                              >> {
+struct TypeTraits<ValueT,
+                  typename std::enable_if_t< //
+                      isIntWrapper<ValueT> //
+                      && (sizeof(typename ValueT::ValueType) <= 4) //
+                      >> {
     static ValueT fromJson(const QJsonValue& value) { return ValueT{value.toInt()}; }
     static ValueT fromVariant(const QVariant& value) { return ValueT{value.toInt()}; }
     static QJsonValue toJson(ValueT value) { return static_cast<int>(value.count()); }
@@ -79,10 +80,11 @@ struct TypeTraits<ValueT, typename std::enable_if_t< //
 };
 
 template <typename ValueT>
-struct TypeTraits<ValueT, typename std::enable_if_t< //
-                              isIntWrapper<ValueT> //
-                              && (sizeof(typename ValueT::ValueType) > 4) //
-                              >> {
+struct TypeTraits<ValueT,
+                  typename std::enable_if_t< //
+                      isIntWrapper<ValueT> //
+                      && (sizeof(typename ValueT::ValueType) > 4) //
+                      >> {
     static ValueT fromJson(const QJsonValue& value) { return ValueT{value.toDouble()}; }
     static ValueT fromVariant(const QVariant& value) { return ValueT{value.toLongLong()}; }
     static QJsonValue toJson(ValueT value) { return static_cast<qint64>(value.count()); }
@@ -234,7 +236,7 @@ using ExecKeys = std::vector<ExecKey>;
 using OrderKey = std::pair<Id64, Id64>;
 using OrderKeys = std::vector<OrderKey>;
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 #endif // SWIRLYUI_TYPES_HXX

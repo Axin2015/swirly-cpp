@@ -25,6 +25,6 @@ namespace swirly {
 
 SWIRLY_API int hexDigits(int64_t i) noexcept;
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_UTILITY_HPP

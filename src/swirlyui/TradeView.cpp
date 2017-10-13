@@ -69,5 +69,5 @@ void TradeView::slotClicked(const QModelIndex& index)
     emit setFields(trade.instr().symbol(), trade.settlDate(), lots, ticks);
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

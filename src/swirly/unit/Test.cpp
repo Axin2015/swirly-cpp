@@ -60,7 +60,7 @@ bool runTestCase(const string& name, void (*fn)(void))
     }
     return pass;
 }
-} // anonymous
+} // namespace
 
 TestException::TestException(const char* file, int line, const char* msg) noexcept
 {
@@ -127,5 +127,5 @@ int run(int argc, char* argv[])
     return ret;
 }
 
-} // test
-} // swirly
+} // namespace test
+} // namespace swirly

@@ -21,5 +21,5 @@ namespace sqlite {
 
 Error::~Error() noexcept = default;
 
-} // sqlite
-} // swirly
+} // namespace sqlite
+} // namespace swirly

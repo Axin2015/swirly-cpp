@@ -54,7 +54,7 @@ inline auto& constCast(const ValueT& ref)
     return const_cast<ValueT&>(ref);
 }
 
-} // anonymous
+} // namespace
 
 struct Serv::Impl {
 
@@ -847,4 +847,4 @@ void Serv::settlEndOfDay(Time now)
     impl_->settlEndOfDay(now);
 }
 
-} // swirly
+} // namespace swirly

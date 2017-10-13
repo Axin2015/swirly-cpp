@@ -42,7 +42,7 @@ void toJsonLevels(LevelSet::ConstIterator it, LevelSet::ConstIterator end, ostre
         }
     }
 }
-} // anonymous
+} // namespace
 
 Market::~Market() noexcept = default;
 
@@ -91,4 +91,4 @@ void Market::toJson(ostream& os) const
     os << "]}";
 }
 
-} // swirly
+} // namespace swirly

@@ -81,8 +81,8 @@ inline bool isSame(double lhs, double rhs, double delta = Epsilon) noexcept
     return std::abs(lhs - rhs) <= delta;
 }
 
-} // test
-} // swirly
+} // namespace test
+} // namespace swirly
 
 #define SWIRLY_FAIL_(file, line, what) throw swirly::test::TestException(file, line, what)
 

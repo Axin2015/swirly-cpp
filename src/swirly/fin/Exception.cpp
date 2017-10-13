@@ -134,4 +134,4 @@ const char* UnauthorizedException::httpReason() const noexcept
     return "Unauthorized";
 }
 
-} // swirly
+} // namespace swirly

@@ -21,6 +21,6 @@
 #include <swirly/util/Date.hpp>
 
 namespace swirly {
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_TYPES_HPP

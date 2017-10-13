@@ -89,4 +89,4 @@ void HttpResponse::setContentLength() noexcept
     }
 }
 
-} // swirly
+} // namespace swirly

@@ -42,6 +42,6 @@ struct Match {
     const ExecPtr takerTrade;
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_CLOB_MATCH_HXX

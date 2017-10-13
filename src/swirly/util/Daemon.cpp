@@ -16,8 +16,8 @@
  */
 #include "Daemon.hpp"
 
-#include <swirly/posix/File.hpp>
-#include <swirly/posix/System.hpp>
+#include <swirly/sys/File.hpp>
+#include <swirly/sys/System.hpp>
 
 using namespace std;
 
@@ -25,7 +25,7 @@ namespace swirly {
 
 void daemon()
 {
-    pid_t pid{posix::fork()};
+    pid_t pid{sys::fork()};
     if (pid != 0) {
         // Exit parent process using system version of exit() to avoid flushing standard streams.
         // FIXME: use quick_exit() when available on OSX.
@@ -33,11 +33,11 @@ void daemon()
     }
 
     // Detach from controlling terminal by making process a session leader.
-    posix::setsid();
+    sys::setsid();
 
     // Forking again ensures that the daemon process is not a session leader, and therefore cannot
     // regain access to a controlling terminal.
-    pid = posix::fork();
+    pid = sys::fork();
     if (pid != 0) {
         // FIXME: use quick_exit() when available on OSX.
         _exit(0);
@@ -45,7 +45,7 @@ void daemon()
 
     // Re-open standard input.
     close(STDIN_FILENO);
-    posix::open("/dev/null", O_RDONLY);
+    sys::open("/dev/null", O_RDONLY);
 
     // Close all non-standard file handles.
     const int fds{getdtablesize()};
@@ -56,4 +56,4 @@ void daemon()
     // Note that the standard output handles are unchanged.
 }
 
-} // swirly
+} // namespace swirly

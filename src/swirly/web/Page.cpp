@@ -41,4 +41,4 @@ Page parseQuery(string_view query) noexcept
     return page;
 }
 
-} // swirly
+} // namespace swirly

@@ -86,5 +86,5 @@ QVariant AssetModel::headerData(int section, Qt::Orientation orientation, int ro
     return var;
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

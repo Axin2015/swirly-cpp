@@ -18,8 +18,8 @@
 
 #include "MemPool.hpp"
 
-#include <swirly/posix/File.hpp>
-#include <swirly/posix/MMap.hpp>
+#include <swirly/sys/File.hpp>
+#include <swirly/sys/MMap.hpp>
 
 #include <fcntl.h>
 
@@ -30,26 +30,26 @@ namespace {
 
 File reserveFile(const char* path, size_t size)
 {
-    File file{posix::open(path, O_RDWR | O_CREAT, 0644)};
-    posix::ftruncate(file.get(), size);
+    File file{sys::open(path, O_RDWR | O_CREAT, 0644)};
+    sys::ftruncate(file.get(), size);
     return file;
 }
 
-} // anonymous
+} // namespace
 
 struct MemCtx::Impl {
     explicit Impl(size_t maxSize)
         : maxSize{maxSize},
-          memMap{posix::mmap(nullptr, PageSize + maxSize, PROT_READ | PROT_WRITE,
-                             MAP_ANON | MAP_PRIVATE, -1, 0)},
+          memMap{sys::mmap(nullptr, PageSize + maxSize, PROT_READ | PROT_WRITE,
+                           MAP_ANON | MAP_PRIVATE, -1, 0)},
           pool(*static_cast<MemPool*>(memMap.get().data()))
     {
     }
     Impl(const char* path, size_t maxSize)
         : maxSize{maxSize},
           file{reserveFile(path, PageSize + maxSize)},
-          memMap{posix::mmap(nullptr, PageSize + maxSize, PROT_READ | PROT_WRITE, MAP_SHARED,
-                             file.get(), 0)},
+          memMap{sys::mmap(nullptr, PageSize + maxSize, PROT_READ | PROT_WRITE, MAP_SHARED,
+                           file.get(), 0)},
           pool(*static_cast<MemPool*>(memMap.get().data()))
     {
     }
@@ -111,13 +111,9 @@ struct MemCtx::Impl {
     MemPool& pool;
 };
 
-MemCtx::MemCtx(size_t maxSize) : impl_{make_unique<Impl>(maxSize)}
-{
-}
+MemCtx::MemCtx(size_t maxSize) : impl_{make_unique<Impl>(maxSize)} {}
 
-MemCtx::MemCtx(const char* path, size_t maxSize) : impl_{make_unique<Impl>(path, maxSize)}
-{
-}
+MemCtx::MemCtx(const char* path, size_t maxSize) : impl_{make_unique<Impl>(path, maxSize)} {}
 
 MemCtx::MemCtx() = default;
 
@@ -154,4 +150,4 @@ void MemCtx::dealloc(void* addr, size_t size) noexcept
     impl_->dealloc(addr, size);
 }
 
-} // swirly
+} // namespace swirly

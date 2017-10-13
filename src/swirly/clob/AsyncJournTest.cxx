@@ -84,7 +84,7 @@ struct AsyncJournFixture {
     AsyncJourn asyncJourn;
 };
 
-} // anonymous
+} // namespace
 
 SWIRLY_TEST_CASE(AsyncWindow)
 {

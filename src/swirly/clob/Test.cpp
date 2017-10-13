@@ -114,29 +114,19 @@ void TestModel::doReadInstr(const ModelCallback<InstrPtr>& cb) const
                    10_lts));
 }
 
-void TestModel::doReadMarket(const ModelCallback<MarketPtr>& cb) const
-{
-}
+void TestModel::doReadMarket(const ModelCallback<MarketPtr>& cb) const {}
 
-void TestModel::doReadAccnt(Time now, const ModelCallback<string_view>& cb) const
-{
-}
+void TestModel::doReadAccnt(Time now, const ModelCallback<string_view>& cb) const {}
 
-void TestModel::doReadOrder(const ModelCallback<OrderPtr>& cb) const
-{
-}
+void TestModel::doReadOrder(const ModelCallback<OrderPtr>& cb) const {}
 
 void TestModel::doReadExec(string_view accnt, size_t limit, const ModelCallback<ExecPtr>& cb) const
 {
 }
 
-void TestModel::doReadTrade(const ModelCallback<ExecPtr>& cb) const
-{
-}
+void TestModel::doReadTrade(const ModelCallback<ExecPtr>& cb) const {}
 
-void TestModel::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const
-{
-}
+void TestModel::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const {}
 
 TestJourn::TestJourn() noexcept = default;
 TestJourn::~TestJourn() noexcept = default;
@@ -147,8 +137,6 @@ TestJourn& TestJourn::operator=(const TestJourn&) noexcept = default;
 constexpr TestJourn::TestJourn(TestJourn&&) noexcept = default;
 TestJourn& TestJourn::operator=(TestJourn&&) noexcept = default;
 
-void TestJourn::doUpdate(const Msg& msg)
-{
-}
+void TestJourn::doUpdate(const Msg& msg) {}
 
-} // swirly
+} // namespace swirly

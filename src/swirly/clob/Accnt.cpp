@@ -37,4 +37,4 @@ PosnPtr Accnt::posn(Id64 marketId, Symbol instr, JDay settlDay)
     return &*it;
 }
 
-} // swirly
+} // namespace swirly

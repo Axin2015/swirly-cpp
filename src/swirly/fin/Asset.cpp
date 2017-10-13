@@ -36,4 +36,4 @@ void Asset::toJson(ostream& os) const
        << "\"}";
 }
 
-} // swirly
+} // namespace swirly

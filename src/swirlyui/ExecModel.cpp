@@ -228,5 +228,5 @@ void ExecModel::updateRow(uint64_t tag, const Exec& exec)
     }
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

@@ -17,7 +17,7 @@
 #ifndef SWIRLY_UTIL_FILE_HPP
 #define SWIRLY_UTIL_FILE_HPP
 
-#include <swirly/posix/File.hpp>
+#include <swirly/sys/File.hpp>
 
 namespace swirly {
 
@@ -27,7 +27,7 @@ namespace swirly {
 inline std::size_t fileSize(int fd)
 {
     struct stat st;
-    posix::fstat(fd, st);
+    sys::fstat(fd, st);
     return st.st_size;
 }
 
@@ -41,6 +41,6 @@ inline mode_t fileMode() noexcept
     return mode;
 }
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_FILE_HPP

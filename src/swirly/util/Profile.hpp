@@ -93,6 +93,6 @@ class SWIRLY_API TimeRecorder {
     std::chrono::time_point<std::chrono::high_resolution_clock> start_;
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_PROFILE_HPP

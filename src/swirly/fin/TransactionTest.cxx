@@ -43,7 +43,7 @@ struct Foo : Transactional {
     void doRollback() override { ++rollbackCalls; }
 };
 
-} // anonymous
+} // namespace
 
 SWIRLY_TEST_CASE(TransScopedCommit)
 {

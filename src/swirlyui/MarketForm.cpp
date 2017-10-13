@@ -136,5 +136,5 @@ void MarketForm::slotBuyOrSellClicked(Side side)
     emit createOrder(instr, settlDateEdit_->date(), "", side, lots, ticks);
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

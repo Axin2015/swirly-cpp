@@ -113,6 +113,6 @@ constexpr Cost cost(Lots lots, Ticks ticks) noexcept
     return Cost{lots.count() * ticks.count()};
 }
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_FIN_CONV_HPP

@@ -45,6 +45,6 @@ constexpr Id64 operator""_id64(unsigned long long val) noexcept
     return Id64{val};
 }
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_BASICTYPES_HPP

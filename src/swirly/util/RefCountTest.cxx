@@ -30,7 +30,7 @@ class Foo : public RefCount<Foo, ThreadUnsafePolicy> {
   private:
     int& alive_;
 };
-} // anonymous
+} // namespace
 
 SWIRLY_TEST_CASE(RefCount)
 {

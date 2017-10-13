@@ -69,7 +69,7 @@ class ExecModel : public QAbstractTableModel {
     boost::circular_buffer<Row<Exec>> rows_{MaxExecs};
 };
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 #endif // SWIRLYUI_EXECMODEL_HXX

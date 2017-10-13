@@ -20,11 +20,9 @@ namespace swirly {
 namespace ui {
 namespace {
 
-} // anonymous
+} // namespace
 
-Client::Client(QObject* parent) : QObject{parent}
-{
-}
+Client::Client(QObject* parent) : QObject{parent} {}
 
 void Client::reset()
 {
@@ -37,5 +35,5 @@ void Client::reset()
     assetModel_.reset();
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

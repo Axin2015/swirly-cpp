@@ -49,7 +49,7 @@ enum class Column : int { //
 };
 constexpr int ColumnCount{unbox(Column::Created) + 1};
 
-} // exec
+} // namespace exec
 
 class Exec {
   public:
@@ -117,8 +117,8 @@ inline bool isModified(const Exec& prev, const Exec& next) noexcept
     return false;
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 Q_DECLARE_METATYPE(swirly::ui::Exec)
 

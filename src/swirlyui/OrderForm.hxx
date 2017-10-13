@@ -46,7 +46,7 @@ class OrderForm : public QWidget {
     OrderModel& orderModel_;
 };
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 #endif // SWIRLYUI_ORDERFORM_HXX

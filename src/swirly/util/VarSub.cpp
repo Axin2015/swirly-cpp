@@ -101,4 +101,4 @@ bool VarSub::substitute(string& s, const size_t i, size_t j, set<string>* outer)
     return false;
 }
 
-} // swirly
+} // namespace swirly

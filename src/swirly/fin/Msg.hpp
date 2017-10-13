@@ -94,6 +94,6 @@ static_assert(sizeof(Msg) == 240, "must be specific size");
 
 using MsgPipe = Pipe<Msg>;
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_FIN_MSG_HPP

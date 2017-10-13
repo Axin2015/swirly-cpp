@@ -33,7 +33,7 @@ struct TestPolicy {
 };
 
 using TestHandle = Handle<TestPolicy>;
-}
+} // namespace
 
 SWIRLY_TEST_CASE(HandleInvalid)
 {

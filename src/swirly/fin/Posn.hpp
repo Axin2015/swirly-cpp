@@ -249,6 +249,6 @@ class SWIRLY_API PosnSet {
     Set set_;
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_FIN_POSN_HPP

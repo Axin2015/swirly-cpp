@@ -68,5 +68,5 @@ void InstrView::slotClicked(const QModelIndex& index)
     }
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

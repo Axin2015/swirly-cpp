@@ -43,7 +43,7 @@ class AssetModel
     QVariant header_[asset::ColumnCount];
 };
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 #endif // SWIRLYUI_ASSETMODEL_HXX

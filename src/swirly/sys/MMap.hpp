@@ -14,10 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_POSIX_MMAP_HPP
-#define SWIRLY_POSIX_MMAP_HPP
+#ifndef SWIRLY_SYS_MMAP_HPP
+#define SWIRLY_SYS_MMAP_HPP
 
-#include <swirly/posix/Util.hpp>
+#include <swirly/sys/Error.hpp>
 
 #include <swirly/Config.h>
 
@@ -67,7 +67,7 @@ struct SWIRLY_API MMapDeleter {
 
 using MMap = std::unique_ptr<MMapPointer, MMapDeleter>;
 
-namespace posix {
+namespace sys {
 
 /**
  * Map files or devices into memory.
@@ -91,7 +91,7 @@ inline MMap mmap(void* addr, size_t len, int prot, int flags, int fd, off_t off)
     return MMap{p};
 }
 
-} // namespace posix
+} // namespace sys
 } // namespace swirly
 
-#endif // SWIRLY_POSIX_MMAP_HPP
+#endif // SWIRLY_SYS_MMAP_HPP

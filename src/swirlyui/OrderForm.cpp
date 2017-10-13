@@ -65,5 +65,5 @@ void OrderForm::slotCancelOrdersClicked()
     emit cancelOrders(orderModel_.checked());
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

@@ -35,6 +35,6 @@ class SWIRLY_API ParseException : public Exception {
     ParseException& operator=(ParseException&&) noexcept = default;
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_WEB_EXCEPTION_HPP

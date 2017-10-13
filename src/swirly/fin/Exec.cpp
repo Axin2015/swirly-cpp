@@ -110,4 +110,4 @@ void Exec::trade(Lots sumLots, Cost sumCost, Lots lastLots, Ticks lastTicks, Id6
     cpty_ = cpty;
 }
 
-} // swirly
+} // namespace swirly

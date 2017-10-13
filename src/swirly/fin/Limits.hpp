@@ -38,6 +38,6 @@ constexpr std::size_t MaxLevels{SWIRLY_MAX_LEVELS};
  */
 constexpr std::size_t MaxRef{64};
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_FIN_LIMITS_HPP

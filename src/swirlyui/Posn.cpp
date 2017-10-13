@@ -48,5 +48,5 @@ QDebug operator<<(QDebug debug, const Posn& posn)
     return debug;
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

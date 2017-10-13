@@ -93,5 +93,5 @@ QDebug operator<<(QDebug debug, const Order& order)
     return debug;
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

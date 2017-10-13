@@ -66,7 +66,7 @@ constexpr auto SelectTradeSql = //
 constexpr auto SelectPosnSql = //
     "SELECT accnt, market_id, instr, settl_day, side_id, lots, cost FROM posn_v;"_sv;
 
-} // anonymous
+} // namespace
 
 Model::Model(const Conf& conf)
     : db_{openDb(conf.get("sqlite_model", "swirly.db"), SQLITE_OPEN_READONLY, conf)}
@@ -372,11 +372,11 @@ void Model::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const
     }
 }
 
-} // sqlite
+} // namespace sqlite
 
 unique_ptr<Model> makeModel(const Conf& conf)
 {
     return make_unique<sqlite::Model>(conf);
 }
 
-} // swirly
+} // namespace swirly

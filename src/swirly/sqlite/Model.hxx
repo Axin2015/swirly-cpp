@@ -59,7 +59,7 @@ class Model : public swirly::Model {
     DbPtr db_;
 };
 
-} // sqlite
-} // swirly
+} // namespace sqlite
+} // namespace swirly
 
 #endif // SWIRLY_SQLITE_MODEL_HXX

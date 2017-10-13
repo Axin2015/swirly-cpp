@@ -113,6 +113,6 @@ class SWIRLY_API RestBody {
     long num() const noexcept { return num_.sign * num_.digits; }
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_WEB_RESTBODY_HPP

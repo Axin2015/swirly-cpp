@@ -41,4 +41,4 @@ int hexDigits(int64_t i) noexcept
     return n;
 }
 
-} // swirly
+} // namespace swirly

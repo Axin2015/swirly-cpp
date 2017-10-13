@@ -47,7 +47,7 @@ class AssetView : public QWidget {
     QTableView* table_{nullptr};
 };
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 #endif // SWIRLYUI_ASSETVIEW_HXX

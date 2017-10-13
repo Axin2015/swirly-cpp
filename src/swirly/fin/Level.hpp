@@ -37,7 +37,7 @@ constexpr LevelKey composeKey(Side side, Ticks ticks) noexcept
     return (side == Side::Buy ? -ticks : ticks).count();
 }
 
-} // detail
+} // namespace detail
 
 /**
  * Price level.
@@ -182,6 +182,6 @@ class SWIRLY_API LevelSet {
     Set set_;
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_FIN_LEVEL_HPP

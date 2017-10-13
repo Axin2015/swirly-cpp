@@ -187,5 +187,5 @@ bool MainWindow::canClose()
     return true;
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

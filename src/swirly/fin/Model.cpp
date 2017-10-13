@@ -22,4 +22,4 @@ namespace swirly {
 
 Model::~Model() noexcept = default;
 
-} // swirly
+} // namespace swirly

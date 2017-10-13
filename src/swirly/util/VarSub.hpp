@@ -67,6 +67,6 @@ class SWIRLY_API VarSub {
     std::function<std::string(const std::string&)> fn_;
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_VARSUB_HPP

@@ -49,6 +49,6 @@ class HttpServ {
     RestServ& restServ_;
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLYD_HTTPSERV_HPP

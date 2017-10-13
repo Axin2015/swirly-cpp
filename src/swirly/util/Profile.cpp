@@ -66,4 +66,4 @@ TimeRecorder::~TimeRecorder() noexcept
     profile_.record(usec);
 }
 
-} // swirly
+} // namespace swirly

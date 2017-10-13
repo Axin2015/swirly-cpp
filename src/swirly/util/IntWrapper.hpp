@@ -353,6 +353,6 @@ static_assert(sizeof(IntWrapper<Int64Policy>) == 8, "must be specific size");
 template <typename ValueT>
 constexpr bool isIntWrapper = std::is_base_of<IntBase, ValueT>::value;
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_INTWRAPPER_HPP

@@ -71,6 +71,6 @@ class SWIRLY_API TestJourn : public Journ {
     void doUpdate(const Msg& msg) override;
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_CLOB_TEST_HPP

@@ -73,6 +73,6 @@ inline std::ostream& operator<<(std::ostream& os, const Asset& asset)
 
 using AssetSet = SymbolSet<Asset>;
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_FIN_ASSET_HPP

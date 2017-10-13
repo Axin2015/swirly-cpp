@@ -72,6 +72,6 @@ class SWIRLY_API BusinessDay {
     mutable std::pair<int64_t, JDay> cache_[2]{};
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_FIN_DATE_HPP

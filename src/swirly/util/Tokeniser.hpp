@@ -62,6 +62,6 @@ class Tokeniser {
     std::string_view::const_iterator i_, j_;
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_TOKENISER_HPP

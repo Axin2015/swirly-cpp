@@ -47,7 +47,7 @@ class TradeView : public QWidget {
     TradeModel& model_;
 };
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 #endif // SWIRLYUI_TRADEVIEW_HXX

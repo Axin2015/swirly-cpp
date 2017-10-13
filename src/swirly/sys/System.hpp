@@ -14,15 +14,15 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_POSIX_SYSTEM_HPP
-#define SWIRLY_POSIX_SYSTEM_HPP
+#ifndef SWIRLY_SYS_SYSTEM_HPP
+#define SWIRLY_SYS_SYSTEM_HPP
 
-#include <swirly/posix/Util.hpp>
+#include <swirly/sys/Error.hpp>
 
 #include <unistd.h>
 
 namespace swirly {
-namespace posix {
+namespace sys {
 
 /**
  * Change working directory.
@@ -94,7 +94,7 @@ inline pid_t setsid()
     return sid;
 }
 
-} // namespace posix
+} // namespace sys
 } // namespace swirly
 
-#endif // SWIRLY_POSIX_SYSTEM_HPP
+#endif // SWIRLY_SYS_SYSTEM_HPP

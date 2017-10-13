@@ -44,6 +44,6 @@ auto makeFinally(FnT fn) noexcept
     return Finally<FnT>{std::move(fn)};
 }
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_FINALLY_HPP

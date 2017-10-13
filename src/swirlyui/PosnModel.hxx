@@ -43,7 +43,7 @@ class PosnModel
     QVariant header_[posn::ColumnCount];
 };
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 #endif // SWIRLYUI_POSNMODEL_HXX

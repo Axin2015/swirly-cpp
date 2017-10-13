@@ -50,7 +50,7 @@ class OrderModel
     QVariant header_[order::ColumnCount];
 };
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 #endif // SWIRLYUI_ORDERMODEL_HXX

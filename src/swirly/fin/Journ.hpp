@@ -52,6 +52,6 @@ class SWIRLY_API Journ {
  */
 SWIRLY_API std::unique_ptr<Journ> makeJourn(const Conf& conf);
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_FIN_JOURN_HPP

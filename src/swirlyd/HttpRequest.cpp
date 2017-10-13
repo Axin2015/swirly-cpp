@@ -20,4 +20,4 @@ namespace swirly {
 
 HttpRequest::~HttpRequest() noexcept = default;
 
-} // swirly
+} // namespace swirly

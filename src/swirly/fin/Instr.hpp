@@ -100,6 +100,6 @@ inline std::ostream& operator<<(std::ostream& os, const Instr& instr)
 
 using InstrSet = SymbolSet<Instr>;
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_FIN_INSTR_HPP

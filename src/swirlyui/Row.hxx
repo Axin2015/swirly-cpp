@@ -48,7 +48,7 @@ class Row {
     ValueT value_;
 };
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 #endif // SWIRLYUI_ROW_HXX

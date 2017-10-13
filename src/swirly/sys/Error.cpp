@@ -14,12 +14,4 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Request.hpp"
-
-namespace swirly {
-
-Request::Request(Request&&) = default;
-
-Request::~Request() noexcept = default;
-
-} // namespace swirly
+#include "Error.hpp"

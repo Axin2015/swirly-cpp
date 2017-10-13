@@ -180,6 +180,6 @@ inline bool isWeekEndDay(JDay jday) noexcept
 {
     return !isWeekDay(jday);
 }
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_DATE_HPP

@@ -62,6 +62,6 @@ class SWIRLY_API MemCtx {
     std::unique_ptr<Impl> impl_;
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_MEMCTX_HPP

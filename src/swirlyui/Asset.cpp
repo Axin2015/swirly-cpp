@@ -37,5 +37,5 @@ QDebug operator<<(QDebug debug, const Asset& asset)
     return debug;
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

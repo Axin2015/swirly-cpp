@@ -93,4 +93,4 @@ void MarketSide::reduceLevel(Level& level, const Order& order, Lots delta) noexc
     }
 }
 
-} // swirly
+} // namespace swirly

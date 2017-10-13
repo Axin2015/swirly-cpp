@@ -104,5 +104,5 @@ State TypeTraits<State>::fromString(const QString& value)
     return state;
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

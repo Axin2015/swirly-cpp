@@ -279,6 +279,6 @@ class SymbolSet {
     Set set_;
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_SET_HPP

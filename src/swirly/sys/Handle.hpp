@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_POSIX_HANDLE_HPP
-#define SWIRLY_POSIX_HANDLE_HPP
+#ifndef SWIRLY_SYS_HANDLE_HPP
+#define SWIRLY_SYS_HANDLE_HPP
 
 #include <cstddef> // nullptr_t
 #include <utility> // swap<>
@@ -99,4 +99,4 @@ inline bool operator!=(const Handle<PolicyT>& lhs, const Handle<PolicyT>& rhs)
 
 } // namespace swirly
 
-#endif // SWIRLY_POSIX_HANDLE_HPP
+#endif // SWIRLY_SYS_HANDLE_HPP

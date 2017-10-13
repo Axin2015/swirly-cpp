@@ -31,8 +31,8 @@
 #include <swirly/util/Log.hpp>
 #include <swirly/util/MemCtx.hpp>
 
-#include <swirly/posix/File.hpp>
-#include <swirly/posix/System.hpp>
+#include <swirly/sys/File.hpp>
+#include <swirly/sys/System.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
@@ -57,7 +57,7 @@ namespace {
 
 void openLogFile(const char* path)
 {
-    const auto file = posix::open(path, O_RDWR | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR | S_IRGRP);
+    const auto file = sys::open(path, O_RDWR | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR | S_IRGRP);
     dup2(*file, STDOUT_FILENO);
     dup2(*file, STDERR_FILENO);
 }
@@ -181,7 +181,7 @@ void getOpts(int argc, char* argv[], Opts& opts)
 
 MemCtx memCtx;
 
-} // anonymous
+} // namespace
 
 namespace swirly {
 
@@ -202,7 +202,7 @@ void dealloc(void* ptr, size_t size) noexcept
     return memCtx.dealloc(ptr, size);
 }
 
-} // swirly
+} // namespace swirly
 
 int main(int argc, char* argv[])
 {
@@ -245,7 +245,7 @@ int main(int argc, char* argv[])
         if (!runDir.empty()) {
             // Change the current working directory if specified.
             runDir = fs::canonical(runDir, fs::current_path());
-            posix::chdir(runDir.c_str());
+            sys::chdir(runDir.c_str());
         } else if (opts.daemon) {
             // Default to root directory if daemon.
             runDir = fs::current_path().root_path();

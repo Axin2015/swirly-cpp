@@ -115,5 +115,5 @@ QVariant PosnModel::headerData(int section, Qt::Orientation orientation, int rol
     return var;
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly

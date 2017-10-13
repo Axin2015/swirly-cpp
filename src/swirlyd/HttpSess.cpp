@@ -62,7 +62,7 @@ auto makeAllocHandler(FnT fn)
     return AllocHandler<FnT>{move(fn)};
 }
 
-} // anonymous
+} // namespace
 
 HttpSess::~HttpSess() noexcept = default;
 
@@ -275,4 +275,4 @@ bool HttpSess::onMessageEnd() noexcept
     return ret;
 }
 
-} // swirly
+} // namespace swirly

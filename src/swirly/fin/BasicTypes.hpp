@@ -260,6 +260,6 @@ inline std::ostream& operator<<(std::ostream& os, State state)
     return os << enumString(state);
 }
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_FIN_BASICTYPES_HPP

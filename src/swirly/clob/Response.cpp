@@ -113,4 +113,4 @@ void Response::setPosn(const ConstPosnPtr& posn) noexcept
     posn_ = posn;
 }
 
-} // swirly
+} // namespace swirly

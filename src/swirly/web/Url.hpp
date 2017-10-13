@@ -90,6 +90,6 @@ class BasicUrl {
     http_parser_url parser_{};
 };
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_WEB_URL_HPP

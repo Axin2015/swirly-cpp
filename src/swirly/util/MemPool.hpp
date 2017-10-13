@@ -214,6 +214,6 @@ inline void deallocBlock(MemPool& pool, MemStack<SizeN>& stack, void* addr)
     push(pool, stack, static_cast<MemNode<SizeN>*>(addr));
 }
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_MEMPOOL_HPP

@@ -46,7 +46,7 @@ enum class Column : int { //
 };
 constexpr int ColumnCount{unbox(Column::Modified) + 1};
 
-} // order
+} // namespace order
 
 class Order {
   public:
@@ -115,8 +115,8 @@ inline bool isModified(const Order& prev, const Order& next) noexcept
         || prev.modified() != next.modified();
 }
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 Q_DECLARE_METATYPE(swirly::ui::Order)
 

@@ -73,7 +73,7 @@ void worker(MsgPipe& pipe, Journ& journ)
         ;
     SWIRLY_NOTICE(logMsg() << "stopped async journal");
 }
-} // anonymous
+} // namespace
 
 AsyncJourn::AsyncJourn(Journ& journ, size_t pipeCapacity)
     : pipe_{pipeCapacity}, thread_{worker, ref(pipe_), ref(journ)}
@@ -189,4 +189,4 @@ void AsyncJourn::doArchiveTrade(Id64 marketId, ArrayView<Id64> ids, Time modifie
     });
 }
 
-} // swirly
+} // namespace swirly

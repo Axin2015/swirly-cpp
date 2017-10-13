@@ -53,7 +53,7 @@ inline ostream& operator<<(ostream& os, Test t)
     return os << enumString(t);
 }
 
-} // swirly
+} // namespace swirly
 
 SWIRLY_TEST_CASE(EnumString)
 {

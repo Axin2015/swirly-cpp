@@ -78,7 +78,7 @@ class Client : public QObject {
     PosnModel posnModel_;
 };
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 #endif // SWIRLYUI_CLIENT_HXX

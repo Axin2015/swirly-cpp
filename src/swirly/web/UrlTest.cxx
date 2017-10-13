@@ -43,7 +43,7 @@ class UrlStringView : public BasicUrl<UrlStringView> {
     string_view url_;
 };
 
-} // anonymous
+} // namespace
 
 SWIRLY_TEST_CASE(UrlString)
 {

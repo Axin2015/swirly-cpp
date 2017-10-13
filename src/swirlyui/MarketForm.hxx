@@ -64,7 +64,7 @@ class MarketForm : public QWidget {
     QDoubleValidator priceValidator_;
 };
 
-} // ui
-} // swirly
+} // namespace ui
+} // namespace swirly
 
 #endif // SWIRLYUI_MARKETFORM_HXX

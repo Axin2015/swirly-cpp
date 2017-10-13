@@ -107,6 +107,6 @@ constexpr ArrayView<std::remove_cv_t<ValueT>> makeArrayView(ValueT (&arr)[SizeN]
     return {arr};
 }
 
-} // swirly
+} // namespace swirly
 
 #endif // SWIRLY_UTIL_ARRAY_HPP
