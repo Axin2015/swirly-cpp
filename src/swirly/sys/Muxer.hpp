@@ -28,21 +28,23 @@
 
 namespace swirly {
 
+using EventMask = std::uint32_t;
+
 template <typename PolicyT>
 class BasicMuxer {
   public:
-    enum : std::uint32_t {
+    enum : EventMask {
         In = PolicyT::In,
         Pri = PolicyT::Pri,
         Out = PolicyT::Out,
         Err = PolicyT::Err,
-        Hup = PolicyT::Hup,
-        RdHup = PolicyT::RdHup
+        Hup = PolicyT::Hup
     };
     using Descriptor = typename PolicyT::Descriptor;
-    using Event = typename PolicyT::Event;
-    using Data = decltype(Event{}.data);
     static constexpr Descriptor invalid() noexcept { return PolicyT::invalid(); }
+
+    using Event = typename PolicyT::Event;
+
     explicit BasicMuxer(std::size_t sizeHint) : md_{PolicyT::create(sizeHint)} {}
     ~BasicMuxer() noexcept
     {
@@ -66,13 +68,13 @@ class BasicMuxer {
 
     void swap(BasicMuxer& rhs) noexcept { std::swap(md_, rhs.md_); }
 
-    void insert(int fd, Event event) { PolicyT::insert(md_, fd, event); }
-    void update(int fd, Event event) { PolicyT::update(md_, fd, event); }
+    void insert(int fd, EventMask mask) { PolicyT::insert(md_, fd, mask); }
+    void update(int fd, EventMask mask) { PolicyT::update(md_, fd, mask); }
     void erase(int fd) { PolicyT::erase(md_, fd); }
-    int wait(Event* buf, std::size_t size) { return PolicyT::wait(md_, buf, size); }
-    int wait(Event* buf, std::size_t size, std::chrono::milliseconds timeout)
+    int wait(Event* buf, std::size_t size) const { return PolicyT::wait(md_, buf, size); }
+    int wait(Event* buf, std::size_t size, std::chrono::milliseconds timeout) const
     {
-        return PolicyT::wait(md_, buf, size, timeout.count());
+        return PolicyT::wait(md_, buf, size, timeout);
     }
 
   private:
@@ -93,38 +95,24 @@ struct SWIRLY_API PollPolicy {
             return lhs.fd < rhs.fd;
         }
     };
-    union Data {
-        void* ptr;
-        int fd;
-        std::uint32_t u32;
-        std::uint64_t u64;
-    };
-    struct Event {
-        std::uint32_t events;
-        Data data;
-    };
     struct Impl {
-        explicit Impl(std::size_t sizeHint)
-        {
-            pfds.reserve(sizeHint);
-            data.reserve(sizeHint);
-        }
+        explicit Impl(std::size_t sizeHint) { pfds.reserve(sizeHint); }
         std::vector<pollfd> pfds;
-        std::vector<Data> data;
     };
-    enum : std::uint32_t {
-        In = POLLIN,
-        Pri = POLLPRI,
-        Out = POLLOUT,
-        Err = POLLERR,
-        Hup = POLLHUP
-    };
+    enum : EventMask { In = POLLIN, Pri = POLLPRI, Out = POLLOUT, Err = POLLERR, Hup = POLLHUP };
     using Descriptor = Impl*;
+    struct Event {
+        EventMask events;
+        struct {
+            int fd;
+        } data;
+    };
     static constexpr Impl* invalid() noexcept { return nullptr; }
+
     static void destroy(Impl* md) noexcept { delete md; }
     static Impl* create(std::size_t sizeHint) { return new Impl{sizeHint}; }
-    static void insert(Impl* md, int fd, Event event);
-    static void update(Impl* md, int fd, Event event);
+    static void insert(Impl* md, int fd, EventMask mask);
+    static void update(Impl* md, int fd, EventMask mask);
     static void erase(Impl* md, int fd);
     static int wait(Impl* md, Event* buf, std::size_t size) { return wait(md, buf, size, -1); }
     static int wait(Impl* md, Event* buf, std::size_t size, std::chrono::milliseconds timeout)
@@ -141,7 +129,7 @@ using PollMuxer = BasicMuxer<PollPolicy>;
 #if defined(__linux__)
 
 struct EpollPolicy {
-    enum : std::uint32_t {
+    enum : EventMask {
         In = EPOLLIN,
         Pri = EPOLLPRI,
         Out = EPOLLOUT,
@@ -151,14 +139,21 @@ struct EpollPolicy {
     using Descriptor = int;
     using Event = epoll_event;
     static constexpr int invalid() noexcept { return -1; }
+
     static void destroy(int md) noexcept { ::close(md); }
     static int create(int sizeHint) { return sys::epoll_create(sizeHint); }
-    static void insert(int md, int fd, Event event)
+    static void insert(int md, int fd, EventMask mask)
     {
+        Event event;
+        event.events = mask;
+        event.data.fd = fd;
         sys::epoll_ctl(md, EPOLL_CTL_ADD, fd, event);
     }
-    static void update(int md, int fd, Event event)
+    static void update(int md, int fd, EventMask mask)
     {
+        Event event;
+        event.events = mask;
+        event.data.fd = fd;
         sys::epoll_ctl(md, EPOLL_CTL_MOD, fd, event);
     }
     static void erase(int md, int fd)
@@ -180,6 +175,12 @@ struct EpollPolicy {
 
 using EpollMuxer = BasicMuxer<EpollPolicy>;
 
+#endif
+
+#if defined(__linux__)
+using Muxer = EpollMuxer;
+#else
+using Muxer = PollMuxer;
 #endif
 
 } // namespace swirly

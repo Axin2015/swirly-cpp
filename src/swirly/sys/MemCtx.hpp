@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_UTIL_MEMCTX_HPP
-#define SWIRLY_UTIL_MEMCTX_HPP
+#ifndef SWIRLY_SYS_MEMCTX_HPP
+#define SWIRLY_SYS_MEMCTX_HPP
 
 #include <swirly/Config.h>
 
@@ -64,4 +64,4 @@ class SWIRLY_API MemCtx {
 
 } // namespace swirly
 
-#endif // SWIRLY_UTIL_MEMCTX_HPP
+#endif // SWIRLY_SYS_MEMCTX_HPP

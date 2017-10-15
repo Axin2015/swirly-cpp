@@ -14,12 +14,18 @@
 # 02110-1301, USA.
 
 set(sys_SOURCES
+  Daemon.cpp
   Error.cpp
   File.cpp
   Handle.cpp
   MMap.cpp
+  MemAlloc.cpp
+  MemCtx.cpp
+  MemPool.cpp
   Muxer.cpp
   Poll.cpp
+  Reactor.cpp
+  RefCount.cpp
   System.cpp)
 
 add_library(sys_static STATIC ${sys_SOURCES})
@@ -35,7 +41,9 @@ if(ENABLE_SHARED_LIBS)
 endif()
 
 set(sys_test_SOURCES
-  HandleTest.cxx)
+  RefCountTest.cxx
+  HandleTest.cxx
+  MemCtxTest.cxx)
 
 foreach(file ${sys_test_SOURCES})
   get_filename_component (name ${file} NAME_WE)

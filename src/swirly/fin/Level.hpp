@@ -19,7 +19,7 @@
 
 #include <swirly/fin/Types.hpp>
 
-#include <swirly/util/MemAlloc.hpp>
+#include <swirly/sys/MemAlloc.hpp>
 
 #include <boost/intrusive/set.hpp>
 

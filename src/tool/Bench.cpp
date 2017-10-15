@@ -23,9 +23,10 @@
 
 #include <swirly/util/Conf.hpp>
 #include <swirly/util/Log.hpp>
-#include <swirly/util/MemCtx.hpp>
 #include <swirly/util/Profile.hpp>
 #include <swirly/util/Time.hpp>
+
+#include <swirly/sys/MemCtx.hpp>
 
 using namespace std;
 using namespace swirly;

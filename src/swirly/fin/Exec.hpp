@@ -20,7 +20,7 @@
 #include <swirly/fin/Conv.hpp>
 #include <swirly/fin/Request.hpp>
 
-#include <swirly/util/MemAlloc.hpp>
+#include <swirly/sys/MemAlloc.hpp>
 
 namespace swirly {
 
