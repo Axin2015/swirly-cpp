@@ -21,23 +21,19 @@
 
 namespace swirly {
 
-void PollPolicy::insert(Impl* md, int fd, Event event)
+void PollPolicy::insert(Impl* md, int fd, EventMask mask)
 {
     auto& pfds = md->pfds;
 
-    const pollfd pfd{fd, static_cast<short>(event.events), 0};
+    const pollfd pfd{fd, static_cast<short>(mask), 0};
     const auto it = std::lower_bound(pfds.begin(), pfds.end(), pfd, Cmp{});
     if (it != pfds.end() && it->fd == fd) {
         throw std::system_error{sys::error(EEXIST), "fd already registered"};
     }
-    auto& data = md->data;
-    const auto jt = data.begin() + distance(pfds.begin(), it);
-
     pfds.insert(it, pfd);
-    data.insert(jt, event.data);
 }
 
-void PollPolicy::update(Impl* md, int fd, Event event)
+void PollPolicy::update(Impl* md, int fd, EventMask mask)
 {
     auto& pfds = md->pfds;
 
@@ -46,11 +42,7 @@ void PollPolicy::update(Impl* md, int fd, Event event)
     if (it == pfds.end() || it->fd != fd) {
         throw std::system_error{sys::error(ENOENT), "fd is not registered"};
     }
-    auto& data = md->data;
-    const auto jt = data.begin() + distance(pfds.begin(), it);
-
-    it->events = event.events;
-    *jt = event.data;
+    it->events = mask;
 }
 
 void PollPolicy::erase(Impl* md, int fd)
@@ -62,11 +54,7 @@ void PollPolicy::erase(Impl* md, int fd)
     if (it == pfds.end() || it->fd != fd) {
         throw std::system_error{sys::error(ENOENT), "fd is not registered"};
     }
-    auto& data = md->data;
-    const auto jt = data.begin() + distance(pfds.begin(), it);
-
     pfds.erase(it);
-    data.erase(jt);
 }
 
 int PollPolicy::wait(Impl* md, Event* buf, std::size_t size, int timeout)
@@ -82,7 +70,7 @@ int PollPolicy::wait(Impl* md, Event* buf, std::size_t size, int timeout)
         const auto& pfd = pfds[i];
         if (pfd.revents) {
             buf->events = pfd.revents;
-            buf->data = md->data[i];
+            buf->data.fd = pfd.fd;
             ++buf;
         }
     }
