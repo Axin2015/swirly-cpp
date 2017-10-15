@@ -24,6 +24,7 @@ set(sys_SOURCES
   MemPool.cpp
   Muxer.cpp
   Poll.cpp
+  Reactor.cpp
   RefCount.cpp
   System.cpp)
 
