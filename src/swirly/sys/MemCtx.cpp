@@ -16,10 +16,9 @@
  */
 #include "MemCtx.hpp"
 
+#include "File.hpp"
+#include "MMap.hpp"
 #include "MemPool.hpp"
-
-#include <swirly/sys/File.hpp>
-#include <swirly/sys/MMap.hpp>
 
 #include <fcntl.h>
 

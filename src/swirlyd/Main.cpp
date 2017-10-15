@@ -25,13 +25,13 @@
 #include <swirly/fin/Model.hpp>
 
 #include <swirly/util/Conf.hpp>
-#include <swirly/util/Daemon.hpp>
 #include <swirly/util/Exception.hpp>
 #include <swirly/util/File.hpp>
 #include <swirly/util/Log.hpp>
-#include <swirly/util/MemCtx.hpp>
 
+#include <swirly/sys/Daemon.hpp>
 #include <swirly/sys/File.hpp>
+#include <swirly/sys/MemCtx.hpp>
 #include <swirly/sys/System.hpp>
 
 #pragma GCC diagnostic push

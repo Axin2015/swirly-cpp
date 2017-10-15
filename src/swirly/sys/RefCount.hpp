@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_UTIL_REFCOUNT_HPP
-#define SWIRLY_UTIL_REFCOUNT_HPP
+#ifndef SWIRLY_SYS_REFCOUNT_HPP
+#define SWIRLY_SYS_REFCOUNT_HPP
 
 #include <swirly/Config.h>
 
@@ -107,4 +107,4 @@ boost::intrusive_ptr<ValueT> makeIntrusive(ArgsT&&... args)
 
 } // namespace swirly
 
-#endif // SWIRLY_UTIL_REFCOUNT_HPP
+#endif // SWIRLY_SYS_REFCOUNT_HPP

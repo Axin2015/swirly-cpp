@@ -18,7 +18,6 @@ set(util_SOURCES
   BasicTypes.cpp
   Compare.cpp
   Conf.cpp
-  Daemon.cpp
   Date.cpp
   Enum.cpp
   Exception.cpp
@@ -28,13 +27,9 @@ set(util_SOURCES
   Limits.cpp
   Log.cpp
   Math.cpp
-  MemAlloc.cpp
-  MemCtx.cpp
-  MemPool.cpp
   Numeric.cpp
   Pipe.cpp
   Profile.cpp
-  RefCount.cpp
   RingBuffer.cpp
   Set.cpp
   Stream.cpp
@@ -68,9 +63,7 @@ set(util_test_SOURCES
   IntWrapperTest.cxx
   LogTest.cxx
   MathTest.cxx
-  MemCtxTest.cxx
   PipeTest.cxx
-  RefCountTest.cxx
   RingBufferTest.cxx
   SetTest.cxx
   StreamTest.cxx

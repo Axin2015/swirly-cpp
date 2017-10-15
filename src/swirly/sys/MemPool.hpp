@@ -14,14 +14,16 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_UTIL_MEMPOOL_HPP
-#define SWIRLY_UTIL_MEMPOOL_HPP
+#ifndef SWIRLY_SYS_MEMPOOL_HPP
+#define SWIRLY_SYS_MEMPOOL_HPP
 
-#include <swirly/util/Math.hpp>
+#include <swirly/Config.h>
 
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+#include <new>
+#include <type_traits>
 
 namespace swirly {
 
@@ -35,8 +37,6 @@ enum : std::size_t {
     PageBits = 12,
     PageSize = 1 << PageBits
 };
-static_assert(isPow2(CacheLineSize));
-static_assert(isPow2(PageSize));
 
 template <int BitsN>
 constexpr std::size_t ceilPow2(std::size_t size) noexcept
@@ -216,4 +216,4 @@ inline void deallocBlock(MemPool& pool, MemStack<SizeN>& stack, void* addr)
 
 } // namespace swirly
 
-#endif // SWIRLY_UTIL_MEMPOOL_HPP
+#endif // SWIRLY_SYS_MEMPOOL_HPP

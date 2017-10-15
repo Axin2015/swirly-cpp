@@ -16,8 +16,8 @@
  */
 #include "Daemon.hpp"
 
-#include <swirly/sys/File.hpp>
-#include <swirly/sys/System.hpp>
+#include "File.hpp"
+#include "System.hpp"
 
 using namespace std;
 

@@ -19,7 +19,7 @@
 #include "HttpResponse.hpp"
 #include "RestServ.hpp"
 
-#include <swirly/util/MemAlloc.hpp>
+#include <swirly/sys/MemAlloc.hpp>
 
 using namespace boost;
 using namespace std;

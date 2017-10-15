@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_UTIL_DAEMON_HPP
-#define SWIRLY_UTIL_DAEMON_HPP
+#ifndef SWIRLY_SYS_DAEMON_HPP
+#define SWIRLY_SYS_DAEMON_HPP
 
 #include <swirly/Config.h>
 
@@ -30,4 +30,4 @@ SWIRLY_API void daemon();
 
 } // namespace swirly
 
-#endif // SWIRLY_UTIL_DAEMON_HPP
+#endif // SWIRLY_SYS_DAEMON_HPP

@@ -22,8 +22,9 @@
 #include <swirly/web/HttpHandler.hpp>
 
 #include <swirly/util/Log.hpp>
-#include <swirly/util/RefCount.hpp>
 #include <swirly/util/RingBuffer.hpp>
+
+#include <swirly/sys/RefCount.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
