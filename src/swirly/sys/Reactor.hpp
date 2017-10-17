@@ -64,16 +64,8 @@ class SWIRLY_API Reactor {
     using Descriptor = typename Muxer::Descriptor;
     using Event = typename Muxer::Event;
     struct Data {
-        explicit Data(long modcnt = 0, EventMask mask = 0) noexcept
-            : modcnt{modcnt}, mask{mask}
-        {
-        }
-        Data(long modcnt, EventMask mask, const EventHandlerPtr& eh) noexcept
-            : modcnt{modcnt}, mask{mask}, eh{eh}
-        {
-        }
-        long modcnt;
-        EventMask mask;
+        int sid{};
+        EventMask mask{};
         EventHandlerPtr eh;
     };
     explicit Reactor(std::size_t sizeHint) : mux_{sizeHint} { data_.resize(sizeHint); }
@@ -89,52 +81,20 @@ class SWIRLY_API Reactor {
 
     void swap(Reactor& rhs) noexcept { mux_.swap(rhs.mux_); }
 
-    void insert(int fd, EventMask mask, const EventHandlerPtr& eh)
-    {
-        if (fd >= static_cast<int>(data_.size())) {
-            data_.resize(fd + 1);
-        }
-        mux_.insert(fd, mask);
-        data_[fd] = Data{++modcnt_, mask, eh};
-    }
-    void update(int fd, EventMask mask)
-    {
-        if (data_[fd].mask != mask) {
-            mux_.update(fd, mask);
-        }
-    }
-    void erase(int fd)
-    {
-        mux_.erase(fd);
-        data_[fd] = Data{++modcnt_};
-    }
-    int poll()
-    {
-        // Record the current modification count immediately prior to the wait() call.
-        const auto modcnt = modcnt_;
+    int poll() const;
 
-        Event events[16];
-        const auto size = mux_.wait(events, 16);
-        dispatch(modcnt, events, size);
-        return size;
-    }
-    int poll(std::chrono::milliseconds timeout)
-    {
-        // Record the current modification count immediately prior to the wait() call.
-        const auto modcnt = modcnt_;
+    int poll(std::chrono::milliseconds timeout) const;
 
-        Event events[16];
-        const auto size = mux_.wait(events, 16, timeout);
-        dispatch(modcnt, events, size);
-        return size;
-    }
+    void insert(int fd, EventMask mask, const EventHandlerPtr& eh);
+
+    void update(int fd, EventMask mask);
+
+    void erase(int fd);
 
   private:
-    void dispatch(long modcnt, Event* events, int size) const;
+    void dispatch(Event* events, int size) const;
 
     Muxer mux_;
-    // The modification counter is incremented whenever a socket is added or removed.
-    long modcnt_{};
     std::vector<Data> data_;
 };
 

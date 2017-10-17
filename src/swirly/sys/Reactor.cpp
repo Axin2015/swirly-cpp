@@ -20,13 +20,62 @@ namespace swirly {
 
 EventHandler::~EventHandler() noexcept = default;
 
-void Reactor::dispatch(long modcnt, Event* events, int size) const
+int Reactor::poll() const
+{
+    Event events[16];
+    const auto size = mux_.wait(events, 16);
+    dispatch(events, size);
+    return size;
+}
+
+int Reactor::poll(std::chrono::milliseconds timeout) const
+{
+    Event events[16];
+    const auto size = mux_.wait(events, 16, timeout);
+    dispatch(events, size);
+    return size;
+}
+
+void Reactor::insert(int fd, EventMask mask, const EventHandlerPtr& eh)
+{
+    assert(fd >= 0);
+    assert(eh);
+    if (fd >= static_cast<int>(data_.size())) {
+        data_.resize(fd + 1);
+    }
+    auto& data = data_[fd];
+    mux_.insert(++data.sid, fd, mask);
+    data.mask = mask;
+    data.eh = eh;
+}
+
+void Reactor::update(int fd, EventMask mask)
+{
+    if (data_[fd].mask != mask) {
+        mux_.update(fd, mask);
+        data_[fd].mask = mask;
+    }
+}
+
+void Reactor::erase(int fd)
+{
+    mux_.erase(fd);
+    auto& data = data_[fd];
+    data.mask = 0;
+    data.eh.reset();
+}
+
+void Reactor::dispatch(Event* events, int size) const
 {
     for (int i{0}; i < size; ++i) {
+
         auto& event = events[i];
-        const auto& data = data_[event.data.fd];
+        const auto fd = static_cast<int>(event.data.u64 & 0xffffffff);
+        const auto sid = static_cast<int>(event.data.u64 >> 32);
+
+        const auto& data = data_[fd];
         // Skip this socket if it was modified after the call to wait().
-        if (data.modcnt > modcnt) {
+        if (data.sid > sid) {
             continue;
         }
         // Apply the interest mask to filter-out any events that the user may have removed from
@@ -37,7 +86,7 @@ void Reactor::dispatch(long modcnt, Event* events, int size) const
             continue;
         }
         EventHandlerPtr eh{data.eh};
-        eh->ioEvent(event.data.fd, event.events);
+        eh->ioEvent(fd, event.events);
     }
 }
 
