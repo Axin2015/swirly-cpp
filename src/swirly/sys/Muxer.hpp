@@ -68,7 +68,7 @@ class BasicMuxer {
 
     void swap(BasicMuxer& rhs) noexcept { std::swap(md_, rhs.md_); }
 
-    void insert(int fd, EventMask mask) { PolicyT::insert(md_, fd, mask); }
+    void insert(int sid, int fd, EventMask mask) { PolicyT::insert(md_, sid, fd, mask); }
     void update(int fd, EventMask mask) { PolicyT::update(md_, fd, mask); }
     void erase(int fd) { PolicyT::erase(md_, fd); }
     int wait(Event* buf, std::size_t size) const { return PolicyT::wait(md_, buf, size); }
@@ -98,20 +98,21 @@ struct SWIRLY_API PollPolicy {
     struct Impl {
         explicit Impl(std::size_t sizeHint) { pfds.reserve(sizeHint); }
         std::vector<pollfd> pfds;
+        std::vector<int> sids;
     };
     enum : EventMask { In = POLLIN, Pri = POLLPRI, Out = POLLOUT, Err = POLLERR, Hup = POLLHUP };
     using Descriptor = Impl*;
     struct Event {
         EventMask events;
         struct {
-            int fd;
+            std::uint64_t u64;
         } data;
     };
     static constexpr Impl* invalid() noexcept { return nullptr; }
 
     static void destroy(Impl* md) noexcept { delete md; }
     static Impl* create(std::size_t sizeHint) { return new Impl{sizeHint}; }
-    static void insert(Impl* md, int fd, EventMask mask);
+    static void insert(Impl* md, int sid, int fd, EventMask mask);
     static void update(Impl* md, int fd, EventMask mask);
     static void erase(Impl* md, int fd);
     static int wait(Impl* md, Event* buf, std::size_t size) { return wait(md, buf, size, -1); }
@@ -142,11 +143,11 @@ struct EpollPolicy {
 
     static void destroy(int md) noexcept { ::close(md); }
     static int create(int sizeHint) { return sys::epoll_create(sizeHint); }
-    static void insert(int md, int fd, EventMask mask)
+    static void insert(int md, int sid, int fd, EventMask mask)
     {
         Event event;
         event.events = mask;
-        event.data.fd = fd;
+        event.data.u64 = static_cast<std::uint64_t>(sid) << 32 | fd;
         sys::epoll_ctl(md, EPOLL_CTL_ADD, fd, event);
     }
     static void update(int md, int fd, EventMask mask)
