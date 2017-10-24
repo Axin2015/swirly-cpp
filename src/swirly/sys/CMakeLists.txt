@@ -14,6 +14,7 @@
 # 02110-1301, USA.
 
 set(sys_SOURCES
+  Buffer.cpp
   Daemon.cpp
   Error.cpp
   File.cpp

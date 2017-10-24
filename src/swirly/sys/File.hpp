@@ -17,6 +17,7 @@
 #ifndef SWIRLY_SYS_FILE_HPP
 #define SWIRLY_SYS_FILE_HPP
 
+#include <swirly/sys/Buffer.hpp>
 #include <swirly/sys/Error.hpp>
 #include <swirly/sys/Handle.hpp>
 
@@ -128,6 +129,146 @@ inline void ftruncate(int fd, off_t length)
     if (ret < 0) {
         throw std::system_error{error(errno), "ftruncate"};
     }
+}
+
+/**
+ * Read from a file descriptor.
+ */
+inline std::size_t read(int fd, void* buf, std::size_t count, std::error_code& ec) noexcept
+{
+    const auto ret = ::read(fd, buf, count);
+    if (ret < 0) {
+        ec = error(errno);
+    }
+    return ret;
+}
+
+/**
+ * Read from a file descriptor.
+ */
+inline std::size_t read(int fd, const MutableBuffer& buf, std::error_code& ec) noexcept
+{
+    return read(fd, buffer_cast<void*>(buf), buffer_size(buf), ec);
+}
+
+/**
+ * Read from a file descriptor.
+ */
+inline std::size_t read(int fd, void* buf, std::size_t count)
+{
+    const auto ret = ::read(fd, buf, count);
+    if (ret < 0) {
+        throw std::system_error{error(errno), "read"};
+    }
+    return ret;
+}
+
+/**
+ * Read from a file descriptor.
+ */
+inline std::size_t read(int fd, const MutableBuffer& buf) noexcept
+{
+    return read(fd, buffer_cast<void*>(buf), buffer_size(buf));
+}
+
+/**
+ * Write to a file descriptor.
+ */
+inline std::size_t write(int fd, const void* buf, std::size_t count, std::error_code& ec) noexcept
+{
+    const auto ret = ::write(fd, buf, count);
+    if (ret < 0) {
+        ec = error(errno);
+    }
+    return ret;
+}
+
+/**
+ * Write to a file descriptor.
+ */
+inline std::size_t write(int fd, const ConstBuffer& buf, std::error_code& ec) noexcept
+{
+    return write(fd, buffer_cast<const void*>(buf), buffer_size(buf), ec);
+}
+
+/**
+ * Write to a file descriptor.
+ */
+inline std::size_t write(int fd, const void* buf, std::size_t count)
+{
+    const auto ret = ::write(fd, buf, count);
+    if (ret < 0) {
+        throw std::system_error{error(errno), "write"};
+    }
+    return ret;
+}
+
+/**
+ * Write to a file descriptor.
+ */
+inline std::size_t write(int fd, const ConstBuffer& buf)
+{
+    return write(fd, buffer_cast<const void*>(buf), buffer_size(buf));
+}
+
+/**
+ * File control.
+ */
+inline int fcntl(int fd, int cmd, std::error_code& ec) noexcept
+{
+    const auto ret = ::fcntl(fd, cmd);
+    if (ret < 0) {
+        ec = error(errno);
+    }
+    return ret;
+}
+
+/**
+ * File control.
+ */
+template <typename ArgT>
+inline int fcntl(int fd, int cmd, ArgT arg, std::error_code& ec) noexcept
+{
+    const auto ret = ::fcntl(fd, cmd, arg);
+    if (ret < 0) {
+        ec = error(errno);
+    }
+    return ret;
+}
+
+/**
+ * File control.
+ */
+inline int fcntl(int fd, int cmd)
+{
+    const auto ret = ::fcntl(fd, cmd);
+    if (ret < 0) {
+        throw std::system_error{error(errno), "fcntl"};
+    }
+    return ret;
+}
+
+/**
+ * File control.
+ */
+template <typename ArgT>
+inline int fcntl(int fd, int cmd, ArgT arg)
+{
+    const auto ret = ::fcntl(fd, cmd, arg);
+    if (ret < 0) {
+        throw std::system_error{error(errno), "fcntl"};
+    }
+    return ret;
+}
+
+inline void setNonBlock(int fd, std::error_code& ec) noexcept
+{
+    fcntl(fd, F_SETFL, O_NONBLOCK, ec);
+}
+
+inline void setNonBlock(int fd)
+{
+    fcntl(fd, F_SETFL, O_NONBLOCK);
 }
 
 } // namespace sys
