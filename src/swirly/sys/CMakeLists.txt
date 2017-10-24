@@ -19,6 +19,7 @@ set(sys_SOURCES
   Error.cpp
   File.cpp
   Handle.cpp
+  IpAddress.cpp
   MMap.cpp
   MemAlloc.cpp
   MemCtx.cpp
@@ -31,17 +32,18 @@ set(sys_SOURCES
 
 add_library(sys_static STATIC ${sys_SOURCES})
 set_target_properties(sys_static PROPERTIES OUTPUT_NAME swirly_sys)
-target_link_libraries(sys_static pthread)
+target_link_libraries(sys_static ${Boost_SYSTEM_LIBRARY} pthread)
 install(TARGETS sys_static DESTINATION lib)
 
 if(ENABLE_SHARED_LIBS)
   add_library(sys_shared SHARED ${sys_SOURCES})
   set_target_properties(sys_shared PROPERTIES OUTPUT_NAME swirly_sys)
-  target_link_libraries(sys_shared pthread)
+  target_link_libraries(sys_shared ${Boost_SYSTEM_LIBRARY} pthread)
   install(TARGETS sys_shared DESTINATION lib)
 endif()
 
 set(sys_test_SOURCES
+  IpAddressTest.cxx
   RefCountTest.cxx
   HandleTest.cxx
   MemCtxTest.cxx)
