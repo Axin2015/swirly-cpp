@@ -15,3 +15,7 @@
  * 02110-1301, USA.
  */
 #include "Error.hpp"
+
+#pragma GCC visibility push(default)
+#include <boost/system/detail/error_code.ipp>
+#pragma GCC visibility pop

@@ -10,7 +10,6 @@ matrix:
       addons:
         apt:
           sources:
-            - boost-latest
             - travis-ci/sqlite3
             - ubuntu-toolchain-r-test
             - sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-5.0 main'
@@ -20,7 +19,6 @@ matrix:
             - cmake
             - cmake-data
             - g++-6
-            - libboost1.55-all-dev
             - libsqlite3-dev
       env:
         - CMAKE_BUILD_TYPE=DEBUG
@@ -33,7 +31,6 @@ matrix:
       addons:
         apt:
           sources:
-            - boost-latest
             - travis-ci/sqlite3
             - ubuntu-toolchain-r-test
             - sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-5.0 main'
@@ -43,7 +40,6 @@ matrix:
             - cmake
             - cmake-data
             - g++-6
-            - libboost1.55-all-dev
             - libsqlite3-dev
       env:
         - CMAKE_BUILD_TYPE=RELEASE
@@ -56,14 +52,12 @@ matrix:
       addons:
         apt:
           sources:
-            - boost-latest
             - travis-ci/sqlite3
             - ubuntu-toolchain-r-test
           packages:
             - cmake
             - cmake-data
             - g++-6
-            - libboost1.55-all-dev
             - libsqlite3-dev
       env:
         - CMAKE_BUILD_TYPE=DEBUG
@@ -76,14 +70,12 @@ matrix:
       addons:
         apt:
           sources:
-            - boost-latest
             - travis-ci/sqlite3
             - ubuntu-toolchain-r-test
           packages:
             - cmake
             - cmake-data
             - g++-6
-            - libboost1.55-all-dev
             - libsqlite3-dev
       env:
         - CMAKE_BUILD_TYPE=RELEASE
@@ -114,6 +106,11 @@ before_install:
       brew update;
       brew install sqlite3;
       brew outdated boost || brew upgrade boost;
+    else
+      sudo add-apt-repository -y ppa:samuel-bachmann/boost;
+      sudo apt-get update;
+      sudo apt-get install libboost-date-time1.60-dev libboost-filesystem1.60-dev
+        libboost-date-time1.60-dev;
     fi
 
 before_script:
