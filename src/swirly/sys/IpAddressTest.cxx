@@ -14,8 +14,33 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Error.hpp"
+#include "IpAddress.hpp"
 
-#pragma GCC visibility push(default)
-#include <boost/system/detail/error_code.ipp>
-#pragma GCC visibility pop
+#include <swirly/unit/Test.hpp>
+
+using namespace std;
+using namespace swirly;
+
+SWIRLY_TEST_CASE(ParseEndpointV4)
+{
+    const auto ep = parseEndpoint<Tcp>("192.168.1.2:443");
+
+    SWIRLY_CHECK(ep.address().to_string() == "192.168.1.2");
+    SWIRLY_CHECK(ep.port() == 443);
+
+    stringstream ss;
+    ss << ep;
+    SWIRLY_CHECK(ss.str() == "192.168.1.2:443");
+}
+
+SWIRLY_TEST_CASE(ParseEndpointV6)
+{
+    const auto ep = parseEndpoint<Udp>("[2001:db8:85a3:8d3:1319:8a2e:370:7348]:443");
+
+    SWIRLY_CHECK(ep.address().to_string() == "2001:db8:85a3:8d3:1319:8a2e:370:7348");
+    SWIRLY_CHECK(ep.port() == 443);
+
+    stringstream ss;
+    ss << ep;
+    SWIRLY_CHECK(ss.str() == "[2001:db8:85a3:8d3:1319:8a2e:370:7348]:443");
+}

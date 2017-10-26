@@ -22,6 +22,5 @@ set(swirlyd_SOURCES
   RestServ.cpp)
 
 add_executable(swirlyd ${swirlyd_SOURCES})
-target_link_libraries(swirlyd ${web_LIBRARY} ${sqlite_LIBRARY}
-  ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+target_link_libraries(swirlyd ${web_LIBRARY} ${sqlite_LIBRARY} ${Boost_FILESYSTEM_LIBRARY})
 install(TARGETS swirlyd DESTINATION bin)

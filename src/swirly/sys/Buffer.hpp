@@ -14,8 +14,19 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Error.hpp"
+#ifndef SWIRLY_SYS_BUFFER_HPP
+#define SWIRLY_SYS_BUFFER_HPP
 
-#pragma GCC visibility push(default)
-#include <boost/system/detail/error_code.ipp>
-#pragma GCC visibility pop
+#include <boost/asio/buffer.hpp>
+
+namespace swirly {
+
+using ConstBuffer = boost::asio::const_buffer;
+using MutableBuffer = boost::asio::mutable_buffer;
+
+using boost::asio::buffer_cast;
+using boost::asio::buffer_size;
+
+} // namespace swirly
+
+#endif // SWIRLY_SYS_BUFFER_HPP

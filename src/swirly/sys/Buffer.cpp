@@ -14,8 +14,4 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Error.hpp"
-
-#pragma GCC visibility push(default)
-#include <boost/system/detail/error_code.ipp>
-#pragma GCC visibility pop
+#include "Buffer.hpp"
