@@ -28,6 +28,7 @@ set(sys_SOURCES
   Poll.cpp
   Reactor.cpp
   RefCount.cpp
+  Socket.cpp
   System.cpp)
 
 add_library(sys_static STATIC ${sys_SOURCES})

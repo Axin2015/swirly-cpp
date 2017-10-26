@@ -14,20 +14,4 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SYS_ERROR_HPP
-#define SWIRLY_SYS_ERROR_HPP
-
-#include <system_error>
-
-namespace swirly {
-namespace sys {
-
-inline std::error_code makeError(int err)
-{
-    return std::error_code{err, std::system_category()};
-}
-
-} // namespace sys
-} // namespace swirly
-
-#endif // SWIRLY_SYS_ERROR_HPP
+#include "Socket.hpp"

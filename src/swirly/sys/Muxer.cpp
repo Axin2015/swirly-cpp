@@ -28,7 +28,7 @@ void PollPolicy::insert(Impl* md, int sid, int fd, EventMask mask)
     const pollfd pfd{fd, static_cast<short>(mask), 0};
     const auto it = std::lower_bound(pfds.begin(), pfds.end(), pfd, Cmp{});
     if (it != pfds.end() && it->fd == fd) {
-        throw std::system_error{sys::error(EEXIST), "fd already registered"};
+        throw std::system_error{sys::makeError(EEXIST), "fd already registered"};
     }
     auto& sids = md->sids;
     const auto jt = sids.begin() + distance(pfds.begin(), it);
@@ -44,7 +44,7 @@ void PollPolicy::update(Impl* md, int fd, EventMask mask)
     const pollfd pfd{fd, 0, 0};
     const auto it = std::lower_bound(pfds.begin(), pfds.end(), pfd, Cmp{});
     if (it == pfds.end() || it->fd != fd) {
-        throw std::system_error{sys::error(ENOENT), "fd is not registered"};
+        throw std::system_error{sys::makeError(ENOENT), "fd is not registered"};
     }
     it->events = mask;
 }
@@ -56,7 +56,7 @@ void PollPolicy::erase(Impl* md, int fd)
     const pollfd pfd{fd, 0, 0};
     const auto it = std::lower_bound(pfds.begin(), pfds.end(), pfd, Cmp{});
     if (it == pfds.end() || it->fd != fd) {
-        throw std::system_error{sys::error(ENOENT), "fd is not registered"};
+        throw std::system_error{sys::makeError(ENOENT), "fd is not registered"};
     }
     auto& sids = md->sids;
     const auto jt = sids.begin() + distance(pfds.begin(), it);
