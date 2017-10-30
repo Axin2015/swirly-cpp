@@ -25,7 +25,7 @@ using namespace swirly;
 
 SWIRLY_TEST_CASE(GetBusDay)
 {
-    BusinessDay busDay{RollHour, NewYork};
+    BusinessDay busDay{MarketZone};
 
     // Business days roll at 5pm New York.
 

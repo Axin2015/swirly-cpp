@@ -685,7 +685,7 @@ struct Serv::Impl {
     }
 
     AsyncJourn journ_;
-    const BusinessDay busDay_{RollHour, NewYork};
+    const BusinessDay busDay_{MarketZone};
     const size_t maxExecs_;
     AssetSet assets_;
     InstrSet instrs_;

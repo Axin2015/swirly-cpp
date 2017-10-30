@@ -27,15 +27,16 @@
 namespace swirly {
 
 /**
- * Roll at 5pm.
- */
-constexpr int RollHour{17};
-
-/**
  * America/New_York.
  * See http://www.di-mgt.com.au/wclock/tz.html
  */
 constexpr char NewYork[]{"EST-5EDT,M3.2.0/2,M11.1.0/2"};
+
+/**
+ * Custom TimeZone representing "Market Time".
+ * Where is Market Time is NewYork + 7 hours.
+ */
+constexpr char MarketZone[]{"MKST+2MKDT,M3.2.0/2,M11.1.0/2"};
 
 /**
  * Business day functor. Date calculations on the critical path can become a performance bottleneck.
@@ -43,7 +44,7 @@ constexpr char NewYork[]{"EST-5EDT,M3.2.0/2,M11.1.0/2"};
  */
 class SWIRLY_API BusinessDay {
   public:
-    explicit BusinessDay(int rollHour, const char* timeZone);
+    explicit BusinessDay(const char* timeZone);
     ~BusinessDay() noexcept;
 
     // Copy.
@@ -64,7 +65,6 @@ class SWIRLY_API BusinessDay {
     JDay operator()(Time time) const;
 
   private:
-    int rollHour_;
     boost::local_time::time_zone_ptr timeZone_;
     /**
      * Cache entries for odd and even time_t values.

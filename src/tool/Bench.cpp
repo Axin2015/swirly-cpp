@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
             model = make_unique<TestModel>();
         }
 
-        const BusinessDay busDay{RollHour, NewYork};
+        const BusinessDay busDay{MarketZone};
         const auto now = UnixClock::now();
 
         Serv serv{*journ, 1 << 10, 1 << 4};

@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
         if (argc > 1) {
             conf.set("sqlite_model", argv[1]);
         }
-        const BusinessDay busDay{RollHour, NewYork};
+        const BusinessDay busDay{MarketZone};
 
         const auto now = UnixClock::now();
         auto model = makeModel(conf);
