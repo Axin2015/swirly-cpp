@@ -261,6 +261,8 @@ inline int fcntl(int fd, int cmd, ArgT arg)
     return ret;
 }
 
+} // namespace sys
+
 inline void setNonBlock(int fd, std::error_code& ec) noexcept
 {
     fcntl(fd, F_SETFL, O_NONBLOCK, ec);
@@ -271,7 +273,6 @@ inline void setNonBlock(int fd)
     fcntl(fd, F_SETFL, O_NONBLOCK);
 }
 
-} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_FILE_HPP

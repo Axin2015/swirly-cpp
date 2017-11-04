@@ -14,4 +14,24 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "IoSocket.hpp"
+#include "UdpSocket.hpp"
+
+namespace swirly {
+
+IpMcastGroup::IpMcastGroup(const IpAddress& addr, unsigned ifindex) noexcept
+{
+    if (addr.is_v6()) {
+        const auto& bytes = addr.to_v6().to_bytes();
+        family = AF_INET6;
+        memcpy(&ipv6.ipv6mr_multiaddr, bytes.data(), bytes.size());
+        ipv6.ipv6mr_interface = ifindex;
+    } else {
+        assert(addr.is_v4());
+        const auto& bytes = addr.to_v4().to_bytes();
+        family = AF_INET;
+        memcpy(&ipv4.imr_multiaddr, bytes.data(), bytes.size());
+        ipv4.imr_ifindex = ifindex;
+    }
+}
+
+} // namespace swirly

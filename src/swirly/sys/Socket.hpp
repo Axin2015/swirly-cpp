@@ -27,11 +27,39 @@ namespace swirly {
 namespace sys {
 
 /**
+ * Returns the index of the network interface corresponding to the name ifname.
+ */
+inline unsigned if_nametoindex(const char* ifname, std::error_code& ec) noexcept
+{
+    unsigned ifindex{0};
+    if (ifname) {
+        if (!(ifindex = ::if_nametoindex(ifname))) {
+            ec = makeError(errno);
+        }
+    }
+    return ifindex;
+}
+
+/**
+ * Returns the index of the network interface corresponding to the name ifname.
+ */
+inline unsigned if_nametoindex(const char* ifname)
+{
+    unsigned ifindex{0};
+    if (ifname) {
+        if (!(ifindex = ::if_nametoindex(ifname))) {
+            throw std::system_error{makeError(errno), "if_nametoindex"};
+        }
+    }
+    return ifindex;
+}
+
+/**
  * Create an endpoint for communication.
  */
-inline File socket(int domain, int type, int protocol, std::error_code& ec) noexcept
+inline File socket(int family, int type, int protocol, std::error_code& ec) noexcept
 {
-    const auto sockfd = ::socket(domain, type, protocol);
+    const auto sockfd = ::socket(family, type, protocol);
     if (sockfd < 0) {
         ec = makeError(errno);
     }
@@ -41,9 +69,9 @@ inline File socket(int domain, int type, int protocol, std::error_code& ec) noex
 /**
  * Create an endpoint for communication.
  */
-inline File socket(int domain, int type, int protocol)
+inline File socket(int family, int type, int protocol)
 {
-    const auto sockfd = ::socket(domain, type, protocol);
+    const auto sockfd = ::socket(family, type, protocol);
     if (sockfd < 0) {
         throw std::system_error{makeError(errno), "socket"};
     }
@@ -71,11 +99,11 @@ inline File socket(TransportT trans)
 /**
  * Create a pair of connected sockets.
  */
-inline std::pair<File, File> socketpair(int domain, int type, int protocol,
+inline std::pair<File, File> socketpair(int family, int type, int protocol,
                                         std::error_code& ec) noexcept
 {
     int sv[2];
-    if (::socketpair(domain, type, protocol, sv) < 0) {
+    if (::socketpair(family, type, protocol, sv) < 0) {
         ec = makeError(errno);
     }
     return {File{sv[0]}, File{sv[1]}};
@@ -84,10 +112,10 @@ inline std::pair<File, File> socketpair(int domain, int type, int protocol,
 /**
  * Create a pair of connected sockets.
  */
-inline std::pair<File, File> socketpair(int domain, int type, int protocol)
+inline std::pair<File, File> socketpair(int family, int type, int protocol)
 {
     int sv[2];
-    if (::socketpair(domain, type, protocol, sv) < 0) {
+    if (::socketpair(family, type, protocol, sv) < 0) {
         throw std::system_error{makeError(errno), "socketpair"};
     }
     return {File{sv[0]}, File{sv[1]}};
@@ -636,6 +664,51 @@ inline void setTcpNoDelay(int sockfd, bool enabled)
     int optval{enabled ? 1 : 0};
     sys::setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
 }
+
+struct Socket {
+    Socket(File&& sock, int family) : sock_{std::move(sock)}, family_{family} {}
+    Socket() = default;
+
+    explicit operator bool() const noexcept { return static_cast<bool>(sock_); }
+    // Returns native file handle.
+    auto handle() const noexcept { return *sock_; }
+
+    // Logically const.
+    int getSoError() const { return swirly::getSoError(*sock_); }
+
+    void close() { sock_.reset(); }
+
+    void setNonBlock(std::error_code& ec) noexcept { swirly::setNonBlock(*sock_, ec); }
+    void setNonBlock() { swirly::setNonBlock(*sock_); }
+
+    void setSoRcvBuf(int size, std::error_code& ec) noexcept
+    {
+        swirly::setSoRcvBuf(*sock_, size, ec);
+    }
+    void setSoRcvBuf(int size) { swirly::setSoRcvBuf(*sock_, size); }
+
+    void setSoReuseAddr(bool enabled, std::error_code& ec) noexcept
+    {
+        swirly::setSoReuseAddr(*sock_, enabled, ec);
+    }
+    void setSoReuseAddr(bool enabled) { swirly::setSoReuseAddr(*sock_, enabled); }
+
+    void setSoSndBuf(int size, std::error_code& ec) noexcept
+    {
+        swirly::setSoSndBuf(*sock_, size, ec);
+    }
+    void setSoSndBuf(int size) { swirly::setSoSndBuf(*sock_, size); }
+
+    void setTcpNoDelay(bool enabled, std::error_code& ec) noexcept
+    {
+        swirly::setTcpNoDelay(*sock_, enabled, ec);
+    }
+    void setTcpNoDelay(bool enabled) { swirly::setTcpNoDelay(*sock_, enabled); }
+
+  protected:
+    File sock_;
+    int family_{};
+};
 
 } // namespace swirly
 

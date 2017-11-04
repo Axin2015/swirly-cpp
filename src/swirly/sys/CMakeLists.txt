@@ -19,6 +19,7 @@ set(sys_SOURCES
   Error.cpp
   File.cpp
   Handle.cpp
+  IoSocket.cpp
   IpAddress.cpp
   MMap.cpp
   MemAlloc.cpp
@@ -29,7 +30,9 @@ set(sys_SOURCES
   Reactor.cpp
   RefCount.cpp
   Socket.cpp
-  System.cpp)
+  System.cpp
+  TcpSocket.cpp
+  UdpSocket.cpp)
 
 add_library(sys_static STATIC ${sys_SOURCES})
 set_target_properties(sys_static PROPERTIES OUTPUT_NAME swirly_sys)
