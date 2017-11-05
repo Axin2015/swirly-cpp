@@ -29,10 +29,7 @@ using namespace std;
 
 namespace swirly {
 
-BusinessDay::BusinessDay(int rollHour, const char* tzname)
-    : rollHour_{rollHour}, timeZone_{new lt::posix_time_zone{tzname}}
-{
-}
+BusinessDay::BusinessDay(const char* timeZone) : timeZone_{new lt::posix_time_zone{timeZone}} {}
 
 BusinessDay::~BusinessDay() noexcept = default;
 
@@ -54,8 +51,6 @@ JDay BusinessDay::operator()(Time time) const
         return cache_[i].second;
     }
     lt::local_date_time ldt{pt::from_time_t(t), timeZone_};
-    // Add 7 hours to 17.00 will roll the date.
-    ldt += pt::hours(24 - rollHour_);
     const auto jd = JDay{ldt.local_time().date().julian_day()};
     // Update cache entry.
     cache_[i] = {t, jd};

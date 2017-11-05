@@ -14,28 +14,24 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Date.hpp"
+#include "UdpSocket.hpp"
 
-#include <swirly/util/Date.hpp>
+namespace swirly {
 
-#include <swirly/unit/Test.hpp>
-
-using namespace std;
-using namespace swirly;
-
-SWIRLY_TEST_CASE(GetBusDay)
+IpMcastGroup::IpMcastGroup(const IpAddress& addr, unsigned ifindex) noexcept
 {
-    BusinessDay busDay{MarketZone};
-
-    // Business days roll at 5pm New York.
-
-    // Friday, March 14, 2014
-    // 21.00 UTC
-    // 17.00 EDT (UTC-4 hours)
-
-    // 20.59 UTC
-    SWIRLY_CHECK(busDay(Time{1394830799000ms}) == ymdToJd(2014, 2, 14));
-
-    // 21.00 UTC
-    SWIRLY_CHECK(busDay(Time{1394830800000ms}) == ymdToJd(2014, 2, 15));
+    if (addr.is_v6()) {
+        const auto& bytes = addr.to_v6().to_bytes();
+        family = AF_INET6;
+        memcpy(&ipv6.ipv6mr_multiaddr, bytes.data(), bytes.size());
+        ipv6.ipv6mr_interface = ifindex;
+    } else {
+        assert(addr.is_v4());
+        const auto& bytes = addr.to_v4().to_bytes();
+        family = AF_INET;
+        memcpy(&ipv4.imr_multiaddr, bytes.data(), bytes.size());
+        ipv4.imr_ifindex = ifindex;
+    }
 }
+
+} // namespace swirly

@@ -14,28 +14,4 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Date.hpp"
-
-#include <swirly/util/Date.hpp>
-
-#include <swirly/unit/Test.hpp>
-
-using namespace std;
-using namespace swirly;
-
-SWIRLY_TEST_CASE(GetBusDay)
-{
-    BusinessDay busDay{MarketZone};
-
-    // Business days roll at 5pm New York.
-
-    // Friday, March 14, 2014
-    // 21.00 UTC
-    // 17.00 EDT (UTC-4 hours)
-
-    // 20.59 UTC
-    SWIRLY_CHECK(busDay(Time{1394830799000ms}) == ymdToJd(2014, 2, 14));
-
-    // 21.00 UTC
-    SWIRLY_CHECK(busDay(Time{1394830800000ms}) == ymdToJd(2014, 2, 15));
-}
+#include "TcpSocket.hpp"

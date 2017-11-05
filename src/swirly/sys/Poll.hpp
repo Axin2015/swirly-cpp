@@ -32,7 +32,7 @@ inline int poll(pollfd* fds, nfds_t nfds, int timeout, std::error_code& ec) noex
 {
     const auto ret = ::poll(fds, nfds, timeout);
     if (ret < 0) {
-        ec = error(errno);
+        ec = makeError(errno);
     }
     return ret;
 }
@@ -41,7 +41,7 @@ inline int poll(pollfd* fds, nfds_t nfds, int timeout)
 {
     const auto ret = ::poll(fds, nfds, timeout);
     if (ret < 0) {
-        throw std::system_error{error(errno), "poll"};
+        throw std::system_error{makeError(errno), "poll"};
     }
     return ret;
 }
@@ -52,7 +52,7 @@ inline int epoll_create(int size, std::error_code& ec) noexcept
 {
     const auto ret = ::epoll_create(size);
     if (ret < 0) {
-        ec = error(errno);
+        ec = makeError(errno);
     }
     return ret;
 }
@@ -61,7 +61,7 @@ inline int epoll_create(int size)
 {
     const auto ret = ::epoll_create(size);
     if (ret < 0) {
-        throw std::system_error{error(errno), "epoll_create"};
+        throw std::system_error{makeError(errno), "epoll_create"};
     }
     return ret;
 }
@@ -70,7 +70,7 @@ inline int epoll_ctl(int epfd, int op, int fd, epoll_event event, std::error_cod
 {
     const auto ret = ::epoll_ctl(epfd, op, fd, &event);
     if (ret < 0) {
-        ec = error(errno);
+        ec = makeError(errno);
     }
     return ret;
 }
@@ -79,7 +79,7 @@ inline int epoll_ctl(int epfd, int op, int fd, epoll_event event)
 {
     const auto ret = ::epoll_ctl(epfd, op, fd, &event);
     if (ret < 0) {
-        throw std::system_error{error(errno), "epoll_ctl"};
+        throw std::system_error{makeError(errno), "epoll_ctl"};
     }
     return ret;
 }
@@ -89,7 +89,7 @@ inline int epoll_wait(int epfd, epoll_event* events, int maxevents, int timeout,
 {
     const auto ret = ::epoll_wait(epfd, events, maxevents, timeout);
     if (ret < 0) {
-        ec = error(errno);
+        ec = makeError(errno);
     }
     return ret;
 }
@@ -98,7 +98,7 @@ inline int epoll_wait(int epfd, epoll_event* events, int maxevents, int timeout)
 {
     const auto ret = ::epoll_wait(epfd, events, maxevents, timeout);
     if (ret < 0) {
-        throw std::system_error{error(errno), "epoll_wait"};
+        throw std::system_error{makeError(errno), "epoll_wait"};
     }
     return ret;
 }
