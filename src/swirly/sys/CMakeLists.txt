@@ -32,6 +32,7 @@ set(sys_SOURCES
   Socket.cpp
   System.cpp
   TcpSocket.cpp
+  Time.cpp
   UdpSocket.cpp)
 
 add_library(sys_static STATIC ${sys_SOURCES})

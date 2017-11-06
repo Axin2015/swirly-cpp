@@ -25,7 +25,8 @@
 
 #include <swirly/util/Conf.hpp>
 #include <swirly/util/Stream.hpp>
-#include <swirly/util/Time.hpp>
+
+#include <swirly/sys/Time.hpp>
 
 #include <iostream>
 

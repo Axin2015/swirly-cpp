@@ -37,7 +37,7 @@ UnixClock::time_point UnixClock::now() noexcept
     return time_point{nanoseconds{ts.tv_sec * 1'000'000'000L + ts.tv_nsec}};
 }
 
-void formatTime(Time time, ostream& os)
+void printTime(Time time, ostream& os)
 {
     const auto t = UnixClock::to_time_t(time);
     const auto us = usSinceEpoch(time);
@@ -49,10 +49,10 @@ void formatTime(Time time, ostream& os)
     os << buf << '.' << setfill('0') << setw(6) << (us % 1'000'000L);
 }
 
-string formatTime(Time time)
+string printTime(Time time)
 {
     stringstream ss;
-    formatTime(time, ss);
+    printTime(time, ss);
     return ss.str();
 }
 

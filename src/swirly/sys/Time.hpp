@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_UTIL_TIME_HPP
-#define SWIRLY_UTIL_TIME_HPP
+#ifndef SWIRLY_SYS_TIME_HPP
+#define SWIRLY_SYS_TIME_HPP
 
 #include <swirly/Config.h>
 
@@ -111,9 +111,9 @@ constexpr std::int64_t nsSinceEpoch(Time time) noexcept
 /**
  * Format time with microsecond precision.
  */
-SWIRLY_API void formatTime(Time time, std::ostream& os);
+SWIRLY_API void printTime(Time time, std::ostream& os);
 
-SWIRLY_API std::string formatTime(Time time);
+SWIRLY_API std::string printTime(Time time);
 
 SWIRLY_API std::ostream& operator<<(std::ostream& os, Time time);
 
@@ -187,4 +187,4 @@ inline timespec operator-(timespec lhs, timespec rhs) noexcept
 
 } // namespace swirly
 
-#endif // SWIRLY_UTIL_TIME_HPP
+#endif // SWIRLY_SYS_TIME_HPP

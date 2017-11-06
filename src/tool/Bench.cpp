@@ -24,7 +24,8 @@
 #include <swirly/util/Conf.hpp>
 #include <swirly/util/Log.hpp>
 #include <swirly/util/Profile.hpp>
-#include <swirly/util/Time.hpp>
+
+#include <swirly/sys/Time.hpp>
 
 #include <swirly/sys/MemCtx.hpp>
 

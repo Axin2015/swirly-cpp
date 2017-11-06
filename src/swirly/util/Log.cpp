@@ -16,7 +16,7 @@
  */
 #include "Log.hpp"
 
-#include <swirly/util/Time.hpp>
+#include <swirly/sys/Time.hpp>
 
 #include <algorithm> // max()
 #include <atomic>
