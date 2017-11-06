@@ -28,7 +28,7 @@ namespace swirly {
 struct IoSocket : Socket {
     using Socket::Socket;
 
-    IoSocket() = default;
+    IoSocket() noexcept = default;
 
     void shutdown(int how) { return sys::shutdown(*sock_, how); }
 

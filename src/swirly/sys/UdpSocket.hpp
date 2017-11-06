@@ -275,7 +275,7 @@ struct UdpSocket : IoSocket {
     {
     }
     explicit UdpSocket(Transport trans) : IoSocket{sys::socket(trans), trans.family()} {}
-    UdpSocket() = default;
+    UdpSocket() noexcept = default;
 
     void bind(const Endpoint& ep, std::error_code& ec) noexcept { sys::bind(*sock_, ep, ec); }
     void bind(const Endpoint& ep) { sys::bind(*sock_, ep); }
