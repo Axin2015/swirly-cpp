@@ -16,6 +16,8 @@
  */
 #include "Reactor.hpp"
 
+#include "Log.hpp"
+
 namespace swirly {
 
 EventHandler::~EventHandler() noexcept = default;
@@ -86,7 +88,12 @@ void Reactor::dispatch(Event* events, int size) const
             continue;
         }
         EventHandlerPtr eh{data.eh};
-        eh->ioEvent(fd, event.events);
+        try {
+            eh->ioEvent(fd, event.events);
+        } catch (const std::exception& e) {
+            using namespace std::string_literals;
+            SWIRLY_ERROR("exception caught in reactor: "s + e.what());
+        }
     }
 }
 

@@ -21,6 +21,7 @@ set(sys_SOURCES
   Handle.cpp
   IoSocket.cpp
   IpAddress.cpp
+  Log.cpp
   MMap.cpp
   MemAlloc.cpp
   MemCtx.cpp
