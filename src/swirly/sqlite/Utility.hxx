@@ -20,7 +20,8 @@
 #include <swirly/util/Enum.hpp>
 #include <swirly/util/Finally.hpp>
 #include <swirly/util/IntWrapper.hpp>
-#include <swirly/util/Time.hpp>
+
+#include <swirly/sys/Time.hpp>
 
 #include <experimental/string_view>
 

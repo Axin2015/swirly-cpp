@@ -21,6 +21,8 @@ set(sys_SOURCES
   Handle.cpp
   IoSocket.cpp
   IpAddress.cpp
+  LocalAddress.cpp
+  Log.cpp
   MMap.cpp
   MemAlloc.cpp
   MemCtx.cpp
@@ -32,6 +34,7 @@ set(sys_SOURCES
   Socket.cpp
   System.cpp
   TcpSocket.cpp
+  Time.cpp
   UdpSocket.cpp)
 
 add_library(sys_static STATIC ${sys_SOURCES})
@@ -47,10 +50,12 @@ if(ENABLE_SHARED_LIBS)
 endif()
 
 set(sys_test_SOURCES
-  IpAddressTest.cxx
-  RefCountTest.cxx
   HandleTest.cxx
-  MemCtxTest.cxx)
+  IpAddressTest.cxx
+  MemCtxTest.cxx
+  ReactorTest.cxx
+  RefCountTest.cxx
+  SocketTest.cxx)
 
 foreach(file ${sys_test_SOURCES})
   get_filename_component (name ${file} NAME_WE)

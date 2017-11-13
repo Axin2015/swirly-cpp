@@ -667,11 +667,11 @@ inline void setTcpNoDelay(int sockfd, bool enabled)
 
 struct Socket {
     Socket(File&& sock, int family) : sock_{std::move(sock)}, family_{family} {}
-    Socket() = default;
+    Socket() noexcept = default;
 
+    auto operator*() const noexcept { return *sock_; }
+    auto get() const noexcept { return sock_.get(); }
     explicit operator bool() const noexcept { return static_cast<bool>(sock_); }
-    // Returns native file handle.
-    auto handle() const noexcept { return *sock_; }
 
     // Logically const.
     int getSoError() const { return swirly::getSoError(*sock_); }

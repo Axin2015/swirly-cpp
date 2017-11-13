@@ -14,19 +14,20 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Log.hpp"
+#ifndef SWIRLY_SYS_LOCALADDRESS_HPP
+#define SWIRLY_SYS_LOCALADDRESS_HPP
 
-using namespace std;
+#include <swirly/Config.h>
+
+#include <boost/asio/local/datagram_protocol.hpp>
+#include <boost/asio/local/stream_protocol.hpp>
 
 namespace swirly {
-namespace {
-thread_local LogMsg logMsg_;
-} // namespace
 
-LogMsg& logMsg() noexcept
-{
-    logMsg_.reset();
-    return logMsg_;
-}
+// Unix domain sockets.
+using LocalDgram = boost::asio::local::datagram_protocol;
+using LocalStream = boost::asio::local::stream_protocol;
 
 } // namespace swirly
+
+#endif // SWIRLY_SYS_LOCALADDRESS_HPP

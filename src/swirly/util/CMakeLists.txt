@@ -35,7 +35,6 @@ set(util_SOURCES
   Stream.cpp
   String.cpp
   Symbol.cpp
-  Time.cpp
   Tokeniser.cpp
   Types.cpp
   Utility.cpp

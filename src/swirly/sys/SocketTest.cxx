@@ -14,19 +14,21 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Log.hpp"
+#include "IoSocket.hpp"
+#include "LocalAddress.hpp"
+#include "Reactor.hpp"
+
+#include <swirly/unit/Test.hpp>
 
 using namespace std;
+using namespace swirly;
 
-namespace swirly {
-namespace {
-thread_local LogMsg logMsg_;
-} // namespace
-
-LogMsg& logMsg() noexcept
+SWIRLY_TEST_CASE(SocketPair)
 {
-    logMsg_.reset();
-    return logMsg_;
-}
+    auto socks = socketpair(LocalStream{});
+    socks.first.send("foo", 4, 0);
 
-} // namespace swirly
+    char buf[4];
+    socks.second.recv(buf, 4, 0);
+    SWIRLY_CHECK(strcmp(buf, "foo") == 0);
+}

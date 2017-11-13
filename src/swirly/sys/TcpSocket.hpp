@@ -36,7 +36,7 @@ struct TcpSocketServ : Socket {
     }
     explicit TcpSocketServ(Transport trans) : Socket{sys::socket(trans), trans.family()} {}
 
-    TcpSocketServ() = default;
+    TcpSocketServ() noexcept = default;
 
     void bind(const Endpoint& ep, std::error_code& ec) noexcept { sys::bind(*sock_, ep, ec); }
     void bind(const Endpoint& ep) { sys::bind(*sock_, ep); }
@@ -66,7 +66,7 @@ struct TcpSocketClnt : IoSocket {
     }
     explicit TcpSocketClnt(Transport trans) : IoSocket{sys::socket(trans), trans.family()} {}
 
-    TcpSocketClnt() = default;
+    TcpSocketClnt() noexcept = default;
 
     void connect(const Endpoint& ep, std::error_code& ec) noexcept
     {
