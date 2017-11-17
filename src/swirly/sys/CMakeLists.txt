@@ -14,6 +14,7 @@
 # 02110-1301, USA.
 
 set(sys_SOURCES
+  AsyncHandler.cpp
   Buffer.cpp
   Daemon.cpp
   Error.cpp
@@ -35,6 +36,8 @@ set(sys_SOURCES
   System.cpp
   TcpSocket.cpp
   Time.cpp
+  Timer.cpp
+  Types.cpp
   UdpSocket.cpp)
 
 add_library(sys_static STATIC ${sys_SOURCES})

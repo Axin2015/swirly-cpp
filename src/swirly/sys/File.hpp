@@ -30,7 +30,7 @@
 namespace swirly {
 
 struct FilePolicy {
-    using Descriptor = int;
+    using Id = int;
     static constexpr int invalid() noexcept { return -1; }
     static void close(int d) noexcept { ::close(d); }
 };

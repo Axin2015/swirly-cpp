@@ -20,55 +20,90 @@
 
 namespace swirly {
 
-EventHandler::~EventHandler() noexcept = default;
+using namespace std;
 
-int Reactor::poll() const
-{
-    Event events[16];
-    const auto size = mux_.wait(events, 16);
-    dispatch(events, size);
-    return size;
-}
-
-int Reactor::poll(std::chrono::milliseconds timeout) const
-{
-    Event events[16];
-    const auto size = mux_.wait(events, 16, timeout);
-    dispatch(events, size);
-    return size;
-}
-
-void Reactor::insert(int fd, EventMask mask, const EventHandlerPtr& eh)
+void Reactor::attach(int fd, EventMask mask, const AsyncHandlerPtr& handler)
 {
     assert(fd >= 0);
-    assert(eh);
+    assert(handler);
     if (fd >= static_cast<int>(data_.size())) {
         data_.resize(fd + 1);
     }
     auto& data = data_[fd];
-    mux_.insert(++data.sid, fd, mask);
+    mux_.attach(++data.sid, fd, mask);
     data.mask = mask;
-    data.eh = eh;
+    data.handler = handler;
 }
 
-void Reactor::update(int fd, EventMask mask)
+void Reactor::setMask(int fd, EventMask mask)
 {
     if (data_[fd].mask != mask) {
-        mux_.update(fd, mask);
+        mux_.setMask(fd, mask);
         data_[fd].mask = mask;
     }
 }
 
-void Reactor::erase(int fd)
+void Reactor::detach(int fd)
 {
-    mux_.erase(fd);
+    mux_.detach(fd);
     auto& data = data_[fd];
     data.mask = 0;
-    data.eh.reset();
+    data.handler.reset();
 }
 
-void Reactor::dispatch(Event* events, int size) const
+Timer Reactor::setTimer(Time expiry, Duration interval, const AsyncHandlerPtr& handler)
 {
+    return tq_.set(expiry, interval, handler);
+}
+
+Timer Reactor::setTimer(Time expiry, const AsyncHandlerPtr& handler)
+{
+    return tq_.set(expiry, handler);
+}
+
+bool Reactor::resetTimer(long id, Duration interval)
+{
+    return tq_.reset(id, interval);
+}
+
+bool Reactor::resetTimer(Timer::Id id, Duration interval)
+{
+    return tq_.reset(id, interval);
+}
+
+void Reactor::cancelTimer(long id)
+{
+    tq_.cancel(id);
+}
+
+void Reactor::cancelTimer(Timer::Id id)
+{
+    tq_.cancel(id);
+}
+
+int Reactor::poll(chrono::milliseconds timeout)
+{
+    using namespace chrono;
+
+    if (!tq_.empty()) {
+        // Millis until next expiry.
+        const auto expiry = duration_cast<milliseconds>(tq_.front().expiry - UnixClock::now());
+        if (expiry < timeout) {
+            timeout = max(expiry, 0ms);
+        }
+    }
+    Event events[16];
+    const auto size = mux_.wait(events, 16, timeout);
+    dispatch(events, size, UnixClock::now());
+    return size;
+}
+
+void Reactor::dispatch(Event* events, int size, Time now)
+{
+    // Dispatch timer notifications.
+    while (tq_.expire(now))
+        ;
+
     for (int i{0}; i < size; ++i) {
 
         auto& event = events[i];
@@ -87,12 +122,12 @@ void Reactor::dispatch(Event* events, int size) const
         if (!(event.events)) {
             continue;
         }
-        EventHandlerPtr eh{data.eh};
+        AsyncHandlerPtr handler{data.handler};
         try {
-            eh->ioEvent(fd, event.events);
+            handler->event(fd, event.events, now);
         } catch (const std::exception& e) {
             using namespace std::string_literals;
-            SWIRLY_ERROR("exception caught in reactor: "s + e.what());
+            SWIRLY_ERROR("error handling io event: "s + e.what());
         }
     }
 }

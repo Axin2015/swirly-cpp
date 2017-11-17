@@ -25,16 +25,16 @@ namespace swirly {
 template <typename PolicyT>
 class Handle {
   public:
-    using Descriptor = typename PolicyT::Descriptor;
+    using Id = typename PolicyT::Id;
 
-    static constexpr Descriptor invalid() noexcept { return PolicyT::invalid(); }
+    static constexpr Id invalid() noexcept { return PolicyT::invalid(); }
 
     Handle(std::nullptr_t = nullptr) noexcept {}
-    Handle(Descriptor d) noexcept : d_{d} {}
+    Handle(Id id) noexcept : id_{id} {}
     ~Handle() noexcept
     {
-        if (d_ != invalid()) {
-            PolicyT::close(d_);
+        if (id_ != invalid()) {
+            PolicyT::close(id_);
         }
     }
 
@@ -43,46 +43,46 @@ class Handle {
     Handle& operator=(const Handle&) = delete;
 
     // Move.
-    Handle(Handle&& rhs) : d_{rhs.d_} { rhs.d_ = invalid(); }
+    Handle(Handle&& rhs) : id_{rhs.id_} { rhs.id_ = invalid(); }
     Handle& operator=(Handle&& rhs)
     {
         close();
-        std::swap(d_, rhs.d_);
+        std::swap(id_, rhs.id_);
         return *this;
     }
 
-    Descriptor operator*() const noexcept { return get(); }
+    Id operator*() const noexcept { return get(); }
 
-    Descriptor get() const noexcept { return d_; }
+    Id get() const noexcept { return id_; }
 
-    explicit operator bool() const noexcept { return d_ != invalid(); }
+    explicit operator bool() const noexcept { return id_ != invalid(); }
 
-    Descriptor release() noexcept
+    Id release() noexcept
     {
-        const auto d = d_;
-        d_ = invalid();
-        return d;
+        const auto id = id_;
+        id_ = invalid();
+        return id;
     }
 
-    void reset(Descriptor d = invalid()) noexcept
+    void reset(Id id = invalid()) noexcept
     {
-        std::swap(d_, d);
-        if (d != invalid()) {
-            PolicyT::close(d);
+        std::swap(id_, id);
+        if (id != invalid()) {
+            PolicyT::close(id);
         }
     }
 
-    void swap(Handle& rhs) noexcept { std::swap(d_, rhs.d_); }
+    void swap(Handle& rhs) noexcept { std::swap(id_, rhs.id_); }
 
   private:
     void close() noexcept
     {
-        if (d_ != invalid()) {
-            PolicyT::close(d_);
-            d_ = invalid();
+        if (id_ != invalid()) {
+            PolicyT::close(id_);
+            id_ = invalid();
         }
     }
-    Descriptor d_{invalid()};
+    Id id_{invalid()};
 };
 
 template <typename PolicyT>

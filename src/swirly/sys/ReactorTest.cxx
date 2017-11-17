@@ -29,17 +29,17 @@ struct Counters {
     int dtor{};
 };
 
-struct TestEventHandler : EventHandler {
+struct TestHandler : AsyncHandler {
 
-    using EventHandler::EventHandler;
+    using AsyncHandler::AsyncHandler;
 
-    explicit TestEventHandler(Reactor& reactor, Counters& cntrs) noexcept
-        : EventHandler{reactor}, cntrs_{&cntrs}
+    explicit TestHandler(Reactor& reactor, Counters& cntrs) noexcept
+        : AsyncHandler{reactor}, cntrs_{&cntrs}
     {
     }
 
-    TestEventHandler() noexcept = default;
-    ~TestEventHandler() noexcept override
+    TestHandler() noexcept = default;
+    ~TestHandler() noexcept override
     {
         if (cntrs_) {
             ++cntrs_->dtor;
@@ -49,7 +49,7 @@ struct TestEventHandler : EventHandler {
     int matches() const { return matches_; }
 
   protected:
-    void onIoEvent(int fd, EventMask events) override
+    void onEvent(int fd, EventMask events, Time now) override
     {
         char buf[4];
         sys::recv(fd, buf, 4, 0);
@@ -57,6 +57,7 @@ struct TestEventHandler : EventHandler {
             ++matches_;
         }
     }
+    void onTimer(long id, Time now) override {}
 
   private:
     Counters* cntrs_{nullptr};
@@ -71,16 +72,16 @@ SWIRLY_TEST_CASE(ReactorHandler)
     Reactor r{1024};
     {
         SWIRLY_CHECK(cntrs.dtor == 0);
-        auto eh = makeIntrusive<TestEventHandler>(r, cntrs);
-        r.insert(STDOUT_FILENO, Reactor::Out, eh);
-        r.insert(STDERR_FILENO, Reactor::Out, eh);
+        auto h = makeIntrusive<TestHandler>(r, cntrs);
+        r.attach(STDOUT_FILENO, Reactor::Out, h);
+        r.attach(STDERR_FILENO, Reactor::Out, h);
     }
     SWIRLY_CHECK(cntrs.dtor == 0);
 
-    r.erase(STDOUT_FILENO);
+    r.detach(STDOUT_FILENO);
     SWIRLY_CHECK(cntrs.dtor == 0);
 
-    r.erase(STDERR_FILENO);
+    r.detach(STDERR_FILENO);
     SWIRLY_CHECK(cntrs.dtor == 1);
 }
 
@@ -89,27 +90,29 @@ SWIRLY_TEST_CASE(ReactorIoEvents)
     using namespace literals::chrono_literals;
 
     Reactor r{1024};
-    auto eh = makeIntrusive<TestEventHandler>(r);
+    auto h = makeIntrusive<TestHandler>(r);
 
     auto socks = socketpair(LocalStream{});
-    r.insert(*socks.second, Reactor::In, eh);
+    r.attach(*socks.second, Reactor::In, h);
 
     SWIRLY_CHECK(r.poll(0ms) == 0);
-    SWIRLY_CHECK(eh->matches() == 0);
+    SWIRLY_CHECK(h->matches() == 0);
 
     socks.first.send("foo", 4, 0);
     SWIRLY_CHECK(r.poll() == 1);
-    SWIRLY_CHECK(eh->matches() == 1);
+    SWIRLY_CHECK(h->matches() == 1);
 
     SWIRLY_CHECK(r.poll(0ms) == 0);
-    SWIRLY_CHECK(eh->matches() == 1);
+    SWIRLY_CHECK(h->matches() == 1);
 
     socks.first.send("foo\0foo", 8, 0);
     SWIRLY_CHECK(r.poll() == 1);
-    SWIRLY_CHECK(eh->matches() == 2);
+    SWIRLY_CHECK(h->matches() == 2);
     SWIRLY_CHECK(r.poll() == 1);
-    SWIRLY_CHECK(eh->matches() == 3);
+    SWIRLY_CHECK(h->matches() == 3);
 
     SWIRLY_CHECK(r.poll(0ms) == 0);
-    SWIRLY_CHECK(eh->matches() == 3);
+    SWIRLY_CHECK(h->matches() == 3);
+
+    r.detach(*socks.second);
 }

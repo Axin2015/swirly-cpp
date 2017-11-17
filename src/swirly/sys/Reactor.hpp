@@ -17,40 +17,11 @@
 #ifndef SWIRLY_SYS_REACTOR_HPP
 #define SWIRLY_SYS_REACTOR_HPP
 
+#include <swirly/sys/AsyncHandler.hpp>
 #include <swirly/sys/Muxer.hpp>
-#include <swirly/sys/RefCount.hpp>
+#include <swirly/sys/Timer.hpp>
 
 namespace swirly {
-
-class Reactor;
-
-class SWIRLY_API EventHandler : public RefCount<EventHandler, ThreadUnsafePolicy> {
-  public:
-    explicit EventHandler(Reactor& reactor) noexcept : reactor_(reactor) {}
-    virtual ~EventHandler() noexcept;
-
-    // Copy.
-    EventHandler(const EventHandler&) noexcept = delete;
-    EventHandler& operator=(const EventHandler&) noexcept = delete;
-
-    // Move.
-    EventHandler(EventHandler&&) noexcept = delete;
-    EventHandler& operator=(EventHandler&&) noexcept = delete;
-
-    void ioEvent(int fd, EventMask events) { onIoEvent(fd, events); }
-
-  protected:
-    virtual void onIoEvent(int fd, EventMask events) = 0;
-
-    const Reactor& reactor() const noexcept { return reactor_; }
-
-    Reactor& reactor() noexcept { return reactor_; }
-
-  private:
-    Reactor& reactor_;
-};
-
-using EventHandlerPtr = boost::intrusive_ptr<EventHandler>;
 
 class SWIRLY_API Reactor {
   public:
@@ -61,19 +32,19 @@ class SWIRLY_API Reactor {
         Err = Muxer::Err,
         Hup = Muxer::Hup
     };
-    using Descriptor = typename Muxer::Descriptor;
+    using Id = typename Muxer::Id;
     using Event = typename Muxer::Event;
     struct Data {
         int sid{};
         EventMask mask{};
-        EventHandlerPtr eh;
+        AsyncHandlerPtr handler;
     };
     explicit Reactor(std::size_t sizeHint) : mux_{sizeHint} { data_.resize(sizeHint); }
     ~Reactor() noexcept = default;
 
     // Copy.
-    Reactor(const Reactor&) = default;
-    Reactor& operator=(const Reactor&) = default;
+    Reactor(const Reactor&) = delete;
+    Reactor& operator=(const Reactor&) = delete;
 
     // Move.
     Reactor(Reactor&&) = default;
@@ -81,20 +52,26 @@ class SWIRLY_API Reactor {
 
     void swap(Reactor& rhs) noexcept { mux_.swap(rhs.mux_); }
 
-    int poll() const;
+    void attach(int fd, EventMask mask, const AsyncHandlerPtr& handler);
+    void setMask(int fd, EventMask mask);
+    void detach(int fd);
 
-    int poll(std::chrono::milliseconds timeout) const;
+    Timer setTimer(Time expiry, Duration interval, const AsyncHandlerPtr& handler);
+    Timer setTimer(Time expiry, const AsyncHandlerPtr& handler);
 
-    void insert(int fd, EventMask mask, const EventHandlerPtr& eh);
+    bool resetTimer(long id, Duration interval);
+    bool resetTimer(Timer::Id id, Duration interval);
 
-    void update(int fd, EventMask mask);
+    void cancelTimer(long id);
+    void cancelTimer(Timer::Id id);
 
-    void erase(int fd);
+    int poll(std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
 
   private:
-    void dispatch(Event* events, int size) const;
+    void dispatch(Event* events, int size, Time now);
 
     Muxer mux_;
+    TimerQueue tq_;
     std::vector<Data> data_;
 };
 
