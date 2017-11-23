@@ -52,6 +52,7 @@ struct SWIRLY_API UnixClock {
     }
 };
 
+using Duration = UnixClock::duration;
 using Time = UnixClock::time_point;
 using Millis = std::chrono::milliseconds;
 using Micros = std::chrono::microseconds;

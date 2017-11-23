@@ -18,6 +18,7 @@
 #define SWIRLY_SYS_MUXER_HPP
 
 #include <swirly/sys/Poll.hpp>
+#include <swirly/sys/Types.hpp>
 
 #include <swirly/Config.h>
 
@@ -27,8 +28,6 @@
 #include <unistd.h>
 
 namespace swirly {
-
-using EventMask = std::uint32_t;
 
 template <typename PolicyT>
 class BasicMuxer {
@@ -40,8 +39,8 @@ class BasicMuxer {
         Err = PolicyT::Err,
         Hup = PolicyT::Hup
     };
-    using Descriptor = typename PolicyT::Descriptor;
-    static constexpr Descriptor invalid() noexcept { return PolicyT::invalid(); }
+    using Id = typename PolicyT::Id;
+    static constexpr Id invalid() noexcept { return PolicyT::invalid(); }
 
     using Event = typename PolicyT::Event;
 
@@ -67,15 +66,14 @@ class BasicMuxer {
     }
 
     void swap(BasicMuxer& rhs) noexcept { std::swap(md_, rhs.md_); }
-
-    void insert(int sid, int fd, EventMask mask) { PolicyT::insert(md_, sid, fd, mask); }
-    void update(int fd, EventMask mask) { PolicyT::update(md_, fd, mask); }
-    void erase(int fd) { PolicyT::erase(md_, fd); }
-    int wait(Event* buf, std::size_t size) const { return PolicyT::wait(md_, buf, size); }
-    int wait(Event* buf, std::size_t size, std::chrono::milliseconds timeout) const
+    int wait(Event* buf, std::size_t size,
+             std::chrono::milliseconds timeout = std::chrono::milliseconds::max()) const
     {
         return PolicyT::wait(md_, buf, size, timeout);
     }
+    void attach(int sid, int fd, EventMask mask) { PolicyT::attach(md_, sid, fd, mask); }
+    void setMask(int fd, EventMask mask) { PolicyT::setMask(md_, fd, mask); }
+    void detach(int fd) { PolicyT::detach(md_, fd); }
 
   private:
     void close() noexcept
@@ -85,7 +83,7 @@ class BasicMuxer {
             md_ = invalid();
         }
     }
-    Descriptor md_{invalid()};
+    Id md_{invalid()};
 };
 
 struct SWIRLY_API PollPolicy {
@@ -101,7 +99,7 @@ struct SWIRLY_API PollPolicy {
         std::vector<int> sids;
     };
     enum : EventMask { In = POLLIN, Pri = POLLPRI, Out = POLLOUT, Err = POLLERR, Hup = POLLHUP };
-    using Descriptor = Impl*;
+    using Id = Impl*;
     struct Event {
         EventMask events;
         struct {
@@ -110,16 +108,16 @@ struct SWIRLY_API PollPolicy {
     };
     static constexpr Impl* invalid() noexcept { return nullptr; }
 
-    static void destroy(Impl* md) noexcept { delete md; }
     static Impl* create(std::size_t sizeHint) { return new Impl{sizeHint}; }
-    static void insert(Impl* md, int sid, int fd, EventMask mask);
-    static void update(Impl* md, int fd, EventMask mask);
-    static void erase(Impl* md, int fd);
-    static int wait(Impl* md, Event* buf, std::size_t size) { return wait(md, buf, size, -1); }
+    static void destroy(Impl* md) noexcept { delete md; }
     static int wait(Impl* md, Event* buf, std::size_t size, std::chrono::milliseconds timeout)
     {
-        return wait(md, buf, size, timeout.count());
+        return wait(md, buf, size,
+                    timeout == std::chrono::milliseconds::max() ? -1 : timeout.count());
     }
+    static void attach(Impl* md, int sid, int fd, EventMask mask);
+    static void setMask(Impl* md, int fd, EventMask mask);
+    static void detach(Impl* md, int fd);
 
   private:
     static int wait(Impl* md, Event* buf, std::size_t size, int timeout);
@@ -137,40 +135,37 @@ struct EpollPolicy {
         Err = EPOLLERR,
         Hup = EPOLLHUP
     };
-    using Descriptor = int;
+    using Id = int;
     using Event = epoll_event;
     static constexpr int invalid() noexcept { return -1; }
 
-    static void destroy(int md) noexcept { ::close(md); }
     static int create(int sizeHint) { return sys::epoll_create(sizeHint); }
-    static void insert(int md, int sid, int fd, EventMask mask)
+    static void destroy(int md) noexcept { ::close(md); }
+    static int wait(int md, Event* buf, std::size_t size, std::chrono::milliseconds timeout)
+    {
+        return sys::epoll_wait(md, buf, size,
+                               timeout == std::chrono::milliseconds::max() ? -1 : timeout.count());
+    }
+    static void attach(int md, int sid, int fd, EventMask mask)
     {
         Event event;
         event.events = mask;
         event.data.u64 = static_cast<std::uint64_t>(sid) << 32 | fd;
         sys::epoll_ctl(md, EPOLL_CTL_ADD, fd, event);
     }
-    static void update(int md, int fd, EventMask mask)
+    static void setMask(int md, int fd, EventMask mask)
     {
         Event event;
         event.events = mask;
         event.data.fd = fd;
         sys::epoll_ctl(md, EPOLL_CTL_MOD, fd, event);
     }
-    static void erase(int md, int fd)
+    static void detach(int md, int fd)
     {
         // In kernel versions before 2.6.9, the EPOLL_CTL_DEL operation required a non-null pointer
         // in event, even though this argument is ignored.
         Event event{};
         sys::epoll_ctl(md, EPOLL_CTL_DEL, fd, event);
-    }
-    static int wait(int md, Event* buf, std::size_t size)
-    {
-        return sys::epoll_wait(md, buf, size, -1);
-    }
-    static int wait(int md, Event* buf, std::size_t size, std::chrono::milliseconds timeout)
-    {
-        return sys::epoll_wait(md, buf, size, timeout.count());
     }
 };
 
