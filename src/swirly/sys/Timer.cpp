@@ -43,7 +43,7 @@ bool TimerQueue::reset(long id, Duration interval)
     return true;
 }
 
-void TimerQueue::cancel(long id)
+void TimerQueue::cancel(long id) noexcept
 {
     auto it = find_if(timers_.begin(), timers_.end(), [id](const auto& t) { return t.id == id; });
     if (it != timers_.end()) {

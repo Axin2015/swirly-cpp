@@ -23,6 +23,29 @@
 
 namespace swirly {
 
+struct TokenPolicy {
+    struct Id {
+        Reactor* reactor{nullptr};
+        int value{-1};
+    };
+    static constexpr Id invalid() noexcept { return {}; }
+    static void close(Id id) noexcept;
+};
+
+inline bool operator==(TokenPolicy::Id lhs, TokenPolicy::Id rhs) noexcept
+{
+    assert(lhs.reactor == rhs.reactor || !lhs.reactor || !rhs.reactor);
+    return lhs.value == rhs.value;
+}
+
+inline bool operator!=(TokenPolicy::Id lhs, TokenPolicy::Id rhs) noexcept
+{
+    assert(lhs.reactor == rhs.reactor || !lhs.reactor || !rhs.reactor);
+    return lhs.value != rhs.value;
+}
+
+using Token = Handle<TokenPolicy>;
+
 class SWIRLY_API Reactor {
   public:
     enum : EventMask {
@@ -52,9 +75,9 @@ class SWIRLY_API Reactor {
 
     void swap(Reactor& rhs) noexcept { mux_.swap(rhs.mux_); }
 
-    void attach(int fd, EventMask mask, const AsyncHandlerPtr& handler);
+    Token attach(int fd, EventMask mask, const AsyncHandlerPtr& handler);
     void setMask(int fd, EventMask mask);
-    void detach(int fd);
+    void detach(int fd) noexcept;
 
     Timer setTimer(Time expiry, Duration interval, const AsyncHandlerPtr& handler);
     Timer setTimer(Time expiry, const AsyncHandlerPtr& handler);
@@ -62,18 +85,23 @@ class SWIRLY_API Reactor {
     bool resetTimer(long id, Duration interval);
     bool resetTimer(Timer::Id id, Duration interval);
 
-    void cancelTimer(long id);
-    void cancelTimer(Timer::Id id);
+    void cancelTimer(long id) noexcept;
+    void cancelTimer(Timer::Id id) noexcept;
 
     int poll(std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
 
   private:
-    void dispatch(Event* events, int size, Time now);
+    int dispatch(Event* events, int size, Time now);
 
     Muxer mux_;
     TimerQueue tq_;
     std::vector<Data> data_;
 };
+
+inline void TokenPolicy::close(Id id) noexcept
+{
+    id.reactor->detach(id.value);
+}
 
 } // namespace swirly
 

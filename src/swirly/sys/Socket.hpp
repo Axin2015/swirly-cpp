@@ -672,6 +672,7 @@ struct Socket {
     auto operator*() const noexcept { return *sock_; }
     auto get() const noexcept { return sock_.get(); }
     explicit operator bool() const noexcept { return static_cast<bool>(sock_); }
+    int family() const noexcept { return family_; }
 
     // Logically const.
     int getSoError() const { return swirly::getSoError(*sock_); }

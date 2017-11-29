@@ -66,14 +66,18 @@ class BasicMuxer {
     }
 
     void swap(BasicMuxer& rhs) noexcept { std::swap(md_, rhs.md_); }
-    int wait(Event* buf, std::size_t size,
-             std::chrono::milliseconds timeout = std::chrono::milliseconds::max()) const
+    int wait(Event* buf, std::size_t size, std::chrono::milliseconds timeout,
+             std::error_code& ec) const
     {
-        return PolicyT::wait(md_, buf, size, timeout);
+        return PolicyT::wait(md_, buf, size, timeout, ec);
+    }
+    int wait(Event* buf, std::size_t size, std::error_code& ec) const
+    {
+        return wait(buf, size, std::chrono::milliseconds::max(), ec);
     }
     void attach(int sid, int fd, EventMask mask) { PolicyT::attach(md_, sid, fd, mask); }
     void setMask(int fd, EventMask mask) { PolicyT::setMask(md_, fd, mask); }
-    void detach(int fd) { PolicyT::detach(md_, fd); }
+    void detach(int fd) noexcept { PolicyT::detach(md_, fd); }
 
   private:
     void close() noexcept
@@ -110,17 +114,18 @@ struct SWIRLY_API PollPolicy {
 
     static Impl* create(std::size_t sizeHint) { return new Impl{sizeHint}; }
     static void destroy(Impl* md) noexcept { delete md; }
-    static int wait(Impl* md, Event* buf, std::size_t size, std::chrono::milliseconds timeout)
+    static int wait(Impl* md, Event* buf, std::size_t size, std::chrono::milliseconds timeout,
+                    std::error_code& ec)
     {
         return wait(md, buf, size,
-                    timeout == std::chrono::milliseconds::max() ? -1 : timeout.count());
+                    timeout == std::chrono::milliseconds::max() ? -1 : timeout.count(), ec);
     }
     static void attach(Impl* md, int sid, int fd, EventMask mask);
     static void setMask(Impl* md, int fd, EventMask mask);
-    static void detach(Impl* md, int fd);
+    static void detach(Impl* md, int fd) noexcept;
 
   private:
-    static int wait(Impl* md, Event* buf, std::size_t size, int timeout);
+    static int wait(Impl* md, Event* buf, std::size_t size, int timeout, std::error_code& ec);
 };
 
 using PollMuxer = BasicMuxer<PollPolicy>;
@@ -141,10 +146,11 @@ struct EpollPolicy {
 
     static int create(int sizeHint) { return sys::epoll_create(sizeHint); }
     static void destroy(int md) noexcept { ::close(md); }
-    static int wait(int md, Event* buf, std::size_t size, std::chrono::milliseconds timeout)
+    static int wait(int md, Event* buf, std::size_t size, std::chrono::milliseconds timeout,
+                    std::error_code& ec)
     {
-        return sys::epoll_wait(md, buf, size,
-                               timeout == std::chrono::milliseconds::max() ? -1 : timeout.count());
+        return sys::epoll_wait(
+            md, buf, size, timeout == std::chrono::milliseconds::max() ? -1 : timeout.count(), ec);
     }
     static void attach(int md, int sid, int fd, EventMask mask)
     {
@@ -160,12 +166,13 @@ struct EpollPolicy {
         event.data.fd = fd;
         sys::epoll_ctl(md, EPOLL_CTL_MOD, fd, event);
     }
-    static void detach(int md, int fd)
+    static void detach(int md, int fd) noexcept
     {
         // In kernel versions before 2.6.9, the EPOLL_CTL_DEL operation required a non-null pointer
         // in event, even though this argument is ignored.
         Event event{};
-        sys::epoll_ctl(md, EPOLL_CTL_DEL, fd, event);
+        std::error_code ec;
+        sys::epoll_ctl(md, EPOLL_CTL_DEL, fd, event, ec);
     }
 };
 

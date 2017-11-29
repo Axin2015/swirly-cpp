@@ -99,8 +99,8 @@ class SWIRLY_API TimerQueue {
         return reset(id.value, interval);
     }
 
-    void cancel(long id);
-    void cancel(Timer::Id id)
+    void cancel(long id) noexcept;
+    void cancel(Timer::Id id) noexcept
     {
         assert(id.queue == this);
         cancel(id.value);

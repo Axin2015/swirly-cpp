@@ -70,11 +70,12 @@ SWIRLY_TEST_CASE(ReactorHandler)
 {
     Counters cntrs;
     Reactor r{1024};
+    Token out, err;
     {
         SWIRLY_CHECK(cntrs.dtor == 0);
         auto h = makeIntrusive<TestHandler>(r, cntrs);
-        r.attach(STDOUT_FILENO, Reactor::Out, h);
-        r.attach(STDERR_FILENO, Reactor::Out, h);
+        out = r.attach(STDOUT_FILENO, Reactor::Out, h);
+        err = r.attach(STDERR_FILENO, Reactor::Out, h);
     }
     SWIRLY_CHECK(cntrs.dtor == 0);
 
@@ -93,7 +94,7 @@ SWIRLY_TEST_CASE(ReactorIoEvents)
     auto h = makeIntrusive<TestHandler>(r);
 
     auto socks = socketpair(LocalStream{});
-    r.attach(*socks.second, Reactor::In, h);
+    const auto tok = r.attach(*socks.second, Reactor::In, h);
 
     SWIRLY_CHECK(r.poll(0ms) == 0);
     SWIRLY_CHECK(h->matches() == 0);

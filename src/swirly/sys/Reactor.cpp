@@ -22,7 +22,7 @@ namespace swirly {
 
 using namespace std;
 
-void Reactor::attach(int fd, EventMask mask, const AsyncHandlerPtr& handler)
+Token Reactor::attach(int fd, EventMask mask, const AsyncHandlerPtr& handler)
 {
     assert(fd >= 0);
     assert(handler);
@@ -33,6 +33,7 @@ void Reactor::attach(int fd, EventMask mask, const AsyncHandlerPtr& handler)
     mux_.attach(++data.sid, fd, mask);
     data.mask = mask;
     data.handler = handler;
+    return Token{{this, fd}};
 }
 
 void Reactor::setMask(int fd, EventMask mask)
@@ -43,7 +44,7 @@ void Reactor::setMask(int fd, EventMask mask)
     }
 }
 
-void Reactor::detach(int fd)
+void Reactor::detach(int fd) noexcept
 {
     mux_.detach(fd);
     auto& data = data_[fd];
@@ -71,12 +72,12 @@ bool Reactor::resetTimer(Timer::Id id, Duration interval)
     return tq_.reset(id, interval);
 }
 
-void Reactor::cancelTimer(long id)
+void Reactor::cancelTimer(long id) noexcept
 {
     tq_.cancel(id);
 }
 
-void Reactor::cancelTimer(Timer::Id id)
+void Reactor::cancelTimer(Timer::Id id) noexcept
 {
     tq_.cancel(id);
 }
@@ -93,16 +94,23 @@ int Reactor::poll(chrono::milliseconds timeout)
         }
     }
     Event events[16];
-    const auto size = mux_.wait(events, 16, timeout);
-    dispatch(events, size, UnixClock::now());
-    return size;
+    error_code ec;
+    const auto ret = mux_.wait(events, 16, timeout, ec);
+    if (ret < 0) {
+        if (ec.value() != EINTR) {
+            throw system_error{ec};
+        }
+        return 0;
+    }
+    return dispatch(events, ret, UnixClock::now());
 }
 
-void Reactor::dispatch(Event* events, int size, Time now)
+int Reactor::dispatch(Event* events, int size, Time now)
 {
     // Dispatch timer notifications.
+    int expired{};
     while (tq_.expire(now))
-        ;
+        ++expired;
 
     for (int i{0}; i < size; ++i) {
 
@@ -130,6 +138,7 @@ void Reactor::dispatch(Event* events, int size, Time now)
             SWIRLY_ERROR("error handling io event: "s + e.what());
         }
     }
+    return size + expired;
 }
 
 } // namespace swirly
