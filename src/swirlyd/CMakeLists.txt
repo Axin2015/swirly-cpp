@@ -24,3 +24,11 @@ set(prog_SOURCES
 add_executable(swirlyd ${prog_SOURCES})
 target_link_libraries(swirlyd ${swirly_web_LIBRARY} ${swirly_sqlite_LIBRARY} ${Boost_FILESYSTEM_LIBRARY})
 install(TARGETS swirlyd DESTINATION bin COMPONENT program)
+
+add_executable(swirly_http
+  HttpMain.cpp
+  HttpRequest.cpp
+  HttpResponse.cpp
+)
+target_link_libraries(swirly_http ${swirly_web_LIBRARY})
+install(TARGETS swirly_http DESTINATION bin COMPONENT program)

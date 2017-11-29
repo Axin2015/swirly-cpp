@@ -36,17 +36,19 @@ namespace swirly {
 class HttpResponse;
 class RestServ;
 
-class HttpSess : public RefCount<HttpSess, ThreadUnsafePolicy>, public BasicHttpHandler<HttpSess> {
+class HttpSess
+  : public RefCount<HttpSess, ThreadUnsafePolicy>
+  , public BasicHttpHandler<HttpSess> {
 
     friend class BasicHttpHandler<HttpSess>;
     enum { IdleTimeout = 5, MaxData = 4096 };
 
   public:
     HttpSess(boost::asio::io_service& ioServ, RestServ& restServ)
-        : BasicHttpHandler<HttpSess>{HttpType::Request},
-          sock_{ioServ},
-          timeout_{ioServ},
-          restServ_(restServ)
+      : BasicHttpHandler<HttpSess>{HttpType::Request}
+      , sock_{ioServ}
+      , timeout_{ioServ}
+      , restServ_(restServ)
     {
     }
     ~HttpSess() noexcept;
