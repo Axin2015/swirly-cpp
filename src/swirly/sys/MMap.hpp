@@ -31,7 +31,7 @@ namespace swirly {
 /**
  * Memory-mapped addressed may be zero (in rare situations), but can never be MAP_FAILED.
  */
-class SWIRLY_API MMapPointer {
+class MMapPointer {
   public:
     MMapPointer(std::nullptr_t = nullptr) noexcept {}
     MMapPointer(void* ptr, std::size_t size) noexcept : ptr_{ptr}, size_{size} {}
@@ -55,9 +55,9 @@ inline bool operator!=(MMapPointer lhs, MMapPointer rhs)
     return !(lhs == rhs);
 }
 
-struct SWIRLY_API MMapDeleter {
+struct MMapDeleter {
     using pointer = MMapPointer;
-    void operator()(MMapPointer p) noexcept
+    void operator()(MMapPointer p) const noexcept
     {
         if (p) {
             munmap(p.get(), p.size());

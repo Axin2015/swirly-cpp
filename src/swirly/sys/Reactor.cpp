@@ -36,7 +36,7 @@ Token Reactor::attach(int fd, EventMask mask, const AsyncHandlerPtr& handler)
     return Token{{this, fd}};
 }
 
-void Reactor::setMask(int fd, EventMask mask)
+void Reactor::mask(int fd, EventMask mask)
 {
     if (data_[fd].mask != mask) {
         mux_.setMask(fd, mask);
@@ -52,34 +52,14 @@ void Reactor::detach(int fd) noexcept
     data.handler.reset();
 }
 
-Timer Reactor::setTimer(Time expiry, Duration interval, const AsyncHandlerPtr& handler)
+Timer Reactor::timer(Time expiry, Duration interval, const AsyncHandlerPtr& handler)
 {
-    return tq_.set(expiry, interval, handler);
+    return tq_.insert(expiry, interval, handler);
 }
 
-Timer Reactor::setTimer(Time expiry, const AsyncHandlerPtr& handler)
+Timer Reactor::timer(Time expiry, const AsyncHandlerPtr& handler)
 {
-    return tq_.set(expiry, handler);
-}
-
-bool Reactor::resetTimer(long id, Duration interval)
-{
-    return tq_.reset(id, interval);
-}
-
-bool Reactor::resetTimer(Timer::Id id, Duration interval)
-{
-    return tq_.reset(id, interval);
-}
-
-void Reactor::cancelTimer(long id) noexcept
-{
-    tq_.cancel(id);
-}
-
-void Reactor::cancelTimer(Timer::Id id) noexcept
-{
-    tq_.cancel(id);
+    return tq_.insert(expiry, handler);
 }
 
 int Reactor::poll(chrono::milliseconds timeout)
@@ -88,7 +68,7 @@ int Reactor::poll(chrono::milliseconds timeout)
 
     if (!tq_.empty()) {
         // Millis until next expiry.
-        const auto expiry = duration_cast<milliseconds>(tq_.front().expiry - UnixClock::now());
+        const auto expiry = duration_cast<milliseconds>(tq_.front().expiry() - UnixClock::now());
         if (expiry < timeout) {
             timeout = max(expiry, 0ms);
         }
@@ -102,16 +82,12 @@ int Reactor::poll(chrono::milliseconds timeout)
         }
         return 0;
     }
-    return dispatch(events, ret, UnixClock::now());
+    const auto now = UnixClock::now();
+    return tq_.dispatch(now) + dispatch(events, ret, now);
 }
 
 int Reactor::dispatch(Event* events, int size, Time now)
 {
-    // Dispatch timer notifications.
-    int expired{};
-    while (tq_.expire(now))
-        ++expired;
-
     for (int i{0}; i < size; ++i) {
 
         auto& event = events[i];
@@ -138,7 +114,7 @@ int Reactor::dispatch(Event* events, int size, Time now)
             SWIRLY_ERROR("error handling io event: "s + e.what());
         }
     }
-    return size + expired;
+    return size;
 }
 
 } // namespace swirly

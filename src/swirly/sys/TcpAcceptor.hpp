@@ -34,7 +34,7 @@ class SWIRLY_API TcpAcceptor : public AsyncHandler {
 
   protected:
     void onEvent(int fd, EventMask events, Time now) override;
-    void onTimer(long id, Time now) override;
+    void onTimer(const Timer& tmr, Time now) override;
     virtual void onAccept(IoSocket&& sock, const Endpoint& ep, Time now) = 0;
 
   private:

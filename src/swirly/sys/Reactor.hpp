@@ -18,6 +18,7 @@
 #define SWIRLY_SYS_REACTOR_HPP
 
 #include <swirly/sys/AsyncHandler.hpp>
+#include <swirly/sys/Handle.hpp>
 #include <swirly/sys/Muxer.hpp>
 #include <swirly/sys/Timer.hpp>
 
@@ -76,17 +77,11 @@ class SWIRLY_API Reactor {
     void swap(Reactor& rhs) noexcept { mux_.swap(rhs.mux_); }
 
     Token attach(int fd, EventMask mask, const AsyncHandlerPtr& handler);
-    void setMask(int fd, EventMask mask);
+    void mask(int fd, EventMask mask);
     void detach(int fd) noexcept;
 
-    Timer setTimer(Time expiry, Duration interval, const AsyncHandlerPtr& handler);
-    Timer setTimer(Time expiry, const AsyncHandlerPtr& handler);
-
-    bool resetTimer(long id, Duration interval);
-    bool resetTimer(Timer::Id id, Duration interval);
-
-    void cancelTimer(long id) noexcept;
-    void cancelTimer(Timer::Id id) noexcept;
+    Timer timer(Time expiry, Duration interval, const AsyncHandlerPtr& handler);
+    Timer timer(Time expiry, const AsyncHandlerPtr& handler);
 
     int poll(std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
 

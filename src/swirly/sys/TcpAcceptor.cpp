@@ -38,6 +38,6 @@ void TcpAcceptor::onEvent(int fd, EventMask events, Time now)
     onAccept(move(sock), ep, now);
 }
 
-void TcpAcceptor::onTimer(long id, Time now) {}
+void TcpAcceptor::onTimer(const Timer& tmr, Time now) {}
 
 } // namespace swirly

@@ -57,7 +57,7 @@ struct TestHandler : AsyncHandler {
             ++matches_;
         }
     }
-    void onTimer(long id, Time now) override {}
+    void onTimer(const Timer& tmr, Time now) override {}
 
   private:
     Counters* cntrs_{nullptr};

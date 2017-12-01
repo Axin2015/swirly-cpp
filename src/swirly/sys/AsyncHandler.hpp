@@ -24,6 +24,7 @@
 namespace swirly {
 
 class Reactor;
+class Timer;
 
 class SWIRLY_API AsyncHandler : public RefCount<AsyncHandler, ThreadUnsafePolicy> {
   public:
@@ -39,11 +40,11 @@ class SWIRLY_API AsyncHandler : public RefCount<AsyncHandler, ThreadUnsafePolicy
     AsyncHandler& operator=(AsyncHandler&&) noexcept = delete;
 
     void event(int fd, EventMask events, Time now) { onEvent(fd, events, now); }
-    void timer(long id, Time now) { onTimer(id, now); }
+    void timer(const Timer& tmr, Time now) { onTimer(tmr, now); }
 
   protected:
     virtual void onEvent(int fd, EventMask events, Time now) = 0;
-    virtual void onTimer(long id, Time now) = 0;
+    virtual void onTimer(const Timer& tmr, Time now) = 0;
 
     const Reactor& reactor() const noexcept { return reactor_; }
 
