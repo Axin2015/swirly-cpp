@@ -21,14 +21,16 @@
 
 namespace swirly {
 
+using namespace std;
+
 void PollPolicy::attach(Impl* md, int sid, int fd, EventMask mask)
 {
     auto& pfds = md->pfds;
 
     const pollfd pfd{fd, static_cast<short>(mask), 0};
-    const auto it = std::lower_bound(pfds.begin(), pfds.end(), pfd, Cmp{});
+    const auto it = lower_bound(pfds.begin(), pfds.end(), pfd, Cmp{});
     if (it != pfds.end() && it->fd == fd) {
-        throw std::system_error{sys::makeError(EEXIST), "fd already registered"};
+        throw system_error{sys::makeError(EEXIST)};
     }
     auto& sids = md->sids;
     const auto jt = sids.begin() + distance(pfds.begin(), it);
@@ -42,49 +44,50 @@ void PollPolicy::setMask(Impl* md, int fd, EventMask mask)
     auto& pfds = md->pfds;
 
     const pollfd pfd{fd, 0, 0};
-    const auto it = std::lower_bound(pfds.begin(), pfds.end(), pfd, Cmp{});
+    const auto it = lower_bound(pfds.begin(), pfds.end(), pfd, Cmp{});
     if (it == pfds.end() || it->fd != fd) {
-        throw std::system_error{sys::makeError(ENOENT), "fd is not registered"};
+        throw system_error{sys::makeError(ENOENT)};
     }
     it->events = mask;
 }
 
-void PollPolicy::detach(Impl* md, int fd)
+void PollPolicy::detach(Impl* md, int fd) noexcept
 {
     auto& pfds = md->pfds;
 
     const pollfd pfd{fd, 0, 0};
-    const auto it = std::lower_bound(pfds.begin(), pfds.end(), pfd, Cmp{});
-    if (it == pfds.end() || it->fd != fd) {
-        throw std::system_error{sys::makeError(ENOENT), "fd is not registered"};
-    }
-    auto& sids = md->sids;
-    const auto jt = sids.begin() + distance(pfds.begin(), it);
+    const auto it = lower_bound(pfds.begin(), pfds.end(), pfd, Cmp{});
+    if (it != pfds.end() && it->fd == fd) {
 
-    pfds.erase(it);
-    sids.erase(jt);
+        auto& sids = md->sids;
+        const auto jt = sids.begin() + distance(pfds.begin(), it);
+
+        pfds.erase(it);
+        sids.erase(jt);
+    }
 }
 
-int PollPolicy::wait(Impl* md, Event* buf, std::size_t size, int timeout)
+int PollPolicy::wait(Impl* md, Event* buf, size_t size, int timeout, error_code& ec)
 {
     assert(buf && size > 0);
     auto& pfds = md->pfds;
     auto& sids = md->sids;
 
-    int n{sys::poll(&pfds[0], pfds.size(), timeout)};
-    n = std::min<int>(n, size);
-
-    const auto* end = buf + n;
-    for (std::size_t i{0}; buf != end && i < pfds.size(); ++i) {
-        const auto& pfd = pfds[i];
-        const auto sid = sids[i];
-        if (pfd.revents) {
-            buf->events = pfd.revents;
-            buf->data.u64 = static_cast<std::uint64_t>(sid) << 32 | pfd.fd;
-            ++buf;
+    int ret{sys::poll(&pfds[0], pfds.size(), timeout, ec)};
+    if (ret > 0) {
+        ret = min<int>(ret, size);
+        const auto* end = buf + ret;
+        for (size_t i{0}; buf != end && i < pfds.size(); ++i) {
+            const auto& pfd = pfds[i];
+            const auto sid = sids[i];
+            if (pfd.revents) {
+                buf->events = pfd.revents;
+                buf->data.u64 = static_cast<uint64_t>(sid) << 32 | pfd.fd;
+                ++buf;
+            }
         }
     }
-    return n;
+    return ret;
 }
 
 } // namespace swirly

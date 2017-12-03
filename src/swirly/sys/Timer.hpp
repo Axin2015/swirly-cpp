@@ -18,58 +18,105 @@
 #define SWIRLY_SYS_TIMER_HPP
 
 #include <swirly/sys/AsyncHandler.hpp>
-#include <swirly/sys/Handle.hpp>
 #include <swirly/sys/Time.hpp>
 
 #include <swirly/Config.h>
 
+#include <memory>
 #include <vector>
 
 namespace swirly {
 
 class TimerQueue;
 
-struct TimerPolicy {
-    struct Id {
-        TimerQueue* queue{nullptr};
-        long value{-1};
+class Timer {
+    friend class TimerQueue;
+
+  public:
+    struct Impl {
+        union {
+            // Singly-linked free-list.
+            Impl* next;
+            TimerQueue* tq;
+        };
+        int refCount;
+        long id;
+        Time expiry;
+        Duration interval;
+        AsyncHandlerPtr handler;
     };
-    static constexpr Id invalid() noexcept { return {}; }
-    static void close(Id id) noexcept;
+    Timer() = default;
+    explicit Timer(Impl* impl) : impl_{impl, false} {}
+    long id() const noexcept { return impl_->id; }
+    Time expiry() const noexcept { return impl_->expiry; }
+    Duration interval() const noexcept { return impl_->interval; }
+    const AsyncHandlerPtr& handler() const noexcept { return impl_->handler; }
+    bool cancelled() const noexcept { return !impl_->handler; }
+    // Setting the interval will not reschedule any pending timer.
+    void setInterval(Duration interval) noexcept { impl_->interval = interval; }
+    void reset() noexcept { impl_.reset(); }
+    void cancel() noexcept;
+
+  private:
+    void setExpiry(Time expiry) noexcept { impl_->expiry = expiry; }
+    AsyncHandlerPtr& handler() noexcept { return impl_->handler; }
+    boost::intrusive_ptr<Timer::Impl> impl_;
 };
 
-inline bool operator==(TimerPolicy::Id lhs, TimerPolicy::Id rhs) noexcept
+/**
+ * Equal to.
+ */
+inline bool operator==(const Timer& lhs, const Timer& rhs) noexcept
 {
-    assert(lhs.queue == rhs.queue || !lhs.queue || !rhs.queue);
-    return lhs.value == rhs.value;
+    return lhs.id() == rhs.id();
 }
 
-inline bool operator!=(TimerPolicy::Id lhs, TimerPolicy::Id rhs) noexcept
+/**
+ * Not equal to.
+ */
+inline bool operator!=(const Timer& lhs, const Timer& rhs) noexcept
 {
-    assert(lhs.queue == rhs.queue || !lhs.queue || !rhs.queue);
-    return lhs.value != rhs.value;
+    return lhs.id() != rhs.id();
 }
 
-using Timer = Handle<TimerPolicy>;
-
-struct TimerEntry {
-    TimerEntry(long id, Time expiry, Duration interval, const AsyncHandlerPtr& handler)
-        : id{id}, expiry{expiry}, interval{interval}, handler{handler}
-    {
-    }
-    long id;
-    Time expiry;
-    Duration interval;
-    AsyncHandlerPtr handler;
-};
-
-inline bool operator<(const TimerEntry& lhs, const TimerEntry& rhs) noexcept
+/**
+ * Less than.
+ */
+inline bool operator<(const Timer& lhs, const Timer& rhs) noexcept
 {
-    return lhs.expiry > rhs.expiry;
+    return lhs.id() < rhs.id();
+}
+
+/**
+ * Greater than.
+ */
+inline bool operator>(const Timer& lhs, const Timer& rhs) noexcept
+{
+    return lhs.id() > rhs.id();
+}
+
+/**
+ * Less than or equal to.
+ */
+inline bool operator<=(const Timer& lhs, const Timer& rhs) noexcept
+{
+    return lhs.id() <= rhs.id();
+}
+
+/**
+ * Greater than or equal to.
+ */
+inline bool operator>=(const Timer& lhs, const Timer& rhs) noexcept
+{
+    return lhs.id() >= rhs.id();
 }
 
 class SWIRLY_API TimerQueue {
-    friend struct TimerPolicy;
+    friend class Timer;
+    friend void intrusive_ptr_add_ref(Timer::Impl*) noexcept;
+    friend void intrusive_ptr_release(Timer::Impl*) noexcept;
+
+    using SlabPtr = std::unique_ptr<Timer::Impl[]>;
 
   public:
     TimerQueue() = default;
@@ -82,41 +129,51 @@ class SWIRLY_API TimerQueue {
     TimerQueue(TimerQueue&&) = default;
     TimerQueue& operator=(TimerQueue&&) = default;
 
-    const TimerEntry& front() const { return timers_.front(); }
-    bool empty() const { return timers_.empty(); }
+    const Timer& front() const { return heap_.front(); }
+    bool empty() const { return heap_.size() - cancelled_ == 0; }
 
-    Timer set(Time expiry, Duration interval, const AsyncHandlerPtr& handler);
-    Timer set(Time expiry, const AsyncHandlerPtr& handler)
+    Timer insert(Time expiry, Duration interval, const AsyncHandlerPtr& handler);
+    Timer insert(Time expiry, const AsyncHandlerPtr& handler)
     {
-        return set(expiry, Duration::zero(), handler);
+        return insert(expiry, Duration::zero(), handler);
     }
 
-    // Resetting the interval will not reschedule any pending timer.
-    bool reset(long id, Duration interval);
-    bool reset(Timer::Id id, Duration interval)
-    {
-        assert(id.queue == this);
-        return reset(id.value, interval);
-    }
-
-    void cancel(long id);
-    void cancel(Timer::Id id)
-    {
-        assert(id.queue == this);
-        cancel(id.value);
-    }
-
-    bool expire(Time now);
+    int dispatch(Time now);
 
   private:
-    // Heap of timers ordered by expiry time.
-    std::vector<TimerEntry> timers_;
+    Timer alloc(Time expiry, Duration interval, const AsyncHandlerPtr& handler);
+    void expire(Time now);
+    void purge() noexcept;
+
     long maxId_{};
+    int cancelled_{};
+    std::vector<SlabPtr> slabs_;
+    // Head of free-list.
+    Timer::Impl* free_{nullptr};
+    // Heap of timers ordered by expiry time.
+    std::vector<Timer> heap_;
 };
 
-inline void TimerPolicy::close(Id id) noexcept
+inline void intrusive_ptr_add_ref(Timer::Impl* impl) noexcept
 {
-    id.queue->cancel(id.value);
+    ++impl->refCount;
+}
+
+inline void intrusive_ptr_release(Timer::Impl* impl) noexcept
+{
+    if (--impl->refCount == 0) {
+        auto& tq = *impl->tq;
+        impl->next = tq.free_;
+        tq.free_ = impl;
+    }
+}
+
+inline void Timer::cancel() noexcept
+{
+    if (impl_->handler) {
+        impl_->handler.reset();
+        ++impl_->tq->cancelled_;
+    }
 }
 
 } // namespace swirly

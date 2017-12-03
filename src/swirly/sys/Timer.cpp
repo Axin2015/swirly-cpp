@@ -24,70 +24,137 @@ namespace swirly {
 
 using namespace std;
 
-Timer TimerQueue::set(Time expiry, Duration interval, const AsyncHandlerPtr& handler)
+namespace {
+// Number of entries per 4K slab, assuming that malloc overhead is no more than 16 bytes.
+constexpr size_t Overhead = 16;
+constexpr size_t PageSize = 4096;
+constexpr size_t SlabSize = (PageSize - Overhead) / sizeof(Timer);
+
+bool isAfter(const Timer& lhs, const Timer& rhs)
 {
-    const auto id = ++maxId_;
-    timers_.emplace_back(id, expiry, interval, handler);
-    push_heap(timers_.begin(), timers_.end());
-    return Timer{{this, id}};
+    return lhs.expiry() > rhs.expiry();
 }
 
-bool TimerQueue::reset(long id, Duration interval)
+} // namespace
+
+Timer TimerQueue::insert(Time expiry, Duration interval, const AsyncHandlerPtr& handler)
 {
-    auto it = find_if(timers_.begin(), timers_.end(), [id](const auto& t) { return t.id == id; });
-    if (it == timers_.end()) {
-        // No matching timer.
-        return false;
-    }
-    it->interval = interval;
-    return true;
+    assert(handler);
+
+    heap_.reserve(heap_.size() + 1);
+    const auto tmr = alloc(expiry, interval, handler);
+
+    // Cannot fail.
+    heap_.push_back(tmr);
+    push_heap(heap_.begin(), heap_.end(), isAfter);
+
+    return tmr;
 }
 
-void TimerQueue::cancel(long id)
+int TimerQueue::dispatch(Time now)
 {
-    auto it = find_if(timers_.begin(), timers_.end(), [id](const auto& t) { return t.id == id; });
-    if (it != timers_.end()) {
-        // Remove timer.
-        pop_heap(it, timers_.end());
-        timers_.pop_back();
+    int expired{};
+    while (!heap_.empty()) {
+
+        if (heap_.front().cancelled()) {
+
+            // Pop cancelled timer from front.
+            pop_heap(heap_.begin(), heap_.end(), isAfter);
+            heap_.pop_back();
+            --cancelled_;
+
+        } else if (heap_.front().expiry() <= now) {
+
+            expire(now);
+            ++expired;
+
+        } else {
+            break;
+        }
     }
+    return expired;
 }
 
-bool TimerQueue::expire(Time now)
+Timer TimerQueue::alloc(Time expiry, Duration interval, const AsyncHandlerPtr& handler)
 {
-    if (timers_.empty() || timers_.front().expiry > now) {
-        return false;
+    Timer::Impl* impl;
+
+    if (free_) {
+
+        // Pop next free timer from stack.
+        impl = free_;
+        free_ = free_->next;
+
+    } else {
+
+        // Add new slab of timers to stack.
+        SlabPtr slab{new Timer::Impl[SlabSize]};
+        impl = &slab[0];
+
+        for (size_t i{1}; i < SlabSize; ++i) {
+            slab[i].next = free_;
+            free_ = &slab[i];
+        }
+        slabs_.push_back(move(slab));
     }
 
-    // Save timer-entry.
-    auto timer = timers_.front();
+    impl->tq = this;
+    impl->refCount = 1;
+    impl->id = ++maxId_;
+    impl->expiry = expiry;
+    impl->interval = interval;
+    impl->handler = handler;
+
+    return Timer{impl};
+}
+
+void TimerQueue::expire(Time now)
+{
+    // Remove timer.
+    auto tmr = heap_.front();
+    pop_heap(heap_.begin(), heap_.end(), isAfter);
+    heap_.pop_back();
+
     try {
-        timer.handler->timer(timer.id, now);
+        // Notify user.
+        tmr.handler()->timer(tmr, now);
     } catch (const std::exception& e) {
-        using namespace std::string_literals;
+        using namespace string_literals;
         SWIRLY_ERROR("error handling timer event: "s + e.what());
     }
 
-    // If timer was not cancelled during callback.
-    if (timers_.front().id == timer.id) {
+    if (tmr.cancelled()) {
 
-        // User may have reset interval during callback.
-        timer.interval = timers_.front().interval;
+        // The timer was cancelled during the callback.
+        --cancelled_;
 
-        // Remove timer.
-        pop_heap(timers_.begin(), timers_.end());
-        timers_.pop_back();
+    } else if (tmr.interval().count() > 0) {
 
-        // If the timer should be restarted.
-        if (timer.interval.count() > 0) {
-            // Add interval to expiry, while ensuring that next expiry is always in the future.
-            timer.expiry = std::max(timer.expiry + timer.interval, now + Nanos{1});
-            // Reschedule timer.
-            timers_.push_back(timer);
-            std::push_heap(timers_.begin(), timers_.end());
-        }
+        // Add interval to expiry, while ensuring that next expiry is always in the future.
+        tmr.setExpiry(max(tmr.expiry() + tmr.interval(), now + Nanos{1}));
+
+        // Reschedule popped timer.
+        heap_.push_back(tmr);
+        push_heap(heap_.begin(), heap_.end(), isAfter);
+
+    } else {
+
+        // Free non-repeating timer.
+        tmr.handler().reset();
     }
-    return true;
+
+    if (cancelled_ > static_cast<int>(heap_.size() >> 2)) {
+        // More than half of the timers have been cancelled, so purge them now.
+        purge();
+    }
+}
+
+void TimerQueue::purge() noexcept
+{
+    const auto it
+        = remove_if(heap_.begin(), heap_.end(), [](const auto& tmr) { return tmr.cancelled(); });
+    heap_.erase(it, heap_.end());
+    cancelled_ = 0;
 }
 
 } // namespace swirly

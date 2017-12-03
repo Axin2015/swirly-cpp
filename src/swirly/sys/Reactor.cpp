@@ -22,7 +22,7 @@ namespace swirly {
 
 using namespace std;
 
-void Reactor::attach(int fd, EventMask mask, const AsyncHandlerPtr& handler)
+Token Reactor::attach(int fd, EventMask mask, const AsyncHandlerPtr& handler)
 {
     assert(fd >= 0);
     assert(handler);
@@ -33,9 +33,10 @@ void Reactor::attach(int fd, EventMask mask, const AsyncHandlerPtr& handler)
     mux_.attach(++data.sid, fd, mask);
     data.mask = mask;
     data.handler = handler;
+    return Token{{this, fd}};
 }
 
-void Reactor::setMask(int fd, EventMask mask)
+void Reactor::mask(int fd, EventMask mask)
 {
     if (data_[fd].mask != mask) {
         mux_.setMask(fd, mask);
@@ -43,7 +44,7 @@ void Reactor::setMask(int fd, EventMask mask)
     }
 }
 
-void Reactor::detach(int fd)
+void Reactor::detach(int fd) noexcept
 {
     mux_.detach(fd);
     auto& data = data_[fd];
@@ -51,34 +52,14 @@ void Reactor::detach(int fd)
     data.handler.reset();
 }
 
-Timer Reactor::setTimer(Time expiry, Duration interval, const AsyncHandlerPtr& handler)
+Timer Reactor::timer(Time expiry, Duration interval, const AsyncHandlerPtr& handler)
 {
-    return tq_.set(expiry, interval, handler);
+    return tq_.insert(expiry, interval, handler);
 }
 
-Timer Reactor::setTimer(Time expiry, const AsyncHandlerPtr& handler)
+Timer Reactor::timer(Time expiry, const AsyncHandlerPtr& handler)
 {
-    return tq_.set(expiry, handler);
-}
-
-bool Reactor::resetTimer(long id, Duration interval)
-{
-    return tq_.reset(id, interval);
-}
-
-bool Reactor::resetTimer(Timer::Id id, Duration interval)
-{
-    return tq_.reset(id, interval);
-}
-
-void Reactor::cancelTimer(long id)
-{
-    tq_.cancel(id);
-}
-
-void Reactor::cancelTimer(Timer::Id id)
-{
-    tq_.cancel(id);
+    return tq_.insert(expiry, handler);
 }
 
 int Reactor::poll(chrono::milliseconds timeout)
@@ -87,23 +68,26 @@ int Reactor::poll(chrono::milliseconds timeout)
 
     if (!tq_.empty()) {
         // Millis until next expiry.
-        const auto expiry = duration_cast<milliseconds>(tq_.front().expiry - UnixClock::now());
+        const auto expiry = duration_cast<milliseconds>(tq_.front().expiry() - UnixClock::now());
         if (expiry < timeout) {
             timeout = max(expiry, 0ms);
         }
     }
     Event events[16];
-    const auto size = mux_.wait(events, 16, timeout);
-    dispatch(events, size, UnixClock::now());
-    return size;
+    error_code ec;
+    const auto ret = mux_.wait(events, 16, timeout, ec);
+    if (ret < 0) {
+        if (ec.value() != EINTR) {
+            throw system_error{ec};
+        }
+        return 0;
+    }
+    const auto now = UnixClock::now();
+    return tq_.dispatch(now) + dispatch(events, ret, now);
 }
 
-void Reactor::dispatch(Event* events, int size, Time now)
+int Reactor::dispatch(Event* events, int size, Time now)
 {
-    // Dispatch timer notifications.
-    while (tq_.expire(now))
-        ;
-
     for (int i{0}; i < size; ++i) {
 
         auto& event = events[i];
@@ -130,6 +114,7 @@ void Reactor::dispatch(Event* events, int size, Time now)
             SWIRLY_ERROR("error handling io event: "s + e.what());
         }
     }
+    return size;
 }
 
 } // namespace swirly
