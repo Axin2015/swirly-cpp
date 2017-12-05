@@ -14,16 +14,13 @@
 # 02110-1301, USA.
 
 add_custom_target(swirly_tool DEPENDS
-  swirly_bench
   swirly_dump
   swirly_scratch
+  swirly_serv_bench
+  swirly_timer_bench
 )
 
 install(PROGRAMS ${bin_FILES} DESTINATION bin COMPONENT program)
-
-add_executable(swirly_bench Bench.cpp)
-target_link_libraries(swirly_bench ${swirly_clob_LIBRARY} ${swirly_sqlite_LIBRARY})
-install(TARGETS swirly_bench DESTINATION bin COMPONENT program)
 
 add_executable(swirly_dump Dump.cpp)
 target_link_libraries(swirly_dump ${swirly_sqlite_LIBRARY})
@@ -32,3 +29,11 @@ install(TARGETS swirly_dump DESTINATION bin COMPONENT program)
 # Reserved as an ad-hoc scratch pad.
 add_executable(swirly_scratch Scratch.cpp)
 target_link_libraries(swirly_scratch ${swirly_util_LIBRARY})
+
+add_executable(swirly_serv_bench ServBench.cpp)
+target_link_libraries(swirly_serv_bench ${swirly_clob_LIBRARY} ${swirly_sqlite_LIBRARY})
+install(TARGETS swirly_serv_bench DESTINATION bin COMPONENT program)
+
+add_executable(swirly_timer_bench TimerBench.cpp)
+target_link_libraries(swirly_timer_bench ${swirly_util_LIBRARY})
+install(TARGETS swirly_timer_bench DESTINATION bin COMPONENT program)
