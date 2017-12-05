@@ -13,7 +13,18 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-set(sys_SOURCES
+if(ENABLE_SHARED_LIBS)
+  add_custom_target(swirly_sys DEPENDS
+    swirly_sys_static
+    swirly_sys_shared
+  )
+else()
+  add_custom_target(swirly_sys DEPENDS
+    swirly_sys_static
+  )
+endif()
+
+set(lib_SOURCES
   AsyncHandler.cpp
   Buffer.cpp
   Daemon.cpp
@@ -41,19 +52,19 @@ set(sys_SOURCES
   Types.cpp
   UdpSocket.cpp)
 
-add_library(sys_static STATIC ${sys_SOURCES})
-set_target_properties(sys_static PROPERTIES OUTPUT_NAME swirly_sys)
-target_link_libraries(sys_static ${Boost_SYSTEM_LIBRARY} pthread)
-install(TARGETS sys_static DESTINATION lib)
+add_library(swirly_sys_static STATIC ${lib_SOURCES})
+set_target_properties(swirly_sys_static PROPERTIES OUTPUT_NAME swirly_sys)
+target_link_libraries(swirly_sys_static ${Boost_SYSTEM_LIBRARY} pthread)
+install(TARGETS swirly_sys_static DESTINATION lib)
 
 if(ENABLE_SHARED_LIBS)
-  add_library(sys_shared SHARED ${sys_SOURCES})
-  set_target_properties(sys_shared PROPERTIES OUTPUT_NAME swirly_sys)
-  target_link_libraries(sys_shared ${Boost_SYSTEM_LIBRARY} pthread)
-  install(TARGETS sys_shared DESTINATION lib)
+  add_library(swirly_sys_shared SHARED ${lib_SOURCES})
+  set_target_properties(swirly_sys_shared PROPERTIES OUTPUT_NAME swirly_sys)
+  target_link_libraries(swirly_sys_shared ${Boost_SYSTEM_LIBRARY} pthread)
+  install(TARGETS swirly_sys_shared DESTINATION lib)
 endif()
 
-set(sys_test_SOURCES
+set(test_SOURCES
   HandleTest.cxx
   IpAddressTest.cxx
   MemCtxTest.cxx
@@ -61,10 +72,10 @@ set(sys_test_SOURCES
   RefCountTest.cxx
   SocketTest.cxx)
 
-foreach(file ${sys_test_SOURCES})
+foreach(file ${test_SOURCES})
   get_filename_component (name ${file} NAME_WE)
-  set(name "sys${name}")
+  set(name "swirly_sys_${name}")
   add_executable(${name} ${file})
-  target_link_libraries(${name} ${sys_LIBRARY} ${unit_LIBRARY})
+  target_link_libraries(${name} ${swirly_sys_LIBRARY} ${swirly_unit_LIBRARY})
   add_test(NAME ${name} COMMAND ${name})
 endforeach()

@@ -21,24 +21,23 @@ if(DOT_EXECUTABLE)
   message(STATUS "Dot found: ${DOT_EXECUTABLE}")
 
   set(names
-    Util
-    Fin
-    Clob
-    Web
+    sys
+    util
+    fin
+    clob
+    web
   )
 
   foreach(name ${names})
 
-    set(outfile "${PROJECT_BINARY_DIR}/image/${name}Depend.png")
+    set(outfile "${PROJECT_BINARY_DIR}/image/swirly_${name}.png")
 
-    string(TOLOWER ${name} lname)
     add_custom_command(
       OUTPUT "${outfile}"
       WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
-      COMMAND CXX="${CMAKE_CXX_COMPILER}" "${PERL}" etc/dotdepend.pl ${lname}
+      COMMAND CXX="${CMAKE_CXX_COMPILER}" "${PERL}" etc/dotdepend.pl ${name}
               | "${DOT_EXECUTABLE}" -Tpng >"${outfile}"
-      DEPENDS "${PROJECT_SOURCE_DIR}/etc/dotdepend.pl"
-              ${lname}_static)
+      DEPENDS "${PROJECT_SOURCE_DIR}/etc/dotdepend.pl" "swirly_${name}_static")
 
     set(outfiles ${outfiles} "${outfile}")
   endforeach()

@@ -13,7 +13,18 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-set(clob_SOURCES
+if(ENABLE_SHARED_LIBS)
+  add_custom_target(swirly_clob DEPENDS
+    swirly_clob_static
+    swirly_clob_shared
+  )
+else()
+  add_custom_target(swirly_clob DEPENDS
+    swirly_clob_static
+  )
+endif()
+
+set(lib_SOURCES
   Accnt.cpp
   AsyncJourn.cpp
   Match.cpp
@@ -21,27 +32,27 @@ set(clob_SOURCES
   Serv.cpp
   Test.cpp)
 
-add_library(clob_static STATIC ${clob_SOURCES})
-set_target_properties(clob_static PROPERTIES OUTPUT_NAME swirly_clob)
-target_link_libraries(clob_static fin_static)
-install(TARGETS clob_static DESTINATION lib)
+add_library(swirly_clob_static STATIC ${lib_SOURCES})
+set_target_properties(swirly_clob_static PROPERTIES OUTPUT_NAME swirly_clob)
+target_link_libraries(swirly_clob_static swirly_fin_static)
+install(TARGETS swirly_clob_static DESTINATION lib)
 
 if(ENABLE_SHARED_LIBS)
-  add_library(clob_shared SHARED ${clob_SOURCES})
-  set_target_properties(clob_shared PROPERTIES OUTPUT_NAME swirly_clob)
-  target_link_libraries(clob_shared fin_shared)
-  install(TARGETS clob_shared DESTINATION lib)
+  add_library(swirly_clob_shared SHARED ${lib_SOURCES})
+  set_target_properties(swirly_clob_shared PROPERTIES OUTPUT_NAME swirly_clob)
+  target_link_libraries(swirly_clob_shared swirly_fin_shared)
+  install(TARGETS swirly_clob_shared DESTINATION lib)
 endif()
 
-set(clob_test_SOURCES
+set(test_SOURCES
   AsyncJournTest.cxx
   ResponseTest.cxx
   ServTest.cxx)
 
-foreach(file ${clob_test_SOURCES})
+foreach(file ${test_SOURCES})
   get_filename_component (name ${file} NAME_WE)
-  set(name "clob${name}")
+  set(name "swirly_clob_${name}")
   add_executable(${name} ${file})
-  target_link_libraries(${name} ${clob_LIBRARY} ${unit_LIBRARY})
+  target_link_libraries(${name} ${swirly_clob_LIBRARY} ${swirly_unit_LIBRARY})
   add_test(NAME ${name} COMMAND ${name})
 endforeach()

@@ -13,7 +13,18 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-set(sqlite_SOURCES
+if(ENABLE_SHARED_LIBS)
+  add_custom_target(swirly_sqlite DEPENDS
+    swirly_sqlite_static
+    swirly_sqlite_shared
+  )
+else()
+  add_custom_target(swirly_sqlite DEPENDS
+    swirly_sqlite_static
+  )
+endif()
+
+set(lib_SOURCES
   Exception.cpp
   Journ.cpp
   Model.cpp
@@ -21,14 +32,14 @@ set(sqlite_SOURCES
 
 include_directories(${SQLITE3_INCLUDE_DIRS})
 
-add_library(sqlite_static STATIC ${sqlite_SOURCES})
-set_target_properties(sqlite_static PROPERTIES OUTPUT_NAME swirly_sqlite)
-target_link_libraries(sqlite_static fin_static ${SQLITE3_LIBRARIES})
-install(TARGETS sqlite_static DESTINATION lib)
+add_library(swirly_sqlite_static STATIC ${lib_SOURCES})
+set_target_properties(swirly_sqlite_static PROPERTIES OUTPUT_NAME swirly_sqlite)
+target_link_libraries(swirly_sqlite_static swirly_fin_static ${SQLITE3_LIBRARIES})
+install(TARGETS swirly_sqlite_static DESTINATION lib)
 
 if(ENABLE_SHARED_LIBS)
-  add_library(sqlite_shared SHARED ${sqlite_SOURCES})
-  set_target_properties(sqlite_shared PROPERTIES OUTPUT_NAME swirly_sqlite)
-  target_link_libraries(sqlite_shared fin_shared ${SQLITE3_LIBRARIES})
-  install(TARGETS sqlite_shared DESTINATION lib)
+  add_library(swirly_sqlite_shared SHARED ${lib_SOURCES})
+  set_target_properties(swirly_sqlite_shared PROPERTIES OUTPUT_NAME swirly_sqlite)
+  target_link_libraries(swirly_sqlite_shared swirly_fin_shared ${SQLITE3_LIBRARIES})
+  install(TARGETS swirly_sqlite_shared DESTINATION lib)
 endif()

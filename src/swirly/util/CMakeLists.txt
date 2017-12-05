@@ -13,7 +13,18 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-set(util_SOURCES
+if(ENABLE_SHARED_LIBS)
+  add_custom_target(swirly_util DEPENDS
+    swirly_util_static
+    swirly_util_shared
+  )
+else()
+  add_custom_target(swirly_util DEPENDS
+    swirly_util_static
+  )
+endif()
+
+set(lib_SOURCES
   Array.cpp
   BasicTypes.cpp
   Compare.cpp
@@ -40,19 +51,19 @@ set(util_SOURCES
   Utility.cpp
   VarSub.cpp)
 
-add_library(util_static STATIC ${util_SOURCES})
-set_target_properties(util_static PROPERTIES OUTPUT_NAME swirly_util)
-target_link_libraries(util_static sys_static pthread)
-install(TARGETS util_static DESTINATION lib)
+add_library(swirly_util_static STATIC ${lib_SOURCES})
+set_target_properties(swirly_util_static PROPERTIES OUTPUT_NAME swirly_util)
+target_link_libraries(swirly_util_static swirly_sys_static pthread)
+install(TARGETS swirly_util_static DESTINATION lib)
 
 if(ENABLE_SHARED_LIBS)
-  add_library(util_shared SHARED ${util_SOURCES})
-  set_target_properties(util_shared PROPERTIES OUTPUT_NAME swirly_util)
-  target_link_libraries(util_shared sys_shared pthread)
-  install(TARGETS util_shared DESTINATION lib)
+  add_library(swirly_util_shared SHARED ${lib_SOURCES})
+  set_target_properties(swirly_util_shared PROPERTIES OUTPUT_NAME swirly_util)
+  target_link_libraries(swirly_util_shared swirly_sys_shared pthread)
+  install(TARGETS swirly_util_shared DESTINATION lib)
 endif()
 
-set(util_test_SOURCES
+set(test_SOURCES
   ArrayTest.cxx
   ConfTest.cxx
   DateTest.cxx
@@ -72,10 +83,10 @@ set(util_test_SOURCES
   UtilityTest.cxx
   VarSubTest.cxx)
 
-foreach(file ${util_test_SOURCES})
+foreach(file ${test_SOURCES})
   get_filename_component (name ${file} NAME_WE)
-  set(name "util${name}")
+  set(name "swirly_util_${name}")
   add_executable(${name} ${file})
-  target_link_libraries(${name} ${util_LIBRARY} ${unit_LIBRARY})
+  target_link_libraries(${name} ${swirly_util_LIBRARY} ${swirly_unit_LIBRARY})
   add_test(NAME ${name} COMMAND ${name})
 endforeach()

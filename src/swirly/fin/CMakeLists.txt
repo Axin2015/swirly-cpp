@@ -13,7 +13,18 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-set(fin_SOURCES
+if(ENABLE_SHARED_LIBS)
+  add_custom_target(swirly_fin DEPENDS
+    swirly_fin_static
+    swirly_fin_shared
+  )
+else()
+  add_custom_target(swirly_fin DEPENDS
+    swirly_fin_static
+  )
+endif()
+
+set(lib_SOURCES
   Asset.cpp
   BasicTypes.cpp
   Instr.cpp
@@ -36,19 +47,19 @@ set(fin_SOURCES
   Transaction.cpp
   Types.cpp)
 
-add_library(fin_static STATIC ${fin_SOURCES})
-set_target_properties(fin_static PROPERTIES OUTPUT_NAME swirly_fin)
-target_link_libraries(fin_static util_static)
-install(TARGETS fin_static DESTINATION lib)
+add_library(swirly_fin_static STATIC ${lib_SOURCES})
+set_target_properties(swirly_fin_static PROPERTIES OUTPUT_NAME swirly_fin)
+target_link_libraries(swirly_fin_static swirly_util_static)
+install(TARGETS swirly_fin_static DESTINATION lib)
 
 if(ENABLE_SHARED_LIBS)
-  add_library(fin_shared SHARED ${fin_SOURCES})
-  set_target_properties(fin_shared PROPERTIES OUTPUT_NAME swirly_fin)
-  target_link_libraries(fin_shared util_shared)
-  install(TARGETS fin_shared DESTINATION lib)
+  add_library(swirly_fin_shared SHARED ${lib_SOURCES})
+  set_target_properties(swirly_fin_shared PROPERTIES OUTPUT_NAME swirly_fin)
+  target_link_libraries(swirly_fin_shared swirly_util_shared)
+  install(TARGETS swirly_fin_shared DESTINATION lib)
 endif()
 
-set(fin_test_SOURCES
+set(test_SOURCES
   AssetTest.cxx
   BasicTypesTest.cxx
   InstrTest.cxx
@@ -62,10 +73,10 @@ set(fin_test_SOURCES
   RequestTest.cxx
   TransactionTest.cxx)
 
-foreach(file ${fin_test_SOURCES})
+foreach(file ${test_SOURCES})
   get_filename_component (name ${file} NAME_WE)
-  set(name "fin${name}")
+  set(name "swirly_fin_${name}")
   add_executable(${name} ${file})
-  target_link_libraries(${name} ${fin_LIBRARY} ${unit_LIBRARY})
+  target_link_libraries(${name} ${swirly_fin_LIBRARY} ${swirly_unit_LIBRARY})
   add_test(NAME ${name} COMMAND ${name})
 endforeach()
