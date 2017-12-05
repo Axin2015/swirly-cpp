@@ -21,11 +21,11 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # FIXME: currently fails on some toolsets, so prefer QT5_ADD_RESOURCES for now.
 #set(CMAKE_AUTORCC ON)
-qt5_add_resources(swirlyui_RESOURCES Application.qrc)
+qt5_add_resources(prog_RESOURCES Application.qrc)
 
 # Explicitly list sources to avoid accidentally including moc sources
 # when build and source directories are the same.
-set(swirlyui_SOURCES
+set(prog_SOURCES
   Asset.cpp
   AssetModel.cpp
   AssetView.cpp
@@ -58,5 +58,5 @@ set(swirlyui_SOURCES
   Types.cpp
   Utility.cpp)
 
-add_executable(swirlyui ${swirlyui_RESOURCES} ${swirlyui_SOURCES})
+add_executable(swirlyui ${prog_RESOURCES} ${prog_SOURCES})
 target_link_libraries(swirlyui Qt5::Widgets Qt5::Network)

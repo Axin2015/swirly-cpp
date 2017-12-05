@@ -13,6 +13,17 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
+if(ENABLE_SHARED_LIBS)
+  add_custom_target(swirly_web DEPENDS
+    swirly_web_static
+    swirly_web_shared
+  )
+else()
+  add_custom_target(swirly_web DEPENDS
+    swirly_web_static
+  )
+endif()
+
 if(RAGEL_EXECUTABLE)
   add_custom_command(
     OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/RestBody.cpp"
@@ -22,7 +33,7 @@ if(RAGEL_EXECUTABLE)
     DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/RestBody.rl")
 endif(RAGEL_EXECUTABLE)
 
-set(web_SOURCES
+set(lib_SOURCES
   EntitySet.cpp
   Exception.cpp
   HttpHandler.cpp
@@ -32,29 +43,29 @@ set(web_SOURCES
   Url.cpp
   http_parser.c)
 
-add_library(web_static STATIC ${web_SOURCES})
-set_target_properties(web_static PROPERTIES OUTPUT_NAME swirly_web)
-target_link_libraries(web_static clob_static)
-install(TARGETS web_static DESTINATION lib)
+add_library(swirly_web_static STATIC ${lib_SOURCES})
+set_target_properties(swirly_web_static PROPERTIES OUTPUT_NAME swirly_web)
+target_link_libraries(swirly_web_static swirly_clob_static)
+install(TARGETS swirly_web_static DESTINATION lib)
 
 if(ENABLE_SHARED_LIBS)
-  add_library(web_shared SHARED ${web_SOURCES})
-  set_target_properties(web_shared PROPERTIES OUTPUT_NAME swirly_web)
-  target_link_libraries(web_shared clob_shared)
-  install(TARGETS web_shared DESTINATION lib)
+  add_library(swirly_web_shared SHARED ${lib_SOURCES})
+  set_target_properties(swirly_web_shared PROPERTIES OUTPUT_NAME swirly_web)
+  target_link_libraries(swirly_web_shared swirly_clob_shared)
+  install(TARGETS swirly_web_shared DESTINATION lib)
 endif()
 
-set(web_test_SOURCES
+set(test_SOURCES
   EntitySetTest.cxx
   HttpHandlerTest.cxx
   PageTest.cxx
   RestBodyTest.cxx
   UrlTest.cxx)
 
-foreach(file ${web_test_SOURCES})
+foreach(file ${test_SOURCES})
   get_filename_component (name ${file} NAME_WE)
-  set(name "web${name}")
+  set(name "swirly_web_${name}")
   add_executable(${name} ${file})
-  target_link_libraries(${name} ${web_LIBRARY} ${unit_LIBRARY})
+  target_link_libraries(${name} ${swirly_web_LIBRARY} ${swirly_unit_LIBRARY})
   add_test(NAME ${name} COMMAND ${name})
 endforeach()

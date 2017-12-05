@@ -13,7 +13,7 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-set(swirlyd_SOURCES
+set(prog_SOURCES
   HttpRequest.cpp
   HttpResponse.cpp
   HttpServ.cpp
@@ -21,6 +21,6 @@ set(swirlyd_SOURCES
   Main.cpp
   RestServ.cpp)
 
-add_executable(swirlyd ${swirlyd_SOURCES})
-target_link_libraries(swirlyd ${web_LIBRARY} ${sqlite_LIBRARY} ${Boost_FILESYSTEM_LIBRARY})
+add_executable(swirlyd ${prog_SOURCES})
+target_link_libraries(swirlyd ${swirly_web_LIBRARY} ${swirly_sqlite_LIBRARY} ${Boost_FILESYSTEM_LIBRARY})
 install(TARGETS swirlyd DESTINATION bin)

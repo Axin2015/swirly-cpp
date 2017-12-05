@@ -13,17 +13,28 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-set(unit_SOURCES
+if(ENABLE_SHARED_LIBS)
+  add_custom_target(swirly_unit DEPENDS
+    swirly_unit_static
+    swirly_unit_shared
+  )
+else()
+  add_custom_target(swirly_unit DEPENDS
+    swirly_unit_static
+  )
+endif()
+
+set(lib_SOURCES
   Test.cpp)
 
-add_library(unit_static STATIC ${unit_SOURCES})
-set_target_properties(unit_static PROPERTIES OUTPUT_NAME swirly_unit)
-target_link_libraries(unit_static)
-install(TARGETS unit_static DESTINATION lib)
+add_library(swirly_unit_static STATIC ${lib_SOURCES})
+set_target_properties(swirly_unit_static PROPERTIES OUTPUT_NAME swirly_unit)
+target_link_libraries(swirly_unit_static)
+install(TARGETS swirly_unit_static DESTINATION lib)
 
 if(ENABLE_SHARED_LIBS)
-  add_library(unit_shared SHARED ${unit_SOURCES})
-  set_target_properties(unit_shared PROPERTIES OUTPUT_NAME swirly_unit)
-  target_link_libraries(unit_shared)
-  install(TARGETS unit_shared DESTINATION lib)
+  add_library(swirly_unit_shared SHARED ${lib_SOURCES})
+  set_target_properties(swirly_unit_shared PROPERTIES OUTPUT_NAME swirly_unit)
+  target_link_libraries(swirly_unit_shared)
+  install(TARGETS swirly_unit_shared DESTINATION lib)
 endif()
