@@ -54,5 +54,5 @@ set(sqlfiles
   schema.sql
   test.sql)
 
-install(FILES ${sqlfiles}  DESTINATION db)
-install(FILES ${dbfiles} DESTINATION db)
+install(FILES ${sqlfiles} DESTINATION db COMPONENT config)
+install(FILES ${dbfiles} DESTINATION db COMPONENT config)

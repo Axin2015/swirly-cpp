@@ -19,15 +19,15 @@ add_custom_target(swirly_tool DEPENDS
   swirly_scratch
 )
 
-install(PROGRAMS ${bin_FILES} DESTINATION bin)
+install(PROGRAMS ${bin_FILES} DESTINATION bin COMPONENT program)
 
 add_executable(swirly_bench Bench.cpp)
 target_link_libraries(swirly_bench ${swirly_clob_LIBRARY} ${swirly_sqlite_LIBRARY})
-install(TARGETS swirly_bench DESTINATION bin)
+install(TARGETS swirly_bench DESTINATION bin COMPONENT program)
 
 add_executable(swirly_dump Dump.cpp)
 target_link_libraries(swirly_dump ${swirly_sqlite_LIBRARY})
-install(TARGETS swirly_dump DESTINATION bin)
+install(TARGETS swirly_dump DESTINATION bin COMPONENT program)
 
 # Reserved as an ad-hoc scratch pad.
 add_executable(swirly_scratch Scratch.cpp)

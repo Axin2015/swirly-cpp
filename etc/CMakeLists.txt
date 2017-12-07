@@ -19,4 +19,4 @@ set(etc_FILES
   swirlyd.conf
 )
 
-install(FILES ${etc_FILES} DESTINATION etc)
+install(FILES ${etc_FILES} DESTINATION etc COMPONENT config)
