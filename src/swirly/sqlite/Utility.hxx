@@ -36,7 +36,7 @@ using experimental::string_view;
 
 namespace swirly {
 
-class Conf;
+class Config;
 
 namespace sqlite {
 namespace detail {
@@ -147,7 +147,7 @@ struct DbTraits<std::string_view> {
 using DbPtr = std::unique_ptr<sqlite3, int (*)(sqlite3*)>;
 using StmtPtr = std::unique_ptr<sqlite3_stmt, int (*)(sqlite3_stmt*)>;
 
-DbPtr openDb(const char* path, int flags, const Conf& conf);
+DbPtr openDb(const char* path, int flags, const Config& config);
 
 StmtPtr prepare(sqlite3& db, std::string_view sql);
 

@@ -23,7 +23,7 @@
 
 namespace swirly {
 
-class Conf;
+class Config;
 struct Msg;
 
 class SWIRLY_API Journ {
@@ -50,7 +50,7 @@ class SWIRLY_API Journ {
  *
  * @param conf Configuration.
  */
-SWIRLY_API std::unique_ptr<Journ> makeJourn(const Conf& conf);
+SWIRLY_API std::unique_ptr<Journ> makeJourn(const Config& config);
 
 } // namespace swirly
 

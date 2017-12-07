@@ -24,7 +24,7 @@
 #include <swirly/fin/Order.hpp>
 #include <swirly/fin/Posn.hpp>
 
-#include <swirly/util/Conf.hpp>
+#include <swirly/util/Config.hpp>
 
 using namespace std;
 
@@ -68,8 +68,8 @@ constexpr auto SelectPosnSql = //
 
 } // namespace
 
-Model::Model(const Conf& conf)
-    : db_{openDb(conf.get("sqlite_model", "swirly.db"), SQLITE_OPEN_READONLY, conf)}
+Model::Model(const Config& config)
+    : db_{openDb(config.get("sqlite_model", "swirly.db"), SQLITE_OPEN_READONLY, config)}
 {
 }
 
@@ -374,9 +374,9 @@ void Model::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const
 
 } // namespace sqlite
 
-unique_ptr<Model> makeModel(const Conf& conf)
+unique_ptr<Model> makeModel(const Config& config)
 {
-    return make_unique<sqlite::Model>(conf);
+    return make_unique<sqlite::Model>(config);
 }
 
 } // namespace swirly

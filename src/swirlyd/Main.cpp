@@ -24,7 +24,7 @@
 #include <swirly/fin/Journ.hpp>
 #include <swirly/fin/Model.hpp>
 
-#include <swirly/util/Conf.hpp>
+#include <swirly/util/Config.hpp>
 #include <swirly/util/Exception.hpp>
 #include <swirly/util/File.hpp>
 #include <swirly/util/Log.hpp>
@@ -216,24 +216,24 @@ int main(int argc, char* argv[])
             opts.startTime = UnixClock::now();
         }
 
-        Conf conf;
+        Config config;
         if (!opts.confFile.empty()) {
             fs::ifstream is{opts.confFile};
             if (!is.is_open()) {
                 throw Exception{errMsg() << "open failed: " << opts.confFile};
             }
-            conf.read(is);
+            config.read(is);
         }
 
-        memCtx = MemCtx{conf.get<size_t>("mem_size", 1) << 20};
+        memCtx = MemCtx{config.get<size_t>("mem_size", 1) << 20};
 
-        const char* const logLevel{conf.get("log_level", nullptr)};
+        const char* const logLevel{config.get("log_level", nullptr)};
         if (logLevel) {
             setLogLevel(atoi(logLevel));
         }
 
         // Restrict file creation mask if specified. The umask function is always successful.
-        const char* const fileMode{conf.get("file_mode", nullptr)};
+        const char* const fileMode{config.get("file_mode", nullptr)};
         if (fileMode) {
             // Zero base to auto-detect: if the prefix is 0, the base is octal, if the prefix is 0x or 0X.
             umask(numericCast<mode_t>(fileMode));
@@ -241,7 +241,7 @@ int main(int argc, char* argv[])
             umask(0027);
         }
 
-        fs::path runDir{conf.get("run_dir", "")};
+        fs::path runDir{config.get("run_dir", "")};
         if (!runDir.empty()) {
             // Change the current working directory if specified.
             runDir = fs::canonical(runDir, fs::current_path());
@@ -254,7 +254,7 @@ int main(int argc, char* argv[])
             runDir = fs::current_path();
         }
 
-        fs::path logFile{conf.get("log_file", "")};
+        fs::path logFile{config.get("log_file", "")};
         if (opts.daemon) {
 
             // Daemonise process.
@@ -282,9 +282,9 @@ int main(int argc, char* argv[])
             openLogFile(logFile.c_str());
         }
 
-        const char* const httpPort{conf.get("http_port", "8080")};
-        const auto pipeCapacity = conf.get<size_t>("pipe_capacity", 1 << 10);
-        const auto maxExecs = conf.get<size_t>("max_execs", 1 << 4);
+        const char* const httpPort{config.get("http_port", "8080")};
+        const auto pipeCapacity = config.get<size_t>("pipe_capacity", 1 << 10);
+        const auto maxExecs = config.get<size_t>("max_execs", 1 << 4);
 
         SWIRLY_NOTICE("initialising daemon");
         SWIRLY_INFO(logMsg() << "conf_file:     " << opts.confFile);
@@ -304,11 +304,11 @@ int main(int argc, char* argv[])
 
         unique_ptr<Journ> journ;
         if (!opts.test) {
-            journ = swirly::makeJourn(conf);
+            journ = swirly::makeJourn(config);
         } else {
             journ = make_unique<TestJourn>();
         }
-        auto model = swirly::makeModel(conf);
+        auto model = swirly::makeModel(config);
         Rest rest{*journ, pipeCapacity, maxExecs};
         rest.load(*model, opts.startTime);
         model = nullptr;

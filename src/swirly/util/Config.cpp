@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Conf.hpp"
+#include "Config.hpp"
 
 #include <swirly/util/VarSub.hpp>
 
@@ -22,18 +22,18 @@ using namespace std;
 
 namespace swirly {
 
-Conf::Conf() = default;
-Conf::~Conf() noexcept = default;
+Config::Config() = default;
+Config::~Config() noexcept = default;
 
 // Copy.
-Conf::Conf(const Conf&) = default;
-Conf& Conf::operator=(const Conf&) = default;
+Config::Config(const Config&) = default;
+Config& Config::operator=(const Config&) = default;
 
 // Move.
-Conf::Conf(Conf&&) = default;
-Conf& Conf::operator=(Conf&&) = default;
+Config::Config(Config&&) = default;
+Config& Config::operator=(Config&&) = default;
 
-void Conf::read(istream& is)
+void Config::read(istream& is)
 {
     VarSub varSub;
     parsePairs(is, [this, &varSub](const auto& key, string val) {

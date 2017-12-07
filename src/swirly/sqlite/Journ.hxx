@@ -31,7 +31,7 @@ class Journ : public Transactional, public swirly::Journ, BasicMsgHandler<Journ>
     friend struct BasicMsgHandler<Journ>;
 
   public:
-    explicit Journ(const Conf& conf);
+    explicit Journ(const Config& config);
     ~Journ() noexcept override;
 
     // Copy.

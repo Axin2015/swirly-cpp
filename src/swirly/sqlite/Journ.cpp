@@ -18,7 +18,7 @@
 
 #include <swirly/fin/Exec.hpp>
 
-#include <swirly/util/Conf.hpp>
+#include <swirly/util/Config.hpp>
 
 using namespace std;
 
@@ -50,8 +50,8 @@ constexpr auto UpdateExecSql = //
 
 } // namespace
 
-Journ::Journ(const Conf& conf)
-    : db_{openDb(conf.get("sqlite_journ", "swirly.db"), SQLITE_OPEN_READWRITE, conf)},
+Journ::Journ(const Config& config)
+    : db_{openDb(config.get("sqlite_journ", "swirly.db"), SQLITE_OPEN_READWRITE, config)},
       beginStmt_{prepare(*db_, BeginSql)},
       commitStmt_{prepare(*db_, CommitSql)},
       rollbackStmt_{prepare(*db_, RollbackSql)},
@@ -182,9 +182,9 @@ void Journ::onArchiveTrade(const ArchiveTradeBody& body)
 
 } // namespace sqlite
 
-unique_ptr<Journ> makeJourn(const Conf& conf)
+unique_ptr<Journ> makeJourn(const Config& config)
 {
-    return make_unique<sqlite::Journ>(conf);
+    return make_unique<sqlite::Journ>(config);
 }
 
 } // namespace swirly

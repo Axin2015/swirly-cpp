@@ -18,7 +18,7 @@
 
 #include "Exception.hxx"
 
-#include <swirly/util/Conf.hpp>
+#include <swirly/util/Config.hpp>
 #include <swirly/util/Log.hpp>
 #include <swirly/util/String.hpp>
 
@@ -75,7 +75,7 @@ void bindsv(sqlite3_stmt& stmt, int col, string_view val)
 
 } // namespace detail
 
-DbPtr openDb(const char* path, int flags, const Conf& conf)
+DbPtr openDb(const char* path, int flags, const Config& config)
 {
     sqlite3* db;
     int rc{sqlite3_open_v2(path, &db, flags, nullptr)};
@@ -83,13 +83,13 @@ DbPtr openDb(const char* path, int flags, const Conf& conf)
     if (rc != SQLITE_OK) {
         throw Error{errMsg() << "sqlite3_open_v2 failed: " << path << ": " << lastError(*db)};
     }
-    if (conf.get("sqlite_enable_trace", false)) {
+    if (config.get("sqlite_enable_trace", false)) {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
         sqlite3_trace(db, trace, nullptr);
 #pragma GCC diagnostic pop
     }
-    if (conf.get("sqlite_enable_fkey", false)) {
+    if (config.get("sqlite_enable_fkey", false)) {
         rc = sqlite3_db_config(db, SQLITE_DBCONFIG_ENABLE_FKEY, 1, nullptr);
         if (rc != SQLITE_OK) {
             throw Error{errMsg() << "sqlite3_db_config failed: " << path << ": " << lastError(*db)};
