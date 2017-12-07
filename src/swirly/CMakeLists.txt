@@ -25,11 +25,15 @@ add_subdirectory(sqlite)
 
 configure_file(Config.h.in "${PROJECT_BINARY_DIR}/include/swirly/Config.h")
 install(FILES "${PROJECT_BINARY_DIR}/include/swirly/Config.h"
-              DESTINATION include/swirly)
+  DESTINATION include/swirly
+  COMPONENT header
+)
 
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-                  DESTINATION include
-                  FILES_MATCHING
-                  PATTERN "*.h"
-                  PATTERN "*.hpp"
-                  PATTERN "Doxyfile.h" EXCLUDE)
+  DESTINATION include
+  COMPONENT header
+  FILES_MATCHING
+  PATTERN "*.h"
+  PATTERN "*.hpp"
+  PATTERN "Doxyfile.h" EXCLUDE
+)

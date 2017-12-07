@@ -50,13 +50,13 @@ set(lib_SOURCES
 add_library(swirly_fin_static STATIC ${lib_SOURCES})
 set_target_properties(swirly_fin_static PROPERTIES OUTPUT_NAME swirly_fin)
 target_link_libraries(swirly_fin_static swirly_util_static)
-install(TARGETS swirly_fin_static DESTINATION lib)
+install(TARGETS swirly_fin_static DESTINATION lib COMPONENT static)
 
 if(ENABLE_SHARED_LIBS)
   add_library(swirly_fin_shared SHARED ${lib_SOURCES})
   set_target_properties(swirly_fin_shared PROPERTIES OUTPUT_NAME swirly_fin)
   target_link_libraries(swirly_fin_shared swirly_util_shared)
-  install(TARGETS swirly_fin_shared DESTINATION lib)
+  install(TARGETS swirly_fin_shared DESTINATION lib COMPONENT shared)
 endif()
 
 set(test_SOURCES

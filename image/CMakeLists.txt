@@ -40,6 +40,7 @@ if(DOT_EXECUTABLE)
       DEPENDS "${PROJECT_SOURCE_DIR}/etc/dotdepend.pl" "swirly_${name}_static")
 
     set(outfiles ${outfiles} "${outfile}")
+    install(FILES "${outfile}" DESTINATION image COMPONENT doc)
   endforeach()
 
 endif()
