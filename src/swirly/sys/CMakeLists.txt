@@ -65,6 +65,7 @@ if(ENABLE_SHARED_LIBS)
 endif()
 
 set(test_SOURCES
+  BufferTest.cxx
   HandleTest.cxx
   IpAddressTest.cxx
   MemCtxTest.cxx
