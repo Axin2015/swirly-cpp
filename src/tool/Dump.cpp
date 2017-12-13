@@ -23,7 +23,7 @@
 #include <swirly/fin/Order.hpp>
 #include <swirly/fin/Posn.hpp>
 
-#include <swirly/util/Conf.hpp>
+#include <swirly/util/Config.hpp>
 #include <swirly/util/Stream.hpp>
 
 #include <swirly/sys/Time.hpp>
@@ -38,14 +38,14 @@ int main(int argc, char* argv[])
     int ret = 1;
     try {
 
-        Conf conf;
+        Config config;
         if (argc > 1) {
-            conf.set("sqlite_model", argv[1]);
+            config.set("sqlite_model", argv[1]);
         }
         const BusinessDay busDay{MarketZone};
 
         const auto now = UnixClock::now();
-        auto model = makeModel(conf);
+        auto model = makeModel(config);
 
         cout << "{\"assets\":[";
         {

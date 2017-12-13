@@ -26,7 +26,7 @@ namespace sqlite {
 
 class Model : public swirly::Model {
   public:
-    explicit Model(const Conf& conf);
+    explicit Model(const Config& config);
     ~Model() noexcept;
 
     // Copy.

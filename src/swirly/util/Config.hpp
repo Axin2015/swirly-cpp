@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_UTIL_CONF_HPP
-#define SWIRLY_UTIL_CONF_HPP
+#ifndef SWIRLY_UTIL_CONFIG_HPP
+#define SWIRLY_UTIL_CONFIG_HPP
 
 #include <swirly/util/Numeric.hpp>
 #include <swirly/util/String.hpp>
@@ -56,20 +56,20 @@ void parsePairs(std::istream& is, FnT fn)
 /**
  * Simple config reader with environment variable substitution.
  */
-class SWIRLY_API Conf {
+class SWIRLY_API Config {
   public:
-    explicit Conf(std::istream& is) { read(is); }
+    explicit Config(std::istream& is) { read(is); }
 
-    Conf();
-    ~Conf() noexcept;
+    Config();
+    ~Config() noexcept;
 
     // Copy.
-    Conf(const Conf&);
-    Conf& operator=(const Conf&);
+    Config(const Config&);
+    Config& operator=(const Config&);
 
     // Move.
-    Conf(Conf&&);
-    Conf& operator=(Conf&&);
+    Config(Config&&);
+    Config& operator=(Config&&);
 
     const char* get(const char* key, const char* dfl) const noexcept
     {
@@ -97,4 +97,4 @@ class SWIRLY_API Conf {
 
 } // namespace swirly
 
-#endif // SWIRLY_UTIL_CONF_HPP
+#endif // SWIRLY_UTIL_CONFIG_HPP

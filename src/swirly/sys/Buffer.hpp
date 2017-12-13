@@ -17,6 +17,8 @@
 #ifndef SWIRLY_SYS_BUFFER_HPP
 #define SWIRLY_SYS_BUFFER_HPP
 
+#include <swirly/Config.h>
+
 #include <boost/asio/buffer.hpp>
 
 namespace swirly {
@@ -26,6 +28,77 @@ using MutableBuffer = boost::asio::mutable_buffer;
 
 using boost::asio::buffer_cast;
 using boost::asio::buffer_size;
+
+class SWIRLY_API Buffer {
+  public:
+    explicit Buffer(std::size_t capacity) { buf_.reserve(capacity); }
+    Buffer() = default;
+    ~Buffer() noexcept = default;
+
+    // Copy.
+    Buffer(const Buffer& rhs) = default;
+    Buffer& operator=(const Buffer& rhs) = default;
+
+    // Move.
+    Buffer(Buffer&& rhs) noexcept = default;
+    Buffer& operator=(Buffer&& rhs) noexcept = default;
+
+    /**
+     * Returns read buffer for available data.
+     */
+    ConstBuffer data() const noexcept { return {rptr(), size()}; }
+    /**
+     * Returns read buffer for available data with upper bound.
+     */
+    ConstBuffer data(std::size_t limit) const noexcept { return {rptr(), std::min(limit, size())}; }
+
+    /**
+     * Returns true if read buffer is empty.
+     */
+    bool empty() const noexcept { return size() == 0; };
+
+    /**
+     * Returns number of bytes available for read.
+     */
+    std::size_t size() const noexcept { return wpos_ - rpos_; }
+
+    /**
+     * Clear buffer.
+     */
+    void clear() noexcept
+    {
+        rpos_ = wpos_ = 0;
+        buf_.clear();
+    }
+
+    /**
+     * Move characters from the write sequence to the read sequence.
+     */
+    void commit(std::size_t count) noexcept { wpos_ += count; }
+
+    /**
+     * Remove characters from the read sequence.
+     */
+    void consume(std::size_t count) noexcept;
+
+    /**
+     * Returns write buffer of specified size.
+     */
+    MutableBuffer prepare(std::size_t size);
+
+    /**
+     * Reserve storage.
+     */
+    void reserve(std::size_t capacity) { buf_.reserve(capacity); }
+
+  private:
+    const char* rptr() const noexcept { return buf_.data() + rpos_; }
+    char* wptr() noexcept { return buf_.data() + wpos_; }
+    std::size_t unused() const noexcept { return buf_.size() - wpos_; }
+
+    std::size_t rpos_{}, wpos_{};
+    std::vector<char> buf_;
+};
 
 } // namespace swirly
 

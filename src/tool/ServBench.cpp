@@ -21,7 +21,7 @@
 
 #include <swirly/fin/Date.hpp>
 
-#include <swirly/util/Conf.hpp>
+#include <swirly/util/Config.hpp>
 #include <swirly/util/Log.hpp>
 #include <swirly/util/Profile.hpp>
 
@@ -100,11 +100,11 @@ int main(int argc, char* argv[])
         unique_ptr<Journ> journ;
         unique_ptr<Model> model;
         if (argc > 1) {
-            Conf conf;
-            conf.set("sqlite_journ", argv[1]);
-            conf.set("sqlite_model", argv[1]);
-            journ = swirly::makeJourn(conf);
-            model = swirly::makeModel(conf);
+            Config config;
+            config.set("sqlite_journ", argv[1]);
+            config.set("sqlite_model", argv[1]);
+            journ = swirly::makeJourn(config);
+            model = swirly::makeModel(config);
         } else {
             journ = make_unique<TestJourn>();
             model = make_unique<TestModel>();

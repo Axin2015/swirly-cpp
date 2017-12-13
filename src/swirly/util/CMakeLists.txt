@@ -28,7 +28,7 @@ set(lib_SOURCES
   Array.cpp
   BasicTypes.cpp
   Compare.cpp
-  Conf.cpp
+  Config.cpp
   Date.cpp
   Enum.cpp
   Exception.cpp
@@ -65,7 +65,7 @@ endif()
 
 set(test_SOURCES
   ArrayTest.cxx
-  ConfTest.cxx
+  ConfigTest.cxx
   DateTest.cxx
   EnumTest.cxx
   ExceptionTest.cxx

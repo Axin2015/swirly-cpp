@@ -25,7 +25,7 @@
 
 namespace swirly {
 
-class Conf;
+class Config;
 
 template <typename ValueT>
 using ModelCallback = std::function<void(ValueT)>;
@@ -82,7 +82,7 @@ class SWIRLY_API Model {
  *
  * @param conf Configuration.
  */
-SWIRLY_API std::unique_ptr<Model> makeModel(const Conf& conf);
+SWIRLY_API std::unique_ptr<Model> makeModel(const Config& config);
 
 } // namespace swirly
 

@@ -15,3 +15,44 @@
  * 02110-1301, USA.
  */
 #include "Buffer.hpp"
+
+namespace swirly {
+
+void Buffer::consume(std::size_t count) noexcept
+{
+    enum { ShrinkThreshold = 1024 };
+
+    rpos_ += count;
+
+    // Shrink if the block of unused bytes at the front of the buffer satisfies the following
+    // requirements: 1) greater than or equal to ShrinkThreshold, 1) greater than or equal to half
+    // the total buffer size.
+    if (rpos_ >= ShrinkThreshold && rpos_ >= (buf_.size() >> 1)) {
+
+        // Then move unread portion to front.
+        const auto n = size();
+        if (n > 0) {
+            // Move data to front.
+            std::memmove(buf_.data(), rptr(), n);
+        }
+
+        rpos_ = 0;
+        wpos_ = n;
+    }
+}
+
+/**
+     * Returns write buffer of specified size.
+     */
+MutableBuffer Buffer::prepare(std::size_t size)
+{
+    const auto n = unused();
+    if (size > n) {
+        // More buffer space required.
+        const auto d = size - n;
+        buf_.resize(buf_.size() + d);
+    }
+    return {wptr(), size};
+}
+
+} // namespace swirly
