@@ -39,6 +39,7 @@ set(lib_SOURCES
   MemCtx.cpp
   MemPool.cpp
   MMap.cpp
+  Msg.cpp
   Muxer.cpp
   Poll.cpp
   Reactor.cpp

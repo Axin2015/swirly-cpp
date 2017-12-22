@@ -66,21 +66,21 @@ class RefCount {
     constexpr RefCount(RefCount&&) noexcept = default;
     RefCount& operator=(RefCount&&) noexcept = default;
 
-    void addRef() const noexcept { PolicyT::fetchAdd(refCount_); }
+    void addRef() const noexcept { PolicyT::fetchAdd(refs_); }
     void release() const noexcept
     {
-        if (PolicyT::fetchSub(refCount_) == 1) {
+        if (PolicyT::fetchSub(refs_) == 1) {
             PolicyT::acquire();
             delete static_cast<const DerivedT*>(this);
         }
     }
-    int refCount() const noexcept { return PolicyT::load(refCount_); }
+    int refCount() const noexcept { return PolicyT::load(refs_); }
 
   protected:
     ~RefCount() noexcept = default;
 
   private:
-    mutable typename PolicyT::Type refCount_{1};
+    mutable typename PolicyT::Type refs_{1};
 };
 
 template <typename DerivedT, typename PolicyT>
