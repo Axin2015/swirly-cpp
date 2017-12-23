@@ -29,6 +29,7 @@ set(lib_SOURCES
   Buffer.cpp
   Daemon.cpp
   Error.cpp
+  EventFile.cpp
   File.cpp
   Handle.cpp
   IoSocket.cpp

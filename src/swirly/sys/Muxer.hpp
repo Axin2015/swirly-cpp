@@ -131,7 +131,6 @@ struct SWIRLY_API PollPolicy {
 using PollMuxer = BasicMuxer<PollPolicy>;
 
 #if defined(__linux__)
-
 struct EpollPolicy {
     enum : IoEvents {
         In = EPOLLIN,
@@ -177,7 +176,6 @@ struct EpollPolicy {
 };
 
 using EpollMuxer = BasicMuxer<EpollPolicy>;
-
 #endif
 
 #if defined(__linux__)
