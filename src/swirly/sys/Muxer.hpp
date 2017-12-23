@@ -32,7 +32,7 @@ namespace swirly {
 template <typename PolicyT>
 class BasicMuxer {
   public:
-    enum : EventMask {
+    enum : IoEvents {
         In = PolicyT::In,
         Pri = PolicyT::Pri,
         Out = PolicyT::Out,
@@ -75,8 +75,8 @@ class BasicMuxer {
     {
         return wait(buf, size, std::chrono::milliseconds::max(), ec);
     }
-    void attach(int sid, int fd, EventMask mask) { PolicyT::attach(md_, sid, fd, mask); }
-    void setMask(int fd, EventMask mask) { PolicyT::setMask(md_, fd, mask); }
+    void attach(int sid, int fd, IoEvents mask) { PolicyT::attach(md_, sid, fd, mask); }
+    void setMask(int fd, IoEvents mask) { PolicyT::setMask(md_, fd, mask); }
     void detach(int fd) noexcept { PolicyT::detach(md_, fd); }
 
   private:
@@ -102,10 +102,10 @@ struct SWIRLY_API PollPolicy {
         std::vector<pollfd> pfds;
         std::vector<int> sids;
     };
-    enum : EventMask { In = POLLIN, Pri = POLLPRI, Out = POLLOUT, Err = POLLERR, Hup = POLLHUP };
+    enum : IoEvents { In = POLLIN, Pri = POLLPRI, Out = POLLOUT, Err = POLLERR, Hup = POLLHUP };
     using Id = Impl*;
     struct Event {
-        EventMask events;
+        IoEvents events;
         struct {
             std::uint64_t u64;
         } data;
@@ -120,8 +120,8 @@ struct SWIRLY_API PollPolicy {
         return wait(md, buf, size,
                     timeout == std::chrono::milliseconds::max() ? -1 : timeout.count(), ec);
     }
-    static void attach(Impl* md, int sid, int fd, EventMask mask);
-    static void setMask(Impl* md, int fd, EventMask mask);
+    static void attach(Impl* md, int sid, int fd, IoEvents mask);
+    static void setMask(Impl* md, int fd, IoEvents mask);
     static void detach(Impl* md, int fd) noexcept;
 
   private:
@@ -133,7 +133,7 @@ using PollMuxer = BasicMuxer<PollPolicy>;
 #if defined(__linux__)
 
 struct EpollPolicy {
-    enum : EventMask {
+    enum : IoEvents {
         In = EPOLLIN,
         Pri = EPOLLPRI,
         Out = EPOLLOUT,
@@ -152,14 +152,14 @@ struct EpollPolicy {
         return sys::epoll_wait(
             md, buf, size, timeout == std::chrono::milliseconds::max() ? -1 : timeout.count(), ec);
     }
-    static void attach(int md, int sid, int fd, EventMask mask)
+    static void attach(int md, int sid, int fd, IoEvents mask)
     {
         Event event;
         event.events = mask;
         event.data.u64 = static_cast<std::uint64_t>(sid) << 32 | fd;
         sys::epoll_ctl(md, EPOLL_CTL_ADD, fd, event);
     }
-    static void setMask(int md, int fd, EventMask mask)
+    static void setMask(int md, int fd, IoEvents mask)
     {
         Event event;
         event.events = mask;

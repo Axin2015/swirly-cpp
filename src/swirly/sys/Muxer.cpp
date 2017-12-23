@@ -23,7 +23,7 @@ namespace swirly {
 
 using namespace std;
 
-void PollPolicy::attach(Impl* md, int sid, int fd, EventMask mask)
+void PollPolicy::attach(Impl* md, int sid, int fd, IoEvents mask)
 {
     auto& pfds = md->pfds;
 
@@ -39,7 +39,7 @@ void PollPolicy::attach(Impl* md, int sid, int fd, EventMask mask)
     sids.insert(jt, sid);
 }
 
-void PollPolicy::setMask(Impl* md, int fd, EventMask mask)
+void PollPolicy::setMask(Impl* md, int fd, IoEvents mask)
 {
     auto& pfds = md->pfds;
 

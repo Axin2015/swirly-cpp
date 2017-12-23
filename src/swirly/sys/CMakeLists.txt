@@ -25,7 +25,7 @@ else()
 endif()
 
 set(lib_SOURCES
-  AsyncHandler.cpp
+  Actor.cpp
   Buffer.cpp
   Daemon.cpp
   Error.cpp

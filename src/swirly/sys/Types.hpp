@@ -21,7 +21,7 @@
 
 namespace swirly {
 
-using EventMask = std::uint32_t;
+using IoEvents = std::uint32_t;
 
 } // namespace swirly
 

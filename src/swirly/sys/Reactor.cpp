@@ -22,21 +22,21 @@ namespace swirly {
 
 using namespace std;
 
-Token Reactor::attach(int fd, EventMask mask, const AsyncHandlerPtr& handler)
+Token Reactor::attach(int fd, IoEvents mask, const ActorPtr& actor)
 {
     assert(fd >= 0);
-    assert(handler);
+    assert(actor);
     if (fd >= static_cast<int>(data_.size())) {
         data_.resize(fd + 1);
     }
     auto& data = data_[fd];
     mux_.attach(++data.sid, fd, mask);
     data.mask = mask;
-    data.handler = handler;
+    data.actor = actor;
     return Token{{this, fd}};
 }
 
-void Reactor::mask(int fd, EventMask mask)
+void Reactor::mask(int fd, IoEvents mask)
 {
     if (data_[fd].mask != mask) {
         mux_.setMask(fd, mask);
@@ -49,17 +49,17 @@ void Reactor::detach(int fd) noexcept
     mux_.detach(fd);
     auto& data = data_[fd];
     data.mask = 0;
-    data.handler.reset();
+    data.actor.reset();
 }
 
-Timer Reactor::timer(Time expiry, Duration interval, const AsyncHandlerPtr& handler)
+Timer Reactor::timer(Time expiry, Duration interval, const ActorPtr& actor)
 {
-    return tq_.insert(expiry, interval, handler);
+    return tq_.insert(expiry, interval, actor);
 }
 
-Timer Reactor::timer(Time expiry, const AsyncHandlerPtr& handler)
+Timer Reactor::timer(Time expiry, const ActorPtr& actor)
 {
-    return tq_.insert(expiry, handler);
+    return tq_.insert(expiry, actor);
 }
 
 int Reactor::poll(chrono::milliseconds timeout)
@@ -99,16 +99,16 @@ int Reactor::dispatch(Event* events, int size, Time now)
         if (data.sid > sid) {
             continue;
         }
-        // Apply the interest mask to filter-out any events that the user may have removed from
-        // the mask since the call to wait() was made. This would typically happen via a
-        // reentrant call into the reactor from an event handler.
+        // Apply the interest mask to filter-out any events that the user may have removed from the
+        // mask since the call to wait() was made. This would typically happen via a reentrant call
+        // into the reactor from an actor.
         event.events &= data.mask;
         if (!(event.events)) {
             continue;
         }
-        AsyncHandlerPtr handler{data.handler};
+        ActorPtr actor{data.actor};
         try {
-            handler->event(fd, event.events, now);
+            actor->ready(fd, event.events, now);
         } catch (const std::exception& e) {
             using namespace std::string_literals;
             SWIRLY_ERROR("error handling io event: "s + e.what());

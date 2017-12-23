@@ -22,7 +22,7 @@
 
 namespace swirly {
 
-class SWIRLY_API TcpAcceptor : public AsyncHandler {
+class SWIRLY_API TcpAcceptor : public Actor {
     using IntrusivePtr = boost::intrusive_ptr<TcpAcceptor>;
 
   public:
@@ -33,9 +33,9 @@ class SWIRLY_API TcpAcceptor : public AsyncHandler {
     ~TcpAcceptor() noexcept override;
 
   protected:
-    void onEvent(int fd, EventMask events, Time now) override;
-    void onTimer(const Timer& tmr, Time now) override;
-    virtual void onAccept(IoSocket&& sock, const Endpoint& ep, Time now) = 0;
+    void doReady(int fd, IoEvents events, Time now) override;
+    void doTimer(const Timer& tmr, Time now) override;
+    virtual void doAccept(IoSocket&& sock, const Endpoint& ep, Time now) = 0;
 
   private:
     TcpSocketServ serv_;

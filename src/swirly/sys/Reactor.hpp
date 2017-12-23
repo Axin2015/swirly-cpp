@@ -17,7 +17,7 @@
 #ifndef SWIRLY_SYS_REACTOR_HPP
 #define SWIRLY_SYS_REACTOR_HPP
 
-#include <swirly/sys/AsyncHandler.hpp>
+#include <swirly/sys/Actor.hpp>
 #include <swirly/sys/Handle.hpp>
 #include <swirly/sys/Muxer.hpp>
 #include <swirly/sys/Timer.hpp>
@@ -49,7 +49,7 @@ using Token = Handle<TokenPolicy>;
 
 class SWIRLY_API Reactor {
   public:
-    enum : EventMask {
+    enum : IoEvents {
         In = Muxer::In,
         Pri = Muxer::Pri,
         Out = Muxer::Out,
@@ -60,8 +60,8 @@ class SWIRLY_API Reactor {
     using Event = typename Muxer::Event;
     struct Data {
         int sid{};
-        EventMask mask{};
-        AsyncHandlerPtr handler;
+        IoEvents mask{};
+        ActorPtr actor;
     };
     explicit Reactor(std::size_t sizeHint) : mux_{sizeHint} { data_.resize(sizeHint); }
     ~Reactor() noexcept = default;
@@ -76,12 +76,12 @@ class SWIRLY_API Reactor {
 
     void swap(Reactor& rhs) noexcept { mux_.swap(rhs.mux_); }
 
-    Token attach(int fd, EventMask mask, const AsyncHandlerPtr& handler);
-    void mask(int fd, EventMask mask);
+    Token attach(int fd, IoEvents mask, const ActorPtr& actor);
+    void mask(int fd, IoEvents mask);
     void detach(int fd) noexcept;
 
-    Timer timer(Time expiry, Duration interval, const AsyncHandlerPtr& handler);
-    Timer timer(Time expiry, const AsyncHandlerPtr& handler);
+    Timer timer(Time expiry, Duration interval, const ActorPtr& actor);
+    Timer timer(Time expiry, const ActorPtr& actor);
 
     int poll(std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
 
