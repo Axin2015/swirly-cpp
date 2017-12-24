@@ -21,7 +21,8 @@ namespace swirly {
 using namespace std;
 
 TcpAcceptor::TcpAcceptor(Reactor& reactor, const Endpoint& ep)
-    : Actor{reactor}, serv_{ep.protocol()}
+  : Actor{reactor}
+  , serv_{ep.protocol()}
 {
     serv_.setSoReuseAddr(true);
     serv_.bind(ep);
@@ -31,7 +32,9 @@ TcpAcceptor::TcpAcceptor(Reactor& reactor, const Endpoint& ep)
 
 TcpAcceptor::~TcpAcceptor() noexcept = default;
 
-void TcpAcceptor::doReady(int fd, IoEvents events, Time now)
+void TcpAcceptor::doEvent(const Event& event) {}
+
+void TcpAcceptor::doReady(int fd, FileEvents events, Time now)
 {
     Endpoint ep;
     IoSocket sock{sys::accept(fd, ep), serv_.family()};

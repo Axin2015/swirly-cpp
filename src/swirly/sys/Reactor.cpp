@@ -22,7 +22,7 @@ namespace swirly {
 
 using namespace std;
 
-Token Reactor::attach(int fd, IoEvents mask, const ActorPtr& actor)
+Token Reactor::attach(int fd, FileEvents mask, const ActorPtr& actor)
 {
     assert(fd >= 0);
     assert(actor);
@@ -36,7 +36,7 @@ Token Reactor::attach(int fd, IoEvents mask, const ActorPtr& actor)
     return Token{{this, fd}};
 }
 
-void Reactor::mask(int fd, IoEvents mask)
+void Reactor::mask(int fd, FileEvents mask)
 {
     if (data_[fd].mask != mask) {
         mux_.setMask(fd, mask);
@@ -73,9 +73,9 @@ int Reactor::poll(chrono::milliseconds timeout)
             timeout = max(expiry, 0ms);
         }
     }
-    Event events[16];
+    FileEvent buf[16];
     error_code ec;
-    const auto ret = mux_.wait(events, 16, timeout, ec);
+    const auto ret = mux_.wait(buf, 16, timeout, ec);
     if (ret < 0) {
         if (ec.value() != EINTR) {
             throw system_error{ec};
@@ -83,16 +83,16 @@ int Reactor::poll(chrono::milliseconds timeout)
         return 0;
     }
     const auto now = UnixClock::now();
-    return tq_.dispatch(now) + dispatch(events, ret, now);
+    return tq_.dispatch(now) + dispatch(buf, ret, now);
 }
 
-int Reactor::dispatch(Event* events, int size, Time now)
+int Reactor::dispatch(FileEvent* buf, int size, Time now)
 {
     for (int i{0}; i < size; ++i) {
 
-        auto& event = events[i];
-        const auto fd = static_cast<int>(event.data.u64 & 0xffffffff);
-        const auto sid = static_cast<int>(event.data.u64 >> 32);
+        auto& ev = buf[i];
+        const auto fd = static_cast<int>(ev.data.u64 & 0xffffffff);
+        const auto sid = static_cast<int>(ev.data.u64 >> 32);
 
         const auto& data = data_[fd];
         // Skip this socket if it was modified after the call to wait().
@@ -102,13 +102,13 @@ int Reactor::dispatch(Event* events, int size, Time now)
         // Apply the interest mask to filter-out any events that the user may have removed from the
         // mask since the call to wait() was made. This would typically happen via a reentrant call
         // into the reactor from an actor.
-        event.events &= data.mask;
-        if (!(event.events)) {
+        ev.events &= data.mask;
+        if (!(ev.events)) {
             continue;
         }
         ActorPtr actor{data.actor};
         try {
-            actor->ready(fd, event.events, now);
+            actor->ready(fd, ev.events, now);
         } catch (const std::exception& e) {
             using namespace std::string_literals;
             SWIRLY_ERROR("error handling io event: "s + e.what());

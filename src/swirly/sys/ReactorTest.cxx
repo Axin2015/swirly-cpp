@@ -49,7 +49,10 @@ struct TestActor : Actor {
     int matches() const { return matches_; }
 
   protected:
-    void doReady(int fd, IoEvents events, Time now) override
+    void doEvent(const Event& event) override
+    {
+    }
+    void doReady(int fd, FileEvents events, Time now) override
     {
         char buf[4];
         sys::recv(fd, buf, 4, 0);
@@ -86,7 +89,7 @@ SWIRLY_TEST_CASE(ReactorHandler)
     SWIRLY_CHECK(cntrs.dtor == 1);
 }
 
-SWIRLY_TEST_CASE(ReactorIoEvents)
+SWIRLY_TEST_CASE(ReactorFileEvents)
 {
     using namespace literals::chrono_literals;
 

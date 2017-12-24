@@ -36,7 +36,8 @@ struct TimerActor : Actor {
 
     ~TimerActor() noexcept override = default;
 
-    void doReady(int fd, IoEvents events, Time now) override {}
+    void doEvent(const Event& event) override {}
+    void doReady(int fd, FileEvents events, Time now) override {}
     void doTimer(const Timer& tmr, Time now) override {}
     int n{};
 };

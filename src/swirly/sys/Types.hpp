@@ -21,7 +21,7 @@
 
 namespace swirly {
 
-using IoEvents = std::uint32_t;
+using FileEvents = std::uint32_t;
 
 } // namespace swirly
 

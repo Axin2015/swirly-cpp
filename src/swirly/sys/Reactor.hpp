@@ -18,6 +18,8 @@
 #define SWIRLY_SYS_REACTOR_HPP
 
 #include <swirly/sys/Actor.hpp>
+#include <swirly/sys/EventFile.hpp>
+#include <swirly/sys/EventQueue.hpp>
 #include <swirly/sys/Handle.hpp>
 #include <swirly/sys/Muxer.hpp>
 #include <swirly/sys/Timer.hpp>
@@ -49,7 +51,7 @@ using Token = Handle<TokenPolicy>;
 
 class SWIRLY_API Reactor {
   public:
-    enum : IoEvents {
+    enum : FileEvents {
         In = Muxer::In,
         Pri = Muxer::Pri,
         Out = Muxer::Out,
@@ -57,10 +59,10 @@ class SWIRLY_API Reactor {
         Hup = Muxer::Hup
     };
     using Id = typename Muxer::Id;
-    using Event = typename Muxer::Event;
+    using FileEvent = typename Muxer::FileEvent;
     struct Data {
         int sid{};
-        IoEvents mask{};
+        FileEvents mask{};
         ActorPtr actor;
     };
     explicit Reactor(std::size_t sizeHint) : mux_{sizeHint} { data_.resize(sizeHint); }
@@ -76,8 +78,8 @@ class SWIRLY_API Reactor {
 
     void swap(Reactor& rhs) noexcept { mux_.swap(rhs.mux_); }
 
-    Token attach(int fd, IoEvents mask, const ActorPtr& actor);
-    void mask(int fd, IoEvents mask);
+    Token attach(int fd, FileEvents mask, const ActorPtr& actor);
+    void mask(int fd, FileEvents mask);
     void detach(int fd) noexcept;
 
     Timer timer(Time expiry, Duration interval, const ActorPtr& actor);
@@ -85,10 +87,21 @@ class SWIRLY_API Reactor {
 
     int poll(std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
 
+    void post(const Event& ev)
+    {
+        eq_.push(ev);
+    }
+    void post(Event&& ev)
+    {
+        eq_.push(std::move(ev));
+    }
+
   private:
-    int dispatch(Event* events, int size, Time now);
+    int dispatch(FileEvent* buf, int size, Time now);
 
     Muxer mux_;
+    EventFile ef_;
+    EventQueue eq_;
     TimerQueue tq_;
     std::vector<Data> data_;
 };
