@@ -53,7 +53,7 @@ Timer TimerQueue::insert(Time expiry, Duration interval, const ActorPtr& actor)
 
 int TimerQueue::dispatch(Time now)
 {
-    int expired{};
+    int n{};
     while (!heap_.empty()) {
 
         if (heap_.front().cancelled()) {
@@ -66,13 +66,13 @@ int TimerQueue::dispatch(Time now)
         } else if (heap_.front().expiry() <= now) {
 
             expire(now);
-            ++expired;
+            ++n;
 
         } else {
             break;
         }
     }
-    return expired;
+    return n;
 }
 
 Timer TimerQueue::alloc(Time expiry, Duration interval, const ActorPtr& actor)

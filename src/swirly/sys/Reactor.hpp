@@ -18,8 +18,6 @@
 #define SWIRLY_SYS_REACTOR_HPP
 
 #include <swirly/sys/Actor.hpp>
-#include <swirly/sys/EventFile.hpp>
-#include <swirly/sys/EventQueue.hpp>
 #include <swirly/sys/Handle.hpp>
 #include <swirly/sys/Muxer.hpp>
 #include <swirly/sys/Timer.hpp>
@@ -65,18 +63,20 @@ class SWIRLY_API Reactor {
         FileEvents mask{};
         ActorPtr actor;
     };
-    explicit Reactor(std::size_t sizeHint) : mux_{sizeHint} { data_.resize(sizeHint); }
-    ~Reactor() noexcept = default;
+    explicit Reactor(std::size_t sizeHint);
+    ~Reactor() noexcept;
 
     // Copy.
     Reactor(const Reactor&) = delete;
     Reactor& operator=(const Reactor&) = delete;
 
     // Move.
-    Reactor(Reactor&&) = default;
-    Reactor& operator=(Reactor&&) = default;
+    Reactor(Reactor&&);
+    Reactor& operator=(Reactor&&);
 
-    void swap(Reactor& rhs) noexcept { mux_.swap(rhs.mux_); }
+    bool quit() const noexcept;
+
+    void swap(Reactor& rhs) noexcept { impl_.swap(rhs.impl_); }
 
     Token attach(int fd, FileEvents mask, const ActorPtr& actor);
     void mask(int fd, FileEvents mask);
@@ -87,23 +87,21 @@ class SWIRLY_API Reactor {
 
     int poll(std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
 
-    void post(const Event& ev)
-    {
-        eq_.push(ev);
-    }
-    void post(Event&& ev)
-    {
-        eq_.push(std::move(ev));
-    }
+    /**
+     * Thread-safe.
+     */
+    void post(const Event& ev);
+
+    /**
+     * Thread-safe.
+     */
+    void post(Event&& ev);
 
   private:
     int dispatch(FileEvent* buf, int size, Time now);
 
-    Muxer mux_;
-    EventFile ef_;
-    EventQueue eq_;
-    TimerQueue tq_;
-    std::vector<Data> data_;
+    struct Impl;
+    std::unique_ptr<Impl> impl_;
 };
 
 inline void TokenPolicy::close(Id id) noexcept
