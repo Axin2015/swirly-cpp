@@ -46,6 +46,7 @@ set(lib_SOURCES
   Poll.cpp
   Reactor.cpp
   RefCount.cpp
+  Signal.cpp
   Socket.cpp
   System.cpp
   TcpAcceptor.cpp
