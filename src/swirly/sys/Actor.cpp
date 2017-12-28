@@ -14,35 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SYS_TCPACCEPTOR_HPP
-#define SWIRLY_SYS_TCPACCEPTOR_HPP
-
-#include <swirly/sys/Reactor.hpp>
-#include <swirly/sys/TcpSocket.hpp>
+#include "Actor.hpp"
 
 namespace swirly {
 
-class SWIRLY_API TcpAcceptor : public Actor {
-    using IntrusivePtr = boost::intrusive_ptr<TcpAcceptor>;
-
-  public:
-    using Transport = Tcp;
-    using Endpoint = TcpEndpoint;
-
-    TcpAcceptor(Reactor& reactor, const Endpoint& ep);
-    ~TcpAcceptor() noexcept override;
-
-  protected:
-    void doEvent(const Event& event) override;
-    void doReady(int fd, FileEvents events, Time now) override;
-    void doTimer(const Timer& tmr, Time now) override;
-    virtual void doAccept(IoSocket&& sock, const Endpoint& ep, Time now) = 0;
-
-  private:
-    TcpSocketServ serv_;
-    Token tok_;
-};
+Actor::~Actor() noexcept = default;
 
 } // namespace swirly
-
-#endif // SWIRLY_SYS_TCPACCEPTOR_HPP

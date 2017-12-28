@@ -37,12 +37,12 @@ bool isAfter(const Timer& lhs, const Timer& rhs)
 
 } // namespace
 
-Timer TimerQueue::insert(Time expiry, Duration interval, const AsyncHandlerPtr& handler)
+Timer TimerQueue::insert(Time expiry, Duration interval, const ActorPtr& actor)
 {
-    assert(handler);
+    assert(actor);
 
     heap_.reserve(heap_.size() + 1);
-    const auto tmr = alloc(expiry, interval, handler);
+    const auto tmr = alloc(expiry, interval, actor);
 
     // Cannot fail.
     heap_.push_back(tmr);
@@ -53,7 +53,7 @@ Timer TimerQueue::insert(Time expiry, Duration interval, const AsyncHandlerPtr& 
 
 int TimerQueue::dispatch(Time now)
 {
-    int expired{};
+    int n{};
     while (!heap_.empty()) {
 
         if (heap_.front().cancelled()) {
@@ -66,16 +66,16 @@ int TimerQueue::dispatch(Time now)
         } else if (heap_.front().expiry() <= now) {
 
             expire(now);
-            ++expired;
+            ++n;
 
         } else {
             break;
         }
     }
-    return expired;
+    return n;
 }
 
-Timer TimerQueue::alloc(Time expiry, Duration interval, const AsyncHandlerPtr& handler)
+Timer TimerQueue::alloc(Time expiry, Duration interval, const ActorPtr& actor)
 {
     Timer::Impl* impl;
 
@@ -103,7 +103,7 @@ Timer TimerQueue::alloc(Time expiry, Duration interval, const AsyncHandlerPtr& h
     impl->id = ++maxId_;
     impl->expiry = expiry;
     impl->interval = interval;
-    impl->handler = handler;
+    impl->actor = actor;
 
     return Timer{impl};
 }
@@ -117,7 +117,7 @@ void TimerQueue::expire(Time now)
 
     try {
         // Notify user.
-        tmr.handler()->timer(tmr, now);
+        tmr.actor()->timer(tmr, now);
     } catch (const std::exception& e) {
         using namespace string_literals;
         SWIRLY_ERROR("error handling timer event: "s + e.what());
@@ -140,7 +140,7 @@ void TimerQueue::expire(Time now)
     } else {
 
         // Free non-repeating timer.
-        tmr.handler().reset();
+        tmr.actor().reset();
     }
 
     if (cancelled_ > static_cast<int>(heap_.size() >> 2)) {

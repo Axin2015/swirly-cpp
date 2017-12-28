@@ -47,7 +47,6 @@ inline int poll(pollfd* fds, nfds_t nfds, int timeout)
 }
 
 #if defined(__linux__)
-
 inline int epoll_create(int size, std::error_code& ec) noexcept
 {
     const auto ret = ::epoll_create(size);
@@ -102,7 +101,6 @@ inline int epoll_wait(int epfd, epoll_event* events, int maxevents, int timeout)
     }
     return ret;
 }
-
 #endif
 
 } // namespace sys

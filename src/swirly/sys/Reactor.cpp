@@ -16,66 +16,109 @@
  */
 #include "Reactor.hpp"
 
+#include "EventFile.hpp"
+#include "EventQueue.hpp"
 #include "Log.hpp"
 
 namespace swirly {
-
 using namespace std;
+namespace {
+constexpr size_t MaxEvents{16};
+} // namespace
 
-Token Reactor::attach(int fd, EventMask mask, const AsyncHandlerPtr& handler)
+struct Reactor::Impl {
+
+    explicit Impl(size_t sizeHint)
+      : mux{sizeHint}
+    {
+        const auto fd = ef.waitfd();
+        data.resize(max<size_t>(fd + 1, sizeHint));
+
+        auto& ref = data[fd];
+        mux.attach(0, fd, In);
+        ref.mask = In;
+        ref.actor = {};
+    }
+
+    Muxer mux;
+    EventFile ef;
+    EventQueue eq;
+    TimerQueue tq;
+    vector<Data> data;
+    bool quit{false};
+};
+
+Reactor::Reactor(size_t sizeHint)
+  : impl_{make_unique<Impl>(sizeHint)}
+{
+}
+
+Reactor::~Reactor() noexcept = default;
+
+// Move.
+Reactor::Reactor(Reactor&&) = default;
+Reactor& Reactor::operator=(Reactor&&) = default;
+
+bool Reactor::quit() const noexcept
+{
+    return impl_->quit;
+}
+
+Token Reactor::attach(int fd, FileEvents mask, const ActorPtr& actor)
 {
     assert(fd >= 0);
-    assert(handler);
-    if (fd >= static_cast<int>(data_.size())) {
-        data_.resize(fd + 1);
+    assert(actor);
+    if (fd >= static_cast<int>(impl_->data.size())) {
+        impl_->data.resize(fd + 1);
     }
-    auto& data = data_[fd];
-    mux_.attach(++data.sid, fd, mask);
-    data.mask = mask;
-    data.handler = handler;
+    auto& ref = impl_->data[fd];
+    impl_->mux.attach(++ref.sid, fd, mask);
+    ref.mask = mask;
+    ref.actor = actor;
     return Token{{this, fd}};
 }
 
-void Reactor::mask(int fd, EventMask mask)
+void Reactor::mask(int fd, FileEvents mask)
 {
-    if (data_[fd].mask != mask) {
-        mux_.setMask(fd, mask);
-        data_[fd].mask = mask;
+    if (impl_->data[fd].mask != mask) {
+        impl_->mux.setMask(fd, mask);
+        impl_->data[fd].mask = mask;
     }
 }
 
 void Reactor::detach(int fd) noexcept
 {
-    mux_.detach(fd);
-    auto& data = data_[fd];
-    data.mask = 0;
-    data.handler.reset();
+    impl_->mux.detach(fd);
+    auto& ref = impl_->data[fd];
+    ref.mask = 0;
+    ref.actor.reset();
 }
 
-Timer Reactor::timer(Time expiry, Duration interval, const AsyncHandlerPtr& handler)
+Timer Reactor::timer(Time expiry, Duration interval, const ActorPtr& actor)
 {
-    return tq_.insert(expiry, interval, handler);
+    return impl_->tq.insert(expiry, interval, actor);
 }
 
-Timer Reactor::timer(Time expiry, const AsyncHandlerPtr& handler)
+Timer Reactor::timer(Time expiry, const ActorPtr& actor)
 {
-    return tq_.insert(expiry, handler);
+    return impl_->tq.insert(expiry, actor);
 }
 
 int Reactor::poll(chrono::milliseconds timeout)
 {
     using namespace chrono;
 
-    if (!tq_.empty()) {
+    if (!impl_->tq.empty()) {
         // Millis until next expiry.
-        const auto expiry = duration_cast<milliseconds>(tq_.front().expiry() - UnixClock::now());
+        const auto expiry
+            = duration_cast<milliseconds>(impl_->tq.front().expiry() - UnixClock::now());
         if (expiry < timeout) {
             timeout = max(expiry, 0ms);
         }
     }
-    Event events[16];
+    FileEvent buf[MaxEvents];
     error_code ec;
-    const auto ret = mux_.wait(events, 16, timeout, ec);
+    const auto ret = impl_->mux.wait(buf, MaxEvents, timeout, ec);
     if (ret < 0) {
         if (ec.value() != EINTR) {
             throw system_error{ec};
@@ -83,38 +126,64 @@ int Reactor::poll(chrono::milliseconds timeout)
         return 0;
     }
     const auto now = UnixClock::now();
-    return tq_.dispatch(now) + dispatch(events, ret, now);
+    return impl_->tq.dispatch(now) + dispatch(buf, ret, now);
 }
 
-int Reactor::dispatch(Event* events, int size, Time now)
+void Reactor::post(const Event& ev)
 {
+    if (impl_->eq.push(ev) == 1) {
+        impl_->ef.notify();
+    }
+}
+
+void Reactor::post(Event&& ev)
+{
+    if (impl_->eq.push(move(ev)) == 1) {
+        impl_->ef.notify();
+    }
+}
+
+int Reactor::dispatch(FileEvent* buf, int size, Time now)
+{
+    int n{};
     for (int i{0}; i < size; ++i) {
 
-        auto& event = events[i];
-        const auto fd = static_cast<int>(event.data.u64 & 0xffffffff);
-        const auto sid = static_cast<int>(event.data.u64 >> 32);
+        auto& ev = buf[i];
+        const auto fd = static_cast<int>(ev.data.u64 & 0xffffffff);
+        if (fd == impl_->ef.waitfd()) {
+            while (auto event = impl_->eq.pop()) {
+                // TODO: dispatch events to Actors.
+                impl_->quit = true;
+                ++n;
+            }
+            continue;
+        }
 
-        const auto& data = data_[fd];
+        const auto sid = static_cast<int>(ev.data.u64 >> 32);
+
+        const auto& ref = impl_->data[fd];
         // Skip this socket if it was modified after the call to wait().
-        if (data.sid > sid) {
+        if (ref.sid > sid) {
             continue;
         }
-        // Apply the interest mask to filter-out any events that the user may have removed from
-        // the mask since the call to wait() was made. This would typically happen via a
-        // reentrant call into the reactor from an event handler.
-        event.events &= data.mask;
-        if (!(event.events)) {
+        // Apply the interest mask to filter-out any events that the user may have removed from the
+        // mask since the call to wait() was made. This would typically happen via a reentrant call
+        // into the reactor from an actor.
+        ev.events &= ref.mask;
+        if (!(ev.events)) {
             continue;
         }
-        AsyncHandlerPtr handler{data.handler};
+
+        ActorPtr actor{ref.actor};
         try {
-            handler->event(fd, event.events, now);
+            actor->ready(fd, ev.events, now);
         } catch (const std::exception& e) {
-            using namespace std::string_literals;
+            using namespace string_literals;
             SWIRLY_ERROR("error handling io event: "s + e.what());
         }
+        ++n;
     }
-    return size;
+    return n;
 }
 
 } // namespace swirly

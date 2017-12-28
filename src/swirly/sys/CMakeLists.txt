@@ -25,25 +25,29 @@ else()
 endif()
 
 set(lib_SOURCES
-  AsyncHandler.cpp
+  Actor.cpp
   Buffer.cpp
   Daemon.cpp
   Error.cpp
+  Event.cpp
+  EventFile.cpp
+  EventQueue.cpp
   File.cpp
   Handle.cpp
   IoSocket.cpp
   IpAddress.cpp
   LocalAddress.cpp
   Log.cpp
+  Math.cpp
   MemAlloc.cpp
   MemCtx.cpp
   MemPool.cpp
   MMap.cpp
-  Msg.cpp
   Muxer.cpp
   Poll.cpp
   Reactor.cpp
   RefCount.cpp
+  Signal.cpp
   Socket.cpp
   System.cpp
   TcpAcceptor.cpp
@@ -69,6 +73,7 @@ set(test_SOURCES
   BufferTest.cxx
   HandleTest.cxx
   IpAddressTest.cxx
+  MathTest.cxx
   MemCtxTest.cxx
   ReactorTest.cxx
   RefCountTest.cxx

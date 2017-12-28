@@ -14,10 +14,41 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "AsyncHandler.hpp"
+#include "Signal.hpp"
+
+#include <swirly/sys/Error.hpp>
 
 namespace swirly {
 
-AsyncHandler::~AsyncHandler() noexcept = default;
+SigWait::SigWait()
+{
+    sigemptyset(&newMask_);
+    sigaddset(&newMask_, SIGHUP);
+    sigaddset(&newMask_, SIGINT);
+    sigaddset(&newMask_, SIGUSR1);
+    sigaddset(&newMask_, SIGUSR2);
+    sigaddset(&newMask_, SIGTERM);
+
+    const auto err = pthread_sigmask(SIG_BLOCK, &newMask_, &oldMask_);
+    if (err != 0) {
+        throw std::system_error{sys::makeError(err), "pthread_sigmask"};
+    }
+}
+
+SigWait::~SigWait() noexcept
+{
+    // Restore original signal mask.
+    pthread_sigmask(SIG_SETMASK, &oldMask_, nullptr);
+}
+
+int SigWait::operator()() const
+{
+    int sig;
+    const auto err = sigwait(&newMask_, &sig);
+    if (err != 0) {
+        throw std::system_error{sys::makeError(err), "sigwait"};
+    }
+    return sig;
+}
 
 } // namespace swirly

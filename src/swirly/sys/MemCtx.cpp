@@ -55,24 +55,32 @@ struct MemCtx::Impl {
     void* alloc(size_t size)
     {
         void* addr;
-        switch (ceilCacheLine(size)) {
-        case 1 << 6:
+        enum { Max = (1 << CacheLineBits) - 1 };
+        const auto cacheLines = (size + Max) >> CacheLineBits;
+        switch (nextPow2(cacheLines)) {
+        case 1: // 64
             addr = allocBlock(pool, pool.free1, maxSize);
             break;
-        case 2 << 6:
+        case 2: // 128
             addr = allocBlock(pool, pool.free2, maxSize);
             break;
-        case 3 << 6:
-            addr = allocBlock(pool, pool.free3, maxSize);
+        case 4:
+            if (cacheLines == 3) {
+                // 192
+                addr = allocBlock(pool, pool.free3, maxSize);
+            } else {
+                // 256
+                addr = allocBlock(pool, pool.free4, maxSize);
+            }
             break;
-        case 4 << 6:
-            addr = allocBlock(pool, pool.free4, maxSize);
+        case 8: // 512
+            addr = allocBlock(pool, pool.free8, maxSize);
             break;
-        case 5 << 6:
-            addr = allocBlock(pool, pool.free5, maxSize);
+        case 16: // 1024
+            addr = allocBlock(pool, pool.free16, maxSize);
             break;
-        case 6 << 6:
-            addr = allocBlock(pool, pool.free6, maxSize);
+        case 32: // 2048
+            addr = allocBlock(pool, pool.free32, maxSize);
             break;
         default:
             throw bad_alloc{};
@@ -81,24 +89,31 @@ struct MemCtx::Impl {
     }
     void dealloc(void* addr, size_t size) noexcept
     {
-        switch (ceilCacheLine(size)) {
-        case 1 << 6:
+        const auto cacheLines = size >> CacheLineBits;
+        switch (nextPow2(cacheLines)) {
+        case 1: // 64
             deallocBlock(pool, pool.free1, addr);
             break;
-        case 2 << 6:
+        case 2: // 128
             deallocBlock(pool, pool.free2, addr);
             break;
-        case 3 << 6:
-            deallocBlock(pool, pool.free3, addr);
+        case 4:
+            if (cacheLines == 3) {
+                // 192
+                deallocBlock(pool, pool.free3, addr);
+            } else {
+                 // 256
+                deallocBlock(pool, pool.free4, addr);
+            }
             break;
-        case 4 << 6:
-            deallocBlock(pool, pool.free4, addr);
+        case 8: // 512
+            deallocBlock(pool, pool.free8, addr);
             break;
-        case 5 << 6:
-            deallocBlock(pool, pool.free5, addr);
+        case 16: // 1024
+            deallocBlock(pool, pool.free16, addr);
             break;
-        case 6 << 6:
-            deallocBlock(pool, pool.free6, addr);
+        case 32: // 2048
+            deallocBlock(pool, pool.free32, addr);
             break;
         default:
             abort();

@@ -30,14 +30,15 @@ using namespace swirly;
 
 namespace {
 
-struct Handler : AsyncHandler {
+struct TimerActor : Actor {
 
-    using AsyncHandler::AsyncHandler;
+    using Actor::Actor;
 
-    ~Handler() noexcept override = default;
+    ~TimerActor() noexcept override = default;
 
-    void onEvent(int fd, EventMask events, Time now) override {}
-    void onTimer(const Timer& tmr, Time now) override {}
+    void doEvent(const Event& event) override {}
+    void doReady(int fd, FileEvents events, Time now) override {}
+    void doTimer(const Timer& tmr, Time now) override {}
     int n{};
 };
 
@@ -55,11 +56,11 @@ int main(int argc, char* argv[])
         Reactor r{1024};
         priority_queue<pair<int, Timer>> pq;
 
-        auto h = makeIntrusive<Handler>(r);
+        auto a = makeIntrusive<TimerActor>(r);
         for (int i{0}; i < 1000000; ++i) {
             const auto now = UnixClock::now();
             if (pq.empty() || dis(gen) % 2 == 0) {
-                pq.emplace(i, r.timer(now + Micros{dis(gen) % 100}, h));
+                pq.emplace(i, r.timer(now + Micros{dis(gen) % 100}, a));
             } else {
                 auto tmr = pq.top().second;
                 pq.pop();

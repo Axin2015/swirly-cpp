@@ -14,35 +14,33 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SYS_TCPACCEPTOR_HPP
-#define SWIRLY_SYS_TCPACCEPTOR_HPP
-
-#include <swirly/sys/Reactor.hpp>
-#include <swirly/sys/TcpSocket.hpp>
+#include "EventQueue.hpp"
 
 namespace swirly {
 
-class SWIRLY_API TcpAcceptor : public Actor {
-    using IntrusivePtr = boost::intrusive_ptr<TcpAcceptor>;
+EventQueue::EventQueue(std::size_t capacity)
+{
+    rdbuf_.reserve(capacity);
+    wrbuf_.reserve(capacity);
+    it_ = rdbuf_.begin();
+}
 
-  public:
-    using Transport = Tcp;
-    using Endpoint = TcpEndpoint;
+EventQueue::~EventQueue() noexcept = default;
 
-    TcpAcceptor(Reactor& reactor, const Endpoint& ep);
-    ~TcpAcceptor() noexcept override;
-
-  protected:
-    void doEvent(const Event& event) override;
-    void doReady(int fd, FileEvents events, Time now) override;
-    void doTimer(const Timer& tmr, Time now) override;
-    virtual void doAccept(IoSocket&& sock, const Endpoint& ep, Time now) = 0;
-
-  private:
-    TcpSocketServ serv_;
-    Token tok_;
-};
+Event EventQueue::pop()
+{
+    if (it_ == rdbuf_.end()) {
+        {
+            std::lock_guard<std::mutex> lock{mutex_};
+            rdbuf_.swap(wrbuf_);
+        }
+        it_ = rdbuf_.begin();
+    }
+    Event ev;
+    if (it_ != rdbuf_.end()) {
+        ev = *it_++;
+    }
+    return ev;
+}
 
 } // namespace swirly
-
-#endif // SWIRLY_SYS_TCPACCEPTOR_HPP

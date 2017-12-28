@@ -24,6 +24,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#if defined(__linux__)
+#include <sys/eventfd.h>
+#endif
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -86,6 +89,92 @@ inline File open(const char* path, int flags)
     }
     return fd;
 }
+
+#if defined(__linux__)
+/**
+ * Create a file descriptor for event notification.
+ */
+inline File eventfd(unsigned intval, int flags, std::error_code& ec) noexcept
+{
+    const auto fd = ::eventfd(intval, flags);
+    if (fd < 0) {
+        ec = makeError(errno);
+    }
+    return fd;
+}
+
+/**
+ * Create a file descriptor for event notification.
+ */
+inline File eventfd(unsigned intval, int flags)
+{
+    const auto fd = ::eventfd(intval, flags);
+    if (fd < 0) {
+        throw std::system_error{makeError(errno), "eventfd"};
+    }
+    return fd;
+}
+
+/**
+ * Create pipe.
+ */
+inline std::pair<File, File> pipe2(int flags, std::error_code& ec) noexcept
+{
+    int pipefd[2];
+    if (::pipe2(pipefd, flags) < 0) {
+        ec = makeError(errno);
+    }
+    return {File{pipefd[0]}, File{pipefd[1]}};
+}
+
+/**
+ * Create pipe.
+ */
+inline std::pair<File, File> pipe2(int flags)
+{
+    int pipefd[2];
+    if (::pipe2(pipefd, flags) < 0) {
+        throw std::system_error{makeError(errno), "pipe2"};
+    }
+    return {File{pipefd[0]}, File{pipefd[1]}};
+}
+#else
+/**
+ * Create pipe.
+ */
+inline std::pair<File, File> pipe2(int flags, std::error_code& ec) noexcept
+{
+    int pipefd[2];
+    if (::pipe(pipefd) < 0) {
+        ec = makeError(errno);
+    }
+    if (flags != 0) {
+        if (::fcntl(pipefd[0], F_SETFL, flags) < 0
+            || ::fcntl(pipefd[1], F_SETFL, flags) < 0) {
+            ec = makeError(errno);
+        }
+    }
+    return {File{pipefd[0]}, File{pipefd[1]}};
+}
+
+/**
+ * Create pipe.
+ */
+inline std::pair<File, File> pipe2(int flags)
+{
+    int pipefd[2];
+    if (::pipe(pipefd) < 0) {
+        throw std::system_error{makeError(errno), "pipe"};
+    }
+    if (flags != 0) {
+        if (::fcntl(pipefd[0], F_SETFL, flags) < 0
+            || ::fcntl(pipefd[1], F_SETFL, flags) < 0) {
+            throw std::system_error{makeError(errno), "fcntl"};
+        }
+    }
+    return {File{pipefd[0]}, File{pipefd[1]}};
+}
+#endif
 
 /**
  * Get file status.

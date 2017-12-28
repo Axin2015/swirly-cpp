@@ -17,7 +17,7 @@
 #ifndef SWIRLY_SYS_REACTOR_HPP
 #define SWIRLY_SYS_REACTOR_HPP
 
-#include <swirly/sys/AsyncHandler.hpp>
+#include <swirly/sys/Actor.hpp>
 #include <swirly/sys/Handle.hpp>
 #include <swirly/sys/Muxer.hpp>
 #include <swirly/sys/Timer.hpp>
@@ -49,7 +49,7 @@ using Token = Handle<TokenPolicy>;
 
 class SWIRLY_API Reactor {
   public:
-    enum : EventMask {
+    enum : FileEvents {
         In = Muxer::In,
         Pri = Muxer::Pri,
         Out = Muxer::Out,
@@ -57,40 +57,51 @@ class SWIRLY_API Reactor {
         Hup = Muxer::Hup
     };
     using Id = typename Muxer::Id;
-    using Event = typename Muxer::Event;
+    using FileEvent = typename Muxer::FileEvent;
     struct Data {
         int sid{};
-        EventMask mask{};
-        AsyncHandlerPtr handler;
+        FileEvents mask{};
+        ActorPtr actor;
     };
-    explicit Reactor(std::size_t sizeHint) : mux_{sizeHint} { data_.resize(sizeHint); }
-    ~Reactor() noexcept = default;
+    explicit Reactor(std::size_t sizeHint);
+    ~Reactor() noexcept;
 
     // Copy.
     Reactor(const Reactor&) = delete;
     Reactor& operator=(const Reactor&) = delete;
 
     // Move.
-    Reactor(Reactor&&) = default;
-    Reactor& operator=(Reactor&&) = default;
+    Reactor(Reactor&&);
+    Reactor& operator=(Reactor&&);
 
-    void swap(Reactor& rhs) noexcept { mux_.swap(rhs.mux_); }
+    bool quit() const noexcept;
 
-    Token attach(int fd, EventMask mask, const AsyncHandlerPtr& handler);
-    void mask(int fd, EventMask mask);
+    void swap(Reactor& rhs) noexcept { impl_.swap(rhs.impl_); }
+
+    Token attach(int fd, FileEvents mask, const ActorPtr& actor);
+    void mask(int fd, FileEvents mask);
     void detach(int fd) noexcept;
 
-    Timer timer(Time expiry, Duration interval, const AsyncHandlerPtr& handler);
-    Timer timer(Time expiry, const AsyncHandlerPtr& handler);
+    Timer timer(Time expiry, Duration interval, const ActorPtr& actor);
+    Timer timer(Time expiry, const ActorPtr& actor);
 
     int poll(std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
 
-  private:
-    int dispatch(Event* events, int size, Time now);
+    /**
+     * Thread-safe.
+     */
+    void post(const Event& ev);
 
-    Muxer mux_;
-    TimerQueue tq_;
-    std::vector<Data> data_;
+    /**
+     * Thread-safe.
+     */
+    void post(Event&& ev);
+
+  private:
+    int dispatch(FileEvent* buf, int size, Time now);
+
+    struct Impl;
+    std::unique_ptr<Impl> impl_;
 };
 
 inline void TokenPolicy::close(Id id) noexcept

@@ -14,33 +14,4 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "TcpAcceptor.hpp"
-
-namespace swirly {
-
-using namespace std;
-
-TcpAcceptor::TcpAcceptor(Reactor& reactor, const Endpoint& ep)
-  : Actor{reactor}
-  , serv_{ep.protocol()}
-{
-    serv_.setSoReuseAddr(true);
-    serv_.bind(ep);
-    serv_.listen(SOMAXCONN);
-    tok_ = reactor.attach(*serv_, Reactor::In, IntrusivePtr{this, false});
-}
-
-TcpAcceptor::~TcpAcceptor() noexcept = default;
-
-void TcpAcceptor::doEvent(const Event& event) {}
-
-void TcpAcceptor::doReady(int fd, FileEvents events, Time now)
-{
-    Endpoint ep;
-    IoSocket sock{sys::accept(fd, ep), serv_.family()};
-    doAccept(move(sock), ep, now);
-}
-
-void TcpAcceptor::doTimer(const Timer& tmr, Time now) {}
-
-} // namespace swirly
+#include "Math.hpp"

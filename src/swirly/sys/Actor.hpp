@@ -14,9 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SYS_ASYNCHANDLER_HPP
-#define SWIRLY_SYS_ASYNCHANDLER_HPP
+#ifndef SWIRLY_SYS_ACTOR_HPP
+#define SWIRLY_SYS_ACTOR_HPP
 
+#include <swirly/sys/Event.hpp>
 #include <swirly/sys/RefCount.hpp>
 #include <swirly/sys/Time.hpp>
 #include <swirly/sys/Types.hpp>
@@ -26,25 +27,27 @@ namespace swirly {
 class Reactor;
 class Timer;
 
-class SWIRLY_API AsyncHandler : public RefCount<AsyncHandler, ThreadUnsafePolicy> {
+class SWIRLY_API Actor : public RefCount<Actor, ThreadUnsafePolicy> {
   public:
-    explicit AsyncHandler(Reactor& reactor) noexcept : reactor_(reactor) {}
-    virtual ~AsyncHandler() noexcept;
+    explicit Actor(Reactor& reactor) noexcept : reactor_(reactor) {}
+    virtual ~Actor() noexcept;
 
     // Copy.
-    AsyncHandler(const AsyncHandler&) noexcept = delete;
-    AsyncHandler& operator=(const AsyncHandler&) noexcept = delete;
+    Actor(const Actor&) noexcept = delete;
+    Actor& operator=(const Actor&) noexcept = delete;
 
     // Move.
-    AsyncHandler(AsyncHandler&&) noexcept = delete;
-    AsyncHandler& operator=(AsyncHandler&&) noexcept = delete;
+    Actor(Actor&&) noexcept = delete;
+    Actor& operator=(Actor&&) noexcept = delete;
 
-    void event(int fd, EventMask events, Time now) { onEvent(fd, events, now); }
-    void timer(const Timer& tmr, Time now) { onTimer(tmr, now); }
+    void event(const Event& event) { doEvent(event); }
+    void ready(int fd, FileEvents mask, Time now) { doReady(fd, mask, now); }
+    void timer(const Timer& tmr, Time now) { doTimer(tmr, now); }
 
   protected:
-    virtual void onEvent(int fd, EventMask events, Time now) = 0;
-    virtual void onTimer(const Timer& tmr, Time now) = 0;
+    virtual void doEvent(const Event& event) = 0;
+    virtual void doReady(int fd, FileEvents mask, Time now) = 0;
+    virtual void doTimer(const Timer& tmr, Time now) = 0;
 
     const Reactor& reactor() const noexcept { return reactor_; }
 
@@ -54,8 +57,8 @@ class SWIRLY_API AsyncHandler : public RefCount<AsyncHandler, ThreadUnsafePolicy
     Reactor& reactor_;
 };
 
-using AsyncHandlerPtr = boost::intrusive_ptr<AsyncHandler>;
+using ActorPtr = boost::intrusive_ptr<Actor>;
 
 } // namespace swirly
 
-#endif // SWIRLY_SYS_ASYNCHANDLER_HPP
+#endif // SWIRLY_SYS_ACTOR_HPP

@@ -14,35 +14,34 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SYS_TCPACCEPTOR_HPP
-#define SWIRLY_SYS_TCPACCEPTOR_HPP
+#ifndef SWIRLY_SYS_SIGNAL_HPP
+#define SWIRLY_SYS_SIGNAL_HPP
 
-#include <swirly/sys/Reactor.hpp>
-#include <swirly/sys/TcpSocket.hpp>
+#include <swirly/Config.h>
+
+#include <signal.h>
 
 namespace swirly {
 
-class SWIRLY_API TcpAcceptor : public Actor {
-    using IntrusivePtr = boost::intrusive_ptr<TcpAcceptor>;
-
+class SWIRLY_API SigWait {
   public:
-    using Transport = Tcp;
-    using Endpoint = TcpEndpoint;
+    SigWait();
+    ~SigWait() noexcept;
 
-    TcpAcceptor(Reactor& reactor, const Endpoint& ep);
-    ~TcpAcceptor() noexcept override;
+    // Copy.
+    SigWait(const SigWait&) = delete;
+    SigWait& operator=(const SigWait&) = delete;
 
-  protected:
-    void doEvent(const Event& event) override;
-    void doReady(int fd, FileEvents events, Time now) override;
-    void doTimer(const Timer& tmr, Time now) override;
-    virtual void doAccept(IoSocket&& sock, const Endpoint& ep, Time now) = 0;
+    // Move.
+    SigWait(SigWait&&) = delete;
+    SigWait& operator=(SigWait&&) = delete;
+
+    int operator()() const;
 
   private:
-    TcpSocketServ serv_;
-    Token tok_;
+    sigset_t newMask_, oldMask_;
 };
 
 } // namespace swirly
 
-#endif // SWIRLY_SYS_TCPACCEPTOR_HPP
+#endif // SWIRLY_SYS_SIGNAL_HPP

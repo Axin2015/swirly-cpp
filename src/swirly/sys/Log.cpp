@@ -26,6 +26,20 @@
 
 #include <sys/uio.h> // writev()
 
+// The gettid() function is a Linux-specific function call.
+#if defined(__linux__)
+#include <sys/syscall.h>
+inline pid_t gettid()
+{
+    return syscall(SYS_gettid);
+}
+#else
+inline pid_t gettid()
+{
+    return getpid();
+}
+#endif
+
 using namespace std;
 
 namespace swirly {
@@ -99,7 +113,7 @@ void stdLogger(int level, string_view msg) noexcept
     char head[42 + 1];
     size_t hlen = strftime(head, sizeof(head), "%b %d %H:%M:%S", &tm);
     hlen += sprintf(head + hlen, ".%03d %-7s [%d]: ", static_cast<int>(ms % 1000), logLabel(level),
-                    static_cast<int>(getpid()));
+                    static_cast<int>(gettid()));
     char tail = '\n';
     iovec iov[] = {
         {head, hlen}, //
