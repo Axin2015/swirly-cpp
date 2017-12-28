@@ -27,6 +27,7 @@
 
 #include <swirly/unit/Test.hpp>
 
+#include <algorithm>
 #include <queue>
 
 using namespace std;

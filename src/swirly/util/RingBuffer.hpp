@@ -17,9 +17,8 @@
 #ifndef SWIRLY_UTIL_RINGBUFFER_HPP
 #define SWIRLY_UTIL_RINGBUFFER_HPP
 
-#include <swirly/util/Math.hpp>
+#include <swirly/sys/Math.hpp>
 
-#include <cstdint>
 #include <memory>
 
 namespace swirly {

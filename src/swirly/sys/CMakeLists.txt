@@ -38,6 +38,7 @@ set(lib_SOURCES
   IpAddress.cpp
   LocalAddress.cpp
   Log.cpp
+  Math.cpp
   MemAlloc.cpp
   MemCtx.cpp
   MemPool.cpp
@@ -72,6 +73,7 @@ set(test_SOURCES
   BufferTest.cxx
   HandleTest.cxx
   IpAddressTest.cxx
+  MathTest.cxx
   MemCtxTest.cxx
   ReactorTest.cxx
   RefCountTest.cxx

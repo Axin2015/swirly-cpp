@@ -21,26 +21,23 @@
 using namespace std;
 using namespace swirly;
 
-SWIRLY_TEST_CASE(VarAccum)
+SWIRLY_TEST_CASE(NextPow2)
 {
-    VarAccum v;
-    v.append(1345, 1301, 1368, 1322, 1310, 1370, 1318, 1350, 1303, 1299);
-    SWIRLY_CHECK(test::isSame(v.size(), 10));
-    SWIRLY_CHECK(test::isSame(v.mean(), 1328.6));
-    SWIRLY_CHECK(test::isSame(var(v), 754.2666667));
-    SWIRLY_CHECK(test::isSame(varp(v), 678.84));
-    SWIRLY_CHECK(test::isSame(stdev(v), 27.4639157));
-    SWIRLY_CHECK(test::isSame(stdevp(v), 26.0545581));
-    SWIRLY_CHECK(test::isSame(v.min(), 1299));
-    SWIRLY_CHECK(test::isSame(v.max(), 1370));
-}
+    SWIRLY_CHECK(nextPow2(1U) == 1U);
+    SWIRLY_CHECK(nextPow2(2U) == 2U);
+    SWIRLY_CHECK(nextPow2(3U) == 4U);
+    SWIRLY_CHECK(nextPow2(4U) == 4U);
+    SWIRLY_CHECK(nextPow2(5U) == 8U);
+    SWIRLY_CHECK(nextPow2(6U) == 8U);
+    SWIRLY_CHECK(nextPow2(7U) == 8U);
+    SWIRLY_CHECK(nextPow2(8U) == 8U);
 
-SWIRLY_TEST_CASE(Ceil)
-{
-    SWIRLY_CHECK(ceil(1U, 3U) == 1U);
-    SWIRLY_CHECK(ceil(2U, 3U) == 1U);
-    SWIRLY_CHECK(ceil(3U, 3U) == 1U);
-    SWIRLY_CHECK(ceil(4U, 3U) == 2U);
-    SWIRLY_CHECK(ceil(5U, 3U) == 2U);
-    SWIRLY_CHECK(ceil(6U, 3U) == 2U);
+    SWIRLY_CHECK(nextPow2(1UL) == 1UL);
+    SWIRLY_CHECK(nextPow2(2UL) == 2UL);
+    SWIRLY_CHECK(nextPow2(3UL) == 4UL);
+    SWIRLY_CHECK(nextPow2(4UL) == 4UL);
+    SWIRLY_CHECK(nextPow2(5UL) == 8UL);
+    SWIRLY_CHECK(nextPow2(6UL) == 8UL);
+    SWIRLY_CHECK(nextPow2(7UL) == 8UL);
+    SWIRLY_CHECK(nextPow2(8UL) == 8UL);
 }

@@ -17,11 +17,12 @@
 #ifndef SWIRLY_SYS_MEMPOOL_HPP
 #define SWIRLY_SYS_MEMPOOL_HPP
 
+#include <swirly/sys/Math.hpp>
+
 #include <swirly/Config.h>
 
 #include <cassert>
 #include <cstddef>
-#include <cstdint>
 #include <new>
 #include <type_traits>
 
@@ -37,13 +38,6 @@ enum : std::size_t {
     PageBits = 12,
     PageSize = 1 << PageBits
 };
-
-template <int BitsN>
-constexpr std::size_t ceilPow2(std::size_t size) noexcept
-{
-    enum { Max = (1 << BitsN) - 1 };
-    return ((size + Max) >> BitsN) << BitsN;
-}
 
 constexpr std::size_t ceilCacheLine(std::size_t size) noexcept
 {
@@ -109,8 +103,9 @@ struct MemPool {
             MemStack<(2 << 6)> free2;
             MemStack<(3 << 6)> free3;
             MemStack<(4 << 6)> free4;
-            MemStack<(5 << 6)> free5;
-            MemStack<(6 << 6)> free6;
+            MemStack<(8 << 6)> free8;
+            MemStack<(16 << 6)> free16;
+            MemStack<(32 << 6)> free32;
             MemSize offset;
         };
     };
