@@ -81,10 +81,11 @@ class Pipe {
     }
     void close()
     {
-        std::unique_lock<std::mutex> lock{mutex_};
-        closed_ = true;
-        // Unlock mutex before notifying to avoid contention.
-        lock.unlock();
+        {
+            std::unique_lock<std::mutex> lock{mutex_};
+            closed_ = true;
+            // Unlock mutex before notifying to avoid contention.
+        }
         notEmpty_.notify_all();
         notFull_.notify_all();
     }

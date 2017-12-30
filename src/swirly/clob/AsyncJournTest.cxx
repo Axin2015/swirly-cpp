@@ -68,9 +68,10 @@ struct TestJourn : Journ {
   protected:
     void doUpdate(const Msg& msg) override
     {
-        unique_lock<mutex> lock{mutex_};
-        msgs_.push(msg);
-        lock.unlock();
+        {
+            lock_guard<mutex> lock{mutex_};
+            msgs_.push(msg);
+        }
         notEmpty_.notify_one();
     }
 
