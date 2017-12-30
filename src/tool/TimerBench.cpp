@@ -38,6 +38,7 @@ struct TimerActor : Actor {
 
     void doEvent(const Event& event) override {}
     void doReady(int fd, FileEvents events, Time now) override {}
+    void doSignal(int sig) override {}
     void doTimer(const Timer& tmr, Time now) override {}
     int n{};
 };
@@ -60,7 +61,7 @@ int main(int argc, char* argv[])
         for (int i{0}; i < 1000000; ++i) {
             const auto now = UnixClock::now();
             if (pq.empty() || dis(gen) % 2 == 0) {
-                pq.emplace(i, r.timer(now + Micros{dis(gen) % 100}, a));
+                pq.emplace(i, r.setTimer(now + Micros{dis(gen) % 100}, a));
             } else {
                 auto tmr = pq.top().second;
                 pq.pop();

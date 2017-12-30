@@ -24,7 +24,7 @@
 
 namespace swirly {
 
-struct TokenPolicy {
+struct FileTokenPolicy {
     struct Id {
         Reactor* reactor{nullptr};
         int value{-1};
@@ -33,19 +33,43 @@ struct TokenPolicy {
     static void close(Id id) noexcept;
 };
 
-inline bool operator==(TokenPolicy::Id lhs, TokenPolicy::Id rhs) noexcept
+inline bool operator==(FileTokenPolicy::Id lhs, FileTokenPolicy::Id rhs) noexcept
 {
     assert(lhs.reactor == rhs.reactor || !lhs.reactor || !rhs.reactor);
     return lhs.value == rhs.value;
 }
 
-inline bool operator!=(TokenPolicy::Id lhs, TokenPolicy::Id rhs) noexcept
+inline bool operator!=(FileTokenPolicy::Id lhs, FileTokenPolicy::Id rhs) noexcept
 {
     assert(lhs.reactor == rhs.reactor || !lhs.reactor || !rhs.reactor);
     return lhs.value != rhs.value;
 }
 
-using Token = Handle<TokenPolicy>;
+using FileToken = Handle<FileTokenPolicy>;
+
+struct EventTokenPolicy {
+    struct Id {
+        Reactor* reactor{nullptr};
+        Address addr{Address::None};
+        Actor* actor{nullptr};
+    };
+    static constexpr Id invalid() noexcept { return {}; }
+    static void close(Id id) noexcept;
+};
+
+inline bool operator==(EventTokenPolicy::Id lhs, EventTokenPolicy::Id rhs) noexcept
+{
+    assert(lhs.reactor == rhs.reactor || !lhs.reactor || !rhs.reactor);
+    return lhs.addr == rhs.addr && lhs.actor == rhs.actor;
+}
+
+inline bool operator!=(EventTokenPolicy::Id lhs, EventTokenPolicy::Id rhs) noexcept
+{
+    assert(lhs.reactor == rhs.reactor || !lhs.reactor || !rhs.reactor);
+    return lhs.addr != rhs.addr || lhs.actor != rhs.actor;
+}
+
+using EventToken = Handle<EventTokenPolicy>;
 
 class SWIRLY_API Reactor {
   public:
@@ -63,7 +87,7 @@ class SWIRLY_API Reactor {
         FileEvents mask{};
         ActorPtr actor;
     };
-    explicit Reactor(std::size_t sizeHint);
+    explicit Reactor(std::size_t sizeHint = 1024);
     ~Reactor() noexcept;
 
     // Copy.
@@ -74,28 +98,30 @@ class SWIRLY_API Reactor {
     Reactor(Reactor&&);
     Reactor& operator=(Reactor&&);
 
-    bool quit() const noexcept;
-
     void swap(Reactor& rhs) noexcept { impl_.swap(rhs.impl_); }
 
-    Token attach(int fd, FileEvents mask, const ActorPtr& actor);
-    void mask(int fd, FileEvents mask);
-    void detach(int fd) noexcept;
+    /**
+     * Thread-safe.
+     */
+    void postEvent(const Event& ev);
 
-    Timer timer(Time expiry, Duration interval, const ActorPtr& actor);
-    Timer timer(Time expiry, const ActorPtr& actor);
+    /**
+     * Thread-safe.
+     */
+    void postEvent(Event&& ev);
+
+    FileToken subscribe(int fd, FileEvents mask, const ActorPtr& actor);
+    EventToken subscribe(Address addr, const ActorPtr& actor);
+
+    void unsubscribe(int fd) noexcept;
+    void unsubscribe(Address addr, const Actor& actor) noexcept;
+
+    void setMask(int fd, FileEvents mask);
+
+    Timer setTimer(Time expiry, Duration interval, const ActorPtr& actor);
+    Timer setTimer(Time expiry, const ActorPtr& actor);
 
     int poll(std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
-
-    /**
-     * Thread-safe.
-     */
-    void post(const Event& ev);
-
-    /**
-     * Thread-safe.
-     */
-    void post(Event&& ev);
 
   private:
     int dispatch(FileEvent* buf, int size, Time now);
@@ -104,10 +130,25 @@ class SWIRLY_API Reactor {
     std::unique_ptr<Impl> impl_;
 };
 
-inline void TokenPolicy::close(Id id) noexcept
+inline void FileTokenPolicy::close(Id id) noexcept
 {
-    id.reactor->detach(id.value);
+    id.reactor->unsubscribe(id.value);
 }
+
+inline void EventTokenPolicy::close(Id id) noexcept
+{
+    id.reactor->unsubscribe(id.addr, *id.actor);
+}
+
+/**
+ * Set the Reactors vector used by postEvent(). This vector must not be modified once set.
+ */
+SWIRLY_API void setReactors(std::vector<Reactor>& rs) noexcept;
+
+/**
+ * Post Event to each Reactor in the Reactors vector.
+ */
+SWIRLY_API void postEvent(const Event& ev);
 
 } // namespace swirly
 

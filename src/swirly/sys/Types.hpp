@@ -23,6 +23,11 @@ namespace swirly {
 
 using FileEvents = std::uint32_t;
 
+enum class Address : int {
+    None = 0,
+    Signal = 1
+};
+
 } // namespace swirly
 
 #endif // SWIRLY_SYS_TYPES_HPP

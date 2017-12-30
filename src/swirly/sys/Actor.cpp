@@ -20,4 +20,9 @@ namespace swirly {
 
 Actor::~Actor() noexcept = default;
 
+void Actor::doEvent(const Event& event) {}
+void Actor::doReady(int fd, FileEvents mask, Time now) {}
+void Actor::doSignal(int sig) {}
+void Actor::doTimer(const Timer& tmr, Time now) {}
+
 } // namespace swirly

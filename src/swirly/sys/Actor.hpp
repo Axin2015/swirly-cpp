@@ -29,7 +29,10 @@ class Timer;
 
 class SWIRLY_API Actor : public RefCount<Actor, ThreadUnsafePolicy> {
   public:
-    explicit Actor(Reactor& reactor) noexcept : reactor_(reactor) {}
+    explicit Actor(Reactor& reactor) noexcept
+      : reactor_(reactor)
+    {
+    }
     virtual ~Actor() noexcept;
 
     // Copy.
@@ -40,14 +43,16 @@ class SWIRLY_API Actor : public RefCount<Actor, ThreadUnsafePolicy> {
     Actor(Actor&&) noexcept = delete;
     Actor& operator=(Actor&&) noexcept = delete;
 
-    void event(const Event& event) { doEvent(event); }
-    void ready(int fd, FileEvents mask, Time now) { doReady(fd, mask, now); }
-    void timer(const Timer& tmr, Time now) { doTimer(tmr, now); }
+    void onEvent(const Event& event) { doEvent(event); }
+    void onReady(int fd, FileEvents mask, Time now) { doReady(fd, mask, now); }
+    void onSignal(int sig) { doSignal(sig); }
+    void onTimer(const Timer& tmr, Time now) { doTimer(tmr, now); }
 
   protected:
-    virtual void doEvent(const Event& event) = 0;
-    virtual void doReady(int fd, FileEvents mask, Time now) = 0;
-    virtual void doTimer(const Timer& tmr, Time now) = 0;
+    virtual void doEvent(const Event& event);
+    virtual void doReady(int fd, FileEvents mask, Time now);
+    virtual void doSignal(int sig);
+    virtual void doTimer(const Timer& tmr, Time now);
 
     const Reactor& reactor() const noexcept { return reactor_; }
 

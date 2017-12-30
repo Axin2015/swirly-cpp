@@ -23,7 +23,7 @@ namespace swirly {
 
 using namespace std;
 
-void PollPolicy::attach(Impl* md, int sid, int fd, FileEvents mask)
+void PollPolicy::subscribe(Impl* md, int sid, int fd, FileEvents mask)
 {
     auto& pfds = md->pfds;
 
@@ -39,19 +39,7 @@ void PollPolicy::attach(Impl* md, int sid, int fd, FileEvents mask)
     sids.insert(jt, sid);
 }
 
-void PollPolicy::setMask(Impl* md, int fd, FileEvents mask)
-{
-    auto& pfds = md->pfds;
-
-    const pollfd pfd{fd, 0, 0};
-    const auto it = lower_bound(pfds.begin(), pfds.end(), pfd, Cmp{});
-    if (it == pfds.end() || it->fd != fd) {
-        throw system_error{sys::makeError(ENOENT)};
-    }
-    it->events = mask;
-}
-
-void PollPolicy::detach(Impl* md, int fd) noexcept
+void PollPolicy::unsubscribe(Impl* md, int fd) noexcept
 {
     auto& pfds = md->pfds;
 
@@ -65,6 +53,18 @@ void PollPolicy::detach(Impl* md, int fd) noexcept
         pfds.erase(it);
         sids.erase(jt);
     }
+}
+
+void PollPolicy::setMask(Impl* md, int fd, FileEvents mask)
+{
+    auto& pfds = md->pfds;
+
+    const pollfd pfd{fd, 0, 0};
+    const auto it = lower_bound(pfds.begin(), pfds.end(), pfd, Cmp{});
+    if (it == pfds.end() || it->fd != fd) {
+        throw system_error{sys::makeError(ENOENT)};
+    }
+    it->events = mask;
 }
 
 int PollPolicy::wait(Impl* md, FileEvent* buf, size_t size, int timeout, error_code& ec)

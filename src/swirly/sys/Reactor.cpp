@@ -20,10 +20,101 @@
 #include "EventQueue.hpp"
 #include "Log.hpp"
 
+#include <algorithm>
+#include <unordered_map>
+
 namespace swirly {
 using namespace std;
 namespace {
+
 constexpr size_t MaxEvents{16};
+
+class EventDispatcher {
+  public:
+    EventDispatcher() = default;
+    ~EventDispatcher() noexcept = default;
+
+    // Copy.
+    EventDispatcher(const EventDispatcher&) = default;
+    EventDispatcher& operator=(const EventDispatcher&) = default;
+
+    // Move.
+    EventDispatcher(EventDispatcher&&) = default;
+    EventDispatcher& operator=(EventDispatcher&&) = default;
+
+    void dispatch(const Event& ev)
+    {
+        const auto addr = ev.to();
+        const auto it = map_.find(addr);
+        if (it == map_.end()) {
+            return;
+        }
+        auto& v = it->second;
+
+        locked_ = addr;
+        struct Finally {
+            explicit Finally(Address& locked)
+              : locked_(locked)
+            {
+            }
+            ~Finally() noexcept { locked_ = Address::None; }
+            Address& locked_;
+        } finally{locked_};
+
+        unsubs_ = 0;
+
+        const auto n = v.size();
+        for (size_t i{0}; i < n; ++i) {
+            const auto actor = v[i];
+            if (actor) {
+                try {
+                    if (addr != Address::Signal) {
+                        actor->onEvent(ev);
+                    } else {
+                        actor->onSignal(ev.type());
+                    }
+                } catch (const std::exception& e) {
+                    using namespace string_literals;
+                    SWIRLY_ERROR("error handling event: "s + e.what());
+                }
+            }
+        }
+
+        if (unsubs_ > 0) {
+            v.erase(remove_if(v.begin(), v.end(), [](const auto& ptr) { return !ptr; }), v.end());
+        }
+    }
+    void subscribe(Address addr, const ActorPtr& actor)
+    {
+        auto& v = map_[addr];
+        if (find(v.begin(), v.end(), actor) != v.end()) {
+            throw logic_error{"already subscribed"};
+        }
+        v.push_back(actor);
+    }
+    void unsubscribe(Address addr, const Actor& actor)
+    {
+        auto& v = map_[addr];
+        const auto pred = [&actor](const auto& ptr) { return ptr.get() == &actor; };
+        if (addr != locked_) {
+            v.erase(remove_if(v.begin(), v.end(), pred), v.end());
+        } else {
+            const auto it = find_if(v.begin(), v.end(), pred);
+            if (it != v.end()) {
+                it->reset();
+                ++unsubs_;
+            }
+        }
+    }
+
+  private:
+    unordered_map<Address, vector<ActorPtr>> map_;
+    Address locked_{Address::None};
+    int unsubs_{};
+};
+
+atomic<vector<Reactor>*> reactors_{nullptr};
+
 } // namespace
 
 struct Reactor::Impl {
@@ -35,17 +126,17 @@ struct Reactor::Impl {
         data.resize(max<size_t>(fd + 1, sizeHint));
 
         auto& ref = data[fd];
-        mux.attach(0, fd, In);
+        mux.subscribe(0, fd, In);
         ref.mask = In;
         ref.actor = {};
     }
 
     Muxer mux;
+    vector<Data> data;
+    EventDispatcher ed;
     EventFile ef;
     EventQueue eq;
     TimerQueue tq;
-    vector<Data> data;
-    bool quit{false};
 };
 
 Reactor::Reactor(size_t sizeHint)
@@ -59,12 +150,21 @@ Reactor::~Reactor() noexcept = default;
 Reactor::Reactor(Reactor&&) = default;
 Reactor& Reactor::operator=(Reactor&&) = default;
 
-bool Reactor::quit() const noexcept
+void Reactor::postEvent(const Event& ev)
 {
-    return impl_->quit;
+    if (impl_->eq.push(ev) == 1) {
+        impl_->ef.notify();
+    }
 }
 
-Token Reactor::attach(int fd, FileEvents mask, const ActorPtr& actor)
+void Reactor::postEvent(Event&& ev)
+{
+    if (impl_->eq.push(move(ev)) == 1) {
+        impl_->ef.notify();
+    }
+}
+
+FileToken Reactor::subscribe(int fd, FileEvents mask, const ActorPtr& actor)
 {
     assert(fd >= 0);
     assert(actor);
@@ -72,13 +172,32 @@ Token Reactor::attach(int fd, FileEvents mask, const ActorPtr& actor)
         impl_->data.resize(fd + 1);
     }
     auto& ref = impl_->data[fd];
-    impl_->mux.attach(++ref.sid, fd, mask);
+    impl_->mux.subscribe(++ref.sid, fd, mask);
     ref.mask = mask;
     ref.actor = actor;
-    return Token{{this, fd}};
+    return FileToken{{this, fd}};
 }
 
-void Reactor::mask(int fd, FileEvents mask)
+EventToken Reactor::subscribe(Address addr, const ActorPtr& actor)
+{
+    impl_->ed.subscribe(addr, actor);
+    return EventToken{{this, addr, actor.get()}};
+}
+
+void Reactor::unsubscribe(int fd) noexcept
+{
+    impl_->mux.unsubscribe(fd);
+    auto& ref = impl_->data[fd];
+    ref.mask = 0;
+    ref.actor.reset();
+}
+
+void Reactor::unsubscribe(Address addr, const Actor& actor) noexcept
+{
+    impl_->ed.unsubscribe(addr, actor);
+}
+
+void Reactor::setMask(int fd, FileEvents mask)
 {
     if (impl_->data[fd].mask != mask) {
         impl_->mux.setMask(fd, mask);
@@ -86,20 +205,12 @@ void Reactor::mask(int fd, FileEvents mask)
     }
 }
 
-void Reactor::detach(int fd) noexcept
-{
-    impl_->mux.detach(fd);
-    auto& ref = impl_->data[fd];
-    ref.mask = 0;
-    ref.actor.reset();
-}
-
-Timer Reactor::timer(Time expiry, Duration interval, const ActorPtr& actor)
+Timer Reactor::setTimer(Time expiry, Duration interval, const ActorPtr& actor)
 {
     return impl_->tq.insert(expiry, interval, actor);
 }
 
-Timer Reactor::timer(Time expiry, const ActorPtr& actor)
+Timer Reactor::setTimer(Time expiry, const ActorPtr& actor)
 {
     return impl_->tq.insert(expiry, actor);
 }
@@ -129,20 +240,6 @@ int Reactor::poll(chrono::milliseconds timeout)
     return impl_->tq.dispatch(now) + dispatch(buf, ret, now);
 }
 
-void Reactor::post(const Event& ev)
-{
-    if (impl_->eq.push(ev) == 1) {
-        impl_->ef.notify();
-    }
-}
-
-void Reactor::post(Event&& ev)
-{
-    if (impl_->eq.push(move(ev)) == 1) {
-        impl_->ef.notify();
-    }
-}
-
 int Reactor::dispatch(FileEvent* buf, int size, Time now)
 {
     int n{};
@@ -152,8 +249,7 @@ int Reactor::dispatch(FileEvent* buf, int size, Time now)
         const auto fd = static_cast<int>(ev.data.u64 & 0xffffffff);
         if (fd == impl_->ef.waitfd()) {
             while (auto event = impl_->eq.pop()) {
-                // TODO: dispatch events to Actors.
-                impl_->quit = true;
+                impl_->ed.dispatch(event);
                 ++n;
             }
             continue;
@@ -176,7 +272,7 @@ int Reactor::dispatch(FileEvent* buf, int size, Time now)
 
         ActorPtr actor{ref.actor};
         try {
-            actor->ready(fd, ev.events, now);
+            actor->onReady(fd, ev.events, now);
         } catch (const std::exception& e) {
             using namespace string_literals;
             SWIRLY_ERROR("error handling io event: "s + e.what());
@@ -184,6 +280,18 @@ int Reactor::dispatch(FileEvent* buf, int size, Time now)
         ++n;
     }
     return n;
+}
+
+void setReactors(vector<Reactor>& rs) noexcept
+{
+    return reactors_.store(&rs, memory_order_release);
+}
+
+void postEvent(const Event& ev)
+{
+    auto* rs = reactors_.load(memory_order_acquire);
+    assert(rs);
+    for_each(rs->begin(), rs->end(), [&ev](auto& r) { r.postEvent(ev); });
 }
 
 } // namespace swirly

@@ -117,7 +117,7 @@ void TimerQueue::expire(Time now)
 
     try {
         // Notify user.
-        tmr.actor()->timer(tmr, now);
+        tmr.actor()->onTimer(tmr, now);
     } catch (const std::exception& e) {
         using namespace string_literals;
         SWIRLY_ERROR("error handling timer event: "s + e.what());

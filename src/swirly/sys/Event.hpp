@@ -18,18 +18,21 @@
 #define SWIRLY_SYS_EVENT_HPP
 
 #include <swirly/sys/MemAlloc.hpp>
+#include <swirly/sys/Types.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 
 namespace swirly {
 
-class Event {
+class SWIRLY_API Event {
     struct Impl {
         mutable int refs;
+        Address to, reply;
         int type, size;
         char data[];
     };
-    static_assert(sizeof(Impl) == 12);
+    static_assert(std::is_pod<Impl>::value);
+    static_assert(sizeof(Impl) == 20);
     friend inline void intrusive_ptr_add_ref(const Impl* impl) noexcept
     {
         __atomic_fetch_add(&impl->refs, 1, __ATOMIC_RELAXED);
@@ -58,18 +61,27 @@ class Event {
     Event(Event&&) = default;
     Event& operator=(Event&&) = default;
 
-    static Event alloc(int type, std::size_t size)
+    static Event alloc(Address to, Address reply, int type, std::size_t size)
     {
         auto* const impl = static_cast<Impl*>(swirly::alloc(sizeof(Impl) + size));
         impl->refs = 1;
+        impl->to = to;
+        impl->reply = reply;
         impl->type = type;
         impl->size = size;
         return Event{boost::intrusive_ptr<Impl>{impl, false}};
     }
+    static Event alloc(Address to, int type, std::size_t size)
+    {
+        return alloc(to, Address::None, type, size);
+    }
     explicit operator bool() const noexcept { return static_cast<bool>(impl_); }
 
-    void reset() noexcept { impl_.reset(); }
+    Address to() const noexcept { return impl_->to; }
+    Address reply() const noexcept { return impl_->reply; }
+    int type() const noexcept { return impl_->type; }
 
+    void reset() noexcept { impl_.reset(); }
     void swap(Event& rhs) noexcept { std::swap(impl_, rhs.impl_); }
 
     template <typename DataT>
@@ -86,6 +98,11 @@ class Event {
   private:
     boost::intrusive_ptr<Impl> impl_;
 };
+
+inline Event makeSignal(int sig)
+{
+    return Event::alloc(Address::Signal, sig, 0);
+}
 
 } // namespace swirly
 

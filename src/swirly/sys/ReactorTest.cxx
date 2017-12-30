@@ -60,6 +60,7 @@ struct TestActor : Actor {
             ++matches_;
         }
     }
+    void doSignal(int sig) override {}
     void doTimer(const Timer& tmr, Time now) override {}
 
   private:
@@ -73,19 +74,19 @@ SWIRLY_TEST_CASE(ReactorHandler)
 {
     Counters cntrs;
     Reactor r{1024};
-    Token out, err;
+    FileToken out, err;
     {
         SWIRLY_CHECK(cntrs.dtor == 0);
         auto a = makeIntrusive<TestActor>(r, cntrs);
-        out = r.attach(STDOUT_FILENO, Reactor::Out, a);
-        err = r.attach(STDERR_FILENO, Reactor::Out, a);
+        out = r.subscribe(STDOUT_FILENO, Reactor::Out, a);
+        err = r.subscribe(STDERR_FILENO, Reactor::Out, a);
     }
     SWIRLY_CHECK(cntrs.dtor == 0);
 
-    r.detach(STDOUT_FILENO);
+    r.unsubscribe(STDOUT_FILENO);
     SWIRLY_CHECK(cntrs.dtor == 0);
 
-    r.detach(STDERR_FILENO);
+    r.unsubscribe(STDERR_FILENO);
     SWIRLY_CHECK(cntrs.dtor == 1);
 }
 
@@ -97,7 +98,7 @@ SWIRLY_TEST_CASE(ReactorFileEvents)
     auto a = makeIntrusive<TestActor>(r);
 
     auto socks = socketpair(LocalStream{});
-    const auto tok = r.attach(*socks.second, Reactor::In, a);
+    const auto tok = r.subscribe(*socks.second, Reactor::In, a);
 
     SWIRLY_CHECK(r.poll(0ms) == 0);
     SWIRLY_CHECK(a->matches() == 0);
@@ -118,5 +119,5 @@ SWIRLY_TEST_CASE(ReactorFileEvents)
     SWIRLY_CHECK(r.poll(0ms) == 0);
     SWIRLY_CHECK(a->matches() == 3);
 
-    r.detach(*socks.second);
+    r.unsubscribe(*socks.second);
 }
