@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -28,7 +28,11 @@ namespace {
 template <size_t StepN>
 class MultiPart {
   public:
-    MultiPart(AsyncJourn& journ, size_t total) noexcept : journ_{journ}, window_{total} {}
+    MultiPart(AsyncJourn& journ, size_t total) noexcept
+      : journ_{journ}
+      , window_{total}
+    {
+    }
     ~MultiPart() noexcept
     {
         if (!done()) {
@@ -76,7 +80,8 @@ void worker(MsgPipe& pipe, Journ& journ)
 } // namespace
 
 AsyncJourn::AsyncJourn(Journ& journ, size_t pipeCapacity)
-    : pipe_{pipeCapacity}, thread_{worker, ref(pipe_), ref(journ)}
+  : pipe_{pipeCapacity}
+  , thread_{worker, ref(pipe_), ref(journ)}
 {
 }
 

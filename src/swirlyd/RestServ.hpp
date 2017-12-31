@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -34,7 +34,11 @@ class Rest;
 
 class RestServ {
   public:
-    explicit RestServ(Rest& rest) noexcept : rest_(rest), profile_{"profile"_sv} {}
+    explicit RestServ(Rest& rest) noexcept
+      : rest_(rest)
+      , profile_{"profile"_sv}
+    {
+    }
     ~RestServ() noexcept;
 
     // Copy.

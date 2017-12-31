@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -20,6 +20,7 @@
 
 #include <algorithm> // max()
 #include <atomic>
+#include <mutex>
 
 #include <syslog.h>
 #include <unistd.h> // getpid()
@@ -40,9 +41,8 @@ inline pid_t gettid()
 }
 #endif
 
-using namespace std;
-
 namespace swirly {
+using namespace std;
 namespace {
 
 const char* labels_[] = {"CRIT", "ERROR", "WARNING", "NOTICE", "INFO", "DEBUG"};
@@ -50,6 +50,7 @@ const char* labels_[] = {"CRIT", "ERROR", "WARNING", "NOTICE", "INFO", "DEBUG"};
 // Global log level and logger function.
 atomic<int> level_{LogInfo};
 atomic<Logger> logger_{stdLogger};
+mutex mutex_;
 
 inline int acquireLevel() noexcept
 {
@@ -114,7 +115,7 @@ void stdLogger(int level, string_view msg) noexcept
     size_t hlen = strftime(head, sizeof(head), "%b %d %H:%M:%S", &tm);
     hlen += sprintf(head + hlen, ".%03d %-7s [%d]: ", static_cast<int>(ms % 1000), logLabel(level),
                     static_cast<int>(gettid()));
-    char tail = '\n';
+    char tail{'\n'};
     iovec iov[] = {
         {head, hlen}, //
         {const_cast<char*>(msg.data()), msg.size()}, //
@@ -122,7 +123,9 @@ void stdLogger(int level, string_view msg) noexcept
     };
 
     int fd{level > LogWarning ? STDOUT_FILENO : STDERR_FILENO};
-// Best effort given that this is the logger.
+    // The following lock was required to avoid interleaving.
+    lock_guard<mutex> lock{mutex_};
+    // Best effort given that this is the logger.
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-result"
     writev(fd, iov, sizeof(iov) / sizeof(iov[0]));

@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -27,22 +27,22 @@ static_assert(sizeof(Instr) <= 4 * 64, "no greater than specified cache-lines");
 Instr::Instr(Id32 id, Symbol symbol, string_view display, Symbol baseAsset, Symbol termCcy,
              int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
              Lots maxLots) noexcept
-    : id_{id},
-      symbol_{symbol},
-      display_{display},
-      baseAsset_{baseAsset},
-      termCcy_{termCcy},
-      lotNumer_{lotNumer},
-      lotDenom_{lotDenom},
-      qtyInc_{fractToReal(lotNumer, lotDenom)},
-      tickNumer_{tickNumer},
-      tickDenom_{tickDenom},
-      priceInc_{fractToReal(tickNumer, tickDenom)},
-      pipDp_{pipDp},
-      qtyDp_{realToDp(qtyInc_)},
-      priceDp_{realToDp(priceInc_)},
-      minLots_{minLots},
-      maxLots_{maxLots}
+  : id_{id}
+  , symbol_{symbol}
+  , display_{display}
+  , baseAsset_{baseAsset}
+  , termCcy_{termCcy}
+  , lotNumer_{lotNumer}
+  , lotDenom_{lotDenom}
+  , qtyInc_{fractToReal(lotNumer, lotDenom)}
+  , tickNumer_{tickNumer}
+  , tickDenom_{tickDenom}
+  , priceInc_{fractToReal(tickNumer, tickDenom)}
+  , pipDp_{pipDp}
+  , qtyDp_{realToDp(qtyInc_)}
+  , priceDp_{realToDp(priceInc_)}
+  , minLots_{minLots}
+  , maxLots_{maxLots}
 {
 }
 

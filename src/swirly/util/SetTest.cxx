@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -28,7 +28,9 @@ namespace {
 class Foo : public RefCount<Foo, ThreadUnsafePolicy> {
   public:
     Foo(Symbol symbol, string_view display, int& alive) noexcept
-        : symbol_{symbol}, display_{display}, alive_{alive}
+      : symbol_{symbol}
+      , display_{display}
+      , alive_{alive}
     {
         ++alive;
     }
@@ -47,7 +49,9 @@ class Foo : public RefCount<Foo, ThreadUnsafePolicy> {
 class Bar : public RefCount<Bar, ThreadUnsafePolicy> {
   public:
     Bar(Id64 id, string_view display, int& alive) noexcept
-        : id_{id}, display_{display}, alive_{alive}
+      : id_{id}
+      , display_{display}
+      , alive_{alive}
     {
         ++alive;
     }

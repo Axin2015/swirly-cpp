@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -25,11 +25,11 @@ struct SWIRLY_API IpMcastGroup {
     IpMcastGroup(const IpAddress& addr, unsigned ifindex = 0) noexcept;
 
     IpMcastGroup(const IpAddress& addr, const char* ifname, std::error_code& ec) noexcept
-        : IpMcastGroup(addr, sys::if_nametoindex(ifname, ec))
+      : IpMcastGroup(addr, sys::if_nametoindex(ifname, ec))
     {
     }
     IpMcastGroup(const IpAddress& addr, const char* ifname)
-        : IpMcastGroup(addr, sys::if_nametoindex(ifname))
+      : IpMcastGroup(addr, sys::if_nametoindex(ifname))
     {
     }
 
@@ -271,10 +271,13 @@ struct UdpSocket : IoSocket {
 
     using IoSocket::IoSocket;
     UdpSocket(Transport trans, std::error_code& ec) noexcept
-        : IoSocket{sys::socket(trans, ec), trans.family()}
+      : IoSocket{sys::socket(trans, ec), trans.family()}
     {
     }
-    explicit UdpSocket(Transport trans) : IoSocket{sys::socket(trans), trans.family()} {}
+    explicit UdpSocket(Transport trans)
+      : IoSocket{sys::socket(trans), trans.family()}
+    {
+    }
     UdpSocket() noexcept = default;
 
     void bind(const Endpoint& ep, std::error_code& ec) noexcept { sys::bind(*sock_, ep, ec); }

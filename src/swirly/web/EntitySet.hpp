@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -41,7 +41,10 @@ class SWIRLY_API EntitySet {
         AccntMask = Market | Order | Exec | Trade | Posn
     };
 
-    constexpr EntitySet(int bs = 0) noexcept : bs_{bs} {}
+    constexpr EntitySet(int bs = 0) noexcept
+      : bs_{bs}
+    {
+    }
     ~EntitySet() noexcept;
 
     // Copy.

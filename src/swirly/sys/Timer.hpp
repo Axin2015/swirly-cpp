@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -46,7 +46,10 @@ class Timer {
         ActorPtr actor;
     };
     Timer() = default;
-    explicit Timer(Impl* impl) : impl_{impl, false} {}
+    explicit Timer(Impl* impl)
+      : impl_{impl, false}
+    {
+    }
     long id() const noexcept { return impl_->id; }
     Time expiry() const noexcept { return impl_->expiry; }
     Duration interval() const noexcept { return impl_->interval; }

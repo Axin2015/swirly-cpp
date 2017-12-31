@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -117,7 +117,7 @@ void TimerQueue::expire(Time now)
 
     try {
         // Notify user.
-        tmr.actor()->timer(tmr, now);
+        tmr.actor()->onTimer(tmr, now);
     } catch (const std::exception& e) {
         using namespace string_literals;
         SWIRLY_ERROR("error handling timer event: "s + e.what());

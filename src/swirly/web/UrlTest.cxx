@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -27,7 +27,11 @@ namespace {
 
 class UrlString : public BasicUrl<UrlString> {
   public:
-    explicit UrlString(const string& url) : url_{url} { parse(); }
+    explicit UrlString(const string& url)
+      : url_{url}
+    {
+        parse();
+    }
     const auto& url() const noexcept { return url_; }
 
   private:
@@ -36,7 +40,11 @@ class UrlString : public BasicUrl<UrlString> {
 
 class UrlStringView : public BasicUrl<UrlStringView> {
   public:
-    explicit UrlStringView(const string_view& url) : url_{url} { parse(); }
+    explicit UrlStringView(const string_view& url)
+      : url_{url}
+    {
+        parse();
+    }
     const auto& url() const noexcept { return url_; }
 
   private:

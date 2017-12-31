@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -39,7 +39,8 @@ enum : int { GetRefData = 1, GetAccnt, PostMarket, PostOrder, PutOrder };
 
 } // namespace
 
-HttpClient::HttpClient(QObject* parent) : Client{parent}
+HttpClient::HttpClient(QObject* parent)
+  : Client{parent}
 {
     connect(&nam_, &QNetworkAccessManager::finished, this, &HttpClient::slotFinished);
     connect(&nam_, &QNetworkAccessManager::networkAccessibleChanged, this,

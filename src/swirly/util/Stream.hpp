@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -58,7 +58,11 @@ class StringBuf : public std::streambuf {
 template <std::size_t MaxN>
 class StringBuilder : public std::ostream {
   public:
-    StringBuilder() : std::ostream{nullptr} { rdbuf(&buf_); }
+    StringBuilder()
+      : std::ostream{nullptr}
+    {
+        rdbuf(&buf_);
+    }
     ~StringBuilder() noexcept override = default;
 
     // Copy.
@@ -106,7 +110,11 @@ class SWIRLY_API OStreamJoiner {
     using reference = void;
     using iterator_category = std::output_iterator_tag;
 
-    OStreamJoiner(std::ostream& os, const char delim) noexcept : os_{&os}, delim_{delim} {}
+    OStreamJoiner(std::ostream& os, const char delim) noexcept
+      : os_{&os}
+      , delim_{delim}
+    {
+    }
     ~OStreamJoiner() noexcept;
 
     // Copy.

@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -65,7 +65,9 @@ void openLogFile(const char* path)
 class SigHandler {
   public:
     SigHandler(boost::asio::io_service& ioServ, const fs::path& logFile)
-        : ioServ_(ioServ), signals_{ioServ}, logFile_{logFile}
+      : ioServ_(ioServ)
+      , signals_{ioServ}
+      , logFile_{logFile}
     {
         signals_.add(SIGHUP);
         signals_.add(SIGINT);

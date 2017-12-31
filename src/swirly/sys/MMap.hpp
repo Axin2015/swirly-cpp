@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -34,7 +34,11 @@ namespace swirly {
 class MMapPointer {
   public:
     MMapPointer(std::nullptr_t = nullptr) noexcept {}
-    MMapPointer(void* ptr, std::size_t size) noexcept : ptr_{ptr}, size_{size} {}
+    MMapPointer(void* ptr, std::size_t size) noexcept
+      : ptr_{ptr}
+      , size_{size}
+    {
+    }
     void* get() const noexcept { return ptr_; }
     void* data() const noexcept { return ptr_; }
     std::size_t size() const noexcept { return size_; }

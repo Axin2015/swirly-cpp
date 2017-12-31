@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -27,7 +27,9 @@ template <typename ValueT>
 class RingBuffer {
   public:
     explicit RingBuffer(std::size_t capacity)
-        : capacity_{nextPow2(capacity)}, mask_{capacity_ - 1}, buf_{new ValueT[capacity_]}
+      : capacity_{nextPow2(capacity)}
+      , mask_{capacity_ - 1}
+      , buf_{new ValueT[capacity_]}
     {
     }
     ~RingBuffer() noexcept = default;

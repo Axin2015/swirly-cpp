@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -25,7 +25,10 @@ namespace swirly {
 
 class SWIRLY_API ServException : public Exception {
   public:
-    explicit ServException(std::string_view what) noexcept : Exception{what} {}
+    explicit ServException(std::string_view what) noexcept
+      : Exception{what}
+    {
+    }
     ~ServException() noexcept override;
 
     // Copy.
@@ -57,7 +60,10 @@ inline std::ostream& operator<<(std::ostream& os, const ServException& e)
  */
 class SWIRLY_API BadRequestException : public ServException {
   public:
-    explicit BadRequestException(std::string_view what) noexcept : ServException{what} {}
+    explicit BadRequestException(std::string_view what) noexcept
+      : ServException{what}
+    {
+    }
     ~BadRequestException() noexcept override;
 
     // Copy.
@@ -75,7 +81,10 @@ class SWIRLY_API BadRequestException : public ServException {
 
 class SWIRLY_API AlreadyExistsException : public BadRequestException {
   public:
-    explicit AlreadyExistsException(std::string_view what) noexcept : BadRequestException{what} {}
+    explicit AlreadyExistsException(std::string_view what) noexcept
+      : BadRequestException{what}
+    {
+    }
     ~AlreadyExistsException() noexcept override;
 
     // Copy.
@@ -90,7 +99,7 @@ class SWIRLY_API AlreadyExistsException : public BadRequestException {
 class SWIRLY_API RefAlreadyExistsException : public AlreadyExistsException {
   public:
     explicit RefAlreadyExistsException(std::string_view what) noexcept
-        : AlreadyExistsException{what}
+      : AlreadyExistsException{what}
     {
     }
     RefAlreadyExistsException() noexcept = default;
@@ -108,7 +117,10 @@ class SWIRLY_API RefAlreadyExistsException : public AlreadyExistsException {
 
 class SWIRLY_API InvalidException : public BadRequestException {
   public:
-    explicit InvalidException(std::string_view what) noexcept : BadRequestException{what} {}
+    explicit InvalidException(std::string_view what) noexcept
+      : BadRequestException{what}
+    {
+    }
     ~InvalidException() noexcept override;
 
     // Copy.
@@ -122,7 +134,10 @@ class SWIRLY_API InvalidException : public BadRequestException {
 
 class SWIRLY_API InvalidLotsException : public InvalidException {
   public:
-    explicit InvalidLotsException(std::string_view what) noexcept : InvalidException{what} {}
+    explicit InvalidLotsException(std::string_view what) noexcept
+      : InvalidException{what}
+    {
+    }
     ~InvalidLotsException() noexcept override;
 
     // Copy.
@@ -136,7 +151,10 @@ class SWIRLY_API InvalidLotsException : public InvalidException {
 
 class SWIRLY_API InvalidTicksException : public InvalidException {
   public:
-    explicit InvalidTicksException(std::string_view what) noexcept : InvalidException{what} {}
+    explicit InvalidTicksException(std::string_view what) noexcept
+      : InvalidException{what}
+    {
+    }
     ~InvalidTicksException() noexcept override;
 
     // Copy.
@@ -150,7 +168,10 @@ class SWIRLY_API InvalidTicksException : public InvalidException {
 
 class SWIRLY_API TooLateException : public BadRequestException {
   public:
-    explicit TooLateException(std::string_view what) noexcept : BadRequestException{what} {}
+    explicit TooLateException(std::string_view what) noexcept
+      : BadRequestException{what}
+    {
+    }
     ~TooLateException() noexcept override;
 
     // Copy.
@@ -171,7 +192,10 @@ class SWIRLY_API TooLateException : public BadRequestException {
  */
 class SWIRLY_API ForbiddenException : public ServException {
   public:
-    explicit ForbiddenException(std::string_view what) noexcept : ServException{what} {}
+    explicit ForbiddenException(std::string_view what) noexcept
+      : ServException{what}
+    {
+    }
     ~ForbiddenException() noexcept override;
 
     // Copy.
@@ -192,7 +216,10 @@ class SWIRLY_API ForbiddenException : public ServException {
  */
 class SWIRLY_API InternalException : public ServException {
   public:
-    explicit InternalException(std::string_view what) noexcept : ServException{what} {}
+    explicit InternalException(std::string_view what) noexcept
+      : ServException{what}
+    {
+    }
     ~InternalException() noexcept override;
 
     // Copy.
@@ -215,7 +242,10 @@ class SWIRLY_API InternalException : public ServException {
  */
 class SWIRLY_API MethodNotAllowedException : public ServException {
   public:
-    explicit MethodNotAllowedException(std::string_view what) noexcept : ServException{what} {}
+    explicit MethodNotAllowedException(std::string_view what) noexcept
+      : ServException{what}
+    {
+    }
     ~MethodNotAllowedException() noexcept override;
 
     // Copy.
@@ -241,7 +271,10 @@ class SWIRLY_API MethodNotAllowedException : public ServException {
  */
 class SWIRLY_API NotFoundException : public ServException {
   public:
-    explicit NotFoundException(std::string_view what) noexcept : ServException{what} {}
+    explicit NotFoundException(std::string_view what) noexcept
+      : ServException{what}
+    {
+    }
     ~NotFoundException() noexcept override;
 
     // Copy.
@@ -259,7 +292,10 @@ class SWIRLY_API NotFoundException : public ServException {
 
 class SWIRLY_API MarketClosedException : public NotFoundException {
   public:
-    explicit MarketClosedException(std::string_view what) noexcept : NotFoundException{what} {}
+    explicit MarketClosedException(std::string_view what) noexcept
+      : NotFoundException{what}
+    {
+    }
     ~MarketClosedException() noexcept override;
 
     // Copy.
@@ -273,7 +309,10 @@ class SWIRLY_API MarketClosedException : public NotFoundException {
 
 class SWIRLY_API MarketNotFoundException : public NotFoundException {
   public:
-    explicit MarketNotFoundException(std::string_view what) noexcept : NotFoundException{what} {}
+    explicit MarketNotFoundException(std::string_view what) noexcept
+      : NotFoundException{what}
+    {
+    }
     ~MarketNotFoundException() noexcept override;
 
     // Copy.
@@ -287,7 +326,10 @@ class SWIRLY_API MarketNotFoundException : public NotFoundException {
 
 class SWIRLY_API OrderNotFoundException : public NotFoundException {
   public:
-    explicit OrderNotFoundException(std::string_view what) noexcept : NotFoundException{what} {}
+    explicit OrderNotFoundException(std::string_view what) noexcept
+      : NotFoundException{what}
+    {
+    }
     ~OrderNotFoundException() noexcept override;
 
     // Copy.
@@ -308,7 +350,10 @@ class SWIRLY_API OrderNotFoundException : public NotFoundException {
  */
 class SWIRLY_API ServiceUnavailableException : public ServException {
   public:
-    explicit ServiceUnavailableException(std::string_view what) noexcept : ServException{what} {}
+    explicit ServiceUnavailableException(std::string_view what) noexcept
+      : ServException{what}
+    {
+    }
     ~ServiceUnavailableException() noexcept override;
 
     // Copy.
@@ -337,7 +382,10 @@ class SWIRLY_API ServiceUnavailableException : public ServException {
  */
 class SWIRLY_API UnauthorizedException : public ServException {
   public:
-    explicit UnauthorizedException(std::string_view what) noexcept : ServException{what} {}
+    explicit UnauthorizedException(std::string_view what) noexcept
+      : ServException{what}
+    {
+    }
     ~UnauthorizedException() noexcept override;
 
     // Copy.

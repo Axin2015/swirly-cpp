@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -19,5 +19,10 @@
 namespace swirly {
 
 Actor::~Actor() noexcept = default;
+
+void Actor::doEvent(const Event& event) {}
+void Actor::doReady(int fd, FileEvents mask, Time now) {}
+void Actor::doSignal(int sig) {}
+void Actor::doTimer(const Timer& tmr, Time now) {}
 
 } // namespace swirly

@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -29,7 +29,10 @@ namespace swirly {
 class SWIRLY_API Asset : public Comparable<Asset> {
   public:
     Asset(Id32 id, Symbol symbol, std::string_view display, AssetType type) noexcept
-        : id_{id}, symbol_{symbol}, display_{display}, type_{type}
+      : id_{id}
+      , symbol_{symbol}
+      , display_{display}
+      , type_{type}
     {
     }
 

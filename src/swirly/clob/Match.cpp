@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -24,11 +24,11 @@ namespace swirly {
 
 Match::Match(Lots lots, const OrderPtr& makerOrder, const ExecPtr& makerTrade,
              const PosnPtr& makerPosn, const ExecPtr& takerTrade) noexcept
-    : lots{lots},
-      makerOrder{makerOrder},
-      makerTrade{makerTrade},
-      makerPosn{makerPosn},
-      takerTrade{takerTrade}
+  : lots{lots}
+  , makerOrder{makerOrder}
+  , makerTrade{makerTrade}
+  , makerPosn{makerPosn}
+  , takerTrade{takerTrade}
 {
 }
 

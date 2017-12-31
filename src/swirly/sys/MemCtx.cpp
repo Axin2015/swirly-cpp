@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -38,18 +38,18 @@ File reserveFile(const char* path, size_t size)
 
 struct MemCtx::Impl {
     explicit Impl(size_t maxSize)
-        : maxSize{maxSize},
-          memMap{sys::mmap(nullptr, PageSize + maxSize, PROT_READ | PROT_WRITE,
-                           MAP_ANON | MAP_PRIVATE, -1, 0)},
-          pool(*static_cast<MemPool*>(memMap.get().data()))
+      : maxSize{maxSize}
+      , memMap{sys::mmap(nullptr, PageSize + maxSize, PROT_READ | PROT_WRITE,
+                         MAP_ANON | MAP_PRIVATE, -1, 0)}
+      , pool(*static_cast<MemPool*>(memMap.get().data()))
     {
     }
     Impl(const char* path, size_t maxSize)
-        : maxSize{maxSize},
-          file{reserveFile(path, PageSize + maxSize)},
-          memMap{sys::mmap(nullptr, PageSize + maxSize, PROT_READ | PROT_WRITE, MAP_SHARED,
-                           file.get(), 0)},
-          pool(*static_cast<MemPool*>(memMap.get().data()))
+      : maxSize{maxSize}
+      , file{reserveFile(path, PageSize + maxSize)}
+      , memMap{sys::mmap(nullptr, PageSize + maxSize, PROT_READ | PROT_WRITE, MAP_SHARED,
+                         file.get(), 0)}
+      , pool(*static_cast<MemPool*>(memMap.get().data()))
     {
     }
     void* alloc(size_t size)
@@ -102,7 +102,7 @@ struct MemCtx::Impl {
                 // 192
                 deallocBlock(pool, pool.free3, addr);
             } else {
-                 // 256
+                // 256
                 deallocBlock(pool, pool.free4, addr);
             }
             break;
@@ -125,9 +125,15 @@ struct MemCtx::Impl {
     MemPool& pool;
 };
 
-MemCtx::MemCtx(size_t maxSize) : impl_{make_unique<Impl>(maxSize)} {}
+MemCtx::MemCtx(size_t maxSize)
+  : impl_{make_unique<Impl>(maxSize)}
+{
+}
 
-MemCtx::MemCtx(const char* path, size_t maxSize) : impl_{make_unique<Impl>(path, maxSize)} {}
+MemCtx::MemCtx(const char* path, size_t maxSize)
+  : impl_{make_unique<Impl>(path, maxSize)}
+{
+}
 
 MemCtx::MemCtx() = default;
 

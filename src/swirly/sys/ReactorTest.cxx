@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -34,7 +34,8 @@ struct TestActor : Actor {
     using Actor::Actor;
 
     explicit TestActor(Reactor& reactor, Counters& cntrs) noexcept
-        : Actor{reactor}, cntrs_{&cntrs}
+      : Actor{reactor}
+      , cntrs_{&cntrs}
     {
     }
 
@@ -49,9 +50,7 @@ struct TestActor : Actor {
     int matches() const { return matches_; }
 
   protected:
-    void doEvent(const Event& event) override
-    {
-    }
+    void doEvent(const Event& event) override {}
     void doReady(int fd, FileEvents events, Time now) override
     {
         char buf[4];
@@ -60,6 +59,7 @@ struct TestActor : Actor {
             ++matches_;
         }
     }
+    void doSignal(int sig) override {}
     void doTimer(const Timer& tmr, Time now) override {}
 
   private:
@@ -73,19 +73,19 @@ SWIRLY_TEST_CASE(ReactorHandler)
 {
     Counters cntrs;
     Reactor r{1024};
-    Token out, err;
+    FileToken out, err;
     {
         SWIRLY_CHECK(cntrs.dtor == 0);
         auto a = makeIntrusive<TestActor>(r, cntrs);
-        out = r.attach(STDOUT_FILENO, Reactor::Out, a);
-        err = r.attach(STDERR_FILENO, Reactor::Out, a);
+        out = r.subscribe(STDOUT_FILENO, Reactor::Out, a);
+        err = r.subscribe(STDERR_FILENO, Reactor::Out, a);
     }
     SWIRLY_CHECK(cntrs.dtor == 0);
 
-    r.detach(STDOUT_FILENO);
+    r.unsubscribe(STDOUT_FILENO);
     SWIRLY_CHECK(cntrs.dtor == 0);
 
-    r.detach(STDERR_FILENO);
+    r.unsubscribe(STDERR_FILENO);
     SWIRLY_CHECK(cntrs.dtor == 1);
 }
 
@@ -97,7 +97,7 @@ SWIRLY_TEST_CASE(ReactorFileEvents)
     auto a = makeIntrusive<TestActor>(r);
 
     auto socks = socketpair(LocalStream{});
-    const auto tok = r.attach(*socks.second, Reactor::In, a);
+    const auto tok = r.subscribe(*socks.second, Reactor::In, a);
 
     SWIRLY_CHECK(r.poll(0ms) == 0);
     SWIRLY_CHECK(a->matches() == 0);
@@ -118,5 +118,5 @@ SWIRLY_TEST_CASE(ReactorFileEvents)
     SWIRLY_CHECK(r.poll(0ms) == 0);
     SWIRLY_CHECK(a->matches() == 3);
 
-    r.detach(*socks.second);
+    r.unsubscribe(*socks.second);
 }

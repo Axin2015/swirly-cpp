@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -48,7 +48,10 @@ const Market& createMarket(Serv& serv, Symbol instrSymbol, JDay settlDay, Market
 
 class Archiver {
   public:
-    explicit Archiver(Serv& serv) noexcept : serv_(serv) {}
+    explicit Archiver(Serv& serv) noexcept
+      : serv_(serv)
+    {
+    }
     void operator()(const Accnt& accnt, Id64 marketId, Time now)
     {
         ids_.clear();

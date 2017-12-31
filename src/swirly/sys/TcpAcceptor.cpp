@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -27,12 +27,10 @@ TcpAcceptor::TcpAcceptor(Reactor& reactor, const Endpoint& ep)
     serv_.setSoReuseAddr(true);
     serv_.bind(ep);
     serv_.listen(SOMAXCONN);
-    tok_ = reactor.attach(*serv_, Reactor::In, IntrusivePtr{this, false});
+    tok_ = reactor.subscribe(*serv_, Reactor::In, IntrusivePtr{this, false});
 }
 
 TcpAcceptor::~TcpAcceptor() noexcept = default;
-
-void TcpAcceptor::doEvent(const Event& event) {}
 
 void TcpAcceptor::doReady(int fd, FileEvents events, Time now)
 {
@@ -40,7 +38,5 @@ void TcpAcceptor::doReady(int fd, FileEvents events, Time now)
     IoSocket sock{sys::accept(fd, ep), serv_.family()};
     doAccept(move(sock), ep, now);
 }
-
-void TcpAcceptor::doTimer(const Timer& tmr, Time now) {}
 
 } // namespace swirly

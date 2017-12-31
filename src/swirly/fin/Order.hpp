@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -31,30 +31,31 @@ class Level;
 /**
  * An instruction to buy or sell goods or services.
  */
-class SWIRLY_API Order : public RefCount<Order, ThreadUnsafePolicy>,
-                         public Request,
-                         public MemAlloc {
+class SWIRLY_API Order
+  : public RefCount<Order, ThreadUnsafePolicy>
+  , public Request
+  , public MemAlloc {
   public:
     Order(Symbol accnt, Id64 marketId, Symbol instr, JDay settlDay, Id64 id, std::string_view ref,
           State state, Side side, Lots lots, Ticks ticks, Lots resdLots, Lots execLots,
           Cost execCost, Lots lastLots, Ticks lastTicks, Lots minLots, Time created,
           Time modified) noexcept
-        : Request{accnt, marketId, instr, settlDay, id, ref, side, lots, created},
-          state_{state},
-          ticks_{ticks},
-          resdLots_{resdLots},
-          execLots_{execLots},
-          execCost_{execCost},
-          lastLots_{lastLots},
-          lastTicks_{lastTicks},
-          minLots_{minLots},
-          modified_{modified}
+      : Request{accnt, marketId, instr, settlDay, id, ref, side, lots, created}
+      , state_{state}
+      , ticks_{ticks}
+      , resdLots_{resdLots}
+      , execLots_{execLots}
+      , execCost_{execCost}
+      , lastLots_{lastLots}
+      , lastTicks_{lastTicks}
+      , minLots_{minLots}
+      , modified_{modified}
     {
     }
     Order(Symbol accnt, Id64 marketId, Symbol instr, JDay settlDay, Id64 id, std::string_view ref,
           Side side, Lots lots, Ticks ticks, Lots minLots, Time created) noexcept
-        : Order{accnt, marketId, instr, settlDay, id,    ref,   State::New, side,    lots,
-                ticks, lots,     0_lts, 0_cst,    0_lts, 0_tks, minLots,    created, created}
+      : Order{accnt, marketId, instr, settlDay, id,    ref,   State::New, side,    lots,
+              ticks, lots,     0_lts, 0_cst,    0_lts, 0_tks, minLots,    created, created}
     {
     }
     ~Order() noexcept;

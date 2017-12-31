@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -29,7 +29,10 @@ namespace swirly {
 template <typename ValueT>
 class Pipe {
   public:
-    explicit Pipe(std::size_t capacity) : buf_{capacity} {}
+    explicit Pipe(std::size_t capacity)
+      : buf_{capacity}
+    {
+    }
     ~Pipe() noexcept = default;
 
     // Copy.
@@ -81,10 +84,11 @@ class Pipe {
     }
     void close()
     {
-        std::unique_lock<std::mutex> lock{mutex_};
-        closed_ = true;
-        // Unlock mutex before notifying to avoid contention.
-        lock.unlock();
+        {
+            std::unique_lock<std::mutex> lock{mutex_};
+            closed_ = true;
+            // Unlock mutex before notifying to avoid contention.
+        }
         notEmpty_.notify_all();
         notFull_.notify_all();
     }

@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -50,13 +50,13 @@ class Market {
 
     Market(Id64 id, const Instr& instr, QDate settlDate, MarketState state, Lots lastLots,
            Ticks lastTicks, const QDateTime& lastTime)
-        : id_{id},
-          instr_{instr},
-          settlDate_{settlDate},
-          state_{state},
-          lastLots_{lastLots},
-          lastTicks_{lastTicks},
-          lastTime_{lastTime}
+      : id_{id}
+      , instr_{instr}
+      , settlDate_{settlDate}
+      , state_{state}
+      , lastLots_{lastLots}
+      , lastTicks_{lastTicks}
+      , lastTime_{lastTime}
     {
     }
     Market() = default;

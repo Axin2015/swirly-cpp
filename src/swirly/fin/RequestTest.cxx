@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -22,10 +22,13 @@ using namespace std;
 using namespace swirly;
 
 namespace {
-class Foo : public RefCount<Foo, ThreadUnsafePolicy>, public Request {
+class Foo
+  : public RefCount<Foo, ThreadUnsafePolicy>
+  , public Request {
   public:
     Foo(Id64 marketId, Id64 id, int& alive) noexcept
-        : Request{{}, marketId, {}, 0_jd, id, {}, Side::Buy, 0_lts, {}}, alive_{alive}
+      : Request{{}, marketId, {}, 0_jd, id, {}, Side::Buy, 0_lts, {}}
+      , alive_{alive}
     {
         ++alive;
     }

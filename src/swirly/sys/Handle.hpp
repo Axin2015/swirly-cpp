@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -30,7 +30,10 @@ class Handle {
     static constexpr Id invalid() noexcept { return PolicyT::invalid(); }
 
     Handle(std::nullptr_t = nullptr) noexcept {}
-    Handle(Id id) noexcept : id_{id} {}
+    Handle(Id id) noexcept
+      : id_{id}
+    {
+    }
     ~Handle() noexcept
     {
         if (id_ != invalid()) {
@@ -43,7 +46,11 @@ class Handle {
     Handle& operator=(const Handle&) = delete;
 
     // Move.
-    Handle(Handle&& rhs) : id_{rhs.id_} { rhs.id_ = invalid(); }
+    Handle(Handle&& rhs)
+      : id_{rhs.id_}
+    {
+        rhs.id_ = invalid();
+    }
     Handle& operator=(Handle&& rhs)
     {
         close();

@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -22,7 +22,8 @@ namespace swirly {
 namespace ui {
 using namespace instr;
 
-InstrModel::InstrModel(QObject* parent) : TableModel{parent}
+InstrModel::InstrModel(QObject* parent)
+  : TableModel{parent}
 {
     header_[unbox(Column::CheckState)] = tr("");
     header_[unbox(Column::Symbol)] = tr("Symbol");

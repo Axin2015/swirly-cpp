@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -191,7 +191,10 @@ void bind(sqlite3_stmt& stmt, int col, ValueT val, MaybeNullTag)
 
 class ScopedBind {
   public:
-    explicit ScopedBind(sqlite3_stmt& stmt) noexcept : stmt_{stmt} {}
+    explicit ScopedBind(sqlite3_stmt& stmt) noexcept
+      : stmt_{stmt}
+    {
+    }
     ~ScopedBind() noexcept { sqlite3_clear_bindings(&stmt_); }
     // Copy.
     ScopedBind(const ScopedBind&) = delete;
@@ -220,7 +223,10 @@ class ScopedBind {
 
 class ScopedStep {
   public:
-    explicit ScopedStep(sqlite3_stmt& stmt) noexcept : stmt_{stmt} {}
+    explicit ScopedStep(sqlite3_stmt& stmt) noexcept
+      : stmt_{stmt}
+    {
+    }
     ~ScopedStep() noexcept { sqlite3_reset(&stmt_); }
     // Copy.
     ScopedStep(const ScopedStep&) = delete;

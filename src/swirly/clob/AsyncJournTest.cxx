@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -68,9 +68,10 @@ struct TestJourn : Journ {
   protected:
     void doUpdate(const Msg& msg) override
     {
-        unique_lock<mutex> lock{mutex_};
-        msgs_.push(msg);
-        lock.unlock();
+        {
+            lock_guard<mutex> lock{mutex_};
+            msgs_.push(msg);
+        }
         notEmpty_.notify_one();
     }
 
@@ -81,7 +82,10 @@ struct TestJourn : Journ {
 };
 
 struct AsyncJournFixture {
-    AsyncJournFixture() : asyncJourn{journ, 1 << 10} {}
+    AsyncJournFixture()
+      : asyncJourn{journ, 1 << 10}
+    {
+    }
     TestJourn journ;
     AsyncJourn asyncJourn;
 };

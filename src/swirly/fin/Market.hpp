@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -27,18 +27,20 @@ namespace swirly {
 using MarketPtr = boost::intrusive_ptr<Market>;
 using ConstMarketPtr = boost::intrusive_ptr<const Market>;
 
-class SWIRLY_API Market : public RefCount<Market, ThreadUnsafePolicy>, public Comparable<Market> {
+class SWIRLY_API Market
+  : public RefCount<Market, ThreadUnsafePolicy>
+  , public Comparable<Market> {
   public:
     Market(Id64 id, Symbol instr, JDay settlDay, MarketState state, Lots lastLots = 0_lts,
            Ticks lastTicks = 0_tks, Time lastTime = {}, Id64 maxId = 0_id64) noexcept
-        : id_{id},
-          instr_{instr},
-          settlDay_{settlDay},
-          state_{state},
-          lastLots_{lastLots},
-          lastTicks_{lastTicks},
-          lastTime_{lastTime},
-          maxId_{maxId}
+      : id_{id}
+      , instr_{instr}
+      , settlDay_{settlDay}
+      , state_{state}
+      , lastLots_{lastLots}
+      , lastTicks_{lastTicks}
+      , lastTime_{lastTime}
+      , maxId_{maxId}
     {
     }
     ~Market() noexcept;

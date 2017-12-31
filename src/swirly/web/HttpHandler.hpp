@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -80,7 +80,8 @@ enum class HttpType : int { Request = HTTP_REQUEST, Response = HTTP_RESPONSE };
 template <typename DerivedT>
 class BasicHttpHandler {
   public:
-    explicit BasicHttpHandler(HttpType type) noexcept : type_{type}
+    explicit BasicHttpHandler(HttpType type) noexcept
+      : type_{type}
     {
         // The http_parser_init() function preserves "data".
         // Important: cast is required for CRTP to work correctly with multiple inheritance.

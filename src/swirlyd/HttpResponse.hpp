@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -23,7 +23,10 @@ namespace swirly {
 
 class HttpResponseBuf : public std::streambuf {
   public:
-    explicit HttpResponseBuf(std::string& buf) noexcept : buf_(buf) {}
+    explicit HttpResponseBuf(std::string& buf) noexcept
+      : buf_(buf)
+    {
+    }
     ~HttpResponseBuf() noexcept override;
 
     // Copy.
@@ -50,7 +53,9 @@ class HttpResponseBuf : public std::streambuf {
 
 class HttpResponse : public std::ostream {
   public:
-    explicit HttpResponse(std::string& buf) noexcept : std::ostream{nullptr}, buf_{buf}
+    explicit HttpResponse(std::string& buf) noexcept
+      : std::ostream{nullptr}
+      , buf_{buf}
     {
         rdbuf(&buf_);
     }

@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -149,8 +149,7 @@ inline std::pair<File, File> pipe2(int flags, std::error_code& ec) noexcept
         ec = makeError(errno);
     }
     if (flags != 0) {
-        if (::fcntl(pipefd[0], F_SETFL, flags) < 0
-            || ::fcntl(pipefd[1], F_SETFL, flags) < 0) {
+        if (::fcntl(pipefd[0], F_SETFL, flags) < 0 || ::fcntl(pipefd[1], F_SETFL, flags) < 0) {
             ec = makeError(errno);
         }
     }
@@ -167,8 +166,7 @@ inline std::pair<File, File> pipe2(int flags)
         throw std::system_error{makeError(errno), "pipe"};
     }
     if (flags != 0) {
-        if (::fcntl(pipefd[0], F_SETFL, flags) < 0
-            || ::fcntl(pipefd[1], F_SETFL, flags) < 0) {
+        if (::fcntl(pipefd[0], F_SETFL, flags) < 0 || ::fcntl(pipefd[1], F_SETFL, flags) < 0) {
             throw std::system_error{makeError(errno), "fcntl"};
         }
     }

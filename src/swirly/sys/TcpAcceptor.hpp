@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -33,14 +33,12 @@ class SWIRLY_API TcpAcceptor : public Actor {
     ~TcpAcceptor() noexcept override;
 
   protected:
-    void doEvent(const Event& event) override;
     void doReady(int fd, FileEvents events, Time now) override;
-    void doTimer(const Timer& tmr, Time now) override;
     virtual void doAccept(IoSocket&& sock, const Endpoint& ep, Time now) = 0;
 
   private:
     TcpSocketServ serv_;
-    Token tok_;
+    FileToken tok_;
 };
 
 } // namespace swirly

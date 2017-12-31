@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -27,7 +27,7 @@ namespace swirly {
 class SWIRLY_API Rest {
   public:
     Rest(Journ& journ, std::size_t pipeCapacity, std::size_t maxExecs)
-        : serv_{journ, pipeCapacity, maxExecs}
+      : serv_{journ, pipeCapacity, maxExecs}
     {
     }
     ~Rest() noexcept;

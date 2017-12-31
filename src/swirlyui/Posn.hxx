@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -42,14 +42,14 @@ class Posn {
   public:
     Posn(const QString& accnt, Id64 marketId, const Instr& instr, QDate settlDate, Lots buyLots,
          Cost buyCost, Lots sellLots, Cost sellCost)
-        : accnt_{accnt},
-          marketId_{marketId},
-          instr_{instr},
-          settlDate_{settlDate},
-          buyLots_{buyLots},
-          buyCost_{buyCost},
-          sellLots_{sellLots},
-          sellCost_{sellCost}
+      : accnt_{accnt}
+      , marketId_{marketId}
+      , instr_{instr}
+      , settlDate_{settlDate}
+      , buyLots_{buyLots}
+      , buyCost_{buyCost}
+      , sellLots_{sellLots}
+      , sellCost_{sellCost}
     {
     }
     Posn() = default;

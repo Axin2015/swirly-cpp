@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -32,7 +32,10 @@ namespace ui {
 template <typename KeyT, typename ValueT, int CheckStateN, int ColumnCountN>
 class TableModel : public QAbstractTableModel {
   public:
-    TableModel(QObject* parent = nullptr) : QAbstractTableModel{parent} {}
+    TableModel(QObject* parent = nullptr)
+      : QAbstractTableModel{parent}
+    {
+    }
     ~TableModel() noexcept override = default;
 
     int rowCount(const QModelIndex& parent) const override { return rows_.size(); }

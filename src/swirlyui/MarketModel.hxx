@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -24,7 +24,7 @@ namespace swirly {
 namespace ui {
 
 class MarketModel
-    : public TableModel<Id64, Market, unbox(market::Column::CheckState), market::ColumnCount> {
+  : public TableModel<Id64, Market, unbox(market::Column::CheckState), market::ColumnCount> {
   public:
     MarketModel(QObject* parent = nullptr);
     ~MarketModel() noexcept override;

@@ -1,6 +1,6 @@
 /*
  * The Restful Matching-Engine.
- * Copyright (C) 2013, 2017 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -44,7 +44,10 @@ class BasicMuxer {
 
     using FileEvent = typename PolicyT::FileEvent;
 
-    explicit BasicMuxer(std::size_t sizeHint) : md_{PolicyT::create(sizeHint)} {}
+    explicit BasicMuxer(std::size_t sizeHint)
+      : md_{PolicyT::create(sizeHint)}
+    {
+    }
     ~BasicMuxer() noexcept
     {
         if (md_ != invalid()) {
@@ -57,7 +60,11 @@ class BasicMuxer {
     BasicMuxer& operator=(const BasicMuxer&) = delete;
 
     // Move.
-    BasicMuxer(BasicMuxer&& rhs) : md_{rhs.md_} { rhs.md_ = invalid(); }
+    BasicMuxer(BasicMuxer&& rhs)
+      : md_{rhs.md_}
+    {
+        rhs.md_ = invalid();
+    }
     BasicMuxer& operator=(BasicMuxer&& rhs)
     {
         close();
@@ -75,9 +82,9 @@ class BasicMuxer {
     {
         return wait(buf, size, std::chrono::milliseconds::max(), ec);
     }
-    void attach(int sid, int fd, FileEvents mask) { PolicyT::attach(md_, sid, fd, mask); }
+    void subscribe(int sid, int fd, FileEvents mask) { PolicyT::subscribe(md_, sid, fd, mask); }
+    void unsubscribe(int fd) noexcept { PolicyT::unsubscribe(md_, fd); }
     void setMask(int fd, FileEvents mask) { PolicyT::setMask(md_, fd, mask); }
-    void detach(int fd) noexcept { PolicyT::detach(md_, fd); }
 
   private:
     void close() noexcept
@@ -120,9 +127,9 @@ struct SWIRLY_API PollPolicy {
         return wait(md, buf, size,
                     timeout == std::chrono::milliseconds::max() ? -1 : timeout.count(), ec);
     }
-    static void attach(Impl* md, int sid, int fd, FileEvents mask);
+    static void subscribe(Impl* md, int sid, int fd, FileEvents mask);
+    static void unsubscribe(Impl* md, int fd) noexcept;
     static void setMask(Impl* md, int fd, FileEvents mask);
-    static void detach(Impl* md, int fd) noexcept;
 
   private:
     static int wait(Impl* md, FileEvent* buf, std::size_t size, int timeout, std::error_code& ec);
@@ -151,12 +158,20 @@ struct EpollPolicy {
         return sys::epoll_wait(
             md, buf, size, timeout == std::chrono::milliseconds::max() ? -1 : timeout.count(), ec);
     }
-    static void attach(int md, int sid, int fd, FileEvents mask)
+    static void subscribe(int md, int sid, int fd, FileEvents mask)
     {
         FileEvent ev;
         ev.events = mask;
         ev.data.u64 = static_cast<std::uint64_t>(sid) << 32 | fd;
         sys::epoll_ctl(md, EPOLL_CTL_ADD, fd, ev);
+    }
+    static void unsubscribe(int md, int fd) noexcept
+    {
+        // In kernel versions before 2.6.9, the EPOLL_CTL_DEL operation required a non-null pointer
+        // in event, even though this argument is ignored.
+        FileEvent ev{};
+        std::error_code ec;
+        sys::epoll_ctl(md, EPOLL_CTL_DEL, fd, ev, ec);
     }
     static void setMask(int md, int fd, FileEvents mask)
     {
@@ -164,14 +179,6 @@ struct EpollPolicy {
         ev.events = mask;
         ev.data.fd = fd;
         sys::epoll_ctl(md, EPOLL_CTL_MOD, fd, ev);
-    }
-    static void detach(int md, int fd) noexcept
-    {
-        // In kernel versions before 2.6.9, the EPOLL_CTL_DEL operation required a non-null pointer
-        // in event, even though this argument is ignored.
-        FileEvent ev{};
-        std::error_code ec;
-        sys::epoll_ctl(md, EPOLL_CTL_DEL, fd, ev, ec);
     }
 };
 
