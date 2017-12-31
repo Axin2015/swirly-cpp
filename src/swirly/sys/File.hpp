@@ -149,8 +149,7 @@ inline std::pair<File, File> pipe2(int flags, std::error_code& ec) noexcept
         ec = makeError(errno);
     }
     if (flags != 0) {
-        if (::fcntl(pipefd[0], F_SETFL, flags) < 0
-            || ::fcntl(pipefd[1], F_SETFL, flags) < 0) {
+        if (::fcntl(pipefd[0], F_SETFL, flags) < 0 || ::fcntl(pipefd[1], F_SETFL, flags) < 0) {
             ec = makeError(errno);
         }
     }
@@ -167,8 +166,7 @@ inline std::pair<File, File> pipe2(int flags)
         throw std::system_error{makeError(errno), "pipe"};
     }
     if (flags != 0) {
-        if (::fcntl(pipefd[0], F_SETFL, flags) < 0
-            || ::fcntl(pipefd[1], F_SETFL, flags) < 0) {
+        if (::fcntl(pipefd[0], F_SETFL, flags) < 0 || ::fcntl(pipefd[1], F_SETFL, flags) < 0) {
             throw std::system_error{makeError(errno), "fcntl"};
         }
     }

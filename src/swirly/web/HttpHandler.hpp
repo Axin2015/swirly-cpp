@@ -80,7 +80,8 @@ enum class HttpType : int { Request = HTTP_REQUEST, Response = HTTP_RESPONSE };
 template <typename DerivedT>
 class BasicHttpHandler {
   public:
-    explicit BasicHttpHandler(HttpType type) noexcept : type_{type}
+    explicit BasicHttpHandler(HttpType type) noexcept
+      : type_{type}
     {
         // The http_parser_init() function preserves "data".
         // Important: cast is required for CRTP to work correctly with multiple inheritance.

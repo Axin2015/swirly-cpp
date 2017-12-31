@@ -24,7 +24,7 @@ namespace swirly {
 namespace ui {
 
 class OrderModel
-    : public TableModel<OrderKey, Order, unbox(order::Column::CheckState), order::ColumnCount> {
+  : public TableModel<OrderKey, Order, unbox(order::Column::CheckState), order::ColumnCount> {
   public:
     OrderModel(QObject* parent = nullptr);
     ~OrderModel() noexcept override;

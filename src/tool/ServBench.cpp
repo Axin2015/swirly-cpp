@@ -48,7 +48,10 @@ const Market& createMarket(Serv& serv, Symbol instrSymbol, JDay settlDay, Market
 
 class Archiver {
   public:
-    explicit Archiver(Serv& serv) noexcept : serv_(serv) {}
+    explicit Archiver(Serv& serv) noexcept
+      : serv_(serv)
+    {
+    }
     void operator()(const Accnt& accnt, Id64 marketId, Time now)
     {
         ids_.clear();

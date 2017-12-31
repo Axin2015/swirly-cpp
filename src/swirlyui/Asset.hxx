@@ -41,7 +41,9 @@ constexpr int ColumnCount{unbox(Column::Type) + 1};
 class Asset {
   public:
     Asset(const QString& symbol, const QString& display, AssetType type)
-        : symbol_{symbol}, display_{display}, type_{type}
+      : symbol_{symbol}
+      , display_{display}
+      , type_{type}
     {
     }
     Asset() = default;

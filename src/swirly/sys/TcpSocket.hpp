@@ -31,10 +31,13 @@ struct TcpSocketServ : Socket {
     using Socket::Socket;
 
     TcpSocketServ(Transport trans, std::error_code& ec) noexcept
-        : Socket{sys::socket(trans, ec), trans.family()}
+      : Socket{sys::socket(trans, ec), trans.family()}
     {
     }
-    explicit TcpSocketServ(Transport trans) : Socket{sys::socket(trans), trans.family()} {}
+    explicit TcpSocketServ(Transport trans)
+      : Socket{sys::socket(trans), trans.family()}
+    {
+    }
 
     TcpSocketServ() noexcept = default;
 
@@ -61,10 +64,13 @@ struct TcpSocketClnt : IoSocket {
     using IoSocket::IoSocket;
 
     TcpSocketClnt(Transport trans, std::error_code& ec) noexcept
-        : IoSocket{sys::socket(trans, ec), trans.family()}
+      : IoSocket{sys::socket(trans, ec), trans.family()}
     {
     }
-    explicit TcpSocketClnt(Transport trans) : IoSocket{sys::socket(trans), trans.family()} {}
+    explicit TcpSocketClnt(Transport trans)
+      : IoSocket{sys::socket(trans), trans.family()}
+    {
+    }
 
     TcpSocketClnt() noexcept = default;
 

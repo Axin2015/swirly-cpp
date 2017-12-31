@@ -29,7 +29,8 @@ namespace swirly {
 namespace ui {
 
 OrderForm::OrderForm(OrderModel& orderModel, QWidget* parent, Qt::WindowFlags f)
-    : QWidget{parent, f}, orderModel_(orderModel)
+  : QWidget{parent, f}
+  , orderModel_(orderModel)
 {
     auto selectAllButton = make_unique<QPushButton>(tr("Select All"));
     auto selectNoneButton = make_unique<QPushButton>(tr("Select None"));

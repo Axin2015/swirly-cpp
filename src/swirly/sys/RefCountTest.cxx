@@ -24,7 +24,11 @@ using namespace swirly;
 namespace {
 class Foo : public RefCount<Foo, ThreadUnsafePolicy> {
   public:
-    explicit Foo(int& alive) noexcept : alive_{alive} { ++alive; }
+    explicit Foo(int& alive) noexcept
+      : alive_{alive}
+    {
+        ++alive;
+    }
     ~Foo() noexcept { --alive_; }
 
   private:

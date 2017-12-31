@@ -34,7 +34,8 @@ struct TestActor : Actor {
     using Actor::Actor;
 
     explicit TestActor(Reactor& reactor, Counters& cntrs) noexcept
-        : Actor{reactor}, cntrs_{&cntrs}
+      : Actor{reactor}
+      , cntrs_{&cntrs}
     {
     }
 
@@ -49,9 +50,7 @@ struct TestActor : Actor {
     int matches() const { return matches_; }
 
   protected:
-    void doEvent(const Event& event) override
-    {
-    }
+    void doEvent(const Event& event) override {}
     void doReady(int fd, FileEvents events, Time now) override
     {
         char buf[4];

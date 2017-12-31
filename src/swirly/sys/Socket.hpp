@@ -666,7 +666,11 @@ inline void setTcpNoDelay(int sockfd, bool enabled)
 }
 
 struct Socket {
-    Socket(File&& sock, int family) : sock_{std::move(sock)}, family_{family} {}
+    Socket(File&& sock, int family)
+      : sock_{std::move(sock)}
+      , family_{family}
+    {
+    }
     Socket() noexcept = default;
 
     auto operator*() const noexcept { return *sock_; }

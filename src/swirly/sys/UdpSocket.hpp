@@ -25,11 +25,11 @@ struct SWIRLY_API IpMcastGroup {
     IpMcastGroup(const IpAddress& addr, unsigned ifindex = 0) noexcept;
 
     IpMcastGroup(const IpAddress& addr, const char* ifname, std::error_code& ec) noexcept
-        : IpMcastGroup(addr, sys::if_nametoindex(ifname, ec))
+      : IpMcastGroup(addr, sys::if_nametoindex(ifname, ec))
     {
     }
     IpMcastGroup(const IpAddress& addr, const char* ifname)
-        : IpMcastGroup(addr, sys::if_nametoindex(ifname))
+      : IpMcastGroup(addr, sys::if_nametoindex(ifname))
     {
     }
 
@@ -271,10 +271,13 @@ struct UdpSocket : IoSocket {
 
     using IoSocket::IoSocket;
     UdpSocket(Transport trans, std::error_code& ec) noexcept
-        : IoSocket{sys::socket(trans, ec), trans.family()}
+      : IoSocket{sys::socket(trans, ec), trans.family()}
     {
     }
-    explicit UdpSocket(Transport trans) : IoSocket{sys::socket(trans), trans.family()} {}
+    explicit UdpSocket(Transport trans)
+      : IoSocket{sys::socket(trans), trans.family()}
+    {
+    }
     UdpSocket() noexcept = default;
 
     void bind(const Endpoint& ep, std::error_code& ec) noexcept { sys::bind(*sock_, ep, ec); }

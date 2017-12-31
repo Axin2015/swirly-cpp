@@ -25,27 +25,27 @@ Exec::Exec(const QString& accnt, Id64 marketId, const Instr& instr, QDate settlD
            Id64 orderId, const QString& ref, State state, Side side, Lots lots, Ticks ticks,
            Lots resdLots, Lots execLots, Cost execCost, Lots lastLots, Ticks lastTicks,
            Lots minLots, Id64 matchId, LiqInd liqInd, const QString& cpty, const QDateTime& created)
-    : accnt_{accnt},
-      marketId_{marketId},
-      instr_{instr},
-      settlDate_{settlDate},
-      id_{id},
-      orderId_{orderId},
-      ref_{ref},
-      state_{state},
-      side_{side},
-      lots_{lots},
-      ticks_{ticks},
-      resdLots_{resdLots},
-      execLots_{execLots},
-      execCost_{execCost},
-      lastLots_{lastLots},
-      lastTicks_{lastTicks},
-      minLots_{minLots},
-      matchId_{matchId},
-      liqInd_{liqInd},
-      cpty_{cpty},
-      created_{created}
+  : accnt_{accnt}
+  , marketId_{marketId}
+  , instr_{instr}
+  , settlDate_{settlDate}
+  , id_{id}
+  , orderId_{orderId}
+  , ref_{ref}
+  , state_{state}
+  , side_{side}
+  , lots_{lots}
+  , ticks_{ticks}
+  , resdLots_{resdLots}
+  , execLots_{execLots}
+  , execCost_{execCost}
+  , lastLots_{lastLots}
+  , lastTicks_{lastTicks}
+  , minLots_{minLots}
+  , matchId_{matchId}
+  , liqInd_{liqInd}
+  , cpty_{cpty}
+  , created_{created}
 {
 }
 

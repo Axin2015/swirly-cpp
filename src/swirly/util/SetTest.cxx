@@ -28,7 +28,9 @@ namespace {
 class Foo : public RefCount<Foo, ThreadUnsafePolicy> {
   public:
     Foo(Symbol symbol, string_view display, int& alive) noexcept
-        : symbol_{symbol}, display_{display}, alive_{alive}
+      : symbol_{symbol}
+      , display_{display}
+      , alive_{alive}
     {
         ++alive;
     }
@@ -47,7 +49,9 @@ class Foo : public RefCount<Foo, ThreadUnsafePolicy> {
 class Bar : public RefCount<Bar, ThreadUnsafePolicy> {
   public:
     Bar(Id64 id, string_view display, int& alive) noexcept
-        : id_{id}, display_{display}, alive_{alive}
+      : id_{id}
+      , display_{display}
+      , alive_{alive}
     {
         ++alive;
     }

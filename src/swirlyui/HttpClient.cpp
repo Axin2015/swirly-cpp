@@ -39,7 +39,8 @@ enum : int { GetRefData = 1, GetAccnt, PostMarket, PostOrder, PutOrder };
 
 } // namespace
 
-HttpClient::HttpClient(QObject* parent) : Client{parent}
+HttpClient::HttpClient(QObject* parent)
+  : Client{parent}
 {
     connect(&nam_, &QNetworkAccessManager::finished, this, &HttpClient::slotFinished);
     connect(&nam_, &QNetworkAccessManager::networkAccessibleChanged, this,

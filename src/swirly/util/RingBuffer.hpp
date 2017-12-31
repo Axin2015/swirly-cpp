@@ -27,7 +27,9 @@ template <typename ValueT>
 class RingBuffer {
   public:
     explicit RingBuffer(std::size_t capacity)
-        : capacity_{nextPow2(capacity)}, mask_{capacity_ - 1}, buf_{new ValueT[capacity_]}
+      : capacity_{nextPow2(capacity)}
+      , mask_{capacity_ - 1}
+      , buf_{new ValueT[capacity_]}
     {
     }
     ~RingBuffer() noexcept = default;

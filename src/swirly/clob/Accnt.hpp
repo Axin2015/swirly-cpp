@@ -39,7 +39,11 @@ using ConstAccntPtr = std::unique_ptr<const Accnt>;
 
 class SWIRLY_API Accnt : public Comparable<Accnt> {
   public:
-    Accnt(Symbol symbol, std::size_t maxExecs) noexcept : symbol_{symbol}, execs_{maxExecs} {}
+    Accnt(Symbol symbol, std::size_t maxExecs) noexcept
+      : symbol_{symbol}
+      , execs_{maxExecs}
+    {
+    }
     ~Accnt() noexcept;
 
     // Copy.

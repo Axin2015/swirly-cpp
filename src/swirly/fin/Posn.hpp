@@ -34,18 +34,18 @@ class SWIRLY_API Posn : public RefCount<Posn, ThreadUnsafePolicy> {
   public:
     Posn(Symbol accnt, Id64 marketId, Symbol instr, JDay settlDay, Lots buyLots, Cost buyCost,
          Lots sellLots, Cost sellCost) noexcept
-        : accnt_{accnt},
-          marketId_{marketId},
-          instr_{instr},
-          settlDay_{settlDay},
-          buyLots_{buyLots},
-          buyCost_{buyCost},
-          sellLots_{sellLots},
-          sellCost_{sellCost}
+      : accnt_{accnt}
+      , marketId_{marketId}
+      , instr_{instr}
+      , settlDay_{settlDay}
+      , buyLots_{buyLots}
+      , buyCost_{buyCost}
+      , sellLots_{sellLots}
+      , sellCost_{sellCost}
     {
     }
     Posn(Symbol accnt, Id64 marketId, Symbol instr, JDay settlDay) noexcept
-        : Posn{accnt, marketId, instr, settlDay, 0_lts, 0_cst, 0_lts, 0_cst}
+      : Posn{accnt, marketId, instr, settlDay, 0_lts, 0_cst, 0_lts, 0_cst}
     {
     }
     ~Posn() noexcept;

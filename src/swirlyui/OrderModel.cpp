@@ -22,7 +22,8 @@ namespace swirly {
 namespace ui {
 using namespace order;
 
-OrderModel::OrderModel(QObject* parent) : TableModel{parent}
+OrderModel::OrderModel(QObject* parent)
+  : TableModel{parent}
 {
     header_[unbox(Column::CheckState)] = tr("");
     header_[unbox(Column::Accnt)] = tr("Accnt");

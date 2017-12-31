@@ -24,7 +24,7 @@ namespace swirly {
 class EventFd {
   public:
     explicit EventFd(int flags = 0)
-    : file_{sys::eventfd(0, eventFlags(flags) | EFD_NONBLOCK)}
+      : file_{sys::eventfd(0, eventFlags(flags) | EFD_NONBLOCK)}
     {
     }
     ~EventFd() noexcept = default;
@@ -37,10 +37,7 @@ class EventFd {
     EventFd(EventFd&&) = default;
     EventFd& operator=(EventFd&&) = default;
 
-    int waitfd() const
-    {
-        return file_.get();
-    }
+    int waitfd() const { return file_.get(); }
     void flush()
     {
         // Adds the 8-byte integer value supplied in its buffer to the counter.
@@ -75,7 +72,7 @@ class EventFd {
 class EventPipe {
   public:
     explicit EventPipe(int flags = 0)
-    : pipe_{sys::pipe2(flags | O_NONBLOCK)}
+      : pipe_{sys::pipe2(flags | O_NONBLOCK)}
     {
     }
     ~EventPipe() noexcept = default;
@@ -88,10 +85,7 @@ class EventPipe {
     EventPipe(EventPipe&&) = default;
     EventPipe& operator=(EventPipe&&) = default;
 
-    int waitfd() const
-    {
-        return pipe_.first.get();
-    }
+    int waitfd() const { return pipe_.first.get(); }
     void flush()
     {
         // Drain block of bytes.

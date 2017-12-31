@@ -30,7 +30,10 @@ namespace detail {
 template <std::size_t StepN>
 class AsyncWindow {
   public:
-    explicit AsyncWindow(std::size_t total) noexcept : total_{total} {}
+    explicit AsyncWindow(std::size_t total) noexcept
+      : total_{total}
+    {
+    }
     ~AsyncWindow() noexcept = default;
 
     // Copy.

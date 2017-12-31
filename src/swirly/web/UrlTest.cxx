@@ -27,7 +27,11 @@ namespace {
 
 class UrlString : public BasicUrl<UrlString> {
   public:
-    explicit UrlString(const string& url) : url_{url} { parse(); }
+    explicit UrlString(const string& url)
+      : url_{url}
+    {
+        parse();
+    }
     const auto& url() const noexcept { return url_; }
 
   private:
@@ -36,7 +40,11 @@ class UrlString : public BasicUrl<UrlString> {
 
 class UrlStringView : public BasicUrl<UrlStringView> {
   public:
-    explicit UrlStringView(const string_view& url) : url_{url} { parse(); }
+    explicit UrlStringView(const string_view& url)
+      : url_{url}
+    {
+        parse();
+    }
     const auto& url() const noexcept { return url_; }
 
   private:

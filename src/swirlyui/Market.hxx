@@ -50,13 +50,13 @@ class Market {
 
     Market(Id64 id, const Instr& instr, QDate settlDate, MarketState state, Lots lastLots,
            Ticks lastTicks, const QDateTime& lastTime)
-        : id_{id},
-          instr_{instr},
-          settlDate_{settlDate},
-          state_{state},
-          lastLots_{lastLots},
-          lastTicks_{lastTicks},
-          lastTime_{lastTime}
+      : id_{id}
+      , instr_{instr}
+      , settlDate_{settlDate}
+      , state_{state}
+      , lastLots_{lastLots}
+      , lastTicks_{lastTicks}
+      , lastTime_{lastTime}
     {
     }
     Market() = default;

@@ -26,7 +26,9 @@ using asio::ip::tcp;
 namespace swirly {
 
 HttpServ::HttpServ(asio::io_service& ioServ, uint16_t port, RestServ& restServ)
-    : ioServ_(ioServ), acceptor_{ioServ}, restServ_(restServ)
+  : ioServ_(ioServ)
+  , acceptor_{ioServ}
+  , restServ_(restServ)
 {
     tcp::endpoint endpoint{tcp::v4(), port};
     acceptor_.open(endpoint.protocol());

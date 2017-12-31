@@ -24,7 +24,10 @@ namespace swirly {
 template <typename FnT>
 class Finally {
   public:
-    explicit Finally(FnT fn) noexcept : fn_{std::move(fn)} {}
+    explicit Finally(FnT fn) noexcept
+      : fn_{std::move(fn)}
+    {
+    }
     ~Finally() noexcept { fn_(); }
     // Copy.
     Finally(const Finally&) = delete;

@@ -29,7 +29,10 @@ namespace swirly {
 template <typename ValueT>
 class Pipe {
   public:
-    explicit Pipe(std::size_t capacity) : buf_{capacity} {}
+    explicit Pipe(std::size_t capacity)
+      : buf_{capacity}
+    {
+    }
     ~Pipe() noexcept = default;
 
     // Copy.

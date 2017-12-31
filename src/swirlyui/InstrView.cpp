@@ -32,7 +32,8 @@ namespace ui {
 using namespace instr;
 
 InstrView::InstrView(InstrModel& model, QWidget* parent, Qt::WindowFlags f)
-    : QWidget{parent, f}, model_(model)
+  : QWidget{parent, f}
+  , model_(model)
 {
     auto table = make_unique<QTableView>();
     {

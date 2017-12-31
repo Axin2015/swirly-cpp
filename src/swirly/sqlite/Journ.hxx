@@ -26,7 +26,10 @@
 namespace swirly {
 namespace sqlite {
 
-class Journ : public Transactional, public swirly::Journ, BasicMsgHandler<Journ> {
+class Journ
+  : public Transactional
+  , public swirly::Journ
+  , BasicMsgHandler<Journ> {
     // Crtp.
     friend struct BasicMsgHandler<Journ>;
 

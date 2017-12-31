@@ -69,7 +69,7 @@ constexpr auto SelectPosnSql = //
 } // namespace
 
 Model::Model(const Config& config)
-    : db_{openDb(config.get("sqlite_model", "swirly.db"), SQLITE_OPEN_READONLY, config)}
+  : db_{openDb(config.get("sqlite_model", "swirly.db"), SQLITE_OPEN_READONLY, config)}
 {
 }
 

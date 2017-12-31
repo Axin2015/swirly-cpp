@@ -36,7 +36,8 @@ namespace swirly {
 namespace ui {
 
 MarketForm::MarketForm(InstrModel& instrModel, QWidget* parent, Qt::WindowFlags f)
-    : QWidget{parent, f}, instrModel_(instrModel)
+  : QWidget{parent, f}
+  , instrModel_(instrModel)
 {
     auto instrComboBox = make_unique<QComboBox>();
     {

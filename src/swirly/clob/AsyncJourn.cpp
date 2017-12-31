@@ -28,7 +28,11 @@ namespace {
 template <size_t StepN>
 class MultiPart {
   public:
-    MultiPart(AsyncJourn& journ, size_t total) noexcept : journ_{journ}, window_{total} {}
+    MultiPart(AsyncJourn& journ, size_t total) noexcept
+      : journ_{journ}
+      , window_{total}
+    {
+    }
     ~MultiPart() noexcept
     {
         if (!done()) {
@@ -76,7 +80,8 @@ void worker(MsgPipe& pipe, Journ& journ)
 } // namespace
 
 AsyncJourn::AsyncJourn(Journ& journ, size_t pipeCapacity)
-    : pipe_{pipeCapacity}, thread_{worker, ref(pipe_), ref(journ)}
+  : pipe_{pipeCapacity}
+  , thread_{worker, ref(pipe_), ref(journ)}
 {
 }
 

@@ -24,7 +24,7 @@ namespace swirly {
 namespace ui {
 
 class InstrModel
-    : public TableModel<QString, Instr, unbox(instr::Column::CheckState), instr::ColumnCount> {
+  : public TableModel<QString, Instr, unbox(instr::Column::CheckState), instr::ColumnCount> {
   public:
     InstrModel(QObject* parent = nullptr);
     ~InstrModel() noexcept override;

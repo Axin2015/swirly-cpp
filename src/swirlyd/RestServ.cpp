@@ -35,7 +35,8 @@ namespace {
 
 class ScopedIds {
   public:
-    ScopedIds(string_view sv, vector<Id64>& ids) noexcept : ids_{ids}
+    ScopedIds(string_view sv, vector<Id64>& ids) noexcept
+      : ids_{ids}
     {
         Tokeniser toks{sv, ","_sv};
         while (!toks.empty()) {

@@ -22,7 +22,10 @@ namespace {
 
 } // namespace
 
-Client::Client(QObject* parent) : QObject{parent} {}
+Client::Client(QObject* parent)
+  : QObject{parent}
+{
+}
 
 void Client::reset()
 {

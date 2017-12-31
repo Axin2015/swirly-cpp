@@ -45,7 +45,9 @@ constexpr LevelKey composeKey(Side side, Ticks ticks) noexcept
  * A price level is an aggregation of orders by price. I.e. the sum of all orders in the market at
  * the same price.
  */
-class SWIRLY_API Level : public Comparable<Level>, public MemAlloc {
+class SWIRLY_API Level
+  : public Comparable<Level>
+  , public MemAlloc {
   public:
     explicit Level(const Order& firstOrder) noexcept;
 

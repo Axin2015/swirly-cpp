@@ -24,7 +24,7 @@ namespace swirly {
 namespace ui {
 
 class MarketModel
-    : public TableModel<Id64, Market, unbox(market::Column::CheckState), market::ColumnCount> {
+  : public TableModel<Id64, Market, unbox(market::Column::CheckState), market::ColumnCount> {
   public:
     MarketModel(QObject* parent = nullptr);
     ~MarketModel() noexcept override;

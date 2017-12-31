@@ -51,14 +51,14 @@ constexpr auto UpdateExecSql = //
 } // namespace
 
 Journ::Journ(const Config& config)
-    : db_{openDb(config.get("sqlite_journ", "swirly.db"), SQLITE_OPEN_READWRITE, config)},
-      beginStmt_{prepare(*db_, BeginSql)},
-      commitStmt_{prepare(*db_, CommitSql)},
-      rollbackStmt_{prepare(*db_, RollbackSql)},
-      insertMarketStmt_{prepare(*db_, InsertMarketSql)},
-      updateMarketStmt_{prepare(*db_, UpdateMarketSql)},
-      insertExecStmt_{prepare(*db_, InsertExecSql)},
-      updateExecStmt_{prepare(*db_, UpdateExecSql)}
+  : db_{openDb(config.get("sqlite_journ", "swirly.db"), SQLITE_OPEN_READWRITE, config)}
+  , beginStmt_{prepare(*db_, BeginSql)}
+  , commitStmt_{prepare(*db_, CommitSql)}
+  , rollbackStmt_{prepare(*db_, RollbackSql)}
+  , insertMarketStmt_{prepare(*db_, InsertMarketSql)}
+  , updateMarketStmt_{prepare(*db_, UpdateMarketSql)}
+  , insertExecStmt_{prepare(*db_, InsertExecSql)}
+  , updateExecStmt_{prepare(*db_, UpdateExecSql)}
 {
 }
 

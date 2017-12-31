@@ -34,7 +34,11 @@ class Rest;
 
 class RestServ {
   public:
-    explicit RestServ(Rest& rest) noexcept : rest_(rest), profile_{"profile"_sv} {}
+    explicit RestServ(Rest& rest) noexcept
+      : rest_(rest)
+      , profile_{"profile"_sv}
+    {
+    }
     ~RestServ() noexcept;
 
     // Copy.

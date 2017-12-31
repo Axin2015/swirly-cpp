@@ -30,7 +30,10 @@ class Handle {
     static constexpr Id invalid() noexcept { return PolicyT::invalid(); }
 
     Handle(std::nullptr_t = nullptr) noexcept {}
-    Handle(Id id) noexcept : id_{id} {}
+    Handle(Id id) noexcept
+      : id_{id}
+    {
+    }
     ~Handle() noexcept
     {
         if (id_ != invalid()) {
@@ -43,7 +46,11 @@ class Handle {
     Handle& operator=(const Handle&) = delete;
 
     // Move.
-    Handle(Handle&& rhs) : id_{rhs.id_} { rhs.id_ = invalid(); }
+    Handle(Handle&& rhs)
+      : id_{rhs.id_}
+    {
+        rhs.id_ = invalid();
+    }
     Handle& operator=(Handle&& rhs)
     {
         close();

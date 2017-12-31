@@ -28,7 +28,12 @@ namespace ui {
 
 class Level {
   public:
-    Level(Ticks ticks, Lots lots, int count) : ticks_{ticks}, lots_{lots}, count_{count} {}
+    Level(Ticks ticks, Lots lots, int count)
+      : ticks_{ticks}
+      , lots_{lots}
+      , count_{count}
+    {
+    }
     Level() = default;
     ~Level() noexcept = default;
 

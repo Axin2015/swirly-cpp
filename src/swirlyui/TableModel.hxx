@@ -32,7 +32,10 @@ namespace ui {
 template <typename KeyT, typename ValueT, int CheckStateN, int ColumnCountN>
 class TableModel : public QAbstractTableModel {
   public:
-    TableModel(QObject* parent = nullptr) : QAbstractTableModel{parent} {}
+    TableModel(QObject* parent = nullptr)
+      : QAbstractTableModel{parent}
+    {
+    }
     ~TableModel() noexcept override = default;
 
     int rowCount(const QModelIndex& parent) const override { return rows_.size(); }

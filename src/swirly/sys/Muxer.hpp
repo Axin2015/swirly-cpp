@@ -44,7 +44,10 @@ class BasicMuxer {
 
     using FileEvent = typename PolicyT::FileEvent;
 
-    explicit BasicMuxer(std::size_t sizeHint) : md_{PolicyT::create(sizeHint)} {}
+    explicit BasicMuxer(std::size_t sizeHint)
+      : md_{PolicyT::create(sizeHint)}
+    {
+    }
     ~BasicMuxer() noexcept
     {
         if (md_ != invalid()) {
@@ -57,7 +60,11 @@ class BasicMuxer {
     BasicMuxer& operator=(const BasicMuxer&) = delete;
 
     // Move.
-    BasicMuxer(BasicMuxer&& rhs) : md_{rhs.md_} { rhs.md_ = invalid(); }
+    BasicMuxer(BasicMuxer&& rhs)
+      : md_{rhs.md_}
+    {
+        rhs.md_ = invalid();
+    }
     BasicMuxer& operator=(BasicMuxer&& rhs)
     {
         close();

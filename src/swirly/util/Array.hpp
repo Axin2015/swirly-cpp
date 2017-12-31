@@ -43,13 +43,20 @@ class ArrayView {
     using difference_type = std::ptrdiff_t;
     using size_type = std::size_t;
 
-    constexpr ArrayView(const ValueT* ptr, std::size_t len) noexcept : len_{len}, ptr_{ptr} {}
+    constexpr ArrayView(const ValueT* ptr, std::size_t len) noexcept
+      : len_{len}
+      , ptr_{ptr}
+    {
+    }
     template <typename TypeU, std::size_t SizeN>
-    constexpr ArrayView(TypeU (&arr)[SizeN]) noexcept : len_{SizeN}, ptr_{arr}
+    constexpr ArrayView(TypeU (&arr)[SizeN]) noexcept
+      : len_{SizeN}
+      , ptr_{arr}
     {
     }
     ArrayView(const std::vector<ValueT>& arr) noexcept
-        : len_{arr.size()}, ptr_{arr.empty() ? nullptr : &arr[0]}
+      : len_{arr.size()}
+      , ptr_{arr.empty() ? nullptr : &arr[0]}
     {
     }
     constexpr ArrayView() noexcept = default;

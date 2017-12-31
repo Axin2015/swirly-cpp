@@ -33,15 +33,15 @@ class SWIRLY_API Request {
   public:
     Request(Symbol accnt, Id64 marketId, Symbol instr, JDay settlDay, Id64 id, std::string_view ref,
             Side side, Lots lots, Time created) noexcept
-        : accnt_{accnt},
-          marketId_{marketId},
-          instr_{instr},
-          settlDay_{settlDay},
-          id_{id},
-          ref_{ref},
-          side_{side},
-          lots_{lots},
-          created_{created}
+      : accnt_{accnt}
+      , marketId_{marketId}
+      , instr_{instr}
+      , settlDay_{settlDay}
+      , id_{id}
+      , ref_{ref}
+      , side_{side}
+      , lots_{lots}
+      , created_{created}
     {
     }
 

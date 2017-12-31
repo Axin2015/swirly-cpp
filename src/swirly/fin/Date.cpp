@@ -29,7 +29,10 @@ using namespace std;
 
 namespace swirly {
 
-BusinessDay::BusinessDay(const char* timeZone) : timeZone_{new lt::posix_time_zone{timeZone}} {}
+BusinessDay::BusinessDay(const char* timeZone)
+  : timeZone_{new lt::posix_time_zone{timeZone}}
+{
+}
 
 BusinessDay::~BusinessDay() noexcept = default;
 

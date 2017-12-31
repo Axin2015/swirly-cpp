@@ -24,7 +24,10 @@ namespace sqlite {
 
 class Error : public Exception {
   public:
-    explicit Error(std::string_view what) noexcept : Exception{what} {}
+    explicit Error(std::string_view what) noexcept
+      : Exception{what}
+    {
+    }
     ~Error() noexcept;
 
     // Copy.

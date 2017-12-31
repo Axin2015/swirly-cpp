@@ -30,7 +30,10 @@ namespace {
 template <typename FnT>
 class AllocHandler {
   public:
-    explicit AllocHandler(FnT fn) noexcept : fn_{move(fn)} {}
+    explicit AllocHandler(FnT fn) noexcept
+      : fn_{move(fn)}
+    {
+    }
     ~AllocHandler() noexcept = default;
 
     // Copy.

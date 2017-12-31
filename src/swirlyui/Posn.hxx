@@ -42,14 +42,14 @@ class Posn {
   public:
     Posn(const QString& accnt, Id64 marketId, const Instr& instr, QDate settlDate, Lots buyLots,
          Cost buyCost, Lots sellLots, Cost sellCost)
-        : accnt_{accnt},
-          marketId_{marketId},
-          instr_{instr},
-          settlDate_{settlDate},
-          buyLots_{buyLots},
-          buyCost_{buyCost},
-          sellLots_{sellLots},
-          sellCost_{sellCost}
+      : accnt_{accnt}
+      , marketId_{marketId}
+      , instr_{instr}
+      , settlDate_{settlDate}
+      , buyLots_{buyLots}
+      , buyCost_{buyCost}
+      , sellLots_{sellLots}
+      , sellCost_{sellCost}
     {
     }
     Posn() = default;

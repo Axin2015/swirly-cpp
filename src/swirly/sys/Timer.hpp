@@ -46,7 +46,10 @@ class Timer {
         ActorPtr actor;
     };
     Timer() = default;
-    explicit Timer(Impl* impl) : impl_{impl, false} {}
+    explicit Timer(Impl* impl)
+      : impl_{impl, false}
+    {
+    }
     long id() const noexcept { return impl_->id; }
     Time expiry() const noexcept { return impl_->expiry; }
     Duration interval() const noexcept { return impl_->interval; }

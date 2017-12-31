@@ -41,7 +41,10 @@ class SWIRLY_API EntitySet {
         AccntMask = Market | Order | Exec | Trade | Posn
     };
 
-    constexpr EntitySet(int bs = 0) noexcept : bs_{bs} {}
+    constexpr EntitySet(int bs = 0) noexcept
+      : bs_{bs}
+    {
+    }
     ~EntitySet() noexcept;
 
     // Copy.

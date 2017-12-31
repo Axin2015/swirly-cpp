@@ -34,7 +34,8 @@ using namespace market;
 
 MarketView::MarketView(InstrModel& instrModel, MarketModel& model, QWidget* parent,
                        Qt::WindowFlags f)
-    : QWidget{parent, f}, model_(model)
+  : QWidget{parent, f}
+  , model_(model)
 {
     auto form = make_unique<MarketForm>(instrModel);
     connect(form.get(), &MarketForm::createMarket, this, &MarketView::createMarket);

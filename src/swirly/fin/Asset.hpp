@@ -29,7 +29,10 @@ namespace swirly {
 class SWIRLY_API Asset : public Comparable<Asset> {
   public:
     Asset(Id32 id, Symbol symbol, std::string_view display, AssetType type) noexcept
-        : id_{id}, symbol_{symbol}, display_{display}, type_{type}
+      : id_{id}
+      , symbol_{symbol}
+      , display_{display}
+      , type_{type}
     {
     }
 

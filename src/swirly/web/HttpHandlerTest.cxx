@@ -30,7 +30,9 @@ using namespace swirly;
 
 namespace {
 
-class HttpHandler : public BasicHttpHandler<HttpHandler>, public BasicUrl<HttpHandler> {
+class HttpHandler
+  : public BasicHttpHandler<HttpHandler>
+  , public BasicUrl<HttpHandler> {
     friend class BasicHttpHandler<HttpHandler>;
     friend class BasicUrl<HttpHandler>;
 

@@ -58,7 +58,11 @@ class StringBuf : public std::streambuf {
 template <std::size_t MaxN>
 class StringBuilder : public std::ostream {
   public:
-    StringBuilder() : std::ostream{nullptr} { rdbuf(&buf_); }
+    StringBuilder()
+      : std::ostream{nullptr}
+    {
+        rdbuf(&buf_);
+    }
     ~StringBuilder() noexcept override = default;
 
     // Copy.
@@ -106,7 +110,11 @@ class SWIRLY_API OStreamJoiner {
     using reference = void;
     using iterator_category = std::output_iterator_tag;
 
-    OStreamJoiner(std::ostream& os, const char delim) noexcept : os_{&os}, delim_{delim} {}
+    OStreamJoiner(std::ostream& os, const char delim) noexcept
+      : os_{&os}
+      , delim_{delim}
+    {
+    }
     ~OStreamJoiner() noexcept;
 
     // Copy.

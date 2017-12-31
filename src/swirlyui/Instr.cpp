@@ -26,21 +26,21 @@ namespace ui {
 Instr::Impl::Impl(const QString& symbol, const QString& display, const QString& baseAsset,
                   const QString& termCcy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
                   int pipDp, Lots minLots, Lots maxLots)
-    : symbol{symbol},
-      display{display},
-      baseAsset{baseAsset},
-      termCcy{termCcy},
-      lotNumer{lotNumer},
-      lotDenom{lotDenom},
-      qtyInc{fractToReal(lotNumer, lotDenom)},
-      tickNumer{tickNumer},
-      tickDenom{tickDenom},
-      priceInc{fractToReal(tickNumer, tickDenom)},
-      pipDp{pipDp},
-      qtyDp{realToDp(qtyInc)},
-      priceDp{realToDp(priceInc)},
-      minLots{minLots},
-      maxLots{maxLots}
+  : symbol{symbol}
+  , display{display}
+  , baseAsset{baseAsset}
+  , termCcy{termCcy}
+  , lotNumer{lotNumer}
+  , lotDenom{lotDenom}
+  , qtyInc{fractToReal(lotNumer, lotDenom)}
+  , tickNumer{tickNumer}
+  , tickDenom{tickDenom}
+  , priceInc{fractToReal(tickNumer, tickDenom)}
+  , pipDp{pipDp}
+  , qtyDp{realToDp(qtyInc)}
+  , priceDp{realToDp(priceInc)}
+  , minLots{minLots}
+  , maxLots{maxLots}
 {
 }
 

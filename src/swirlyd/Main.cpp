@@ -65,7 +65,9 @@ void openLogFile(const char* path)
 class SigHandler {
   public:
     SigHandler(boost::asio::io_service& ioServ, const fs::path& logFile)
-        : ioServ_(ioServ), signals_{ioServ}, logFile_{logFile}
+      : ioServ_(ioServ)
+      , signals_{ioServ}
+      , logFile_{logFile}
     {
         signals_.add(SIGHUP);
         signals_.add(SIGINT);
