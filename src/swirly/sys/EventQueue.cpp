@@ -30,6 +30,7 @@ EventQueue::~EventQueue() noexcept = default;
 Event EventQueue::pop()
 {
     if (it_ == rdbuf_.end()) {
+        rdbuf_.clear();
         {
             std::lock_guard<std::mutex> lock{mutex_};
             rdbuf_.swap(wrbuf_);
@@ -38,7 +39,7 @@ Event EventQueue::pop()
     }
     Event ev;
     if (it_ != rdbuf_.end()) {
-        ev = *it_++;
+        ev.swap(*it_++);
     }
     return ev;
 }

@@ -75,6 +75,18 @@ class SWIRLY_API Event {
     {
         return alloc(to, Address::None, type, size);
     }
+    template <typename DataT>
+    static Event alloc(Address to, Address reply, int type)
+    {
+        static_assert(std::is_pod<DataT>::value);
+        return alloc(to, reply, type, sizeof(DataT));
+    }
+    template <typename DataT>
+    static Event alloc(Address to, int type)
+    {
+        static_assert(std::is_pod<DataT>::value);
+        return alloc(to, type, sizeof(DataT));
+    }
     explicit operator bool() const noexcept { return static_cast<bool>(impl_); }
 
     Address to() const noexcept { return impl_->to; }
@@ -87,11 +99,13 @@ class SWIRLY_API Event {
     template <typename DataT>
     inline const DataT& data() const noexcept
     {
+        static_assert(std::is_pod<DataT>::value);
         return *reinterpret_cast<const DataT*>(impl_->data);
     }
     template <typename DataT>
     inline DataT& data() noexcept
     {
+        static_assert(std::is_pod<DataT>::value);
         return *reinterpret_cast<DataT*>(impl_->data);
     }
 

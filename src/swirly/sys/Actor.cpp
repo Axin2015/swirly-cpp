@@ -16,13 +16,23 @@
  */
 #include "Actor.hpp"
 
+#include <csignal>
+
 namespace swirly {
 
 Actor::~Actor() noexcept = default;
 
 void Actor::doEvent(const Event& event) {}
 void Actor::doReady(int fd, FileEvents mask, Time now) {}
-void Actor::doSignal(int sig) {}
+void Actor::doSignal(int sig)
+{
+    switch (sig) {
+    case SIGINT:
+    case SIGTERM:
+        doClose();
+        break;
+    }
+}
 void Actor::doTimer(const Timer& tmr, Time now) {}
 
 } // namespace swirly
