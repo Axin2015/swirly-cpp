@@ -22,9 +22,9 @@ namespace swirly {
 
 Actor::~Actor() noexcept = default;
 
-void Actor::doEvent(const Event& event) {}
+void Actor::doEvent(const Event& event, Time now) {}
 void Actor::doReady(int fd, FileEvents mask, Time now) {}
-void Actor::doSignal(int sig)
+void Actor::doSignal(int sig, Time now)
 {
     switch (sig) {
     case SIGINT:

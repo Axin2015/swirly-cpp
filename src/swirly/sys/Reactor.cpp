@@ -42,7 +42,7 @@ class EventDispatcher {
     EventDispatcher(EventDispatcher&&) = default;
     EventDispatcher& operator=(EventDispatcher&&) = default;
 
-    void dispatch(const Event& ev)
+    void dispatch(const Event& ev, Time now)
     {
         const auto addr = ev.to();
         const auto it = map_.find(addr);
@@ -69,9 +69,9 @@ class EventDispatcher {
             if (actor) {
                 try {
                     if (addr != Address::Signal) {
-                        actor->onEvent(ev);
+                        actor->onEvent(ev, now);
                     } else {
-                        actor->onSignal(ev.type());
+                        actor->onSignal(ev.type(), now);
                     }
                 } catch (const std::exception& e) {
                     using namespace string_literals;
@@ -94,7 +94,11 @@ class EventDispatcher {
     }
     void unsubscribe(Address addr, const Actor& actor)
     {
-        auto& v = map_[addr];
+        const auto it = map_.find(addr);
+        if (it == map_.end()) {
+            return;
+        }
+        auto& v = it->second;
         const auto pred = [&actor](const auto& ptr) { return ptr.get() == &actor; };
         if (addr != locked_) {
             v.erase(remove_if(v.begin(), v.end(), pred), v.end());
@@ -249,7 +253,7 @@ int Reactor::dispatch(FileEvent* buf, int size, Time now)
         const auto fd = static_cast<int>(ev.data.u64 & 0xffffffff);
         if (fd == impl_->ef.waitfd()) {
             while (auto event = impl_->eq.pop()) {
-                impl_->ed.dispatch(event);
+                impl_->ed.dispatch(event, now);
                 ++n;
             }
             continue;
