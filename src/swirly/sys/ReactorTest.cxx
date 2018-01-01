@@ -50,7 +50,7 @@ struct TestActor : Actor {
     int matches() const { return matches_; }
 
   protected:
-    void doEvent(const Event& event) override {}
+    void doClose() noexcept override {}
     void doReady(int fd, FileEvents events, Time now) override
     {
         char buf[4];
@@ -59,8 +59,6 @@ struct TestActor : Actor {
             ++matches_;
         }
     }
-    void doSignal(int sig) override {}
-    void doTimer(const Timer& tmr, Time now) override {}
 
   private:
     Counters* cntrs_{nullptr};
