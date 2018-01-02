@@ -38,9 +38,9 @@ SET(CMAKE_CXX_FLAGS_PERF "${CMAKE_CXX_FLAGS_RELEASE} -fno-omit-frame-pointer")
 if(NOT CMAKE_BUILD_TYPE)
   #set(CMAKE_BUILD_TYPE DEBUG)
   #set(CMAKE_BUILD_TYPE RELEASE)
-  set(CMAKE_BUILD_TYPE RELWITHDEBINFO)
+  #set(CMAKE_BUILD_TYPE RELWITHDEBINFO)
   #set(CMAKE_BUILD_TYPE MINSIZEREL)
-  #set(CMAKE_BUILD_TYPE PERF)
+  set(CMAKE_BUILD_TYPE PERF)
 endif()
 
 # Enable for use with clang-tidy.
@@ -57,7 +57,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(COMMON_WARN "-Wall -Werror -Wextra -Wstrict-aliasing=2 -Wno-unused-parameter -Wno-unused-variable")
 set(COMMON_C_FLAGS "-fstrict-aliasing -fvisibility=hidden")
-set(COMMON_CXX_FLAGS "${COMMON_C_FLAGS} -faligned-new -fno-rtti")
+set(COMMON_CXX_FLAGS "${COMMON_C_FLAGS} -faligned-new -frtti")
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   set(COMMON_WARN "${COMMON_WARN} -Wno-implicit-fallthrough")

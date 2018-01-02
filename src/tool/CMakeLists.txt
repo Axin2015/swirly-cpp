@@ -15,6 +15,7 @@
 
 add_custom_target(swirly_tool DEPENDS
   swirly_dump
+  swirly_fiber_bench
   swirly_queue_bench
   swirly_scratch
   swirly_serv_bench
@@ -26,6 +27,10 @@ install(PROGRAMS ${bin_FILES} DESTINATION bin COMPONENT program)
 add_executable(swirly_dump Dump.cpp)
 target_link_libraries(swirly_dump ${swirly_sqlite_LIBRARY})
 install(TARGETS swirly_dump DESTINATION bin COMPONENT program)
+
+add_executable(swirly_fiber_bench FiberBench.cpp)
+target_link_libraries(swirly_fiber_bench ${swirly_util_LIBRARY})
+install(TARGETS swirly_fiber_bench DESTINATION bin COMPONENT program)
 
 add_executable(swirly_queue_bench QueueBench.cpp)
 target_link_libraries(swirly_queue_bench ${swirly_util_LIBRARY})
