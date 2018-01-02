@@ -45,16 +45,16 @@ class SWIRLY_API Actor : public RefCount<Actor, ThreadUnsafePolicy> {
 
     void close() { doClose(); }
 
-    void onEvent(const Event& event) { doEvent(event); }
+    void onEvent(const Event& event, Time now) { doEvent(event, now); }
     void onReady(int fd, FileEvents mask, Time now) { doReady(fd, mask, now); }
-    void onSignal(int sig) { doSignal(sig); }
+    void onSignal(int sig, Time now) { doSignal(sig, now); }
     void onTimer(const Timer& tmr, Time now) { doTimer(tmr, now); }
 
   protected:
     virtual void doClose() = 0;
-    virtual void doEvent(const Event& event);
+    virtual void doEvent(const Event& event, Time now);
     virtual void doReady(int fd, FileEvents mask, Time now);
-    virtual void doSignal(int sig);
+    virtual void doSignal(int sig, Time now);
     virtual void doTimer(const Timer& tmr, Time now);
 
     const Reactor& reactor() const noexcept { return reactor_; }
