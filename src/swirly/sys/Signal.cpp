@@ -51,4 +51,14 @@ int SigWait::operator()() const
     return sig;
 }
 
+void sigBlockAll()
+{
+    sigset_t ss;
+    sigemptyset(&ss);
+    const auto err = pthread_sigmask(SIG_SETMASK, &ss, nullptr);
+    if (err != 0) {
+        throw std::system_error{sys::makeError(err), "pthread_sigmask"};
+    }
+}
+
 } // namespace swirly

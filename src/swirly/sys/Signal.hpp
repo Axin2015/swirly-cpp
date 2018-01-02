@@ -42,6 +42,11 @@ class SWIRLY_API SigWait {
     sigset_t newMask_, oldMask_;
 };
 
+/**
+ * Block all signals.
+ */
+SWIRLY_API void sigBlockAll();
+
 } // namespace swirly
 
 #endif // SWIRLY_SYS_SIGNAL_HPP
