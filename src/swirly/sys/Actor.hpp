@@ -54,6 +54,9 @@ class SWIRLY_API Actor : public RefCount<Actor, ThreadUnsafePolicy> {
     virtual void doClose() = 0;
     virtual void doEvent(const Event& event, Time now);
     virtual void doReady(int fd, FileEvents mask, Time now);
+    /**
+     * The default doSignal() implementation calls doClose() on SIGINT or SIGTERM.
+     */
     virtual void doSignal(int sig, Time now);
     virtual void doTimer(const Timer& tmr, Time now);
 

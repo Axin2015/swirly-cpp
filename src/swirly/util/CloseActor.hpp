@@ -14,39 +14,28 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SYS_SIGNAL_HPP
-#define SWIRLY_SYS_SIGNAL_HPP
+#ifndef SWIRLY_UTIL_CLOSEACTOR_HPP
+#define SWIRLY_UTIL_CLOSEACTOR_HPP
 
-#include <swirly/Config.h>
-
-#include <signal.h>
+#include <swirly/sys/Reactor.hpp>
 
 namespace swirly {
 
-class SWIRLY_API SigWait {
+class SWIRLY_API CloseActor : public Actor {
   public:
-    SigWait();
-    ~SigWait() noexcept;
+    explicit CloseActor(Reactor& r);
+    ~CloseActor() noexcept override;
+    static auto make(Reactor& r) { return makeIntrusive<CloseActor>(r); }
+    bool closed() const noexcept { return closed_; }
 
-    // Copy.
-    SigWait(const SigWait&) = delete;
-    SigWait& operator=(const SigWait&) = delete;
-
-    // Move.
-    SigWait(SigWait&&) = delete;
-    SigWait& operator=(SigWait&&) = delete;
-
-    int operator()() const;
+  protected:
+    void doClose() noexcept override;
 
   private:
-    sigset_t newMask_, oldMask_;
+    bool closed_{};
+    EventToken signal_;
 };
-
-/**
- * Block all signals.
- */
-SWIRLY_API void sigBlockAll();
 
 } // namespace swirly
 
-#endif // SWIRLY_SYS_SIGNAL_HPP
+#endif // SWIRLY_UTIL_CLOSEACTOR_HPP
