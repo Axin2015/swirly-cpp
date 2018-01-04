@@ -22,6 +22,16 @@
 
 #include <boost/intrusive_ptr.hpp>
 
+#include <utility>
+
+#if __cplusplus <= 201402L
+namespace std {
+struct in_place_t {
+};
+constexpr in_place_t in_place{};
+} // namespace std
+#endif
+
 namespace swirly {
 
 class SWIRLY_API Event {
@@ -61,9 +71,9 @@ class SWIRLY_API Event {
     Event(Event&&) = default;
     Event& operator=(Event&&) = default;
 
-    static Event alloc(Address to, Address reply, int type, std::size_t size)
+    static Event make(Address to, Address reply, int type, std::size_t size)
     {
-        auto* const impl = static_cast<Impl*>(swirly::alloc(sizeof(Impl) + size));
+        auto* const impl = static_cast<Impl*>(alloc(sizeof(Impl) + size));
         impl->refs = 1;
         impl->to = to;
         impl->reply = reply;
@@ -71,21 +81,31 @@ class SWIRLY_API Event {
         impl->size = size;
         return Event{boost::intrusive_ptr<Impl>{impl, false}};
     }
-    static Event alloc(Address to, int type, std::size_t size)
+    static Event make(Address to, int type, std::size_t size)
     {
-        return alloc(to, Address::None, type, size);
+        return make(to, Address::None, type, size);
     }
     template <typename DataT>
-    static Event alloc(Address to, Address reply, int type)
+    static Event make(Address to, Address reply, int type)
     {
-        static_assert(std::is_pod<DataT>::value);
-        return alloc(to, reply, type, sizeof(DataT));
+        static_assert(std::is_trivially_copyable<DataT>::value);
+        return make(to, reply, type, sizeof(DataT));
     }
     template <typename DataT>
-    static Event alloc(Address to, int type)
+    static Event make(Address to, int type)
     {
-        static_assert(std::is_pod<DataT>::value);
-        return alloc(to, type, sizeof(DataT));
+        static_assert(std::is_trivially_copyable<DataT>::value);
+        return make(to, type, sizeof(DataT));
+    }
+    template <typename DataT, typename... ArgsT>
+    static Event make(Address to, Address reply, int type, std::in_place_t, ArgsT&&... args)
+    {
+        return make(to, reply, type, sizeof(DataT)).construct(std::forward<ArgsT>(args)...);
+    }
+    template <typename DataT, typename... ArgsT>
+    static Event make(Address to, int type, std::in_place_t, ArgsT&&... args)
+    {
+        return make(to, type, sizeof(DataT)).construct<DataT>(std::forward<ArgsT>(args)...);
     }
     explicit operator bool() const noexcept { return static_cast<bool>(impl_); }
 
@@ -99,23 +119,30 @@ class SWIRLY_API Event {
     template <typename DataT>
     inline const DataT& data() const noexcept
     {
-        static_assert(std::is_pod<DataT>::value);
+        static_assert(std::is_trivially_copyable<DataT>::value);
         return *reinterpret_cast<const DataT*>(impl_->data);
     }
     template <typename DataT>
     inline DataT& data() noexcept
     {
-        static_assert(std::is_pod<DataT>::value);
+        static_assert(std::is_trivially_copyable<DataT>::value);
         return *reinterpret_cast<DataT*>(impl_->data);
     }
 
   private:
+    template <typename DataT, typename... ArgsT>
+    Event construct(ArgsT&&... args)
+    {
+        static_assert(std::is_trivially_copyable<DataT>::value);
+        ::new (impl_->data) DataT{std::forward<ArgsT>(args)...};
+        return *this;
+    }
     boost::intrusive_ptr<Impl> impl_;
 };
 
 inline Event makeSignal(int sig)
 {
-    return Event::alloc(Address::Signal, sig, 0);
+    return Event::make(Address::Signal, sig, 0);
 }
 
 } // namespace swirly
