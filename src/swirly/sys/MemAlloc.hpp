@@ -24,16 +24,12 @@
 namespace swirly {
 
 SWIRLY_API void* alloc(std::size_t size);
-#if __GNUC__ >= 7
 SWIRLY_API void* alloc(std::size_t size, std::align_val_t al);
-#endif
 SWIRLY_API void dealloc(void* ptr, std::size_t size) noexcept;
 
 struct MemAlloc {
     static void* operator new(std::size_t size) { return alloc(size); }
-#if __GNUC__ >= 7
     static void* operator new(std::size_t size, std::align_val_t al) { return alloc(size, al); }
-#endif
     static void operator delete(void* ptr, std::size_t size) noexcept { return dealloc(ptr, size); }
 
   protected:

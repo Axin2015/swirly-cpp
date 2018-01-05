@@ -22,15 +22,10 @@
 
 #include <swirly/Config.h>
 
-#include <experimental/string_view>
-
 #include <cstdint>
 #include <cstring>
 #include <memory>
-
-namespace std {
-using experimental::string_view;
-}
+#include <string_view>
 
 namespace swirly {
 

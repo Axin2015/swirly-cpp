@@ -19,15 +19,8 @@
 
 #include <swirly/Config.h>
 
-#include <experimental/optional>
-#include <experimental/string_view>
-
-namespace std {
-template <typename T>
-using optional = experimental::optional<T>;
-using experimental::nullopt;
-using experimental::string_view;
-} // namespace std
+#include <optional>
+#include <string_view>
 
 namespace swirly {
 

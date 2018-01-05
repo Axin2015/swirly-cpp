@@ -21,11 +21,7 @@
 
 #include <swirly/web/http_parser.h>
 
-#include <experimental/string_view>
-
-namespace std {
-using experimental::string_view;
-}
+#include <string_view>
 
 namespace swirly {
 

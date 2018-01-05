@@ -50,10 +50,8 @@ class SWIRLY_API MemCtx {
 
     void* alloc(std::size_t size);
 
-#if __GNUC__ >= 7
     // Requested alignment must not be greater than the size of a cache-line.
     void* alloc(std::size_t size, std::align_val_t al);
-#endif
 
     void dealloc(void* addr, std::size_t size) noexcept;
 
