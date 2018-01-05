@@ -28,33 +28,33 @@ SWIRLY_TEST_CASE(SymbolEmpty)
     Symbol symbol;
     SWIRLY_CHECK(symbol.empty());
     SWIRLY_CHECK(symbol.size() == 0UL);
-    SWIRLY_CHECK(symbol.compare(""_sv) == 0);
-    SWIRLY_CHECK(symbol == Symbol{""_sv});
+    SWIRLY_CHECK(symbol.compare(""sv) == 0);
+    SWIRLY_CHECK(symbol == Symbol{""sv});
 }
 
 SWIRLY_TEST_CASE(SymbolNonEmpty)
 {
-    Symbol symbol{"Foo"_sv};
+    Symbol symbol{"Foo"sv};
     SWIRLY_CHECK(!symbol.empty());
     SWIRLY_CHECK(symbol.size() == 3UL);
-    SWIRLY_CHECK(symbol.compare("Foo"_sv) == 0);
-    SWIRLY_CHECK(symbol == Symbol{"Foo"_sv});
+    SWIRLY_CHECK(symbol.compare("Foo"sv) == 0);
+    SWIRLY_CHECK(symbol == Symbol{"Foo"sv});
 }
 
 SWIRLY_TEST_CASE(SymbolUpperBound)
 {
-    Symbol symbol{"0123456789ABCDEFx"_sv};
+    Symbol symbol{"0123456789ABCDEFx"sv};
     SWIRLY_CHECK(symbol.size() == MaxSymbol);
-    SWIRLY_CHECK(symbol == "0123456789ABCDEF"_sv);
+    SWIRLY_CHECK(symbol == "0123456789ABCDEF"sv);
 
-    symbol = "0123456789abcdefx"_sv;
+    symbol = "0123456789abcdefx"sv;
     SWIRLY_CHECK(symbol.size() == MaxSymbol);
-    SWIRLY_CHECK(symbol == "0123456789abcdef"_sv);
+    SWIRLY_CHECK(symbol == "0123456789abcdef"sv);
 }
 
 SWIRLY_TEST_CASE(SymbolIndex)
 {
-    Symbol symbol{"Bar"_sv};
+    Symbol symbol{"Bar"sv};
     SWIRLY_CHECK(symbol[0] == 'B');
     SWIRLY_CHECK(symbol[1] == 'a');
     SWIRLY_CHECK(symbol[2] == 'r');
@@ -64,7 +64,7 @@ SWIRLY_TEST_CASE(SymbolIndex)
 
 SWIRLY_TEST_CASE(SymbolClear)
 {
-    Symbol symbol{"Foo"_sv};
+    Symbol symbol{"Foo"sv};
     symbol.clear();
     SWIRLY_CHECK(symbol.empty());
 }

@@ -26,7 +26,7 @@ namespace swirly {
 class Tokeniser {
   public:
     Tokeniser(std::string_view buf, std::string_view toks) noexcept { reset(buf, toks); }
-    Tokeniser() noexcept { reset(""_sv, ""_sv); }
+    Tokeniser() noexcept { reset(""sv, ""sv); }
     ~Tokeniser() noexcept = default;
 
     // Copy.

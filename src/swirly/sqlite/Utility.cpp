@@ -96,11 +96,11 @@ DbPtr openDb(const char* path, int flags, const Config& config)
         }
     }
     {
-        StmtPtr stmt{prepare(*db, "PRAGMA journal_mode = MEMORY"_sv)};
+        StmtPtr stmt{prepare(*db, "PRAGMA journal_mode = MEMORY"sv)};
         stepOnce(*stmt);
     }
     {
-        StmtPtr stmt{prepare(*db, "PRAGMA synchronous = OFF"_sv)};
+        StmtPtr stmt{prepare(*db, "PRAGMA synchronous = OFF"sv)};
         stepOnce(*stmt);
     }
     return ptr;

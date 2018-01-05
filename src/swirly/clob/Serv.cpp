@@ -154,7 +154,7 @@ struct Serv::Impl {
             // busDay <= settlDay.
             const auto busDay = busDay_(now);
             if (settlDay < busDay) {
-                throw InvalidException{"settl-day before bus-day"_sv};
+                throw InvalidException{"settl-day before bus-day"sv};
             }
         }
         const auto id = toMarketId(instr.id(), settlDay);

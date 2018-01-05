@@ -71,11 +71,11 @@ class HttpRequest : public BasicUrl<HttpRequest> {
     void appendHeaderValue(std::string_view sv, bool first)
     {
         if (first) {
-            if (field_ == "Swirly-Accnt"_sv) {
+            if (field_ == "Swirly-Accnt"sv) {
                 value_ = &accnt_;
-            } else if (field_ == "Swirly-Perm"_sv) {
+            } else if (field_ == "Swirly-Perm"sv) {
                 value_ = &perm_;
-            } else if (field_ == "Swirly-Time"_sv) {
+            } else if (field_ == "Swirly-Time"sv) {
                 value_ = &time_;
             } else {
                 value_ = nullptr;

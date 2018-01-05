@@ -27,10 +27,7 @@
 
 namespace swirly {
 
-constexpr std::string_view operator""_sv(const char* str, std::size_t len) noexcept
-{
-    return {str, len};
-}
+using namespace std::literals::string_view_literals;
 
 template <std::size_t MaxN>
 struct StringData {

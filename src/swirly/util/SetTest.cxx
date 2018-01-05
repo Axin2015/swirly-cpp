@@ -75,23 +75,23 @@ SWIRLY_TEST_CASE(SymbolSet)
     {
         SymbolSet<Foo> s;
 
-        Foo& foo1{*s.emplace("FOO"_sv, "Foo One"_sv, alive)};
+        Foo& foo1{*s.emplace("FOO"sv, "Foo One"sv, alive)};
         SWIRLY_CHECK(alive == 1);
-        SWIRLY_CHECK(foo1.symbol() == "FOO"_sv);
-        SWIRLY_CHECK(foo1.display() == "Foo One"_sv);
-        SWIRLY_CHECK(s.find("FOO"_sv) != s.end());
+        SWIRLY_CHECK(foo1.symbol() == "FOO"sv);
+        SWIRLY_CHECK(foo1.display() == "Foo One"sv);
+        SWIRLY_CHECK(s.find("FOO"sv) != s.end());
 
         // Duplicate.
-        Foo& foo2{*s.emplace("FOO"_sv, "Foo Two"_sv, alive)};
+        Foo& foo2{*s.emplace("FOO"sv, "Foo Two"sv, alive)};
         SWIRLY_CHECK(alive == 1);
         SWIRLY_CHECK(&foo2 == &foo1);
 
         // Replace.
-        Foo& foo3{*s.emplaceOrReplace("FOO"_sv, "Foo Three"_sv, alive)};
+        Foo& foo3{*s.emplaceOrReplace("FOO"sv, "Foo Three"sv, alive)};
         SWIRLY_CHECK(alive == 1);
         SWIRLY_CHECK(&foo3 != &foo1);
-        SWIRLY_CHECK(foo3.symbol() == "FOO"_sv);
-        SWIRLY_CHECK(foo3.display() == "Foo Three"_sv);
+        SWIRLY_CHECK(foo3.symbol() == "FOO"sv);
+        SWIRLY_CHECK(foo3.display() == "Foo Three"sv);
     }
     SWIRLY_CHECK(alive == 0);
 }
@@ -102,23 +102,23 @@ SWIRLY_TEST_CASE(IdSet)
     {
         IdSet<Bar> s;
 
-        Bar& bar1{*s.emplace(1_id64, "Bar One"_sv, alive)};
+        Bar& bar1{*s.emplace(1_id64, "Bar One"sv, alive)};
         SWIRLY_CHECK(alive == 1);
         SWIRLY_CHECK(bar1.id() == 1_id64);
-        SWIRLY_CHECK(bar1.display() == "Bar One"_sv);
+        SWIRLY_CHECK(bar1.display() == "Bar One"sv);
         SWIRLY_CHECK(s.find(1_id64) != s.end());
 
         // Duplicate.
-        Bar& bar2{*s.emplace(1_id64, "Bar Two"_sv, alive)};
+        Bar& bar2{*s.emplace(1_id64, "Bar Two"sv, alive)};
         SWIRLY_CHECK(alive == 1);
         SWIRLY_CHECK(&bar2 == &bar1);
 
         // Replace.
-        Bar& bar3{*s.emplaceOrReplace(1_id64, "Bar Three"_sv, alive)};
+        Bar& bar3{*s.emplaceOrReplace(1_id64, "Bar Three"sv, alive)};
         SWIRLY_CHECK(alive == 1);
         SWIRLY_CHECK(&bar3 != &bar1);
         SWIRLY_CHECK(bar3.id() == 1_id64);
-        SWIRLY_CHECK(bar3.display() == "Bar Three"_sv);
+        SWIRLY_CHECK(bar3.display() == "Bar Three"sv);
     }
     SWIRLY_CHECK(alive == 0);
 }

@@ -67,12 +67,12 @@ SWIRLY_TEST_CASE(UrlString)
 
 SWIRLY_TEST_CASE(UrlStringView)
 {
-    UrlStringView url{"http://www.swirlycloud.com:8080/accnt/execs?offset=3&limit5"_sv};
-    SWIRLY_CHECK(url.schema() == "http"_sv);
-    SWIRLY_CHECK(url.host() == "www.swirlycloud.com"_sv);
-    SWIRLY_CHECK(url.port() == "8080"_sv);
-    SWIRLY_CHECK(url.path() == "/accnt/execs"_sv);
-    SWIRLY_CHECK(url.query() == "offset=3&limit5"_sv);
+    UrlStringView url{"http://www.swirlycloud.com:8080/accnt/execs?offset=3&limit5"sv};
+    SWIRLY_CHECK(url.schema() == "http"sv);
+    SWIRLY_CHECK(url.host() == "www.swirlycloud.com"sv);
+    SWIRLY_CHECK(url.port() == "8080"sv);
+    SWIRLY_CHECK(url.path() == "/accnt/execs"sv);
+    SWIRLY_CHECK(url.query() == "offset=3&limit5"sv);
     SWIRLY_CHECK(url.fragment().empty());
     SWIRLY_CHECK(url.userInfo().empty());
 }

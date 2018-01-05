@@ -24,7 +24,7 @@ using namespace swirly;
 
 SWIRLY_TEST_CASE(MarketToString)
 {
-    Market market{1_id64, "EURUSD"_sv, ymdToJd(2014, 2, 14), 0x01};
+    Market market{1_id64, "EURUSD"sv, ymdToJd(2014, 2, 14), 0x01};
 
     SWIRLY_CHECK(toString(market) == //
                  "{\"id\":1"
@@ -45,7 +45,7 @@ SWIRLY_TEST_CASE(MarketToString)
 
 SWIRLY_TEST_CASE(MarketToStringNull)
 {
-    Market market{1_id64, "EURUSD"_sv, 0_jd, 0x01};
+    Market market{1_id64, "EURUSD"sv, 0_jd, 0x01};
 
     SWIRLY_CHECK(toString(market) == //
                  "{\"id\":1"

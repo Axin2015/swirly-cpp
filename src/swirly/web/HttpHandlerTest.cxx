@@ -111,7 +111,7 @@ SWIRLY_TEST_CASE(HttpInitialRequestLine)
 {
     constexpr auto Message = //
         "GET /path/to/file/index.html HTTP/1.0\r\n" //
-        "\r\n"_sv;
+        "\r\n"sv;
 
     HttpHandler h{HttpType::Request};
     SWIRLY_CHECK(h.parse(Message) == Message.size());
@@ -130,7 +130,7 @@ SWIRLY_TEST_CASE(HttpInitialResponseLine)
 {
     constexpr auto Message = //
         "HTTP/1.0 404 Not Found\r\n" //
-        "\r\n"_sv;
+        "\r\n"sv;
 
     HttpHandler h{HttpType::Response};
     SWIRLY_CHECK(h.parse(Message) == Message.size());
@@ -151,7 +151,7 @@ SWIRLY_TEST_CASE(HttpBasicRequest)
         "GET /path/file.html HTTP/1.0\r\n" //
         "From: someuser@swirlycloud.com\r\n" //
         "User-Agent: HTTPTool/1.0\r\n" //
-        "\r\n"_sv;
+        "\r\n"sv;
 
     HttpHandler h{HttpType::Request};
     SWIRLY_CHECK(h.parse(Message) == Message.size());
@@ -177,7 +177,7 @@ SWIRLY_TEST_CASE(HttpBasicResponse)
         "Content-Type: text/plain\r\n" //
         "Content-Length: 13\r\n" //
         "\r\n" //
-        "Hello, World!"_sv;
+        "Hello, World!"sv;
 
     HttpHandler h{HttpType::Response};
     SWIRLY_CHECK(h.parse(Message) == Message.size());
@@ -205,7 +205,7 @@ SWIRLY_TEST_CASE(HttpPostRequest)
         "Content-Type: application/x-www-form-urlencoded\r\n" //
         "Content-Length: 32\r\n" //
         "\r\n" //
-        "home=Cosby&favorite+flavor=flies"_sv;
+        "home=Cosby&favorite+flavor=flies"sv;
 
     HttpHandler h{HttpType::Request};
     SWIRLY_CHECK(h.parse(Message) == Message.size());
@@ -231,7 +231,7 @@ SWIRLY_TEST_CASE(HttpKeepAliveRequest)
     constexpr auto Message = //
         "GET /path/file.html HTTP/1.1\r\n" //
         "Host: www.host1.com:80\r\n" //
-        "\r\n"_sv;
+        "\r\n"sv;
 
     HttpHandler h{HttpType::Request};
     SWIRLY_CHECK(h.parse(Message) == Message.size());
@@ -263,7 +263,7 @@ SWIRLY_TEST_CASE(HttpChunkedResponse)
         "0\r\n" //
         "some-footer: some-value\r\n" //
         "another-footer: another-value\r\n" //
-        "\r\n"_sv;
+        "\r\n"sv;
 
     HttpHandler h{HttpType::Response};
     SWIRLY_CHECK(h.parse(Message) == Message.size());
@@ -296,7 +296,7 @@ SWIRLY_TEST_CASE(HttpMultiResponse)
         "Content-Type: text/plain\r\n" //
         "Content-Length: 6\r\n" //
         "\r\n" //
-        "second"_sv;
+        "second"sv;
 
     HttpHandler h{HttpType::Request};
     SWIRLY_CHECK(h.parse(Message) == Message.size());
