@@ -58,6 +58,13 @@ using Millis = std::chrono::milliseconds;
 using Micros = std::chrono::microseconds;
 using Nanos = std::chrono::nanoseconds;
 
+SWIRLY_API Time getTime() noexcept;
+
+inline UnixClock::time_point UnixClock::now() noexcept
+{
+    return getTime();
+}
+
 constexpr bool isZero(Time time) noexcept
 {
     return time == Time{};

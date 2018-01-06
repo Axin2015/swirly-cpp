@@ -29,12 +29,14 @@ constexpr size_t operator""_strlen(const char* data, size_t len) noexcept
 }
 } // namespace
 
-UnixClock::time_point UnixClock::now() noexcept
+SWIRLY_WEAK Time getTime() noexcept;
+
+Time getTime() noexcept
 {
     using chrono::nanoseconds;
     timespec ts;
     clock_gettime(CLOCK_REALTIME, &ts);
-    return time_point{nanoseconds{ts.tv_sec * 1'000'000'000L + ts.tv_nsec}};
+    return Time{nanoseconds{ts.tv_sec * 1'000'000'000L + ts.tv_nsec}};
 }
 
 void printTime(Time time, ostream& os)
