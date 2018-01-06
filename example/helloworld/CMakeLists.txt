@@ -24,7 +24,7 @@ endif()
 
 set(COMMON_WARN "-Wall -Werror -Wextra -Wstrict-aliasing=2 -Wno-unused-parameter")
 set(COMMON_FLAGS "-fstrict-aliasing -fvisibility=hidden")
-set(CMAKE_CXX_FLAGS "-std=c++14 ${COMMON_FLAGS} ${COMMON_WARN} -fno-rtti")
+set(CMAKE_CXX_FLAGS "-std=c++17 ${COMMON_FLAGS} ${COMMON_WARN} -fno-rtti")
 
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "$ENV{SWIRLY_HOME}/etc")
 

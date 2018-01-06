@@ -26,13 +26,13 @@ SWIRLY_TEST_CASE(TokeniserEmpty)
 
     SWIRLY_CHECK(toks.empty());
 
-    toks = Tokeniser{""_sv, ","_sv};
+    toks = Tokeniser{""sv, ","sv};
     SWIRLY_CHECK(toks.empty());
 }
 
 SWIRLY_TEST_CASE(TokeniserMultiEmpty)
 {
-    Tokeniser toks{","_sv, ","_sv};
+    Tokeniser toks{","sv, ","sv};
 
     SWIRLY_CHECK(toks.top().empty());
 
@@ -42,7 +42,7 @@ SWIRLY_TEST_CASE(TokeniserMultiEmpty)
 
 SWIRLY_TEST_CASE(TokeniserSingleValue)
 {
-    Tokeniser toks{"foo"_sv, ","_sv};
+    Tokeniser toks{"foo"sv, ","sv};
 
     SWIRLY_CHECK(toks.top() == "foo");
 
@@ -52,7 +52,7 @@ SWIRLY_TEST_CASE(TokeniserSingleValue)
 
 SWIRLY_TEST_CASE(TokeniserMultiValue)
 {
-    Tokeniser toks{"foo,bar,baz"_sv, ","_sv};
+    Tokeniser toks{"foo,bar,baz"sv, ","sv};
 
     SWIRLY_CHECK(toks.top() == "foo");
 
@@ -68,7 +68,7 @@ SWIRLY_TEST_CASE(TokeniserMultiValue)
 
 SWIRLY_TEST_CASE(TokeniserMultiDelim)
 {
-    Tokeniser toks{"foo,bar;baz"_sv, ",;"_sv};
+    Tokeniser toks{"foo,bar;baz"sv, ",;"sv};
 
     SWIRLY_CHECK(toks.top() == "foo");
 
@@ -84,7 +84,7 @@ SWIRLY_TEST_CASE(TokeniserMultiDelim)
 
 SWIRLY_TEST_CASE(TokeniserLeading)
 {
-    Tokeniser toks{",foo"_sv, ","_sv};
+    Tokeniser toks{",foo"sv, ","sv};
 
     SWIRLY_CHECK(toks.top().empty());
 
@@ -97,7 +97,7 @@ SWIRLY_TEST_CASE(TokeniserLeading)
 
 SWIRLY_TEST_CASE(TokeniserTrailing)
 {
-    Tokeniser toks{"foo,"_sv, ","_sv};
+    Tokeniser toks{"foo,"sv, ","sv};
 
     SWIRLY_CHECK(toks.top() == "foo");
 

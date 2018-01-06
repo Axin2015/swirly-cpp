@@ -19,6 +19,7 @@
 #include "Log.hpp"
 
 #include <algorithm>
+#include <string>
 
 namespace swirly {
 

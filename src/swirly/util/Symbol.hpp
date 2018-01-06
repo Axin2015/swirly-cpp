@@ -22,15 +22,11 @@
 
 #include <swirly/Config.h>
 
-#include <experimental/string_view>
-
 #include <cstdint>
 #include <cstring>
 #include <memory>
-
-namespace std {
-using experimental::string_view;
-}
+#include <ostream>
+#include <string_view>
 
 namespace swirly {
 
@@ -241,7 +237,7 @@ inline bool operator>=(std::string_view lhs, Symbol rhs) noexcept
 
 inline std::ostream& operator<<(std::ostream& os, Symbol rhs)
 {
-    return os << +rhs;
+    return std::operator<<(os, std::string_view{rhs.data(), rhs.size()});
 }
 
 template <std::size_t SizeN>

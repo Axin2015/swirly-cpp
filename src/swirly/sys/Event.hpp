@@ -24,14 +24,6 @@
 
 #include <utility>
 
-#if __cplusplus <= 201402L
-namespace std {
-struct in_place_t {
-};
-constexpr in_place_t in_place{};
-} // namespace std
-#endif
-
 namespace swirly {
 
 class SWIRLY_API Event {

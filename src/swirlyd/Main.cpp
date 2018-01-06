@@ -94,18 +94,18 @@ class SigHandler {
             if (!ec) {
                 switch (sig) {
                 case SIGHUP:
-                    SWIRLY_INFO("received SIGHUP"_sv);
+                    SWIRLY_INFO("received SIGHUP"sv);
                     if (!logFile_.empty()) {
                         SWIRLY_NOTICE(logMsg() << "reopening log file: " << logFile_);
                         openLogFile(logFile_.c_str());
                     }
                     break;
                 case SIGINT:
-                    SWIRLY_INFO("received SIGINT"_sv);
+                    SWIRLY_INFO("received SIGINT"sv);
                     ioServ_.stop();
                     break;
                 case SIGTERM:
-                    SWIRLY_INFO("received SIGTERM"_sv);
+                    SWIRLY_INFO("received SIGTERM"sv);
                     ioServ_.stop();
                     break;
                 }
@@ -192,12 +192,10 @@ void* alloc(size_t size)
     return memCtx.alloc(size);
 }
 
-#if __GNUC__ >= 7
 void* alloc(size_t size, align_val_t al)
 {
     return memCtx.alloc(size, al);
 }
-#endif
 
 void dealloc(void* ptr, size_t size) noexcept
 {
@@ -328,6 +326,6 @@ int main(int argc, char* argv[])
     } catch (const exception& e) {
         SWIRLY_ERROR(logMsg() << "exception: " << e.what());
     }
-    SWIRLY_NOTICE("stopped http server"_sv);
+    SWIRLY_NOTICE("stopped http server"sv);
     return ret;
 }

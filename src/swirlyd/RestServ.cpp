@@ -38,7 +38,7 @@ class ScopedIds {
     ScopedIds(string_view sv, vector<Id64>& ids) noexcept
       : ids_{ids}
     {
-        Tokeniser toks{sv, ","_sv};
+        Tokeniser toks{sv, ","sv};
         while (!toks.empty()) {
             ids.push_back(static_cast<Id64>(stou64(toks.top())));
             toks.pop();
@@ -54,7 +54,7 @@ string_view getAccnt(const HttpRequest& req)
 {
     const string_view accnt{req.accnt()};
     if (accnt.empty()) {
-        throw UnauthorizedException{"user account not specified"_sv};
+        throw UnauthorizedException{"user account not specified"sv};
     }
     return accnt;
 }
@@ -75,7 +75,7 @@ string_view getAdmin(const HttpRequest& req)
     const auto accnt = getAccnt(req);
     const auto perm = getPerm(req);
     if (!(perm & 0x1)) {
-        throw ForbiddenException{"user account does not have admin permission "_sv};
+        throw ForbiddenException{"user account does not have admin permission "sv};
     }
     return accnt;
 }
@@ -85,7 +85,7 @@ string_view getTrader(const HttpRequest& req)
     const auto accnt = getAccnt(req);
     const auto perm = getPerm(req);
     if (!(perm & 0x2)) {
-        throw ForbiddenException{"user account does not have trade permission "_sv};
+        throw ForbiddenException{"user account does not have trade permission "sv};
     }
     return accnt;
 }
@@ -113,7 +113,7 @@ void RestServ::handleRequest(const HttpRequest& req, HttpResponse& resp) noexcep
     try {
         const auto& body = req.body();
         if (req.partial()) {
-            throw BadRequestException{"request body is incomplete"_sv};
+            throw BadRequestException{"request body is incomplete"sv};
         }
         restRequest(req, now, resp);
         if (!matchPath_) {
@@ -149,14 +149,14 @@ bool RestServ::reset(const HttpRequest& req) noexcept
     if (path.front() == '/') {
         path.remove_prefix(1);
     }
-    path_.reset(path, "/"_sv);
+    path_.reset(path, "/"sv);
 
     if (req.method() != HttpMethod::Get) {
         // No cache.
         return false;
     }
     // Cache if GET for refdata.
-    return !path.empty() && path_.top() == "refdata"_sv;
+    return !path.empty() && path_.top() == "refdata"sv;
 }
 
 void RestServ::restRequest(const HttpRequest& req, Time now, HttpResponse& resp)
@@ -168,10 +168,10 @@ void RestServ::restRequest(const HttpRequest& req, Time now, HttpResponse& resp)
     auto tok = path_.top();
     path_.pop();
 
-    if (tok == "refdata"_sv) {
+    if (tok == "refdata"sv) {
         // /refdata
         refDataRequest(req, now, resp);
-    } else if (tok == "accnt"_sv) {
+    } else if (tok == "accnt"sv) {
         // /accnt
         accntRequest(req, now, resp);
     } else {
@@ -179,7 +179,7 @@ void RestServ::restRequest(const HttpRequest& req, Time now, HttpResponse& resp)
         if (!tok.empty() && tok.back() == 's') {
             tok.remove_suffix(1);
         }
-        if (tok == "market"_sv) {
+        if (tok == "market"sv) {
             // /markets
             marketRequest(req, now, resp);
         }
@@ -373,7 +373,7 @@ void RestServ::marketRequest(const HttpRequest& req, Time now, HttpResponse& res
                 constexpr auto ReqFields = RestBody::Instr | RestBody::SettlDate;
                 constexpr auto OptFields = RestBody::State;
                 if (!req.body().valid(ReqFields, OptFields)) {
-                    throw InvalidException{"request fields are invalid"_sv};
+                    throw InvalidException{"request fields are invalid"sv};
                 }
                 rest_.postMarket(req.body().instr(), req.body().settlDate(), req.body().state(),
                                  now, resp);
@@ -407,7 +407,7 @@ void RestServ::marketRequest(const HttpRequest& req, Time now, HttpResponse& res
                 constexpr auto ReqFields = RestBody::SettlDate;
                 constexpr auto OptFields = RestBody::State;
                 if (!req.body().valid(ReqFields, OptFields)) {
-                    throw InvalidException{"request fields are invalid"_sv};
+                    throw InvalidException{"request fields are invalid"sv};
                 }
                 rest_.postMarket(instr, req.body().settlDate(), req.body().state(), now, resp);
             }
@@ -440,7 +440,7 @@ void RestServ::marketRequest(const HttpRequest& req, Time now, HttpResponse& res
                 constexpr auto ReqFields = 0;
                 constexpr auto OptFields = RestBody::State;
                 if (!req.body().valid(ReqFields, OptFields)) {
-                    throw InvalidException{"request fields are invalid"_sv};
+                    throw InvalidException{"request fields are invalid"sv};
                 }
                 rest_.postMarket(instr, settlDate, req.body().state(), now, resp);
             }
@@ -452,7 +452,7 @@ void RestServ::marketRequest(const HttpRequest& req, Time now, HttpResponse& res
             {
                 constexpr auto ReqFields = RestBody::State;
                 if (!req.body().valid(ReqFields)) {
-                    throw InvalidException{"request fields are invalid"_sv};
+                    throw InvalidException{"request fields are invalid"sv};
                 }
                 rest_.putMarket(instr, settlDate, req.body().state(), now, resp);
             }
@@ -487,7 +487,7 @@ void RestServ::orderRequest(const HttpRequest& req, Time now, HttpResponse& resp
                     | RestBody::Lots | RestBody::Ticks;
                 constexpr auto OptFields = RestBody::Ref | RestBody::MinLots;
                 if (!req.body().valid(ReqFields, OptFields)) {
-                    throw InvalidException{"request fields are invalid"_sv};
+                    throw InvalidException{"request fields are invalid"sv};
                 }
                 rest_.postOrder(accnt, req.body().instr(), req.body().settlDate(), req.body().ref(),
                                 req.body().side(), req.body().lots(), req.body().ticks(),
@@ -524,7 +524,7 @@ void RestServ::orderRequest(const HttpRequest& req, Time now, HttpResponse& resp
                     = RestBody::SettlDate | RestBody::Side | RestBody::Lots | RestBody::Ticks;
                 constexpr auto OptFields = RestBody::Ref | RestBody::MinLots;
                 if (!req.body().valid(ReqFields, OptFields)) {
-                    throw InvalidException{"request fields are invalid"_sv};
+                    throw InvalidException{"request fields are invalid"sv};
                 }
                 rest_.postOrder(accnt, instr, req.body().settlDate(), req.body().ref(),
                                 req.body().side(), req.body().lots(), req.body().ticks(),
@@ -560,7 +560,7 @@ void RestServ::orderRequest(const HttpRequest& req, Time now, HttpResponse& resp
                 constexpr auto ReqFields = RestBody::Side | RestBody::Lots | RestBody::Ticks;
                 constexpr auto OptFields = RestBody::Ref | RestBody::MinLots;
                 if (!req.body().valid(ReqFields, OptFields)) {
-                    throw InvalidException{"request fields are invalid"_sv};
+                    throw InvalidException{"request fields are invalid"sv};
                 }
                 rest_.postOrder(accnt, instr, settlDate, req.body().ref(), req.body().side(),
                                 req.body().lots(), req.body().ticks(), req.body().minLots(), now,
@@ -595,7 +595,7 @@ void RestServ::orderRequest(const HttpRequest& req, Time now, HttpResponse& resp
                 const auto accnt = getTrader(req);
                 constexpr auto ReqFields = RestBody::Lots;
                 if (req.body().fields() != ReqFields) {
-                    throw InvalidException{"request fields are invalid"_sv};
+                    throw InvalidException{"request fields are invalid"sv};
                 }
                 rest_.putOrder(accnt, instr, settlDate, ids_, req.body().lots(), now, resp);
             }
@@ -646,7 +646,7 @@ void RestServ::tradeRequest(const HttpRequest& req, Time now, HttpResponse& resp
                 constexpr auto OptFields
                     = RestBody::Ref | RestBody::Ticks | RestBody::LiqInd | RestBody::Cpty;
                 if (!req.body().valid(ReqFields, OptFields)) {
-                    throw InvalidException{"request fields are invalid"_sv};
+                    throw InvalidException{"request fields are invalid"sv};
                 }
                 rest_.postTrade(req.body().accnt(), req.body().instr(), req.body().settlDate(),
                                 req.body().ref(), req.body().side(), req.body().lots(),
@@ -684,7 +684,7 @@ void RestServ::tradeRequest(const HttpRequest& req, Time now, HttpResponse& resp
                 constexpr auto OptFields
                     = RestBody::Ref | RestBody::Ticks | RestBody::LiqInd | RestBody::Cpty;
                 if (!req.body().valid(ReqFields, OptFields)) {
-                    throw InvalidException{"request fields are invalid"_sv};
+                    throw InvalidException{"request fields are invalid"sv};
                 }
                 rest_.postTrade(req.body().accnt(), instr, req.body().settlDate(), req.body().ref(),
                                 req.body().side(), req.body().lots(), req.body().ticks(),
@@ -720,7 +720,7 @@ void RestServ::tradeRequest(const HttpRequest& req, Time now, HttpResponse& resp
                 constexpr auto OptFields
                     = RestBody::Ref | RestBody::Ticks | RestBody::LiqInd | RestBody::Cpty;
                 if (!req.body().valid(ReqFields, OptFields)) {
-                    throw InvalidException{"request fields are invalid"_sv};
+                    throw InvalidException{"request fields are invalid"sv};
                 }
                 rest_.postTrade(req.body().accnt(), instr, settlDate, req.body().ref(),
                                 req.body().side(), req.body().lots(), req.body().ticks(),

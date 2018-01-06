@@ -60,7 +60,7 @@ EntitySet::~EntitySet() noexcept = default;
 EntitySet EntitySet::parse(string_view sv)
 {
     int bs{0};
-    Tokeniser toks{sv, ","_sv};
+    Tokeniser toks{sv, ","sv};
     while (!toks.empty()) {
         bs |= bit(toks.top());
         toks.pop();

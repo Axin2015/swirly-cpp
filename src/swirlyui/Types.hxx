@@ -29,13 +29,7 @@
 #include <QDebug>
 #include <QJsonValue>
 
-#include <experimental/optional>
-
-namespace std {
-template <typename T>
-using optional = experimental::optional<T>;
-using experimental::nullopt;
-} // namespace std
+#include <optional>
 
 // This is acceptable in private header that is only visible to and under the instrol of the Swirly
 // build.

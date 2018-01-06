@@ -1,4 +1,4 @@
-Swirly is an open-source, restful matching-engine written in C++14. The target platform is
+Swirly is an open-source, restful matching-engine written in C++17. The target platform is
 GNU/Linux. The source-code is
 [freely available on GitHub](http://github.com/swirlycloud/swirly). Swirly is designed to run either
 in the Cloud or on dedicated infrastructure.

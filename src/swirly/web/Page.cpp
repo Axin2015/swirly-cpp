@@ -27,13 +27,13 @@ namespace swirly {
 Page parseQuery(string_view query) noexcept
 {
     Page page;
-    Tokeniser toks{query, "&;"_sv};
+    Tokeniser toks{query, "&;"sv};
     while (!toks.empty()) {
         string_view key, val;
         tie(key, val) = splitPair(toks.top(), '=');
-        if (key == "offset"_sv) {
+        if (key == "offset"sv) {
             page.offset = stou64(val);
-        } else if (key == "limit"_sv) {
+        } else if (key == "limit"sv) {
             page.limit = stou64(val);
         }
         toks.pop();

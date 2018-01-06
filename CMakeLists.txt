@@ -14,7 +14,7 @@
 # 02110-1301, USA.
 
 # Version 3.1 required for CMAKE_CXX_STANDARD.
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.8)
 project(swirly)
 
 # Configuration options:
@@ -50,22 +50,22 @@ endif()
 
 string(TOUPPER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE)
 
+set(CMAKE_C_STANDARD 11)
+# Emits -std=gnu++1z on OSX which is not working as expected.
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 set(COMMON_WARN "-Wall -Werror -Wextra -Wstrict-aliasing=2 -Wno-unused-parameter -Wno-unused-variable")
 set(COMMON_C_FLAGS "-fstrict-aliasing -fvisibility=hidden")
-set(COMMON_CXX_FLAGS "${COMMON_C_FLAGS} -fno-rtti")
+set(COMMON_CXX_FLAGS "${COMMON_C_FLAGS} -faligned-new -fno-rtti")
 
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_STANDARD 14)
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  if(NOT "${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS 7)
-    set(COMMON_WARN "${COMMON_WARN} -Wno-implicit-fallthrough")
-    set(COMMON_CXX_FLAGS "${COMMON_CXX_FLAGS} -faligned-new")
-  endif()
+  set(COMMON_WARN "${COMMON_WARN} -Wno-implicit-fallthrough")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMMON_C_FLAGS} ${COMMON_WARN}")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_CXX_FLAGS} ${COMMON_WARN} -fno-enforce-eh-specs -fnothrow-opt")
 elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMMON_C_FLAGS} ${COMMON_WARN}")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_CXX_FLAGS} ${COMMON_WARN} -Wno-c++1z-extensions")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_CXX_FLAGS} ${COMMON_WARN}")
 endif()
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
 
@@ -99,6 +99,7 @@ find_package(SQLite3 3.7.15 REQUIRED)
 find_package(Doxygen)                # Optional.
 find_package(Perl)                   # Optional.
 find_package(PythonInterp 2.7 EXACT) # Optional.
+
 # Find Qt components.
 find_package(Qt5Widgets QUIET)
 find_package(Qt5Network QUIET)

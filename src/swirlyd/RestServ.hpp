@@ -36,7 +36,7 @@ class RestServ {
   public:
     explicit RestServ(Rest& rest) noexcept
       : rest_(rest)
-      , profile_{"profile"_sv}
+      , profile_{"profile"sv}
     {
     }
     ~RestServ() noexcept;

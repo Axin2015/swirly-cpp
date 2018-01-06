@@ -21,21 +21,13 @@
 
 #include <swirly/Config.h>
 
-#include <experimental/string_view>
-
 #include <cstring>
 #include <sstream>
-
-namespace std {
-using experimental::string_view;
-}
+#include <string_view>
 
 namespace swirly {
 
-constexpr std::string_view operator""_sv(const char* str, std::size_t len) noexcept
-{
-    return {str, len};
-}
+using namespace std::literals::string_view_literals;
 
 template <std::size_t MaxN>
 struct StringData {
@@ -263,7 +255,7 @@ bool operator>=(std::string_view lhs, const String<MaxN>& rhs) noexcept
 template <std::size_t MaxN>
 std::ostream& operator<<(std::ostream& os, const String<MaxN>& rhs)
 {
-    return os << +rhs;
+    return std::operator<<(os, std::string_view{rhs.data(), rhs.size()});
 }
 
 template <typename ValueT, typename std::enable_if_t<std::is_arithmetic<ValueT>::value>* = nullptr>

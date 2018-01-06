@@ -23,7 +23,7 @@ using namespace swirly;
 
 SWIRLY_TEST_CASE(AssetToString)
 {
-    Asset asset{1_id32, "GBP"_sv, "United Kingdom, Pounds"_sv, AssetType::Ccy};
+    Asset asset{1_id32, "GBP"sv, "United Kingdom, Pounds"sv, AssetType::Ccy};
 
     SWIRLY_CHECK(toString(asset) == //
                  "{\"symbol\":\"GBP\""

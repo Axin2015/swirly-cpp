@@ -33,38 +33,38 @@ namespace sqlite {
 namespace {
 
 constexpr auto SelectAssetSql = //
-    "SELECT id, symbol, display, type_id FROM asset_t"_sv;
+    "SELECT id, symbol, display, type_id FROM asset_t"sv;
 
 constexpr auto SelectInstrSql = //
     "SELECT id, symbol, display, base_asset, term_ccy, tick_numer, tick_denom," //
-    " lot_numer, lot_denom, pip_dp, min_lots, max_lots FROM instr_v"_sv;
+    " lot_numer, lot_denom, pip_dp, min_lots, max_lots FROM instr_v"sv;
 
 constexpr auto SelectMarketSql = //
     "SELECT id, instr, settl_day, state, last_lots, last_ticks, last_time, max_id" //
-    " FROM market_v"_sv;
+    " FROM market_v"sv;
 
 constexpr auto SelectAccntSql = //
-    "SELECT symbol FROM accnt_t WHERE modified > ?"_sv;
+    "SELECT symbol FROM accnt_t WHERE modified > ?"sv;
 
 constexpr auto SelectOrderSql = //
     "SELECT accnt, market_id, instr, settl_day, id, ref, state_id, side_id, lots, ticks," //
     " resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots, created, modified" //
-    " FROM order_t WHERE resd_lots > 0;"_sv;
+    " FROM order_t WHERE resd_lots > 0;"sv;
 
 constexpr auto SelectExecSql = //
     "SELECT market_id, instr, settl_day, id, order_id, ref, state_id, side_id, lots, ticks," //
     " resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots, match_id, liqInd_id," //
     " cpty, created" //
-    " FROM exec_t WHERE accnt = ? ORDER BY seq_id DESC LIMIT ?;"_sv;
+    " FROM exec_t WHERE accnt = ? ORDER BY seq_id DESC LIMIT ?;"sv;
 
 constexpr auto SelectTradeSql = //
     "SELECT accnt, market_id, instr, settl_day, id, order_id, ref, side_id, lots, ticks," //
     " resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots, match_id, liqInd_id," //
     " cpty, created" //
-    " FROM exec_t WHERE state_id = 4 AND archive IS NULL;"_sv;
+    " FROM exec_t WHERE state_id = 4 AND archive IS NULL;"sv;
 
 constexpr auto SelectPosnSql = //
-    "SELECT accnt, market_id, instr, settl_day, side_id, lots, cost FROM posn_v;"_sv;
+    "SELECT accnt, market_id, instr, settl_day, side_id, lots, cost FROM posn_v;"sv;
 
 } // namespace
 

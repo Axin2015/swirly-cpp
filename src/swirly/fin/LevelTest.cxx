@@ -25,7 +25,7 @@ using namespace swirly;
 
 SWIRLY_TEST_CASE(LevelSet)
 {
-    const Order order{"MARAYL"_sv, 1_id64,    "EURUSD"_sv, 0_jd,      0_id64, ""_sv,
+    const Order order{"MARAYL"sv, 1_id64,    "EURUSD"sv, 0_jd,      0_id64, ""sv,
                       State::New,  Side::Buy, 10_lts,      12345_tks, 0_lts,  0_lts,
                       0_cst,       0_lts,     0_tks,       0_lts,     {},     {}};
 

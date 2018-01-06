@@ -23,16 +23,12 @@
 
 #include <swirly/sys/Time.hpp>
 
-#include <experimental/string_view>
+#include <string_view>
 
 #include <memory>
 #include <type_traits>
 
 #include <sqlite3.h>
-
-namespace std {
-using experimental::string_view;
-}
 
 namespace swirly {
 
