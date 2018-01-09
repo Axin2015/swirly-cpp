@@ -13,11 +13,22 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-add_subdirectory(disrupt)
-add_subdirectory(swirly)
-add_subdirectory(swirlyd)
-if(Qt5Widgets_FOUND AND Qt5Network_FOUND)
-  add_subdirectory(swirlyui)
-endif()
-add_subdirectory(tool)
-add_subdirectory(swift)
+set(prog_SOURCES
+  ConsumerInfo.cpp
+  Cursored.cpp
+  Disruptor.cpp
+  EventHandler.cpp
+  EventProcessor.cpp
+  Executor.cpp
+  Main.cpp
+  RingBuffer.cpp
+  Runnable.cpp
+  SequenceBarrier.cpp
+  Sequence.cpp
+  Sequenced.cpp
+  Sequencer.cpp
+  Types.cpp)
+
+add_executable(swirly_disrupt ${prog_SOURCES})
+target_link_libraries(swirly_disrupt ${swirly_util_LIBRARY})
+install(TARGETS swirly_disrupt DESTINATION bin COMPONENT program)
