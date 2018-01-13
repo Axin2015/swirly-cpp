@@ -22,19 +22,19 @@
 
 namespace swirly {
 
-template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+template <typename EnumT, typename = std::enable_if_t<std::is_enum_v<EnumT>>>
 constexpr EnumT box(typename std::underlying_type_t<EnumT> val) noexcept
 {
     return static_cast<EnumT>(val);
 }
 
-template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+template <typename EnumT, typename = std::enable_if_t<std::is_enum_v<EnumT>>>
 constexpr typename std::underlying_type_t<EnumT> unbox(EnumT val) noexcept
 {
     return static_cast<typename std::underlying_type_t<EnumT>>(val);
 }
 
-template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+template <typename EnumT, typename = std::enable_if_t<std::is_enum_v<EnumT>>>
 std::ostream& operator<<(std::ostream& os, EnumT val)
 {
     return os << unbox(val);

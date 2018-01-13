@@ -49,7 +49,7 @@ struct DbTraits;
  */
 template <typename ValueT>
 struct DbTraits<ValueT,
-                std::enable_if_t<std::is_integral<ValueT>::value && (sizeof(ValueT) <= 4)>> {
+                std::enable_if_t<std::is_integral_v<ValueT> && (sizeof(ValueT) <= 4)>> {
     static constexpr bool isNull(ValueT val) noexcept { return val == 0; }
     static void bind(sqlite3_stmt& stmt, int col, ValueT val) { bind32(stmt, col, val); }
     static ValueT column(sqlite3_stmt& stmt, int col) noexcept
@@ -62,7 +62,7 @@ struct DbTraits<ValueT,
  * Integer 64bit.
  */
 template <typename ValueT>
-struct DbTraits<ValueT, std::enable_if_t<std::is_integral<ValueT>::value && (sizeof(ValueT) > 4)>> {
+struct DbTraits<ValueT, std::enable_if_t<std::is_integral_v<ValueT> && (sizeof(ValueT) > 4)>> {
     static constexpr bool isNull(ValueT val) noexcept { return val == 0; }
     static void bind(sqlite3_stmt& stmt, int col, ValueT val) { bind64(stmt, col, val); }
     static ValueT column(sqlite3_stmt& stmt, int col) noexcept
@@ -94,7 +94,7 @@ struct DbTraits<ValueT, std::enable_if_t<isIntWrapper<ValueT>>> {
  * Enum.
  */
 template <typename ValueT>
-struct DbTraits<ValueT, std::enable_if_t<std::is_enum<ValueT>::value>> {
+struct DbTraits<ValueT, std::enable_if_t<std::is_enum_v<ValueT>>> {
 
     using UnderlyingTraits = DbTraits<std::underlying_type_t<ValueT>>;
 

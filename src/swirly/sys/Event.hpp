@@ -33,7 +33,7 @@ class SWIRLY_API Event {
         int type, size;
         char data[];
     };
-    static_assert(std::is_pod<Impl>::value);
+    static_assert(std::is_pod_v<Impl>);
     static_assert(sizeof(Impl) == 20);
     friend inline void intrusive_ptr_add_ref(const Impl* impl) noexcept
     {
@@ -80,13 +80,13 @@ class SWIRLY_API Event {
     template <typename DataT>
     static Event make(Address to, Address reply, int type)
     {
-        static_assert(std::is_trivially_copyable<DataT>::value);
+        static_assert(std::is_trivially_copyable_v<DataT>);
         return make(to, reply, type, sizeof(DataT));
     }
     template <typename DataT>
     static Event make(Address to, int type)
     {
-        static_assert(std::is_trivially_copyable<DataT>::value);
+        static_assert(std::is_trivially_copyable_v<DataT>);
         return make(to, type, sizeof(DataT));
     }
     template <typename DataT, typename... ArgsT>
@@ -111,13 +111,13 @@ class SWIRLY_API Event {
     template <typename DataT>
     inline const DataT& data() const noexcept
     {
-        static_assert(std::is_trivially_copyable<DataT>::value);
+        static_assert(std::is_trivially_copyable_v<DataT>);
         return *reinterpret_cast<const DataT*>(impl_->data);
     }
     template <typename DataT>
     inline DataT& data() noexcept
     {
-        static_assert(std::is_trivially_copyable<DataT>::value);
+        static_assert(std::is_trivially_copyable_v<DataT>);
         return *reinterpret_cast<DataT*>(impl_->data);
     }
 
@@ -125,7 +125,7 @@ class SWIRLY_API Event {
     template <typename DataT, typename... ArgsT>
     Event construct(ArgsT&&... args)
     {
-        static_assert(std::is_trivially_copyable<DataT>::value);
+        static_assert(std::is_trivially_copyable_v<DataT>);
         ::new (impl_->data) DataT{std::forward<ArgsT>(args)...};
         return *this;
     }

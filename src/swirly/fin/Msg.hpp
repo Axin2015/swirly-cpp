@@ -34,13 +34,13 @@ struct SWIRLY_PACKED CreateMarketBody {
     JDay settlDay;
     MarketState state;
 };
-static_assert(std::is_pod<CreateMarketBody>::value);
+static_assert(std::is_pod_v<CreateMarketBody>);
 
 struct SWIRLY_PACKED UpdateMarketBody {
     Id64 id;
     MarketState state;
 };
-static_assert(std::is_pod<UpdateMarketBody>::value);
+static_assert(std::is_pod_v<UpdateMarketBody>);
 
 struct SWIRLY_PACKED CreateExecBody {
     char accnt[MaxSymbol];
@@ -67,7 +67,7 @@ struct SWIRLY_PACKED CreateExecBody {
     int64_t created;
     More more;
 };
-static_assert(std::is_pod<CreateExecBody>::value);
+static_assert(std::is_pod_v<CreateExecBody>);
 
 constexpr std::size_t MaxIds{(sizeof(CreateExecBody) - MaxSymbol - sizeof(int64_t) - sizeof(More))
                              / sizeof(Id64)};
@@ -78,7 +78,7 @@ struct SWIRLY_PACKED ArchiveTradeBody {
     int64_t modified;
     More more;
 };
-static_assert(std::is_pod<ArchiveTradeBody>::value);
+static_assert(std::is_pod_v<ArchiveTradeBody>);
 
 struct SWIRLY_PACKED Msg {
     MsgType type;
@@ -89,7 +89,7 @@ struct SWIRLY_PACKED Msg {
         ArchiveTradeBody archiveTrade;
     };
 };
-static_assert(std::is_pod<Msg>::value);
+static_assert(std::is_pod_v<Msg>);
 static_assert(sizeof(Msg) == 240, "must be specific size");
 
 using MsgPipe = Pipe<Msg>;

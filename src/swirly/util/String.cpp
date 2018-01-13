@@ -26,7 +26,7 @@ template <typename ValueT>
 ValueT stou(string_view sv) noexcept
 {
     // ValueT type must be unsigned.
-    enable_if_t<is_unsigned<ValueT>::value, ValueT> u{0};
+    enable_if_t<is_unsigned_v<ValueT>, ValueT> u{0};
     auto it = sv.begin(), end = sv.end();
 
     // Skip leading whitespace.
