@@ -18,12 +18,72 @@
 #define SWIRLY_SYS_TYPES_HPP
 
 #include <cstdint>
+#include <type_traits>
+#include <utility>
 
 namespace swirly {
 
+/**
+ * The first topic is reserved for signal handling.
+ */
+enum class Topic : int { None = 0, Signal = 1 };
+
+// Deprecated alias.
+using Address = Topic;
+
 using FileEvents = std::uint32_t;
 
-enum class Address : int { None = 0, Signal = 1 };
+struct MsgEvent {
+    Topic topic;
+    int type;
+    /**
+     * Reserved for future use.
+     */
+    int reserved[2];
+    char data[1000];
+};
+static_assert(std::is_pod_v<MsgEvent>);
+static_assert(sizeof(MsgEvent) + sizeof(std::int64_t) == 1024);
+
+template <typename DataT>
+void emplaceEvent(MsgEvent& ev, Topic topic, int type) noexcept
+{
+    static_assert(alignof(DataT) <= 8);
+    static_assert(std::is_nothrow_default_constructible_v<DataT>);
+    static_assert(std::is_trivially_copyable_v<DataT>);
+    ev.topic = topic;
+    ev.type = type;
+    ::new (ev.data) DataT{};
+}
+
+template <typename DataT, typename... ArgsT>
+void emplaceEvent(MsgEvent& ev, Topic topic, int type, std::in_place_t, ArgsT&&... args) noexcept
+{
+    static_assert(alignof(DataT) <= 8);
+    static_assert(std::is_nothrow_constructible_v<DataT, ArgsT...>);
+    static_assert(std::is_trivially_copyable_v<DataT>);
+    ev.topic = topic;
+    ev.type = type;
+    ::new (ev.data) DataT{std::forward<ArgsT>(args)...};
+}
+
+inline void emplaceSignal(MsgEvent& ev, int sig) noexcept
+{
+    ev.topic = Topic::Signal;
+    ev.type = sig;
+}
+
+template <typename DataT>
+const DataT& data(const MsgEvent& ev) noexcept
+{
+    return *reinterpret_cast<const DataT*>(ev.data);
+}
+
+template <typename DataT>
+DataT& data(MsgEvent& ev) noexcept
+{
+    return *reinterpret_cast<DataT*>(ev.data);
+}
 
 } // namespace swirly
 
