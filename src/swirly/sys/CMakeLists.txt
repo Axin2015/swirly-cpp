@@ -26,6 +26,7 @@ endif()
 
 set(lib_SOURCES
   Actor.cpp
+  BoundedQueue.cpp
   Buffer.cpp
   Daemon.cpp
   Error.cpp

@@ -14,32 +14,4 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_UTIL_ENUM_HPP
-#define SWIRLY_UTIL_ENUM_HPP
-
-#include <iosfwd>
-#include <type_traits>
-
-namespace swirly {
-
-template <typename EnumT, typename = std::enable_if_t<std::is_enum_v<EnumT>>>
-constexpr EnumT box(typename std::underlying_type_t<EnumT> val) noexcept
-{
-    return static_cast<EnumT>(val);
-}
-
-template <typename EnumT, typename = std::enable_if_t<std::is_enum_v<EnumT>>>
-constexpr typename std::underlying_type_t<EnumT> unbox(EnumT val) noexcept
-{
-    return static_cast<typename std::underlying_type_t<EnumT>>(val);
-}
-
-template <typename EnumT, typename = std::enable_if_t<std::is_enum_v<EnumT>>>
-std::ostream& operator<<(std::ostream& os, EnumT val)
-{
-    return os << unbox(val);
-}
-
-} // namespace swirly
-
-#endif // SWIRLY_UTIL_ENUM_HPP
+#include "BoundedQueue.hpp"

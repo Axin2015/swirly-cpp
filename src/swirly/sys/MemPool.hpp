@@ -82,7 +82,7 @@ struct SWIRLY_PACKED MemNode {
         char storage[SizeN];
     };
 };
-static_assert(std::is_pod<MemNode<1>>::value);
+static_assert(std::is_pod_v<MemNode<1>>);
 static_assert(sizeof(MemNode<256>) == 256);
 
 template <std::size_t SizeN>
@@ -92,7 +92,7 @@ struct alignas(CacheLineSize) MemStack {
         MemTag tag;
     };
 };
-static_assert(std::is_pod<MemStack<1>>::value);
+static_assert(std::is_pod_v<MemStack<1>>);
 static_assert(sizeof(MemStack<1>) == CacheLineSize);
 
 struct MemPool {
@@ -111,7 +111,7 @@ struct MemPool {
     };
     char storage[];
 };
-static_assert(std::is_pod<MemPool>::value);
+static_assert(std::is_pod_v<MemPool>);
 static_assert(offsetof(MemPool, storage) == PageSize);
 
 constexpr void* offsetToPtr(const MemPool& pool, MemSize offset) noexcept

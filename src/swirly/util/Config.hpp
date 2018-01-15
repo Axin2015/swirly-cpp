@@ -81,7 +81,7 @@ class SWIRLY_API Config {
         auto it = map_.find(key);
         return it != map_.end() ? stob(it->second, dfl) : dfl;
     }
-    template <typename ValueT, typename = std::enable_if_t<std::is_arithmetic<ValueT>::value>>
+    template <typename ValueT, typename = std::enable_if_t<std::is_arithmetic_v<ValueT>>>
     ValueT get(const char* key, ValueT dfl) const noexcept
     {
         auto it = map_.find(key);

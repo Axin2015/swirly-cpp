@@ -43,7 +43,7 @@ struct SWIRLY_PACKED IntWrapper : IntBase {
     using ValueType = typename PolicyT::ValueType;
 
     template <typename RhsT,
-              typename = typename std::enable_if_t<std::is_convertible<RhsT, ValueType>::value>>
+              typename = typename std::enable_if_t<std::is_convertible_v<RhsT, ValueType>>>
     constexpr explicit IntWrapper(RhsT rhs) noexcept
       : value_{static_cast<ValueType>(rhs)}
     {
@@ -347,12 +347,12 @@ struct SWIRLY_PACKED IntWrapper : IntBase {
   private:
     ValueType value_;
 };
-static_assert(std::is_pod<IntWrapper<Int32Policy>>::value);
+static_assert(std::is_pod_v<IntWrapper<Int32Policy>>);
 static_assert(sizeof(IntWrapper<Int32Policy>) == 4, "must be specific size");
 static_assert(sizeof(IntWrapper<Int64Policy>) == 8, "must be specific size");
 
 template <typename ValueT>
-constexpr bool isIntWrapper = std::is_base_of<IntBase, ValueT>::value;
+constexpr bool isIntWrapper = std::is_base_of_v<IntBase, ValueT>;
 
 } // namespace swirly
 
