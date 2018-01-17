@@ -73,7 +73,7 @@ void worker(MsgPipe& pipe, Journ& journ)
             SWIRLY_ERROR(logMsg() << "failed to update journal: " << e.what());
         }
     };
-    while (pipe.read(fn))
+    while (pipe.fetch(fn))
         ;
     SWIRLY_NOTICE(logMsg() << "stopped async journal");
 }
@@ -117,12 +117,12 @@ void AsyncJourn::archiveTrade(Id64 marketId, ArrayView<Id64> ids, Time modified)
 
 void AsyncJourn::doReset()
 {
-    pipe_.write([](Msg& msg) { msg.type = MsgType::Reset; });
+    pipe_.post([](Msg& msg) { msg.type = MsgType::Reset; });
 }
 
 void AsyncJourn::doCreateMarket(Id64 id, Symbol instr, JDay settlDay, MarketState state)
 {
-    pipe_.write([id, &instr, settlDay, state](Msg& msg) {
+    pipe_.post([id, &instr, settlDay, state](Msg& msg) {
         msg.type = MsgType::CreateMarket;
         auto& body = msg.createMarket;
         body.id = id;
@@ -134,7 +134,7 @@ void AsyncJourn::doCreateMarket(Id64 id, Symbol instr, JDay settlDay, MarketStat
 
 void AsyncJourn::doUpdateMarket(Id64 id, MarketState state)
 {
-    pipe_.write([&id, state](Msg& msg) {
+    pipe_.post([&id, state](Msg& msg) {
         msg.type = MsgType::UpdateMarket;
         auto& body = msg.updateMarket;
         body.id = id;
@@ -144,7 +144,7 @@ void AsyncJourn::doUpdateMarket(Id64 id, MarketState state)
 
 void AsyncJourn::doCreateExec(const Exec& exec, More more)
 {
-    pipe_.write([&exec, more](Msg& msg) {
+    pipe_.post([&exec, more](Msg& msg) {
         msg.type = MsgType::CreateExec;
         auto& body = msg.createExec;
         setCString(body.accnt, exec.accnt());
@@ -175,7 +175,7 @@ void AsyncJourn::doCreateExec(const Exec& exec, More more)
 void AsyncJourn::doArchiveTrade(Id64 marketId, ArrayView<Id64> ids, Time modified, More more)
 {
     assert(ids.size() <= MaxIds);
-    pipe_.write([&marketId, ids, modified, more](Msg& msg) {
+    pipe_.post([&marketId, ids, modified, more](Msg& msg) {
         msg.type = MsgType::ArchiveTrade;
         auto& body = msg.archiveTrade;
         body.marketId = marketId;

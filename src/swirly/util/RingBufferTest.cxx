@@ -30,7 +30,7 @@ SWIRLY_TEST_CASE(RingBuffer)
     SWIRLY_CHECK(!rb.full());
     SWIRLY_CHECK(rb.size() == 0);
 
-    rb.write([](int& val) { val = 1; });
+    rb.post([](int& val) { val = 1; });
     SWIRLY_CHECK(!rb.empty());
     SWIRLY_CHECK(!rb.full());
     SWIRLY_CHECK(rb.size() == 1);
@@ -54,7 +54,7 @@ SWIRLY_TEST_CASE(RingBuffer)
     SWIRLY_CHECK(rb.size() == 4);
 
     int val;
-    rb.read([&val](const int& ref) { val = ref; });
+    rb.fetch([&val](const int& ref) { val = ref; });
     SWIRLY_CHECK(2);
     SWIRLY_CHECK(!rb.empty());
     SWIRLY_CHECK(!rb.full());
