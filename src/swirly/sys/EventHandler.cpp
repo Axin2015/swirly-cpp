@@ -14,17 +14,17 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Actor.hpp"
+#include "EventHandler.hpp"
 
 #include <csignal>
 
 namespace swirly {
 
-Actor::~Actor() noexcept = default;
+EventHandler::~EventHandler() noexcept = default;
 
-void Actor::doEvent(const Event& event, Time now) {}
-void Actor::doReady(int fd, FileEvents mask, Time now) {}
-void Actor::doSignal(int sig, Time now)
+void EventHandler::doEvent(const Event& event, Time now) {}
+void EventHandler::doReady(int fd, FileEvents mask, Time now) {}
+void EventHandler::doSignal(int sig, Time now)
 {
     switch (sig) {
     case SIGINT:
@@ -33,6 +33,6 @@ void Actor::doSignal(int sig, Time now)
         break;
     }
 }
-void Actor::doTimer(const Timer& tmr, Time now) {}
+void EventHandler::doTimer(const Timer& tmr, Time now) {}
 
 } // namespace swirly

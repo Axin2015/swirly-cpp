@@ -22,7 +22,7 @@
 
 namespace swirly {
 
-class SWIRLY_API TcpAcceptor : public Actor {
+class SWIRLY_API TcpAcceptor : public EventHandler {
     using IntrusivePtr = boost::intrusive_ptr<TcpAcceptor>;
 
   public:

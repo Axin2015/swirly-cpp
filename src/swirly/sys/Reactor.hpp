@@ -17,7 +17,7 @@
 #ifndef SWIRLY_SYS_REACTOR_HPP
 #define SWIRLY_SYS_REACTOR_HPP
 
-#include <swirly/sys/Actor.hpp>
+#include <swirly/sys/EventHandler.hpp>
 #include <swirly/sys/Handle.hpp>
 #include <swirly/sys/Muxer.hpp>
 #include <swirly/sys/Timer.hpp>
@@ -51,7 +51,7 @@ struct EventTokenPolicy {
     struct Id {
         Reactor* reactor{nullptr};
         Address addr{Address::None};
-        Actor* actor{nullptr};
+        EventHandler* handler{nullptr};
     };
     static constexpr Id invalid() noexcept { return {}; }
     static void close(Id id) noexcept;
@@ -60,13 +60,13 @@ struct EventTokenPolicy {
 inline bool operator==(EventTokenPolicy::Id lhs, EventTokenPolicy::Id rhs) noexcept
 {
     assert(lhs.reactor == rhs.reactor || !lhs.reactor || !rhs.reactor);
-    return lhs.addr == rhs.addr && lhs.actor == rhs.actor;
+    return lhs.addr == rhs.addr && lhs.handler == rhs.handler;
 }
 
 inline bool operator!=(EventTokenPolicy::Id lhs, EventTokenPolicy::Id rhs) noexcept
 {
     assert(lhs.reactor == rhs.reactor || !lhs.reactor || !rhs.reactor);
-    return lhs.addr != rhs.addr || lhs.actor != rhs.actor;
+    return lhs.addr != rhs.addr || lhs.handler != rhs.handler;
 }
 
 using EventToken = Handle<EventTokenPolicy>;
@@ -85,7 +85,7 @@ class SWIRLY_API Reactor {
     struct Data {
         int sid{};
         FileEvents mask{};
-        ActorPtr actor;
+        EventHandlerPtr handler;
     };
     explicit Reactor(std::size_t sizeHint = 1024);
     ~Reactor() noexcept;
@@ -110,16 +110,16 @@ class SWIRLY_API Reactor {
      */
     void postEvent(Event&& ev);
 
-    FileToken subscribe(int fd, FileEvents mask, const ActorPtr& actor);
-    EventToken subscribe(Address addr, const ActorPtr& actor);
+    FileToken subscribe(int fd, FileEvents mask, const EventHandlerPtr& handler);
+    EventToken subscribe(Address addr, const EventHandlerPtr& handler);
 
     void unsubscribe(int fd) noexcept;
-    void unsubscribe(Address addr, const Actor& actor) noexcept;
+    void unsubscribe(Address addr, const EventHandler& handler) noexcept;
 
     void setMask(int fd, FileEvents mask);
 
-    Timer setTimer(Time expiry, Duration interval, const ActorPtr& actor);
-    Timer setTimer(Time expiry, const ActorPtr& actor);
+    Timer setTimer(Time expiry, Duration interval, const EventHandlerPtr& handler);
+    Timer setTimer(Time expiry, const EventHandlerPtr& handler);
 
     int poll(std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
 
@@ -137,7 +137,7 @@ inline void FileTokenPolicy::close(Id id) noexcept
 
 inline void EventTokenPolicy::close(Id id) noexcept
 {
-    id.reactor->unsubscribe(id.addr, *id.actor);
+    id.reactor->unsubscribe(id.addr, *id.handler);
 }
 
 /**

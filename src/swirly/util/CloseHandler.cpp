@@ -14,28 +14,23 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_UTIL_CLOSEACTOR_HPP
-#define SWIRLY_UTIL_CLOSEACTOR_HPP
-
-#include <swirly/sys/Reactor.hpp>
+#include "CloseHandler.hpp"
 
 namespace swirly {
 
-class SWIRLY_API CloseActor : public Actor {
-  public:
-    explicit CloseActor(Reactor& r);
-    ~CloseActor() noexcept override;
-    static auto make(Reactor& r) { return makeIntrusive<CloseActor>(r); }
-    bool closed() const noexcept { return closed_; }
+CloseHandler::CloseHandler(Reactor& r)
+  : EventHandler{r}
+{
+    const auto a = self();
+    signal_ = r.subscribe(Address::Signal, a);
+}
 
-  protected:
-    void doClose() noexcept override;
+CloseHandler::~CloseHandler() noexcept = default;
 
-  private:
-    bool closed_{};
-    EventToken signal_;
-};
+void CloseHandler::doClose() noexcept
+{
+    closed_ = true;
+    signal_.reset();
+}
 
 } // namespace swirly
-
-#endif // SWIRLY_UTIL_CLOSEACTOR_HPP
