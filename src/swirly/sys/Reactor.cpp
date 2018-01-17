@@ -126,7 +126,7 @@ struct Reactor::Impl {
     explicit Impl(size_t sizeHint)
       : mux{sizeHint}
     {
-        const auto fd = ef.waitfd();
+        const auto fd = ef.fd();
         data.resize(max<size_t>(fd + 1, sizeHint));
 
         auto& ref = data[fd];
@@ -251,7 +251,7 @@ int Reactor::dispatch(FileEvent* buf, int size, Time now)
 
         auto& ev = buf[i];
         const auto fd = static_cast<int>(ev.data.u64 & 0xffffffff);
-        if (fd == impl_->ef.waitfd()) {
+        if (fd == impl_->ef.fd()) {
             while (auto event = impl_->eq.pop()) {
                 impl_->ed.dispatch(event, now);
                 ++n;
