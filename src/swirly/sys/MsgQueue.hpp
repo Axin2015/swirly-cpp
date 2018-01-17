@@ -18,8 +18,8 @@
 #define SWIRLY_SYS_MSGQUEUE_HPP
 
 #include <swirly/sys/BoundedQueue.hpp>
+#include <swirly/sys/Event.hpp>
 #include <swirly/sys/EventFile.hpp>
-#include <swirly/sys/Types.hpp>
 
 #include <swirly/Config.h>
 

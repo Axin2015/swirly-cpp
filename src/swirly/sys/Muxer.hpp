@@ -17,8 +17,8 @@
 #ifndef SWIRLY_SYS_MUXER_HPP
 #define SWIRLY_SYS_MUXER_HPP
 
+#include <swirly/sys/Event.hpp>
 #include <swirly/sys/Poll.hpp>
-#include <swirly/sys/Types.hpp>
 
 #include <swirly/Config.h>
 
