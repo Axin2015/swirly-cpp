@@ -31,7 +31,7 @@ class BoundedQueue {
     static_assert(std::is_trivially_copyable_v<ValueT>);
     enum : std::size_t { CacheLineSize = 64 };
     struct alignas(CacheLineSize) Entry {
-        std::atomic<std::size_t> seq;
+        std::atomic<std::int64_t> seq;
         ValueT val;
     };
 
@@ -43,7 +43,7 @@ class BoundedQueue {
     {
         assert(capacity >= 2);
         // Initialise sequence numbers.
-        for (std::size_t i{0}; i < capacity; ++i) {
+        for (std::int64_t i{0}; i < static_cast<std::int64_t>(capacity); ++i) {
             buf_[i].seq.store(i, std::memory_order_relaxed);
         }
     }
@@ -88,7 +88,7 @@ class BoundedQueue {
         for (;;) {
             auto& entry = buf_[rpos & mask_];
             const auto seq = entry.seq.load(std::memory_order_acquire);
-            const auto diff = static_cast<ssize_t>(seq) - static_cast<ssize_t>(rpos + 1);
+            const auto diff = seq - (rpos + 1);
             if (diff == 0) {
                 // The compare_exchange_weak function re-reads wpos on failure.
                 if (rpos_.compare_exchange_weak(rpos, rpos + 1, std::memory_order_relaxed)) {
@@ -116,7 +116,7 @@ class BoundedQueue {
         for (;;) {
             auto& entry = buf_[wpos & mask_];
             const auto seq = entry.seq.load(std::memory_order_acquire);
-            const auto diff = static_cast<ssize_t>(seq) - static_cast<ssize_t>(wpos);
+            const auto diff = seq - wpos;
             if (diff == 0) {
                 // The compare_exchange_weak function re-reads wpos on failure.
                 if (wpos_.compare_exchange_weak(wpos, wpos + 1, std::memory_order_relaxed)) {
@@ -164,8 +164,8 @@ class BoundedQueue {
     const std::size_t mask_;
     std::unique_ptr<Entry[]> buf_;
     // Ensure that read and write positions are in different cache-lines.
-    alignas(CacheLineSize) std::atomic<std::size_t> rpos_{0};
-    alignas(CacheLineSize) std::atomic<std::size_t> wpos_{0};
+    alignas(CacheLineSize) std::atomic<std::int64_t> rpos_{0};
+    alignas(CacheLineSize) std::atomic<std::int64_t> wpos_{0};
 };
 
 } // namespace swirly
