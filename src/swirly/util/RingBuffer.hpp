@@ -62,14 +62,14 @@ class RingBuffer {
         ++wpos_;
     }
     template <typename FnT>
-    void read(FnT fn)
+    void fetch(FnT fn)
     {
         const auto& ref = buf_[rpos_ & mask_];
         fn(ref);
         ++rpos_;
     }
     template <typename FnT>
-    void write(FnT fn)
+    void post(FnT fn)
     {
         auto& ref = buf_[wpos_ & mask_];
         fn(ref);

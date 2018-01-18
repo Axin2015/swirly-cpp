@@ -256,7 +256,7 @@ bool HttpSess::onMessageEnd() noexcept
     try {
         req_.flush(); // May throw.
         const auto wasEmpty = outbuf_.empty();
-        outbuf_.write([](auto& ref) { ref.clear(); });
+        outbuf_.post([](auto& ref) { ref.clear(); });
         {
             HttpResponse resp{outbuf_.back()};
             restServ_.handleRequest(req_, resp);

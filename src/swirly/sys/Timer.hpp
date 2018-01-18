@@ -17,7 +17,7 @@
 #ifndef SWIRLY_SYS_TIMER_HPP
 #define SWIRLY_SYS_TIMER_HPP
 
-#include <swirly/sys/Actor.hpp>
+#include <swirly/sys/EventHandler.hpp>
 #include <swirly/sys/Time.hpp>
 
 #include <swirly/Config.h>
@@ -43,7 +43,7 @@ class Timer {
         long id;
         Time expiry;
         Duration interval;
-        ActorPtr actor;
+        EventHandlerPtr handler;
     };
     Timer() = default;
     explicit Timer(Impl* impl)
@@ -53,8 +53,8 @@ class Timer {
     long id() const noexcept { return impl_->id; }
     Time expiry() const noexcept { return impl_->expiry; }
     Duration interval() const noexcept { return impl_->interval; }
-    const ActorPtr& actor() const noexcept { return impl_->actor; }
-    bool cancelled() const noexcept { return !impl_->actor; }
+    const EventHandlerPtr& handler() const noexcept { return impl_->handler; }
+    bool cancelled() const noexcept { return !impl_->handler; }
     // Setting the interval will not reschedule any pending timer.
     void setInterval(Duration interval) noexcept { impl_->interval = interval; }
     void reset() noexcept { impl_.reset(); }
@@ -62,7 +62,7 @@ class Timer {
 
   private:
     void setExpiry(Time expiry) noexcept { impl_->expiry = expiry; }
-    ActorPtr& actor() noexcept { return impl_->actor; }
+    EventHandlerPtr& handler() noexcept { return impl_->handler; }
     boost::intrusive_ptr<Timer::Impl> impl_;
 };
 
@@ -135,16 +135,16 @@ class SWIRLY_API TimerQueue {
     const Timer& front() const { return heap_.front(); }
     bool empty() const { return heap_.size() - cancelled_ == 0; }
 
-    Timer insert(Time expiry, Duration interval, const ActorPtr& actor);
-    Timer insert(Time expiry, const ActorPtr& actor)
+    Timer insert(Time expiry, Duration interval, const EventHandlerPtr& handler);
+    Timer insert(Time expiry, const EventHandlerPtr& handler)
     {
-        return insert(expiry, Duration::zero(), actor);
+        return insert(expiry, Duration::zero(), handler);
     }
 
     int dispatch(Time now);
 
   private:
-    Timer alloc(Time expiry, Duration interval, const ActorPtr& actor);
+    Timer alloc(Time expiry, Duration interval, const EventHandlerPtr& handler);
     void expire(Time now);
     void purge() noexcept;
 
@@ -173,8 +173,8 @@ inline void intrusive_ptr_release(Timer::Impl* impl) noexcept
 
 inline void Timer::cancel() noexcept
 {
-    if (impl_->actor) {
-        impl_->actor.reset();
+    if (impl_->handler) {
+        impl_->handler.reset();
         ++impl_->tq->cancelled_;
     }
 }

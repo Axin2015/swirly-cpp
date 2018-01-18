@@ -81,7 +81,7 @@ class BoundedQueue {
      * Returns false if queue is empty.
      */
     template <typename FnT>
-    bool read(FnT fn) noexcept
+    bool fetch(FnT fn) noexcept
     {
         static_assert(std::is_nothrow_invocable_v<FnT, ValueT&&>);
         auto rpos = rpos_.load(std::memory_order_relaxed);
@@ -109,7 +109,7 @@ class BoundedQueue {
      * Returns false if capacity is exceeded.
      */
     template <typename FnT>
-    bool write(FnT fn) noexcept
+    bool post(FnT fn) noexcept
     {
         static_assert(std::is_nothrow_invocable_v<FnT, ValueT&>);
         auto wpos = wpos_.load(std::memory_order_relaxed);
@@ -139,7 +139,7 @@ class BoundedQueue {
     bool pop(ValueT& val) noexcept
     {
         static_assert(std::is_nothrow_move_assignable_v<ValueT>);
-        return read([&val](ValueT && ref) noexcept { val = std::move(ref); });
+        return fetch([&val](ValueT && ref) noexcept { val = std::move(ref); });
     }
     /**
      * Returns false if capacity is exceeded.
@@ -147,7 +147,7 @@ class BoundedQueue {
     bool push(const ValueT& val) noexcept
     {
         static_assert(std::is_nothrow_copy_assignable_v<ValueT>);
-        return write([&val](ValueT & ref) noexcept { ref = val; });
+        return post([&val](ValueT & ref) noexcept { ref = val; });
     }
     /**
      * Returns false if capacity is exceeded.
@@ -155,7 +155,7 @@ class BoundedQueue {
     bool push(ValueT&& val) noexcept
     {
         static_assert(std::is_nothrow_move_assignable_v<ValueT>);
-        return write([&val](ValueT & ref) noexcept { ref = std::move(val); });
+        return post([&val](ValueT & ref) noexcept { ref = std::move(val); });
     }
 
   private:

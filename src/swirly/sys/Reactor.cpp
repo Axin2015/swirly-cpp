@@ -65,13 +65,13 @@ class EventDispatcher {
 
         const auto n = v.size();
         for (size_t i{0}; i < n; ++i) {
-            const auto actor = v[i];
-            if (actor) {
+            const auto handler = v[i];
+            if (handler) {
                 try {
                     if (addr != Address::Signal) {
-                        actor->onEvent(ev, now);
+                        handler->onEvent(ev, now);
                     } else {
-                        actor->onSignal(ev.type(), now);
+                        handler->onSignal(ev.type(), now);
                     }
                 } catch (const std::exception& e) {
                     using namespace string_literals;
@@ -84,22 +84,22 @@ class EventDispatcher {
             v.erase(remove_if(v.begin(), v.end(), [](const auto& ptr) { return !ptr; }), v.end());
         }
     }
-    void subscribe(Address addr, const ActorPtr& actor)
+    void subscribe(Address addr, const EventHandlerPtr& handler)
     {
         auto& v = map_[addr];
-        if (find(v.begin(), v.end(), actor) != v.end()) {
+        if (find(v.begin(), v.end(), handler) != v.end()) {
             throw logic_error{"already subscribed"};
         }
-        v.push_back(actor);
+        v.push_back(handler);
     }
-    void unsubscribe(Address addr, const Actor& actor)
+    void unsubscribe(Address addr, const EventHandler& handler)
     {
         const auto it = map_.find(addr);
         if (it == map_.end()) {
             return;
         }
         auto& v = it->second;
-        const auto pred = [&actor](const auto& ptr) { return ptr.get() == &actor; };
+        const auto pred = [&handler](const auto& ptr) { return ptr.get() == &handler; };
         if (addr != locked_) {
             v.erase(remove_if(v.begin(), v.end(), pred), v.end());
         } else {
@@ -112,7 +112,7 @@ class EventDispatcher {
     }
 
   private:
-    unordered_map<Address, vector<ActorPtr>> map_;
+    unordered_map<Address, vector<EventHandlerPtr>> map_;
     Address locked_{Address::None};
     int unsubs_{};
 };
@@ -126,13 +126,13 @@ struct Reactor::Impl {
     explicit Impl(size_t sizeHint)
       : mux{sizeHint}
     {
-        const auto fd = ef.waitfd();
+        const auto fd = ef.fd();
         data.resize(max<size_t>(fd + 1, sizeHint));
 
         auto& ref = data[fd];
         mux.subscribe(0, fd, In);
         ref.mask = In;
-        ref.actor = {};
+        ref.handler = {};
     }
 
     Muxer mux;
@@ -168,24 +168,24 @@ void Reactor::postEvent(Event&& ev)
     }
 }
 
-FileToken Reactor::subscribe(int fd, FileEvents mask, const ActorPtr& actor)
+FileToken Reactor::subscribe(int fd, FileEvents mask, const EventHandlerPtr& handler)
 {
     assert(fd >= 0);
-    assert(actor);
+    assert(handler);
     if (fd >= static_cast<int>(impl_->data.size())) {
         impl_->data.resize(fd + 1);
     }
     auto& ref = impl_->data[fd];
     impl_->mux.subscribe(++ref.sid, fd, mask);
     ref.mask = mask;
-    ref.actor = actor;
+    ref.handler = handler;
     return FileToken{{this, fd}};
 }
 
-EventToken Reactor::subscribe(Address addr, const ActorPtr& actor)
+EventToken Reactor::subscribe(Address addr, const EventHandlerPtr& handler)
 {
-    impl_->ed.subscribe(addr, actor);
-    return EventToken{{this, addr, actor.get()}};
+    impl_->ed.subscribe(addr, handler);
+    return EventToken{{this, addr, handler.get()}};
 }
 
 void Reactor::unsubscribe(int fd) noexcept
@@ -193,12 +193,12 @@ void Reactor::unsubscribe(int fd) noexcept
     impl_->mux.unsubscribe(fd);
     auto& ref = impl_->data[fd];
     ref.mask = 0;
-    ref.actor.reset();
+    ref.handler.reset();
 }
 
-void Reactor::unsubscribe(Address addr, const Actor& actor) noexcept
+void Reactor::unsubscribe(Address addr, const EventHandler& handler) noexcept
 {
-    impl_->ed.unsubscribe(addr, actor);
+    impl_->ed.unsubscribe(addr, handler);
 }
 
 void Reactor::setMask(int fd, FileEvents mask)
@@ -209,14 +209,14 @@ void Reactor::setMask(int fd, FileEvents mask)
     }
 }
 
-Timer Reactor::setTimer(Time expiry, Duration interval, const ActorPtr& actor)
+Timer Reactor::setTimer(Time expiry, Duration interval, const EventHandlerPtr& handler)
 {
-    return impl_->tq.insert(expiry, interval, actor);
+    return impl_->tq.insert(expiry, interval, handler);
 }
 
-Timer Reactor::setTimer(Time expiry, const ActorPtr& actor)
+Timer Reactor::setTimer(Time expiry, const EventHandlerPtr& handler)
 {
-    return impl_->tq.insert(expiry, actor);
+    return impl_->tq.insert(expiry, handler);
 }
 
 int Reactor::poll(chrono::milliseconds timeout)
@@ -251,7 +251,7 @@ int Reactor::dispatch(FileEvent* buf, int size, Time now)
 
         auto& ev = buf[i];
         const auto fd = static_cast<int>(ev.data.u64 & 0xffffffff);
-        if (fd == impl_->ef.waitfd()) {
+        if (fd == impl_->ef.fd()) {
             while (auto event = impl_->eq.pop()) {
                 impl_->ed.dispatch(event, now);
                 ++n;
@@ -268,15 +268,15 @@ int Reactor::dispatch(FileEvent* buf, int size, Time now)
         }
         // Apply the interest mask to filter-out any events that the user may have removed from the
         // mask since the call to wait() was made. This would typically happen via a reentrant call
-        // into the reactor from an actor.
+        // into the reactor from an event-handler.
         ev.events &= ref.mask;
         if (!(ev.events)) {
             continue;
         }
 
-        ActorPtr actor{ref.actor};
+        EventHandlerPtr eh{ref.handler};
         try {
-            actor->onReady(fd, ev.events, now);
+            eh->onReady(fd, ev.events, now);
         } catch (const std::exception& e) {
             using namespace string_literals;
             SWIRLY_ERROR("error handling io event: "s + e.what());

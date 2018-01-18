@@ -28,7 +28,7 @@ using IntPipe = Pipe<int>;
 void producer(IntPipe& p)
 {
     for (int i{1}; i <= 100; ++i) {
-        p.write([i](int& ref) { ref = i; });
+        p.post([i](int& ref) { ref = i; });
     }
     p.close();
 }
@@ -40,7 +40,7 @@ SWIRLY_TEST_CASE(Pipe)
     IntPipe p{1 << 4};
     thread t{producer, ref(p)};
     int sum{0};
-    while (p.read([&sum](int i) { sum += i; }))
+    while (p.fetch([&sum](int i) { sum += i; }))
         ;
     t.join();
     SWIRLY_CHECK(sum == 5050);

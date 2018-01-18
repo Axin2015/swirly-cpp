@@ -30,11 +30,11 @@ using namespace swirly;
 
 namespace {
 
-struct TimerActor : Actor {
+struct TimerHandler : EventHandler {
 
-    using Actor::Actor;
+    using EventHandler::EventHandler;
 
-    ~TimerActor() noexcept override = default;
+    ~TimerHandler() noexcept override = default;
 
     void doClose() noexcept override {}
     void doTimer(const Timer& tmr, Time now) override {}
@@ -54,11 +54,11 @@ int main(int argc, char* argv[])
         Reactor r{1024};
         priority_queue<pair<int, Timer>> pq;
 
-        auto a = makeIntrusive<TimerActor>(r);
+        auto h = makeIntrusive<TimerHandler>(r);
         for (int i{0}; i < 1000000; ++i) {
             const auto now = UnixClock::now();
             if (pq.empty() || dis(gen) % 2 == 0) {
-                pq.emplace(i, r.setTimer(now + Micros{dis(gen) % 100}, a));
+                pq.emplace(i, r.setTimer(now + Micros{dis(gen) % 100}, h));
             } else {
                 auto tmr = pq.top().second;
                 pq.pop();

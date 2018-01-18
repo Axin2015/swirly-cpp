@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SYS_ACTOR_HPP
-#define SWIRLY_SYS_ACTOR_HPP
+#ifndef SWIRLY_SYS_EVENTHANDLER_HPP
+#define SWIRLY_SYS_EVENTHANDLER_HPP
 
 #include <swirly/sys/Event.hpp>
 #include <swirly/sys/RefCount.hpp>
@@ -27,21 +27,21 @@ namespace swirly {
 class Reactor;
 class Timer;
 
-class SWIRLY_API Actor : public RefCount<Actor, ThreadUnsafePolicy> {
+class SWIRLY_API EventHandler : public RefCount<EventHandler, ThreadUnsafePolicy> {
   public:
-    explicit Actor(Reactor& reactor) noexcept
+    explicit EventHandler(Reactor& reactor) noexcept
       : reactor_(reactor)
     {
     }
-    virtual ~Actor() noexcept;
+    virtual ~EventHandler() noexcept;
 
     // Copy.
-    Actor(const Actor&) noexcept = delete;
-    Actor& operator=(const Actor&) noexcept = delete;
+    EventHandler(const EventHandler&) noexcept = delete;
+    EventHandler& operator=(const EventHandler&) noexcept = delete;
 
     // Move.
-    Actor(Actor&&) noexcept = delete;
-    Actor& operator=(Actor&&) noexcept = delete;
+    EventHandler(EventHandler&&) noexcept = delete;
+    EventHandler& operator=(EventHandler&&) noexcept = delete;
 
     void close() { doClose(); }
 
@@ -61,7 +61,7 @@ class SWIRLY_API Actor : public RefCount<Actor, ThreadUnsafePolicy> {
     virtual void doTimer(const Timer& tmr, Time now);
 
     const Reactor& reactor() const noexcept { return reactor_; }
-    boost::intrusive_ptr<Actor> self() noexcept { return {this, true}; }
+    boost::intrusive_ptr<EventHandler> self() noexcept { return {this, true}; }
 
     Reactor& reactor() noexcept { return reactor_; }
 
@@ -69,8 +69,8 @@ class SWIRLY_API Actor : public RefCount<Actor, ThreadUnsafePolicy> {
     Reactor& reactor_;
 };
 
-using ActorPtr = boost::intrusive_ptr<Actor>;
+using EventHandlerPtr = boost::intrusive_ptr<EventHandler>;
 
 } // namespace swirly
 
-#endif // SWIRLY_SYS_ACTOR_HPP
+#endif // SWIRLY_SYS_EVENTHANDLER_HPP

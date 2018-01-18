@@ -25,13 +25,13 @@ else()
 endif()
 
 set(lib_SOURCES
-  Actor.cpp
   BoundedQueue.cpp
   Buffer.cpp
   Daemon.cpp
   Error.cpp
   Event.cpp
   EventFile.cpp
+  EventHandler.cpp
   EventQueue.cpp
   File.cpp
   Handle.cpp

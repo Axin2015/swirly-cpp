@@ -54,7 +54,7 @@ class Pipe {
         return buf_.full();
     }
     template <typename FnT>
-    bool read(FnT fn)
+    bool fetch(FnT fn)
     {
         std::unique_lock<std::mutex> lock{mutex_};
         notEmpty_.wait(lock, [this] { return !this->buf_.empty() || closed_; });
@@ -63,13 +63,13 @@ class Pipe {
             return false;
         }
         // Continue to read when closed while buffer is not empty.
-        buf_.read(fn);
+        buf_.fetch(fn);
         lock.unlock();
         notFull_.notify_one();
         return true;
     }
     template <typename FnT>
-    bool write(FnT fn)
+    bool post(FnT fn)
     {
         std::unique_lock<std::mutex> lock{mutex_};
         notFull_.wait(lock, [this] { return !this->buf_.full() || closed_; });
@@ -77,7 +77,7 @@ class Pipe {
         if (closed_) {
             return false;
         }
-        buf_.write(fn);
+        buf_.post(fn);
         lock.unlock();
         notEmpty_.notify_one();
         return true;

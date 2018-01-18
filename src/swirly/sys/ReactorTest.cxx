@@ -29,18 +29,18 @@ struct Counters {
     int dtor{};
 };
 
-struct TestActor : Actor {
+struct TestHandler : EventHandler {
 
-    using Actor::Actor;
+    using EventHandler::EventHandler;
 
-    explicit TestActor(Reactor& reactor, Counters& cntrs) noexcept
-      : Actor{reactor}
+    explicit TestHandler(Reactor& reactor, Counters& cntrs) noexcept
+      : EventHandler{reactor}
       , cntrs_{&cntrs}
     {
     }
 
-    TestActor() noexcept = default;
-    ~TestActor() noexcept override
+    TestHandler() noexcept = default;
+    ~TestHandler() noexcept override
     {
         if (cntrs_) {
             ++cntrs_->dtor;
@@ -74,9 +74,9 @@ SWIRLY_TEST_CASE(ReactorHandler)
     FileToken out, err;
     {
         SWIRLY_CHECK(cntrs.dtor == 0);
-        auto a = makeIntrusive<TestActor>(r, cntrs);
-        out = r.subscribe(STDOUT_FILENO, Reactor::Out, a);
-        err = r.subscribe(STDERR_FILENO, Reactor::Out, a);
+        auto h = makeIntrusive<TestHandler>(r, cntrs);
+        out = r.subscribe(STDOUT_FILENO, Reactor::Out, h);
+        err = r.subscribe(STDERR_FILENO, Reactor::Out, h);
     }
     SWIRLY_CHECK(cntrs.dtor == 0);
 
@@ -92,29 +92,29 @@ SWIRLY_TEST_CASE(ReactorFileEvents)
     using namespace literals::chrono_literals;
 
     Reactor r{1024};
-    auto a = makeIntrusive<TestActor>(r);
+    auto h = makeIntrusive<TestHandler>(r);
 
     auto socks = socketpair(LocalStream{});
-    const auto tok = r.subscribe(*socks.second, Reactor::In, a);
+    const auto tok = r.subscribe(*socks.second, Reactor::In, h);
 
     SWIRLY_CHECK(r.poll(0ms) == 0);
-    SWIRLY_CHECK(a->matches() == 0);
+    SWIRLY_CHECK(h->matches() == 0);
 
     socks.first.send("foo", 4, 0);
     SWIRLY_CHECK(r.poll() == 1);
-    SWIRLY_CHECK(a->matches() == 1);
+    SWIRLY_CHECK(h->matches() == 1);
 
     SWIRLY_CHECK(r.poll(0ms) == 0);
-    SWIRLY_CHECK(a->matches() == 1);
+    SWIRLY_CHECK(h->matches() == 1);
 
     socks.first.send("foo\0foo", 8, 0);
     SWIRLY_CHECK(r.poll() == 1);
-    SWIRLY_CHECK(a->matches() == 2);
+    SWIRLY_CHECK(h->matches() == 2);
     SWIRLY_CHECK(r.poll() == 1);
-    SWIRLY_CHECK(a->matches() == 3);
+    SWIRLY_CHECK(h->matches() == 3);
 
     SWIRLY_CHECK(r.poll(0ms) == 0);
-    SWIRLY_CHECK(a->matches() == 3);
+    SWIRLY_CHECK(h->matches() == 3);
 
     r.unsubscribe(*socks.second);
 }
