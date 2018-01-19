@@ -22,7 +22,7 @@ CloseHandler::CloseHandler(Reactor& r)
   : EventHandler{r}
 {
     const auto a = self();
-    signal_ = r.subscribe(Address::Signal, a);
+    signal_ = r.subscribe(Topic::Signal, a);
 }
 
 CloseHandler::~CloseHandler() noexcept = default;

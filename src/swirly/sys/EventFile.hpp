@@ -37,7 +37,7 @@ class EventFd {
     EventFd(EventFd&&) = default;
     EventFd& operator=(EventFd&&) = default;
 
-    int fd() const { return file_.get(); }
+    int fd() const noexcept { return file_.get(); }
     void flush()
     {
         // Adds the 8-byte integer value supplied in its buffer to the counter.
@@ -85,7 +85,7 @@ class EventPipe {
     EventPipe(EventPipe&&) = default;
     EventPipe& operator=(EventPipe&&) = default;
 
-    int fd() const { return pipe_.first.get(); }
+    int fd() const noexcept { return pipe_.first.get(); }
     void flush()
     {
         // Drain block of bytes.

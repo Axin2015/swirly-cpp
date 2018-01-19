@@ -19,6 +19,7 @@
 
 #include <swirly/sys/EventHandler.hpp>
 #include <swirly/sys/Handle.hpp>
+#include <swirly/sys/MsgQueue.hpp>
 #include <swirly/sys/Muxer.hpp>
 #include <swirly/sys/Timer.hpp>
 
@@ -50,7 +51,7 @@ using FileToken = Handle<FileTokenPolicy>;
 struct EventTokenPolicy {
     struct Id {
         Reactor* reactor{nullptr};
-        Address addr{Address::None};
+        Topic topic{Topic::None};
         EventHandler* handler{nullptr};
     };
     static constexpr Id invalid() noexcept { return {}; }
@@ -60,13 +61,13 @@ struct EventTokenPolicy {
 inline bool operator==(EventTokenPolicy::Id lhs, EventTokenPolicy::Id rhs) noexcept
 {
     assert(lhs.reactor == rhs.reactor || !lhs.reactor || !rhs.reactor);
-    return lhs.addr == rhs.addr && lhs.handler == rhs.handler;
+    return lhs.topic == rhs.topic && lhs.handler == rhs.handler;
 }
 
 inline bool operator!=(EventTokenPolicy::Id lhs, EventTokenPolicy::Id rhs) noexcept
 {
     assert(lhs.reactor == rhs.reactor || !lhs.reactor || !rhs.reactor);
-    return lhs.addr != rhs.addr || lhs.handler != rhs.handler;
+    return lhs.topic != rhs.topic || lhs.handler != rhs.handler;
 }
 
 using EventToken = Handle<EventTokenPolicy>;
@@ -101,20 +102,19 @@ class SWIRLY_API Reactor {
     void swap(Reactor& rhs) noexcept { impl_.swap(rhs.impl_); }
 
     /**
-     * Thread-safe.
+     * Thread-safe. Returns false if capacity is exceeded.
      */
-    void postEvent(const Event& ev);
-
-    /**
-     * Thread-safe.
-     */
-    void postEvent(Event&& ev);
+    template <typename FnT>
+    bool postEvent(FnT fn)
+    {
+        return mq().post(fn);
+    }
 
     FileToken subscribe(int fd, FileEvents mask, const EventHandlerPtr& handler);
-    EventToken subscribe(Address addr, const EventHandlerPtr& handler);
+    EventToken subscribe(Topic topic, const EventHandlerPtr& handler);
 
     void unsubscribe(int fd) noexcept;
-    void unsubscribe(Address addr, const EventHandler& handler) noexcept;
+    void unsubscribe(Topic topic, const EventHandler& handler) noexcept;
 
     void setMask(int fd, FileEvents mask);
 
@@ -124,6 +124,8 @@ class SWIRLY_API Reactor {
     int poll(std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
 
   private:
+    MsgQueue& mq() noexcept;
+
     int dispatch(FileEvent* buf, int size, Time now);
 
     struct Impl;
@@ -137,8 +139,13 @@ inline void FileTokenPolicy::close(Id id) noexcept
 
 inline void EventTokenPolicy::close(Id id) noexcept
 {
-    id.reactor->unsubscribe(id.addr, *id.handler);
+    id.reactor->unsubscribe(id.topic, *id.handler);
 }
+
+/**
+ * Get the Reactors vector used by postEvent(). The resulting vector must not be modified.
+ */
+SWIRLY_API std::vector<Reactor>& getReactors() noexcept;
 
 /**
  * Set the Reactors vector used by postEvent(). This vector must not be modified once set.
@@ -146,9 +153,22 @@ inline void EventTokenPolicy::close(Id id) noexcept
 SWIRLY_API void setReactors(std::vector<Reactor>& rs) noexcept;
 
 /**
- * Post Event to each Reactor in the Reactors vector.
+ * Post Event to each Reactor in the Reactors vector. Returns false if a postEvent() for at least
+ * one Reactor.
  */
-SWIRLY_API void postEvent(const Event& ev);
+template <typename FnT>
+bool postEvent(FnT fn)
+{
+    bool ret{true};
+    auto& rs = getReactors();
+    for (auto& r : rs) {
+        if (!r.postEvent(fn)) {
+            // TODO: backoff and retry.
+            ret = false;
+        }
+    }
+    return ret;
+}
 
 } // namespace swirly
 

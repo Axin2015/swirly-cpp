@@ -32,7 +32,6 @@ set(lib_SOURCES
   Event.cpp
   EventFile.cpp
   EventHandler.cpp
-  EventQueue.cpp
   File.cpp
   Handle.cpp
   IoSocket.cpp
@@ -56,7 +55,6 @@ set(lib_SOURCES
   TcpSocket.cpp
   Time.cpp
   Timer.cpp
-  Types.cpp
   UdpSocket.cpp)
 
 add_library(swirly_sys_static STATIC ${lib_SOURCES})

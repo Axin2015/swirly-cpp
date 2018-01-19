@@ -17,124 +17,69 @@
 #ifndef SWIRLY_SYS_EVENT_HPP
 #define SWIRLY_SYS_EVENT_HPP
 
-#include <swirly/sys/MemAlloc.hpp>
-#include <swirly/sys/Types.hpp>
-
-#include <boost/intrusive_ptr.hpp>
-
+#include <cstdint>
+#include <type_traits>
 #include <utility>
 
 namespace swirly {
 
-class SWIRLY_API Event {
-    struct Impl {
-        mutable int refs;
-        Address to, reply;
-        int type, size;
-        char data[];
-    };
-    static_assert(std::is_pod_v<Impl>);
-    static_assert(sizeof(Impl) == 20);
-    friend inline void intrusive_ptr_add_ref(const Impl* impl) noexcept
-    {
-        __atomic_fetch_add(&impl->refs, 1, __ATOMIC_RELAXED);
-    }
-    friend inline void intrusive_ptr_release(const Impl* impl) noexcept
-    {
-        if (__atomic_fetch_sub(&impl->refs, 1, __ATOMIC_RELEASE) == 1) {
-            __atomic_thread_fence(__ATOMIC_ACQUIRE);
-            dealloc(const_cast<Impl*>(impl), sizeof(Impl) + impl->size);
-        }
-    }
-    explicit Event(boost::intrusive_ptr<Impl>&& impl)
-      : impl_{std::move(impl)}
-    {
-    }
+/**
+ * The first topic is reserved for signal handling.
+ */
+enum class Topic : int { None = 0, Signal = 1 };
 
-  public:
-    Event() = default;
-    ~Event() noexcept = default;
+using FileEvents = std::uint32_t;
 
-    // Copy.
-    Event(const Event&) = default;
-    Event& operator=(const Event&) = default;
-
-    // Move.
-    Event(Event&&) = default;
-    Event& operator=(Event&&) = default;
-
-    static Event make(Address to, Address reply, int type, std::size_t size)
-    {
-        auto* const impl = static_cast<Impl*>(alloc(sizeof(Impl) + size));
-        impl->refs = 1;
-        impl->to = to;
-        impl->reply = reply;
-        impl->type = type;
-        impl->size = size;
-        return Event{boost::intrusive_ptr<Impl>{impl, false}};
-    }
-    static Event make(Address to, int type, std::size_t size)
-    {
-        return make(to, Address::None, type, size);
-    }
-    template <typename DataT>
-    static Event make(Address to, Address reply, int type)
-    {
-        static_assert(std::is_trivially_copyable_v<DataT>);
-        return make(to, reply, type, sizeof(DataT));
-    }
-    template <typename DataT>
-    static Event make(Address to, int type)
-    {
-        static_assert(std::is_trivially_copyable_v<DataT>);
-        return make(to, type, sizeof(DataT));
-    }
-    template <typename DataT, typename... ArgsT>
-    static Event make(Address to, Address reply, int type, std::in_place_t, ArgsT&&... args)
-    {
-        return make(to, reply, type, sizeof(DataT)).construct(std::forward<ArgsT>(args)...);
-    }
-    template <typename DataT, typename... ArgsT>
-    static Event make(Address to, int type, std::in_place_t, ArgsT&&... args)
-    {
-        return make(to, type, sizeof(DataT)).construct<DataT>(std::forward<ArgsT>(args)...);
-    }
-    explicit operator bool() const noexcept { return static_cast<bool>(impl_); }
-
-    Address to() const noexcept { return impl_->to; }
-    Address reply() const noexcept { return impl_->reply; }
-    int type() const noexcept { return impl_->type; }
-
-    void reset() noexcept { impl_.reset(); }
-    void swap(Event& rhs) noexcept { std::swap(impl_, rhs.impl_); }
-
-    template <typename DataT>
-    inline const DataT& data() const noexcept
-    {
-        static_assert(std::is_trivially_copyable_v<DataT>);
-        return *reinterpret_cast<const DataT*>(impl_->data);
-    }
-    template <typename DataT>
-    inline DataT& data() noexcept
-    {
-        static_assert(std::is_trivially_copyable_v<DataT>);
-        return *reinterpret_cast<DataT*>(impl_->data);
-    }
-
-  private:
-    template <typename DataT, typename... ArgsT>
-    Event construct(ArgsT&&... args)
-    {
-        static_assert(std::is_trivially_copyable_v<DataT>);
-        ::new (impl_->data) DataT{std::forward<ArgsT>(args)...};
-        return *this;
-    }
-    boost::intrusive_ptr<Impl> impl_;
+struct MsgEvent {
+    Topic topic;
+    int type;
+    /**
+     * Reserved for future use.
+     */
+    int reserved[2];
+    char data[1000];
 };
+static_assert(std::is_pod_v<MsgEvent>);
+static_assert(sizeof(MsgEvent) + sizeof(std::int64_t) == 1024);
 
-inline Event makeSignal(int sig)
+template <typename DataT>
+void emplaceEvent(MsgEvent& ev, Topic topic, int type) noexcept
 {
-    return Event::make(Address::Signal, sig, 0);
+    static_assert(alignof(DataT) <= 8);
+    static_assert(std::is_nothrow_default_constructible_v<DataT>);
+    static_assert(std::is_trivially_copyable_v<DataT>);
+    ev.topic = topic;
+    ev.type = type;
+    ::new (ev.data) DataT{};
+}
+
+template <typename DataT, typename... ArgsT>
+void emplaceEvent(MsgEvent& ev, Topic topic, int type, std::in_place_t, ArgsT&&... args) noexcept
+{
+    static_assert(alignof(DataT) <= 8);
+    static_assert(std::is_nothrow_constructible_v<DataT, ArgsT...>);
+    static_assert(std::is_trivially_copyable_v<DataT>);
+    ev.topic = topic;
+    ev.type = type;
+    ::new (ev.data) DataT{std::forward<ArgsT>(args)...};
+}
+
+inline void emplaceSignal(MsgEvent& ev, int sig) noexcept
+{
+    ev.topic = Topic::Signal;
+    ev.type = sig;
+}
+
+template <typename DataT>
+const DataT& data(const MsgEvent& ev) noexcept
+{
+    return *reinterpret_cast<const DataT*>(ev.data);
+}
+
+template <typename DataT>
+DataT& data(MsgEvent& ev) noexcept
+{
+    return *reinterpret_cast<DataT*>(ev.data);
 }
 
 } // namespace swirly

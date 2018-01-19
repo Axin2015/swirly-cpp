@@ -17,7 +17,6 @@
 #include "Reactor.hpp"
 
 #include "EventFile.hpp"
-#include "EventQueue.hpp"
 #include "Log.hpp"
 
 #include <algorithm>
@@ -42,23 +41,30 @@ class EventDispatcher {
     EventDispatcher(EventDispatcher&&) = default;
     EventDispatcher& operator=(EventDispatcher&&) = default;
 
-    void dispatch(const Event& ev, Time now)
+    int dispatch(MsgQueue& mq, Time now) noexcept
     {
-        const auto addr = ev.to();
-        const auto it = map_.find(addr);
+        int n{};
+        while (mq.fetch([this, now](const MsgEvent& ev) noexcept { dispatch(ev, now); })) {
+            ++n;
+        }
+        return n;
+    }
+    void dispatch(const MsgEvent& ev, Time now) noexcept
+    {
+        const auto it = map_.find(ev.topic);
         if (it == map_.end()) {
             return;
         }
         auto& v = it->second;
 
-        locked_ = addr;
+        locked_ = ev.topic;
         struct Finally {
-            explicit Finally(Address& locked)
+            explicit Finally(Topic& locked)
               : locked_(locked)
             {
             }
-            ~Finally() noexcept { locked_ = Address::None; }
-            Address& locked_;
+            ~Finally() noexcept { locked_ = Topic::None; }
+            Topic& locked_;
         } finally{locked_};
 
         unsubs_ = 0;
@@ -68,10 +74,10 @@ class EventDispatcher {
             const auto handler = v[i];
             if (handler) {
                 try {
-                    if (addr != Address::Signal) {
+                    if (ev.topic != Topic::Signal) {
                         handler->onEvent(ev, now);
                     } else {
-                        handler->onSignal(ev.type(), now);
+                        handler->onSignal(ev.type, now);
                     }
                 } catch (const std::exception& e) {
                     using namespace string_literals;
@@ -84,23 +90,23 @@ class EventDispatcher {
             v.erase(remove_if(v.begin(), v.end(), [](const auto& ptr) { return !ptr; }), v.end());
         }
     }
-    void subscribe(Address addr, const EventHandlerPtr& handler)
+    void subscribe(Topic topic, const EventHandlerPtr& handler)
     {
-        auto& v = map_[addr];
+        auto& v = map_[topic];
         if (find(v.begin(), v.end(), handler) != v.end()) {
             throw logic_error{"already subscribed"};
         }
         v.push_back(handler);
     }
-    void unsubscribe(Address addr, const EventHandler& handler)
+    void unsubscribe(Topic topic, const EventHandler& handler)
     {
-        const auto it = map_.find(addr);
+        const auto it = map_.find(topic);
         if (it == map_.end()) {
             return;
         }
         auto& v = it->second;
         const auto pred = [&handler](const auto& ptr) { return ptr.get() == &handler; };
-        if (addr != locked_) {
+        if (topic != locked_) {
             v.erase(remove_if(v.begin(), v.end(), pred), v.end());
         } else {
             const auto it = find_if(v.begin(), v.end(), pred);
@@ -112,8 +118,8 @@ class EventDispatcher {
     }
 
   private:
-    unordered_map<Address, vector<EventHandlerPtr>> map_;
-    Address locked_{Address::None};
+    unordered_map<Topic, vector<EventHandlerPtr>> map_;
+    Topic locked_{Topic::None};
     int unsubs_{};
 };
 
@@ -125,8 +131,9 @@ struct Reactor::Impl {
 
     explicit Impl(size_t sizeHint)
       : mux{sizeHint}
+      , mq{ef, 1 << 14}
     {
-        const auto fd = ef.fd();
+        const auto fd = mq.fd();
         data.resize(max<size_t>(fd + 1, sizeHint));
 
         auto& ref = data[fd];
@@ -139,7 +146,7 @@ struct Reactor::Impl {
     vector<Data> data;
     EventDispatcher ed;
     EventFile ef;
-    EventQueue eq;
+    MsgQueue mq;
     TimerQueue tq;
 };
 
@@ -153,20 +160,6 @@ Reactor::~Reactor() noexcept = default;
 // Move.
 Reactor::Reactor(Reactor&&) = default;
 Reactor& Reactor::operator=(Reactor&&) = default;
-
-void Reactor::postEvent(const Event& ev)
-{
-    if (impl_->eq.push(ev) == 1) {
-        impl_->ef.notify();
-    }
-}
-
-void Reactor::postEvent(Event&& ev)
-{
-    if (impl_->eq.push(move(ev)) == 1) {
-        impl_->ef.notify();
-    }
-}
 
 FileToken Reactor::subscribe(int fd, FileEvents mask, const EventHandlerPtr& handler)
 {
@@ -182,10 +175,10 @@ FileToken Reactor::subscribe(int fd, FileEvents mask, const EventHandlerPtr& han
     return FileToken{{this, fd}};
 }
 
-EventToken Reactor::subscribe(Address addr, const EventHandlerPtr& handler)
+EventToken Reactor::subscribe(Topic topic, const EventHandlerPtr& handler)
 {
-    impl_->ed.subscribe(addr, handler);
-    return EventToken{{this, addr, handler.get()}};
+    impl_->ed.subscribe(topic, handler);
+    return EventToken{{this, topic, handler.get()}};
 }
 
 void Reactor::unsubscribe(int fd) noexcept
@@ -196,9 +189,9 @@ void Reactor::unsubscribe(int fd) noexcept
     ref.handler.reset();
 }
 
-void Reactor::unsubscribe(Address addr, const EventHandler& handler) noexcept
+void Reactor::unsubscribe(Topic topic, const EventHandler& handler) noexcept
 {
-    impl_->ed.unsubscribe(addr, handler);
+    impl_->ed.unsubscribe(topic, handler);
 }
 
 void Reactor::setMask(int fd, FileEvents mask)
@@ -233,7 +226,13 @@ int Reactor::poll(chrono::milliseconds timeout)
     }
     FileEvent buf[MaxEvents];
     error_code ec;
-    const auto ret = impl_->mux.wait(buf, MaxEvents, timeout, ec);
+    int ret;
+    if (timeout > 0ms && impl_->mq.park()) {
+        ret = impl_->mux.wait(buf, MaxEvents, timeout, ec);
+        impl_->mq.unpark();
+    } else {
+        ret = impl_->mux.wait(buf, MaxEvents, 0ms, ec);
+    }
     if (ret < 0) {
         if (ec.value() != EINTR) {
             throw system_error{ec};
@@ -241,7 +240,12 @@ int Reactor::poll(chrono::milliseconds timeout)
         return 0;
     }
     const auto now = UnixClock::now();
-    return impl_->tq.dispatch(now) + dispatch(buf, ret, now);
+    return impl_->ed.dispatch(impl_->mq, now) + impl_->tq.dispatch(now) + dispatch(buf, ret, now);
+}
+
+MsgQueue& Reactor::mq() noexcept
+{
+    return impl_->mq;
 }
 
 int Reactor::dispatch(FileEvent* buf, int size, Time now)
@@ -251,11 +255,8 @@ int Reactor::dispatch(FileEvent* buf, int size, Time now)
 
         auto& ev = buf[i];
         const auto fd = static_cast<int>(ev.data.u64 & 0xffffffff);
-        if (fd == impl_->ef.fd()) {
-            while (auto event = impl_->eq.pop()) {
-                impl_->ed.dispatch(event, now);
-                ++n;
-            }
+        if (fd == impl_->mq.fd()) {
+            impl_->mq.flush();
             continue;
         }
 
@@ -286,16 +287,16 @@ int Reactor::dispatch(FileEvent* buf, int size, Time now)
     return n;
 }
 
-void setReactors(vector<Reactor>& rs) noexcept
-{
-    return reactors_.store(&rs, memory_order_release);
-}
-
-void postEvent(const Event& ev)
+std::vector<Reactor>& getReactors() noexcept
 {
     auto* rs = reactors_.load(memory_order_acquire);
     assert(rs);
-    for_each(rs->begin(), rs->end(), [&ev](auto& r) { r.postEvent(ev); });
+    return *rs;
+}
+
+void setReactors(vector<Reactor>& rs) noexcept
+{
+    return reactors_.store(&rs, memory_order_release);
 }
 
 } // namespace swirly

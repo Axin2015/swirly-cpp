@@ -20,7 +20,6 @@
 #include <swirly/sys/Event.hpp>
 #include <swirly/sys/RefCount.hpp>
 #include <swirly/sys/Time.hpp>
-#include <swirly/sys/Types.hpp>
 
 namespace swirly {
 
@@ -45,14 +44,14 @@ class SWIRLY_API EventHandler : public RefCount<EventHandler, ThreadUnsafePolicy
 
     void close() { doClose(); }
 
-    void onEvent(const Event& event, Time now) { doEvent(event, now); }
+    void onEvent(const MsgEvent& ev, Time now) { doEvent(ev, now); }
     void onReady(int fd, FileEvents mask, Time now) { doReady(fd, mask, now); }
     void onSignal(int sig, Time now) { doSignal(sig, now); }
     void onTimer(const Timer& tmr, Time now) { doTimer(tmr, now); }
 
   protected:
     virtual void doClose() = 0;
-    virtual void doEvent(const Event& event, Time now);
+    virtual void doEvent(const MsgEvent& ev, Time now);
     virtual void doReady(int fd, FileEvents mask, Time now);
     /**
      * The default doSignal() implementation calls doClose() on SIGINT or SIGTERM.
