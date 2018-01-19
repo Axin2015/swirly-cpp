@@ -17,7 +17,7 @@
 #ifndef SWIRLY_SYS_BOUNDEDQUEUE_HPP
 #define SWIRLY_SYS_BOUNDEDQUEUE_HPP
 
-#include <swirly/sys/Math.hpp>
+#include <swirly/sys/Memory.hpp>
 
 #include <atomic>
 #include <cassert>
@@ -29,9 +29,8 @@ namespace swirly {
 template <typename ValueT>
 class BoundedQueue {
     static_assert(std::is_trivially_copyable_v<ValueT>);
-    enum : std::size_t { CacheLineSize = 64 };
     struct alignas(CacheLineSize) Entry {
-        std::atomic<std::int64_t> seq;
+        std::int64_t seq;
         ValueT val;
     };
 
@@ -44,7 +43,7 @@ class BoundedQueue {
         assert(capacity >= 2);
         // Initialise sequence numbers.
         for (std::int64_t i{0}; i < static_cast<std::int64_t>(capacity); ++i) {
-            buf_[i].seq.store(i, std::memory_order_relaxed);
+            __atomic_store_n(&buf_[i].seq, i, __ATOMIC_RELAXED);
         }
     }
     ~BoundedQueue() noexcept = default;
@@ -63,8 +62,8 @@ class BoundedQueue {
     bool empty() const noexcept
     {
         // Acquire prevents reordering of these loads.
-        const auto rpos = rpos_.load(std::memory_order_acquire);
-        const auto wpos = wpos_.load(std::memory_order_relaxed);
+        const auto rpos = __atomic_load_n(&rpos_, __ATOMIC_ACQUIRE);
+        const auto wpos = __atomic_load_n(&wpos_, __ATOMIC_RELAXED);
         return rpos == wpos;
     }
     /**
@@ -73,8 +72,8 @@ class BoundedQueue {
     std::size_t size() const noexcept
     {
         // Acquire prevents reordering of these loads.
-        const auto rpos = rpos_.load(std::memory_order_acquire);
-        const auto wpos = wpos_.load(std::memory_order_relaxed);
+        const auto rpos = __atomic_load_n(&rpos_, __ATOMIC_ACQUIRE);
+        const auto wpos = __atomic_load_n(&wpos_, __ATOMIC_RELAXED);
         return wpos - rpos;
     }
     /**
@@ -84,23 +83,24 @@ class BoundedQueue {
     bool fetch(FnT fn) noexcept
     {
         static_assert(std::is_nothrow_invocable_v<FnT, ValueT&&>);
-        auto rpos = rpos_.load(std::memory_order_relaxed);
+        auto rpos = __atomic_load_n(&rpos_, __ATOMIC_RELAXED);
         for (;;) {
             auto& entry = buf_[rpos & mask_];
-            const auto seq = entry.seq.load(std::memory_order_acquire);
+            const auto seq = __atomic_load_n(&entry.seq, __ATOMIC_ACQUIRE);
             const auto diff = seq - (rpos + 1);
             if (diff == 0) {
                 // The compare_exchange_weak function re-reads wpos on failure.
-                if (rpos_.compare_exchange_weak(rpos, rpos + 1, std::memory_order_relaxed)) {
+                if (__atomic_compare_exchange_n(&rpos_, &rpos, rpos + 1, true, __ATOMIC_RELAXED,
+                                                __ATOMIC_RELAXED)) {
                     fn(std::move(entry.val));
                     // Commit.
-                    entry.seq.store(rpos + capacity_, std::memory_order_release);
+                    __atomic_store_n(&entry.seq, rpos + capacity_, __ATOMIC_RELEASE);
                     break;
                 }
             } else if (diff < 0) {
                 return false;
             } else {
-                rpos = rpos_.load(std::memory_order_relaxed);
+                rpos = __atomic_load_n(&rpos_, __ATOMIC_RELAXED);
             }
         }
         return true;
@@ -112,23 +112,24 @@ class BoundedQueue {
     bool post(FnT fn) noexcept
     {
         static_assert(std::is_nothrow_invocable_v<FnT, ValueT&>);
-        auto wpos = wpos_.load(std::memory_order_relaxed);
+        auto wpos = __atomic_load_n(&wpos_, __ATOMIC_RELAXED);
         for (;;) {
             auto& entry = buf_[wpos & mask_];
-            const auto seq = entry.seq.load(std::memory_order_acquire);
+            const auto seq = __atomic_load_n(&entry.seq, __ATOMIC_ACQUIRE);
             const auto diff = seq - wpos;
             if (diff == 0) {
                 // The compare_exchange_weak function re-reads wpos on failure.
-                if (wpos_.compare_exchange_weak(wpos, wpos + 1, std::memory_order_relaxed)) {
+                if (__atomic_compare_exchange_n(&wpos_, &wpos, wpos + 1, true, __ATOMIC_RELAXED,
+                                                __ATOMIC_RELAXED)) {
                     fn(entry.val);
                     // Commit.
-                    entry.seq.store(wpos + 1, std::memory_order_release);
+                    __atomic_store_n(&entry.seq, wpos + 1, __ATOMIC_RELEASE);
                     break;
                 }
             } else if (diff < 0) {
                 return false;
             } else {
-                wpos = wpos_.load(std::memory_order_relaxed);
+                wpos = __atomic_load_n(&wpos_, __ATOMIC_RELAXED);
             }
         }
         return true;
@@ -162,10 +163,10 @@ class BoundedQueue {
     // Array is in first cache-line along with read-only members.
     const std::size_t capacity_;
     const std::size_t mask_;
-    std::unique_ptr<Entry[]> buf_;
     // Ensure that read and write positions are in different cache-lines.
-    alignas(CacheLineSize) std::atomic<std::int64_t> rpos_{0};
-    alignas(CacheLineSize) std::atomic<std::int64_t> wpos_{0};
+    alignas(CacheLineSize) std::int64_t rpos_{0};
+    alignas(CacheLineSize) std::int64_t wpos_{0};
+    std::unique_ptr<Entry[]> buf_;
 };
 
 } // namespace swirly

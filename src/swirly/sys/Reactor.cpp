@@ -29,6 +29,7 @@ namespace {
 constexpr size_t MaxEvents{16};
 
 class EventDispatcher {
+    enum : int { Unlocked = -1 };
   public:
     EventDispatcher() = default;
     ~EventDispatcher() noexcept = default;
@@ -43,41 +44,55 @@ class EventDispatcher {
 
     int dispatch(MsgQueue& mq, Time now) noexcept
     {
-        int n{};
+        struct Lock {
+            explicit Lock(int& state)
+              : state_(state)
+            {
+                state = 0;
+            }
+            ~Lock() noexcept { state_ = Unlocked; }
+            int& state_;
+        } lock{state_};
+
+        int n{0};
         while (mq.fetch([this, now](const MsgEvent& ev) noexcept { dispatch(ev, now); })) {
             ++n;
         }
+        if (state_ > 0) {
+            handlers_.erase(remove_if(handlers_.begin(), handlers_.end(), [](const auto& ptr) { return !ptr; }), handlers_.end());
+        }
         return n;
     }
+    void subscribe(const EventHandlerPtr& handler)
+    {
+        handlers_.push_back(handler);
+    }
+    void unsubscribe(const EventHandler& handler)
+    {
+        const auto pred = [&handler](const auto& ptr) { return ptr.get() == &handler; };
+        const auto it = find_if(handlers_.begin(), handlers_.end(), pred);
+        if (it != handlers_.end()) {
+            if (state_ == Unlocked) {
+                handlers_.erase(it);
+            } else {
+                it->reset();
+                ++state_;
+            }
+        }
+    }
+
+  private:
     void dispatch(const MsgEvent& ev, Time now) noexcept
     {
-        const auto it = map_.find(ev.topic);
-        if (it == map_.end()) {
-            return;
-        }
-        auto& v = it->second;
-
-        locked_ = ev.topic;
-        struct Finally {
-            explicit Finally(Topic& locked)
-              : locked_(locked)
-            {
-            }
-            ~Finally() noexcept { locked_ = Topic::None; }
-            Topic& locked_;
-        } finally{locked_};
-
-        unsubs_ = 0;
-
-        const auto n = v.size();
+        const auto n = handlers_.size();
         for (size_t i{0}; i < n; ++i) {
-            const auto handler = v[i];
+            const auto handler = handlers_[i];
             if (handler) {
                 try {
-                    if (ev.topic != Topic::Signal) {
+                    if (ev.type != Signal) {
                         handler->onEvent(ev, now);
                     } else {
-                        handler->onSignal(ev.type, now);
+                        handler->onSignal(data<int>(ev), now);
                     }
                 } catch (const std::exception& e) {
                     using namespace string_literals;
@@ -86,41 +101,15 @@ class EventDispatcher {
             }
         }
 
-        if (unsubs_ > 0) {
-            v.erase(remove_if(v.begin(), v.end(), [](const auto& ptr) { return !ptr; }), v.end());
-        }
     }
-    void subscribe(Topic topic, const EventHandlerPtr& handler)
-    {
-        auto& v = map_[topic];
-        if (find(v.begin(), v.end(), handler) != v.end()) {
-            throw logic_error{"already subscribed"};
-        }
-        v.push_back(handler);
-    }
-    void unsubscribe(Topic topic, const EventHandler& handler)
-    {
-        const auto it = map_.find(topic);
-        if (it == map_.end()) {
-            return;
-        }
-        auto& v = it->second;
-        const auto pred = [&handler](const auto& ptr) { return ptr.get() == &handler; };
-        if (topic != locked_) {
-            v.erase(remove_if(v.begin(), v.end(), pred), v.end());
-        } else {
-            const auto it = find_if(v.begin(), v.end(), pred);
-            if (it != v.end()) {
-                it->reset();
-                ++unsubs_;
-            }
-        }
-    }
+    vector<EventHandlerPtr> handlers_;
+    int state_{Unlocked};
+};
 
-  private:
-    unordered_map<Topic, vector<EventHandlerPtr>> map_;
-    Topic locked_{Topic::None};
-    int unsubs_{};
+struct Data {
+    int sid{};
+    FileEvents mask{};
+    EventHandlerPtr handler;
 };
 
 atomic<vector<Reactor>*> reactors_{nullptr};
@@ -161,6 +150,12 @@ Reactor::~Reactor() noexcept = default;
 Reactor::Reactor(Reactor&&) = default;
 Reactor& Reactor::operator=(Reactor&&) = default;
 
+EventToken Reactor::subscribe(const EventHandlerPtr& handler)
+{
+    impl_->ed.subscribe(handler);
+    return EventToken{{this, handler.get()}};
+}
+
 FileToken Reactor::subscribe(int fd, FileEvents mask, const EventHandlerPtr& handler)
 {
     assert(fd >= 0);
@@ -175,10 +170,9 @@ FileToken Reactor::subscribe(int fd, FileEvents mask, const EventHandlerPtr& han
     return FileToken{{this, fd}};
 }
 
-EventToken Reactor::subscribe(Topic topic, const EventHandlerPtr& handler)
+void Reactor::unsubscribe(const EventHandler& handler) noexcept
 {
-    impl_->ed.subscribe(topic, handler);
-    return EventToken{{this, topic, handler.get()}};
+    impl_->ed.unsubscribe(handler);
 }
 
 void Reactor::unsubscribe(int fd) noexcept
@@ -187,11 +181,6 @@ void Reactor::unsubscribe(int fd) noexcept
     auto& ref = impl_->data[fd];
     ref.mask = 0;
     ref.handler.reset();
-}
-
-void Reactor::unsubscribe(Topic topic, const EventHandler& handler) noexcept
-{
-    impl_->ed.unsubscribe(topic, handler);
 }
 
 void Reactor::setMask(int fd, FileEvents mask)
@@ -250,7 +239,7 @@ MsgQueue& Reactor::mq() noexcept
 
 int Reactor::dispatch(FileEvent* buf, int size, Time now)
 {
-    int n{};
+    int n{0};
     for (int i{0}; i < size; ++i) {
 
         auto& ev = buf[i];

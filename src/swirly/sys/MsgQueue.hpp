@@ -43,7 +43,7 @@ class SWIRLY_API MsgQueue {
     MsgQueue& operator=(MsgQueue&&) = delete;
 
     /**
-     * Returns the event file descriptor..
+     * Returns the event file descriptor.
      */
     int fd() const noexcept { return ef_.fd(); }
     /**

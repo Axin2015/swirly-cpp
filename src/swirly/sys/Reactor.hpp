@@ -51,7 +51,6 @@ using FileToken = Handle<FileTokenPolicy>;
 struct EventTokenPolicy {
     struct Id {
         Reactor* reactor{nullptr};
-        Topic topic{Topic::None};
         EventHandler* handler{nullptr};
     };
     static constexpr Id invalid() noexcept { return {}; }
@@ -61,13 +60,13 @@ struct EventTokenPolicy {
 inline bool operator==(EventTokenPolicy::Id lhs, EventTokenPolicy::Id rhs) noexcept
 {
     assert(lhs.reactor == rhs.reactor || !lhs.reactor || !rhs.reactor);
-    return lhs.topic == rhs.topic && lhs.handler == rhs.handler;
+    return lhs.handler == rhs.handler;
 }
 
 inline bool operator!=(EventTokenPolicy::Id lhs, EventTokenPolicy::Id rhs) noexcept
 {
     assert(lhs.reactor == rhs.reactor || !lhs.reactor || !rhs.reactor);
-    return lhs.topic != rhs.topic || lhs.handler != rhs.handler;
+    return lhs.handler != rhs.handler;
 }
 
 using EventToken = Handle<EventTokenPolicy>;
@@ -83,11 +82,7 @@ class SWIRLY_API Reactor {
     };
     using Id = typename Muxer::Id;
     using FileEvent = typename Muxer::FileEvent;
-    struct Data {
-        int sid{};
-        FileEvents mask{};
-        EventHandlerPtr handler;
-    };
+
     explicit Reactor(std::size_t sizeHint = 1024);
     ~Reactor() noexcept;
 
@@ -110,11 +105,11 @@ class SWIRLY_API Reactor {
         return mq().post(fn);
     }
 
+    EventToken subscribe(const EventHandlerPtr& handler);
     FileToken subscribe(int fd, FileEvents mask, const EventHandlerPtr& handler);
-    EventToken subscribe(Topic topic, const EventHandlerPtr& handler);
 
+    void unsubscribe(const EventHandler& handler) noexcept;
     void unsubscribe(int fd) noexcept;
-    void unsubscribe(Topic topic, const EventHandler& handler) noexcept;
 
     void setMask(int fd, FileEvents mask);
 
@@ -139,7 +134,7 @@ inline void FileTokenPolicy::close(Id id) noexcept
 
 inline void EventTokenPolicy::close(Id id) noexcept
 {
-    id.reactor->unsubscribe(id.topic, *id.handler);
+    id.reactor->unsubscribe(*id.handler);
 }
 
 /**

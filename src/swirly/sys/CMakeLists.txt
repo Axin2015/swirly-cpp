@@ -43,6 +43,7 @@ set(lib_SOURCES
   MemAlloc.cpp
   MemCtx.cpp
   MemPool.cpp
+  Memory.cpp
   MsgQueue.cpp
   Muxer.cpp
   Poll.cpp

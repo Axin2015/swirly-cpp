@@ -17,7 +17,7 @@
 #ifndef SWIRLY_SYS_MEMPOOL_HPP
 #define SWIRLY_SYS_MEMPOOL_HPP
 
-#include <swirly/sys/Math.hpp>
+#include <swirly/sys/Memory.hpp>
 
 #include <swirly/Config.h>
 
@@ -27,27 +27,6 @@
 #include <type_traits>
 
 namespace swirly {
-
-// Assumptions:
-// sysconf(_SC_LEVEL1_DCACHE_LINESIZE) == 64
-// sysconf(_SC_PAGESIZE) == 4096
-
-enum : std::size_t {
-    CacheLineBits = 6,
-    CacheLineSize = 1 << CacheLineBits,
-    PageBits = 12,
-    PageSize = 1 << PageBits
-};
-
-constexpr std::size_t ceilCacheLine(std::size_t size) noexcept
-{
-    return ceilPow2<CacheLineBits>(size);
-}
-
-constexpr std::size_t ceilPage(std::size_t size) noexcept
-{
-    return ceilPow2<PageBits>(size);
-}
 
 /**
  * Size type used for 32bit index or offset into shared memory segment.
