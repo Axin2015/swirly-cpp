@@ -39,11 +39,12 @@ set(lib_SOURCES
   IpAddress.cpp
   LocalAddress.cpp
   Log.cpp
+  MMap.cpp
   Math.cpp
   MemAlloc.cpp
   MemCtx.cpp
   MemPool.cpp
-  MMap.cpp
+  MsgQueue.cpp
   Muxer.cpp
   Poll.cpp
   Reactor.cpp

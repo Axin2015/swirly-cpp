@@ -227,10 +227,7 @@ inline void setIpMcastLoop(int sockfd, int family, bool enabled)
 }
 
 /**
- * Set or read the time-to-live value of outgoing multicast packets for this socket. It is very
- * important for multicast packets to set the smallest TTL possible. The default is 1 which means
- * that multicast packets don't leave the local network unless the user program explicitly requests
- * it.
+ * Set or read the time-to-live value of outgoing multicast packets for this socket.
  */
 inline void setIpMcastTtl(int sockfd, int family, int ttl, std::error_code& ec) noexcept
 {
@@ -245,10 +242,7 @@ inline void setIpMcastTtl(int sockfd, int family, int ttl, std::error_code& ec) 
 }
 
 /**
- * Set or read the time-to-live value of outgoing multicast packets for this socket. It is very
- * important for multicast packets to set the smallest TTL possible. The default is 1 which means
- * that multicast packets don't leave the local network unless the user program explicitly requests
- * it.
+ * Set or read the time-to-live value of outgoing multicast packets for this socket.
  */
 inline void setIpMcastTtl(int sockfd, int family, int ttl)
 {
