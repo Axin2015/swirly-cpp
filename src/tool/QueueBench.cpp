@@ -17,7 +17,7 @@
 #include <swirly/util/Log.hpp>
 #include <swirly/util/Profile.hpp>
 
-#include <swirly/sys/BoundedQueue.hpp>
+#include <swirly/sys/MemQueue.hpp>
 
 #include <iostream>
 #include <thread>
@@ -33,8 +33,8 @@ int main(int argc, char* argv[])
 
     int ret = 1;
     try {
-        Profile p{"BoundedQueue"sv};
-        BoundedQueue<Clock::time_point> q{1 << 14};
+        Profile p{"MemQueue"sv};
+        MemQueue<Clock::time_point> q{1 << 14};
 
         enum { Iters = 50000000 };
         auto t1 = thread([&q]() {
