@@ -22,6 +22,8 @@
 #include <iostream>
 #include <thread>
 
+#include <xmmintrin.h>
+
 using namespace std;
 using namespace swirly;
 
@@ -68,7 +70,7 @@ int main(int argc, char* argv[])
                 const auto usec = diff.count();
                 p.record(usec);
             } else {
-                sched_yield();
+                _mm_pause();
             }
         }
 
