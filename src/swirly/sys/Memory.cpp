@@ -14,23 +14,4 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "CloseHandler.hpp"
-
-namespace swirly {
-
-CloseHandler::CloseHandler(Reactor& r)
-  : EventHandler{r}
-{
-    const auto eh = self();
-    signal_ = r.subscribe(eh);
-}
-
-CloseHandler::~CloseHandler() noexcept = default;
-
-void CloseHandler::doClose() noexcept
-{
-    closed_ = true;
-    signal_.reset();
-}
-
-} // namespace swirly
+#include "Memory.hpp"

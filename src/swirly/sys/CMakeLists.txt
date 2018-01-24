@@ -25,7 +25,6 @@ else()
 endif()
 
 set(lib_SOURCES
-  BoundedQueue.cpp
   Buffer.cpp
   Daemon.cpp
   Error.cpp
@@ -43,6 +42,8 @@ set(lib_SOURCES
   MemAlloc.cpp
   MemCtx.cpp
   MemPool.cpp
+  MemQueue.cpp
+  Memory.cpp
   MsgQueue.cpp
   Muxer.cpp
   Poll.cpp

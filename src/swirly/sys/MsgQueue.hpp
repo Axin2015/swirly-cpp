@@ -17,9 +17,9 @@
 #ifndef SWIRLY_SYS_MSGQUEUE_HPP
 #define SWIRLY_SYS_MSGQUEUE_HPP
 
-#include <swirly/sys/BoundedQueue.hpp>
 #include <swirly/sys/Event.hpp>
 #include <swirly/sys/EventFile.hpp>
+#include <swirly/sys/MemQueue.hpp>
 
 #include <swirly/Config.h>
 
@@ -43,7 +43,7 @@ class SWIRLY_API MsgQueue {
     MsgQueue& operator=(MsgQueue&&) = delete;
 
     /**
-     * Returns the event file descriptor..
+     * Returns the event file descriptor.
      */
     int fd() const noexcept { return ef_.fd(); }
     /**
@@ -130,7 +130,7 @@ class SWIRLY_API MsgQueue {
 
   private:
     EventFile& ef_;
-    BoundedQueue<MsgEvent> mq_;
+    MemQueue<MsgEvent> mq_;
     std::atomic<bool> parked_{false};
 };
 

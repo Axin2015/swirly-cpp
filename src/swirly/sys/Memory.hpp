@@ -14,23 +14,34 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "CloseHandler.hpp"
+#ifndef SWIRLY_SYS_MEMORY_HPP
+#define SWIRLY_SYS_MEMORY_HPP
+
+#include <swirly/sys/Math.hpp>
 
 namespace swirly {
 
-CloseHandler::CloseHandler(Reactor& r)
-  : EventHandler{r}
+// Assumptions:
+// sysconf(_SC_LEVEL1_DCACHE_LINESIZE) == 64
+// sysconf(_SC_PAGESIZE) == 4096
+
+enum : std::size_t {
+    CacheLineBits = 6,
+    CacheLineSize = 1 << CacheLineBits,
+    PageBits = 12,
+    PageSize = 1 << PageBits
+};
+
+constexpr std::size_t ceilCacheLine(std::size_t size) noexcept
 {
-    const auto eh = self();
-    signal_ = r.subscribe(eh);
+    return ceilPow2<CacheLineBits>(size);
 }
 
-CloseHandler::~CloseHandler() noexcept = default;
-
-void CloseHandler::doClose() noexcept
+constexpr std::size_t ceilPage(std::size_t size) noexcept
 {
-    closed_ = true;
-    signal_.reset();
+    return ceilPow2<PageBits>(size);
 }
 
 } // namespace swirly
+
+#endif // SWIRLY_SYS_MEMORY_HPP
