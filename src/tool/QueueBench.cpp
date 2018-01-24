@@ -22,8 +22,6 @@
 #include <iostream>
 #include <thread>
 
-#include <xmmintrin.h>
-
 using namespace std;
 using namespace swirly;
 
@@ -70,7 +68,7 @@ int main(int argc, char* argv[])
                 const auto usec = diff.count();
                 p.record(usec);
             } else {
-                _mm_pause();
+                cpuPause();
             }
         }
 
