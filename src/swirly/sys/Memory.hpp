@@ -42,6 +42,15 @@ constexpr std::size_t ceilPage(std::size_t size) noexcept
     return ceilPow2<PageBits>(size);
 }
 
+inline void cpuPause() noexcept
+{
+#if defined(__x86_64__) || defined(__i386__)
+    __asm__("pause");
+#elif defined(__arm__) || defined(__arm64__)
+    __asm__("yield");
+#endif
+}
+
 } // namespace swirly
 
 #endif // SWIRLY_SYS_MEMORY_HPP
