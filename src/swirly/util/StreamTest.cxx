@@ -24,27 +24,27 @@
 using namespace std;
 using namespace swirly;
 
-SWIRLY_TEST_CASE(StringBuilder)
+SWIRLY_TEST_CASE(StringStream)
 {
-    StringBuilder<7> sb;
-    SWIRLY_CHECK(sb.empty());
-    sb << "foo";
-    SWIRLY_CHECK(sb.size() == 3UL);
-    SWIRLY_CHECK(sb.str() == "foo");
-    sb << ',' << "bar";
-    SWIRLY_CHECK(sb.size() == 7UL);
-    SWIRLY_CHECK(sb.str() == "foo,bar");
+    StringStream<7> ss;
+    SWIRLY_CHECK(ss.empty());
+    ss << "foo";
+    SWIRLY_CHECK(ss.size() == 3UL);
+    SWIRLY_CHECK(ss.str() == "foo");
+    ss << ',' << "bar";
+    SWIRLY_CHECK(ss.size() == 7UL);
+    SWIRLY_CHECK(ss.str() == "foo,bar");
 
-    sb.reset();
-    SWIRLY_CHECK(sb.empty());
-    sb << 12345678;
-    SWIRLY_CHECK(sb.size() == 7UL);
-    SWIRLY_CHECK(sb.str() == "1234567");
-    SWIRLY_CHECK(!sb);
+    ss.reset();
+    SWIRLY_CHECK(ss.empty());
+    ss << 12345678;
+    SWIRLY_CHECK(ss.size() == 7UL);
+    SWIRLY_CHECK(ss.str() == "1234567");
+    SWIRLY_CHECK(!ss);
 
-    sb.reset();
-    SWIRLY_CHECK(sb);
-    SWIRLY_CHECK((sb << "test").str() == "test");
+    ss.reset();
+    SWIRLY_CHECK(ss);
+    SWIRLY_CHECK((ss << "test").str() == "test");
 }
 
 SWIRLY_TEST_CASE(OStreamJoiner)

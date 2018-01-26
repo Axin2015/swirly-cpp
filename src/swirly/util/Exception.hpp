@@ -25,7 +25,7 @@
 
 namespace swirly {
 
-using ErrMsg = StringBuilder<MaxErrMsg>;
+using ErrMsg = StringStream<MaxErrMsg>;
 
 class SWIRLY_API Exception : public std::exception {
   public:
@@ -52,8 +52,8 @@ class SWIRLY_API Exception : public std::exception {
 };
 
 /**
- * Thread-local error message. This thread-local instance of StringBuilder can be used to format
- * error messages before throwing. Note that the StringBuilder is reset each time this function is
+ * Thread-local error message. This thread-local instance of StringStream can be used to format
+ * error messages before throwing. Note that the StringStream is reset each time this function is
  * called.
  */
 SWIRLY_API ErrMsg& errMsg() noexcept;
