@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "HttpHandler.hpp"
+#include "HttpParser.hpp"
 
 #include <swirly/web/Url.hpp>
 
@@ -30,15 +30,15 @@ using namespace swirly;
 
 namespace {
 
-class HttpHandler
-  : public BasicHttpHandler<HttpHandler>
-  , public BasicUrl<HttpHandler> {
-    friend class BasicHttpHandler<HttpHandler>;
-    friend class BasicUrl<HttpHandler>;
+class HttpParser
+  : public BasicHttpParser<HttpParser>
+  , public BasicUrl<HttpParser> {
+    friend class BasicHttpParser<HttpParser>;
+    friend class BasicUrl<HttpParser>;
 
   public:
-    using BasicHttpHandler<HttpHandler>::BasicHttpHandler;
-    ~HttpHandler() noexcept = default;
+    using BasicHttpParser<HttpParser>::BasicHttpParser;
+    ~HttpParser() noexcept = default;
 
     const auto& url() const noexcept { return url_; }
     const auto& status() const noexcept { return status_; }
@@ -52,26 +52,26 @@ class HttpHandler
         headers_.clear();
         body_.clear();
     }
-    using BasicHttpHandler<HttpHandler>::parse;
+    using BasicHttpParser<HttpParser>::parse;
 
   private:
-    bool onMessageBegin() noexcept
+    bool doMessageBegin() noexcept
     {
-        BasicUrl<HttpHandler>::reset();
+        BasicUrl<HttpParser>::reset();
         clear();
         return true;
     }
-    bool onUrl(string_view sv) noexcept
+    bool doUrl(string_view sv) noexcept
     {
         url_.append(sv.data(), sv.size());
         return true;
     }
-    bool onStatus(string_view sv) noexcept
+    bool doStatus(string_view sv) noexcept
     {
         status_.append(sv.data(), sv.size());
         return true;
     }
-    bool onHeaderField(string_view sv, bool first) noexcept
+    bool doHeaderField(string_view sv, bool first) noexcept
     {
         if (first) {
             headers_.emplace_back(string{sv.data(), sv.size()}, "");
@@ -80,24 +80,24 @@ class HttpHandler
         }
         return true;
     }
-    bool onHeaderValue(string_view sv, bool first) noexcept
+    bool doHeaderValue(string_view sv, bool first) noexcept
     {
         headers_.back().second.append(sv.data(), sv.size());
         return true;
     }
-    bool onHeadersEnd() noexcept { return true; }
-    bool onBody(string_view sv) noexcept
+    bool doHeadersEnd() noexcept { return true; }
+    bool doBody(string_view sv) noexcept
     {
         body_.append(sv.data(), sv.size());
         return true;
     }
-    bool onMessageEnd() noexcept
+    bool doMessageEnd() noexcept
     {
-        BasicUrl<HttpHandler>::parse();
+        BasicUrl<HttpParser>::parse();
         return true;
     }
-    bool onChunkHeader(size_t len) noexcept { return true; }
-    bool onChunkEnd() noexcept { return true; }
+    bool doChunkHeader(size_t len) noexcept { return true; }
+    bool doChunkEnd() noexcept { return true; }
 
     string url_;
     string status_;
@@ -113,7 +113,7 @@ SWIRLY_TEST_CASE(HttpInitialRequestLine)
         "GET /path/to/file/index.html HTTP/1.0\r\n" //
         "\r\n"sv;
 
-    HttpHandler h{HttpType::Request};
+    HttpParser h{HttpType::Request};
     SWIRLY_CHECK(h.parse(Message) == Message.size());
     SWIRLY_CHECK(!h.shouldKeepAlive());
     SWIRLY_CHECK(h.httpMajor() == 1);
@@ -132,7 +132,7 @@ SWIRLY_TEST_CASE(HttpInitialResponseLine)
         "HTTP/1.0 404 Not Found\r\n" //
         "\r\n"sv;
 
-    HttpHandler h{HttpType::Response};
+    HttpParser h{HttpType::Response};
     SWIRLY_CHECK(h.parse(Message) == Message.size());
     SWIRLY_CHECK(!h.shouldKeepAlive());
     SWIRLY_CHECK(h.httpMajor() == 1);
@@ -153,7 +153,7 @@ SWIRLY_TEST_CASE(HttpBasicRequest)
         "User-Agent: HTTPTool/1.0\r\n" //
         "\r\n"sv;
 
-    HttpHandler h{HttpType::Request};
+    HttpParser h{HttpType::Request};
     SWIRLY_CHECK(h.parse(Message) == Message.size());
     SWIRLY_CHECK(!h.shouldKeepAlive());
     SWIRLY_CHECK(h.httpMajor() == 1);
@@ -179,7 +179,7 @@ SWIRLY_TEST_CASE(HttpBasicResponse)
         "\r\n" //
         "Hello, World!"sv;
 
-    HttpHandler h{HttpType::Response};
+    HttpParser h{HttpType::Response};
     SWIRLY_CHECK(h.parse(Message) == Message.size());
     SWIRLY_CHECK(!h.shouldKeepAlive());
     SWIRLY_CHECK(h.httpMajor() == 1);
@@ -207,7 +207,7 @@ SWIRLY_TEST_CASE(HttpPostRequest)
         "\r\n" //
         "home=Cosby&favorite+flavor=flies"sv;
 
-    HttpHandler h{HttpType::Request};
+    HttpParser h{HttpType::Request};
     SWIRLY_CHECK(h.parse(Message) == Message.size());
     SWIRLY_CHECK(!h.shouldKeepAlive());
     SWIRLY_CHECK(h.httpMajor() == 1);
@@ -233,7 +233,7 @@ SWIRLY_TEST_CASE(HttpKeepAliveRequest)
         "Host: www.host1.com:80\r\n" //
         "\r\n"sv;
 
-    HttpHandler h{HttpType::Request};
+    HttpParser h{HttpType::Request};
     SWIRLY_CHECK(h.parse(Message) == Message.size());
     SWIRLY_CHECK(h.shouldKeepAlive());
     SWIRLY_CHECK(h.httpMajor() == 1);
@@ -265,7 +265,7 @@ SWIRLY_TEST_CASE(HttpChunkedResponse)
         "another-footer: another-value\r\n" //
         "\r\n"sv;
 
-    HttpHandler h{HttpType::Response};
+    HttpParser h{HttpType::Response};
     SWIRLY_CHECK(h.parse(Message) == Message.size());
     SWIRLY_CHECK(h.shouldKeepAlive());
     SWIRLY_CHECK(h.httpMajor() == 1);
@@ -298,7 +298,7 @@ SWIRLY_TEST_CASE(HttpMultiResponse)
         "\r\n" //
         "second"sv;
 
-    HttpHandler h{HttpType::Request};
+    HttpParser h{HttpType::Request};
     SWIRLY_CHECK(h.parse(Message) == Message.size());
     SWIRLY_CHECK(h.shouldKeepAlive());
     SWIRLY_CHECK(h.httpMajor() == 1);

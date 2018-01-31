@@ -93,7 +93,7 @@ void HttpSess::parse()
     const auto size = asio::buffer_size(inbuf_);
     if (size > 0) {
         const auto* data = asio::buffer_cast<const char*>(inbuf_);
-        const auto n = BasicHttpHandler::parse({data, size});
+        const auto n = BasicHttpParser::parse({data, size});
         // Slide buffer window forward based on number of bytes consumed by parser.
         inbuf_ = asio::buffer(data + n, size - n);
     }
@@ -129,7 +129,7 @@ void HttpSess::asyncReadSome()
     HttpSessPtr session{this};
     auto fn = [this, session](auto ec, auto len) {
         if (!ec) {
-            this->onReadSome(len);
+            this->doReadSome(len);
         } else if (ec == asio::error::operation_aborted) {
             SWIRLY_INFO(this->logMsg() << "read cancelled");
         } else {
@@ -148,7 +148,7 @@ void HttpSess::asyncWrite()
     HttpSessPtr session{this};
     auto fn = [this, session](auto ec, auto len) {
         if (!ec) {
-            this->onWrite();
+            this->doWrite();
         } else if (ec == asio::error::operation_aborted) {
             SWIRLY_WARNING(this->logMsg() << "write cancelled");
         } else {
@@ -159,7 +159,7 @@ void HttpSess::asyncWrite()
     asio::async_write(sock_, asio::buffer(data), makeAllocHandler(fn));
 }
 
-void HttpSess::onReadSome(size_t len) noexcept
+void HttpSess::doReadSome(size_t len) noexcept
 {
     inbuf_ = asio::buffer(data_, len);
     try {
@@ -171,7 +171,7 @@ void HttpSess::onReadSome(size_t len) noexcept
     }
 }
 
-void HttpSess::onWrite() noexcept
+void HttpSess::doWrite() noexcept
 {
     const auto wasFull = outbuf_.full();
     outbuf_.pop();
@@ -188,7 +188,7 @@ void HttpSess::onWrite() noexcept
     }
 }
 
-bool HttpSess::onUrl(string_view sv) noexcept
+bool HttpSess::doUrl(string_view sv) noexcept
 {
     bool ret{false};
     try {
@@ -202,7 +202,7 @@ bool HttpSess::onUrl(string_view sv) noexcept
     return ret;
 }
 
-bool HttpSess::onHeaderField(string_view sv, bool first) noexcept
+bool HttpSess::doHeaderField(string_view sv, bool first) noexcept
 {
     bool ret{false};
     try {
@@ -216,7 +216,7 @@ bool HttpSess::onHeaderField(string_view sv, bool first) noexcept
     return ret;
 }
 
-bool HttpSess::onHeaderValue(string_view sv, bool first) noexcept
+bool HttpSess::doHeaderValue(string_view sv, bool first) noexcept
 {
     bool ret{false};
     try {
@@ -230,13 +230,13 @@ bool HttpSess::onHeaderValue(string_view sv, bool first) noexcept
     return ret;
 }
 
-bool HttpSess::onHeadersEnd() noexcept
+bool HttpSess::doHeadersEnd() noexcept
 {
     req_.setMethod(method());
     return true;
 }
 
-bool HttpSess::onBody(string_view sv) noexcept
+bool HttpSess::doBody(string_view sv) noexcept
 {
     bool ret{false};
     try {
@@ -250,7 +250,7 @@ bool HttpSess::onBody(string_view sv) noexcept
     return ret;
 }
 
-bool HttpSess::onMessageEnd() noexcept
+bool HttpSess::doMessageEnd() noexcept
 {
     bool ret{false};
     try {

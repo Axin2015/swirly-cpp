@@ -36,7 +36,7 @@ endif(RAGEL_EXECUTABLE)
 set(lib_SOURCES
   EntitySet.cpp
   Exception.cpp
-  HttpHandler.cpp
+  HttpParser.cpp
   Page.cpp
   RestBody.cpp
   Rest.cpp
@@ -57,7 +57,7 @@ endif()
 
 set(test_SOURCES
   EntitySetTest.cxx
-  HttpHandlerTest.cxx
+  HttpParserTest.cxx
   PageTest.cxx
   RestBodyTest.cxx
   UrlTest.cxx)
