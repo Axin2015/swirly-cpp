@@ -126,7 +126,7 @@ struct Reactor::Impl {
         data.resize(max<size_t>(fd + 1, sizeHint));
 
         auto& ref = data[fd];
-        mux.subscribe(0, fd, In);
+        mux.subscribe(fd, 0, In);
         ref.mask = In;
         ref.handler = {};
     }
@@ -164,7 +164,7 @@ FileToken Reactor::subscribe(int fd, FileEvents mask, const EventHandlerPtr& han
         impl_->data.resize(fd + 1);
     }
     auto& ref = impl_->data[fd];
-    impl_->mux.subscribe(++ref.sid, fd, mask);
+    impl_->mux.subscribe(fd, ++ref.sid, mask);
     ref.mask = mask;
     ref.handler = handler;
     return FileToken{{this, fd}};
@@ -185,8 +185,9 @@ void Reactor::unsubscribe(int fd) noexcept
 
 void Reactor::setMask(int fd, FileEvents mask)
 {
-    if (impl_->data[fd].mask != mask) {
-        impl_->mux.setMask(fd, mask);
+    auto& ref = impl_->data[fd];
+    if (ref.mask != mask) {
+        impl_->mux.setMask(fd, ref.sid, mask);
         impl_->data[fd].mask = mask;
     }
 }

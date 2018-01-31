@@ -82,9 +82,9 @@ class BasicMuxer {
     {
         return wait(buf, size, std::chrono::milliseconds::max(), ec);
     }
-    void subscribe(int sid, int fd, FileEvents mask) { PolicyT::subscribe(md_, sid, fd, mask); }
+    void subscribe(int fd, int sid, FileEvents mask) { PolicyT::subscribe(md_, fd, sid, mask); }
     void unsubscribe(int fd) noexcept { PolicyT::unsubscribe(md_, fd); }
-    void setMask(int fd, FileEvents mask) { PolicyT::setMask(md_, fd, mask); }
+    void setMask(int fd, int sid, FileEvents mask) { PolicyT::setMask(md_, fd, sid, mask); }
 
   private:
     void close() noexcept
@@ -127,9 +127,9 @@ struct SWIRLY_API PollPolicy {
         return wait(md, buf, size,
                     timeout == std::chrono::milliseconds::max() ? -1 : timeout.count(), ec);
     }
-    static void subscribe(Impl* md, int sid, int fd, FileEvents mask);
+    static void subscribe(Impl* md, int fd, int sid, FileEvents mask);
     static void unsubscribe(Impl* md, int fd) noexcept;
-    static void setMask(Impl* md, int fd, FileEvents mask);
+    static void setMask(Impl* md, int fd, int sid, FileEvents mask);
 
   private:
     static int wait(Impl* md, FileEvent* buf, std::size_t size, int timeout, std::error_code& ec);
@@ -158,7 +158,7 @@ struct EpollPolicy {
         return sys::epoll_wait(
             md, buf, size, timeout == std::chrono::milliseconds::max() ? -1 : timeout.count(), ec);
     }
-    static void subscribe(int md, int sid, int fd, FileEvents mask)
+    static void subscribe(int md, int fd, int sid, FileEvents mask)
     {
         FileEvent ev;
         ev.events = mask;
@@ -173,11 +173,11 @@ struct EpollPolicy {
         std::error_code ec;
         sys::epoll_ctl(md, EPOLL_CTL_DEL, fd, ev, ec);
     }
-    static void setMask(int md, int fd, FileEvents mask)
+    static void setMask(int md, int fd, int sid, FileEvents mask)
     {
         FileEvent ev;
         ev.events = mask;
-        ev.data.fd = fd;
+        ev.data.u64 = static_cast<std::uint64_t>(sid) << 32 | fd;
         sys::epoll_ctl(md, EPOLL_CTL_MOD, fd, ev);
     }
 };
