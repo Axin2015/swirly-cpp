@@ -41,9 +41,6 @@ void Buffer::consume(std::size_t count) noexcept
     }
 }
 
-/**
-     * Returns write buffer of specified size.
-     */
 MutableBuffer Buffer::prepare(std::size_t size)
 {
     const auto n = unused();

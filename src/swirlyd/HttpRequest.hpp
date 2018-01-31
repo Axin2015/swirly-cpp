@@ -17,7 +17,7 @@
 #ifndef SWIRLYD_HTTPREQUEST_HPP
 #define SWIRLYD_HTTPREQUEST_HPP
 
-#include <swirly/web/HttpHandler.hpp>
+#include <swirly/web/HttpParser.hpp>
 #include <swirly/web/RestBody.hpp>
 #include <swirly/web/Url.hpp>
 

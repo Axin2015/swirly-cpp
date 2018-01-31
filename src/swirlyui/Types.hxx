@@ -31,7 +31,7 @@
 
 #include <optional>
 
-// This is acceptable in private header that is only visible to and under the instrol of the Swirly
+// This is acceptable in private header that is only visible to and under the control of the Swirly
 // build.
 
 namespace swirly {

@@ -19,7 +19,7 @@
 
 #include "HttpRequest.hpp"
 
-#include <swirly/web/HttpHandler.hpp>
+#include <swirly/web/HttpParser.hpp>
 
 #include <swirly/util/Log.hpp>
 #include <swirly/util/RingBuffer.hpp>
@@ -36,17 +36,19 @@ namespace swirly {
 class HttpResponse;
 class RestServ;
 
-class HttpSess : public RefCount<HttpSess, ThreadUnsafePolicy>, public BasicHttpHandler<HttpSess> {
+class HttpSess
+  : public RefCount<HttpSess, ThreadUnsafePolicy>
+  , public BasicHttpParser<HttpSess> {
 
-    friend class BasicHttpHandler<HttpSess>;
+    friend class BasicHttpParser<HttpSess>;
     enum { IdleTimeout = 5, MaxData = 4096 };
 
   public:
     HttpSess(boost::asio::io_service& ioServ, RestServ& restServ)
-        : BasicHttpHandler<HttpSess>{HttpType::Request},
-          sock_{ioServ},
-          timeout_{ioServ},
-          restServ_(restServ)
+      : BasicHttpParser<HttpSess>{HttpType::Request}
+      , sock_{ioServ}
+      , timeout_{ioServ}
+      , restServ_(restServ)
     {
     }
     ~HttpSess() noexcept;
@@ -77,23 +79,23 @@ class HttpSess : public RefCount<HttpSess, ThreadUnsafePolicy>, public BasicHttp
 
     void asyncReadSome();
     void asyncWrite();
-    void onReadSome(std::size_t len) noexcept;
-    void onWrite() noexcept;
+    void doReadSome(std::size_t len) noexcept;
+    void doWrite() noexcept;
 
-    bool onMessageBegin() noexcept { return true; }
-    bool onUrl(std::string_view sv) noexcept;
-    bool onStatus(std::string_view sv) noexcept
+    bool doMessageBegin() noexcept { return true; }
+    bool doUrl(std::string_view sv) noexcept;
+    bool doStatus(std::string_view sv) noexcept
     {
         // Only supported for HTTP responses.
         return false;
     }
-    bool onHeaderField(std::string_view sv, bool first) noexcept;
-    bool onHeaderValue(std::string_view sv, bool first) noexcept;
-    bool onHeadersEnd() noexcept;
-    bool onBody(std::string_view sv) noexcept;
-    bool onMessageEnd() noexcept;
-    bool onChunkHeader(size_t len) noexcept { return true; }
-    bool onChunkEnd() noexcept { return true; }
+    bool doHeaderField(std::string_view sv, bool first) noexcept;
+    bool doHeaderValue(std::string_view sv, bool first) noexcept;
+    bool doHeadersEnd() noexcept;
+    bool doBody(std::string_view sv) noexcept;
+    bool doMessageEnd() noexcept;
+    bool doChunkHeader(size_t len) noexcept { return true; }
+    bool doChunkEnd() noexcept { return true; }
 
     boost::asio::ip::tcp::socket sock_;
     // Close session if client is inactive.

@@ -51,22 +51,22 @@ class StringBuf : public std::streambuf {
 };
 
 template <std::size_t MaxN>
-class StringBuilder : public std::ostream {
+class StringStream : public std::ostream {
   public:
-    StringBuilder()
+    StringStream()
       : std::ostream{nullptr}
     {
         rdbuf(&buf_);
     }
-    ~StringBuilder() noexcept override = default;
+    ~StringStream() noexcept override = default;
 
     // Copy.
-    StringBuilder(const StringBuilder& rhs) = delete;
-    StringBuilder& operator=(const StringBuilder& rhs) = delete;
+    StringStream(const StringStream& rhs) = delete;
+    StringStream& operator=(const StringStream& rhs) = delete;
 
     // Move.
-    StringBuilder(StringBuilder&&) = delete;
-    StringBuilder& operator=(StringBuilder&&) = delete;
+    StringStream(StringStream&&) = delete;
+    StringStream& operator=(StringStream&&) = delete;
 
     const char* data() const noexcept { return buf_.data(); }
     bool empty() const noexcept { return buf_.empty(); }
@@ -84,10 +84,10 @@ class StringBuilder : public std::ostream {
 };
 
 template <std::size_t MaxN, typename ValueT>
-auto& operator<<(StringBuilder<MaxN>& sb, ValueT&& val)
+auto& operator<<(StringStream<MaxN>& ss, ValueT&& val)
 {
-    static_cast<std::ostream&>(sb) << std::forward<ValueT>(val);
-    return sb;
+    static_cast<std::ostream&>(ss) << std::forward<ValueT>(val);
+    return ss;
 }
 
 /**

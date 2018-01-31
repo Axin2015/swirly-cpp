@@ -27,11 +27,11 @@ namespace swirly {
 /**
  * Logger callback function.
  */
-using LogMsg = StringBuilder<MaxLogMsg>;
+using LogMsg = StringStream<MaxLogMsg>;
 
 /**
- * Thread-local log message. This thread-local instance of StringBuilder can be used to format log
- * messages before writing to the log. Note that the StringBuilder is reset each time this function
+ * Thread-local log message. This thread-local instance of StringStream can be used to format log
+ * messages before writing to the log. Note that the StringStream is reset each time this function
  * is called.
  */
 SWIRLY_API LogMsg& logMsg() noexcept;

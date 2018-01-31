@@ -23,7 +23,7 @@ namespace swirly {
 
 using namespace std;
 
-void PollPolicy::subscribe(Impl* md, int sid, int fd, FileEvents mask)
+void PollPolicy::subscribe(Impl* md, int fd, int sid, FileEvents mask)
 {
     auto& pfds = md->pfds;
 
@@ -55,7 +55,7 @@ void PollPolicy::unsubscribe(Impl* md, int fd) noexcept
     }
 }
 
-void PollPolicy::setMask(Impl* md, int fd, FileEvents mask)
+void PollPolicy::setMask(Impl* md, int fd, int sid, FileEvents mask)
 {
     auto& pfds = md->pfds;
 
