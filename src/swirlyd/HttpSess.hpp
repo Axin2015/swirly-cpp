@@ -55,9 +55,7 @@ class SWIRLY_API HttpSess
 
   protected:
     void doClose() noexcept override;
-    void doEvent(const MsgEvent& ev, Time now) override;
     void doReady(int fd, FileEvents events, Time now) override;
-    void doSignal(int sig, Time now) override;
     void doTimer(const Timer& tmr, Time now) override;
 
     bool doMessageBegin() noexcept { return true; }

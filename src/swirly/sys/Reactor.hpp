@@ -19,7 +19,6 @@
 
 #include <swirly/sys/EventHandler.hpp>
 #include <swirly/sys/Handle.hpp>
-#include <swirly/sys/MsgQueue.hpp>
 #include <swirly/sys/Muxer.hpp>
 #include <swirly/sys/Timer.hpp>
 
@@ -48,29 +47,6 @@ inline bool operator!=(FileTokenPolicy::Id lhs, FileTokenPolicy::Id rhs) noexcep
 
 using FileToken = Handle<FileTokenPolicy>;
 
-struct EventTokenPolicy {
-    struct Id {
-        Reactor* reactor{nullptr};
-        EventHandler* handler{nullptr};
-    };
-    static constexpr Id invalid() noexcept { return {}; }
-    static void close(Id id) noexcept;
-};
-
-inline bool operator==(EventTokenPolicy::Id lhs, EventTokenPolicy::Id rhs) noexcept
-{
-    assert(lhs.reactor == rhs.reactor || !lhs.reactor || !rhs.reactor);
-    return lhs.handler == rhs.handler;
-}
-
-inline bool operator!=(EventTokenPolicy::Id lhs, EventTokenPolicy::Id rhs) noexcept
-{
-    assert(lhs.reactor == rhs.reactor || !lhs.reactor || !rhs.reactor);
-    return lhs.handler != rhs.handler;
-}
-
-using EventToken = Handle<EventTokenPolicy>;
-
 class SWIRLY_API Reactor {
   public:
     enum : FileEvents {
@@ -97,18 +73,16 @@ class SWIRLY_API Reactor {
     void swap(Reactor& rhs) noexcept { impl_.swap(rhs.impl_); }
 
     /**
-     * Thread-safe. Returns false if capacity is exceeded.
+     * Thread-safe.
      */
-    template <typename FnT>
-    bool postEvent(FnT fn)
-    {
-        return mq().post(fn);
-    }
+    bool closed() const noexcept;
 
-    EventToken subscribe(const EventHandlerPtr& handler);
+    /**
+     * Thread-safe.
+     */
+    void close() noexcept;
+
     FileToken subscribe(int fd, FileEvents mask, const EventHandlerPtr& handler);
-
-    void unsubscribe(const EventHandler& handler) noexcept;
     void unsubscribe(int fd) noexcept;
 
     void setMask(int fd, FileEvents mask);
@@ -119,8 +93,6 @@ class SWIRLY_API Reactor {
     int poll(std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
 
   private:
-    MsgQueue& mq() noexcept;
-
     int dispatch(FileEvent* buf, int size, Time now);
 
     struct Impl;
@@ -130,39 +102,6 @@ class SWIRLY_API Reactor {
 inline void FileTokenPolicy::close(Id id) noexcept
 {
     id.reactor->unsubscribe(id.value);
-}
-
-inline void EventTokenPolicy::close(Id id) noexcept
-{
-    id.reactor->unsubscribe(*id.handler);
-}
-
-/**
- * Get the Reactors vector used by postEvent(). The resulting vector must not be modified.
- */
-SWIRLY_API std::vector<Reactor>& getReactors() noexcept;
-
-/**
- * Set the Reactors vector used by postEvent(). This vector must not be modified once set.
- */
-SWIRLY_API void setReactors(std::vector<Reactor>& rs) noexcept;
-
-/**
- * Post Event to each Reactor in the Reactors vector. Returns false if a postEvent() for at least
- * one Reactor.
- */
-template <typename FnT>
-bool postEvent(FnT fn)
-{
-    bool ret{true};
-    auto& rs = getReactors();
-    for (auto& r : rs) {
-        if (!r.postEvent(fn)) {
-            // TODO: backoff and retry.
-            ret = false;
-        }
-    }
-    return ret;
 }
 
 } // namespace swirly

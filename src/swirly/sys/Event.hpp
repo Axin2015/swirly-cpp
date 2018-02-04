@@ -23,8 +23,6 @@
 
 namespace swirly {
 
-enum : int { Signal };
-
 using FileEvents = std::uint32_t;
 
 struct MsgEvent {
@@ -52,11 +50,6 @@ void emplaceEvent(MsgEvent& ev, int type, ArgsT&&... args) noexcept
     static_assert(std::is_trivially_copyable_v<DataT>);
     ev.type = type;
     ::new (ev.data) DataT{std::forward<ArgsT>(args)...};
-}
-
-inline void emplaceSignal(MsgEvent& ev, int sig) noexcept
-{
-    emplaceEvent<int>(ev, Signal, sig);
 }
 
 template <typename DataT>
