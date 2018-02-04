@@ -18,38 +18,25 @@
 
 #include "HttpSess.hpp"
 
-using namespace boost;
-using namespace std;
-
-using asio::ip::tcp;
-
 namespace swirly {
 
-HttpServ::HttpServ(asio::io_service& ioServ, uint16_t port, RestServ& restServ)
-  : ioServ_(ioServ)
-  , acceptor_{ioServ}
-  , restServ_(restServ)
-{
-    tcp::endpoint endpoint{tcp::v4(), port};
-    acceptor_.open(endpoint.protocol());
-    acceptor_.set_option(tcp::acceptor::reuse_address{true});
-    acceptor_.bind(endpoint);
-    acceptor_.listen();
+using namespace std;
 
-    asyncAccept();
+HttpServ::HttpServ(Reactor& r, const Endpoint& ep, RestServ& rs)
+  : TcpAcceptor{r, ep}
+  , restServ_(rs)
+{
 }
 
 HttpServ::~HttpServ() noexcept = default;
 
-void HttpServ::asyncAccept()
+void HttpServ::doClose() noexcept
 {
-    auto sess = makeIntrusive<HttpSess>(ioServ_, restServ_);
-    acceptor_.async_accept(sess->socket(), [this, sess](auto ec) {
-        if (!ec) {
-            sess->start();
-        }
-        this->asyncAccept();
-    });
+}
+
+void HttpServ::doAccept(IoSocket&& sock, const Endpoint& ep, Time now)
+{
+    HttpSess::make(reactor(), move(sock), ep, restServ_, now);
 }
 
 } // namespace swirly

@@ -22,12 +22,20 @@
 using namespace std;
 
 namespace swirly {
+namespace {
 
-HttpResponseBuf::~HttpResponseBuf() noexcept = default;
-
-void HttpResponseBuf::setContentLength(size_t pos, size_t len) noexcept
+// All 1xx (informational), 204 (no content), and 304 (not modified) responses must not include a
+// body.
+constexpr bool withBody(int status) noexcept
 {
-    auto it = buf_.begin() + pos;
+    return !((status >= 100 && status < 200) || status == 204 || status == 304);
+}
+
+} // namespace
+
+void HttpResponseBuf::setContentLength(std::streamsize pos, std::streamsize len) noexcept
+{
+    auto it = pbase_ + pos;
     do {
         --it;
         *it = '0' + len % 10;
@@ -35,27 +43,35 @@ void HttpResponseBuf::setContentLength(size_t pos, size_t len) noexcept
     } while (len > 0);
 }
 
+HttpResponseBuf::~HttpResponseBuf() noexcept = default;
+
 HttpResponseBuf::int_type HttpResponseBuf::overflow(int_type c) noexcept
 {
     if (c != traits_type::eof()) {
-        buf_ += c;
+        auto buf = buf_.prepare(pcount_ + 1);
+        pbase_ = buffer_cast<char*>(buf);
+        pbase_[pcount_++] = c;
     }
     return c;
 }
 
 streamsize HttpResponseBuf::xsputn(const char_type* s, streamsize count) noexcept
 {
-    buf_.append(s, count);
+    auto buf = buf_.prepare(pcount_ + count);
+    pbase_ = buffer_cast<char*>(buf);
+    memcpy(pbase_ + pcount_, s, count);
+    pcount_ += count;
     return count;
 }
 
 HttpResponse::~HttpResponse() noexcept = default;
 
-// All 1xx (informational), 204 (no content), and 304 (not modified) responses must not include a
-// body.
-constexpr bool withBody(int status) noexcept
+void HttpResponse::commit() noexcept
 {
-    return !((status >= 100 && status < 200) || status == 204 || status == 304);
+    if (cloff_ > 0) {
+        buf_.setContentLength(cloff_, pcount() - hcount_);
+    }
+    buf_.commit();
 }
 
 void HttpResponse::reset(int status, const char* reason, bool cache)
@@ -68,25 +84,18 @@ void HttpResponse::reset(int status, const char* reason, bool cache)
         *this << "\r\nCache-Control: no-cache";
     }
     if (withBody(status)) {
-        // Status-Line = HTTP-Version SP Status-Code SP Reason-Phrase CRLF. Use 10 space place-holder
-        // for content length. RFC2616 states that field value MAY be preceded by any amount of LWS,
-        // though a single SP is preferred.
+        // Status-Line = HTTP-Version SP Status-Code SP Reason-Phrase CRLF. Use 10 space
+        // place-holder for content length. RFC2616 states that field value MAY be preceded by any
+        // amount of LWS, though a single SP is preferred.
         *this << //
             "\r\nContent-Type: application/json" //
             "\r\nContent-Length:          0";
-        lengthAt_ = size();
+        cloff_ = pcount();
     } else {
-        lengthAt_ = 0;
+        cloff_ = 0;
     }
     *this << "\r\n\r\n";
-    headSize_ = size();
-}
-
-void HttpResponse::setContentLength() noexcept
-{
-    if (lengthAt_ > 0) {
-        buf_.setContentLength(lengthAt_, size() - headSize_);
-    }
+    hcount_ = pcount();
 }
 
 } // namespace swirly

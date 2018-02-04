@@ -16,9 +16,8 @@
  */
 #include "RestServ.hpp"
 
-#include "HttpRequest.hpp"
-#include "HttpResponse.hpp"
-
+#include <swirly/web/HttpRequest.hpp>
+#include <swirly/web/HttpResponse.hpp>
 #include <swirly/web/Rest.hpp>
 
 #include <swirly/fin/Exception.hpp>
@@ -136,7 +135,7 @@ void RestServ::handleRequest(const HttpRequest& req, HttpResponse& resp) noexcep
         resp.reset(status, reason);
         ServException::toJson(status, reason, e.what(), resp);
     }
-    resp.setContentLength(); // noexcept
+    resp.commit(); // noexcept
 }
 
 bool RestServ::reset(const HttpRequest& req) noexcept

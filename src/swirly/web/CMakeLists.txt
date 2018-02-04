@@ -37,6 +37,8 @@ set(lib_SOURCES
   EntitySet.cpp
   Exception.cpp
   HttpParser.cpp
+  HttpRequest.cpp
+  HttpResponse.cpp
   Page.cpp
   RestBody.cpp
   Rest.cpp

@@ -25,6 +25,15 @@ class SWIRLY_API CloseHandler : public EventHandler {
   public:
     explicit CloseHandler(Reactor& r);
     ~CloseHandler() noexcept override;
+
+    // Copy.
+    CloseHandler(const CloseHandler&) = delete;
+    CloseHandler& operator=(const CloseHandler&) = delete;
+
+    // Move.
+    CloseHandler(CloseHandler&&) = delete;
+    CloseHandler& operator=(CloseHandler&&) = delete;
+
     static auto make(Reactor& r) { return makeIntrusive<CloseHandler>(r); }
     bool closed() const noexcept { return closed_; }
 

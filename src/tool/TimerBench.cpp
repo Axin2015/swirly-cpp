@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
             } else {
                 auto tmr = pq.top().second;
                 pq.pop();
-                tmr.cancel();
+                tmr.reset();
             }
             if (!pq.empty()) {
                 r.poll(0ms);

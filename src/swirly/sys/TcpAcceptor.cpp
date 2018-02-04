@@ -20,14 +20,14 @@ namespace swirly {
 
 using namespace std;
 
-TcpAcceptor::TcpAcceptor(Reactor& reactor, const Endpoint& ep)
-  : EventHandler{reactor}
+TcpAcceptor::TcpAcceptor(Reactor& r, const Endpoint& ep)
+  : EventHandler{r}
   , serv_{ep.protocol()}
 {
     serv_.setSoReuseAddr(true);
     serv_.bind(ep);
     serv_.listen(SOMAXCONN);
-    tok_ = reactor.subscribe(*serv_, Reactor::In, IntrusivePtr{this, false});
+    tok_ = r.subscribe(*serv_, Reactor::In, self());
 }
 
 TcpAcceptor::~TcpAcceptor() noexcept = default;

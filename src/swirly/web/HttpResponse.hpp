@@ -14,16 +14,18 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYD_HTTPRESPONSE_HPP
-#define SWIRLYD_HTTPRESPONSE_HPP
+#ifndef SWIRLY_WEB_HTTPRESPONSE_HPP
+#define SWIRLY_WEB_HTTPRESPONSE_HPP
 
-#include <ostream>
+#include <swirly/util/Stream.hpp>
+
+#include <swirly/sys/Buffer.hpp>
 
 namespace swirly {
 
-class HttpResponseBuf : public std::streambuf {
+class SWIRLY_API HttpResponseBuf : public std::streambuf {
   public:
-    explicit HttpResponseBuf(std::string& buf) noexcept
+    explicit HttpResponseBuf(Buffer& buf) noexcept
       : buf_(buf)
     {
     }
@@ -37,10 +39,14 @@ class HttpResponseBuf : public std::streambuf {
     HttpResponseBuf(HttpResponseBuf&&) = delete;
     HttpResponseBuf& operator=(HttpResponseBuf&&) = delete;
 
-    const char_type* data() const noexcept { return buf_.data(); }
-    std::streamsize size() const noexcept { return buf_.size(); }
-    void reset() noexcept { buf_.clear(); }
-    void setContentLength(size_t pos, std::size_t len) noexcept;
+    std::streamsize pcount() const noexcept { return pcount_; }
+    void commit() noexcept { buf_.commit(pcount_); }
+    void reset() noexcept
+    {
+        pbase_ = nullptr;
+        pcount_ = 0;
+    }
+    void setContentLength(std::streamsize pos, std::streamsize len) noexcept;
 
   protected:
     int_type overflow(int_type c) noexcept override;
@@ -48,12 +54,14 @@ class HttpResponseBuf : public std::streambuf {
     std::streamsize xsputn(const char_type* s, std::streamsize count) noexcept override;
 
   private:
-    std::string& buf_;
+    Buffer& buf_;
+    char* pbase_{nullptr};
+    std::streamsize pcount_{0};
 };
 
-class HttpResponse : public std::ostream {
+class SWIRLY_API HttpResponse : public std::ostream {
   public:
-    explicit HttpResponse(std::string& buf) noexcept
+    explicit HttpResponse(Buffer& buf) noexcept
       : std::ostream{nullptr}
       , buf_{buf}
     {
@@ -69,17 +77,28 @@ class HttpResponse : public std::ostream {
     HttpResponse(HttpResponse&&) = delete;
     HttpResponse& operator=(HttpResponse&&) = delete;
 
-    const char_type* data() const noexcept { return buf_.data(); }
-    std::streamsize size() const noexcept { return buf_.size(); }
+    std::streamsize pcount() const noexcept { return buf_.pcount(); }
+    void commit() noexcept;
+    void reset() noexcept
+    {
+        buf_.reset();
+        swirly::reset(*this);
+        cloff_ = hcount_ = 0;
+    }
     void reset(int status, const char* reason, bool cache = false);
-    void setContentLength() noexcept;
 
   private:
     HttpResponseBuf buf_;
-    std::size_t headSize_{0};
-    std::size_t lengthAt_{0};
+    /**
+     * Content-Length offset.
+     */
+    std::streamsize cloff_{0};
+    /**
+     * Header size.
+     */
+    std::streamsize hcount_{0};
 };
 
 } // namespace swirly
 
-#endif // SWIRLYD_HTTPRESPONSE_HPP
+#endif // SWIRLY_WEB_HTTPRESPONSE_HPP

@@ -24,6 +24,7 @@
 #include <swirly/fin/Journ.hpp>
 #include <swirly/fin/Model.hpp>
 
+#include <swirly/util/CloseHandler.hpp>
 #include <swirly/util/Config.hpp>
 #include <swirly/util/Exception.hpp>
 #include <swirly/util/File.hpp>
@@ -32,17 +33,19 @@
 #include <swirly/sys/Daemon.hpp>
 #include <swirly/sys/File.hpp>
 #include <swirly/sys/MemCtx.hpp>
+#include <swirly/sys/Signal.hpp>
 #include <swirly/sys/System.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
-#include <boost/asio.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 #pragma GCC diagnostic pop
 
+#include <csignal>
 #include <iomanip>
 #include <iostream>
+#include <thread>
 
 #include <fcntl.h> // open()
 #include <syslog.h>
@@ -61,63 +64,6 @@ void openLogFile(const char* path)
     dup2(*file, STDOUT_FILENO);
     dup2(*file, STDERR_FILENO);
 }
-
-class SigHandler {
-  public:
-    SigHandler(boost::asio::io_service& ioServ, const fs::path& logFile)
-      : ioServ_(ioServ)
-      , signals_{ioServ}
-      , logFile_{logFile}
-    {
-        signals_.add(SIGHUP);
-        signals_.add(SIGINT);
-        signals_.add(SIGTERM);
-
-        wait();
-    }
-    ~SigHandler() noexcept = default;
-
-    // Copy.
-    SigHandler(const SigHandler&) = delete;
-    SigHandler& operator=(const SigHandler&) = delete;
-
-    // Move.
-    SigHandler(SigHandler&&) = delete;
-    SigHandler& operator=(SigHandler&&) = delete;
-
-  private:
-    void wait() noexcept
-    {
-        // FIXME: implement clean shutdown that attempts to deliver pending messages on a best effort
-        // basis.
-        signals_.async_wait([this](auto ec, int sig) {
-            if (!ec) {
-                switch (sig) {
-                case SIGHUP:
-                    SWIRLY_INFO("received SIGHUP"sv);
-                    if (!logFile_.empty()) {
-                        SWIRLY_NOTICE(logMsg() << "reopening log file: " << logFile_);
-                        openLogFile(logFile_.c_str());
-                    }
-                    break;
-                case SIGINT:
-                    SWIRLY_INFO("received SIGINT"sv);
-                    ioServ_.stop();
-                    break;
-                case SIGTERM:
-                    SWIRLY_INFO("received SIGTERM"sv);
-                    ioServ_.stop();
-                    break;
-                }
-            }
-            this->wait();
-        });
-    }
-
-    boost::asio::io_service& ioServ_;
-    boost::asio::signal_set signals_;
-    fs::path logFile_;
-};
 
 struct Opts {
     fs::path confFile;
@@ -182,6 +128,7 @@ void getOpts(int argc, char* argv[], Opts& opts)
 }
 
 MemCtx memCtx;
+volatile sig_atomic_t quit{0};
 
 } // namespace
 
@@ -206,6 +153,8 @@ void dealloc(void* ptr, size_t size) noexcept
 
 int main(int argc, char* argv[])
 {
+    signal(SIGINT, [](int) { ++quit; });
+
     int ret = 1;
     try {
 
@@ -313,14 +262,52 @@ int main(int argc, char* argv[])
         rest.load(*model, opts.startTime);
         model = nullptr;
 
-        boost::asio::io_service ioServ;
-        SigHandler sigHandler{ioServ, logFile};
-
         RestServ restServ{rest};
-        HttpServ serv{ioServ, stou16(httpPort), restServ};
 
-        SWIRLY_NOTICE(logMsg() << "started http server on port " << httpPort);
-        ioServ.run();
+        Reactor reactor{1024};
+        const TcpEndpoint ep{Tcp::v4(), stou16(httpPort)};
+        HttpServ::make(reactor, ep, restServ);
+
+        SWIRLY_NOTICE(logMsg() << "http server running on port " << httpPort);
+
+        const auto fn = [](Reactor& r) {
+            sigBlockAll();
+
+            const auto ch = CloseHandler::make(r);
+            while (!ch->closed()) {
+                r.poll();
+            }
+        };
+        auto t = thread{fn, ref(reactor)};
+
+        // Wait for termination.
+        {
+            SigWait sigWait;
+            while (const auto sig = sigWait()) {
+                auto fn = [sig](MsgEvent & ev) noexcept { emplaceSignal(ev, sig); };
+                postEvent(fn);
+                switch (sig) {
+                case SIGHUP:
+                    SWIRLY_INFO("received SIGHUP"sv);
+                    if (!logFile.empty()) {
+                        SWIRLY_NOTICE(logMsg() << "reopening log file: " << logFile);
+                        openLogFile(logFile.c_str());
+                    }
+                    break;
+                case SIGINT:
+                    SWIRLY_INFO("received SIGINT"sv);
+                    break;
+                case SIGTERM:
+                    SWIRLY_INFO("received SIGTERM"sv);
+                    break;
+                default:
+                    continue;
+                }
+                break;
+            }
+        }
+
+        t.join();
         ret = 0;
 
     } catch (const exception& e) {

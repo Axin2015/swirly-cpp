@@ -33,8 +33,8 @@ struct TestHandler : EventHandler {
 
     using EventHandler::EventHandler;
 
-    explicit TestHandler(Reactor& reactor, Counters& cntrs) noexcept
-      : EventHandler{reactor}
+    explicit TestHandler(Reactor& r, Counters& cntrs) noexcept
+      : EventHandler{r}
       , cntrs_{&cntrs}
     {
     }
