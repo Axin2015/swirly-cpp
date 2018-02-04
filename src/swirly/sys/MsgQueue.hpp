@@ -58,10 +58,7 @@ class SWIRLY_API MsgQueue {
     /**
      * Flush underlying event file.
      */
-    void flush()
-    {
-        ef_.flush();
-    }
+    void flush() { ef_.flush(); }
     /**
      * Set state to parked if and only if the queue is empty. Returns false if the queue is not
      * empty.

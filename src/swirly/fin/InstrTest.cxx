@@ -24,7 +24,7 @@ using namespace swirly;
 SWIRLY_TEST_CASE(InstrToString)
 {
     Instr instr{1_id32, "EURUSD"sv, "EURUSD"sv, "EUR"sv, "USD"sv, 1000000,
-                1,      1,           10000,       4,        1_lts,    10_lts};
+                1,      1,          10000,      4,       1_lts,   10_lts};
 
     SWIRLY_CHECK(toString(instr) == //
                  "{\"symbol\":\"EURUSD\""

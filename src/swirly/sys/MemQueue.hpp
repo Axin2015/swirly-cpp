@@ -39,6 +39,7 @@ inline std::size_t fileSize(int fd)
 template <typename ValueT>
 class MemQueue {
     static_assert(std::is_trivially_copyable_v<ValueT>);
+
   public:
     struct alignas(CacheLineSize) Elem {
         std::int64_t seq;

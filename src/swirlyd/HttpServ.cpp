@@ -30,9 +30,7 @@ HttpServ::HttpServ(Reactor& r, const Endpoint& ep, RestServ& rs)
 
 HttpServ::~HttpServ() noexcept = default;
 
-void HttpServ::doClose() noexcept
-{
-}
+void HttpServ::doClose() noexcept {}
 
 void HttpServ::doAccept(IoSocket&& sock, const Endpoint& ep, Time now)
 {
