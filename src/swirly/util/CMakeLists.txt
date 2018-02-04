@@ -27,7 +27,6 @@ endif()
 set(lib_SOURCES
   Array.cpp
   BasicTypes.cpp
-  CloseHandler.cpp
   Compare.cpp
   Config.cpp
   Date.cpp

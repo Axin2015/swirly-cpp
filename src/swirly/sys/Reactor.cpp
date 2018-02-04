@@ -23,87 +23,12 @@
 #include <unordered_map>
 
 namespace swirly {
+
 using namespace std;
+
 namespace {
 
 constexpr size_t MaxEvents{16};
-
-class EventDispatcher {
-    enum : int { Unlocked = -1 };
-
-  public:
-    EventDispatcher() = default;
-    ~EventDispatcher() noexcept = default;
-
-    // Copy.
-    EventDispatcher(const EventDispatcher&) = default;
-    EventDispatcher& operator=(const EventDispatcher&) = default;
-
-    // Move.
-    EventDispatcher(EventDispatcher&&) = default;
-    EventDispatcher& operator=(EventDispatcher&&) = default;
-
-    int dispatch(MsgQueue& mq, Time now) noexcept
-    {
-        struct Lock {
-            explicit Lock(int& state)
-              : state_(state)
-            {
-                state = 0;
-            }
-            ~Lock() noexcept { state_ = Unlocked; }
-            int& state_;
-        } lock{state_};
-
-        int n{0};
-        while (mq.fetch([ this, now ](const MsgEvent& ev) noexcept { dispatch(ev, now); })) {
-            ++n;
-        }
-        if (state_ > 0) {
-            handlers_.erase(
-                remove_if(handlers_.begin(), handlers_.end(), [](const auto& ptr) { return !ptr; }),
-                handlers_.end());
-        }
-        return n;
-    }
-    void subscribe(const EventHandlerPtr& handler) { handlers_.push_back(handler); }
-    void unsubscribe(const EventHandler& handler)
-    {
-        const auto pred = [&handler](const auto& ptr) { return ptr.get() == &handler; };
-        const auto it = find_if(handlers_.begin(), handlers_.end(), pred);
-        if (it != handlers_.end()) {
-            if (state_ == Unlocked) {
-                handlers_.erase(it);
-            } else {
-                it->reset();
-                ++state_;
-            }
-        }
-    }
-
-  private:
-    void dispatch(const MsgEvent& ev, Time now) noexcept
-    {
-        const auto n = handlers_.size();
-        for (size_t i{0}; i < n; ++i) {
-            const auto handler = handlers_[i];
-            if (handler) {
-                try {
-                    if (ev.type != Signal) {
-                        handler->onEvent(ev, now);
-                    } else {
-                        handler->onSignal(data<int>(ev), now);
-                    }
-                } catch (const std::exception& e) {
-                    using namespace string_literals;
-                    SWIRLY_ERROR("error handling event: "s + e.what());
-                }
-            }
-        }
-    }
-    vector<EventHandlerPtr> handlers_;
-    int state_{Unlocked};
-};
 
 struct Data {
     int sid{};
@@ -111,31 +36,32 @@ struct Data {
     EventHandlerPtr handler;
 };
 
-atomic<vector<Reactor>*> reactors_{nullptr};
-
 } // namespace
 
 struct Reactor::Impl {
 
     explicit Impl(size_t sizeHint)
       : mux{sizeHint}
-      , mq{ef, 1 << 14}
     {
-        const auto fd = mq.fd();
+        const auto fd = ef.fd();
         data.resize(max<size_t>(fd + 1, sizeHint));
+        mux.subscribe(fd, 0, In);
 
         auto& ref = data[fd];
-        mux.subscribe(fd, 0, In);
+        ref.sid = 0;
         ref.mask = In;
         ref.handler = {};
+    }
+    ~Impl() noexcept
+    {
+        mux.unsubscribe(ef.fd());
     }
 
     Muxer mux;
     vector<Data> data;
-    EventDispatcher ed;
     EventFile ef;
-    MsgQueue mq;
     TimerQueue tq;
+    std::atomic<bool> closed;
 };
 
 Reactor::Reactor(size_t sizeHint)
@@ -149,10 +75,15 @@ Reactor::~Reactor() noexcept = default;
 Reactor::Reactor(Reactor&&) = default;
 Reactor& Reactor::operator=(Reactor&&) = default;
 
-EventToken Reactor::subscribe(const EventHandlerPtr& handler)
+bool Reactor::closed() const noexcept
 {
-    impl_->ed.subscribe(handler);
-    return EventToken{{this, handler.get()}};
+    return impl_->closed.load(std::memory_order_acquire);
+}
+
+void Reactor::close() noexcept
+{
+    impl_->closed.store(true, std::memory_order_release);
+    impl_->ef.notify();
 }
 
 FileToken Reactor::subscribe(int fd, FileEvents mask, const EventHandlerPtr& handler)
@@ -167,11 +98,6 @@ FileToken Reactor::subscribe(int fd, FileEvents mask, const EventHandlerPtr& han
     ref.mask = mask;
     ref.handler = handler;
     return FileToken{{this, fd}};
-}
-
-void Reactor::unsubscribe(const EventHandler& handler) noexcept
-{
-    impl_->ed.unsubscribe(handler);
 }
 
 void Reactor::unsubscribe(int fd) noexcept
@@ -215,13 +141,7 @@ int Reactor::poll(chrono::milliseconds timeout)
     }
     FileEvent buf[MaxEvents];
     error_code ec;
-    int ret;
-    if (timeout > 0ms && impl_->mq.park()) {
-        ret = impl_->mux.wait(buf, MaxEvents, timeout, ec);
-        impl_->mq.unpark();
-    } else {
-        ret = impl_->mux.wait(buf, MaxEvents, 0ms, ec);
-    }
+    const auto ret = impl_->mux.wait(buf, MaxEvents, timeout, ec);
     if (ret < 0) {
         if (ec.value() != EINTR) {
             throw system_error{ec};
@@ -229,12 +149,7 @@ int Reactor::poll(chrono::milliseconds timeout)
         return 0;
     }
     const auto now = UnixClock::now();
-    return impl_->ed.dispatch(impl_->mq, now) + impl_->tq.dispatch(now) + dispatch(buf, ret, now);
-}
-
-MsgQueue& Reactor::mq() noexcept
-{
-    return impl_->mq;
+    return impl_->tq.dispatch(now) + dispatch(buf, ret, now);
 }
 
 int Reactor::dispatch(FileEvent* buf, int size, Time now)
@@ -244,8 +159,9 @@ int Reactor::dispatch(FileEvent* buf, int size, Time now)
 
         auto& ev = buf[i];
         const auto fd = static_cast<int>(ev.data.u64 & 0xffffffff);
-        if (fd == impl_->mq.fd()) {
-            impl_->mq.flush();
+        if (fd == impl_->ef.fd()) {
+            SWIRLY_INFO("reactor wakeup"sv);
+            impl_->ef.flush();
             continue;
         }
 
@@ -274,18 +190,6 @@ int Reactor::dispatch(FileEvent* buf, int size, Time now)
         ++n;
     }
     return n;
-}
-
-std::vector<Reactor>& getReactors() noexcept
-{
-    auto* rs = reactors_.load(memory_order_acquire);
-    assert(rs);
-    return *rs;
-}
-
-void setReactors(vector<Reactor>& rs) noexcept
-{
-    return reactors_.store(&rs, memory_order_release);
 }
 
 } // namespace swirly

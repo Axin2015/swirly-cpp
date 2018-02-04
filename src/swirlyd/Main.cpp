@@ -24,7 +24,6 @@
 #include <swirly/fin/Journ.hpp>
 #include <swirly/fin/Model.hpp>
 
-#include <swirly/util/CloseHandler.hpp>
 #include <swirly/util/Config.hpp>
 #include <swirly/util/Exception.hpp>
 #include <swirly/util/File.hpp>
@@ -263,29 +262,24 @@ int main(int argc, char* argv[])
         model = nullptr;
 
         RestServ restServ{rest};
-
         Reactor reactor{1024};
+
         const TcpEndpoint ep{Tcp::v4(), stou16(httpPort)};
         HttpServ::make(reactor, ep, restServ);
-
-        SWIRLY_NOTICE(logMsg() << "http server running on port " << httpPort);
-
         const auto fn = [](Reactor& r) {
             sigBlockAll();
-
-            const auto ch = CloseHandler::make(r);
-            while (!ch->closed()) {
+            while (!r.closed()) {
                 r.poll();
             }
         };
-        auto t = thread{fn, ref(reactor)};
+        auto worker = thread{fn, ref(reactor)};
+
+        SWIRLY_NOTICE(logMsg() << "started http server on port " << httpPort);
 
         // Wait for termination.
         {
             SigWait sigWait;
             while (const auto sig = sigWait()) {
-                auto fn = [sig](MsgEvent & ev) noexcept { emplaceSignal(ev, sig); };
-                postEvent(fn);
                 switch (sig) {
                 case SIGHUP:
                     SWIRLY_INFO("received SIGHUP"sv);
@@ -293,21 +287,24 @@ int main(int argc, char* argv[])
                         SWIRLY_NOTICE(logMsg() << "reopening log file: " << logFile);
                         openLogFile(logFile.c_str());
                     }
-                    break;
+                    continue;
                 case SIGINT:
                     SWIRLY_INFO("received SIGINT"sv);
+                    reactor.close();
                     break;
                 case SIGTERM:
                     SWIRLY_INFO("received SIGTERM"sv);
+                    reactor.close();
                     break;
                 default:
+                    SWIRLY_INFO(logMsg() << "received signal: " << sig);
                     continue;
                 }
                 break;
             }
         }
 
-        t.join();
+        worker.join();
         ret = 0;
 
     } catch (const exception& e) {

@@ -44,7 +44,6 @@ set(lib_SOURCES
   MemPool.cpp
   MemQueue.cpp
   Memory.cpp
-  MsgQueue.cpp
   Muxer.cpp
   Poll.cpp
   Reactor.cpp

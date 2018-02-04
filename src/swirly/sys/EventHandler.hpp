@@ -43,20 +43,12 @@ class SWIRLY_API EventHandler : public RefCount<EventHandler, ThreadUnsafePolicy
     EventHandler& operator=(EventHandler&&) noexcept = delete;
 
     void close() { doClose(); }
-
-    void onEvent(const MsgEvent& ev, Time now) { doEvent(ev, now); }
     void onReady(int fd, FileEvents mask, Time now) { doReady(fd, mask, now); }
-    void onSignal(int sig, Time now) { doSignal(sig, now); }
     void onTimer(const Timer& tmr, Time now) { doTimer(tmr, now); }
 
   protected:
     virtual void doClose() = 0;
-    virtual void doEvent(const MsgEvent& ev, Time now);
     virtual void doReady(int fd, FileEvents mask, Time now);
-    /**
-     * The default doSignal() implementation calls doClose() on SIGINT or SIGTERM.
-     */
-    virtual void doSignal(int sig, Time now);
     virtual void doTimer(const Timer& tmr, Time now);
 
     const Reactor& reactor() const noexcept { return reactor_; }

@@ -53,8 +53,6 @@ void HttpSess::doClose() noexcept
     tok_.reset();
 }
 
-void HttpSess::doEvent(const MsgEvent& ev, Time now) {}
-
 void HttpSess::doReady(int fd, FileEvents events, Time now)
 {
     try {
@@ -81,8 +79,6 @@ void HttpSess::doReady(int fd, FileEvents events, Time now)
         close();
     }
 }
-
-void HttpSess::doSignal(int sig, Time now) {}
 
 void HttpSess::doTimer(const Timer& tmr, Time now)
 {
