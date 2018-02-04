@@ -17,41 +17,28 @@
 #ifndef SWIRLYD_HTTPSESS_HPP
 #define SWIRLYD_HTTPSESS_HPP
 
-#include "HttpRequest.hpp"
-
 #include <swirly/web/HttpParser.hpp>
+#include <swirly/web/HttpRequest.hpp>
+#include <swirly/web/HttpResponse.hpp>
 
 #include <swirly/util/Log.hpp>
-#include <swirly/util/RingBuffer.hpp>
 
-#include <swirly/sys/RefCount.hpp>
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
-#include <boost/asio.hpp>
-#pragma GCC diagnostic pop
+#include <swirly/sys/MemAlloc.hpp>
+#include <swirly/sys/TcpAcceptor.hpp>
 
 namespace swirly {
 
-class HttpResponse;
 class RestServ;
 
-class HttpSess
-  : public RefCount<HttpSess, ThreadUnsafePolicy>
-  , public BasicHttpParser<HttpSess> {
-
+class SWIRLY_API HttpSess
+  : public EventHandler
+  , public BasicHttpParser<HttpSess>
+  , public MemAlloc {
     friend class BasicHttpParser<HttpSess>;
-    enum { IdleTimeout = 5, MaxData = 4096 };
 
   public:
-    HttpSess(boost::asio::io_service& ioServ, RestServ& restServ)
-      : BasicHttpParser<HttpSess>{HttpType::Request}
-      , sock_{ioServ}
-      , timeout_{ioServ}
-      , restServ_(restServ)
-    {
-    }
-    ~HttpSess() noexcept;
+    HttpSess(Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, RestServ& rs, Time now);
+    ~HttpSess() noexcept override;
 
     // Copy.
     HttpSess(const HttpSess&) = delete;
@@ -61,26 +48,17 @@ class HttpSess
     HttpSess(HttpSess&&) = delete;
     HttpSess& operator=(HttpSess&&) = delete;
 
-    LogMsg& logMsg() noexcept
+    static auto make(Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, RestServ& rs, Time now)
     {
-        auto& ref = swirly::logMsg();
-        boost::system::error_code ec;
-        ref << '<' << sock_.remote_endpoint(ec) << "> ";
-        return ref;
+        return makeIntrusive<HttpSess>(r, std::move(sock), ep, rs, now);
     }
 
-    void start();
-    void stop() noexcept;
-    auto& socket() noexcept { return sock_; }
-
-  private:
-    void parse();
-    void resetTimeout();
-
-    void asyncReadSome();
-    void asyncWrite();
-    void doReadSome(std::size_t len) noexcept;
-    void doWrite() noexcept;
+  protected:
+    void doClose() noexcept override;
+    void doEvent(const MsgEvent& ev, Time now) override;
+    void doReady(int fd, FileEvents events, Time now) override;
+    void doSignal(int sig, Time now) override;
+    void doTimer(const Timer& tmr, Time now) override;
 
     bool doMessageBegin() noexcept { return true; }
     bool doUrl(std::string_view sv) noexcept;
@@ -97,17 +75,23 @@ class HttpSess
     bool doChunkHeader(size_t len) noexcept { return true; }
     bool doChunkEnd() noexcept { return true; }
 
-    boost::asio::ip::tcp::socket sock_;
-    // Close session if client is inactive.
-    boost::asio::deadline_timer timeout_;
-    RestServ& restServ_;
-    char data_[MaxData];
-    boost::asio::const_buffer inbuf_;
-    HttpRequest req_;
-    RingBuffer<std::string> outbuf_{8};
-};
+    LogMsg& logMsg() const noexcept
+    {
+        auto& ref = swirly::logMsg();
+        ref << '<' << ep_ << "> ";
+        return ref;
+    }
 
-using HttpSessPtr = boost::intrusive_ptr<HttpSess>;
+  private:
+    IoSocket sock_;
+    TcpEndpoint ep_;
+    RestServ& restServ_;
+    FileToken tok_;
+    Timer tmr_;
+    HttpRequest req_;
+    Buffer outbuf_;
+    HttpResponse rsp_{outbuf_};
+};
 
 } // namespace swirly
 

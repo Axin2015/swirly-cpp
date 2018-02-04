@@ -14,8 +14,6 @@
 # 02110-1301, USA.
 
 set(prog_SOURCES
-  HttpRequest.cpp
-  HttpResponse.cpp
   HttpServ.cpp
   HttpSess.cpp
   Main.cpp

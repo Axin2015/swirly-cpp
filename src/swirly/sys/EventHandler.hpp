@@ -28,8 +28,8 @@ class Timer;
 
 class SWIRLY_API EventHandler : public RefCount<EventHandler, ThreadUnsafePolicy> {
   public:
-    explicit EventHandler(Reactor& reactor) noexcept
-      : reactor_(reactor)
+    explicit EventHandler(Reactor& r) noexcept
+      : reactor_(r)
     {
     }
     virtual ~EventHandler() noexcept;

@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYD_HTTPREQUEST_HPP
-#define SWIRLYD_HTTPREQUEST_HPP
+#ifndef SWIRLY_WEB_HTTPREQUEST_HPP
+#define SWIRLY_WEB_HTTPREQUEST_HPP
 
 #include <swirly/web/HttpParser.hpp>
 #include <swirly/web/RestBody.hpp>
@@ -23,7 +23,7 @@
 
 namespace swirly {
 
-class HttpRequest : public BasicUrl<HttpRequest> {
+class SWIRLY_API HttpRequest : public BasicUrl<HttpRequest> {
   public:
     HttpRequest() noexcept = default;
     ~HttpRequest() noexcept;
@@ -102,4 +102,4 @@ class HttpRequest : public BasicUrl<HttpRequest> {
 
 } // namespace swirly
 
-#endif // SWIRLYD_HTTPREQUEST_HPP
+#endif // SWIRLY_WEB_HTTPREQUEST_HPP

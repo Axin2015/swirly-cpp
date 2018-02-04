@@ -17,21 +17,16 @@
 #ifndef SWIRLYD_HTTPSERV_HPP
 #define SWIRLYD_HTTPSERV_HPP
 
-#include <swirly/Config.h>
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
-#include <boost/asio.hpp>
-#pragma GCC diagnostic pop
+#include <swirly/sys/TcpAcceptor.hpp>
 
 namespace swirly {
 
 class RestServ;
 
-class HttpServ {
+class SWIRLY_API HttpServ : public TcpAcceptor {
   public:
-    HttpServ(boost::asio::io_service& ioServ, std::uint16_t port, RestServ& restServ);
-    ~HttpServ() noexcept;
+    HttpServ(Reactor& r, const Endpoint& ep, RestServ& rs);
+    ~HttpServ() noexcept override;
 
     // Copy.
     HttpServ(const HttpServ&) = delete;
@@ -41,11 +36,16 @@ class HttpServ {
     HttpServ(HttpServ&&) = delete;
     HttpServ& operator=(HttpServ&&) = delete;
 
-  private:
-    void asyncAccept();
+    static auto make(Reactor& r, const TcpEndpoint& ep, RestServ& rs)
+    {
+        return makeIntrusive<HttpServ>(r, ep, rs);
+    }
 
-    boost::asio::io_service& ioServ_;
-    boost::asio::ip::tcp::acceptor acceptor_;
+  protected:
+    void doClose() noexcept override;
+    void doAccept(IoSocket&& sock, const Endpoint& ep, Time now) override;
+
+  private:
     RestServ& restServ_;
 };
 

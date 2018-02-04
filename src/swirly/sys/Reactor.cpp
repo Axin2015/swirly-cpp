@@ -30,6 +30,7 @@ constexpr size_t MaxEvents{16};
 
 class EventDispatcher {
     enum : int { Unlocked = -1 };
+
   public:
     EventDispatcher() = default;
     ~EventDispatcher() noexcept = default;
@@ -55,18 +56,17 @@ class EventDispatcher {
         } lock{state_};
 
         int n{0};
-        while (mq.fetch([this, now](const MsgEvent& ev) noexcept { dispatch(ev, now); })) {
+        while (mq.fetch([ this, now ](const MsgEvent& ev) noexcept { dispatch(ev, now); })) {
             ++n;
         }
         if (state_ > 0) {
-            handlers_.erase(remove_if(handlers_.begin(), handlers_.end(), [](const auto& ptr) { return !ptr; }), handlers_.end());
+            handlers_.erase(
+                remove_if(handlers_.begin(), handlers_.end(), [](const auto& ptr) { return !ptr; }),
+                handlers_.end());
         }
         return n;
     }
-    void subscribe(const EventHandlerPtr& handler)
-    {
-        handlers_.push_back(handler);
-    }
+    void subscribe(const EventHandlerPtr& handler) { handlers_.push_back(handler); }
     void unsubscribe(const EventHandler& handler)
     {
         const auto pred = [&handler](const auto& ptr) { return ptr.get() == &handler; };
@@ -100,7 +100,6 @@ class EventDispatcher {
                 }
             }
         }
-
     }
     vector<EventHandlerPtr> handlers_;
     int state_{Unlocked};
