@@ -52,16 +52,13 @@ struct Reactor::Impl {
         ref.mask = In;
         ref.handler = {};
     }
-    ~Impl() noexcept
-    {
-        mux.unsubscribe(ef.fd());
-    }
+    ~Impl() noexcept { mux.unsubscribe(ef.fd()); }
 
     Muxer mux;
     vector<Data> data;
     EventFile ef;
     TimerQueue tq;
-    std::atomic<bool> closed;
+    std::atomic<bool> closed{false};
 };
 
 Reactor::Reactor(size_t sizeHint)
