@@ -27,6 +27,7 @@
 #include <swirly/util/Config.hpp>
 #include <swirly/util/Exception.hpp>
 #include <swirly/util/File.hpp>
+#include <swirly/util/Finally.hpp>
 #include <swirly/util/Log.hpp>
 
 #include <swirly/sys/Daemon.hpp>
@@ -266,45 +267,50 @@ int main(int argc, char* argv[])
 
         const TcpEndpoint ep{Tcp::v4(), stou16(httpPort)};
         HttpServ::make(reactor, ep, restServ);
+
         const auto fn = [](Reactor& r) {
             sigBlockAll();
-            while (!r.closed()) {
-                r.poll();
+            SWIRLY_NOTICE("started reactor thread"sv);
+            try {
+                while (!r.closed()) {
+                    r.poll();
+                }
+            } catch (const exception& e) {
+                SWIRLY_ERROR(logMsg() << "exception: " << e.what());
             }
+            SWIRLY_NOTICE("stopped reactor thread"sv);
         };
         auto worker = thread{fn, ref(reactor)};
+        auto finally = makeFinally([&]() {
+            reactor.close();
+            worker.join();
+        });
 
         SWIRLY_NOTICE(logMsg() << "started http server on port " << httpPort);
 
         // Wait for termination.
-        {
-            SigWait sigWait;
-            while (const auto sig = sigWait()) {
-                switch (sig) {
-                case SIGHUP:
-                    SWIRLY_INFO("received SIGHUP"sv);
-                    if (!logFile.empty()) {
-                        SWIRLY_NOTICE(logMsg() << "reopening log file: " << logFile);
-                        openLogFile(logFile.c_str());
-                    }
-                    continue;
-                case SIGINT:
-                    SWIRLY_INFO("received SIGINT"sv);
-                    reactor.close();
-                    break;
-                case SIGTERM:
-                    SWIRLY_INFO("received SIGTERM"sv);
-                    reactor.close();
-                    break;
-                default:
-                    SWIRLY_INFO(logMsg() << "received signal: " << sig);
-                    continue;
+        SigWait sigWait;
+        while (const auto sig = sigWait()) {
+            switch (sig) {
+            case SIGHUP:
+                SWIRLY_INFO("received SIGHUP"sv);
+                if (!logFile.empty()) {
+                    SWIRLY_NOTICE(logMsg() << "reopening log file: " << logFile);
+                    openLogFile(logFile.c_str());
                 }
+                continue;
+            case SIGINT:
+                SWIRLY_INFO("received SIGINT"sv);
                 break;
+            case SIGTERM:
+                SWIRLY_INFO("received SIGTERM"sv);
+                break;
+            default:
+                SWIRLY_INFO(logMsg() << "received signal: " << sig);
+                continue;
             }
+            break;
         }
-
-        worker.join();
         ret = 0;
 
     } catch (const exception& e) {
