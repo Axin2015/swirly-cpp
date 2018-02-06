@@ -1,0 +1,14 @@
+[Unit]
+Description=Swirly Daemon
+After=network.target
+
+[Service]
+EnvironmentFile=/etc/environment
+ExecStart=${CMAKE_INSTALL_PREFIX}/bin/swirlyd -f ${CMAKE_INSTALL_PREFIX}/etc/swirlyd.conf
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=always
+Type=simple
+
+[Install]
+WantedBy=multi-user.target
