@@ -55,4 +55,4 @@ set(sqlfiles
   test.sql)
 
 install(FILES ${sqlfiles} DESTINATION db COMPONENT config)
-install(FILES ${dbfiles} DESTINATION db COMPONENT config)
+install(FILES ${dbfiles} DESTINATION var COMPONENT config)

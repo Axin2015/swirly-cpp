@@ -42,10 +42,10 @@ pipe_capacity = 1024
 max_execs = 16
 
 # Sqlite journal database.
-sqlite_journ = ${CMAKE_INSTALL_PREFIX}/db/forex.db
+sqlite_journ = ${CMAKE_INSTALL_PREFIX}/var/forex.db
 
 # Sqlite model database.
-sqlite_model = ${CMAKE_INSTALL_PREFIX}/db/forex.db
+sqlite_model = ${CMAKE_INSTALL_PREFIX}/var/forex.db
 
 # Enable SQL tracing.
 sqlite_enable_trace = no
