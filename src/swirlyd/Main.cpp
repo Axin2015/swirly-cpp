@@ -205,26 +205,34 @@ int main(int argc, char* argv[])
 
         fs::path logFile{config.get("log_file", "")};
         if (opts.daemon) {
-
             // Daemonise process.
             daemon();
-
-            // Daemon uses syslog by default.
-            if (logFile.empty()) {
-                openlog("swirlyd", LOG_PID | LOG_NDELAY, LOG_LOCAL0);
-                setlogmask(LOG_UPTO(LOG_DEBUG));
-                setLogger(sysLogger);
-            }
         }
 
-        if (!logFile.empty()) {
+        if (logFile.empty()) {
 
-            // Log file is relative to working directory. We use absolute, rather than canonical here,
-            // because canonical requires that the file exists.
+            // If a log file is not specified, then use syslog().
+
+#if SWIRLY_ENABLE_DEBUG
+            setlogmask(LOG_UPTO(LOG_DEBUG));
+#endif
+            setLogger(sysLogger);
+
+        } else if (logFile == "-") {
+
+            // A single dash in place of a file name is used to indicate stdout/stderr.
+            // This is effectively a no-op and there is no need to open a file.
+
+            // Clear so that SIGHUP does not attempt to reopen the log file.
+            logFile.clear();
+
+        } else {
+
+            // Log file is relative to working directory. We use absolute, rather than canonical
+            // here, because canonical requires that the file exists.
             if (logFile.is_relative()) {
                 logFile = fs::absolute(logFile, runDir);
             }
-
             fs::create_directory(logFile.parent_path());
 
             SWIRLY_NOTICE(logMsg() << "opening log file: " << logFile);
