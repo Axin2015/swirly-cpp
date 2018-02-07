@@ -17,7 +17,10 @@ install(FILES FindSQLite3.cmake DESTINATION etc COMPONENT config)
 install(FILES FindSwirly.cmake DESTINATION etc COMPONENT config)
 
 configure_file(swirlyd.conf.in "${PROJECT_BINARY_DIR}/etc/swirlyd.conf")
-install(FILES "${PROJECT_BINARY_DIR}/etc/swirlyd.conf"
+configure_file(swirlyd.service.in "${PROJECT_BINARY_DIR}/etc/swirlyd.service")
+install(FILES
+  "${PROJECT_BINARY_DIR}/etc/swirlyd.conf"
+  "${PROJECT_BINARY_DIR}/etc/swirlyd.service"
   DESTINATION etc
   COMPONENT config
 )

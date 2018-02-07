@@ -26,7 +26,7 @@ run_dir = ${CMAKE_INSTALL_PREFIX}
 # Write to log-file. The log-file's parent directory will be created if it does not exist. Relative
 # paths are interpreted relative to the run directory. The syslog facility is used by default if no
 # log-file is specified for daemonised processes.
-log_file = ${CMAKE_INSTALL_PREFIX}/log/swirlyd.log
+#log_file = ${CMAKE_INSTALL_PREFIX}/log/swirlyd.log
 
 # Set the log-level. Valid range is from 0 to 5 inclusive, where 0=Crit, 1=Error, 2=Warning,
 # 3=Notice, 4=Info and 5=Debug. The default is 4 (Info).
@@ -42,10 +42,10 @@ pipe_capacity = 1024
 max_execs = 16
 
 # Sqlite journal database.
-sqlite_journ = ${CMAKE_INSTALL_PREFIX}/db/forex.db
+sqlite_journ = ${CMAKE_INSTALL_PREFIX}/var/forex.db
 
 # Sqlite model database.
-sqlite_model = ${CMAKE_INSTALL_PREFIX}/db/forex.db
+sqlite_model = ${CMAKE_INSTALL_PREFIX}/var/forex.db
 
 # Enable SQL tracing.
 sqlite_enable_trace = no
