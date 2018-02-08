@@ -14,25 +14,41 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SYS_DAEMON_HPP
-#define SWIRLY_SYS_DAEMON_HPP
+#ifndef SWIRLY_SYS_PIDFILE_HPP
+#define SWIRLY_SYS_PIDFILE_HPP
 
 #include <swirly/Config.h>
 
-#include <sys/types.h>
+#include <memory>
+
+struct pidfh;
 
 namespace swirly {
+namespace detail {
+struct SWIRLY_API PidFileDeleter {
+    void operator()(pidfh* pfh) const noexcept;
+};
+} // namespace detail
+
+using PidFile = std::unique_ptr<pidfh, detail::PidFileDeleter>;
 
 /**
- * Close all non-standard file handles.
+ * Create pidfile and obtain lock. An exception is thrown if the pidfile cannot be locked, because a
+ * daemon is already running. If the path argument is null, then /var/run/{progname}.pid is used as
+ * the pidfile location.
  */
-SWIRLY_API void closeAll() noexcept;
+SWIRLY_API PidFile openPidFile(const char* path, mode_t mode);
 
 /**
- * Daemonise process. Detach from controlling terminal and run in the background as a system daemon.
+ * Close pidfile without removing it. This function should be used when forking daemon processes.
  */
-SWIRLY_API void daemon();
+SWIRLY_API void closePidFile(PidFile& pf) noexcept;
+
+/**
+ * Write process' PID into pidfile.
+ */
+SWIRLY_API void writePidFile(PidFile& pf);
 
 } // namespace swirly
 
-#endif // SWIRLY_SYS_DAEMON_HPP
+#endif // SWIRLY_SYS_PIDFILE_HPP

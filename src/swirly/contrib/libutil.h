@@ -14,25 +14,23 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SYS_DAEMON_HPP
-#define SWIRLY_SYS_DAEMON_HPP
+#ifndef SWIRLY_CONTRIB_LIBUTIL_H
+#define SWIRLY_CONTRIB_LIBUTIL_H
 
-#include <swirly/Config.h>
+/* See https://github.com/LuaDist/libbsd */
 
-#include <sys/types.h>
+static const char* getprogname(void) { return program_invocation_short_name; }
 
-namespace swirly {
+struct pidfh {
+    int pf_fd;
+    char* pf_path;
+    dev_t pf_dev;
+    ino_t pf_ino;
+};
 
-/**
- * Close all non-standard file handles.
- */
-SWIRLY_API void closeAll() noexcept;
+int flopen(const char *path, int flags, ...);
+int pidfile_write(struct pidfh* pfh);
+int pidfile_close(struct pidfh* pfh);
+int pidfile_remove(struct pidfh* pfh);
 
-/**
- * Daemonise process. Detach from controlling terminal and run in the background as a system daemon.
- */
-SWIRLY_API void daemon();
-
-} // namespace swirly
-
-#endif // SWIRLY_SYS_DAEMON_HPP
+#endif // SWIRLY_CONTRIB_LIBUTIL_H
