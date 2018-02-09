@@ -43,7 +43,7 @@ set(lib_SOURCES
   RestBody.cpp
   Rest.cpp
   Url.cpp
-  http_parser.c)
+  "${PROJECT_SOURCE_DIR}/src/swirly/contrib/http_parser.c")
 
 add_library(swirly_web_static STATIC ${lib_SOURCES})
 set_target_properties(swirly_web_static PROPERTIES OUTPUT_NAME swirly_web)
