@@ -45,6 +45,7 @@ set(lib_SOURCES
   MemQueue.cpp
   Memory.cpp
   Muxer.cpp
+  PidFile.cpp
   Poll.cpp
   Reactor.cpp
   RefCount.cpp

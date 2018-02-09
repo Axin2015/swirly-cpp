@@ -33,6 +33,7 @@
 #include <swirly/sys/Daemon.hpp>
 #include <swirly/sys/File.hpp>
 #include <swirly/sys/MemCtx.hpp>
+#include <swirly/sys/PidFile.hpp>
 #include <swirly/sys/Signal.hpp>
 #include <swirly/sys/System.hpp>
 
@@ -60,7 +61,7 @@ namespace {
 
 void openLogFile(const char* path)
 {
-    const auto file = sys::open(path, O_RDWR | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR | S_IRGRP);
+    const auto file = sys::open(path, O_RDWR | O_CREAT | O_APPEND, 0644);
     dup2(*file, STDOUT_FILENO);
     dup2(*file, STDERR_FILENO);
 }
@@ -153,6 +154,7 @@ void dealloc(void* ptr, size_t size) noexcept
 
 int main(int argc, char* argv[])
 {
+    closeAll();
     signal(SIGINT, [](int) { ++quit; });
 
     int ret = 1;
@@ -204,11 +206,26 @@ int main(int argc, char* argv[])
         }
 
         fs::path logFile{config.get("log_file", "")};
+        fs::path pidFile{config.get("pid_file", "")};
+
+        PidFile pf;
+        if (!pidFile.empty()) {
+
+            // Pid file is relative to working directory. We use absolute, rather than canonical
+            // here, because canonical requires that the file exists.
+            if (pidFile.is_relative()) {
+                pidFile = fs::absolute(pidFile, runDir);
+            }
+            fs::create_directory(pidFile.parent_path());
+            pf = openPidFile(pidFile.c_str(), 0644);
+        }
+
         if (opts.daemon) {
             // Daemonise process.
             daemon();
         }
 
+        writePidFile(pf);
         if (logFile.empty()) {
 
             // If a log file is not specified, then use syslog().
@@ -292,8 +309,8 @@ int main(int argc, char* argv[])
         auto finally = makeFinally([&]() {
             reactor.close();
             worker.join();
+            SWIRLY_NOTICE("stopped http server"sv);
         });
-
         SWIRLY_NOTICE(logMsg() << "started http server on port " << httpPort);
 
         // Wait for termination.
@@ -324,6 +341,5 @@ int main(int argc, char* argv[])
     } catch (const exception& e) {
         SWIRLY_ERROR(logMsg() << "exception: " << e.what());
     }
-    SWIRLY_NOTICE("stopped http server"sv);
     return ret;
 }

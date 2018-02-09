@@ -23,6 +23,14 @@ using namespace std;
 
 namespace swirly {
 
+void closeAll() noexcept
+{
+    const int fds{getdtablesize()};
+    for (int fd{STDERR_FILENO + 1}; fd < fds; ++fd) {
+        close(fd);
+    }
+}
+
 void daemon()
 {
     pid_t pid{sys::fork()};
@@ -46,14 +54,6 @@ void daemon()
     // Re-open standard input.
     close(STDIN_FILENO);
     sys::open("/dev/null", O_RDONLY);
-
-    // Close all non-standard file handles.
-    const int fds{getdtablesize()};
-    for (int fd{STDERR_FILENO + 1}; fd < fds; ++fd) {
-        close(fd);
-    }
-
-    // Note that the standard output handles are unchanged.
 }
 
 } // namespace swirly

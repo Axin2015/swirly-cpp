@@ -19,7 +19,7 @@
 
 #include <swirly/web/Exception.hpp>
 
-#include <swirly/web/http_parser.h>
+#include <swirly/contrib/http_parser.h>
 
 namespace swirly {
 
