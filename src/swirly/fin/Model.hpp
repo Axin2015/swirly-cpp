@@ -80,7 +80,7 @@ class SWIRLY_API Model {
 /**
  * Make Model. Forward declaration for Model backend.
  *
- * @param conf Configuration.
+ * @param config Configuration.
  */
 SWIRLY_API std::unique_ptr<Model> makeModel(const Config& config);
 

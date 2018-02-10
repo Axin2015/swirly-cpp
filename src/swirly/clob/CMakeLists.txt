@@ -45,9 +45,9 @@ if(ENABLE_SHARED_LIBS)
 endif()
 
 set(test_SOURCES
-  AsyncJournTest.cxx
-  ResponseTest.cxx
-  ServTest.cxx)
+  AsyncJournTest.cc
+  ResponseTest.cc
+  ServTest.cc)
 
 foreach(file ${test_SOURCES})
   get_filename_component (name ${file} NAME_WE)
