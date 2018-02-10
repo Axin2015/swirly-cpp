@@ -60,18 +60,18 @@ if(ENABLE_SHARED_LIBS)
 endif()
 
 set(test_SOURCES
-  AssetTest.cxx
-  BasicTypesTest.cxx
-  InstrTest.cxx
-  DateTest.cxx
-  ExceptionTest.cxx
-  LevelTest.cxx
-  MarketIdTest.cxx
-  MarketTest.cxx
-  MsgHandlerTest.cxx
-  PosnTest.cxx
-  RequestTest.cxx
-  TransactionTest.cxx)
+  AssetTest.cc
+  BasicTypesTest.cc
+  InstrTest.cc
+  DateTest.cc
+  ExceptionTest.cc
+  LevelTest.cc
+  MarketIdTest.cc
+  MarketTest.cc
+  MsgHandlerTest.cc
+  PosnTest.cc
+  RequestTest.cc
+  TransactionTest.cc)
 
 foreach(file ${test_SOURCES})
   get_filename_component (name ${file} NAME_WE)

@@ -64,24 +64,24 @@ if(ENABLE_SHARED_LIBS)
 endif()
 
 set(test_SOURCES
-  ArrayTest.cxx
-  ConfigTest.cxx
-  DateTest.cxx
-  EnumTest.cxx
-  ExceptionTest.cxx
-  FinallyTest.cxx
-  IntWrapperTest.cxx
-  LogTest.cxx
-  MathTest.cxx
-  PipeTest.cxx
-  RingBufferTest.cxx
-  SetTest.cxx
-  StreamTest.cxx
-  StringTest.cxx
-  SymbolTest.cxx
-  TokeniserTest.cxx
-  UtilityTest.cxx
-  VarSubTest.cxx)
+  ArrayTest.cc
+  ConfigTest.cc
+  DateTest.cc
+  EnumTest.cc
+  ExceptionTest.cc
+  FinallyTest.cc
+  IntWrapperTest.cc
+  LogTest.cc
+  MathTest.cc
+  PipeTest.cc
+  RingBufferTest.cc
+  SetTest.cc
+  StreamTest.cc
+  StringTest.cc
+  SymbolTest.cc
+  TokeniserTest.cc
+  UtilityTest.cc
+  VarSubTest.cc)
 
 foreach(file ${test_SOURCES})
   get_filename_component (name ${file} NAME_WE)

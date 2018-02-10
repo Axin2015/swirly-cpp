@@ -58,11 +58,11 @@ if(ENABLE_SHARED_LIBS)
 endif()
 
 set(test_SOURCES
-  EntitySetTest.cxx
-  HttpParserTest.cxx
-  PageTest.cxx
-  RestBodyTest.cxx
-  UrlTest.cxx)
+  EntitySetTest.cc
+  HttpParserTest.cc
+  PageTest.cc
+  RestBodyTest.cc
+  UrlTest.cc)
 
 foreach(file ${test_SOURCES})
   get_filename_component (name ${file} NAME_WE)
