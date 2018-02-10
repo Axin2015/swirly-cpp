@@ -1,18 +1,22 @@
 Component Dependencies  {#Depend}
 ======================
 
+Sys Library
+-----------
+![Util Depends](@ref swirly_sys.png)
+
 Util Library
 -----------
-![Util Depends](@ref UtilDepend.png)
+![Util Depends](@ref swirly_util.png)
 
 Fin Library
 -----------
-![Fin Depends](@ref FinDepend.png)
+![Fin Depends](@ref swirly_fin.png)
 
 Clob Library
 -----------
-![Clob Depends](@ref ClobDepend.png)
+![Clob Depends](@ref swirly_clob.png)
 
 Web Library
 -----------
-![Web Depends](@ref WebDepend.png)
+![Web Depends](@ref swirly_web.png)

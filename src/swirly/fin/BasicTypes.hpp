@@ -65,7 +65,32 @@ constexpr Cost operator""_cst(unsigned long long val) noexcept
  */
 using MarketState = unsigned;
 
-enum class AssetType { Cmdty = 1, Corp, Ccy, Eqty, Govt, Index };
+enum class AssetType {
+    /**
+     * Commodity.
+     */
+    Cmdty = 1,
+    /**
+     * Corporate Bond.
+     */
+    Corp,
+    /**
+     * Currency.
+     */
+    Ccy,
+    /**
+     * Equity.
+     */
+    Eqty,
+    /**
+     * Government Bond.
+     */
+    Govt,
+    /**
+     * Index.
+     */
+    Index
+};
 
 inline const char* enumString(AssetType type) noexcept
 {

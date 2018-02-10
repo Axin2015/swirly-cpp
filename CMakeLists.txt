@@ -116,8 +116,6 @@ if(DOXYGEN_FOUND)
     SOURCES "${PROJECT_BINARY_DIR}/Doxyfile")
 
   add_dependencies(doc image)
-
-  install(DIRECTORY "${PROJECT_BINARY_DIR}/share/doc/" DESTINATION share/doc COMPONENT doc)
 endif()
 
 include_directories("${Boost_INCLUDE_DIRS}")

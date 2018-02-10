@@ -48,7 +48,7 @@ class SWIRLY_API Journ {
 /**
  * Make Journal. Forward declaration for Journal backend.
  *
- * @param conf Configuration.
+ * @param config Configuration.
  */
 SWIRLY_API std::unique_ptr<Journ> makeJourn(const Config& config);
 
