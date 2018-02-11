@@ -93,7 +93,7 @@ void Journ::onReset()
     Transactional::reset();
 }
 
-void Journ::onCreateMarket(const CreateMarketBody& body)
+void Journ::onCreateMarket(const CreateMarket& body)
 {
     auto& stmt = *insertMarketStmt_;
 
@@ -106,7 +106,7 @@ void Journ::onCreateMarket(const CreateMarketBody& body)
     stepOnce(stmt);
 }
 
-void Journ::onUpdateMarket(const UpdateMarketBody& body)
+void Journ::onUpdateMarket(const UpdateMarket& body)
 {
     auto& stmt = *updateMarketStmt_;
 
@@ -117,7 +117,7 @@ void Journ::onUpdateMarket(const UpdateMarketBody& body)
     stepOnce(stmt);
 }
 
-void Journ::onCreateExec(const CreateExecBody& body)
+void Journ::onCreateExec(const CreateExec& body)
 {
     Transaction trans{*this, body.more};
     if (failed()) {
@@ -157,7 +157,7 @@ void Journ::onCreateExec(const CreateExecBody& body)
     trans.commit();
 }
 
-void Journ::onArchiveTrade(const ArchiveTradeBody& body)
+void Journ::onArchiveTrade(const ArchiveTrade& body)
 {
     Transaction trans{*this, body.more};
     if (failed()) {
