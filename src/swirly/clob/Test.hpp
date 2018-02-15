@@ -40,14 +40,11 @@ class SWIRLY_API TestModel : public Model {
 
     void doReadInstr(const ModelCallback<InstrPtr>& cb) const override;
 
-    void doReadAccnt(Time now, const ModelCallback<std::string_view>& cb) const override;
-
     void doReadMarket(const ModelCallback<MarketPtr>& cb) const override;
 
     void doReadOrder(const ModelCallback<OrderPtr>& cb) const override;
 
-    void doReadExec(std::string_view accnt, std::size_t limit,
-                    const ModelCallback<ExecPtr>& cb) const override;
+    void doReadExec(Time since, const ModelCallback<ExecPtr>& cb) const override;
 
     void doReadTrade(const ModelCallback<ExecPtr>& cb) const override;
 

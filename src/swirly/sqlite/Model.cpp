@@ -43,19 +43,16 @@ constexpr auto SelectMarketSql = //
     "SELECT id, instr, settl_day, state, last_lots, last_ticks, last_time, max_id" //
     " FROM market_v"sv;
 
-constexpr auto SelectAccntSql = //
-    "SELECT symbol FROM accnt_t WHERE modified > ?"sv;
-
 constexpr auto SelectOrderSql = //
     "SELECT accnt, market_id, instr, settl_day, id, ref, state_id, side_id, lots, ticks," //
     " resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots, created, modified" //
     " FROM order_t WHERE resd_lots > 0;"sv;
 
 constexpr auto SelectExecSql = //
-    "SELECT market_id, instr, settl_day, id, order_id, ref, state_id, side_id, lots, ticks," //
-    " resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots, match_id, liqInd_id," //
-    " cpty, created" //
-    " FROM exec_t WHERE accnt = ? ORDER BY seq_id DESC LIMIT ?;"sv;
+    "SELECT accnt, market_id, instr, settl_day, id, order_id, ref, state_id, side_id, lots," //
+    " ticks, resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots, match_id," //
+    " liqInd_id, cpty, created" //
+    " FROM exec_t WHERE created > ? ORDER BY seq_id DESC;"sv;
 
 constexpr auto SelectTradeSql = //
     "SELECT accnt, market_id, instr, settl_day, id, order_id, ref, side_id, lots, ticks," //
@@ -157,21 +154,6 @@ void Model::doReadMarket(const ModelCallback<MarketPtr>& cb) const
     }
 }
 
-void Model::doReadAccnt(Time now, const ModelCallback<string_view>& cb) const
-{
-    enum { //
-        Symbol //
-    };
-
-    StmtPtr stmt{prepare(*db_, SelectAccntSql)};
-    ScopedBind bind{*stmt};
-    // One week ago.
-    bind(now - 604800000ms);
-    while (step(*stmt)) {
-        cb(column<string_view>(*stmt, Symbol));
-    }
-}
-
 void Model::doReadOrder(const ModelCallback<OrderPtr>& cb) const
 {
     enum { //
@@ -218,9 +200,10 @@ void Model::doReadOrder(const ModelCallback<OrderPtr>& cb) const
     }
 }
 
-void Model::doReadExec(string_view accnt, size_t limit, const ModelCallback<ExecPtr>& cb) const
+void Model::doReadExec(Time since, const ModelCallback<ExecPtr>& cb) const
 {
     enum { //
+        Accnt, //
         MarketId, //
         Instr, //
         SettlDay, //
@@ -245,10 +228,9 @@ void Model::doReadExec(string_view accnt, size_t limit, const ModelCallback<Exec
 
     StmtPtr stmt{prepare(*db_, SelectExecSql)};
     ScopedBind bind{*stmt};
-    bind(accnt);
-    bind(limit);
+    bind(since);
     while (step(*stmt)) {
-        cb(Exec::make(accnt, //
+        cb(Exec::make(column<string_view>(*stmt, Accnt), //
                       column<Id64>(*stmt, MarketId), //
                       column<string_view>(*stmt, Instr), //
                       column<JDay>(*stmt, SettlDay), //

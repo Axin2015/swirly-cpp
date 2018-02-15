@@ -70,9 +70,8 @@ int main(int argc, char* argv[])
         cout << "],\"execs\":[";
         {
             OStreamJoiner it(cout, ',');
-            model->readAccnt(now, [&model, &it](auto symbol) {
-                model->readExec(symbol, 1 << 4, [&it](auto ptr) { it = *ptr; });
-            });
+            // One week ago.
+            model->readExec(now - 604800000ms, [&it](auto ptr) { it = *ptr; });
         }
         cout << "],\"trades\":[";
         {
