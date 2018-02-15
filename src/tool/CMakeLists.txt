@@ -14,7 +14,8 @@
 # 02110-1301, USA.
 
 add_custom_target(swirly_tool DEPENDS
-  swirly_dump
+  swirly_dbtocsv
+  swirly_dbtojson
   swirly_queue_bench
   swirly_scratch
   swirly_serv_bench
@@ -23,9 +24,13 @@ add_custom_target(swirly_tool DEPENDS
 
 install(PROGRAMS ${bin_FILES} DESTINATION bin COMPONENT program)
 
-add_executable(swirly_dump Dump.cpp)
-target_link_libraries(swirly_dump ${swirly_sqlite_LIBRARY})
-install(TARGETS swirly_dump DESTINATION bin COMPONENT program)
+add_executable(swirly_dbtocsv DbToCsv.cpp)
+target_link_libraries(swirly_dbtocsv ${swirly_sqlite_LIBRARY})
+install(TARGETS swirly_dbtocsv DESTINATION bin COMPONENT program)
+
+add_executable(swirly_dbtojson DbToJson.cpp)
+target_link_libraries(swirly_dbtojson ${swirly_sqlite_LIBRARY})
+install(TARGETS swirly_dbtojson DESTINATION bin COMPONENT program)
 
 add_executable(swirly_queue_bench QueueBench.cpp)
 target_link_libraries(swirly_queue_bench ${swirly_util_LIBRARY})

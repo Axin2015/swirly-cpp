@@ -51,6 +51,6 @@ SWIRLY_TEST_CASE(OStreamJoiner)
 {
     array<string, 3> arr{{"foo", "bar", "baz"}};
     stringstream ss;
-    copy(arr.begin(), arr.end(), OStreamJoiner(ss, ','));
+    copy(arr.begin(), arr.end(), OStreamJoiner{ss, ','});
     SWIRLY_CHECK(ss.str() == "foo,bar,baz");
 }

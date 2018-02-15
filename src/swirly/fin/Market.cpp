@@ -17,12 +17,12 @@
 #include "Market.hpp"
 
 #include <swirly/util/Date.hpp>
+#include <swirly/util/Stream.hpp>
 
 #include <cassert>
 
-using namespace std;
-
 namespace swirly {
+using namespace std;
 
 static_assert(sizeof(Market) <= 4 * 64, "no greater than specified cache-lines");
 
@@ -47,6 +47,28 @@ void toJsonLevels(LevelSet::ConstIterator it, LevelSet::ConstIterator end, ostre
 Market::~Market() noexcept = default;
 
 Market::Market(Market&&) = default;
+
+void Market::toCsv(ostream& os, char delim) const
+{
+    OStreamJoiner osj{os, delim};
+    osj << id_ //
+        << instr_;
+    if (settlDay_ != 0_jd) {
+        osj << jdToIso(settlDay_);
+    } else {
+        osj << "";
+    }
+    osj << state_;
+    if (lastLots_ != 0_lts) {
+        osj << lastLots_ //
+            << lastTicks_ //
+            << lastTime_;
+    } else {
+        osj << "" << "" << "";
+    }
+    osj << maxId_;
+
+}
 
 void Market::toJson(ostream& os) const
 {

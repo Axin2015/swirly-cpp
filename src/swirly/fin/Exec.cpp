@@ -17,16 +17,70 @@
 #include "Exec.hpp"
 
 #include <swirly/util/Date.hpp>
-
-using namespace std;
+#include <swirly/util/Stream.hpp>
 
 namespace swirly {
+using namespace std;
 
 static_assert(sizeof(Exec) <= 5 * 64, "no greater than specified cache-lines");
 
 Exec::~Exec() noexcept = default;
 
 Exec::Exec(Exec&&) = default;
+
+void Exec::toCsv(ostream& os, char delim) const
+{
+    OStreamJoiner osj{os, delim};
+    osj << accnt_ //
+        << marketId_ //
+        << instr_;
+    if (settlDay_ != 0_jd) {
+        osj << jdToIso(settlDay_);
+    } else {
+        osj << "";
+    }
+    osj << id_ //
+       << orderId_;
+    if (!ref_.empty()) {
+        osj << ref_;
+    } else {
+        osj << "";
+    }
+    osj << state_ //
+        << side_ //
+        << lots_ //
+        << ticks_ //
+        << resdLots_ //
+        << execLots_ //
+        << execCost_;
+    if (lastLots_ != 0_lts) {
+        osj << lastLots_ //
+            << lastTicks_;
+    } else {
+        osj << "" << "";
+    }
+    if (minLots_ != 0_lts) {
+        osj << minLots_;
+    } else {
+        osj << "";
+    }
+    if (matchId_ != 0_id64) {
+        osj << matchId_;
+    } else {
+        osj << "";
+    }
+    if (liqInd_ != LiqInd::None) {
+        osj << liqInd_;
+    } else {
+        osj << "";
+    }
+    if (!cpty_.empty()) {
+        osj << cpty_ ;
+    } else {
+        osj << "";
+    }
+    osj << created_;
+}
 
 void Exec::toJson(ostream& os) const
 {

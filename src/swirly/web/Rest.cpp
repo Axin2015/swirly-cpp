@@ -35,7 +35,7 @@ void getOrder(const Accnt& accnt, ostream& out)
 {
     const auto& orders = accnt.orders();
     out << '[';
-    copy(orders.begin(), orders.end(), OStreamJoiner(out, ','));
+    copy(orders.begin(), orders.end(), OStreamJoiner{out, ','});
     out << ']';
 }
 
@@ -55,7 +55,7 @@ void getExec(const Accnt& accnt, Page page, ostream& out)
             last = execs.end();
         }
         transform(first, last,
-                  OStreamJoiner(out, ','), [](const auto& ptr) -> const auto& { return *ptr; });
+                  OStreamJoiner{out, ','}, [](const auto& ptr) -> const auto& { return *ptr; });
     }
     out << ']';
 }
@@ -64,7 +64,7 @@ void getTrade(const Accnt& accnt, ostream& out)
 {
     const auto& trades = accnt.trades();
     out << '[';
-    copy(trades.begin(), trades.end(), OStreamJoiner(out, ','));
+    copy(trades.begin(), trades.end(), OStreamJoiner{out, ','});
     out << ']';
 }
 
@@ -72,7 +72,7 @@ void getPosn(const Accnt& accnt, ostream& out)
 {
     const auto& posns = accnt.posns();
     out << '[';
-    copy(posns.begin(), posns.end(), OStreamJoiner(out, ','));
+    copy(posns.begin(), posns.end(), OStreamJoiner{out, ','});
     out << ']';
 }
 
@@ -118,7 +118,7 @@ void Rest::getAsset(Time now, ostream& out) const
 {
     const auto& assets = serv_.assets();
     out << '[';
-    copy(assets.begin(), assets.end(), OStreamJoiner(out, ','));
+    copy(assets.begin(), assets.end(), OStreamJoiner{out, ','});
     out << ']';
 }
 
@@ -136,7 +136,7 @@ void Rest::getInstr(Time now, ostream& out) const
 {
     const auto& instrs = serv_.instrs();
     out << '[';
-    copy(instrs.begin(), instrs.end(), OStreamJoiner(out, ','));
+    copy(instrs.begin(), instrs.end(), OStreamJoiner{out, ','});
     out << ']';
 }
 
@@ -199,7 +199,7 @@ void Rest::getMarket(Time now, std::ostream& out) const
 {
     const auto& markets = serv_.markets();
     out << '[';
-    copy(markets.begin(), markets.end(), OStreamJoiner(out, ','));
+    copy(markets.begin(), markets.end(), OStreamJoiner{out, ','});
     out << ']';
 }
 
@@ -207,7 +207,7 @@ void Rest::getMarket(Symbol instrSymbol, Time now, std::ostream& out) const
 {
     const auto& markets = serv_.markets();
     out << '[';
-    copy_if(markets.begin(), markets.end(), OStreamJoiner(out, ','),
+    copy_if(markets.begin(), markets.end(), OStreamJoiner{out, ','},
             [instrSymbol](const auto& market) { return market.instr() == instrSymbol; });
     out << ']';
 }
@@ -228,7 +228,7 @@ void Rest::getOrder(Symbol accntSymbol, Symbol instrSymbol, Time now, ostream& o
     const auto& accnt = serv_.accnt(accntSymbol);
     const auto& orders = accnt.orders();
     out << '[';
-    copy_if(orders.begin(), orders.end(), OStreamJoiner(out, ','),
+    copy_if(orders.begin(), orders.end(), OStreamJoiner{out, ','},
             [instrSymbol](const auto& order) { return order.instr() == instrSymbol; });
     out << ']';
 }
@@ -241,7 +241,7 @@ void Rest::getOrder(Symbol accntSymbol, Symbol instrSymbol, IsoDate settlDate, T
     const auto marketId = toMarketId(instr.id(), settlDate);
     const auto& orders = accnt.orders();
     out << '[';
-    copy_if(orders.begin(), orders.end(), OStreamJoiner(out, ','),
+    copy_if(orders.begin(), orders.end(), OStreamJoiner{out, ','},
             [marketId](const auto& order) { return order.marketId() == marketId; });
     out << ']';
 }
@@ -275,7 +275,7 @@ void Rest::getTrade(Symbol accntSymbol, Symbol instrSymbol, Time now, std::ostre
     const auto& accnt = serv_.accnt(accntSymbol);
     const auto& trades = accnt.trades();
     out << '[';
-    copy_if(trades.begin(), trades.end(), OStreamJoiner(out, ','),
+    copy_if(trades.begin(), trades.end(), OStreamJoiner{out, ','},
             [instrSymbol](const auto& trade) { return trade.instr() == instrSymbol; });
     out << ']';
 }
@@ -288,7 +288,7 @@ void Rest::getTrade(Symbol accntSymbol, Symbol instrSymbol, IsoDate settlDate, T
     const auto marketId = toMarketId(instr.id(), settlDate);
     const auto& trades = accnt.trades();
     out << '[';
-    copy_if(trades.begin(), trades.end(), OStreamJoiner(out, ','),
+    copy_if(trades.begin(), trades.end(), OStreamJoiner{out, ','},
             [marketId](const auto& trade) { return trade.marketId() == marketId; });
     out << ']';
 }
@@ -317,7 +317,7 @@ void Rest::getPosn(Symbol accntSymbol, Symbol instrSymbol, Time now, ostream& ou
     const auto& accnt = serv_.accnt(accntSymbol);
     const auto& posns = accnt.posns();
     out << '[';
-    copy_if(posns.begin(), posns.end(), OStreamJoiner(out, ','),
+    copy_if(posns.begin(), posns.end(), OStreamJoiner{out, ','},
             [instrSymbol](const auto& posn) { return posn.instr() == instrSymbol; });
     out << ']';
 }
