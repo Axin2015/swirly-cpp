@@ -16,9 +16,10 @@
  */
 #include "Asset.hpp"
 
-using namespace std;
+#include <swirly/util/Stream.hpp>
 
 namespace swirly {
+using namespace std;
 
 static_assert(sizeof(Asset) <= 3 * 64, "no greater than specified cache-lines");
 
@@ -27,6 +28,14 @@ Asset::~Asset() noexcept = default;
 Asset::Asset(const Asset&) = default;
 
 Asset::Asset(Asset&&) = default;
+
+void Asset::toCsv(ostream& os, char delim) const
+{
+    OStreamJoiner osj{os, delim};
+    osj << symbol_ //
+        << display_ //
+        << type_;
+}
 
 void Asset::toJson(ostream& os) const
 {

@@ -17,17 +17,42 @@
 #include "Posn.hpp"
 
 #include <swirly/util/Date.hpp>
+#include <swirly/util/Stream.hpp>
 #include <swirly/util/Symbol.hpp>
 
-using namespace std;
-
 namespace swirly {
+using namespace std;
 
 static_assert(sizeof(Posn) <= 2 * 64, "no greater than specified cache-lines");
 
 Posn::~Posn() noexcept = default;
 
 Posn::Posn(Posn&&) = default;
+
+void Posn::toCsv(ostream& os, char delim) const
+{
+    OStreamJoiner osj{os, delim};
+    osj << accnt_ //
+        << marketId_ //
+        << instr_;
+    if (settlDay_ != 0_jd) {
+        osj << jdToIso(settlDay_);
+    } else {
+        osj << "";
+    }
+    if (buyLots_ != 0_lts) {
+        osj << buyLots_ //
+            << buyCost_;
+    } else {
+        osj << '0' << '0';
+    }
+    if (sellLots_ != 0_lts) {
+        osj << sellLots_ //
+            << sellCost_;
+    } else {
+        osj << '0' << '0';
+    }
+}
 
 void Posn::toJson(ostream& os) const
 {

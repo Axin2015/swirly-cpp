@@ -32,10 +32,10 @@ struct MsgHandler : BasicMsgHandler<MsgHandler> {
     int archiveTradeCalls{0};
 
     void onReset() { ++resetCalls; }
-    void onCreateMarket(const CreateMarketBody& body) { ++createMarketCalls; }
-    void onUpdateMarket(const UpdateMarketBody& body) { ++updateMarketCalls; }
-    void onCreateExec(const CreateExecBody& body) { ++createExecCalls; }
-    void onArchiveTrade(const ArchiveTradeBody& body) { ++archiveTradeCalls; }
+    void onCreateMarket(const CreateMarket& body) { ++createMarketCalls; }
+    void onUpdateMarket(const UpdateMarket& body) { ++updateMarketCalls; }
+    void onCreateExec(const CreateExec& body) { ++createExecCalls; }
+    void onArchiveTrade(const ArchiveTrade& body) { ++archiveTradeCalls; }
 };
 
 } // namespace

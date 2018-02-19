@@ -57,13 +57,13 @@ class Journ
   private:
     void onReset();
 
-    void onCreateMarket(const CreateMarketBody& body);
+    void onCreateMarket(const CreateMarket& body);
 
-    void onUpdateMarket(const UpdateMarketBody& body);
+    void onUpdateMarket(const UpdateMarket& body);
 
-    void onCreateExec(const CreateExecBody& body);
+    void onCreateExec(const CreateExec& body);
 
-    void onArchiveTrade(const ArchiveTradeBody& body);
+    void onArchiveTrade(const ArchiveTrade& body);
 
     DbPtr db_;
     StmtPtr beginStmt_;

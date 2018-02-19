@@ -70,6 +70,7 @@ class SWIRLY_API Exec
     }
     ExecPtr opposite(Id64 id) const;
 
+    void toCsv(std::ostream& os, char delim = ',') const;
     void toJson(std::ostream& os) const;
 
     auto orderId() const noexcept { return orderId_; }

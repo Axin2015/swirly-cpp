@@ -18,9 +18,10 @@
 
 #include <swirly/fin/Conv.hpp>
 
-using namespace std;
+#include <swirly/util/Stream.hpp>
 
 namespace swirly {
+using namespace std;
 
 static_assert(sizeof(Instr) <= 4 * 64, "no greater than specified cache-lines");
 
@@ -51,6 +52,22 @@ Instr::~Instr() noexcept = default;
 Instr::Instr(const Instr&) = default;
 
 Instr::Instr(Instr&&) = default;
+
+void Instr::toCsv(ostream& os, char delim) const
+{
+    OStreamJoiner osj{os, delim};
+    osj << symbol_ //
+        << display_ //
+        << baseAsset_ //
+        << termCcy_ //
+        << lotNumer_ //
+        << lotDenom_ //
+        << tickNumer_ //
+        << tickDenom_ //
+        << pipDp_ //
+        << minLots_ //
+        << maxLots_;
+}
 
 void Instr::toJson(ostream& os) const
 {

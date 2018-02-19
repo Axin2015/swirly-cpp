@@ -45,16 +45,9 @@ class SWIRLY_API Model {
 
     void readAsset(const ModelCallback<AssetPtr>& cb) const { doReadAsset(cb); }
     void readInstr(const ModelCallback<InstrPtr>& cb) const { doReadInstr(cb); }
-    void readAccnt(Time now, const ModelCallback<std::string_view>& cb) const
-    {
-        doReadAccnt(now, cb);
-    }
     void readMarket(const ModelCallback<MarketPtr>& cb) const { doReadMarket(cb); }
     void readOrder(const ModelCallback<OrderPtr>& cb) const { doReadOrder(cb); }
-    void readExec(std::string_view accnt, std::size_t limit, const ModelCallback<ExecPtr>& cb) const
-    {
-        doReadExec(accnt, limit, cb);
-    }
+    void readExec(Time since, const ModelCallback<ExecPtr>& cb) const { doReadExec(since, cb); }
     void readTrade(const ModelCallback<ExecPtr>& cb) const { doReadTrade(cb); }
     void readPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const { doReadPosn(busDay, cb); }
 
@@ -63,14 +56,11 @@ class SWIRLY_API Model {
 
     virtual void doReadInstr(const ModelCallback<InstrPtr>& cb) const = 0;
 
-    virtual void doReadAccnt(Time now, const ModelCallback<std::string_view>& cb) const = 0;
-
     virtual void doReadMarket(const ModelCallback<MarketPtr>& cb) const = 0;
 
     virtual void doReadOrder(const ModelCallback<OrderPtr>& cb) const = 0;
 
-    virtual void doReadExec(std::string_view accnt, std::size_t limit,
-                            const ModelCallback<ExecPtr>& cb) const = 0;
+    virtual void doReadExec(Time since, const ModelCallback<ExecPtr>& cb) const = 0;
 
     virtual void doReadTrade(const ModelCallback<ExecPtr>& cb) const = 0;
 

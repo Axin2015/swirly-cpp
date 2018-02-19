@@ -71,11 +71,6 @@ struct Serv::Impl {
         const auto busDay = busDay_(now);
         model.readAsset([& assets = assets_](auto ptr) { assets.insert(move(ptr)); });
         model.readInstr([& instrs = instrs_](auto ptr) { instrs.insert(move(ptr)); });
-        model.readAccnt(now, [this, &model](auto symbol) {
-            auto& accnt = this->accnt(symbol);
-            model.readExec(symbol, accnt.execs().capacity(),
-                           [&accnt](auto ptr) { accnt.pushExecBack(ptr); });
-        });
         model.readMarket([& markets = markets_](MarketPtr ptr) { markets.insert(ptr); });
         model.readOrder([this](auto ptr) {
             auto& accnt = this->accnt(ptr->accnt());
@@ -90,6 +85,11 @@ struct Serv::Impl {
             assert(it != this->markets_.end());
             it->insertOrder(ptr);
             success = true;
+        });
+        // One week ago.
+        model.readExec(now - 604800000ms, [this](auto ptr) {
+            auto& accnt = this->accnt(ptr->accnt());
+            accnt.pushExecBack(ptr);
         });
         model.readTrade([this](auto ptr) {
             auto& accnt = this->accnt(ptr->accnt());

@@ -17,16 +17,55 @@
 #include "Order.hpp"
 
 #include <swirly/util/Date.hpp>
-
-using namespace std;
+#include <swirly/util/Stream.hpp>
 
 namespace swirly {
+using namespace std;
 
 static_assert(sizeof(Order) <= 6 * 64, "no greater than specified cache-lines");
 
 Order::~Order() noexcept = default;
 
 Order::Order(Order&&) = default;
+
+void Order::toCsv(ostream& os, char delim) const
+{
+    OStreamJoiner osj{os, delim};
+    osj << accnt_ //
+        << marketId_ //
+        << instr_;
+    if (settlDay_ != 0_jd) {
+        osj << jdToIso(settlDay_);
+    } else {
+        osj << "";
+    }
+    osj << id_;
+    if (!ref_.empty()) {
+        osj << ref_;
+    } else {
+        osj << "";
+    }
+    osj << state_ //
+        << side_ //
+        << lots_ //
+        << ticks_ //
+        << resdLots_ //
+        << execLots_ //
+        << execCost_;
+    if (lastLots_ != 0_lts) {
+        osj << lastLots_ //
+            << lastTicks_;
+    } else {
+        osj << "" << "";
+    }
+    if (minLots_ != 0_lts) {
+        osj << minLots_;
+    } else {
+        osj << "";
+    }
+    osj << created_ //
+        << modified_;
+}
 
 void Order::toJson(ostream& os) const
 {

@@ -116,13 +116,9 @@ void TestModel::doReadInstr(const ModelCallback<InstrPtr>& cb) const
 
 void TestModel::doReadMarket(const ModelCallback<MarketPtr>& cb) const {}
 
-void TestModel::doReadAccnt(Time now, const ModelCallback<string_view>& cb) const {}
-
 void TestModel::doReadOrder(const ModelCallback<OrderPtr>& cb) const {}
 
-void TestModel::doReadExec(string_view accnt, size_t limit, const ModelCallback<ExecPtr>& cb) const
-{
-}
+void TestModel::doReadExec(Time since, const ModelCallback<ExecPtr>& cb) const {}
 
 void TestModel::doReadTrade(const ModelCallback<ExecPtr>& cb) const {}
 
