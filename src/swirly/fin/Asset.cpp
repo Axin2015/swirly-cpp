@@ -29,7 +29,7 @@ Asset::Asset(const Asset&) = default;
 
 Asset::Asset(Asset&&) = default;
 
-void Asset::toCsv(ostream& os, char delim) const
+void Asset::toDsv(ostream& os, char delim) const
 {
     OStreamJoiner osj{os, delim};
     osj << symbol_ //

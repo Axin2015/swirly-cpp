@@ -28,7 +28,7 @@ Order::~Order() noexcept = default;
 
 Order::Order(Order&&) = default;
 
-void Order::toCsv(ostream& os, char delim) const
+void Order::toDsv(ostream& os, char delim) const
 {
     OStreamJoiner osj{os, delim};
     osj << accnt_ //

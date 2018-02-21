@@ -28,7 +28,7 @@ Exec::~Exec() noexcept = default;
 
 Exec::Exec(Exec&&) = default;
 
-void Exec::toCsv(ostream& os, char delim) const
+void Exec::toDsv(ostream& os, char delim) const
 {
     OStreamJoiner osj{os, delim};
     osj << accnt_ //

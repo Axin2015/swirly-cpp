@@ -48,7 +48,7 @@ Market::~Market() noexcept = default;
 
 Market::Market(Market&&) = default;
 
-void Market::toCsv(ostream& os, char delim) const
+void Market::toDsv(ostream& os, char delim) const
 {
     OStreamJoiner osj{os, delim};
     osj << id_ //

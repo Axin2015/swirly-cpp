@@ -48,7 +48,7 @@ class SWIRLY_API Instr : public Comparable<Instr> {
         return std::make_unique<Instr>(std::forward<ArgsT>(args)...);
     }
 
-    void toCsv(std::ostream& os, char delim = ',') const;
+    void toDsv(std::ostream& os, char delim = ',') const;
     void toJson(std::ostream& os) const;
 
     int compare(const Instr& rhs) const noexcept { return symbol_.compare(rhs.symbol_); }

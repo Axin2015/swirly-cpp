@@ -29,7 +29,7 @@ Posn::~Posn() noexcept = default;
 
 Posn::Posn(Posn&&) = default;
 
-void Posn::toCsv(ostream& os, char delim) const
+void Posn::toDsv(ostream& os, char delim) const
 {
     OStreamJoiner osj{os, delim};
     osj << accnt_ //

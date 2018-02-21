@@ -74,7 +74,7 @@ class SWIRLY_API Order
         return makeIntrusive<Order>(std::forward<ArgsT>(args)...);
     }
 
-    void toCsv(std::ostream& os, char delim = ',') const;
+    void toDsv(std::ostream& os, char delim = ',') const;
     void toJson(std::ostream& os) const;
 
     auto* level() const noexcept { return level_; }

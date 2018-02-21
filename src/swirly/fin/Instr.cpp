@@ -53,7 +53,7 @@ Instr::Instr(const Instr&) = default;
 
 Instr::Instr(Instr&&) = default;
 
-void Instr::toCsv(ostream& os, char delim) const
+void Instr::toDsv(ostream& os, char delim) const
 {
     OStreamJoiner osj{os, delim};
     osj << symbol_ //

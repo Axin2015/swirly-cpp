@@ -64,7 +64,7 @@ class SWIRLY_API Posn : public RefCount<Posn, ThreadUnsafePolicy> {
         return makeIntrusive<Posn>(std::forward<ArgsT>(args)...);
     }
 
-    void toCsv(std::ostream& os, char delim = ',') const;
+    void toDsv(std::ostream& os, char delim = ',') const;
     void toJson(std::ostream& os) const;
 
     auto accnt() const noexcept { return accnt_; }
