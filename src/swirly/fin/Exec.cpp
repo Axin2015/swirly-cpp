@@ -28,9 +28,9 @@ Exec::~Exec() noexcept = default;
 
 Exec::Exec(Exec&&) = default;
 
-void Exec::toDsv(ostream& os, char delim) const
+void Exec::toDsv(ostream& os, char sep) const
 {
-    OStreamJoiner osj{os, delim};
+    OStreamJoiner osj{os, sep};
     osj << accnt_ //
         << marketId_ //
         << instr_;

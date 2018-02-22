@@ -105,9 +105,9 @@ class SWIRLY_API OStreamJoiner {
     using reference = void;
     using iterator_category = std::output_iterator_tag;
 
-    OStreamJoiner(std::ostream& os, char delim) noexcept
+    OStreamJoiner(std::ostream& os, char sep) noexcept
       : os_{&os}
-      , delim_{delim}
+      , sep_{sep}
     {
     }
     ~OStreamJoiner() noexcept;
@@ -124,7 +124,7 @@ class SWIRLY_API OStreamJoiner {
     OStreamJoiner& operator=(const ValueT& value)
     {
         if (!first_) {
-            *os_ << delim_;
+            *os_ << sep_;
         }
         first_ = false;
         *os_ << value;
@@ -136,7 +136,7 @@ class SWIRLY_API OStreamJoiner {
 
   private:
     std::ostream* os_;
-    char delim_;
+    char sep_;
     bool first_{true};
 };
 

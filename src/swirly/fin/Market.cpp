@@ -48,9 +48,9 @@ Market::~Market() noexcept = default;
 
 Market::Market(Market&&) = default;
 
-void Market::toDsv(ostream& os, char delim) const
+void Market::toDsv(ostream& os, char sep) const
 {
-    OStreamJoiner osj{os, delim};
+    OStreamJoiner osj{os, sep};
     osj << id_ //
         << instr_;
     if (settlDay_ != 0_jd) {

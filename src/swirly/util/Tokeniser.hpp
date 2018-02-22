@@ -25,7 +25,7 @@ namespace swirly {
 
 class Tokeniser {
   public:
-    Tokeniser(std::string_view buf, std::string_view toks) noexcept { reset(buf, toks); }
+    Tokeniser(std::string_view buf, std::string_view seps) noexcept { reset(buf, seps); }
     Tokeniser() noexcept { reset(""sv, ""sv); }
     ~Tokeniser() noexcept = default;
 
@@ -42,15 +42,15 @@ class Tokeniser {
     void reset(std::string_view buf, std::string_view toks) noexcept
     {
         buf_ = buf;
-        toks_ = toks;
+        seps_ = toks;
         i_ = buf_.cbegin();
-        j_ = std::find_first_of(i_, buf_.cend(), toks_.cbegin(), toks_.cend());
+        j_ = std::find_first_of(i_, buf_.cend(), seps_.cbegin(), seps_.cend());
     }
     void pop() noexcept
     {
         if (j_ != buf_.cend()) {
             i_ = j_ + 1;
-            j_ = std::find_first_of(i_, buf_.cend(), toks_.cbegin(), toks_.cend());
+            j_ = std::find_first_of(i_, buf_.cend(), seps_.cbegin(), seps_.cend());
         } else {
             i_ = j_;
         }
@@ -58,7 +58,7 @@ class Tokeniser {
 
   private:
     std::string_view buf_;
-    std::string_view toks_;
+    std::string_view seps_;
     std::string_view::const_iterator i_, j_;
 };
 

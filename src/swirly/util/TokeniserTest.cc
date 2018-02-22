@@ -66,7 +66,7 @@ SWIRLY_TEST_CASE(TokeniserMultiValue)
     SWIRLY_CHECK(toks.empty());
 }
 
-SWIRLY_TEST_CASE(TokeniserMultiDelim)
+SWIRLY_TEST_CASE(TokeniserMultiSep)
 {
     Tokeniser toks{"foo,bar;baz"sv, ",;"sv};
 
