@@ -20,6 +20,7 @@
 #include <swirly/util/String.hpp>
 
 #include <algorithm>
+#include <array>
 
 namespace swirly {
 
@@ -61,6 +62,22 @@ class Tokeniser {
     std::string_view seps_;
     std::string_view::const_iterator i_, j_;
 };
+
+template <std::size_t N>
+using Row = std::array<std::string_view, N>;
+
+template <std::size_t N>
+void split(std::string_view line, std::string_view seps, Row<N>& row) noexcept
+{
+    Tokeniser toks{line, seps};
+    for (auto& col : row) {
+        if (toks.empty()) {
+            break;
+        }
+        col = toks.top();
+        toks.pop();
+    }
+}
 
 } // namespace swirly
 
