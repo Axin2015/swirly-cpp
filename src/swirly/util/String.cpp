@@ -16,32 +16,106 @@
  */
 #include "String.hpp"
 
-using namespace std;
+#include <cassert>
 
 namespace swirly {
+using namespace std;
+
 namespace {
 constexpr char Space[] = " \t\n\v\f\r";
 
 template <typename ValueT>
-ValueT stou(string_view sv) noexcept
+ValueT stoi(string_view sv) noexcept
 {
-    // ValueT type must be unsigned.
-    enable_if_t<is_unsigned_v<ValueT>, ValueT> u{0};
     auto it = sv.begin(), end = sv.end();
 
     // Skip leading whitespace.
-    while (it != end && isspace(*it)) {
+    for (;;) {
+        if (it == end) {
+            return 0;
+        }
+        if (!isspace(*it)) {
+            break;
+        }
         ++it;
     }
-    while (it != end && isdigit(*it)) {
-        u *= 10;
+    assert(it != end);
+
+    // Handle sign.
+    bool neg{false};
+    if (*it == '-') {
+        if (++it == end) {
+            return 0;
+        }
+        neg = true;
+    } else if (*it == '+') {
+        if (++it == end) {
+            return 0;
+        }
+    }
+    assert(it != end);
+
+    // ValueT type must be signed.
+    enable_if_t<is_signed_v<ValueT>, ValueT> i{0};
+    if (isdigit(*it)) {
+        i += *it - '0';
+        ++it;
+        while (it != end && isdigit(*it)) {
+            i *= 10;
+            i += *it - '0';
+            ++it;
+        }
+    }
+    return neg ? -i : i;
+}
+
+template <typename ValueT>
+ValueT stou(string_view sv) noexcept
+{
+    auto it = sv.begin(), end = sv.end();
+
+    // Skip leading whitespace.
+    for (;;) {
+        if (it == end) {
+            return 0;
+        }
+        if (!isspace(*it)) {
+            break;
+        }
+        ++it;
+    }
+    assert(it != end);
+
+    // ValueT type must be unsigned.
+    enable_if_t<is_unsigned_v<ValueT>, ValueT> u{0};
+    if (isdigit(*it)) {
         u += *it - '0';
         ++it;
+        while (it != end && isdigit(*it)) {
+            u *= 10;
+            u += *it - '0';
+            ++it;
+        }
     }
     return u;
 }
 
 } // namespace
+
+int16_t stoi16(string_view sv) noexcept
+{
+    return stoi<int16_t>(sv);
+}
+
+int32_t stoi32(string_view sv) noexcept
+{
+    return stoi<int32_t>(sv);
+}
+
+int64_t stoi64(string_view sv) noexcept
+{
+    return stoi<int64_t>(sv);
+}
 
 uint16_t stou16(string_view sv) noexcept
 {
