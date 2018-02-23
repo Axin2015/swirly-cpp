@@ -59,7 +59,7 @@ class SWIRLY_API Market
         return makeIntrusive<Market>(std::forward<ArgsT>(args)...);
     }
 
-    void toCsv(std::ostream& os, char delim = ',') const;
+    void toDsv(std::ostream& os, char sep = ',') const;
     void toJson(std::ostream& os) const;
 
     int compare(const Market& rhs) const noexcept { return swirly::compare(id_, rhs.id_); }

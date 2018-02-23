@@ -95,6 +95,51 @@ SWIRLY_TEST_CASE(StringToString)
     SWIRLY_CHECK(stod(toString(12345.67)) == 12345.67);
 }
 
+SWIRLY_TEST_CASE(Stoi32NoSign)
+{
+    SWIRLY_CHECK(stoi32(""sv) == 0);
+    SWIRLY_CHECK(stoi32("1"sv) == 1);
+    SWIRLY_CHECK(stoi32("123"sv) == 123);
+    SWIRLY_CHECK(stoi32(" "sv) == 0);
+    SWIRLY_CHECK(stoi32(" 1 "sv) == 1);
+    SWIRLY_CHECK(stoi32(" 123 "sv) == 123);
+    SWIRLY_CHECK(stoi32("x"sv) == 0);
+    SWIRLY_CHECK(stoi32(" 1x"sv) == 1);
+    SWIRLY_CHECK(stoi32(" 123x"sv) == 123);
+    SWIRLY_CHECK(stoi32("x1 "sv) == 0);
+    SWIRLY_CHECK(stoi32("x123 "sv) == 0);
+}
+
+SWIRLY_TEST_CASE(Stoi32PosSign)
+{
+    SWIRLY_CHECK(stoi32("+"sv) == 0);
+    SWIRLY_CHECK(stoi32("+1"sv) == 1);
+    SWIRLY_CHECK(stoi32("+123"sv) == 123);
+    SWIRLY_CHECK(stoi32(" + "sv) == 0);
+    SWIRLY_CHECK(stoi32(" +1 "sv) == 1);
+    SWIRLY_CHECK(stoi32(" +123 "sv) == 123);
+    SWIRLY_CHECK(stoi32("+x"sv) == 0);
+    SWIRLY_CHECK(stoi32(" +1x"sv) == 1);
+    SWIRLY_CHECK(stoi32(" +123x"sv) == 123);
+    SWIRLY_CHECK(stoi32("x+1 "sv) == 0);
+    SWIRLY_CHECK(stoi32("x+123 "sv) == 0);
+}
+
+SWIRLY_TEST_CASE(Stoi32NegSign)
+{
+    SWIRLY_CHECK(stoi32("-"sv) == 0);
+    SWIRLY_CHECK(stoi32("-1"sv) == -1);
+    SWIRLY_CHECK(stoi32("-123"sv) == -123);
+    SWIRLY_CHECK(stoi32(" - "sv) == 0);
+    SWIRLY_CHECK(stoi32(" -1 "sv) == -1);
+    SWIRLY_CHECK(stoi32(" -123 "sv) == -123);
+    SWIRLY_CHECK(stoi32("-x"sv) == 0);
+    SWIRLY_CHECK(stoi32(" -1x"sv) == -1);
+    SWIRLY_CHECK(stoi32(" -123x"sv) == -123);
+    SWIRLY_CHECK(stoi32("x-1 "sv) == 0);
+    SWIRLY_CHECK(stoi32("x-123 "sv) == 0);
+}
+
 SWIRLY_TEST_CASE(Stou64)
 {
     SWIRLY_CHECK(stou64(""sv) == 0UL);

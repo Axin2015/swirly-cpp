@@ -65,7 +65,7 @@ constexpr Cost operator""_cst(unsigned long long val) noexcept
  */
 using MarketState = unsigned;
 
-enum class AssetType {
+enum class AssetType : int {
     /**
      * Commodity.
      */
@@ -116,7 +116,7 @@ inline std::ostream& operator<<(std::ostream& os, AssetType type)
     return os << enumString(type);
 }
 
-enum class Direct {
+enum class Direct : int {
     /**
      * Aggressor bought. Taker lifted the offer resulting in a market uptick.
      */
@@ -143,7 +143,7 @@ inline std::ostream& operator<<(std::ostream& os, Direct direct)
     return os << enumString(direct);
 }
 
-enum class LiqInd {
+enum class LiqInd : int {
     /**
      * No liqInd.
      */
@@ -191,7 +191,7 @@ inline std::ostream& operator<<(std::ostream& os, LiqInd liqInd)
     return os << enumString(liqInd);
 }
 
-enum class Side { Buy = 1, Sell = -1 };
+enum class Side : int { Buy = 1, Sell = -1 };
 
 inline const char* enumString(Side side) noexcept
 {
@@ -226,7 +226,7 @@ inline std::ostream& operator<<(std::ostream& os, Side side)
  * Order states.
  * @image html OrderState.png
  */
-enum class State {
+enum class State : int {
     None = 0,
     /**
      * Initial state of a resting order placed in the order-book.

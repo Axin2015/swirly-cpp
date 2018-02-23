@@ -49,25 +49,25 @@ int main(int argc, char* argv[])
         {
             ofstream os{"asset.txt"};
             os << "symbol\tdisplay\ttype\n";
-            model->readAsset([&os](auto ptr) { ptr->toCsv(os, '\t'); os << '\n'; });
+            model->readAsset([&os](auto ptr) { ptr->toDsv(os, '\t'); os << '\n'; });
         }
         {
             ofstream os{"instr.txt"};
             os << "symbol\tdisplay\tbaseAsset\ttermCcy\tlotNumer\tlotDenom\ttickNumer\t"
                 "tickDenom\tpipDp\tminLots\tmaxLots\n";
-            model->readInstr([&os](auto ptr) { ptr->toCsv(os, '\t'); os << '\n'; });
+            model->readInstr([&os](auto ptr) { ptr->toDsv(os, '\t'); os << '\n'; });
         }
         {
             ofstream os{"market.txt"};
             os << "id\tinstr\tsettlDay\tstate\tlastLots\tlastTicks\tlastTime\tmaxId\n";
-            model->readMarket([&os](auto ptr) { ptr->toCsv(os, '\t'); os << '\n'; });
+            model->readMarket([&os](auto ptr) { ptr->toDsv(os, '\t'); os << '\n'; });
         }
         {
             ofstream os{"order.txt"};
             os << "accnt\tmarketId\tinstr\tsettlDate\tid\tref\tstate\tside\tlots\tticks\t"
                 "resdLots\texecLots\texecCost\tlastLots\tlastTicks\tminLots\tcreated\t"
                 "modified\n";
-            model->readOrder([&os](auto ptr) { ptr->toCsv(os, '\t'); os << '\n'; });
+            model->readOrder([&os](auto ptr) { ptr->toDsv(os, '\t'); os << '\n'; });
         }
         {
             ofstream os{"exec.txt"};
@@ -75,19 +75,19 @@ int main(int argc, char* argv[])
                 "ticks\tresdLots\texecLots\texecCost\tlastLots\tlastTicks\tminLots\tmatchId\t"
                 "liqInd\tcpty\tcreated\n";
             // One week ago.
-            model->readExec(now - 604800000ms, [&os](auto ptr) { ptr->toCsv(os, '\t'); os << '\n'; });
+            model->readExec(now - 604800000ms, [&os](auto ptr) { ptr->toDsv(os, '\t'); os << '\n'; });
         }
         {
             ofstream os{"trade.txt"};
             os << "accnt\tmarketId\tinstr\tsettlDate\tid\torderId\tref\tstate\tside\tlots\t"
                 "ticks\tresdLots\texecLots\texecCost\tlastLots\tlastTicks\tminLots\tmatchId\t"
                 "liqInd\tcpty\tcreated\n";
-            model->readTrade([&os](auto ptr) { ptr->toCsv(os, '\t'); os << '\n'; });
+            model->readTrade([&os](auto ptr) { ptr->toDsv(os, '\t'); os << '\n'; });
         }
         {
             ofstream os{"posn.txt"};
             os << "accnt\tmarketId\tinstr\tsettlDate\tbuyLots\tbuyCost\tsellLots\tsellCost\n";
-            model->readPosn(busDay(now), [&os](auto ptr) { ptr->toCsv(os, '\t'); os << '\n'; });
+            model->readPosn(busDay(now), [&os](auto ptr) { ptr->toDsv(os, '\t'); os << '\n'; });
         }
 
         ret = 0;

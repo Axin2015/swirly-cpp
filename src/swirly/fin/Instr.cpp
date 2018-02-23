@@ -53,9 +53,9 @@ Instr::Instr(const Instr&) = default;
 
 Instr::Instr(Instr&&) = default;
 
-void Instr::toCsv(ostream& os, char delim) const
+void Instr::toDsv(ostream& os, char sep) const
 {
-    OStreamJoiner osj{os, delim};
+    OStreamJoiner osj{os, sep};
     osj << symbol_ //
         << display_ //
         << baseAsset_ //

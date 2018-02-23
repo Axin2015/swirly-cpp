@@ -29,9 +29,9 @@ Posn::~Posn() noexcept = default;
 
 Posn::Posn(Posn&&) = default;
 
-void Posn::toCsv(ostream& os, char delim) const
+void Posn::toDsv(ostream& os, char sep) const
 {
-    OStreamJoiner osj{os, delim};
+    OStreamJoiner osj{os, sep};
     osj << accnt_ //
         << marketId_ //
         << instr_;

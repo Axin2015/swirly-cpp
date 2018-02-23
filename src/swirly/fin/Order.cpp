@@ -28,9 +28,9 @@ Order::~Order() noexcept = default;
 
 Order::Order(Order&&) = default;
 
-void Order::toCsv(ostream& os, char delim) const
+void Order::toDsv(ostream& os, char sep) const
 {
-    OStreamJoiner osj{os, delim};
+    OStreamJoiner osj{os, sep};
     osj << accnt_ //
         << marketId_ //
         << instr_;
