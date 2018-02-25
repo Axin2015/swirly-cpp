@@ -89,13 +89,13 @@ class SWIRLY_API HttpRequest : public BasicUrl<HttpRequest> {
 
   private:
     HttpMethod method_{HttpMethod::Get};
-    String<128> url_;
-    String<16> field_;
-    String<24>* value_{nullptr};
+    StringBuf<128> url_;
+    StringBuf<16> field_;
+    StringBuf<24>* value_{nullptr};
     // Header fields.
-    String<24> accnt_;
-    String<24> perm_;
-    String<24> time_;
+    StringBuf<24> accnt_;
+    StringBuf<24> perm_;
+    StringBuf<24> time_;
     RestBody body_;
     bool partial_{false};
 };

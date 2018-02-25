@@ -178,16 +178,16 @@ int main(int argc, char* argv[])
 
         memCtx = MemCtx{config.get<size_t>("mem_size", 1) << 20};
 
-        const char* const logLevel{config.get("log_level", nullptr)};
-        if (logLevel) {
-            setLogLevel(atoi(logLevel));
+        const auto logLevel = config.get("log_level", ""sv);
+        if (!logLevel.empty()) {
+            setLogLevel(fromString<int>(logLevel));
         }
 
         // Restrict file creation mask if specified. The umask function is always successful.
-        const char* const fileMode{config.get("file_mode", nullptr)};
-        if (fileMode) {
+        const auto fileMode = config.get("file_mode", ""sv);
+        if (!fileMode.empty()) {
             // Zero base to auto-detect: if the prefix is 0, the base is octal, if the prefix is 0x or 0X.
-            umask(numericCast<mode_t>(fileMode));
+            umask(fromString<mode_t>(fileMode));
         } else if (opts.daemon) {
             umask(0027);
         }
