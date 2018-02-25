@@ -18,7 +18,7 @@
 #define SWIRLY_UTIL_PROFILE_HPP
 
 #include <swirly/util/Math.hpp>
-#include <swirly/util/String.hpp>
+#include <swirly/util/StringBuf.hpp>
 
 #include <chrono>
 
@@ -67,7 +67,7 @@ class SWIRLY_API Profile {
     void record(double val) noexcept;
 
   private:
-    String<16> name_;
+    StringBuf<16> name_;
     VarAccum var_;
 };
 

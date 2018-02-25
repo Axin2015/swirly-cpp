@@ -17,8 +17,8 @@
 #ifndef SWIRLY_UTIL_CONFIG_HPP
 #define SWIRLY_UTIL_CONFIG_HPP
 
-#include <swirly/util/Numeric.hpp>
 #include <swirly/util/String.hpp>
+#include <swirly/util/TypeTraits.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
@@ -76,16 +76,16 @@ class SWIRLY_API Config {
         auto it = map_.find(key);
         return it != map_.end() ? it->second.c_str() : dfl;
     }
-    bool get(const char* key, bool dfl) const noexcept
+    const char* get(const char* key, std::nullptr_t) const noexcept
     {
         auto it = map_.find(key);
-        return it != map_.end() ? stob(it->second, dfl) : dfl;
+        return it != map_.end() ? it->second.c_str() : nullptr;
     }
-    template <typename ValueT, typename = std::enable_if_t<std::is_arithmetic_v<ValueT>>>
+    template <typename ValueT>
     ValueT get(const char* key, ValueT dfl) const noexcept
     {
         auto it = map_.find(key);
-        return it != map_.end() ? numericCast<ValueT>(it->second.c_str()) : dfl;
+        return it != map_.end() ? fromString<ValueT>(it->second) : dfl;
     }
     void clear() noexcept { map_.clear(); }
     void read(std::istream& is);

@@ -16,7 +16,7 @@
  */
 #include "Set.hpp"
 
-#include <swirly/util/String.hpp>
+#include <swirly/util/StringBuf.hpp>
 
 #include <swirly/unit/Test.hpp>
 
@@ -42,7 +42,7 @@ class Foo : public RefCount<Foo, ThreadUnsafePolicy> {
 
   private:
     const Symbol symbol_;
-    String<64> display_;
+    StringBuf<64> display_;
     int& alive_;
 };
 
@@ -63,7 +63,7 @@ class Bar : public RefCount<Bar, ThreadUnsafePolicy> {
 
   private:
     const Id64 id_;
-    String<64> display_;
+    StringBuf<64> display_;
     int& alive_;
 };
 

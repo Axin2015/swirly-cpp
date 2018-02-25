@@ -19,14 +19,13 @@
 
 #include <swirly/util/Compare.hpp>
 #include <swirly/util/Limits.hpp>
+#include <swirly/util/TypeTraits.hpp>
 
 #include <swirly/Config.h>
 
-#include <cstdint>
 #include <cstring>
 #include <memory>
 #include <ostream>
-#include <string_view>
 
 namespace swirly {
 
@@ -252,6 +251,14 @@ void setCString(char (&lhs)[SizeN], Symbol rhs) noexcept
         lhs[i] = '\0';
     }
 }
+
+template <>
+struct TypeTraits<Symbol> {
+    static auto fromString(std::string_view sv) noexcept
+    {
+        return Symbol{sv};
+    }
+};
 
 } // namespace swirly
 

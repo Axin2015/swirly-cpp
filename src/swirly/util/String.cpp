@@ -48,10 +48,8 @@ ValueT stoi(string_view sv) noexcept
             return 0;
         }
         neg = true;
-    } else if (*it == '+') {
-        if (++it == end) {
-            return 0;
-        }
+    } else if (*it == '+' && ++it == end) {
+        return 0;
     }
     assert(it != end);
 

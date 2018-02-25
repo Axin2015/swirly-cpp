@@ -24,6 +24,21 @@
 
 namespace swirly {
 
+template <std::size_t MaxN>
+struct StringData {
+
+    // Length in the first cache-line.
+    // Use int to save space.
+    int len;
+    char buf[MaxN];
+};
+
+template <std::size_t MaxN>
+constexpr std::string_view operator+(const StringData<MaxN>& s) noexcept
+{
+    return {s.buf, static_cast<std::size_t>(s.len)};
+}
+
 class SWIRLY_API RestBody {
   public:
     enum : unsigned {

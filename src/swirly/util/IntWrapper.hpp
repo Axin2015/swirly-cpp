@@ -17,7 +17,7 @@
 #ifndef SWIRLY_UTIL_INTWRAPPER_HPP
 #define SWIRLY_UTIL_INTWRAPPER_HPP
 
-#include <swirly/Config.h>
+#include <swirly/util/TypeTraits.hpp>
 
 #include <cstdint>
 #include <iosfwd>
@@ -353,6 +353,15 @@ static_assert(sizeof(IntWrapper<Int64Policy>) == 8, "must be specific size");
 
 template <typename ValueT>
 constexpr bool isIntWrapper = std::is_base_of_v<IntBase, ValueT>;
+
+template <typename ValueT>
+struct TypeTraits<ValueT, std::enable_if_t<isIntWrapper<ValueT>>> {
+    static auto fromString(std::string_view sv) noexcept
+    {
+        using UnderlyingTraits = TypeTraits<typename ValueT::ValueType>;
+        return ValueT{UnderlyingTraits::fromString(sv)};
+    }
+};
 
 } // namespace swirly
 

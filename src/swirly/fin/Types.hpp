@@ -20,7 +20,7 @@
 #include <swirly/fin/BasicTypes.hpp>
 #include <swirly/fin/Limits.hpp>
 
-#include <swirly/util/String.hpp>
+#include <swirly/util/StringBuf.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 
@@ -31,12 +31,12 @@ namespace swirly {
 /**
  * Description suitable for display on user-interface.
  */
-using Display = String<MaxDisplay>;
+using Display = StringBuf<MaxDisplay>;
 
 /**
  * Reference.
  */
-using Ref = String<MaxRef>;
+using Ref = StringBuf<MaxRef>;
 
 class Asset;
 using AssetPtr = std::unique_ptr<Asset>;

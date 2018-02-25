@@ -38,15 +38,16 @@ set(lib_SOURCES
   Limits.cpp
   Log.cpp
   Math.cpp
-  Numeric.cpp
   Pipe.cpp
   Profile.cpp
   RingBuffer.cpp
   Set.cpp
   Stream.cpp
   String.cpp
+  StringBuf.cpp
   Symbol.cpp
   Tokeniser.cpp
+  TypeTraits.cpp
   Types.cpp
   Utility.cpp
   VarSub.cpp)
@@ -78,6 +79,7 @@ set(test_SOURCES
   SetTest.cc
   StreamTest.cc
   StringTest.cc
+  StringBufTest.cc
   SymbolTest.cc
   TokeniserTest.cc
   UtilityTest.cc

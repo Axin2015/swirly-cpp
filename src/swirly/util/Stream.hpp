@@ -27,18 +27,18 @@ namespace swirly {
 SWIRLY_API void reset(std::ostream& os) noexcept;
 
 template <std::size_t MaxN>
-class StringBuf : public std::streambuf {
+class StringStreamBuf : public std::streambuf {
   public:
-    StringBuf() noexcept { reset(); }
-    ~StringBuf() noexcept override = default;
+    StringStreamBuf() noexcept { reset(); }
+    ~StringStreamBuf() noexcept override = default;
 
     // Copy.
-    StringBuf(const StringBuf& rhs) = delete;
-    StringBuf& operator=(const StringBuf& rhs) = delete;
+    StringStreamBuf(const StringStreamBuf& rhs) = delete;
+    StringStreamBuf& operator=(const StringStreamBuf& rhs) = delete;
 
     // Move.
-    StringBuf(StringBuf&&) = delete;
-    StringBuf& operator=(StringBuf&&) = delete;
+    StringStreamBuf(StringStreamBuf&&) = delete;
+    StringStreamBuf& operator=(StringStreamBuf&&) = delete;
 
     const char* data() const noexcept { return pbase(); }
     bool empty() const noexcept { return pbase() == pptr(); }
@@ -80,7 +80,7 @@ class StringStream : public std::ostream {
     };
 
   private:
-    StringBuf<MaxN> buf_;
+    StringStreamBuf<MaxN> buf_;
 };
 
 template <std::size_t MaxN, typename ValueT>
