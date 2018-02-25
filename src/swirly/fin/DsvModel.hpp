@@ -14,27 +14,25 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SQLITE_MODEL_HXX
-#define SWIRLY_SQLITE_MODEL_HXX
-
-#include "Utility.hxx"
+#ifndef SWIRLY_FIN_DSVMODEL_HPP
+#define SWIRLY_FIN_DSVMODEL_HPP
 
 #include <swirly/fin/Model.hpp>
 
 namespace swirly {
 
-class SqlModel : public Model {
+class SWIRLY_API DsvModel : public Model {
   public:
-    explicit SqlModel(const Config& config);
-    ~SqlModel() noexcept;
+    DsvModel() noexcept;
+    ~DsvModel() noexcept override;
 
     // Copy.
-    SqlModel(const SqlModel&) = delete;
-    SqlModel& operator=(const SqlModel&) = delete;
+    constexpr DsvModel(const DsvModel&) noexcept;
+    DsvModel& operator=(const DsvModel&) noexcept;
 
     // Move.
-    SqlModel(SqlModel&&);
-    SqlModel& operator=(SqlModel&&);
+    constexpr DsvModel(DsvModel&&) noexcept;
+    DsvModel& operator=(DsvModel&&) noexcept;
 
   protected:
     void doReadAsset(const ModelCallback<AssetPtr>& cb) const override;
@@ -50,11 +48,8 @@ class SqlModel : public Model {
     void doReadTrade(const ModelCallback<ExecPtr>& cb) const override;
 
     void doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const override;
-
-  private:
-    sqlite::DbPtr db_;
 };
 
 } // namespace swirly
 
-#endif // SWIRLY_SQLITE_MODEL_HXX
+#endif // SWIRLY_FIN_DSVMODEL_HPP

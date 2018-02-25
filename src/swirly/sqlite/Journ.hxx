@@ -24,26 +24,25 @@
 #include <swirly/fin/Transaction.hpp>
 
 namespace swirly {
-namespace sqlite {
 
-class Journ
+class SqlJourn
   : public Transactional
-  , public swirly::Journ
-  , BasicMsgHandler<Journ> {
+  , public Journ
+  , BasicMsgHandler<SqlJourn> {
     // Crtp.
-    friend struct BasicMsgHandler<Journ>;
+    friend struct BasicMsgHandler<SqlJourn>;
 
   public:
-    explicit Journ(const Config& config);
-    ~Journ() noexcept override;
+    explicit SqlJourn(const Config& config);
+    ~SqlJourn() noexcept override;
 
     // Copy.
-    Journ(const Journ&) = delete;
-    Journ& operator=(const Journ&) = delete;
+    SqlJourn(const SqlJourn&) = delete;
+    SqlJourn& operator=(const SqlJourn&) = delete;
 
     // Move.
-    Journ(Journ&&);
-    Journ& operator=(Journ&&);
+    SqlJourn(SqlJourn&&);
+    SqlJourn& operator=(SqlJourn&&);
 
   protected:
     void doBegin() override;
@@ -65,17 +64,16 @@ class Journ
 
     void onArchiveTrade(const ArchiveTrade& body);
 
-    DbPtr db_;
-    StmtPtr beginStmt_;
-    StmtPtr commitStmt_;
-    StmtPtr rollbackStmt_;
-    StmtPtr insertMarketStmt_;
-    StmtPtr updateMarketStmt_;
-    StmtPtr insertExecStmt_;
-    StmtPtr updateExecStmt_;
+    sqlite::DbPtr db_;
+    sqlite::StmtPtr beginStmt_;
+    sqlite::StmtPtr commitStmt_;
+    sqlite::StmtPtr rollbackStmt_;
+    sqlite::StmtPtr insertMarketStmt_;
+    sqlite::StmtPtr updateMarketStmt_;
+    sqlite::StmtPtr insertExecStmt_;
+    sqlite::StmtPtr updateExecStmt_;
 };
 
-} // namespace sqlite
 } // namespace swirly
 
 #endif // SWIRLY_SQLITE_JOURN_HXX

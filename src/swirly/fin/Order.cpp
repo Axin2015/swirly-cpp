@@ -56,7 +56,8 @@ void Order::toDsv(ostream& os, char sep) const
         osj << lastLots_ //
             << lastTicks_;
     } else {
-        osj << "" << "";
+        osj << ""
+            << "";
     }
     if (minLots_ != 0_lts) {
         osj << minLots_;

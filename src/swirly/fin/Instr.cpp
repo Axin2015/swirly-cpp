@@ -56,7 +56,8 @@ Instr::Instr(Instr&&) = default;
 void Instr::toDsv(ostream& os, char sep) const
 {
     OStreamJoiner osj{os, sep};
-    osj << symbol_ //
+    osj << id_ //
+        << symbol_ //
         << display_ //
         << baseAsset_ //
         << termCcy_ //

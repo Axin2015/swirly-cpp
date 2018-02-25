@@ -38,7 +38,7 @@ install(TARGETS swirly_queue_bench DESTINATION bin COMPONENT program)
 
 # Reserved as an ad-hoc scratch pad.
 add_executable(swirly_scratch Scratch.cpp)
-target_link_libraries(swirly_scratch ${swirly_util_LIBRARY})
+target_link_libraries(swirly_scratch ${swirly_fin_LIBRARY})
 
 add_executable(swirly_serv_bench ServBench.cpp)
 target_link_libraries(swirly_serv_bench ${swirly_clob_LIBRARY} ${swirly_sqlite_LIBRARY})

@@ -51,7 +51,7 @@ template <typename ValueT>
 struct DbTraits<ValueT, std::enable_if_t<std::is_integral_v<ValueT> && (sizeof(ValueT) <= 4)>> {
     static constexpr bool isNull(ValueT val) noexcept { return val == 0; }
     static void bind(sqlite3_stmt& stmt, int col, ValueT val) { bind32(stmt, col, val); }
-    static ValueT column(sqlite3_stmt& stmt, int col) noexcept
+    static auto column(sqlite3_stmt& stmt, int col) noexcept
     {
         return sqlite3_column_int(&stmt, col);
     }
@@ -64,7 +64,7 @@ template <typename ValueT>
 struct DbTraits<ValueT, std::enable_if_t<std::is_integral_v<ValueT> && (sizeof(ValueT) > 4)>> {
     static constexpr bool isNull(ValueT val) noexcept { return val == 0; }
     static void bind(sqlite3_stmt& stmt, int col, ValueT val) { bind64(stmt, col, val); }
-    static ValueT column(sqlite3_stmt& stmt, int col) noexcept
+    static auto column(sqlite3_stmt& stmt, int col) noexcept
     {
         return sqlite3_column_int64(&stmt, col);
     }
@@ -83,7 +83,7 @@ struct DbTraits<ValueT, std::enable_if_t<isIntWrapper<ValueT>>> {
     {
         UnderlyingTraits::bind(stmt, col, val.count());
     }
-    static ValueT column(sqlite3_stmt& stmt, int col) noexcept
+    static auto column(sqlite3_stmt& stmt, int col) noexcept
     {
         return ValueT{UnderlyingTraits::column(stmt, col)};
     }
@@ -102,7 +102,7 @@ struct DbTraits<ValueT, std::enable_if_t<std::is_enum_v<ValueT>>> {
     {
         UnderlyingTraits::bind(stmt, col, unbox(val));
     }
-    static ValueT column(sqlite3_stmt& stmt, int col) noexcept
+    static auto column(sqlite3_stmt& stmt, int col) noexcept
     {
         return static_cast<ValueT>(UnderlyingTraits::column(stmt, col));
     }
@@ -118,7 +118,7 @@ struct DbTraits<Time> {
     {
         bind64(stmt, col, msSinceEpoch(val));
     }
-    static Time column(sqlite3_stmt& stmt, int col) noexcept
+    static auto column(sqlite3_stmt& stmt, int col) noexcept
     {
         return toTime(Millis{sqlite3_column_int64(&stmt, col)});
     }
@@ -202,13 +202,13 @@ class ScopedBind {
     template <typename ValueT>
     void operator()(ValueT val)
     {
-        sqlite::bind(stmt_, ++col_, val);
+        bind(stmt_, ++col_, val);
     }
 
     template <typename ValueT>
     void operator()(ValueT val, MaybeNullTag)
     {
-        sqlite::bind(stmt_, ++col_, val, MaybeNull);
+        bind(stmt_, ++col_, val, MaybeNull);
     }
 
   private:
@@ -231,7 +231,7 @@ class ScopedStep {
     ScopedStep(ScopedStep&&) = delete;
     ScopedStep& operator=(ScopedStep&&) = delete;
 
-    bool operator()() { return sqlite::step(stmt_); }
+    bool operator()() { return step(stmt_); }
 
   private:
     sqlite3_stmt& stmt_;

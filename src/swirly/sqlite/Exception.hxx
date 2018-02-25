@@ -20,26 +20,24 @@
 #include <swirly/util/Exception.hpp>
 
 namespace swirly {
-namespace sqlite {
 
-class Error : public Exception {
+class SqlException : public Exception {
   public:
-    explicit Error(std::string_view what) noexcept
+    explicit SqlException(std::string_view what) noexcept
       : Exception{what}
     {
     }
-    ~Error() noexcept;
+    ~SqlException() noexcept;
 
     // Copy.
-    Error(const Error&) noexcept = default;
-    Error& operator=(const Error&) noexcept = default;
+    SqlException(const SqlException&) noexcept = default;
+    SqlException& operator=(const SqlException&) noexcept = default;
 
     // Move.
-    Error(Error&&) noexcept = default;
-    Error& operator=(Error&&) noexcept = default;
+    SqlException(SqlException&&) noexcept = default;
+    SqlException& operator=(SqlException&&) noexcept = default;
 };
 
-} // namespace sqlite
 } // namespace swirly
 
 #endif // SWIRLY_SQLITE_EXCEPTION_HXX
