@@ -19,7 +19,7 @@
 #include <swirly/unit/Test.hpp>
 
 #include <algorithm> // equal()
-#include <numeric> // accumulate()
+#include <numeric>   // accumulate()
 
 using namespace std;
 using namespace swirly;

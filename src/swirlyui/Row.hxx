@@ -26,7 +26,7 @@ template <typename ValueT>
 class Row {
   public:
     explicit Row(std::uint64_t tag = 0, const ValueT& value = ValueT{}) noexcept
-      : value_{value}
+    : value_{value}
     {
         tag_ = tag;
         checked_ = 0;

@@ -45,7 +45,7 @@ struct SWIRLY_PACKED IntWrapper : IntBase {
     template <typename RhsT,
               typename = typename std::enable_if_t<std::is_convertible_v<RhsT, ValueType>>>
     constexpr explicit IntWrapper(RhsT rhs) noexcept
-      : value_{static_cast<ValueType>(rhs)}
+    : value_{static_cast<ValueType>(rhs)}
     {
     }
 

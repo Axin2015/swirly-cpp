@@ -31,8 +31,8 @@ Level Level::fromJson(const QJsonObject& obj)
 QDebug operator<<(QDebug debug, const Level& level)
 {
     debug.nospace() << "Level{ticks=" << level.ticks() //
-                    << ",lots=" << level.lots() //
-                    << ",count=" << level.count() //
+                    << ",lots=" << level.lots()        //
+                    << ",count=" << level.count()      //
                     << '}';
     return debug;
 }

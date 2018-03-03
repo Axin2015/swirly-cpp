@@ -24,14 +24,14 @@ namespace ui {
 namespace posn {
 
 enum class Column : int { //
-    CheckState, //
-    Accnt, //
-    MarketId, //
-    Instr, //
-    SettlDate, //
-    BuyLots, //
-    BuyAvgPrice, //
-    SellLots, //
+    CheckState,           //
+    Accnt,                //
+    MarketId,             //
+    Instr,                //
+    SettlDate,            //
+    BuyLots,              //
+    BuyAvgPrice,          //
+    SellLots,             //
     SellAvgPrice
 };
 constexpr int ColumnCount{unbox(Column::SellAvgPrice) + 1};
@@ -42,14 +42,14 @@ class Posn {
   public:
     Posn(const QString& accnt, Id64 marketId, const Instr& instr, QDate settlDate, Lots buyLots,
          Cost buyCost, Lots sellLots, Cost sellCost)
-      : accnt_{accnt}
-      , marketId_{marketId}
-      , instr_{instr}
-      , settlDate_{settlDate}
-      , buyLots_{buyLots}
-      , buyCost_{buyCost}
-      , sellLots_{sellLots}
-      , sellCost_{sellCost}
+    : accnt_{accnt}
+    , marketId_{marketId}
+    , instr_{instr}
+    , settlDate_{settlDate}
+    , buyLots_{buyLots}
+    , buyCost_{buyCost}
+    , sellLots_{sellLots}
+    , sellCost_{sellCost}
     {
     }
     Posn() = default;
@@ -81,8 +81,8 @@ QDebug operator<<(QDebug debug, const Posn& posn);
 
 inline bool isModified(const Posn& prev, const Posn& next) noexcept
 {
-    return prev.buyLots() != next.buyLots() //
-        || prev.buyCost() != next.buyCost() //
+    return prev.buyLots() != next.buyLots()   //
+        || prev.buyCost() != next.buyCost()   //
         || prev.sellLots() != next.sellLots() //
         || prev.sellCost() != next.sellCost();
 }

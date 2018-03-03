@@ -26,21 +26,21 @@ namespace ui {
 Instr::Impl::Impl(const QString& symbol, const QString& display, const QString& baseAsset,
                   const QString& termCcy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
                   int pipDp, Lots minLots, Lots maxLots)
-  : symbol{symbol}
-  , display{display}
-  , baseAsset{baseAsset}
-  , termCcy{termCcy}
-  , lotNumer{lotNumer}
-  , lotDenom{lotDenom}
-  , qtyInc{fractToReal(lotNumer, lotDenom)}
-  , tickNumer{tickNumer}
-  , tickDenom{tickDenom}
-  , priceInc{fractToReal(tickNumer, tickDenom)}
-  , pipDp{pipDp}
-  , qtyDp{realToDp(qtyInc)}
-  , priceDp{realToDp(priceInc)}
-  , minLots{minLots}
-  , maxLots{maxLots}
+: symbol{symbol}
+, display{display}
+, baseAsset{baseAsset}
+, termCcy{termCcy}
+, lotNumer{lotNumer}
+, lotDenom{lotDenom}
+, qtyInc{fractToReal(lotNumer, lotDenom)}
+, tickNumer{tickNumer}
+, tickDenom{tickDenom}
+, priceInc{fractToReal(tickNumer, tickDenom)}
+, pipDp{pipDp}
+, qtyDp{realToDp(qtyInc)}
+, priceDp{realToDp(priceInc)}
+, minLots{minLots}
+, maxLots{maxLots}
 {
 }
 
@@ -63,17 +63,17 @@ shared_ptr<const Instr::Impl> Instr::empty()
 
 QDebug operator<<(QDebug debug, const Instr& instr)
 {
-    debug.nospace() << "Instr{symbol=" << instr.symbol() //
-                    << ",display=" << instr.display() //
+    debug.nospace() << "Instr{symbol=" << instr.symbol()  //
+                    << ",display=" << instr.display()     //
                     << ",baseAsset=" << instr.baseAsset() //
-                    << ",termCcy=" << instr.termCcy() //
-                    << ",lotNumer=" << instr.lotNumer() //
-                    << ",lotDenom=" << instr.lotDenom() //
+                    << ",termCcy=" << instr.termCcy()     //
+                    << ",lotNumer=" << instr.lotNumer()   //
+                    << ",lotDenom=" << instr.lotDenom()   //
                     << ",tickNumer=" << instr.tickNumer() //
                     << ",tickDenom=" << instr.tickDenom() //
-                    << ",pipDp=" << instr.pipDp() //
-                    << ",minLots=" << instr.minLots() //
-                    << ",maxLots=" << instr.maxLots() //
+                    << ",pipDp=" << instr.pipDp()         //
+                    << ",minLots=" << instr.minLots()     //
+                    << ",maxLots=" << instr.maxLots()     //
                     << '}';
     return debug;
 }

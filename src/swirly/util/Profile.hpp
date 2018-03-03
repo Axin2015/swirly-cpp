@@ -30,7 +30,7 @@ namespace swirly {
 class SWIRLY_API Profile {
   public:
     Profile(std::string_view name) noexcept
-      : name_{name}
+    : name_{name}
     {
     }
     ~Profile() noexcept;
@@ -78,8 +78,8 @@ class SWIRLY_API Profile {
 class SWIRLY_API TimeRecorder {
   public:
     explicit TimeRecorder(Profile& profile) noexcept
-      : profile_(profile)
-      , start_{std::chrono::high_resolution_clock::now()}
+    : profile_(profile)
+    , start_{std::chrono::high_resolution_clock::now()}
     {
     }
     ~TimeRecorder() noexcept;

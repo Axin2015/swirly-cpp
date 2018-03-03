@@ -23,7 +23,7 @@ namespace ui {
 using namespace market;
 
 MarketModel::MarketModel(QObject* parent)
-  : TableModel{parent}
+: TableModel{parent}
 {
     header_[unbox(Column::CheckState)] = tr("");
     header_[unbox(Column::Id)] = tr("Id");

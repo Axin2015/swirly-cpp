@@ -97,16 +97,16 @@ class SWIRLY_API Transactional {
 class SWIRLY_API Transaction {
   public:
     Transaction(Transactional& target, More more)
-      : target_(target)
-      , more_{more}
+    : target_(target)
+    , more_{more}
     {
         if (more == More::Yes) {
             target_.tryBegin();
         }
     }
     explicit Transaction(Transactional& target)
-      : target_(target)
-      , more_{More::No}
+    : target_(target)
+    , more_{More::No}
     {
         target_.tryBegin();
     }

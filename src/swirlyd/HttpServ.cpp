@@ -23,8 +23,8 @@ namespace swirly {
 using namespace std;
 
 HttpServ::HttpServ(Reactor& r, const Endpoint& ep, RestServ& rs)
-  : TcpAcceptor{r, ep}
-  , restServ_(rs)
+: TcpAcceptor{r, ep}
+, restServ_(rs)
 {
 }
 

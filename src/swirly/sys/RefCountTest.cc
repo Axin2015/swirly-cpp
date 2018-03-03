@@ -25,7 +25,7 @@ namespace {
 class Foo : public RefCount<Foo, ThreadUnsafePolicy> {
   public:
     explicit Foo(int& alive) noexcept
-      : alive_{alive}
+    : alive_{alive}
     {
         ++alive;
     }

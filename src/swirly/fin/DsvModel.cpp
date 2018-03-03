@@ -36,10 +36,10 @@ DsvModel::~DsvModel() noexcept = default;
 void DsvModel::doReadAsset(const ModelCallback<AssetPtr>& cb) const
 {
     enum {
-        Id, //
-        Symbol, //
+        Id,      //
+        Symbol,  //
         Display, //
-        TypeId //
+        TypeId   //
     };
 
     ifstream is{"asset.txt"};
@@ -64,18 +64,18 @@ void DsvModel::doReadAsset(const ModelCallback<AssetPtr>& cb) const
 void DsvModel::doReadInstr(const ModelCallback<InstrPtr>& cb) const
 {
     enum {
-        Id, //
-        Symbol, //
-        Display, //
+        Id,        //
+        Symbol,    //
+        Display,   //
         BaseAsset, //
-        TermCcy, //
+        TermCcy,   //
         TickNumer, //
         TickDenom, //
-        LotNumer, //
-        LotDenom, //
-        PipDp, //
-        MinLots, //
-        MaxLots //
+        LotNumer,  //
+        LotDenom,  //
+        PipDp,     //
+        MinLots,   //
+        MaxLots    //
     };
 
     ifstream is{"instr.txt"};
@@ -108,15 +108,15 @@ void DsvModel::doReadInstr(const ModelCallback<InstrPtr>& cb) const
 
 void DsvModel::doReadMarket(const ModelCallback<MarketPtr>& cb) const
 {
-    enum { //
-        Id, //
-        Instr, //
-        SettlDay, //
-        State, //
-        LastLots, //
+    enum {         //
+        Id,        //
+        Instr,     //
+        SettlDay,  //
+        State,     //
+        LastLots,  //
         LastTicks, //
-        LastTime, //
-        MaxId //
+        LastTime,  //
+        MaxId      //
     };
 
     ifstream is{"market.txt"};
@@ -144,25 +144,25 @@ void DsvModel::doReadMarket(const ModelCallback<MarketPtr>& cb) const
 
 void DsvModel::doReadOrder(const ModelCallback<OrderPtr>& cb) const
 {
-    enum { //
-        Accnt, //
-        MarketId, //
-        Instr, //
-        SettlDay, //
-        Id, //
-        Ref, //
-        State, //
-        Side, //
-        Lots, //
-        Ticks, //
-        ResdLots, //
-        ExecLots, //
-        ExecCost, //
-        LastLots, //
+    enum {         //
+        Accnt,     //
+        MarketId,  //
+        Instr,     //
+        SettlDay,  //
+        Id,        //
+        Ref,       //
+        State,     //
+        Side,      //
+        Lots,      //
+        Ticks,     //
+        ResdLots,  //
+        ExecLots,  //
+        ExecCost,  //
+        LastLots,  //
         LastTicks, //
-        MinLots, //
-        Created, //
-        Modified //
+        MinLots,   //
+        Created,   //
+        Modified   //
     };
 
     ifstream is{"order.txt"};
@@ -202,28 +202,28 @@ void DsvModel::doReadOrder(const ModelCallback<OrderPtr>& cb) const
 
 void DsvModel::doReadExec(Time since, const ModelCallback<ExecPtr>& cb) const
 {
-    enum { //
-        Accnt, //
-        MarketId, //
-        Instr, //
-        SettlDay, //
-        Id, //
-        OrderId, //
-        Ref, //
-        State, //
-        Side, //
-        Lots, //
-        Ticks, //
-        ResdLots, //
-        ExecLots, //
-        ExecCost, //
-        LastLots, //
+    enum {         //
+        Accnt,     //
+        MarketId,  //
+        Instr,     //
+        SettlDay,  //
+        Id,        //
+        OrderId,   //
+        Ref,       //
+        State,     //
+        Side,      //
+        Lots,      //
+        Ticks,     //
+        ResdLots,  //
+        ExecLots,  //
+        ExecCost,  //
+        LastLots,  //
         LastTicks, //
-        MinLots, //
-        MatchId, //
-        LiqInd, //
-        Cpty, //
-        Created //
+        MinLots,   //
+        MatchId,   //
+        LiqInd,    //
+        Cpty,      //
+        Created    //
     };
 
     ifstream is{"exec.txt"};
@@ -266,27 +266,27 @@ void DsvModel::doReadExec(Time since, const ModelCallback<ExecPtr>& cb) const
 
 void DsvModel::doReadTrade(const ModelCallback<ExecPtr>& cb) const
 {
-    enum { //
-        Accnt, //
-        MarketId, //
-        Instr, //
-        SettlDay, //
-        Id, //
-        OrderId, //
-        Ref, //
-        Side, //
-        Lots, //
-        Ticks, //
-        ResdLots, //
-        ExecLots, //
-        ExecCost, //
-        LastLots, //
+    enum {         //
+        Accnt,     //
+        MarketId,  //
+        Instr,     //
+        SettlDay,  //
+        Id,        //
+        OrderId,   //
+        Ref,       //
+        Side,      //
+        Lots,      //
+        Ticks,     //
+        ResdLots,  //
+        ExecLots,  //
+        ExecCost,  //
+        LastLots,  //
         LastTicks, //
-        MinLots, //
-        MatchId, //
-        LiqInd, //
-        Cpty, //
-        Created //
+        MinLots,   //
+        MatchId,   //
+        LiqInd,    //
+        Cpty,      //
+        Created    //
     };
 
     ifstream is{"trade.txt"};
@@ -328,15 +328,15 @@ void DsvModel::doReadTrade(const ModelCallback<ExecPtr>& cb) const
 
 void DsvModel::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const
 {
-    enum { //
-        Accnt, //
+    enum {        //
+        Accnt,    //
         MarketId, //
-        Instr, //
+        Instr,    //
         SettlDay, //
-        BuyLots, //
-        BuyCost, //
+        BuyLots,  //
+        BuyCost,  //
         SellLots, //
-        SellCost //
+        SellCost  //
     };
 
     ifstream is{"posn.txt"};

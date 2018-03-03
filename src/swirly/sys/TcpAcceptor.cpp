@@ -21,8 +21,8 @@ namespace swirly {
 using namespace std;
 
 TcpAcceptor::TcpAcceptor(Reactor& r, const Endpoint& ep)
-  : EventHandler{r}
-  , serv_{ep.protocol()}
+: EventHandler{r}
+, serv_{ep.protocol()}
 {
     serv_.setSoReuseAddr(true);
     serv_.bind(ep);

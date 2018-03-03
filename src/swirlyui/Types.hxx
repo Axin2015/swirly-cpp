@@ -63,8 +63,8 @@ struct TypeTraits<unsigned> {
 
 template <typename ValueT>
 struct TypeTraits<ValueT,
-                  typename std::enable_if_t< //
-                      isIntWrapper<ValueT> //
+                  typename std::enable_if_t<                       //
+                      isIntWrapper<ValueT>                         //
                       && (sizeof(typename ValueT::ValueType) <= 4) //
                       >> {
     static ValueT fromJson(const QJsonValue& value) { return ValueT{value.toInt()}; }
@@ -75,8 +75,8 @@ struct TypeTraits<ValueT,
 
 template <typename ValueT>
 struct TypeTraits<ValueT,
-                  typename std::enable_if_t< //
-                      isIntWrapper<ValueT> //
+                  typename std::enable_if_t<                      //
+                      isIntWrapper<ValueT>                        //
                       && (sizeof(typename ValueT::ValueType) > 4) //
                       >> {
     static ValueT fromJson(const QJsonValue& value) { return ValueT{value.toDouble()}; }

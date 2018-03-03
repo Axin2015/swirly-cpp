@@ -25,11 +25,11 @@ namespace swirly {
 static_assert(sizeof(Level) <= 2 * 64, "no greater than specified cache-lines");
 
 Level::Level(const Order& firstOrder) noexcept
-  : firstOrder_{&firstOrder}
-  , key_{detail::composeKey(firstOrder.side(), firstOrder.ticks())}
-  , ticks_{firstOrder.ticks()}
-  , lots_{firstOrder.resdLots()}
-  , count_{1}
+: firstOrder_{&firstOrder}
+, key_{detail::composeKey(firstOrder.side(), firstOrder.ticks())}
+, ticks_{firstOrder.ticks()}
+, lots_{firstOrder.resdLots()}
+, count_{1}
 {
 }
 

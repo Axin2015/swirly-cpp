@@ -49,7 +49,7 @@ class SWIRLY_API TestModel : public swirly::TestModel {
 
 struct ServFixture {
     ServFixture()
-      : serv{journ, 1 << 10, 1 << 4}
+    : serv{journ, 1 << 10, 1 << 4}
     {
         serv.load(TestModel{}, Now);
     }

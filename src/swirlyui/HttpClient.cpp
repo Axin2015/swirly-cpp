@@ -40,7 +40,7 @@ enum : int { GetRefData = 1, GetAccnt, PostMarket, PostOrder, PutOrder };
 } // namespace
 
 HttpClient::HttpClient(QObject* parent)
-  : Client{parent}
+: Client{parent}
 {
     connect(&nam_, &QNetworkAccessManager::finished, this, &HttpClient::slotFinished);
     connect(&nam_, &QNetworkAccessManager::networkAccessibleChanged, this,
@@ -120,7 +120,7 @@ void HttpClient::cancelOrders(const OrderKeys& keys)
             }
             market = marketModel().find(key.first);
             out << "http://127.0.0.1:8080/accnt/orders/" << market.instr().symbol() //
-                << '/' << dateToIso(market.settlDate()) //
+                << '/' << dateToIso(market.settlDate())                             //
                 << '/' << id;
         } else {
             out << ',' << id;

@@ -31,7 +31,7 @@ class Handle {
 
     Handle(std::nullptr_t = nullptr) noexcept {}
     Handle(Id id) noexcept
-      : id_{id}
+    : id_{id}
     {
     }
     ~Handle() noexcept
@@ -47,7 +47,7 @@ class Handle {
 
     // Move.
     Handle(Handle&& rhs)
-      : id_{rhs.id_}
+    : id_{rhs.id_}
     {
         rhs.id_ = invalid();
     }

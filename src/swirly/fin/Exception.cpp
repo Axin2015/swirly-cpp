@@ -26,8 +26,8 @@ ServException::~ServException() noexcept = default;
 
 void ServException::toJson(int status, const char* reason, const char* detail, ostream& os)
 {
-    os << "{\"status\":" << status //
-       << ",\"reason\":\"" << reason //
+    os << "{\"status\":" << status     //
+       << ",\"reason\":\"" << reason   //
        << "\",\"detail\":\"" << detail //
        << "\"}";
 }

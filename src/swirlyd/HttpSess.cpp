@@ -30,11 +30,11 @@ enum { MaxData = 2048 };
 } // namespace
 
 HttpSess::HttpSess(Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, RestServ& rs, Time now)
-  : EventHandler{r}
-  , BasicHttpParser<HttpSess>{HttpType::Request}
-  , sock_{move(sock)}
-  , ep_{ep}
-  , restServ_(rs)
+: EventHandler{r}
+, BasicHttpParser<HttpSess>{HttpType::Request}
+, sock_{move(sock)}
+, ep_{ep}
+, restServ_(rs)
 {
     SWIRLY_INFO(logMsg() << "accept session");
 

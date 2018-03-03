@@ -24,7 +24,7 @@ namespace swirly {
 class SqlException : public Exception {
   public:
     explicit SqlException(std::string_view what) noexcept
-      : Exception{what}
+    : Exception{what}
     {
     }
     ~SqlException() noexcept;

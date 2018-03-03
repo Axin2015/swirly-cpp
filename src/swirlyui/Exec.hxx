@@ -24,27 +24,27 @@ namespace ui {
 namespace exec {
 
 enum class Column : int { //
-    CheckState, //
-    Accnt, //
-    MarketId, //
-    Instr, //
-    SettlDate, //
-    Id, //
-    OrderId, //
-    Ref, //
-    State, //
-    Side, //
-    Lots, //
-    Price, //
-    ResdLots, //
-    ExecLots, //
-    AvgPrice, //
-    LastLots, //
-    LastPrice, //
-    MinLots, //
-    MatchId, //
-    LiqInd, //
-    Cpty, //
+    CheckState,           //
+    Accnt,                //
+    MarketId,             //
+    Instr,                //
+    SettlDate,            //
+    Id,                   //
+    OrderId,              //
+    Ref,                  //
+    State,                //
+    Side,                 //
+    Lots,                 //
+    Price,                //
+    ResdLots,             //
+    ExecLots,             //
+    AvgPrice,             //
+    LastLots,             //
+    LastPrice,            //
+    MinLots,              //
+    MatchId,              //
+    LiqInd,               //
+    Cpty,                 //
     Created
 };
 constexpr int ColumnCount{unbox(Column::Created) + 1};

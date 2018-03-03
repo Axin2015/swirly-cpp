@@ -41,7 +41,7 @@ struct Data {
 struct Reactor::Impl {
 
     explicit Impl(size_t sizeHint)
-      : mux{sizeHint}
+    : mux{sizeHint}
     {
         const auto fd = ef.fd();
         data.resize(max<size_t>(fd + 1, sizeHint));
@@ -62,7 +62,7 @@ struct Reactor::Impl {
 };
 
 Reactor::Reactor(size_t sizeHint)
-  : impl_{make_unique<Impl>(sizeHint)}
+: impl_{make_unique<Impl>(sizeHint)}
 {
 }
 

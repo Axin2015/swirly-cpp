@@ -162,18 +162,18 @@ bool stob(string_view sv, bool dfl) noexcept
         }
         break;
     case 3:
-        if ((sv[0] == 'O' || sv[0] == 'o') //
+        if ((sv[0] == 'O' || sv[0] == 'o')    //
             && (sv[1] == 'F' || sv[1] == 'f') //
             && (sv[2] == 'F' || sv[2] == 'f')) {
             val = false;
-        } else if ((sv[0] == 'Y' || sv[0] == 'y') //
+        } else if ((sv[0] == 'Y' || sv[0] == 'y')    //
                    && (sv[1] == 'E' || sv[1] == 'e') //
                    && (sv[2] == 'S' || sv[2] == 's')) {
             val = true;
         }
         break;
     case 4:
-        if ((sv[0] == 'T' || sv[0] == 't') //
+        if ((sv[0] == 'T' || sv[0] == 't')    //
             && (sv[1] == 'R' || sv[1] == 'r') //
             && (sv[2] == 'U' || sv[2] == 'u') //
             && (sv[3] == 'E' || sv[3] == 'e')) {
@@ -181,7 +181,7 @@ bool stob(string_view sv, bool dfl) noexcept
         }
         break;
     case 5:
-        if ((sv[0] == 'F' || sv[0] == 'f') //
+        if ((sv[0] == 'F' || sv[0] == 'f')    //
             && (sv[1] == 'A' || sv[1] == 'a') //
             && (sv[2] == 'L' || sv[2] == 'l') //
             && (sv[3] == 'S' || sv[3] == 's') //

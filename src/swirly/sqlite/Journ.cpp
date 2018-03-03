@@ -29,35 +29,35 @@ constexpr auto BeginSql = "BEGIN TRANSACTION"sv;
 constexpr auto CommitSql = "COMMIT TRANSACTION"sv;
 constexpr auto RollbackSql = "ROLLBACK TRANSACTION"sv;
 
-constexpr auto InsertMarketSql = //
+constexpr auto InsertMarketSql =                         //
     "INSERT INTO market_t (id, instr, settl_day, state)" //
     " VALUES (?, ?, ?, ?)"sv;
 
-constexpr auto UpdateMarketSql = //
+constexpr auto UpdateMarketSql =     //
     "UPDATE Market_t SET state = ?2" //
     " WHERE id = ?1"sv;
 
-constexpr auto InsertExecSql = //
-    "INSERT INTO exec_t (market_id, instr, settl_day, id, order_id, accnt, ref," //
+constexpr auto InsertExecSql =                                                     //
+    "INSERT INTO exec_t (market_id, instr, settl_day, id, order_id, accnt, ref,"   //
     " state_id, side_id, lots, ticks, resd_lots, exec_lots, exec_cost, last_lots," //
-    " last_ticks, min_lots, match_id, liqInd_id, cpty, created)" //
+    " last_ticks, min_lots, match_id, liqInd_id, cpty, created)"                   //
     " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"sv;
 
-constexpr auto UpdateExecSql = //
+constexpr auto UpdateExecSql =       //
     "UPDATE exec_t SET archive = ?3" //
     " WHERE market_id = ?1 AND id = ?2"sv;
 
 } // namespace
 
 SqlJourn::SqlJourn(const Config& config)
-  : db_{openDb(config.get("sqlite_journ", "swirly.db"), SQLITE_OPEN_READWRITE, config)}
-  , beginStmt_{prepare(*db_, BeginSql)}
-  , commitStmt_{prepare(*db_, CommitSql)}
-  , rollbackStmt_{prepare(*db_, RollbackSql)}
-  , insertMarketStmt_{prepare(*db_, InsertMarketSql)}
-  , updateMarketStmt_{prepare(*db_, UpdateMarketSql)}
-  , insertExecStmt_{prepare(*db_, InsertExecSql)}
-  , updateExecStmt_{prepare(*db_, UpdateExecSql)}
+: db_{openDb(config.get("sqlite_journ", "swirly.db"), SQLITE_OPEN_READWRITE, config)}
+, beginStmt_{prepare(*db_, BeginSql)}
+, commitStmt_{prepare(*db_, CommitSql)}
+, rollbackStmt_{prepare(*db_, RollbackSql)}
+, insertMarketStmt_{prepare(*db_, InsertMarketSql)}
+, updateMarketStmt_{prepare(*db_, UpdateMarketSql)}
+, insertExecStmt_{prepare(*db_, InsertExecSql)}
+, updateExecStmt_{prepare(*db_, UpdateExecSql)}
 {
 }
 

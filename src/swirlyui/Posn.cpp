@@ -36,14 +36,14 @@ Posn Posn::fromJson(const Instr& instr, const QJsonObject& obj)
 
 QDebug operator<<(QDebug debug, const Posn& posn)
 {
-    debug.nospace() << "Posn{accnt=" << posn.accnt() //
-                    << ",marketId=" << posn.marketId() //
+    debug.nospace() << "Posn{accnt=" << posn.accnt()      //
+                    << ",marketId=" << posn.marketId()    //
                     << ",instr=" << posn.instr().symbol() //
-                    << ",settlDate=" << posn.settlDate() //
-                    << ",buyLots=" << posn.buyLots() //
-                    << ",buyCost=" << posn.buyCost() //
-                    << ",sellLots=" << posn.sellLots() //
-                    << ",sellCost=" << posn.sellCost() //
+                    << ",settlDate=" << posn.settlDate()  //
+                    << ",buyLots=" << posn.buyLots()      //
+                    << ",buyCost=" << posn.buyCost()      //
+                    << ",sellLots=" << posn.sellLots()    //
+                    << ",sellCost=" << posn.sellCost()    //
                     << '}';
     return debug;
 }

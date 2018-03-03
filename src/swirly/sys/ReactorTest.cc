@@ -34,8 +34,8 @@ struct TestHandler : EventHandler {
     using EventHandler::EventHandler;
 
     explicit TestHandler(Reactor& r, Counters& cntrs) noexcept
-      : EventHandler{r}
-      , cntrs_{&cntrs}
+    : EventHandler{r}
+    , cntrs_{&cntrs}
     {
     }
 

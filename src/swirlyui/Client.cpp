@@ -23,7 +23,7 @@ namespace {
 } // namespace
 
 Client::Client(QObject* parent)
-  : QObject{parent}
+: QObject{parent}
 {
 }
 

@@ -31,17 +31,17 @@ namespace ui {
 namespace instr {
 
 enum class Column : int { //
-    CheckState, //
-    Symbol, //
-    Display, //
-    BaseAsset, //
-    TermCcy, //
-    LotNumer, //
-    LotDenom, //
-    TickNumer, //
-    TickDenom, //
-    PipDp, //
-    MinLots, //
+    CheckState,           //
+    Symbol,               //
+    Display,              //
+    BaseAsset,            //
+    TermCcy,              //
+    LotNumer,             //
+    LotDenom,             //
+    TickNumer,            //
+    TickDenom,            //
+    PipDp,                //
+    MinLots,              //
     MaxLots
 };
 constexpr int ColumnCount{unbox(Column::MaxLots) + 1};
@@ -54,8 +54,8 @@ class Instr {
     Instr(const QString& symbol, const QString& display, const QString& baseAsset,
           const QString& termCcy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
           int pipDp, Lots minLots, Lots maxLots)
-      : impl_{std::make_shared<const Impl>(symbol, display, baseAsset, termCcy, lotNumer, lotDenom,
-                                           tickNumer, tickDenom, pipDp, minLots, maxLots)}
+    : impl_{std::make_shared<const Impl>(symbol, display, baseAsset, termCcy, lotNumer, lotDenom,
+                                         tickNumer, tickDenom, pipDp, minLots, maxLots)}
     {
     }
     Instr() = default;

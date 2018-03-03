@@ -32,7 +32,7 @@ Posn::Posn(Posn&&) = default;
 void Posn::toDsv(ostream& os, char sep) const
 {
     OStreamJoiner osj{os, sep};
-    osj << accnt_ //
+    osj << accnt_    //
         << marketId_ //
         << instr_;
     if (settlDay_ != 0_jd) {
@@ -56,9 +56,9 @@ void Posn::toDsv(ostream& os, char sep) const
 
 void Posn::toJson(ostream& os) const
 {
-    os << "{\"accnt\":\"" << accnt_ //
+    os << "{\"accnt\":\"" << accnt_       //
        << "\",\"marketId\":" << marketId_ //
-       << ",\"instr\":\"" << instr_ //
+       << ",\"instr\":\"" << instr_       //
        << "\",\"settlDate\":";
     if (settlDay_ != 0_jd) {
         os << jdToIso(settlDay_);

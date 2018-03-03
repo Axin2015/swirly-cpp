@@ -59,8 +59,8 @@ inline auto& constCast(const ValueT& ref)
 struct Serv::Impl {
 
     Impl(Journ& journ, size_t pipeCapacity, size_t maxExecs) noexcept
-      : journ_{journ, pipeCapacity}
-      , maxExecs_{maxExecs}
+    : journ_{journ, pipeCapacity}
+    , maxExecs_{maxExecs}
     {
         matches_.reserve(8);
         execs_.reserve(1 + 16);
@@ -303,8 +303,8 @@ struct Serv::Impl {
             // 1. greater than original lots;
             // 2. less than executed lots;
             // 3. less than min lots.
-            if (lots == 0_lts //
-                || lots > order.lots() //
+            if (lots == 0_lts              //
+                || lots > order.lots()     //
                 || lots < order.execLots() //
                 || lots < order.minLots()) {
                 throw new InvalidLotsException{errMsg() << "invalid lots '" << lots << '\''};
@@ -638,8 +638,8 @@ struct Serv::Impl {
         // 1. greater than original lots;
         // 2. less than executed lots;
         // 3. less than min lots.
-        if (lots == 0_lts //
-            || lots > order.lots() //
+        if (lots == 0_lts              //
+            || lots > order.lots()     //
             || lots < order.execLots() //
             || lots < order.minLots()) {
             throw new InvalidLotsException{errMsg() << "invalid lots '" << lots << '\''};
@@ -697,7 +697,7 @@ struct Serv::Impl {
 };
 
 Serv::Serv(Journ& journ, size_t pipeCapacity, size_t maxExecs)
-  : impl_{make_unique<Impl>(journ, pipeCapacity, maxExecs)}
+: impl_{make_unique<Impl>(journ, pipeCapacity, maxExecs)}
 {
 }
 
