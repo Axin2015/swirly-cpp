@@ -25,24 +25,24 @@ Order::Order(const QString& accnt, Id64 marketId, const Instr& instr, QDate sett
              const QString& ref, State state, Side side, Lots lots, Ticks ticks, Lots resdLots,
              Lots execLots, Cost execCost, Lots lastLots, Ticks lastTicks, Lots minLots,
              const QDateTime& created, const QDateTime& modified)
-  : accnt_{accnt}
-  , marketId_{marketId}
-  , instr_{instr}
-  , settlDate_{settlDate}
-  , id_{id}
-  , ref_{ref}
-  , state_{state}
-  , side_{side}
-  , lots_{lots}
-  , ticks_{ticks}
-  , resdLots_{resdLots}
-  , execLots_{execLots}
-  , execCost_{execCost}
-  , lastLots_{lastLots}
-  , lastTicks_{lastTicks}
-  , minLots_{minLots}
-  , created_{created}
-  , modified_{modified}
+: accnt_{accnt}
+, marketId_{marketId}
+, instr_{instr}
+, settlDate_{settlDate}
+, id_{id}
+, ref_{ref}
+, state_{state}
+, side_{side}
+, lots_{lots}
+, ticks_{ticks}
+, resdLots_{resdLots}
+, execLots_{execLots}
+, execCost_{execCost}
+, lastLots_{lastLots}
+, lastTicks_{lastTicks}
+, minLots_{minLots}
+, created_{created}
+, modified_{modified}
 {
 }
 
@@ -71,24 +71,24 @@ Order Order::fromJson(const Instr& instr, const QJsonObject& obj)
 
 QDebug operator<<(QDebug debug, const Order& order)
 {
-    debug.nospace() << "Order{accnt=" << order.accnt() //
-                    << ",marketId=" << order.marketId() //
-                    << ",instr=" << order.instr() //
+    debug.nospace() << "Order{accnt=" << order.accnt()    //
+                    << ",marketId=" << order.marketId()   //
+                    << ",instr=" << order.instr()         //
                     << ",settlDate=" << order.settlDate() //
-                    << ",id=" << order.id() //
-                    << ",ref=" << order.ref() //
-                    << ",state=" << order.state() //
-                    << ",side=" << order.side() //
-                    << ",lots=" << order.lots() //
-                    << ",ticks=" << order.ticks() //
-                    << ",resdLots=" << order.resdLots() //
-                    << ",execLots=" << order.execLots() //
-                    << ",execCost=" << order.execCost() //
-                    << ",lastLots=" << order.lastLots() //
+                    << ",id=" << order.id()               //
+                    << ",ref=" << order.ref()             //
+                    << ",state=" << order.state()         //
+                    << ",side=" << order.side()           //
+                    << ",lots=" << order.lots()           //
+                    << ",ticks=" << order.ticks()         //
+                    << ",resdLots=" << order.resdLots()   //
+                    << ",execLots=" << order.execLots()   //
+                    << ",execCost=" << order.execCost()   //
+                    << ",lastLots=" << order.lastLots()   //
                     << ",lastTicks=" << order.lastTicks() //
-                    << ",minLots=" << order.minLots() //
-                    << ",created=" << order.created() //
-                    << ",modified=" << order.modified() //
+                    << ",minLots=" << order.minLots()     //
+                    << ",created=" << order.created()     //
+                    << ",modified=" << order.modified()   //
                     << '}';
     return debug;
 }

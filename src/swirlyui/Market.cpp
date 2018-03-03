@@ -59,14 +59,14 @@ Market Market::fromJson(const Instr& instr, const QJsonObject& obj)
 
 QDebug operator<<(QDebug debug, const Market& market)
 {
-    debug.nospace() << "Market{id=" << market.id() //
-                    << ",instr=" << market.instr().symbol() //
-                    << ",settlDate=" << market.settlDate() //
-                    << ",state=" << market.state() //
-                    << ",lastLots=" << market.lastLots() //
-                    << ",lastTicks=" << market.lastTicks() //
-                    << ",lastTime=" << market.lastTime() //
-                    << ",bestBid=" << market.bids().front() //
+    debug.nospace() << "Market{id=" << market.id()              //
+                    << ",instr=" << market.instr().symbol()     //
+                    << ",settlDate=" << market.settlDate()      //
+                    << ",state=" << market.state()              //
+                    << ",lastLots=" << market.lastLots()        //
+                    << ",lastTicks=" << market.lastTicks()      //
+                    << ",lastTime=" << market.lastTime()        //
+                    << ",bestBid=" << market.bids().front()     //
                     << ",bestOffer=" << market.offers().front() //
                     << '}';
     return debug;

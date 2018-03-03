@@ -33,8 +33,8 @@ namespace ui {
 using namespace order;
 
 OrderView::OrderView(OrderModel& model, QWidget* parent, Qt::WindowFlags f)
-  : QWidget{parent, f}
-  , model_(model)
+: QWidget{parent, f}
+, model_(model)
 {
     auto form = make_unique<OrderForm>(model);
     connect(form.get(), &OrderForm::cancelOrders, this, &OrderView::cancelOrders);

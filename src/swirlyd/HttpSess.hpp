@@ -31,9 +31,9 @@ namespace swirly {
 class RestServ;
 
 class SWIRLY_API HttpSess
-  : public EventHandler
-  , public BasicHttpParser<HttpSess>
-  , public MemAlloc {
+: public EventHandler
+, public BasicHttpParser<HttpSess>
+, public MemAlloc {
     friend class BasicHttpParser<HttpSess>;
 
   public:

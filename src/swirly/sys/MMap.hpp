@@ -35,8 +35,8 @@ class MMapPointer {
   public:
     MMapPointer(std::nullptr_t = nullptr) noexcept {}
     MMapPointer(void* ptr, std::size_t size) noexcept
-      : ptr_{ptr}
-      , size_{size}
+    : ptr_{ptr}
+    , size_{size}
     {
     }
     void* get() const noexcept { return ptr_; }

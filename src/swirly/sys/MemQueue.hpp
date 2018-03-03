@@ -59,11 +59,11 @@ class MemQueue {
     static_assert(offsetof(Impl, elems) == 2 * CacheLineSize);
 
     explicit MemQueue(std::size_t capacity)
-      : capacity_{nextPow2(capacity)}
-      , mask_{capacity_ - 1}
-      , memMap_{sys::mmap(nullptr, size(capacity_), PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE,
-                          -1, 0)}
-      , impl_{*static_cast<Impl*>(memMap_.get().data())}
+    : capacity_{nextPow2(capacity)}
+    , mask_{capacity_ - 1}
+    , memMap_{sys::mmap(nullptr, size(capacity_), PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE,
+                        -1, 0)}
+    , impl_{*static_cast<Impl*>(memMap_.get().data())}
     {
         assert(capacity >= 2);
 
@@ -74,12 +74,12 @@ class MemQueue {
         }
     }
     explicit MemQueue(const char* path)
-      : file_{sys::open(path, O_RDWR)}
-      , capacity_{capacity(detail::fileSize(file_.get()))}
-      , mask_{capacity_ - 1}
-      , memMap_{sys::mmap(nullptr, size(capacity_), PROT_READ | PROT_WRITE, MAP_SHARED, file_.get(),
-                          0)}
-      , impl_{*static_cast<Impl*>(memMap_.get().data())}
+    : file_{sys::open(path, O_RDWR)}
+    , capacity_{capacity(detail::fileSize(file_.get()))}
+    , mask_{capacity_ - 1}
+    , memMap_{sys::mmap(nullptr, size(capacity_), PROT_READ | PROT_WRITE, MAP_SHARED, file_.get(),
+                        0)}
+    , impl_{*static_cast<Impl*>(memMap_.get().data())}
     {
         if (!isPow2(capacity_)) {
             throw std::runtime_error{"capacity not a power of two"};

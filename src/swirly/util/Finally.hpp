@@ -25,7 +25,7 @@ template <typename FnT>
 class Finally {
   public:
     explicit Finally(FnT fn) noexcept
-      : fn_{std::move(fn)}
+    : fn_{std::move(fn)}
     {
     }
     ~Finally() noexcept { fn_(); }

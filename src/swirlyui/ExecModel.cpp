@@ -25,7 +25,7 @@ namespace ui {
 using namespace exec;
 
 ExecModel::ExecModel(QObject* parent)
-  : QAbstractTableModel{parent}
+: QAbstractTableModel{parent}
 {
     header_[unbox(Column::CheckState)] = tr("");
     header_[unbox(Column::Accnt)] = tr("Accnt");

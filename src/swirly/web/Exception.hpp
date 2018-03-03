@@ -24,7 +24,7 @@ namespace swirly {
 class SWIRLY_API ParseException : public Exception {
   public:
     explicit ParseException(std::string_view what) noexcept
-      : Exception{what}
+    : Exception{what}
     {
     }
     ~ParseException() noexcept override;

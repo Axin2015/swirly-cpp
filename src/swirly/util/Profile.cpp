@@ -31,15 +31,15 @@ void Profile::report() const noexcept
 {
     const auto sd = stdev(var_);
     if (!std::isnan(sd)) {
-        SWIRLY_INFO(logMsg() << '<' << name_ //
-                             << "> {\"size\":" << var_.size() //
-                             << ",\"mean\":" << var_.mean() //
-                             << ",\"stdevp\":" << sd //
-                             << ",\"pctile95\":" << pctile95(var_.mean(), sd) //
-                             << ",\"pctile99\":" << pctile99(var_.mean(), sd) //
+        SWIRLY_INFO(logMsg() << '<' << name_                                    //
+                             << "> {\"size\":" << var_.size()                   //
+                             << ",\"mean\":" << var_.mean()                     //
+                             << ",\"stdevp\":" << sd                            //
+                             << ",\"pctile95\":" << pctile95(var_.mean(), sd)   //
+                             << ",\"pctile99\":" << pctile99(var_.mean(), sd)   //
                              << ",\"pctile999\":" << pctile999(var_.mean(), sd) //
-                             << ",\"min\":" << var_.min() //
-                             << ",\"max\":" << var_.max() //
+                             << ",\"min\":" << var_.min()                       //
+                             << ",\"max\":" << var_.max()                       //
                              << '}');
     }
 }

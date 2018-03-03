@@ -28,7 +28,7 @@ namespace {
 class UrlString : public BasicUrl<UrlString> {
   public:
     explicit UrlString(const string& url)
-      : url_{url}
+    : url_{url}
     {
         parse();
     }
@@ -41,7 +41,7 @@ class UrlString : public BasicUrl<UrlString> {
 class UrlStringView : public BasicUrl<UrlStringView> {
   public:
     explicit UrlStringView(const string_view& url)
-      : url_{url}
+    : url_{url}
     {
         parse();
     }

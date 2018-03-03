@@ -117,9 +117,9 @@ void stdLogger(int level, string_view msg) noexcept
                     static_cast<int>(gettid()));
     char tail{'\n'};
     iovec iov[] = {
-        {head, hlen}, //
+        {head, hlen},                                //
         {const_cast<char*>(msg.data()), msg.size()}, //
-        {&tail, 1} //
+        {&tail, 1}                                   //
     };
 
     int fd{level > LogWarning ? STDOUT_FILENO : STDERR_FILENO};

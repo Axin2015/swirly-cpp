@@ -26,9 +26,9 @@
 namespace swirly {
 
 class SqlJourn
-  : public Transactional
-  , public Journ
-  , BasicMsgHandler<SqlJourn> {
+: public Transactional
+, public Journ
+, BasicMsgHandler<SqlJourn> {
     // Crtp.
     friend struct BasicMsgHandler<SqlJourn>;
 

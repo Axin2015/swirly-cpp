@@ -77,7 +77,7 @@ template <typename DerivedT>
 class BasicHttpParser {
   public:
     explicit BasicHttpParser(HttpType type) noexcept
-      : type_{type}
+    : type_{type}
     {
         // The http_parser_init() function preserves "data".
         // Important: cast is required for CRTP to work correctly with multiple inheritance.

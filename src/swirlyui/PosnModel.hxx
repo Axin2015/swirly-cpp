@@ -24,7 +24,7 @@ namespace swirly {
 namespace ui {
 
 class PosnModel
-  : public TableModel<Id64, Posn, unbox(posn::Column::CheckState), posn::ColumnCount> {
+: public TableModel<Id64, Posn, unbox(posn::Column::CheckState), posn::ColumnCount> {
   public:
     PosnModel(QObject* parent = nullptr);
     ~PosnModel() noexcept override;

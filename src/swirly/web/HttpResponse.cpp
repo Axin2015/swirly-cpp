@@ -87,7 +87,7 @@ void HttpResponse::reset(int status, const char* reason, bool cache)
         // Status-Line = HTTP-Version SP Status-Code SP Reason-Phrase CRLF. Use 10 space
         // place-holder for content length. RFC2616 states that field value MAY be preceded by any
         // amount of LWS, though a single SP is preferred.
-        *this << //
+        *this <<                                 //
             "\r\nContent-Type: application/json" //
             "\r\nContent-Length:          0";
         cloff_ = pcount();

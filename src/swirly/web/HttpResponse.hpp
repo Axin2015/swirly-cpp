@@ -26,7 +26,7 @@ namespace swirly {
 class SWIRLY_API HttpResponseBuf : public std::streambuf {
   public:
     explicit HttpResponseBuf(Buffer& buf) noexcept
-      : buf_(buf)
+    : buf_(buf)
     {
     }
     ~HttpResponseBuf() noexcept override;
@@ -62,8 +62,8 @@ class SWIRLY_API HttpResponseBuf : public std::streambuf {
 class SWIRLY_API HttpResponse : public std::ostream {
   public:
     explicit HttpResponse(Buffer& buf) noexcept
-      : std::ostream{nullptr}
-      , buf_{buf}
+    : std::ostream{nullptr}
+    , buf_{buf}
     {
         rdbuf(&buf_);
     }

@@ -46,8 +46,8 @@ constexpr LevelKey composeKey(Side side, Ticks ticks) noexcept
  * the same price.
  */
 class SWIRLY_API Level
-  : public Comparable<Level>
-  , public MemAlloc {
+: public Comparable<Level>
+, public MemAlloc {
   public:
     explicit Level(const Order& firstOrder) noexcept;
 

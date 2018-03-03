@@ -83,7 +83,7 @@ struct TestJourn : Journ {
 
 struct AsyncJournFixture {
     AsyncJournFixture()
-      : asyncJourn{journ, 1 << 10}
+    : asyncJourn{journ, 1 << 10}
     {
     }
     TestJourn journ;

@@ -60,7 +60,7 @@ void Market::toDsv(ostream& os, char sep) const
     }
     osj << state_;
     if (lastLots_ != 0_lts) {
-        osj << lastLots_ //
+        osj << lastLots_  //
             << lastTicks_ //
             << lastTime_;
     } else {
@@ -73,7 +73,7 @@ void Market::toDsv(ostream& os, char sep) const
 
 void Market::toJson(ostream& os) const
 {
-    os << "{\"id\":" << id_ //
+    os << "{\"id\":" << id_         //
        << ",\"instr\":\"" << instr_ //
        << "\",\"settlDate\":";
     if (settlDay_ != 0_jd) {
@@ -83,7 +83,7 @@ void Market::toJson(ostream& os) const
     }
     os << ",\"state\":" << state_;
     if (lastLots_ != 0_lts) {
-        os << ",\"lastLots\":" << lastLots_ //
+        os << ",\"lastLots\":" << lastLots_   //
            << ",\"lastTicks\":" << lastTicks_ //
            << ",\"lastTime\":" << lastTime_;
     } else {

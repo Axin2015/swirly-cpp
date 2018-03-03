@@ -54,7 +54,7 @@ template <std::size_t MaxN>
 class StringStream : public std::ostream {
   public:
     StringStream()
-      : std::ostream{nullptr}
+    : std::ostream{nullptr}
     {
         rdbuf(&buf_);
     }
@@ -106,8 +106,8 @@ class SWIRLY_API OStreamJoiner {
     using iterator_category = std::output_iterator_tag;
 
     OStreamJoiner(std::ostream& os, char sep) noexcept
-      : os_{&os}
-      , sep_{sep}
+    : os_{&os}
+    , sep_{sep}
     {
     }
     ~OStreamJoiner() noexcept;

@@ -25,7 +25,7 @@ namespace ui {
 using namespace posn;
 
 PosnModel::PosnModel(QObject* parent)
-  : TableModel{parent}
+: TableModel{parent}
 {
     header_[unbox(Column::CheckState)] = tr("");
     header_[unbox(Column::Accnt)] = tr("Accnt");

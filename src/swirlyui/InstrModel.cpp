@@ -23,7 +23,7 @@ namespace ui {
 using namespace instr;
 
 InstrModel::InstrModel(QObject* parent)
-  : TableModel{parent}
+: TableModel{parent}
 {
     header_[unbox(Column::CheckState)] = tr("");
     header_[unbox(Column::Symbol)] = tr("Symbol");

@@ -25,19 +25,19 @@ namespace ui {
 namespace market {
 
 enum class Column : int { //
-    CheckState, //
-    Id, //
-    Instr, //
-    SettlDate, //
-    State, //
-    BidCount, //
-    BidLots, //
-    BidPrice, //
-    LastLots, //
-    LastPrice, //
-    LastTime, //
-    OfferPrice, //
-    OfferLots, //
+    CheckState,           //
+    Id,                   //
+    Instr,                //
+    SettlDate,            //
+    State,                //
+    BidCount,             //
+    BidLots,              //
+    BidPrice,             //
+    LastLots,             //
+    LastPrice,            //
+    LastTime,             //
+    OfferPrice,           //
+    OfferLots,            //
     OfferCount
 };
 constexpr int ColumnCount{unbox(Column::OfferCount) + 1};
@@ -50,13 +50,13 @@ class Market {
 
     Market(Id64 id, const Instr& instr, QDate settlDate, MarketState state, Lots lastLots,
            Ticks lastTicks, const QDateTime& lastTime)
-      : id_{id}
-      , instr_{instr}
-      , settlDate_{settlDate}
-      , state_{state}
-      , lastLots_{lastLots}
-      , lastTicks_{lastTicks}
-      , lastTime_{lastTime}
+    : id_{id}
+    , instr_{instr}
+    , settlDate_{settlDate}
+    , state_{state}
+    , lastLots_{lastLots}
+    , lastTicks_{lastTicks}
+    , lastTime_{lastTime}
     {
     }
     Market() = default;

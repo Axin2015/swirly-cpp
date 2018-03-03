@@ -24,7 +24,7 @@ namespace swirly {
 class EventFd {
   public:
     explicit EventFd(int flags = 0)
-      : file_{sys::eventfd(0, eventFlags(flags) | EFD_NONBLOCK)}
+    : file_{sys::eventfd(0, eventFlags(flags) | EFD_NONBLOCK)}
     {
     }
     ~EventFd() noexcept = default;
@@ -72,7 +72,7 @@ class EventFd {
 class EventPipe {
   public:
     explicit EventPipe(int flags = 0)
-      : pipe_{sys::pipe2(flags | O_NONBLOCK)}
+    : pipe_{sys::pipe2(flags | O_NONBLOCK)}
     {
     }
     ~EventPipe() noexcept = default;

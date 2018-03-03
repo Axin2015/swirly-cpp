@@ -24,24 +24,24 @@ namespace ui {
 namespace order {
 
 enum class Column : int { //
-    CheckState, //
-    Accnt, //
-    MarketId, //
-    Instr, //
-    SettlDate, //
-    Id, //
-    Ref, //
-    State, //
-    Side, //
-    Lots, //
-    Price, //
-    ResdLots, //
-    ExecLots, //
-    AvgPrice, //
-    LastLots, //
-    LastPrice, //
-    MinLots, //
-    Created, //
+    CheckState,           //
+    Accnt,                //
+    MarketId,             //
+    Instr,                //
+    SettlDate,            //
+    Id,                   //
+    Ref,                  //
+    State,                //
+    Side,                 //
+    Lots,                 //
+    Price,                //
+    ResdLots,             //
+    ExecLots,             //
+    AvgPrice,             //
+    LastLots,             //
+    LastPrice,            //
+    MinLots,              //
+    Created,              //
     Modified
 };
 constexpr int ColumnCount{unbox(Column::Modified) + 1};
@@ -105,12 +105,12 @@ QDebug operator<<(QDebug debug, const Order& order);
 
 inline bool isModified(const Order& prev, const Order& next) noexcept
 {
-    return prev.state() != next.state() //
-        || prev.lots() != next.lots() //
-        || prev.resdLots() != next.resdLots() //
-        || prev.execLots() != next.execLots() //
-        || prev.execCost() != next.execCost() //
-        || prev.lastLots() != next.lastLots() //
+    return prev.state() != next.state()         //
+        || prev.lots() != next.lots()           //
+        || prev.resdLots() != next.resdLots()   //
+        || prev.execLots() != next.execLots()   //
+        || prev.execCost() != next.execCost()   //
+        || prev.lastLots() != next.lastLots()   //
         || prev.lastTicks() != next.lastTicks() //
         || prev.modified() != next.modified();
 }

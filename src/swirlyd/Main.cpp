@@ -228,7 +228,7 @@ int main(int argc, char* argv[])
         writePidFile(pf);
         if (logFile.empty()) {
 
-            // If a log file is not specified, then use syslog().
+        // If a log file is not specified, then use syslog().
 
 #if SWIRLY_ENABLE_DEBUG
             setlogmask(LOG_UPTO(LOG_DEBUG));

@@ -47,7 +47,7 @@ class Timer {
     };
     Timer() = default;
     explicit Timer(Impl* impl)
-      : impl_{impl, false}
+    : impl_{impl, false}
     {
     }
     long id() const noexcept { return impl_->id; }

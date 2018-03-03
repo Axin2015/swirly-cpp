@@ -30,27 +30,27 @@ namespace swirly {
  * Trade executions represent the exchange of goods or services between counter-parties.
  */
 class SWIRLY_API Exec
-  : public RefCount<Exec, ThreadUnsafePolicy>
-  , public Request
-  , public MemAlloc {
+: public RefCount<Exec, ThreadUnsafePolicy>
+, public Request
+, public MemAlloc {
   public:
     Exec(Symbol accnt, Id64 marketId, Symbol instr, JDay settlDay, Id64 id, Id64 orderId,
          std::string_view ref, State state, Side side, Lots lots, Ticks ticks, Lots resdLots,
          Lots execLots, Cost execCost, Lots lastLots, Ticks lastTicks, Lots minLots, Id64 matchId,
          LiqInd liqInd, Symbol cpty, Time created) noexcept
-      : Request{accnt, marketId, instr, settlDay, id, ref, side, lots, created}
-      , orderId_{orderId}
-      , state_{state}
-      , ticks_{ticks}
-      , resdLots_{resdLots}
-      , execLots_{execLots}
-      , execCost_{execCost}
-      , lastLots_{lastLots}
-      , lastTicks_{lastTicks}
-      , minLots_{minLots}
-      , matchId_{matchId}
-      , liqInd_{liqInd}
-      , cpty_{cpty}
+    : Request{accnt, marketId, instr, settlDay, id, ref, side, lots, created}
+    , orderId_{orderId}
+    , state_{state}
+    , ticks_{ticks}
+    , resdLots_{resdLots}
+    , execLots_{execLots}
+    , execCost_{execCost}
+    , lastLots_{lastLots}
+    , lastTicks_{lastTicks}
+    , minLots_{minLots}
+    , matchId_{matchId}
+    , liqInd_{liqInd}
+    , cpty_{cpty}
     {
     }
     ~Exec() noexcept;

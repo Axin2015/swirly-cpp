@@ -23,12 +23,12 @@ using namespace swirly;
 
 namespace {
 class Foo
-  : public RefCount<Foo, ThreadUnsafePolicy>
-  , public Request {
+: public RefCount<Foo, ThreadUnsafePolicy>
+, public Request {
   public:
     Foo(Id64 marketId, Id64 id, int& alive) noexcept
-      : Request{{}, marketId, {}, 0_jd, id, {}, Side::Buy, 0_lts, {}}
-      , alive_{alive}
+    : Request{{}, marketId, {}, 0_jd, id, {}, Side::Buy, 0_lts, {}}
+    , alive_{alive}
     {
         ++alive;
     }

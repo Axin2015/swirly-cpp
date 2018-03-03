@@ -33,7 +33,7 @@ template <typename KeyT, typename ValueT, int CheckStateN, int ColumnCountN>
 class TableModel : public QAbstractTableModel {
   public:
     TableModel(QObject* parent = nullptr)
-      : QAbstractTableModel{parent}
+    : QAbstractTableModel{parent}
     {
     }
     ~TableModel() noexcept override = default;

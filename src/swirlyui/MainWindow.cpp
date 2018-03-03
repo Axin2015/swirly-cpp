@@ -117,10 +117,10 @@ void MainWindow::slotCreateOrder(const Instr& instr, QDate settlDate, const QStr
                                  Lots lots, Ticks ticks)
 {
     qDebug().nospace() << "slotCreateOrder: instr=" << instr //
-                       << ",settlDate=" << settlDate //
-                       << ",ref=" << ref //
-                       << ",side=" << side //
-                       << ",lots=" << lots //
+                       << ",settlDate=" << settlDate         //
+                       << ",ref=" << ref                     //
+                       << ",side=" << side                   //
+                       << ",lots=" << lots                   //
                        << ",ticks=" << ticks;
     client_.createOrder(instr, settlDate, ref, side, lots, ticks);
 }

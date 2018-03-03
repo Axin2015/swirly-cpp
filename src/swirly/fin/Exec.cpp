@@ -31,7 +31,7 @@ Exec::Exec(Exec&&) = default;
 void Exec::toDsv(ostream& os, char sep) const
 {
     OStreamJoiner osj{os, sep};
-    osj << accnt_ //
+    osj << accnt_    //
         << marketId_ //
         << instr_;
     if (settlDay_ != 0_jd) {
@@ -46,10 +46,10 @@ void Exec::toDsv(ostream& os, char sep) const
     } else {
         osj << "";
     }
-    osj << state_ //
-        << side_ //
-        << lots_ //
-        << ticks_ //
+    osj << state_    //
+        << side_     //
+        << lots_     //
+        << ticks_    //
         << resdLots_ //
         << execLots_ //
         << execCost_;
@@ -85,16 +85,16 @@ void Exec::toDsv(ostream& os, char sep) const
 
 void Exec::toJson(ostream& os) const
 {
-    os << "{\"accnt\":\"" << accnt_ //
+    os << "{\"accnt\":\"" << accnt_       //
        << "\",\"marketId\":" << marketId_ //
-       << ",\"instr\":\"" << instr_ //
+       << ",\"instr\":\"" << instr_       //
        << "\",\"settlDate\":";
     if (settlDay_ != 0_jd) {
         os << jdToIso(settlDay_);
     } else {
         os << "null";
     }
-    os << ",\"id\":" << id_ //
+    os << ",\"id\":" << id_           //
        << ",\"orderId\":" << orderId_ //
        << ",\"ref\":";
     if (!ref_.empty()) {
@@ -102,10 +102,10 @@ void Exec::toJson(ostream& os) const
     } else {
         os << "null";
     }
-    os << ",\"state\":\"" << state_ //
-       << "\",\"side\":\"" << side_ //
-       << "\",\"lots\":" << lots_ //
-       << ",\"ticks\":" << ticks_ //
+    os << ",\"state\":\"" << state_     //
+       << "\",\"side\":\"" << side_     //
+       << "\",\"lots\":" << lots_       //
+       << ",\"ticks\":" << ticks_       //
        << ",\"resdLots\":" << resdLots_ //
        << ",\"execLots\":" << execLots_ //
        << ",\"execCost\":" << execCost_;

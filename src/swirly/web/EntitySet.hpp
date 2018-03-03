@@ -38,7 +38,7 @@ class SWIRLY_API EntitySet {
     };
 
     constexpr EntitySet(int bs = 0) noexcept
-      : bs_{bs}
+    : bs_{bs}
     {
     }
     ~EntitySet() noexcept;

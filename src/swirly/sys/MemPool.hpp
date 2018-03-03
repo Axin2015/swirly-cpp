@@ -122,11 +122,11 @@ inline void push(const MemPool& pool, MemStack<SizeN>& stack, MemNode<SizeN>* no
     do {
         node->next = oldHead;
     } while (!__atomic_compare_exchange_n(&stack.head,
-                                          &oldHead, // Expected.
-                                          newHead, // Desired.
-                                          1, // Weak.
+                                          &oldHead,         // Expected.
+                                          newHead,          // Desired.
+                                          1,                // Weak.
                                           __ATOMIC_RELEASE, // Success.
-                                          __ATOMIC_RELAXED // Failure.
+                                          __ATOMIC_RELAXED  // Failure.
                                           ));
 }
 
@@ -143,11 +143,11 @@ inline MemNode<SizeN>* pop(const MemPool& pool, MemStack<SizeN>& stack)
         }
         node = offsetToPtr<decltype(node)>(pool, linkToOffset(oldHead));
     } while (!__atomic_compare_exchange_n(&stack.head,
-                                          &oldHead, // Expected.
-                                          node->next, // Desired.
-                                          1, // Weak.
+                                          &oldHead,         // Expected.
+                                          node->next,       // Desired.
+                                          1,                // Weak.
                                           __ATOMIC_ACQUIRE, // Success.
-                                          __ATOMIC_ACQUIRE // Failure.
+                                          __ATOMIC_ACQUIRE  // Failure.
                                           ));
     return node;
 }
@@ -162,11 +162,11 @@ inline MemSize reserve(MemPool& pool, MemSize size, MemSize maxSize)
             throw std::bad_alloc{};
         }
     } while (!__atomic_compare_exchange_n(&pool.offset,
-                                          &oldOffset, // Expected.
-                                          newOffset, // Desired.
-                                          1, // Weak.
+                                          &oldOffset,       // Expected.
+                                          newOffset,        // Desired.
+                                          1,                // Weak.
                                           __ATOMIC_RELAXED, // Success.
-                                          __ATOMIC_RELAXED // Failure.
+                                          __ATOMIC_RELAXED  // Failure.
                                           ));
     return oldOffset;
 }

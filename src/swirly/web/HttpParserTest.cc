@@ -31,8 +31,8 @@ using namespace swirly;
 namespace {
 
 class HttpParser
-  : public BasicHttpParser<HttpParser>
-  , public BasicUrl<HttpParser> {
+: public BasicHttpParser<HttpParser>
+, public BasicUrl<HttpParser> {
     friend class BasicHttpParser<HttpParser>;
     friend class BasicUrl<HttpParser>;
 
@@ -109,7 +109,7 @@ class HttpParser
 
 SWIRLY_TEST_CASE(HttpInitialRequestLine)
 {
-    constexpr auto Message = //
+    constexpr auto Message =                        //
         "GET /path/to/file/index.html HTTP/1.0\r\n" //
         "\r\n"sv;
 
@@ -128,7 +128,7 @@ SWIRLY_TEST_CASE(HttpInitialRequestLine)
 
 SWIRLY_TEST_CASE(HttpInitialResponseLine)
 {
-    constexpr auto Message = //
+    constexpr auto Message =         //
         "HTTP/1.0 404 Not Found\r\n" //
         "\r\n"sv;
 
@@ -147,10 +147,10 @@ SWIRLY_TEST_CASE(HttpInitialResponseLine)
 
 SWIRLY_TEST_CASE(HttpBasicRequest)
 {
-    constexpr auto Message = //
-        "GET /path/file.html HTTP/1.0\r\n" //
+    constexpr auto Message =                 //
+        "GET /path/file.html HTTP/1.0\r\n"   //
         "From: someuser@swirlycloud.com\r\n" //
-        "User-Agent: HTTPTool/1.0\r\n" //
+        "User-Agent: HTTPTool/1.0\r\n"       //
         "\r\n"sv;
 
     HttpParser h{HttpType::Request};
@@ -171,12 +171,12 @@ SWIRLY_TEST_CASE(HttpBasicRequest)
 
 SWIRLY_TEST_CASE(HttpBasicResponse)
 {
-    constexpr auto Message = //
-        "HTTP/1.0 200 OK\r\n" //
+    constexpr auto Message =                      //
+        "HTTP/1.0 200 OK\r\n"                     //
         "Date: Fri, 31 Dec 1999 23:59:59 GMT\r\n" //
-        "Content-Type: text/plain\r\n" //
-        "Content-Length: 13\r\n" //
-        "\r\n" //
+        "Content-Type: text/plain\r\n"            //
+        "Content-Length: 13\r\n"                  //
+        "\r\n"                                    //
         "Hello, World!"sv;
 
     HttpParser h{HttpType::Response};
@@ -198,13 +198,13 @@ SWIRLY_TEST_CASE(HttpBasicResponse)
 
 SWIRLY_TEST_CASE(HttpPostRequest)
 {
-    constexpr auto Message = //
-        "POST /path/script.cgi HTTP/1.0\r\n" //
-        "From: frog@swirlycloud.com\r\n" //
-        "User-Agent: HTTPTool/1.0\r\n" //
+    constexpr auto Message =                                  //
+        "POST /path/script.cgi HTTP/1.0\r\n"                  //
+        "From: frog@swirlycloud.com\r\n"                      //
+        "User-Agent: HTTPTool/1.0\r\n"                        //
         "Content-Type: application/x-www-form-urlencoded\r\n" //
-        "Content-Length: 32\r\n" //
-        "\r\n" //
+        "Content-Length: 32\r\n"                              //
+        "\r\n"                                                //
         "home=Cosby&favorite+flavor=flies"sv;
 
     HttpParser h{HttpType::Request};
@@ -228,9 +228,9 @@ SWIRLY_TEST_CASE(HttpPostRequest)
 
 SWIRLY_TEST_CASE(HttpKeepAliveRequest)
 {
-    constexpr auto Message = //
+    constexpr auto Message =               //
         "GET /path/file.html HTTP/1.1\r\n" //
-        "Host: www.host1.com:80\r\n" //
+        "Host: www.host1.com:80\r\n"       //
         "\r\n"sv;
 
     HttpParser h{HttpType::Request};
@@ -250,19 +250,19 @@ SWIRLY_TEST_CASE(HttpKeepAliveRequest)
 
 SWIRLY_TEST_CASE(HttpChunkedResponse)
 {
-    constexpr auto Message = //
-        "HTTP/1.1 200 OK\r\n" //
+    constexpr auto Message =                      //
+        "HTTP/1.1 200 OK\r\n"                     //
         "Date: Fri, 31 Dec 1999 23:59:59 GMT\r\n" //
-        "Content-Type: text/plain\r\n" //
-        "Transfer-Encoding: chunked\r\n" //
-        "\r\n" //
-        "1a; ignore-stuff-here\r\n" //
-        "abcdefghijklmnopqrstuvwxyz\r\n" //
-        "10\r\n" //
-        "1234567890abcdef\r\n" //
-        "0\r\n" //
-        "some-footer: some-value\r\n" //
-        "another-footer: another-value\r\n" //
+        "Content-Type: text/plain\r\n"            //
+        "Transfer-Encoding: chunked\r\n"          //
+        "\r\n"                                    //
+        "1a; ignore-stuff-here\r\n"               //
+        "abcdefghijklmnopqrstuvwxyz\r\n"          //
+        "10\r\n"                                  //
+        "1234567890abcdef\r\n"                    //
+        "0\r\n"                                   //
+        "some-footer: some-value\r\n"             //
+        "another-footer: another-value\r\n"       //
         "\r\n"sv;
 
     HttpParser h{HttpType::Response};
@@ -286,16 +286,16 @@ SWIRLY_TEST_CASE(HttpChunkedResponse)
 
 SWIRLY_TEST_CASE(HttpMultiResponse)
 {
-    constexpr auto Message = //
+    constexpr auto Message =                 //
         "POST /path/script.cgi HTTP/1.1\r\n" //
-        "Content-Type: text/plain\r\n" //
-        "Content-Length: 5\r\n" //
-        "\r\n" //
-        "first" //
+        "Content-Type: text/plain\r\n"       //
+        "Content-Length: 5\r\n"              //
+        "\r\n"                               //
+        "first"                              //
         "POST /path/script.cgi HTTP/1.1\r\n" //
-        "Content-Type: text/plain\r\n" //
-        "Content-Length: 6\r\n" //
-        "\r\n" //
+        "Content-Type: text/plain\r\n"       //
+        "Content-Length: 6\r\n"              //
+        "\r\n"                               //
         "second"sv;
 
     HttpParser h{HttpType::Request};

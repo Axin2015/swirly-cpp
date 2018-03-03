@@ -28,22 +28,22 @@ static_assert(sizeof(Instr) <= 4 * 64, "no greater than specified cache-lines");
 Instr::Instr(Id32 id, Symbol symbol, string_view display, Symbol baseAsset, Symbol termCcy,
              int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
              Lots maxLots) noexcept
-  : id_{id}
-  , symbol_{symbol}
-  , display_{display}
-  , baseAsset_{baseAsset}
-  , termCcy_{termCcy}
-  , lotNumer_{lotNumer}
-  , lotDenom_{lotDenom}
-  , qtyInc_{fractToReal(lotNumer, lotDenom)}
-  , tickNumer_{tickNumer}
-  , tickDenom_{tickDenom}
-  , priceInc_{fractToReal(tickNumer, tickDenom)}
-  , pipDp_{pipDp}
-  , qtyDp_{realToDp(qtyInc_)}
-  , priceDp_{realToDp(priceInc_)}
-  , minLots_{minLots}
-  , maxLots_{maxLots}
+: id_{id}
+, symbol_{symbol}
+, display_{display}
+, baseAsset_{baseAsset}
+, termCcy_{termCcy}
+, lotNumer_{lotNumer}
+, lotDenom_{lotDenom}
+, qtyInc_{fractToReal(lotNumer, lotDenom)}
+, tickNumer_{tickNumer}
+, tickDenom_{tickDenom}
+, priceInc_{fractToReal(tickNumer, tickDenom)}
+, pipDp_{pipDp}
+, qtyDp_{realToDp(qtyInc_)}
+, priceDp_{realToDp(priceInc_)}
+, minLots_{minLots}
+, maxLots_{maxLots}
 {
 }
 
@@ -56,33 +56,33 @@ Instr::Instr(Instr&&) = default;
 void Instr::toDsv(ostream& os, char sep) const
 {
     OStreamJoiner osj{os, sep};
-    osj << id_ //
-        << symbol_ //
-        << display_ //
+    osj << id_        //
+        << symbol_    //
+        << display_   //
         << baseAsset_ //
-        << termCcy_ //
-        << lotNumer_ //
-        << lotDenom_ //
+        << termCcy_   //
+        << lotNumer_  //
+        << lotDenom_  //
         << tickNumer_ //
         << tickDenom_ //
-        << pipDp_ //
-        << minLots_ //
+        << pipDp_     //
+        << minLots_   //
         << maxLots_;
 }
 
 void Instr::toJson(ostream& os) const
 {
-    os << "{\"symbol\":\"" << symbol_ //
-       << "\",\"display\":\"" << display_ //
+    os << "{\"symbol\":\"" << symbol_         //
+       << "\",\"display\":\"" << display_     //
        << "\",\"baseAsset\":\"" << baseAsset_ //
-       << "\",\"termCcy\":\"" << termCcy_ //
-       << "\",\"lotNumer\":" << lotNumer_ //
-       << ",\"lotDenom\":" << lotDenom_ //
-       << ",\"tickNumer\":" << tickNumer_ //
-       << ",\"tickDenom\":" << tickDenom_ //
-       << ",\"pipDp\":" << pipDp_ //
-       << ",\"minLots\":" << minLots_ //
-       << ",\"maxLots\":" << maxLots_ //
+       << "\",\"termCcy\":\"" << termCcy_     //
+       << "\",\"lotNumer\":" << lotNumer_     //
+       << ",\"lotDenom\":" << lotDenom_       //
+       << ",\"tickNumer\":" << tickNumer_     //
+       << ",\"tickDenom\":" << tickDenom_     //
+       << ",\"pipDp\":" << pipDp_             //
+       << ",\"minLots\":" << minLots_         //
+       << ",\"maxLots\":" << maxLots_         //
        << "}";
 }
 

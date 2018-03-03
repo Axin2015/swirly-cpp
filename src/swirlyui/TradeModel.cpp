@@ -23,7 +23,7 @@ namespace ui {
 using namespace exec;
 
 TradeModel::TradeModel(QObject* parent)
-  : TableModel{parent}
+: TableModel{parent}
 {
     header_[unbox(Column::CheckState)] = tr("");
     header_[unbox(Column::Accnt)] = tr("Accnt");

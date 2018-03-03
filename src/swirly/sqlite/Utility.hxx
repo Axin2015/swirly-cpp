@@ -187,7 +187,7 @@ void bind(sqlite3_stmt& stmt, int col, ValueT val, MaybeNullTag)
 class ScopedBind {
   public:
     explicit ScopedBind(sqlite3_stmt& stmt) noexcept
-      : stmt_{stmt}
+    : stmt_{stmt}
     {
     }
     ~ScopedBind() noexcept { sqlite3_clear_bindings(&stmt_); }
@@ -219,7 +219,7 @@ class ScopedBind {
 class ScopedStep {
   public:
     explicit ScopedStep(sqlite3_stmt& stmt) noexcept
-      : stmt_{stmt}
+    : stmt_{stmt}
     {
     }
     ~ScopedStep() noexcept { sqlite3_reset(&stmt_); }

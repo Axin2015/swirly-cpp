@@ -33,7 +33,7 @@ SWIRLY_API std::string getEnv(const std::string& name);
 class SWIRLY_API VarSub {
   public:
     explicit VarSub(std::function<std::string(const std::string&)> fn = getEnv)
-      : fn_{std::move(fn)}
+    : fn_{std::move(fn)}
     {
     }
     ~VarSub() noexcept;
