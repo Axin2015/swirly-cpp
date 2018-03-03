@@ -29,15 +29,15 @@
 using namespace std;
 
 namespace swirly {
-namespace sqlite {
+using namespace sqlite;
 namespace {
 
 constexpr auto SelectAssetSql = //
     "SELECT id, symbol, display, type_id FROM asset_t"sv;
 
 constexpr auto SelectInstrSql = //
-    "SELECT id, symbol, display, base_asset, term_ccy, tick_numer, tick_denom," //
-    " lot_numer, lot_denom, pip_dp, min_lots, max_lots FROM instr_v"sv;
+    "SELECT id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom," //
+    " tick_numer, tick_denom, pip_dp, min_lots, max_lots FROM instr_v"sv;
 
 constexpr auto SelectMarketSql = //
     "SELECT id, instr, settl_day, state, last_lots, last_ticks, last_time, max_id" //
@@ -65,18 +65,18 @@ constexpr auto SelectPosnSql = //
 
 } // namespace
 
-Model::Model(const Config& config)
+SqlModel::SqlModel(const Config& config)
   : db_{openDb(config.get("sqlite_model", "swirly.db"), SQLITE_OPEN_READONLY, config)}
 {
 }
 
-Model::~Model() noexcept = default;
+SqlModel::~SqlModel() noexcept = default;
 
-Model::Model(Model&&) = default;
+SqlModel::SqlModel(SqlModel&&) = default;
 
-Model& Model::operator=(Model&&) = default;
+SqlModel& SqlModel::operator=(SqlModel&&) = default;
 
-void Model::doReadAsset(const ModelCallback<AssetPtr>& cb) const
+void SqlModel::doReadAsset(const ModelCallback<AssetPtr>& cb) const
 {
     enum {
         Id, //
@@ -94,7 +94,7 @@ void Model::doReadAsset(const ModelCallback<AssetPtr>& cb) const
     }
 }
 
-void Model::doReadInstr(const ModelCallback<InstrPtr>& cb) const
+void SqlModel::doReadInstr(const ModelCallback<InstrPtr>& cb) const
 {
     enum {
         Id, //
@@ -102,10 +102,10 @@ void Model::doReadInstr(const ModelCallback<InstrPtr>& cb) const
         Display, //
         BaseAsset, //
         TermCcy, //
-        TickNumer, //
-        TickDenom, //
         LotNumer, //
         LotDenom, //
+        TickNumer, //
+        TickDenom, //
         PipDp, //
         MinLots, //
         MaxLots //
@@ -128,7 +128,7 @@ void Model::doReadInstr(const ModelCallback<InstrPtr>& cb) const
     }
 }
 
-void Model::doReadMarket(const ModelCallback<MarketPtr>& cb) const
+void SqlModel::doReadMarket(const ModelCallback<MarketPtr>& cb) const
 {
     enum { //
         Id, //
@@ -154,7 +154,7 @@ void Model::doReadMarket(const ModelCallback<MarketPtr>& cb) const
     }
 }
 
-void Model::doReadOrder(const ModelCallback<OrderPtr>& cb) const
+void SqlModel::doReadOrder(const ModelCallback<OrderPtr>& cb) const
 {
     enum { //
         Accnt, //
@@ -200,7 +200,7 @@ void Model::doReadOrder(const ModelCallback<OrderPtr>& cb) const
     }
 }
 
-void Model::doReadExec(Time since, const ModelCallback<ExecPtr>& cb) const
+void SqlModel::doReadExec(Time since, const ModelCallback<ExecPtr>& cb) const
 {
     enum { //
         Accnt, //
@@ -254,7 +254,7 @@ void Model::doReadExec(Time since, const ModelCallback<ExecPtr>& cb) const
     }
 }
 
-void Model::doReadTrade(const ModelCallback<ExecPtr>& cb) const
+void SqlModel::doReadTrade(const ModelCallback<ExecPtr>& cb) const
 {
     enum { //
         Accnt, //
@@ -305,7 +305,7 @@ void Model::doReadTrade(const ModelCallback<ExecPtr>& cb) const
     }
 }
 
-void Model::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const
+void SqlModel::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const
 {
     enum { //
         Accnt, //
@@ -354,11 +354,9 @@ void Model::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const
     }
 }
 
-} // namespace sqlite
-
 unique_ptr<Model> makeModel(const Config& config)
 {
-    return make_unique<sqlite::Model>(config);
+    return make_unique<SqlModel>(config);
 }
 
 } // namespace swirly

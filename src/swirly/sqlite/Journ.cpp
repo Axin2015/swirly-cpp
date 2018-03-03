@@ -20,10 +20,9 @@
 
 #include <swirly/util/Config.hpp>
 
-using namespace std;
-
 namespace swirly {
-namespace sqlite {
+using namespace sqlite;
+using namespace std;
 namespace {
 
 constexpr auto BeginSql = "BEGIN TRANSACTION"sv;
@@ -50,7 +49,7 @@ constexpr auto UpdateExecSql = //
 
 } // namespace
 
-Journ::Journ(const Config& config)
+SqlJourn::SqlJourn(const Config& config)
   : db_{openDb(config.get("sqlite_journ", "swirly.db"), SQLITE_OPEN_READWRITE, config)}
   , beginStmt_{prepare(*db_, BeginSql)}
   , commitStmt_{prepare(*db_, CommitSql)}
@@ -62,38 +61,38 @@ Journ::Journ(const Config& config)
 {
 }
 
-Journ::~Journ() noexcept = default;
+SqlJourn::~SqlJourn() noexcept = default;
 
-Journ::Journ(Journ&&) = default;
+SqlJourn::SqlJourn(SqlJourn&&) = default;
 
-Journ& Journ::operator=(Journ&&) = default;
+SqlJourn& SqlJourn::operator=(SqlJourn&&) = default;
 
-void Journ::doBegin()
+void SqlJourn::doBegin()
 {
     stepOnce(*beginStmt_);
 }
 
-void Journ::doCommit()
+void SqlJourn::doCommit()
 {
     stepOnce(*commitStmt_);
 }
 
-void Journ::doRollback()
+void SqlJourn::doRollback()
 {
     stepOnce(*rollbackStmt_);
 }
 
-void Journ::doUpdate(const Msg& msg)
+void SqlJourn::doUpdate(const Msg& msg)
 {
     dispatch(msg);
 }
 
-void Journ::onReset()
+void SqlJourn::onReset()
 {
     Transactional::reset();
 }
 
-void Journ::onCreateMarket(const CreateMarket& body)
+void SqlJourn::onCreateMarket(const CreateMarket& body)
 {
     auto& stmt = *insertMarketStmt_;
 
@@ -106,7 +105,7 @@ void Journ::onCreateMarket(const CreateMarket& body)
     stepOnce(stmt);
 }
 
-void Journ::onUpdateMarket(const UpdateMarket& body)
+void SqlJourn::onUpdateMarket(const UpdateMarket& body)
 {
     auto& stmt = *updateMarketStmt_;
 
@@ -117,7 +116,7 @@ void Journ::onUpdateMarket(const UpdateMarket& body)
     stepOnce(stmt);
 }
 
-void Journ::onCreateExec(const CreateExec& body)
+void SqlJourn::onCreateExec(const CreateExec& body)
 {
     Transaction trans{*this, body.more};
     if (failed()) {
@@ -157,7 +156,7 @@ void Journ::onCreateExec(const CreateExec& body)
     trans.commit();
 }
 
-void Journ::onArchiveTrade(const ArchiveTrade& body)
+void SqlJourn::onArchiveTrade(const ArchiveTrade& body)
 {
     Transaction trans{*this, body.more};
     if (failed()) {
@@ -180,11 +179,9 @@ void Journ::onArchiveTrade(const ArchiveTrade& body)
     trans.commit();
 }
 
-} // namespace sqlite
-
 unique_ptr<Journ> makeJourn(const Config& config)
 {
-    return make_unique<sqlite::Journ>(config);
+    return make_unique<SqlJourn>(config);
 }
 
 } // namespace swirly

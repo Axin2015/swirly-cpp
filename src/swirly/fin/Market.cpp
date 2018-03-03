@@ -64,10 +64,11 @@ void Market::toDsv(ostream& os, char sep) const
             << lastTicks_ //
             << lastTime_;
     } else {
-        osj << "" << "" << "";
+        osj << ""
+            << ""
+            << "";
     }
     osj << maxId_;
-
 }
 
 void Market::toJson(ostream& os) const

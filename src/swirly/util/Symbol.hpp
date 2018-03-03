@@ -254,10 +254,7 @@ void setCString(char (&lhs)[SizeN], Symbol rhs) noexcept
 
 template <>
 struct TypeTraits<Symbol> {
-    static auto fromString(std::string_view sv) noexcept
-    {
-        return Symbol{sv};
-    }
+    static auto fromString(std::string_view sv) noexcept { return Symbol{sv}; }
 };
 
 } // namespace swirly

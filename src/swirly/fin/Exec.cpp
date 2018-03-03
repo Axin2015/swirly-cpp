@@ -40,7 +40,7 @@ void Exec::toDsv(ostream& os, char sep) const
         osj << "";
     }
     osj << id_ //
-       << orderId_;
+        << orderId_;
     if (!ref_.empty()) {
         osj << ref_;
     } else {
@@ -57,7 +57,8 @@ void Exec::toDsv(ostream& os, char sep) const
         osj << lastLots_ //
             << lastTicks_;
     } else {
-        osj << "" << "";
+        osj << ""
+            << "";
     }
     if (minLots_ != 0_lts) {
         osj << minLots_;
@@ -75,7 +76,7 @@ void Exec::toDsv(ostream& os, char sep) const
         osj << "";
     }
     if (!cpty_.empty()) {
-        osj << cpty_ ;
+        osj << cpty_;
     } else {
         osj << "";
     }

@@ -27,11 +27,12 @@ endif()
 set(lib_SOURCES
   Asset.cpp
   BasicTypes.cpp
-  Instr.cpp
   Conv.cpp
   Date.cpp
+  DsvModel.cpp
   Exception.cpp
   Exec.cpp
+  Instr.cpp
   Journ.cpp
   Level.cpp
   Limits.cpp

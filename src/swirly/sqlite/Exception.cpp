@@ -17,9 +17,7 @@
 #include "Exception.hxx"
 
 namespace swirly {
-namespace sqlite {
 
-Error::~Error() noexcept = default;
+SqlException::~SqlException() noexcept = default;
 
-} // namespace sqlite
 } // namespace swirly
