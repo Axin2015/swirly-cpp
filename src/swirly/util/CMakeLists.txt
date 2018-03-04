@@ -65,25 +65,25 @@ if(ENABLE_SHARED_LIBS)
 endif()
 
 set(test_SOURCES
-  ArrayTest.cc
-  ConfigTest.cc
-  DateTest.cc
-  EnumTest.cc
-  ExceptionTest.cc
-  FinallyTest.cc
-  IntWrapperTest.cc
-  LogTest.cc
-  MathTest.cc
-  PipeTest.cc
-  RingBufferTest.cc
-  SetTest.cc
-  StreamTest.cc
-  StringTest.cc
-  StringBufTest.cc
-  SymbolTest.cc
-  TokeniserTest.cc
-  UtilityTest.cc
-  VarSubTest.cc)
+  Array.ut.cpp
+  Config.ut.cpp
+  Date.ut.cpp
+  Enum.ut.cpp
+  Exception.ut.cpp
+  Finally.ut.cpp
+  IntWrapper.ut.cpp
+  Log.ut.cpp
+  Math.ut.cpp
+  Pipe.ut.cpp
+  RingBuffer.ut.cpp
+  Set.ut.cpp
+  Stream.ut.cpp
+  String.ut.cpp
+  StringBuf.ut.cpp
+  Symbol.ut.cpp
+  Tokeniser.ut.cpp
+  Utility.ut.cpp
+  VarSub.ut.cpp)
 
 foreach(file ${test_SOURCES})
   get_filename_component (name ${file} NAME_WE)

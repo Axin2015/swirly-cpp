@@ -129,6 +129,11 @@ digraph G {
   rankdir=BT
 EOD
 
+# Delete unit-tests.
+foreach (keys %comps) {
+  delete $comps{$_} if /[.]ut$/;
+}
+
 # Components are depicted as ovals.
 print PIPE "  $_ [shape=oval];\n"
   foreach keys %comps;
