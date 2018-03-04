@@ -71,14 +71,14 @@ if(ENABLE_SHARED_LIBS)
 endif()
 
 set(test_SOURCES
-  BufferTest.cc
-  HandleTest.cc
-  IpAddressTest.cc
-  MathTest.cc
-  MemCtxTest.cc
-  ReactorTest.cc
-  RefCountTest.cc
-  SocketTest.cc)
+  Buffer.ut.cpp
+  Handle.ut.cpp
+  IpAddress.ut.cpp
+  Math.ut.cpp
+  MemCtx.ut.cpp
+  Reactor.ut.cpp
+  RefCount.ut.cpp
+  Socket.ut.cpp)
 
 foreach(file ${test_SOURCES})
   get_filename_component (name ${file} NAME_WE)
