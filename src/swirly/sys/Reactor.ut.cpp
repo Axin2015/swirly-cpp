@@ -18,7 +18,8 @@
 #include "LocalAddress.hpp"
 #include "Reactor.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 using namespace std;
 using namespace swirly;
@@ -67,27 +68,29 @@ struct TestHandler : EventHandler {
 
 } // namespace
 
-SWIRLY_TEST_CASE(ReactorHandler)
+BOOST_AUTO_TEST_SUITE(ReactorSuite)
+
+BOOST_AUTO_TEST_CASE(ReactorHandlerCase)
 {
     Counters cntrs;
     Reactor r{1024};
     FileToken out, err;
     {
-        SWIRLY_CHECK(cntrs.dtor == 0);
+        BOOST_TEST(cntrs.dtor == 0);
         auto h = makeIntrusive<TestHandler>(r, cntrs);
         out = r.subscribe(STDOUT_FILENO, Reactor::Out, h);
         err = r.subscribe(STDERR_FILENO, Reactor::Out, h);
     }
-    SWIRLY_CHECK(cntrs.dtor == 0);
+    BOOST_TEST(cntrs.dtor == 0);
 
     r.unsubscribe(STDOUT_FILENO);
-    SWIRLY_CHECK(cntrs.dtor == 0);
+    BOOST_TEST(cntrs.dtor == 0);
 
     r.unsubscribe(STDERR_FILENO);
-    SWIRLY_CHECK(cntrs.dtor == 1);
+    BOOST_TEST(cntrs.dtor == 1);
 }
 
-SWIRLY_TEST_CASE(ReactorFileEvents)
+BOOST_AUTO_TEST_CASE(ReactorFileEventsCase)
 {
     using namespace literals::chrono_literals;
 
@@ -97,24 +100,26 @@ SWIRLY_TEST_CASE(ReactorFileEvents)
     auto socks = socketpair(LocalStream{});
     const auto tok = r.subscribe(*socks.second, Reactor::In, h);
 
-    SWIRLY_CHECK(r.poll(0ms) == 0);
-    SWIRLY_CHECK(h->matches() == 0);
+    BOOST_TEST(r.poll(0ms) == 0);
+    BOOST_TEST(h->matches() == 0);
 
     socks.first.send("foo", 4, 0);
-    SWIRLY_CHECK(r.poll() == 1);
-    SWIRLY_CHECK(h->matches() == 1);
+    BOOST_TEST(r.poll() == 1);
+    BOOST_TEST(h->matches() == 1);
 
-    SWIRLY_CHECK(r.poll(0ms) == 0);
-    SWIRLY_CHECK(h->matches() == 1);
+    BOOST_TEST(r.poll(0ms) == 0);
+    BOOST_TEST(h->matches() == 1);
 
     socks.first.send("foo\0foo", 8, 0);
-    SWIRLY_CHECK(r.poll() == 1);
-    SWIRLY_CHECK(h->matches() == 2);
-    SWIRLY_CHECK(r.poll() == 1);
-    SWIRLY_CHECK(h->matches() == 3);
+    BOOST_TEST(r.poll() == 1);
+    BOOST_TEST(h->matches() == 2);
+    BOOST_TEST(r.poll() == 1);
+    BOOST_TEST(h->matches() == 3);
 
-    SWIRLY_CHECK(r.poll(0ms) == 0);
-    SWIRLY_CHECK(h->matches() == 3);
+    BOOST_TEST(r.poll(0ms) == 0);
+    BOOST_TEST(h->matches() == 3);
 
     r.unsubscribe(*socks.second);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

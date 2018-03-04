@@ -18,7 +18,8 @@
 
 #include <swirly/util/StringBuf.hpp>
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 using namespace std;
 using namespace swirly;
@@ -69,56 +70,60 @@ class Bar : public RefCount<Bar, ThreadUnsafePolicy> {
 
 } // namespace
 
-SWIRLY_TEST_CASE(SymbolSet)
+BOOST_AUTO_TEST_SUITE(SetSuite)
+
+BOOST_AUTO_TEST_CASE(SymbolSetCase)
 {
     int alive{0};
     {
         SymbolSet<Foo> s;
 
         Foo& foo1{*s.emplace("FOO"sv, "Foo One"sv, alive)};
-        SWIRLY_CHECK(alive == 1);
-        SWIRLY_CHECK(foo1.symbol() == "FOO"sv);
-        SWIRLY_CHECK(foo1.display() == "Foo One"sv);
-        SWIRLY_CHECK(s.find("FOO"sv) != s.end());
+        BOOST_TEST(alive == 1);
+        BOOST_TEST(foo1.symbol() == "FOO"sv);
+        BOOST_TEST(foo1.display() == "Foo One"sv);
+        BOOST_TEST(s.find("FOO"sv) != s.end());
 
         // Duplicate.
         Foo& foo2{*s.emplace("FOO"sv, "Foo Two"sv, alive)};
-        SWIRLY_CHECK(alive == 1);
-        SWIRLY_CHECK(&foo2 == &foo1);
+        BOOST_TEST(alive == 1);
+        BOOST_TEST(&foo2 == &foo1);
 
         // Replace.
         Foo& foo3{*s.emplaceOrReplace("FOO"sv, "Foo Three"sv, alive)};
-        SWIRLY_CHECK(alive == 1);
-        SWIRLY_CHECK(&foo3 != &foo1);
-        SWIRLY_CHECK(foo3.symbol() == "FOO"sv);
-        SWIRLY_CHECK(foo3.display() == "Foo Three"sv);
+        BOOST_TEST(alive == 1);
+        BOOST_TEST(&foo3 != &foo1);
+        BOOST_TEST(foo3.symbol() == "FOO"sv);
+        BOOST_TEST(foo3.display() == "Foo Three"sv);
     }
-    SWIRLY_CHECK(alive == 0);
+    BOOST_TEST(alive == 0);
 }
 
-SWIRLY_TEST_CASE(IdSet)
+BOOST_AUTO_TEST_CASE(IdSetCase)
 {
     int alive{0};
     {
         IdSet<Bar> s;
 
         Bar& bar1{*s.emplace(1_id64, "Bar One"sv, alive)};
-        SWIRLY_CHECK(alive == 1);
-        SWIRLY_CHECK(bar1.id() == 1_id64);
-        SWIRLY_CHECK(bar1.display() == "Bar One"sv);
-        SWIRLY_CHECK(s.find(1_id64) != s.end());
+        BOOST_TEST(alive == 1);
+        BOOST_TEST(bar1.id() == 1_id64);
+        BOOST_TEST(bar1.display() == "Bar One"sv);
+        BOOST_TEST(s.find(1_id64) != s.end());
 
         // Duplicate.
         Bar& bar2{*s.emplace(1_id64, "Bar Two"sv, alive)};
-        SWIRLY_CHECK(alive == 1);
-        SWIRLY_CHECK(&bar2 == &bar1);
+        BOOST_TEST(alive == 1);
+        BOOST_TEST(&bar2 == &bar1);
 
         // Replace.
         Bar& bar3{*s.emplaceOrReplace(1_id64, "Bar Three"sv, alive)};
-        SWIRLY_CHECK(alive == 1);
-        SWIRLY_CHECK(&bar3 != &bar1);
-        SWIRLY_CHECK(bar3.id() == 1_id64);
-        SWIRLY_CHECK(bar3.display() == "Bar Three"sv);
+        BOOST_TEST(alive == 1);
+        BOOST_TEST(&bar3 != &bar1);
+        BOOST_TEST(bar3.id() == 1_id64);
+        BOOST_TEST(bar3.display() == "Bar Three"sv);
     }
-    SWIRLY_CHECK(alive == 0);
+    BOOST_TEST(alive == 0);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

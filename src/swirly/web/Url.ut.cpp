@@ -18,7 +18,8 @@
 
 #include <swirly/util/String.hpp>
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 using namespace std;
 using namespace swirly;
@@ -53,26 +54,30 @@ class UrlStringView : public BasicUrl<UrlStringView> {
 
 } // namespace
 
-SWIRLY_TEST_CASE(UrlString)
+BOOST_AUTO_TEST_SUITE(UrlSuite)
+
+BOOST_AUTO_TEST_CASE(UrlStringCase)
 {
     UrlString url{"http://www.swirlycloud.com:8080/accnt/execs?offset=3&limit5"s};
-    SWIRLY_CHECK(url.schema() == "http"s);
-    SWIRLY_CHECK(url.host() == "www.swirlycloud.com"s);
-    SWIRLY_CHECK(url.port() == "8080"s);
-    SWIRLY_CHECK(url.path() == "/accnt/execs"s);
-    SWIRLY_CHECK(url.query() == "offset=3&limit5"s);
-    SWIRLY_CHECK(url.fragment().empty());
-    SWIRLY_CHECK(url.userInfo().empty());
+    BOOST_TEST(url.schema() == "http"s);
+    BOOST_TEST(url.host() == "www.swirlycloud.com"s);
+    BOOST_TEST(url.port() == "8080"s);
+    BOOST_TEST(url.path() == "/accnt/execs"s);
+    BOOST_TEST(url.query() == "offset=3&limit5"s);
+    BOOST_TEST(url.fragment().empty());
+    BOOST_TEST(url.userInfo().empty());
 }
 
-SWIRLY_TEST_CASE(UrlStringView)
+BOOST_AUTO_TEST_CASE(UrlStringViewCase)
 {
     UrlStringView url{"http://www.swirlycloud.com:8080/accnt/execs?offset=3&limit5"sv};
-    SWIRLY_CHECK(url.schema() == "http"sv);
-    SWIRLY_CHECK(url.host() == "www.swirlycloud.com"sv);
-    SWIRLY_CHECK(url.port() == "8080"sv);
-    SWIRLY_CHECK(url.path() == "/accnt/execs"sv);
-    SWIRLY_CHECK(url.query() == "offset=3&limit5"sv);
-    SWIRLY_CHECK(url.fragment().empty());
-    SWIRLY_CHECK(url.userInfo().empty());
+    BOOST_TEST(url.schema() == "http"sv);
+    BOOST_TEST(url.host() == "www.swirlycloud.com"sv);
+    BOOST_TEST(url.port() == "8080"sv);
+    BOOST_TEST(url.path() == "/accnt/execs"sv);
+    BOOST_TEST(url.query() == "offset=3&limit5"sv);
+    BOOST_TEST(url.fragment().empty());
+    BOOST_TEST(url.userInfo().empty());
 }
+
+BOOST_AUTO_TEST_SUITE_END()

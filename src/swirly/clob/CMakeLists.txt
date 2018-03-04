@@ -17,10 +17,12 @@ if(ENABLE_SHARED_LIBS)
   add_custom_target(swirly_clob DEPENDS
     swirly_clob_static
     swirly_clob_shared
+    swirly_clob_test
   )
 else()
   add_custom_target(swirly_clob DEPENDS
     swirly_clob_static
+    swirly_clob_test
   )
 endif()
 
@@ -49,10 +51,12 @@ set(test_SOURCES
   Response.ut.cpp
   Serv.ut.cpp)
 
+add_executable(swirly_clob_test
+  ${test_SOURCES}
+  Main.ut.cpp)
+target_link_libraries(swirly_clob_test ${swirly_clob_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+
 foreach(file ${test_SOURCES})
   get_filename_component (name ${file} NAME_WE)
-  set(name "swirly_clob_${name}")
-  add_executable(${name} ${file})
-  target_link_libraries(${name} ${swirly_clob_LIBRARY} ${swirly_unit_LIBRARY})
-  add_test(NAME ${name} COMMAND ${name})
+  add_test(NAME clob::${name}Suite COMMAND swirly_clob_test -l error -t ${name}Suite)
 endforeach()

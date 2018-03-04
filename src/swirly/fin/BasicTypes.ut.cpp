@@ -16,39 +16,44 @@
  */
 #include "BasicTypes.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 #include <cstring>
 
 using namespace swirly;
 
-SWIRLY_TEST_CASE(AssetType)
+BOOST_AUTO_TEST_SUITE(BasicTypesSuite)
+
+BOOST_AUTO_TEST_CASE(AssetTypeCase)
 {
-    SWIRLY_CHECK(strcmp(enumString(AssetType::Cmdty), "CMDTY") == 0);
+    BOOST_TEST(strcmp(enumString(AssetType::Cmdty), "CMDTY") == 0);
 }
 
-SWIRLY_TEST_CASE(Direct)
+BOOST_AUTO_TEST_CASE(DirectCase)
 {
-    SWIRLY_CHECK(strcmp(enumString(Direct::Paid), "PAID") == 0);
+    BOOST_TEST(strcmp(enumString(Direct::Paid), "PAID") == 0);
 }
 
-SWIRLY_TEST_CASE(LiqInd)
+BOOST_AUTO_TEST_CASE(LiqIndCase)
 {
-    SWIRLY_CHECK(strcmp(enumString(LiqInd::Maker), "MAKER") == 0);
+    BOOST_TEST(strcmp(enumString(LiqInd::Maker), "MAKER") == 0);
 }
 
-SWIRLY_TEST_CASE(Side)
+BOOST_AUTO_TEST_CASE(SideCase)
 {
-    SWIRLY_CHECK(strcmp(enumString(Side::Buy), "BUY") == 0);
+    BOOST_TEST(strcmp(enumString(Side::Buy), "BUY") == 0);
 }
 
-SWIRLY_TEST_CASE(State)
+BOOST_AUTO_TEST_CASE(StateCase)
 {
-    SWIRLY_CHECK(strcmp(enumString(State::New), "NEW") == 0);
+    BOOST_TEST(strcmp(enumString(State::New), "NEW") == 0);
 }
 
-SWIRLY_TEST_CASE(StateResd)
+BOOST_AUTO_TEST_CASE(StateResdCase)
 {
-    SWIRLY_CHECK(strcmp(enumString(State::Trade, 0_lts), "COMPLETE") == 0);
-    SWIRLY_CHECK(strcmp(enumString(State::Trade, 1_lts), "PARTIAL") == 0);
+    BOOST_TEST(strcmp(enumString(State::Trade, 0_lts), "COMPLETE") == 0);
+    BOOST_TEST(strcmp(enumString(State::Trade, 1_lts), "PARTIAL") == 0);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

@@ -20,99 +20,104 @@
 
 #include <swirly/util/String.hpp>
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 using namespace swirly;
 
-SWIRLY_TEST_CASE(EntitySetZero)
+BOOST_AUTO_TEST_SUITE(EntitySetSuite)
+
+BOOST_AUTO_TEST_CASE(EntitySetZeroCase)
 {
     const auto es = EntitySet::parse(""sv);
-    SWIRLY_CHECK(!es.many());
-    SWIRLY_CHECK(!es.asset());
-    SWIRLY_CHECK(!es.instr());
-    SWIRLY_CHECK(!es.market());
+    BOOST_TEST(!es.many());
+    BOOST_TEST(!es.asset());
+    BOOST_TEST(!es.instr());
+    BOOST_TEST(!es.market());
 
     // End.
-    SWIRLY_CHECK(es.empty());
+    BOOST_TEST(es.empty());
 }
 
-SWIRLY_TEST_CASE(EntitySetOne)
+BOOST_AUTO_TEST_CASE(EntitySetOneCase)
 {
     auto es = EntitySet::parse("assets"sv);
-    SWIRLY_CHECK(!es.many());
-    SWIRLY_CHECK(es.asset());
-    SWIRLY_CHECK(!es.instr());
-    SWIRLY_CHECK(!es.market());
+    BOOST_TEST(!es.many());
+    BOOST_TEST(es.asset());
+    BOOST_TEST(!es.instr());
+    BOOST_TEST(!es.market());
 
     // First.
-    SWIRLY_CHECK(!es.empty());
-    SWIRLY_CHECK(es.pop() == EntitySet::Asset);
+    BOOST_TEST(!es.empty());
+    BOOST_TEST(es.pop() == EntitySet::Asset);
 
     // End.
-    SWIRLY_CHECK(es.empty());
+    BOOST_TEST(es.empty());
 }
 
-SWIRLY_TEST_CASE(EntitySetTwo)
+BOOST_AUTO_TEST_CASE(EntitySetTwoCase)
 {
     auto es = EntitySet::parse("assets,instrs"sv);
-    SWIRLY_CHECK(es.many());
-    SWIRLY_CHECK(es.asset());
-    SWIRLY_CHECK(es.instr());
-    SWIRLY_CHECK(!es.market());
+    BOOST_TEST(es.many());
+    BOOST_TEST(es.asset());
+    BOOST_TEST(es.instr());
+    BOOST_TEST(!es.market());
 
     // First.
-    SWIRLY_CHECK(!es.empty());
-    SWIRLY_CHECK(es.pop() == EntitySet::Asset);
+    BOOST_TEST(!es.empty());
+    BOOST_TEST(es.pop() == EntitySet::Asset);
 
     // Second.
-    SWIRLY_CHECK(!es.empty());
-    SWIRLY_CHECK(es.pop() == EntitySet::Instr);
+    BOOST_TEST(!es.empty());
+    BOOST_TEST(es.pop() == EntitySet::Instr);
 
     // End.
-    SWIRLY_CHECK(es.empty());
+    BOOST_TEST(es.empty());
 }
 
-SWIRLY_TEST_CASE(EntitySetThree)
+BOOST_AUTO_TEST_CASE(EntitySetThreeCase)
 {
     auto es = EntitySet::parse("markets,instrs,assets"sv);
-    SWIRLY_CHECK(es.many());
-    SWIRLY_CHECK(es.asset());
-    SWIRLY_CHECK(es.instr());
-    SWIRLY_CHECK(es.market());
+    BOOST_TEST(es.many());
+    BOOST_TEST(es.asset());
+    BOOST_TEST(es.instr());
+    BOOST_TEST(es.market());
 
     // First.
-    SWIRLY_CHECK(!es.empty());
-    SWIRLY_CHECK(es.pop() == EntitySet::Asset);
+    BOOST_TEST(!es.empty());
+    BOOST_TEST(es.pop() == EntitySet::Asset);
 
     // Second.
-    SWIRLY_CHECK(!es.empty());
-    SWIRLY_CHECK(es.pop() == EntitySet::Instr);
+    BOOST_TEST(!es.empty());
+    BOOST_TEST(es.pop() == EntitySet::Instr);
 
     // Third.
-    SWIRLY_CHECK(!es.empty());
-    SWIRLY_CHECK(es.pop() == EntitySet::Market);
+    BOOST_TEST(!es.empty());
+    BOOST_TEST(es.pop() == EntitySet::Market);
 
     // End.
-    SWIRLY_CHECK(es.empty());
+    BOOST_TEST(es.empty());
 }
 
-SWIRLY_TEST_CASE(EntitySetTrailing)
+BOOST_AUTO_TEST_CASE(EntitySetTrailingCase)
 {
     auto es = EntitySet::parse("markets,"sv);
-    SWIRLY_CHECK(!es.many());
-    SWIRLY_CHECK(!es.asset());
-    SWIRLY_CHECK(!es.instr());
-    SWIRLY_CHECK(es.market());
+    BOOST_TEST(!es.many());
+    BOOST_TEST(!es.asset());
+    BOOST_TEST(!es.instr());
+    BOOST_TEST(es.market());
 
     // First.
-    SWIRLY_CHECK(!es.empty());
-    SWIRLY_CHECK(es.pop() == EntitySet::Market);
+    BOOST_TEST(!es.empty());
+    BOOST_TEST(es.pop() == EntitySet::Market);
 
     // End.
-    SWIRLY_CHECK(es.empty());
+    BOOST_TEST(es.empty());
 }
 
-SWIRLY_TEST_CASE(EntitySetBadEntity)
+BOOST_AUTO_TEST_CASE(EntitySetBadEntityCase)
 {
-    SWIRLY_CHECK_THROW(EntitySet::parse("bad"sv), NotFoundException);
+    BOOST_CHECK_THROW(EntitySet::parse("bad"sv), NotFoundException);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

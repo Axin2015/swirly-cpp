@@ -16,58 +16,63 @@
  */
 #include "RingBuffer.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 using namespace std;
 using namespace swirly;
 
-SWIRLY_TEST_CASE(RingBuffer)
+BOOST_AUTO_TEST_SUITE(RingBufferSuite)
+
+BOOST_AUTO_TEST_CASE(RingBufferCase)
 {
     using IntRingBuffer = RingBuffer<int>;
 
     IntRingBuffer rb{4};
-    SWIRLY_CHECK(rb.empty());
-    SWIRLY_CHECK(!rb.full());
-    SWIRLY_CHECK(rb.size() == 0);
+    BOOST_TEST(rb.empty());
+    BOOST_TEST(!rb.full());
+    BOOST_TEST(rb.size() == 0);
 
     rb.post([](int& val) { val = 1; });
-    SWIRLY_CHECK(!rb.empty());
-    SWIRLY_CHECK(!rb.full());
-    SWIRLY_CHECK(rb.size() == 1);
+    BOOST_TEST(!rb.empty());
+    BOOST_TEST(!rb.full());
+    BOOST_TEST(rb.size() == 1);
 
     rb.clear();
-    SWIRLY_CHECK(rb.empty());
-    SWIRLY_CHECK(!rb.full());
-    SWIRLY_CHECK(rb.size() == 0);
+    BOOST_TEST(rb.empty());
+    BOOST_TEST(!rb.full());
+    BOOST_TEST(rb.size() == 0);
 
     rb.push(1);
     rb.push(2);
     rb.push(3);
     rb.push(4);
-    SWIRLY_CHECK(!rb.empty());
-    SWIRLY_CHECK(rb.full());
-    SWIRLY_CHECK(rb.size() == 4);
+    BOOST_TEST(!rb.empty());
+    BOOST_TEST(rb.full());
+    BOOST_TEST(rb.size() == 4);
 
     rb.push(5);
-    SWIRLY_CHECK(!rb.empty());
-    SWIRLY_CHECK(rb.full());
-    SWIRLY_CHECK(rb.size() == 4);
+    BOOST_TEST(!rb.empty());
+    BOOST_TEST(rb.full());
+    BOOST_TEST(rb.size() == 4);
 
     int val;
     rb.fetch([&val](const int& ref) { val = ref; });
-    SWIRLY_CHECK(2);
-    SWIRLY_CHECK(!rb.empty());
-    SWIRLY_CHECK(!rb.full());
-    SWIRLY_CHECK(rb.size() == 3);
+    BOOST_TEST(2);
+    BOOST_TEST(!rb.empty());
+    BOOST_TEST(!rb.full());
+    BOOST_TEST(rb.size() == 3);
 
-    SWIRLY_CHECK(rb.front() == 3);
+    BOOST_TEST(rb.front() == 3);
     rb.pop();
-    SWIRLY_CHECK(rb.front() == 4);
+    BOOST_TEST(rb.front() == 4);
     rb.pop();
-    SWIRLY_CHECK(rb.front() == 5);
+    BOOST_TEST(rb.front() == 5);
     rb.pop();
 
-    SWIRLY_CHECK(rb.empty());
-    SWIRLY_CHECK(!rb.full());
-    SWIRLY_CHECK(rb.size() == 0);
+    BOOST_TEST(rb.empty());
+    BOOST_TEST(!rb.full());
+    BOOST_TEST(rb.size() == 0);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

@@ -16,27 +16,32 @@
  */
 #include "Instr.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 using namespace std;
 using namespace swirly;
 
-SWIRLY_TEST_CASE(InstrToString)
+BOOST_AUTO_TEST_SUITE(InstrSuite)
+
+BOOST_AUTO_TEST_CASE(InstrToStringCase)
 {
     Instr instr{1_id32, "EURUSD"sv, "EURUSD"sv, "EUR"sv, "USD"sv, 1000000,
                 1,      1,          10000,      4,       1_lts,   10_lts};
 
-    SWIRLY_CHECK(toString(instr) == //
-                 "{\"symbol\":\"EURUSD\""
-                 ",\"display\":\"EURUSD\""
-                 ",\"baseAsset\":\"EUR\""
-                 ",\"termCcy\":\"USD\""
-                 ",\"lotNumer\":1000000"
-                 ",\"lotDenom\":1"
-                 ",\"tickNumer\":1"
-                 ",\"tickDenom\":10000"
-                 ",\"pipDp\":4"
-                 ",\"minLots\":1"
-                 ",\"maxLots\":10"
-                 "}");
+    BOOST_TEST(toString(instr) == //
+               "{\"symbol\":\"EURUSD\""
+               ",\"display\":\"EURUSD\""
+               ",\"baseAsset\":\"EUR\""
+               ",\"termCcy\":\"USD\""
+               ",\"lotNumer\":1000000"
+               ",\"lotDenom\":1"
+               ",\"tickNumer\":1"
+               ",\"tickDenom\":10000"
+               ",\"pipDp\":4"
+               ",\"minLots\":1"
+               ",\"maxLots\":10"
+               "}");
 }
+
+BOOST_AUTO_TEST_SUITE_END()

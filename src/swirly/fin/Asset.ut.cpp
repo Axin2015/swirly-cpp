@@ -16,18 +16,23 @@
  */
 #include "Asset.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 using namespace std;
 using namespace swirly;
 
-SWIRLY_TEST_CASE(AssetToString)
+BOOST_AUTO_TEST_SUITE(AssetSuite)
+
+BOOST_AUTO_TEST_CASE(AssetToStringCase)
 {
     Asset asset{1_id32, "GBP"sv, "United Kingdom, Pounds"sv, AssetType::Ccy};
 
-    SWIRLY_CHECK(toString(asset) == //
-                 "{\"symbol\":\"GBP\""
-                 ",\"display\":\"United Kingdom, Pounds\""
-                 ",\"type\":\"CCY\""
-                 "}");
+    BOOST_TEST(toString(asset) == //
+               "{\"symbol\":\"GBP\""
+               ",\"display\":\"United Kingdom, Pounds\""
+               ",\"type\":\"CCY\""
+               "}");
 }
+
+BOOST_AUTO_TEST_SUITE_END()

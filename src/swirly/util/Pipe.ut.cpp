@@ -16,7 +16,8 @@
  */
 #include "Pipe.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 using namespace std;
 using namespace swirly;
@@ -35,7 +36,9 @@ void producer(IntPipe& p)
 
 } // namespace
 
-SWIRLY_TEST_CASE(Pipe)
+BOOST_AUTO_TEST_SUITE(PipeSuite)
+
+BOOST_AUTO_TEST_CASE(PipeCase)
 {
     IntPipe p{1 << 4};
     thread t{producer, ref(p)};
@@ -43,5 +46,7 @@ SWIRLY_TEST_CASE(Pipe)
     while (p.fetch([&sum](int i) { sum += i; }))
         ;
     t.join();
-    SWIRLY_CHECK(sum == 5050);
+    BOOST_TEST(sum == 5050);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

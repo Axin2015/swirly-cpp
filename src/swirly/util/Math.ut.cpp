@@ -16,31 +16,38 @@
  */
 #include "Math.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 using namespace std;
 using namespace swirly;
 
-SWIRLY_TEST_CASE(VarAccum)
+namespace utf = boost::unit_test;
+
+BOOST_AUTO_TEST_SUITE(MathSuite)
+
+BOOST_AUTO_TEST_CASE(VarAccumCase, *utf::tolerance(0.0000001))
 {
     VarAccum v;
     v.append(1345, 1301, 1368, 1322, 1310, 1370, 1318, 1350, 1303, 1299);
-    SWIRLY_CHECK(test::isSame(v.size(), 10));
-    SWIRLY_CHECK(test::isSame(v.mean(), 1328.6));
-    SWIRLY_CHECK(test::isSame(var(v), 754.2666667));
-    SWIRLY_CHECK(test::isSame(varp(v), 678.84));
-    SWIRLY_CHECK(test::isSame(stdev(v), 27.4639157));
-    SWIRLY_CHECK(test::isSame(stdevp(v), 26.0545581));
-    SWIRLY_CHECK(test::isSame(v.min(), 1299));
-    SWIRLY_CHECK(test::isSame(v.max(), 1370));
+    BOOST_TEST(v.size() == 10);
+    BOOST_TEST(v.mean() == 1328.6);
+    BOOST_TEST(var(v) == 754.2666667);
+    BOOST_TEST(varp(v) == 678.84);
+    BOOST_TEST(stdev(v) == 27.4639157);
+    BOOST_TEST(stdevp(v) == 26.0545581);
+    BOOST_TEST(v.min() == 1299);
+    BOOST_TEST(v.max() == 1370);
 }
 
-SWIRLY_TEST_CASE(Ceil)
+BOOST_AUTO_TEST_CASE(CeilCase)
 {
-    SWIRLY_CHECK(ceil(1U, 3U) == 1U);
-    SWIRLY_CHECK(ceil(2U, 3U) == 1U);
-    SWIRLY_CHECK(ceil(3U, 3U) == 1U);
-    SWIRLY_CHECK(ceil(4U, 3U) == 2U);
-    SWIRLY_CHECK(ceil(5U, 3U) == 2U);
-    SWIRLY_CHECK(ceil(6U, 3U) == 2U);
+    BOOST_TEST(ceil(1U, 3U) == 1U);
+    BOOST_TEST(ceil(2U, 3U) == 1U);
+    BOOST_TEST(ceil(3U, 3U) == 1U);
+    BOOST_TEST(ceil(4U, 3U) == 2U);
+    BOOST_TEST(ceil(5U, 3U) == 2U);
+    BOOST_TEST(ceil(6U, 3U) == 2U);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

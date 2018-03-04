@@ -16,177 +16,190 @@
  */
 #include "String.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
+
+namespace std {
+template <typename T, typename U>
+ostream& operator<<(ostream& os, const pair<T, U>& p)
+{
+    return os << '(' << p.first << ',' << p.second << ')';
+}
+} // namespace std
 
 using namespace std;
 using namespace swirly;
 
-SWIRLY_TEST_CASE(ToString)
+BOOST_AUTO_TEST_SUITE(StringSuite)
+
+BOOST_AUTO_TEST_CASE(ToStringCase)
 {
-    SWIRLY_CHECK(toString("foo"sv) == "foo"s);
-    SWIRLY_CHECK(stoi(toString(12345)) == 12345);
-    SWIRLY_CHECK(stod(toString(12345.67)) == 12345.67);
+    BOOST_TEST(toString("foo"sv) == "foo"s);
+    BOOST_TEST(stoi(toString(12345)) == 12345);
+    BOOST_TEST(stod(toString(12345.67)) == 12345.67);
 }
 
-SWIRLY_TEST_CASE(Stoi32NoSign)
+BOOST_AUTO_TEST_CASE(Stoi32NoSignCase)
 {
-    SWIRLY_CHECK(stoi32(""sv) == 0);
-    SWIRLY_CHECK(stoi32("1"sv) == 1);
-    SWIRLY_CHECK(stoi32("123"sv) == 123);
-    SWIRLY_CHECK(stoi32(" "sv) == 0);
-    SWIRLY_CHECK(stoi32(" 1 "sv) == 1);
-    SWIRLY_CHECK(stoi32(" 123 "sv) == 123);
-    SWIRLY_CHECK(stoi32("x"sv) == 0);
-    SWIRLY_CHECK(stoi32(" 1x"sv) == 1);
-    SWIRLY_CHECK(stoi32(" 123x"sv) == 123);
-    SWIRLY_CHECK(stoi32("x1 "sv) == 0);
-    SWIRLY_CHECK(stoi32("x123 "sv) == 0);
+    BOOST_TEST(stoi32(""sv) == 0);
+    BOOST_TEST(stoi32("1"sv) == 1);
+    BOOST_TEST(stoi32("123"sv) == 123);
+    BOOST_TEST(stoi32(" "sv) == 0);
+    BOOST_TEST(stoi32(" 1 "sv) == 1);
+    BOOST_TEST(stoi32(" 123 "sv) == 123);
+    BOOST_TEST(stoi32("x"sv) == 0);
+    BOOST_TEST(stoi32(" 1x"sv) == 1);
+    BOOST_TEST(stoi32(" 123x"sv) == 123);
+    BOOST_TEST(stoi32("x1 "sv) == 0);
+    BOOST_TEST(stoi32("x123 "sv) == 0);
 }
 
-SWIRLY_TEST_CASE(Stoi32PosSign)
+BOOST_AUTO_TEST_CASE(Stoi32PosSignCase)
 {
-    SWIRLY_CHECK(stoi32("+"sv) == 0);
-    SWIRLY_CHECK(stoi32("+1"sv) == 1);
-    SWIRLY_CHECK(stoi32("+123"sv) == 123);
-    SWIRLY_CHECK(stoi32(" + "sv) == 0);
-    SWIRLY_CHECK(stoi32(" +1 "sv) == 1);
-    SWIRLY_CHECK(stoi32(" +123 "sv) == 123);
-    SWIRLY_CHECK(stoi32("+x"sv) == 0);
-    SWIRLY_CHECK(stoi32(" +1x"sv) == 1);
-    SWIRLY_CHECK(stoi32(" +123x"sv) == 123);
-    SWIRLY_CHECK(stoi32("x+1 "sv) == 0);
-    SWIRLY_CHECK(stoi32("x+123 "sv) == 0);
+    BOOST_TEST(stoi32("+"sv) == 0);
+    BOOST_TEST(stoi32("+1"sv) == 1);
+    BOOST_TEST(stoi32("+123"sv) == 123);
+    BOOST_TEST(stoi32(" + "sv) == 0);
+    BOOST_TEST(stoi32(" +1 "sv) == 1);
+    BOOST_TEST(stoi32(" +123 "sv) == 123);
+    BOOST_TEST(stoi32("+x"sv) == 0);
+    BOOST_TEST(stoi32(" +1x"sv) == 1);
+    BOOST_TEST(stoi32(" +123x"sv) == 123);
+    BOOST_TEST(stoi32("x+1 "sv) == 0);
+    BOOST_TEST(stoi32("x+123 "sv) == 0);
 }
 
-SWIRLY_TEST_CASE(Stoi32NegSign)
+BOOST_AUTO_TEST_CASE(Stoi32NegSignCase)
 {
-    SWIRLY_CHECK(stoi32("-"sv) == 0);
-    SWIRLY_CHECK(stoi32("-1"sv) == -1);
-    SWIRLY_CHECK(stoi32("-123"sv) == -123);
-    SWIRLY_CHECK(stoi32(" - "sv) == 0);
-    SWIRLY_CHECK(stoi32(" -1 "sv) == -1);
-    SWIRLY_CHECK(stoi32(" -123 "sv) == -123);
-    SWIRLY_CHECK(stoi32("-x"sv) == 0);
-    SWIRLY_CHECK(stoi32(" -1x"sv) == -1);
-    SWIRLY_CHECK(stoi32(" -123x"sv) == -123);
-    SWIRLY_CHECK(stoi32("x-1 "sv) == 0);
-    SWIRLY_CHECK(stoi32("x-123 "sv) == 0);
+    BOOST_TEST(stoi32("-"sv) == 0);
+    BOOST_TEST(stoi32("-1"sv) == -1);
+    BOOST_TEST(stoi32("-123"sv) == -123);
+    BOOST_TEST(stoi32(" - "sv) == 0);
+    BOOST_TEST(stoi32(" -1 "sv) == -1);
+    BOOST_TEST(stoi32(" -123 "sv) == -123);
+    BOOST_TEST(stoi32("-x"sv) == 0);
+    BOOST_TEST(stoi32(" -1x"sv) == -1);
+    BOOST_TEST(stoi32(" -123x"sv) == -123);
+    BOOST_TEST(stoi32("x-1 "sv) == 0);
+    BOOST_TEST(stoi32("x-123 "sv) == 0);
 }
 
-SWIRLY_TEST_CASE(Stou64)
+BOOST_AUTO_TEST_CASE(Stou64Case)
 {
-    SWIRLY_CHECK(stou64(""sv) == 0UL);
-    SWIRLY_CHECK(stou64("1"sv) == 1UL);
-    SWIRLY_CHECK(stou64("123"sv) == 123UL);
-    SWIRLY_CHECK(stou64(" "sv) == 0UL);
-    SWIRLY_CHECK(stou64(" 1 "sv) == 1UL);
-    SWIRLY_CHECK(stou64(" 123 "sv) == 123UL);
-    SWIRLY_CHECK(stou64("x"sv) == 0UL);
-    SWIRLY_CHECK(stou64(" 1x"sv) == 1UL);
-    SWIRLY_CHECK(stou64(" 123x"sv) == 123UL);
-    SWIRLY_CHECK(stou64("x1 "sv) == 0UL);
-    SWIRLY_CHECK(stou64("x123 "sv) == 0UL);
-    SWIRLY_CHECK(stou64("18446744073709551615"sv) == 18446744073709551615ULL);
+    BOOST_TEST(stou64(""sv) == 0UL);
+    BOOST_TEST(stou64("1"sv) == 1UL);
+    BOOST_TEST(stou64("123"sv) == 123UL);
+    BOOST_TEST(stou64(" "sv) == 0UL);
+    BOOST_TEST(stou64(" 1 "sv) == 1UL);
+    BOOST_TEST(stou64(" 123 "sv) == 123UL);
+    BOOST_TEST(stou64("x"sv) == 0UL);
+    BOOST_TEST(stou64(" 1x"sv) == 1UL);
+    BOOST_TEST(stou64(" 123x"sv) == 123UL);
+    BOOST_TEST(stou64("x1 "sv) == 0UL);
+    BOOST_TEST(stou64("x123 "sv) == 0UL);
+    BOOST_TEST(stou64("18446744073709551615"sv) == 18446744073709551615ULL);
 }
 
-SWIRLY_TEST_CASE(Stob)
+BOOST_AUTO_TEST_CASE(StobCase)
 {
-    SWIRLY_CHECK(stob(""sv, false) == false);
-    SWIRLY_CHECK(stob(""sv, true) == true);
+    BOOST_TEST(stob(""sv, false) == false);
+    BOOST_TEST(stob(""sv, true) == true);
 
-    SWIRLY_CHECK(stob("0"sv, true) == false);
-    SWIRLY_CHECK(stob("F"sv, true) == false);
-    SWIRLY_CHECK(stob("N"sv, true) == false);
-    SWIRLY_CHECK(stob("f"sv, true) == false);
-    SWIRLY_CHECK(stob("n"sv, true) == false);
+    BOOST_TEST(stob("0"sv, true) == false);
+    BOOST_TEST(stob("F"sv, true) == false);
+    BOOST_TEST(stob("N"sv, true) == false);
+    BOOST_TEST(stob("f"sv, true) == false);
+    BOOST_TEST(stob("n"sv, true) == false);
 
-    SWIRLY_CHECK(stob("1"sv, false) == true);
-    SWIRLY_CHECK(stob("T"sv, false) == true);
-    SWIRLY_CHECK(stob("Y"sv, false) == true);
-    SWIRLY_CHECK(stob("t"sv, false) == true);
-    SWIRLY_CHECK(stob("y"sv, false) == true);
+    BOOST_TEST(stob("1"sv, false) == true);
+    BOOST_TEST(stob("T"sv, false) == true);
+    BOOST_TEST(stob("Y"sv, false) == true);
+    BOOST_TEST(stob("t"sv, false) == true);
+    BOOST_TEST(stob("y"sv, false) == true);
 
-    SWIRLY_CHECK(stob("NO"sv, true) == false);
-    SWIRLY_CHECK(stob("No"sv, true) == false);
-    SWIRLY_CHECK(stob("no"sv, true) == false);
+    BOOST_TEST(stob("NO"sv, true) == false);
+    BOOST_TEST(stob("No"sv, true) == false);
+    BOOST_TEST(stob("no"sv, true) == false);
 
-    SWIRLY_CHECK(stob("ON"sv, false) == true);
-    SWIRLY_CHECK(stob("On"sv, false) == true);
-    SWIRLY_CHECK(stob("on"sv, false) == true);
+    BOOST_TEST(stob("ON"sv, false) == true);
+    BOOST_TEST(stob("On"sv, false) == true);
+    BOOST_TEST(stob("on"sv, false) == true);
 
-    SWIRLY_CHECK(stob("OFF"sv, true) == false);
-    SWIRLY_CHECK(stob("Off"sv, true) == false);
-    SWIRLY_CHECK(stob("off"sv, true) == false);
+    BOOST_TEST(stob("OFF"sv, true) == false);
+    BOOST_TEST(stob("Off"sv, true) == false);
+    BOOST_TEST(stob("off"sv, true) == false);
 
-    SWIRLY_CHECK(stob("YES"sv, false) == true);
-    SWIRLY_CHECK(stob("Yes"sv, false) == true);
-    SWIRLY_CHECK(stob("yes"sv, false) == true);
+    BOOST_TEST(stob("YES"sv, false) == true);
+    BOOST_TEST(stob("Yes"sv, false) == true);
+    BOOST_TEST(stob("yes"sv, false) == true);
 
-    SWIRLY_CHECK(stob("TRUE"sv, false) == true);
-    SWIRLY_CHECK(stob("True"sv, false) == true);
-    SWIRLY_CHECK(stob("true"sv, false) == true);
+    BOOST_TEST(stob("TRUE"sv, false) == true);
+    BOOST_TEST(stob("True"sv, false) == true);
+    BOOST_TEST(stob("true"sv, false) == true);
 
-    SWIRLY_CHECK(stob("FALSE"sv, true) == false);
-    SWIRLY_CHECK(stob("False"sv, true) == false);
-    SWIRLY_CHECK(stob("false"sv, true) == false);
+    BOOST_TEST(stob("FALSE"sv, true) == false);
+    BOOST_TEST(stob("False"sv, true) == false);
+    BOOST_TEST(stob("false"sv, true) == false);
 }
 
-SWIRLY_TEST_CASE(LtrimCopy)
+BOOST_AUTO_TEST_CASE(LtrimCopyCase)
 {
-    SWIRLY_CHECK(ltrimCopy(""sv) == ""sv);
-    SWIRLY_CHECK(ltrimCopy(" \t\n\v\f\r"sv) == ""sv);
-    SWIRLY_CHECK(ltrimCopy(" \t\n\v\f\rfoo "sv) == "foo "sv);
-    SWIRLY_CHECK(ltrimCopy("foo"sv) == "foo"sv);
+    BOOST_TEST(ltrimCopy(""sv) == ""sv);
+    BOOST_TEST(ltrimCopy(" \t\n\v\f\r"sv) == ""sv);
+    BOOST_TEST(ltrimCopy(" \t\n\v\f\rfoo "sv) == "foo "sv);
+    BOOST_TEST(ltrimCopy("foo"sv) == "foo"sv);
 
-    SWIRLY_CHECK(ltrimCopy(""s) == ""s);
-    SWIRLY_CHECK(ltrimCopy(" \t\n\v\f\r"s) == ""s);
-    SWIRLY_CHECK(ltrimCopy(" \t\n\v\f\rfoo "s) == "foo "s);
-    SWIRLY_CHECK(ltrimCopy("foo"s) == "foo"s);
+    BOOST_TEST(ltrimCopy(""s) == ""s);
+    BOOST_TEST(ltrimCopy(" \t\n\v\f\r"s) == ""s);
+    BOOST_TEST(ltrimCopy(" \t\n\v\f\rfoo "s) == "foo "s);
+    BOOST_TEST(ltrimCopy("foo"s) == "foo"s);
 }
 
-SWIRLY_TEST_CASE(RtrimCopy)
+BOOST_AUTO_TEST_CASE(RtrimCopyCase)
 {
-    SWIRLY_CHECK(rtrimCopy(""sv) == ""sv);
-    SWIRLY_CHECK(rtrimCopy(" \t\n\v\f\r"sv) == ""sv);
-    SWIRLY_CHECK(rtrimCopy(" foo \t\n\v\f\r"sv) == " foo"sv);
-    SWIRLY_CHECK(rtrimCopy("foo"sv) == "foo"sv);
+    BOOST_TEST(rtrimCopy(""sv) == ""sv);
+    BOOST_TEST(rtrimCopy(" \t\n\v\f\r"sv) == ""sv);
+    BOOST_TEST(rtrimCopy(" foo \t\n\v\f\r"sv) == " foo"sv);
+    BOOST_TEST(rtrimCopy("foo"sv) == "foo"sv);
 
-    SWIRLY_CHECK(rtrimCopy(""s) == ""s);
-    SWIRLY_CHECK(rtrimCopy(" \t\n\v\f\r"s) == ""s);
-    SWIRLY_CHECK(rtrimCopy(" foo \t\n\v\f\r"s) == " foo"s);
-    SWIRLY_CHECK(rtrimCopy("foo"s) == "foo"s);
+    BOOST_TEST(rtrimCopy(""s) == ""s);
+    BOOST_TEST(rtrimCopy(" \t\n\v\f\r"s) == ""s);
+    BOOST_TEST(rtrimCopy(" foo \t\n\v\f\r"s) == " foo"s);
+    BOOST_TEST(rtrimCopy("foo"s) == "foo"s);
 }
 
-SWIRLY_TEST_CASE(TrimCopy)
+BOOST_AUTO_TEST_CASE(TrimCopyCase)
 {
-    SWIRLY_CHECK(trimCopy(""sv) == ""sv);
-    SWIRLY_CHECK(trimCopy(" \t\n\v\f\r"sv) == ""sv);
-    SWIRLY_CHECK(trimCopy(" \t\n\v\f\rfoo \t\n\v\f\r"sv) == "foo"sv);
-    SWIRLY_CHECK(trimCopy("foo"sv) == "foo"sv);
+    BOOST_TEST(trimCopy(""sv) == ""sv);
+    BOOST_TEST(trimCopy(" \t\n\v\f\r"sv) == ""sv);
+    BOOST_TEST(trimCopy(" \t\n\v\f\rfoo \t\n\v\f\r"sv) == "foo"sv);
+    BOOST_TEST(trimCopy("foo"sv) == "foo"sv);
 
-    SWIRLY_CHECK(trimCopy(""s) == ""s);
-    SWIRLY_CHECK(trimCopy(" \t\n\v\f\r"s) == ""s);
-    SWIRLY_CHECK(trimCopy(" \t\n\v\f\rfoo \t\n\v\f\r"s) == "foo"s);
-    SWIRLY_CHECK(trimCopy("foo"s) == "foo"s);
+    BOOST_TEST(trimCopy(""s) == ""s);
+    BOOST_TEST(trimCopy(" \t\n\v\f\r"s) == ""s);
+    BOOST_TEST(trimCopy(" \t\n\v\f\rfoo \t\n\v\f\r"s) == "foo"s);
+    BOOST_TEST(trimCopy("foo"s) == "foo"s);
 }
 
-SWIRLY_TEST_CASE(SplitPair)
+BOOST_AUTO_TEST_CASE(SplitPairCase)
 {
-    SWIRLY_CHECK(splitPair(""sv, '=') == make_pair(""sv, ""sv));
-    SWIRLY_CHECK(splitPair("="sv, '=') == make_pair(""sv, ""sv));
-    SWIRLY_CHECK(splitPair("a"sv, '=') == make_pair("a"sv, ""sv));
-    SWIRLY_CHECK(splitPair("a="sv, '=') == make_pair("a"sv, ""sv));
-    SWIRLY_CHECK(splitPair("=b"sv, '=') == make_pair(""sv, "b"sv));
-    SWIRLY_CHECK(splitPair("a=b"sv, '=') == make_pair("a"sv, "b"sv));
-    SWIRLY_CHECK(splitPair("a:b"sv, ':') == make_pair("a"sv, "b"sv));
-    SWIRLY_CHECK(splitPair(" a = b "sv, '=') == make_pair(" a "sv, " b "sv));
+    BOOST_TEST(splitPair(""sv, '=') == make_pair(""sv, ""sv));
+    BOOST_TEST(splitPair("="sv, '=') == make_pair(""sv, ""sv));
+    BOOST_TEST(splitPair("a"sv, '=') == make_pair("a"sv, ""sv));
+    BOOST_TEST(splitPair("a="sv, '=') == make_pair("a"sv, ""sv));
+    BOOST_TEST(splitPair("=b"sv, '=') == make_pair(""sv, "b"sv));
+    BOOST_TEST(splitPair("a=b"sv, '=') == make_pair("a"sv, "b"sv));
+    BOOST_TEST(splitPair("a:b"sv, ':') == make_pair("a"sv, "b"sv));
+    BOOST_TEST(splitPair(" a = b "sv, '=') == make_pair(" a "sv, " b "sv));
 
-    SWIRLY_CHECK(splitPair(""s, '=') == make_pair(""s, ""s));
-    SWIRLY_CHECK(splitPair("="s, '=') == make_pair(""s, ""s));
-    SWIRLY_CHECK(splitPair("a"s, '=') == make_pair("a"s, ""s));
-    SWIRLY_CHECK(splitPair("a="s, '=') == make_pair("a"s, ""s));
-    SWIRLY_CHECK(splitPair("=b"s, '=') == make_pair(""s, "b"s));
-    SWIRLY_CHECK(splitPair("a=b"s, '=') == make_pair("a"s, "b"s));
-    SWIRLY_CHECK(splitPair("a:b"s, ':') == make_pair("a"s, "b"s));
-    SWIRLY_CHECK(splitPair(" a = b "s, '=') == make_pair(" a "s, " b "s));
+    BOOST_TEST(splitPair(""s, '=') == make_pair(""s, ""s));
+    BOOST_TEST(splitPair("="s, '=') == make_pair(""s, ""s));
+    BOOST_TEST(splitPair("a"s, '=') == make_pair("a"s, ""s));
+    BOOST_TEST(splitPair("a="s, '=') == make_pair("a"s, ""s));
+    BOOST_TEST(splitPair("=b"s, '=') == make_pair(""s, "b"s));
+    BOOST_TEST(splitPair("a=b"s, '=') == make_pair("a"s, "b"s));
+    BOOST_TEST(splitPair("a:b"s, ':') == make_pair("a"s, "b"s));
+    BOOST_TEST(splitPair(" a = b "s, '=') == make_pair(" a "s, " b "s));
 }
+
+BOOST_AUTO_TEST_SUITE_END()

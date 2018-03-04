@@ -21,14 +21,17 @@
 #include <swirly/util/Date.hpp>
 #include <swirly/util/Set.hpp>
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 using namespace std;
 using namespace swirly;
 
 using AccntPosnSet = IdSet<Posn, MarketIdTraits<Posn>>;
 
-SWIRLY_TEST_CASE(AccntPosnSet)
+BOOST_AUTO_TEST_SUITE(PosnSuite)
+
+BOOST_AUTO_TEST_CASE(AccntPosnSetCase)
 {
     constexpr auto SettlDay = ymdToJd(2014, 2, 14);
     constexpr auto MarketId = toMarketId(1_id32, SettlDay);
@@ -37,22 +40,24 @@ SWIRLY_TEST_CASE(AccntPosnSet)
 
     PosnPtr posn1{
         &*s.emplace("MARAYL"sv, MarketId, "EURUSD"sv, SettlDay, 0_lts, 0_cst, 0_lts, 0_cst)};
-    SWIRLY_CHECK(posn1->refCount() == 2);
-    SWIRLY_CHECK(posn1->instr() == "EURUSD"sv);
-    SWIRLY_CHECK(posn1->settlDay() == SettlDay);
-    SWIRLY_CHECK(s.find(MarketId) != s.end());
+    BOOST_TEST(posn1->refCount() == 2);
+    BOOST_TEST(posn1->instr() == "EURUSD"sv);
+    BOOST_TEST(posn1->settlDay() == SettlDay);
+    BOOST_TEST(s.find(MarketId) != s.end());
 
     // Duplicate.
     PosnPtr posn2{
         &*s.emplace("MARAYL"sv, MarketId, "EURUSD"sv, SettlDay, 0_lts, 0_cst, 0_lts, 0_cst)};
-    SWIRLY_CHECK(posn2->refCount() == 3);
-    SWIRLY_CHECK(posn2 == posn1);
+    BOOST_TEST(posn2->refCount() == 3);
+    BOOST_TEST(posn2 == posn1);
 
     // Replace.
     PosnPtr posn3{&*s.emplaceOrReplace("MARAYL"sv, MarketId, "EURUSD"sv, SettlDay, 0_lts, 0_cst,
                                        0_lts, 0_cst)};
-    SWIRLY_CHECK(posn3->refCount() == 2);
-    SWIRLY_CHECK(posn3 != posn1);
-    SWIRLY_CHECK(posn3->instr() == "EURUSD"sv);
-    SWIRLY_CHECK(posn3->settlDay() == SettlDay);
+    BOOST_TEST(posn3->refCount() == 2);
+    BOOST_TEST(posn3 != posn1);
+    BOOST_TEST(posn3->instr() == "EURUSD"sv);
+    BOOST_TEST(posn3->settlDay() == SettlDay);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

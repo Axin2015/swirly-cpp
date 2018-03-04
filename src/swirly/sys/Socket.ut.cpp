@@ -18,17 +18,22 @@
 #include "LocalAddress.hpp"
 #include "Reactor.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 using namespace std;
 using namespace swirly;
 
-SWIRLY_TEST_CASE(SocketPair)
+BOOST_AUTO_TEST_SUITE(SocketSuite)
+
+BOOST_AUTO_TEST_CASE(SocketPairCase)
 {
     auto socks = socketpair(LocalStream{});
     socks.first.send("foo", 4, 0);
 
     char buf[4];
     socks.second.recv(buf, 4, 0);
-    SWIRLY_CHECK(strcmp(buf, "foo") == 0);
+    BOOST_TEST(strcmp(buf, "foo") == 0);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

@@ -16,7 +16,8 @@
  */
 #include "MsgHandler.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 using namespace std;
 using namespace swirly;
@@ -40,38 +41,42 @@ struct MsgHandler : BasicMsgHandler<MsgHandler> {
 
 } // namespace
 
-SWIRLY_TEST_CASE(BasicMsgHandler)
+BOOST_AUTO_TEST_SUITE(MsgHandlerSuite)
+
+BOOST_AUTO_TEST_CASE(BasicMsgHandlerCase)
 {
     MsgHandler h;
     Msg m;
     memset(&m, 0, sizeof(m));
 
-    SWIRLY_CHECK(h.resetCalls == 0);
+    BOOST_TEST(h.resetCalls == 0);
     h.dispatch(m);
-    SWIRLY_CHECK(h.resetCalls == 1);
+    BOOST_TEST(h.resetCalls == 1);
 
     m.type = MsgType::Reset;
-    SWIRLY_CHECK(h.resetCalls == 1);
+    BOOST_TEST(h.resetCalls == 1);
     h.dispatch(m);
-    SWIRLY_CHECK(h.resetCalls == 2);
+    BOOST_TEST(h.resetCalls == 2);
 
     m.type = MsgType::CreateMarket;
-    SWIRLY_CHECK(h.createMarketCalls == 0);
+    BOOST_TEST(h.createMarketCalls == 0);
     h.dispatch(m);
-    SWIRLY_CHECK(h.createMarketCalls == 1);
+    BOOST_TEST(h.createMarketCalls == 1);
 
     m.type = MsgType::UpdateMarket;
-    SWIRLY_CHECK(h.updateMarketCalls == 0);
+    BOOST_TEST(h.updateMarketCalls == 0);
     h.dispatch(m);
-    SWIRLY_CHECK(h.updateMarketCalls == 1);
+    BOOST_TEST(h.updateMarketCalls == 1);
 
     m.type = MsgType::CreateExec;
-    SWIRLY_CHECK(h.createExecCalls == 0);
+    BOOST_TEST(h.createExecCalls == 0);
     h.dispatch(m);
-    SWIRLY_CHECK(h.createExecCalls == 1);
+    BOOST_TEST(h.createExecCalls == 1);
 
     m.type = MsgType::ArchiveTrade;
-    SWIRLY_CHECK(h.archiveTradeCalls == 0);
+    BOOST_TEST(h.archiveTradeCalls == 0);
     h.dispatch(m);
-    SWIRLY_CHECK(h.archiveTradeCalls == 1);
+    BOOST_TEST(h.archiveTradeCalls == 1);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

@@ -16,55 +16,60 @@
  */
 #include "Symbol.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 #include <swirly/util/String.hpp>
 
 using namespace std;
 using namespace swirly;
 
-SWIRLY_TEST_CASE(SymbolEmpty)
+BOOST_AUTO_TEST_SUITE(SymbolSuite)
+
+BOOST_AUTO_TEST_CASE(SymbolEmptyCase)
 {
     Symbol symbol;
-    SWIRLY_CHECK(symbol.empty());
-    SWIRLY_CHECK(symbol.size() == 0UL);
-    SWIRLY_CHECK(symbol.compare(""sv) == 0);
-    SWIRLY_CHECK(symbol == Symbol{""sv});
+    BOOST_TEST(symbol.empty());
+    BOOST_TEST(symbol.size() == 0UL);
+    BOOST_TEST(symbol.compare(""sv) == 0);
+    BOOST_TEST(symbol == Symbol{""sv});
 }
 
-SWIRLY_TEST_CASE(SymbolNonEmpty)
+BOOST_AUTO_TEST_CASE(SymbolNonEmptyCase)
 {
     Symbol symbol{"Foo"sv};
-    SWIRLY_CHECK(!symbol.empty());
-    SWIRLY_CHECK(symbol.size() == 3UL);
-    SWIRLY_CHECK(symbol.compare("Foo"sv) == 0);
-    SWIRLY_CHECK(symbol == Symbol{"Foo"sv});
+    BOOST_TEST(!symbol.empty());
+    BOOST_TEST(symbol.size() == 3UL);
+    BOOST_TEST(symbol.compare("Foo"sv) == 0);
+    BOOST_TEST(symbol == Symbol{"Foo"sv});
 }
 
-SWIRLY_TEST_CASE(SymbolUpperBound)
+BOOST_AUTO_TEST_CASE(SymbolUpperBoundCase)
 {
     Symbol symbol{"0123456789ABCDEFx"sv};
-    SWIRLY_CHECK(symbol.size() == MaxSymbol);
-    SWIRLY_CHECK(symbol == "0123456789ABCDEF"sv);
+    BOOST_TEST(symbol.size() == MaxSymbol);
+    BOOST_TEST(symbol == "0123456789ABCDEF"sv);
 
     symbol = "0123456789abcdefx"sv;
-    SWIRLY_CHECK(symbol.size() == MaxSymbol);
-    SWIRLY_CHECK(symbol == "0123456789abcdef"sv);
+    BOOST_TEST(symbol.size() == MaxSymbol);
+    BOOST_TEST(symbol == "0123456789abcdef"sv);
 }
 
-SWIRLY_TEST_CASE(SymbolIndex)
+BOOST_AUTO_TEST_CASE(SymbolIndexCase)
 {
     Symbol symbol{"Bar"sv};
-    SWIRLY_CHECK(symbol[0] == 'B');
-    SWIRLY_CHECK(symbol[1] == 'a');
-    SWIRLY_CHECK(symbol[2] == 'r');
-    SWIRLY_CHECK(symbol.front() == 'B');
-    SWIRLY_CHECK(symbol.back() == 'r');
+    BOOST_TEST(symbol[0] == 'B');
+    BOOST_TEST(symbol[1] == 'a');
+    BOOST_TEST(symbol[2] == 'r');
+    BOOST_TEST(symbol.front() == 'B');
+    BOOST_TEST(symbol.back() == 'r');
 }
 
-SWIRLY_TEST_CASE(SymbolClear)
+BOOST_AUTO_TEST_CASE(SymbolClearCase)
 {
     Symbol symbol{"Foo"sv};
     symbol.clear();
-    SWIRLY_CHECK(symbol.empty());
+    BOOST_TEST(symbol.empty());
 }
+
+BOOST_AUTO_TEST_SUITE_END()

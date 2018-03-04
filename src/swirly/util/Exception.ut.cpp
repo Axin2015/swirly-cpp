@@ -16,12 +16,17 @@
  */
 #include "Exception.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 using namespace swirly;
 
-SWIRLY_TEST_CASE(Exception)
+BOOST_AUTO_TEST_SUITE(ExceptionSuite)
+
+BOOST_AUTO_TEST_CASE(ExceptionCase)
 {
     Exception e{"Foo"};
-    SWIRLY_CHECK(strcmp(e.what(), "Foo") == 0);
+    BOOST_TEST(strcmp(e.what(), "Foo") == 0);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

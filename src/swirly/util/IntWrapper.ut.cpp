@@ -16,7 +16,8 @@
  */
 #include "IntWrapper.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 #include <boost/lexical_cast.hpp>
 
@@ -37,239 +38,245 @@ constexpr Test operator""_test(unsigned long long val) noexcept
 
 } // namespace
 
-SWIRLY_TEST_CASE(IntAddAssign)
+BOOST_AUTO_TEST_SUITE(IntWrapperSuite)
+
+BOOST_AUTO_TEST_CASE(IntAddAssignCase)
 {
     auto x = 5_test;
-    SWIRLY_CHECK((x += 3_test) == 8_test);
-    SWIRLY_CHECK(x == 8_test);
+    BOOST_TEST((x += 3_test) == 8_test);
+    BOOST_TEST(x == 8_test);
 }
 
-SWIRLY_TEST_CASE(IntSubAssign)
+BOOST_AUTO_TEST_CASE(IntSubAssignCase)
 {
     auto x = 5_test;
-    SWIRLY_CHECK((x -= 3_test) == 2_test);
-    SWIRLY_CHECK(x == 2_test);
+    BOOST_TEST((x -= 3_test) == 2_test);
+    BOOST_TEST(x == 2_test);
 }
 
-SWIRLY_TEST_CASE(IntMulAssign)
+BOOST_AUTO_TEST_CASE(IntMulAssignCase)
 {
     auto x = 5_test;
-    SWIRLY_CHECK((x *= 3_test) == 15_test);
-    SWIRLY_CHECK(x == 15_test);
+    BOOST_TEST((x *= 3_test) == 15_test);
+    BOOST_TEST(x == 15_test);
 }
 
-SWIRLY_TEST_CASE(IntDivAssign)
+BOOST_AUTO_TEST_CASE(IntDivAssignCase)
 {
     auto x = 15_test;
-    SWIRLY_CHECK((x /= 3_test) == 5_test);
-    SWIRLY_CHECK(x == 5_test);
+    BOOST_TEST((x /= 3_test) == 5_test);
+    BOOST_TEST(x == 5_test);
 }
 
-SWIRLY_TEST_CASE(IntModAssign)
+BOOST_AUTO_TEST_CASE(IntModAssignCase)
 {
     auto x = 5_test;
-    SWIRLY_CHECK((x %= 3_test) == 2_test);
-    SWIRLY_CHECK(x == 2_test);
+    BOOST_TEST((x %= 3_test) == 2_test);
+    BOOST_TEST(x == 2_test);
 }
 
-SWIRLY_TEST_CASE(IntBitwiseAndAssign)
+BOOST_AUTO_TEST_CASE(IntBitwiseAndAssignCase)
 {
     // 11100
     // 00111
     // 00100
     auto x = 28_test;
-    SWIRLY_CHECK((x &= 7_test) == 4_test);
-    SWIRLY_CHECK(x == 4_test);
+    BOOST_TEST((x &= 7_test) == 4_test);
+    BOOST_TEST(x == 4_test);
 }
 
-SWIRLY_TEST_CASE(IntBitwiseOrAssign)
+BOOST_AUTO_TEST_CASE(IntBitwiseOrAssignCase)
 {
     // 11100
     // 00111
     // 11111
     auto x = 28_test;
-    SWIRLY_CHECK((x |= 7_test) == 31_test);
-    SWIRLY_CHECK(x == 31_test);
+    BOOST_TEST((x |= 7_test) == 31_test);
+    BOOST_TEST(x == 31_test);
 }
 
-SWIRLY_TEST_CASE(IntBitwiseXorAssign)
+BOOST_AUTO_TEST_CASE(IntBitwiseXorAssignCase)
 {
     // 11100
     // 00111
     // 11011
     auto x = 28_test;
-    SWIRLY_CHECK((x ^= 7_test) == 27_test);
-    SWIRLY_CHECK(x == 27_test);
+    BOOST_TEST((x ^= 7_test) == 27_test);
+    BOOST_TEST(x == 27_test);
 }
 
-SWIRLY_TEST_CASE(IntLeftShiftAssign)
+BOOST_AUTO_TEST_CASE(IntLeftShiftAssignCase)
 {
     // 00111
     // 11100
     auto x = 7_test;
-    SWIRLY_CHECK((x <<= 2_test) == 28_test);
-    SWIRLY_CHECK(x == 28_test);
+    BOOST_TEST((x <<= 2_test) == 28_test);
+    BOOST_TEST(x == 28_test);
 }
 
-SWIRLY_TEST_CASE(IntRightShiftAssign)
+BOOST_AUTO_TEST_CASE(IntRightShiftAssignCase)
 {
     // 11100
     // 00111
     auto x = 28_test;
-    SWIRLY_CHECK((x >>= 2_test) == 7_test);
-    SWIRLY_CHECK(x == 7_test);
+    BOOST_TEST((x >>= 2_test) == 7_test);
+    BOOST_TEST(x == 7_test);
 }
 
-SWIRLY_TEST_CASE(IntPreInc)
+BOOST_AUTO_TEST_CASE(IntPreIncCase)
 {
     auto x = 5_test;
-    SWIRLY_CHECK(++x == 6_test);
-    SWIRLY_CHECK(x == 6_test);
+    BOOST_TEST(++x == 6_test);
+    BOOST_TEST(x == 6_test);
 }
 
-SWIRLY_TEST_CASE(IntPreDec)
+BOOST_AUTO_TEST_CASE(IntPreDecCase)
 {
     auto x = 5_test;
-    SWIRLY_CHECK(--x == 4_test);
-    SWIRLY_CHECK(x == 4_test);
+    BOOST_TEST(--x == 4_test);
+    BOOST_TEST(x == 4_test);
 }
 
-SWIRLY_TEST_CASE(IntPostInc)
+BOOST_AUTO_TEST_CASE(IntPostIncCase)
 {
     auto x = 5_test;
-    SWIRLY_CHECK(x++ == 5_test);
-    SWIRLY_CHECK(x == 6_test);
+    BOOST_TEST(x++ == 5_test);
+    BOOST_TEST(x == 6_test);
 }
 
-SWIRLY_TEST_CASE(IntPostDec)
+BOOST_AUTO_TEST_CASE(IntPostDecCase)
 {
     auto x = 5_test;
-    SWIRLY_CHECK(x-- == 5_test);
-    SWIRLY_CHECK(x == 4_test);
+    BOOST_TEST(x-- == 5_test);
+    BOOST_TEST(x == 4_test);
 }
 
-SWIRLY_TEST_CASE(IntUnaryPlus)
+BOOST_AUTO_TEST_CASE(IntUnaryPlusCase)
 {
     constexpr auto x = 5_test;
-    SWIRLY_CHECK(+x == 5_test);
+    BOOST_TEST(+x == 5_test);
 }
 
-SWIRLY_TEST_CASE(IntUnaryMinus)
+BOOST_AUTO_TEST_CASE(IntUnaryMinusCase)
 {
     constexpr auto x = 5_test;
-    SWIRLY_CHECK(-x == -5_test);
+    BOOST_TEST(-x == -5_test);
 }
 
-SWIRLY_TEST_CASE(IntAdd)
+BOOST_AUTO_TEST_CASE(IntAddCase)
 {
     constexpr auto x = 5_test;
-    SWIRLY_CHECK((x + 3_test) == 8_test);
+    BOOST_TEST((x + 3_test) == 8_test);
 }
 
-SWIRLY_TEST_CASE(IntSub)
+BOOST_AUTO_TEST_CASE(IntSubCase)
 {
     constexpr auto x = 5_test;
-    SWIRLY_CHECK((x - 3_test) == 2_test);
+    BOOST_TEST((x - 3_test) == 2_test);
 }
 
-SWIRLY_TEST_CASE(IntMul)
+BOOST_AUTO_TEST_CASE(IntMulCase)
 {
     constexpr auto x = 5_test;
-    SWIRLY_CHECK((x * 3_test) == 15_test);
+    BOOST_TEST((x * 3_test) == 15_test);
 }
 
-SWIRLY_TEST_CASE(IntDiv)
+BOOST_AUTO_TEST_CASE(IntDivCase)
 {
     constexpr auto x = 15_test;
-    SWIRLY_CHECK(x / 3_test == 5_test);
+    BOOST_TEST(x / 3_test == 5_test);
 }
 
-SWIRLY_TEST_CASE(IntMod)
+BOOST_AUTO_TEST_CASE(IntModCase)
 {
     constexpr auto x = 5_test;
-    SWIRLY_CHECK((x % 3_test) == 2_test);
+    BOOST_TEST((x % 3_test) == 2_test);
 }
 
-SWIRLY_TEST_CASE(IntBitwiseNot)
+BOOST_AUTO_TEST_CASE(IntBitwiseNotCase)
 {
     constexpr auto x = Test{~1};
-    SWIRLY_CHECK(~x == 1_test);
+    BOOST_TEST(~x == 1_test);
 }
 
-SWIRLY_TEST_CASE(IntBitwiseAnd)
+BOOST_AUTO_TEST_CASE(IntBitwiseAndCase)
 {
     // 11100
     // 00111
     // 00100
     constexpr auto x = 28_test;
-    SWIRLY_CHECK((x & 7_test) == 4_test);
+    BOOST_TEST((x & 7_test) == 4_test);
 }
 
-SWIRLY_TEST_CASE(IntBitwiseOr)
+BOOST_AUTO_TEST_CASE(IntBitwiseOrCase)
 {
     // 11100
     // 00111
     // 11111
     constexpr auto x = 28_test;
-    SWIRLY_CHECK((x | 7_test) == 31_test);
+    BOOST_TEST((x | 7_test) == 31_test);
 }
 
-SWIRLY_TEST_CASE(IntBitwiseXor)
+BOOST_AUTO_TEST_CASE(IntBitwiseXorCase)
 {
     // 11100
     // 00111
     // 11011
     constexpr auto x = 28_test;
-    SWIRLY_CHECK((x ^ 7_test) == 27_test);
+    BOOST_TEST((x ^ 7_test) == 27_test);
 }
 
-SWIRLY_TEST_CASE(IntLeftShift)
+BOOST_AUTO_TEST_CASE(IntLeftShiftCase)
 {
     // 00111
     // 11100
     constexpr auto x = 7_test;
-    SWIRLY_CHECK((x << 2_test) == 28_test);
+    BOOST_TEST((x << 2_test) == 28_test);
 }
 
-SWIRLY_TEST_CASE(IntRightShift)
+BOOST_AUTO_TEST_CASE(IntRightShiftCase)
 {
     // 11100
     // 00111
     constexpr auto x = 28_test;
-    SWIRLY_CHECK((x >> 2_test) == 7_test);
+    BOOST_TEST((x >> 2_test) == 7_test);
 }
 
-SWIRLY_TEST_CASE(IntEqualTo)
+BOOST_AUTO_TEST_CASE(IntEqualToCase)
 {
-    SWIRLY_CHECK(5_test == 5_test);
+    BOOST_TEST(5_test == 5_test);
 }
 
-SWIRLY_TEST_CASE(IntNotEqualTo)
+BOOST_AUTO_TEST_CASE(IntNotEqualToCase)
 {
-    SWIRLY_CHECK(5_test != 7_test);
+    BOOST_TEST(5_test != 7_test);
 }
 
-SWIRLY_TEST_CASE(IntLessThan)
+BOOST_AUTO_TEST_CASE(IntLessThanCase)
 {
-    SWIRLY_CHECK(5_test < 7_test);
+    BOOST_TEST(5_test < 7_test);
 }
 
-SWIRLY_TEST_CASE(IntGreaterThan)
+BOOST_AUTO_TEST_CASE(IntGreaterThanCase)
 {
-    SWIRLY_CHECK(5_test > 3_test);
+    BOOST_TEST(5_test > 3_test);
 }
 
-SWIRLY_TEST_CASE(IntLessThanOrEqualTo)
+BOOST_AUTO_TEST_CASE(IntLessThanOrEqualToCase)
 {
-    SWIRLY_CHECK(5_test <= 5_test && 5_test <= 7_test);
+    BOOST_TEST(5_test <= 5_test);
+    BOOST_TEST(5_test <= 7_test);
 }
 
-SWIRLY_TEST_CASE(IntGreaterThanOrEqualTo)
+BOOST_AUTO_TEST_CASE(IntGreaterThanOrEqualToCase)
 {
-    SWIRLY_CHECK(5_test >= 5_test && 5_test >= 3_test);
+    BOOST_TEST(5_test >= 5_test);
+    BOOST_TEST(5_test >= 3_test);
 }
 
-SWIRLY_TEST_CASE(IntInsertion)
+BOOST_AUTO_TEST_CASE(IntInsertionCase)
 {
-    SWIRLY_CHECK(lexical_cast<string>(5_test) == "5");
+    BOOST_TEST(lexical_cast<string>(5_test) == "5");
 }
+
+BOOST_AUTO_TEST_SUITE_END()

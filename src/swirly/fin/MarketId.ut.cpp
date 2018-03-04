@@ -16,12 +16,17 @@
  */
 #include "MarketId.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 using namespace swirly;
 
-SWIRLY_TEST_CASE(toMarketId)
+BOOST_AUTO_TEST_SUITE(MarketIdSuite)
+
+BOOST_AUTO_TEST_CASE(toMarketIdCase)
 {
     const auto id = toMarketId(171_id32, 2492719_jd);
-    SWIRLY_CHECK(id == 0xabcdef_id64);
+    BOOST_TEST(id == 0xabcdef_id64);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

@@ -16,14 +16,17 @@
  */
 #include "Config.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 #include <map>
 
 using namespace std;
 using namespace swirly;
 
-SWIRLY_TEST_CASE(ParsePairs)
+BOOST_AUTO_TEST_SUITE(ConfigSuite)
+
+BOOST_AUTO_TEST_CASE(ParsePairsCase)
 {
     const string text{R"(
 # comment
@@ -42,12 +45,14 @@ st = = uv =
     istringstream is{text};
     map<string, string> conf;
     parsePairs(is, [&conf](const auto& key, const auto& val) { conf.emplace(key, val); });
-    SWIRLY_CHECK(conf.size() == 7);
-    SWIRLY_CHECK(conf["ab"] == "");
-    SWIRLY_CHECK(conf["cd"] == "");
-    SWIRLY_CHECK(conf["ef"] == "gh");
-    SWIRLY_CHECK(conf[""] == "ij");
-    SWIRLY_CHECK(conf["kl"] == "mn");
-    SWIRLY_CHECK(conf["op"] == "qr");
-    SWIRLY_CHECK(conf["st"] == "= uv =");
+    BOOST_TEST(conf.size() == 7);
+    BOOST_TEST(conf["ab"] == "");
+    BOOST_TEST(conf["cd"] == "");
+    BOOST_TEST(conf["ef"] == "gh");
+    BOOST_TEST(conf[""] == "ij");
+    BOOST_TEST(conf["kl"] == "mn");
+    BOOST_TEST(conf["op"] == "qr");
+    BOOST_TEST(conf["st"] == "= uv =");
 }
+
+BOOST_AUTO_TEST_SUITE_END()

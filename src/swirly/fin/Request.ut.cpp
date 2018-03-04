@@ -16,7 +16,8 @@
  */
 #include "Request.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 using namespace std;
 using namespace swirly;
@@ -43,32 +44,36 @@ using FooPtr = boost::intrusive_ptr<Foo>;
 
 } // namespace
 
-SWIRLY_TEST_CASE(RequestIdSet)
+BOOST_AUTO_TEST_SUITE(RequestSuite)
+
+BOOST_AUTO_TEST_CASE(RequestIdSetCase)
 {
     int alive{0};
     {
         RequestIdSet<Foo> s;
 
         FooPtr foo1{&*s.emplace(1_id64, 2_id64, alive)};
-        SWIRLY_CHECK(alive == 1);
-        SWIRLY_CHECK(foo1->refCount() == 2);
-        SWIRLY_CHECK(foo1->marketId() == 1_id64);
-        SWIRLY_CHECK(foo1->id() == 2_id64);
-        SWIRLY_CHECK(s.find(1_id64, 2_id64) != s.end());
+        BOOST_TEST(alive == 1);
+        BOOST_TEST(foo1->refCount() == 2);
+        BOOST_TEST(foo1->marketId() == 1_id64);
+        BOOST_TEST(foo1->id() == 2_id64);
+        BOOST_TEST(s.find(1_id64, 2_id64) != s.end());
 
         // Duplicate.
         FooPtr foo2{&*s.emplace(1_id64, 2_id64, alive)};
-        SWIRLY_CHECK(alive == 1);
-        SWIRLY_CHECK(foo2->refCount() == 3);
-        SWIRLY_CHECK(foo2 == foo1);
+        BOOST_TEST(alive == 1);
+        BOOST_TEST(foo2->refCount() == 3);
+        BOOST_TEST(foo2 == foo1);
 
         // Replace.
         FooPtr foo3{&*s.emplaceOrReplace(1_id64, 2_id64, alive)};
-        SWIRLY_CHECK(alive == 2);
-        SWIRLY_CHECK(foo3->refCount() == 2);
-        SWIRLY_CHECK(foo3 != foo1);
-        SWIRLY_CHECK(foo3->marketId() == 1_id64);
-        SWIRLY_CHECK(foo3->id() == 2_id64);
+        BOOST_TEST(alive == 2);
+        BOOST_TEST(foo3->refCount() == 2);
+        BOOST_TEST(foo3 != foo1);
+        BOOST_TEST(foo3->marketId() == 1_id64);
+        BOOST_TEST(foo3->id() == 2_id64);
     }
-    SWIRLY_CHECK(alive == 0);
+    BOOST_TEST(alive == 0);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

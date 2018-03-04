@@ -16,7 +16,8 @@
  */
 #include "Handle.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 #include <iostream>
 
@@ -33,80 +34,90 @@ struct TestPolicy {
 };
 
 using TestHandle = Handle<TestPolicy>;
+
+ostream& operator<<(ostream& os, const TestHandle& h)
+{
+    return os << h.get();
+}
+
 } // namespace
 
-SWIRLY_TEST_CASE(HandleInvalid)
+BOOST_AUTO_TEST_SUITE(HandleSuite)
+
+BOOST_AUTO_TEST_CASE(HandleInvalidCase)
 {
     lastClosed = 0;
 
-    SWIRLY_CHECK(!TestHandle{});
-    SWIRLY_CHECK(TestHandle{}.get() == -1);
-    SWIRLY_CHECK(lastClosed == 0);
+    BOOST_TEST(!TestHandle{});
+    BOOST_TEST(TestHandle{}.get() == -1);
+    BOOST_TEST(lastClosed == 0);
 
-    SWIRLY_CHECK(!TestHandle{nullptr});
-    SWIRLY_CHECK(TestHandle{nullptr}.get() == -1);
-    SWIRLY_CHECK(lastClosed == 0);
+    BOOST_TEST(!TestHandle{nullptr});
+    BOOST_TEST(TestHandle{nullptr}.get() == -1);
+    BOOST_TEST(lastClosed == 0);
 }
 
-SWIRLY_TEST_CASE(HandleClose)
+BOOST_AUTO_TEST_CASE(HandleCloseCase)
 {
     lastClosed = 0;
 
-    SWIRLY_CHECK(TestHandle{1});
-    SWIRLY_CHECK(TestHandle{1}.get() == 1);
-    SWIRLY_CHECK(lastClosed == 1);
+    BOOST_TEST(TestHandle{1});
+    BOOST_TEST(TestHandle{1}.get() == 1);
+    BOOST_TEST(lastClosed == 1);
 }
 
-SWIRLY_TEST_CASE(HandleRelease)
+BOOST_AUTO_TEST_CASE(HandleReleaseCase)
 {
     lastClosed = 0;
 
-    SWIRLY_CHECK(TestHandle{1}.release() == 1);
-    SWIRLY_CHECK(lastClosed == 0);
+    BOOST_TEST(TestHandle{1}.release() == 1);
+    BOOST_TEST(lastClosed == 0);
 }
 
-SWIRLY_TEST_CASE(HandleReset)
+BOOST_AUTO_TEST_CASE(HandleResetCase)
 {
     lastClosed = 0;
     {
         TestHandle h{1};
         h.reset(2);
-        SWIRLY_CHECK(lastClosed == 1);
+        BOOST_TEST(lastClosed == 1);
     }
-    SWIRLY_CHECK(lastClosed == 2);
+    BOOST_TEST(lastClosed == 2);
 }
 
-SWIRLY_TEST_CASE(HandleSwap)
+BOOST_AUTO_TEST_CASE(HandleSwapCase)
 {
     lastClosed = 0;
     {
         TestHandle h{1};
         TestHandle{2}.swap(h);
-        SWIRLY_CHECK(lastClosed == 1);
+        BOOST_TEST(lastClosed == 1);
     }
-    SWIRLY_CHECK(lastClosed == 2);
+    BOOST_TEST(lastClosed == 2);
 }
 
-SWIRLY_TEST_CASE(HandleMove)
+BOOST_AUTO_TEST_CASE(HandleMoveCase)
 {
     lastClosed = 0;
 
     TestHandle h{1};
     TestHandle{move(h)};
-    SWIRLY_CHECK(lastClosed == 1);
-    SWIRLY_CHECK(h.get() == -1);
+    BOOST_TEST(lastClosed == 1);
+    BOOST_TEST(h.get() == -1);
 
     h.reset(2);
     {
         TestHandle tmp;
         tmp = move(h);
     }
-    SWIRLY_CHECK(lastClosed == 2);
-    SWIRLY_CHECK(h.get() == -1);
+    BOOST_TEST(lastClosed == 2);
+    BOOST_TEST(h.get() == -1);
 }
 
-SWIRLY_TEST_CASE(HandleEquality)
+BOOST_AUTO_TEST_CASE(HandleEqualityCase)
 {
-    SWIRLY_CHECK(TestHandle{1} == TestHandle{1});
-    SWIRLY_CHECK(TestHandle{1} != TestHandle{2});
+    BOOST_TEST(TestHandle{1} == TestHandle{1});
+    BOOST_TEST(TestHandle{1} != TestHandle{2});
 }
+
+BOOST_AUTO_TEST_SUITE_END()

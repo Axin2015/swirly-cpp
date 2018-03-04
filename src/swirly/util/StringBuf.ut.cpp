@@ -16,7 +16,8 @@
  */
 #include "StringBuf.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 using namespace std;
 using namespace swirly;
@@ -25,65 +26,69 @@ namespace {
 constexpr string_view Name = "string_view"sv;
 } // namespace
 
-SWIRLY_TEST_CASE(StringBufEmpty)
+BOOST_AUTO_TEST_SUITE(StringBufSuite)
+
+BOOST_AUTO_TEST_CASE(StringBufEmptyCase)
 {
     StringBuf<3> sb;
-    SWIRLY_CHECK(sb.empty());
-    SWIRLY_CHECK(sb.size() == 0UL);
-    SWIRLY_CHECK(sb.compare(""sv) == 0);
-    SWIRLY_CHECK(sb == StringBuf<3>{""sv});
+    BOOST_TEST(sb.empty());
+    BOOST_TEST(sb.size() == 0UL);
+    BOOST_TEST(sb.compare(""sv) == 0);
+    BOOST_TEST(sb == StringBuf<3>{""sv});
 }
 
-SWIRLY_TEST_CASE(StringBufNonEmpty)
+BOOST_AUTO_TEST_CASE(StringBufNonEmptyCase)
 {
     StringBuf<3> sb{"Foo"sv};
-    SWIRLY_CHECK(!sb.empty());
-    SWIRLY_CHECK(sb.size() == 3UL);
-    SWIRLY_CHECK(sb.compare("Foo"sv) == 0);
-    SWIRLY_CHECK(sb == StringBuf<3>{"Foo"sv});
+    BOOST_TEST(!sb.empty());
+    BOOST_TEST(sb.size() == 3UL);
+    BOOST_TEST(sb.compare("Foo"sv) == 0);
+    BOOST_TEST(sb == StringBuf<3>{"Foo"sv});
 }
 
-SWIRLY_TEST_CASE(StringBufUpperBound)
+BOOST_AUTO_TEST_CASE(StringBufUpperBoundCase)
 {
     StringBuf<3> sb{"Foox"sv};
-    SWIRLY_CHECK(sb.size() == 3UL);
-    SWIRLY_CHECK(sb == "Foo"sv);
+    BOOST_TEST(sb.size() == 3UL);
+    BOOST_TEST(sb == "Foo"sv);
 
     sb = "Barx"sv;
-    SWIRLY_CHECK(sb.size() == 3UL);
-    SWIRLY_CHECK(sb == "Bar"sv);
+    BOOST_TEST(sb.size() == 3UL);
+    BOOST_TEST(sb == "Bar"sv);
 }
 
-SWIRLY_TEST_CASE(StringBufClear)
+BOOST_AUTO_TEST_CASE(StringBufClearCase)
 {
     StringBuf<3> sb{"Foo"sv};
     sb.clear();
-    SWIRLY_CHECK(sb.empty());
+    BOOST_TEST(sb.empty());
 }
 
-SWIRLY_TEST_CASE(StringBufAssign)
+BOOST_AUTO_TEST_CASE(StringBufAssignCase)
 {
     StringBuf<3> sb;
     sb = "Foo"sv;
-    SWIRLY_CHECK(sb.size() == 3UL);
-    SWIRLY_CHECK(sb == "Foo"sv);
+    BOOST_TEST(sb.size() == 3UL);
+    BOOST_TEST(sb == "Foo"sv);
 
     sb.clear();
     sb = "Foox"sv;
-    SWIRLY_CHECK(sb.size() == 3UL);
-    SWIRLY_CHECK(sb == "Foo"sv);
+    BOOST_TEST(sb.size() == 3UL);
+    BOOST_TEST(sb == "Foo"sv);
 }
 
-SWIRLY_TEST_CASE(StringBufAppend)
+BOOST_AUTO_TEST_CASE(StringBufAppendCase)
 {
     StringBuf<6> sb;
     sb = "Foo"sv;
     sb += "Bar"sv;
-    SWIRLY_CHECK(sb.size() == 6UL);
-    SWIRLY_CHECK(sb == "FooBar"sv);
+    BOOST_TEST(sb.size() == 6UL);
+    BOOST_TEST(sb == "FooBar"sv);
 
     sb = "Foo"sv;
     sb += "Barx"sv;
-    SWIRLY_CHECK(sb.size() == 6UL);
-    SWIRLY_CHECK(sb == "FooBar"sv);
+    BOOST_TEST(sb.size() == 6UL);
+    BOOST_TEST(sb == "FooBar"sv);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

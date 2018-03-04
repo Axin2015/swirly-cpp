@@ -17,10 +17,12 @@ if(ENABLE_SHARED_LIBS)
   add_custom_target(swirly_web DEPENDS
     swirly_web_static
     swirly_web_shared
+    swirly_web_test
   )
 else()
   add_custom_target(swirly_web DEPENDS
     swirly_web_static
+    swirly_web_test
   )
 endif()
 
@@ -64,10 +66,12 @@ set(test_SOURCES
   RestBody.ut.cpp
   Url.ut.cpp)
 
+add_executable(swirly_web_test
+  ${test_SOURCES}
+  Main.ut.cpp)
+target_link_libraries(swirly_web_test ${swirly_web_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+
 foreach(file ${test_SOURCES})
   get_filename_component (name ${file} NAME_WE)
-  set(name "swirly_web_${name}")
-  add_executable(${name} ${file})
-  target_link_libraries(${name} ${swirly_web_LIBRARY} ${swirly_unit_LIBRARY})
-  add_test(NAME ${name} COMMAND ${name})
+  add_test(NAME web::${name}Suite COMMAND swirly_web_test -l error -t ${name}Suite)
 endforeach()

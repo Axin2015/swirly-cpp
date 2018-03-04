@@ -16,30 +16,43 @@
  */
 #include "Date.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
+
+namespace std::chrono {
+template <typename RepT, typename PeriodT>
+ostream& operator<<(ostream& os, duration<RepT, PeriodT> d)
+{
+    return os << d.count();
+}
+} // namespace std::chrono
 
 using namespace std;
 using namespace swirly;
 
-SWIRLY_TEST_CASE(YmdToIso)
+BOOST_AUTO_TEST_SUITE(DateSuite)
+
+BOOST_AUTO_TEST_CASE(YmdToIsoCase)
 {
-    SWIRLY_CHECK(20140314_ymd == ymdToIso(2014, 2, 14));
+    BOOST_TEST(20140314_ymd == ymdToIso(2014, 2, 14));
 }
 
-SWIRLY_TEST_CASE(YmdToJd)
+BOOST_AUTO_TEST_CASE(YmdToJdCase)
 {
-    SWIRLY_CHECK(2456731_jd == ymdToJd(2014, 2, 14));
+    BOOST_TEST(2456731_jd == ymdToJd(2014, 2, 14));
     // AD 1978 January 1, 0h UT is JD 2443509.5 and AD 1978 July 21, 15h UT, is JD 2443711.125.
-    SWIRLY_CHECK(2443510_jd == ymdToJd(1978, 0, 1));
-    SWIRLY_CHECK(2443711_jd == ymdToJd(1978, 6, 21));
+    BOOST_TEST(2443510_jd == ymdToJd(1978, 0, 1));
+    BOOST_TEST(2443711_jd == ymdToJd(1978, 6, 21));
 }
 
-SWIRLY_TEST_CASE(JdToIso)
+BOOST_AUTO_TEST_CASE(JdToIsoCase)
 {
-    SWIRLY_CHECK(20140314_ymd == jdToIso(ymdToJd(2014, 2, 14)));
+    BOOST_TEST(20140314_ymd == jdToIso(ymdToJd(2014, 2, 14)));
 }
 
-SWIRLY_TEST_CASE(JdToTime)
+BOOST_AUTO_TEST_CASE(JdToTimeCase)
 {
-    SWIRLY_CHECK(1394798400000ms == jdToTime(ymdToJd(2014, 2, 14)).time_since_epoch());
+    BOOST_TEST(1394798400000ms == jdToTime(ymdToJd(2014, 2, 14)).time_since_epoch());
 }
+
+BOOST_AUTO_TEST_SUITE_END()

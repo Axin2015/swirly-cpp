@@ -20,10 +20,19 @@
 
 #include <swirly/util/String.hpp>
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 #include <iostream>
 #include <vector>
+
+namespace std {
+template <typename T, typename U>
+ostream& operator<<(ostream& os, const pair<T, U>& p)
+{
+    return os << '(' << p.first << ',' << p.second << ')';
+}
+} // namespace std
 
 using namespace std;
 using namespace swirly;
@@ -107,45 +116,47 @@ class HttpParser
 
 } // namespace
 
-SWIRLY_TEST_CASE(HttpInitialRequestLine)
+BOOST_AUTO_TEST_SUITE(HttpParserSuite)
+
+BOOST_AUTO_TEST_CASE(HttpInitialRequestLineCase)
 {
     constexpr auto Message =                        //
         "GET /path/to/file/index.html HTTP/1.0\r\n" //
         "\r\n"sv;
 
     HttpParser h{HttpType::Request};
-    SWIRLY_CHECK(h.parse(Message) == Message.size());
-    SWIRLY_CHECK(!h.shouldKeepAlive());
-    SWIRLY_CHECK(h.httpMajor() == 1);
-    SWIRLY_CHECK(h.httpMinor() == 0);
+    BOOST_TEST(h.parse(Message) == Message.size());
+    BOOST_TEST(!h.shouldKeepAlive());
+    BOOST_TEST(h.httpMajor() == 1);
+    BOOST_TEST(h.httpMinor() == 0);
 
-    SWIRLY_CHECK(h.method() == HttpMethod::Get);
-    SWIRLY_CHECK(h.url() == "/path/to/file/index.html"s);
+    BOOST_TEST(h.method() == HttpMethod::Get);
+    BOOST_TEST(h.url() == "/path/to/file/index.html"s);
 
-    SWIRLY_CHECK(h.headers().empty());
-    SWIRLY_CHECK(h.body().empty());
+    BOOST_TEST(h.headers().empty());
+    BOOST_TEST(h.body().empty());
 }
 
-SWIRLY_TEST_CASE(HttpInitialResponseLine)
+BOOST_AUTO_TEST_CASE(HttpInitialResponseLineCase)
 {
     constexpr auto Message =         //
         "HTTP/1.0 404 Not Found\r\n" //
         "\r\n"sv;
 
     HttpParser h{HttpType::Response};
-    SWIRLY_CHECK(h.parse(Message) == Message.size());
-    SWIRLY_CHECK(!h.shouldKeepAlive());
-    SWIRLY_CHECK(h.httpMajor() == 1);
-    SWIRLY_CHECK(h.httpMinor() == 0);
+    BOOST_TEST(h.parse(Message) == Message.size());
+    BOOST_TEST(!h.shouldKeepAlive());
+    BOOST_TEST(h.httpMajor() == 1);
+    BOOST_TEST(h.httpMinor() == 0);
 
-    SWIRLY_CHECK(h.statusCode() == 404);
-    SWIRLY_CHECK(h.status() == "Not Found"s);
+    BOOST_TEST(h.statusCode() == 404);
+    BOOST_TEST(h.status() == "Not Found"s);
 
-    SWIRLY_CHECK(h.headers().empty());
-    SWIRLY_CHECK(h.body().empty());
+    BOOST_TEST(h.headers().empty());
+    BOOST_TEST(h.body().empty());
 }
 
-SWIRLY_TEST_CASE(HttpBasicRequest)
+BOOST_AUTO_TEST_CASE(HttpBasicRequestCase)
 {
     constexpr auto Message =                 //
         "GET /path/file.html HTTP/1.0\r\n"   //
@@ -154,22 +165,22 @@ SWIRLY_TEST_CASE(HttpBasicRequest)
         "\r\n"sv;
 
     HttpParser h{HttpType::Request};
-    SWIRLY_CHECK(h.parse(Message) == Message.size());
-    SWIRLY_CHECK(!h.shouldKeepAlive());
-    SWIRLY_CHECK(h.httpMajor() == 1);
-    SWIRLY_CHECK(h.httpMinor() == 0);
+    BOOST_TEST(h.parse(Message) == Message.size());
+    BOOST_TEST(!h.shouldKeepAlive());
+    BOOST_TEST(h.httpMajor() == 1);
+    BOOST_TEST(h.httpMinor() == 0);
 
-    SWIRLY_CHECK(h.method() == HttpMethod::Get);
-    SWIRLY_CHECK(h.url() == "/path/file.html"s);
+    BOOST_TEST(h.method() == HttpMethod::Get);
+    BOOST_TEST(h.url() == "/path/file.html"s);
 
-    SWIRLY_CHECK(h.headers().size() == 2);
-    SWIRLY_CHECK(h.headers()[0] == make_pair("From"s, "someuser@swirlycloud.com"s));
-    SWIRLY_CHECK(h.headers()[1] == make_pair("User-Agent"s, "HTTPTool/1.0"s));
+    BOOST_TEST(h.headers().size() == 2);
+    BOOST_TEST(h.headers()[0] == make_pair("From"s, "someuser@swirlycloud.com"s));
+    BOOST_TEST(h.headers()[1] == make_pair("User-Agent"s, "HTTPTool/1.0"s));
 
-    SWIRLY_CHECK(h.body().empty());
+    BOOST_TEST(h.body().empty());
 }
 
-SWIRLY_TEST_CASE(HttpBasicResponse)
+BOOST_AUTO_TEST_CASE(HttpBasicResponseCase)
 {
     constexpr auto Message =                      //
         "HTTP/1.0 200 OK\r\n"                     //
@@ -180,23 +191,23 @@ SWIRLY_TEST_CASE(HttpBasicResponse)
         "Hello, World!"sv;
 
     HttpParser h{HttpType::Response};
-    SWIRLY_CHECK(h.parse(Message) == Message.size());
-    SWIRLY_CHECK(!h.shouldKeepAlive());
-    SWIRLY_CHECK(h.httpMajor() == 1);
-    SWIRLY_CHECK(h.httpMinor() == 0);
+    BOOST_TEST(h.parse(Message) == Message.size());
+    BOOST_TEST(!h.shouldKeepAlive());
+    BOOST_TEST(h.httpMajor() == 1);
+    BOOST_TEST(h.httpMinor() == 0);
 
-    SWIRLY_CHECK(h.statusCode() == 200);
-    SWIRLY_CHECK(h.status() == "OK"s);
+    BOOST_TEST(h.statusCode() == 200);
+    BOOST_TEST(h.status() == "OK"s);
 
-    SWIRLY_CHECK(h.headers().size() == 3);
-    SWIRLY_CHECK(h.headers()[0] == make_pair("Date"s, "Fri, 31 Dec 1999 23:59:59 GMT"s));
-    SWIRLY_CHECK(h.headers()[1] == make_pair("Content-Type"s, "text/plain"s));
-    SWIRLY_CHECK(h.headers()[2] == make_pair("Content-Length"s, "13"s));
+    BOOST_TEST(h.headers().size() == 3);
+    BOOST_TEST(h.headers()[0] == make_pair("Date"s, "Fri, 31 Dec 1999 23:59:59 GMT"s));
+    BOOST_TEST(h.headers()[1] == make_pair("Content-Type"s, "text/plain"s));
+    BOOST_TEST(h.headers()[2] == make_pair("Content-Length"s, "13"s));
 
-    SWIRLY_CHECK(h.body() == "Hello, World!"s);
+    BOOST_TEST(h.body() == "Hello, World!"s);
 }
 
-SWIRLY_TEST_CASE(HttpPostRequest)
+BOOST_AUTO_TEST_CASE(HttpPostRequestCase)
 {
     constexpr auto Message =                                  //
         "POST /path/script.cgi HTTP/1.0\r\n"                  //
@@ -208,25 +219,24 @@ SWIRLY_TEST_CASE(HttpPostRequest)
         "home=Cosby&favorite+flavor=flies"sv;
 
     HttpParser h{HttpType::Request};
-    SWIRLY_CHECK(h.parse(Message) == Message.size());
-    SWIRLY_CHECK(!h.shouldKeepAlive());
-    SWIRLY_CHECK(h.httpMajor() == 1);
-    SWIRLY_CHECK(h.httpMinor() == 0);
+    BOOST_TEST(h.parse(Message) == Message.size());
+    BOOST_TEST(!h.shouldKeepAlive());
+    BOOST_TEST(h.httpMajor() == 1);
+    BOOST_TEST(h.httpMinor() == 0);
 
-    SWIRLY_CHECK(h.method() == HttpMethod::Post);
-    SWIRLY_CHECK(h.url() == "/path/script.cgi"s);
+    BOOST_TEST(h.method() == HttpMethod::Post);
+    BOOST_TEST(h.url() == "/path/script.cgi"s);
 
-    SWIRLY_CHECK(h.headers().size() == 4);
-    SWIRLY_CHECK(h.headers()[0] == make_pair("From"s, "frog@swirlycloud.com"s));
-    SWIRLY_CHECK(h.headers()[1] == make_pair("User-Agent"s, "HTTPTool/1.0"s));
-    SWIRLY_CHECK(h.headers()[2]
-                 == make_pair("Content-Type"s, "application/x-www-form-urlencoded"s));
-    SWIRLY_CHECK(h.headers()[3] == make_pair("Content-Length"s, "32"s));
+    BOOST_TEST(h.headers().size() == 4);
+    BOOST_TEST(h.headers()[0] == make_pair("From"s, "frog@swirlycloud.com"s));
+    BOOST_TEST(h.headers()[1] == make_pair("User-Agent"s, "HTTPTool/1.0"s));
+    BOOST_TEST(h.headers()[2] == make_pair("Content-Type"s, "application/x-www-form-urlencoded"s));
+    BOOST_TEST(h.headers()[3] == make_pair("Content-Length"s, "32"s));
 
-    SWIRLY_CHECK(h.body() == "home=Cosby&favorite+flavor=flies"s);
+    BOOST_TEST(h.body() == "home=Cosby&favorite+flavor=flies"s);
 }
 
-SWIRLY_TEST_CASE(HttpKeepAliveRequest)
+BOOST_AUTO_TEST_CASE(HttpKeepAliveRequestCase)
 {
     constexpr auto Message =               //
         "GET /path/file.html HTTP/1.1\r\n" //
@@ -234,21 +244,21 @@ SWIRLY_TEST_CASE(HttpKeepAliveRequest)
         "\r\n"sv;
 
     HttpParser h{HttpType::Request};
-    SWIRLY_CHECK(h.parse(Message) == Message.size());
-    SWIRLY_CHECK(h.shouldKeepAlive());
-    SWIRLY_CHECK(h.httpMajor() == 1);
-    SWIRLY_CHECK(h.httpMinor() == 1);
+    BOOST_TEST(h.parse(Message) == Message.size());
+    BOOST_TEST(h.shouldKeepAlive());
+    BOOST_TEST(h.httpMajor() == 1);
+    BOOST_TEST(h.httpMinor() == 1);
 
-    SWIRLY_CHECK(h.method() == HttpMethod::Get);
-    SWIRLY_CHECK(h.url() == "/path/file.html"s);
+    BOOST_TEST(h.method() == HttpMethod::Get);
+    BOOST_TEST(h.url() == "/path/file.html"s);
 
-    SWIRLY_CHECK(h.headers().size() == 1);
-    SWIRLY_CHECK(h.headers()[0] == make_pair("Host"s, "www.host1.com:80"s));
+    BOOST_TEST(h.headers().size() == 1);
+    BOOST_TEST(h.headers()[0] == make_pair("Host"s, "www.host1.com:80"s));
 
-    SWIRLY_CHECK(h.body().empty());
+    BOOST_TEST(h.body().empty());
 }
 
-SWIRLY_TEST_CASE(HttpChunkedResponse)
+BOOST_AUTO_TEST_CASE(HttpChunkedResponseCase)
 {
     constexpr auto Message =                      //
         "HTTP/1.1 200 OK\r\n"                     //
@@ -266,25 +276,25 @@ SWIRLY_TEST_CASE(HttpChunkedResponse)
         "\r\n"sv;
 
     HttpParser h{HttpType::Response};
-    SWIRLY_CHECK(h.parse(Message) == Message.size());
-    SWIRLY_CHECK(h.shouldKeepAlive());
-    SWIRLY_CHECK(h.httpMajor() == 1);
-    SWIRLY_CHECK(h.httpMinor() == 1);
+    BOOST_TEST(h.parse(Message) == Message.size());
+    BOOST_TEST(h.shouldKeepAlive());
+    BOOST_TEST(h.httpMajor() == 1);
+    BOOST_TEST(h.httpMinor() == 1);
 
-    SWIRLY_CHECK(h.statusCode() == 200);
-    SWIRLY_CHECK(h.status() == "OK"s);
+    BOOST_TEST(h.statusCode() == 200);
+    BOOST_TEST(h.status() == "OK"s);
 
-    SWIRLY_CHECK(h.headers().size() == 5);
-    SWIRLY_CHECK(h.headers()[0] == make_pair("Date"s, "Fri, 31 Dec 1999 23:59:59 GMT"s));
-    SWIRLY_CHECK(h.headers()[1] == make_pair("Content-Type"s, "text/plain"s));
-    SWIRLY_CHECK(h.headers()[2] == make_pair("Transfer-Encoding"s, "chunked"s));
-    SWIRLY_CHECK(h.headers()[3] == make_pair("some-footer"s, "some-value"s));
-    SWIRLY_CHECK(h.headers()[4] == make_pair("another-footer"s, "another-value"s));
+    BOOST_TEST(h.headers().size() == 5);
+    BOOST_TEST(h.headers()[0] == make_pair("Date"s, "Fri, 31 Dec 1999 23:59:59 GMT"s));
+    BOOST_TEST(h.headers()[1] == make_pair("Content-Type"s, "text/plain"s));
+    BOOST_TEST(h.headers()[2] == make_pair("Transfer-Encoding"s, "chunked"s));
+    BOOST_TEST(h.headers()[3] == make_pair("some-footer"s, "some-value"s));
+    BOOST_TEST(h.headers()[4] == make_pair("another-footer"s, "another-value"s));
 
-    SWIRLY_CHECK(h.body() == "abcdefghijklmnopqrstuvwxyz1234567890abcdef"s);
+    BOOST_TEST(h.body() == "abcdefghijklmnopqrstuvwxyz1234567890abcdef"s);
 }
 
-SWIRLY_TEST_CASE(HttpMultiResponse)
+BOOST_AUTO_TEST_CASE(HttpMultiResponseCase)
 {
     constexpr auto Message =                 //
         "POST /path/script.cgi HTTP/1.1\r\n" //
@@ -299,17 +309,19 @@ SWIRLY_TEST_CASE(HttpMultiResponse)
         "second"sv;
 
     HttpParser h{HttpType::Request};
-    SWIRLY_CHECK(h.parse(Message) == Message.size());
-    SWIRLY_CHECK(h.shouldKeepAlive());
-    SWIRLY_CHECK(h.httpMajor() == 1);
-    SWIRLY_CHECK(h.httpMinor() == 1);
+    BOOST_TEST(h.parse(Message) == Message.size());
+    BOOST_TEST(h.shouldKeepAlive());
+    BOOST_TEST(h.httpMajor() == 1);
+    BOOST_TEST(h.httpMinor() == 1);
 
-    SWIRLY_CHECK(h.method() == HttpMethod::Post);
-    SWIRLY_CHECK(h.url() == "/path/script.cgi"s);
+    BOOST_TEST(h.method() == HttpMethod::Post);
+    BOOST_TEST(h.url() == "/path/script.cgi"s);
 
-    SWIRLY_CHECK(h.headers().size() == 2);
-    SWIRLY_CHECK(h.headers()[0] == make_pair("Content-Type"s, "text/plain"s));
-    SWIRLY_CHECK(h.headers()[1] == make_pair("Content-Length"s, "6"s));
+    BOOST_TEST(h.headers().size() == 2);
+    BOOST_TEST(h.headers()[0] == make_pair("Content-Type"s, "text/plain"s));
+    BOOST_TEST(h.headers()[1] == make_pair("Content-Length"s, "6"s));
 
-    SWIRLY_CHECK(h.body() == "second"s);
+    BOOST_TEST(h.body() == "second"s);
 }
+
+BOOST_AUTO_TEST_SUITE_END()
