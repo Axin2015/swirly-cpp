@@ -27,12 +27,12 @@ TcpAcceptor::TcpAcceptor(Reactor& r, const Endpoint& ep)
     serv_.setSoReuseAddr(true);
     serv_.bind(ep);
     serv_.listen(SOMAXCONN);
-    tok_ = r.subscribe(*serv_, Reactor::In, self());
+    sub_ = r.subscribe(*serv_, EventIn, self());
 }
 
 TcpAcceptor::~TcpAcceptor() noexcept = default;
 
-void TcpAcceptor::doReady(int fd, FileEvents events, Time now)
+void TcpAcceptor::doReady(int fd, unsigned events, Time now)
 {
     Endpoint ep;
     IoSocket sock{sys::accept(fd, ep), serv_.family()};

@@ -74,11 +74,10 @@ class MemQueue {
         }
     }
     explicit MemQueue(const char* path)
-    : file_{sys::open(path, O_RDWR)}
-    , capacity_{capacity(detail::fileSize(file_.get()))}
+    : fh_{sys::open(path, O_RDWR)}
+    , capacity_{capacity(detail::fileSize(fh_.get()))}
     , mask_{capacity_ - 1}
-    , memMap_{sys::mmap(nullptr, size(capacity_), PROT_READ | PROT_WRITE, MAP_SHARED, file_.get(),
-                        0)}
+    , memMap_{sys::mmap(nullptr, size(capacity_), PROT_READ | PROT_WRITE, MAP_SHARED, fh_.get(), 0)}
     , impl_{*static_cast<Impl*>(memMap_.get().data())}
     {
         if (!isPow2(capacity_)) {
@@ -208,7 +207,7 @@ class MemQueue {
         return sizeof(Impl) + capacity * sizeof(Elem);
     }
 
-    File file_;
+    FileHandle fh_;
     std::uint64_t capacity_, mask_;
     MMap memMap_;
     Impl& impl_;
@@ -228,9 +227,9 @@ void createMemQueue(const char* path, std::size_t capacity, mode_t mode)
     capacity = nextPow2(capacity);
     const auto size = sizeof(Impl) + capacity * sizeof(Elem);
 
-    File file{sys::open(path, O_RDWR | O_CREAT | O_EXCL, mode)};
-    sys::ftruncate(file.get(), size);
-    MMap memMap{sys::mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, file.get(), 0)};
+    FileHandle fh{sys::open(path, O_RDWR | O_CREAT | O_EXCL, mode)};
+    sys::ftruncate(fh.get(), size);
+    MMap memMap{sys::mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fh.get(), 0)};
     auto& impl = *static_cast<Impl*>(memMap.get().data());
 
     memset(&impl, 0, size);

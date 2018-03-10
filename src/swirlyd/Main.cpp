@@ -17,6 +17,9 @@
 #include "HttpServ.hpp"
 #include "RestServ.hpp"
 
+#include <swirly/sqlite/Journ.hpp>
+#include <swirly/sqlite/Model.hpp>
+
 #include <swirly/clob/Test.hpp>
 
 #include <swirly/web/Rest.hpp>
@@ -278,17 +281,18 @@ int main(int argc, char* argv[])
 
         unique_ptr<Journ> journ;
         if (!opts.test) {
-            journ = swirly::makeJourn(config);
+            journ = make_unique<SqlJourn>(config);
         } else {
             journ = make_unique<TestJourn>();
         }
-        auto model = swirly::makeModel(config);
         Rest rest{*journ, pipeCapacity, maxExecs};
-        rest.load(*model, opts.startTime);
-        model = nullptr;
+        {
+            SqlModel model{config};
+            rest.load(model, opts.startTime);
+        }
 
         RestServ restServ{rest};
-        Reactor reactor{1024};
+        EpollReactor reactor{1024};
 
         const TcpEndpoint ep{Tcp::v4(), stou16(httpPort)};
         HttpServ::make(reactor, ep, restServ);

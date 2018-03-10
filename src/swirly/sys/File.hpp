@@ -38,14 +38,14 @@ struct FilePolicy {
     static void close(int d) noexcept { ::close(d); }
 };
 
-using File = Handle<FilePolicy>;
+using FileHandle = Handle<FilePolicy>;
 
 namespace sys {
 
 /**
  * Open and possibly create a file.
  */
-inline File open(const char* path, int flags, mode_t mode, std::error_code& ec) noexcept
+inline FileHandle open(const char* path, int flags, mode_t mode, std::error_code& ec) noexcept
 {
     const auto fd = ::open(path, flags, mode);
     if (fd < 0) {
@@ -57,7 +57,7 @@ inline File open(const char* path, int flags, mode_t mode, std::error_code& ec) 
 /**
  * Open and possibly create a file.
  */
-inline File open(const char* path, int flags, mode_t mode)
+inline FileHandle open(const char* path, int flags, mode_t mode)
 {
     const auto fd = ::open(path, flags, mode);
     if (fd < 0) {
@@ -69,7 +69,7 @@ inline File open(const char* path, int flags, mode_t mode)
 /**
  * Open and possibly create a file.
  */
-inline File open(const char* path, int flags, std::error_code& ec) noexcept
+inline FileHandle open(const char* path, int flags, std::error_code& ec) noexcept
 {
     const auto fd = ::open(path, flags);
     if (fd < 0) {
@@ -81,7 +81,7 @@ inline File open(const char* path, int flags, std::error_code& ec) noexcept
 /**
  * Open and possibly create a file.
  */
-inline File open(const char* path, int flags)
+inline FileHandle open(const char* path, int flags)
 {
     const auto fd = ::open(path, flags);
     if (fd < 0) {
@@ -94,7 +94,7 @@ inline File open(const char* path, int flags)
 /**
  * Create a file descriptor for event notification.
  */
-inline File eventfd(unsigned intval, int flags, std::error_code& ec) noexcept
+inline FileHandle eventfd(unsigned intval, int flags, std::error_code& ec) noexcept
 {
     const auto fd = ::eventfd(intval, flags);
     if (fd < 0) {
@@ -106,7 +106,7 @@ inline File eventfd(unsigned intval, int flags, std::error_code& ec) noexcept
 /**
  * Create a file descriptor for event notification.
  */
-inline File eventfd(unsigned intval, int flags)
+inline FileHandle eventfd(unsigned intval, int flags)
 {
     const auto fd = ::eventfd(intval, flags);
     if (fd < 0) {
@@ -118,31 +118,31 @@ inline File eventfd(unsigned intval, int flags)
 /**
  * Create pipe.
  */
-inline std::pair<File, File> pipe2(int flags, std::error_code& ec) noexcept
+inline std::pair<FileHandle, FileHandle> pipe2(int flags, std::error_code& ec) noexcept
 {
     int pipefd[2];
     if (::pipe2(pipefd, flags) < 0) {
         ec = makeError(errno);
     }
-    return {File{pipefd[0]}, File{pipefd[1]}};
+    return {FileHandle{pipefd[0]}, FileHandle{pipefd[1]}};
 }
 
 /**
  * Create pipe.
  */
-inline std::pair<File, File> pipe2(int flags)
+inline std::pair<FileHandle, FileHandle> pipe2(int flags)
 {
     int pipefd[2];
     if (::pipe2(pipefd, flags) < 0) {
         throw std::system_error{makeError(errno), "pipe2"};
     }
-    return {File{pipefd[0]}, File{pipefd[1]}};
+    return {FileHandle{pipefd[0]}, FileHandle{pipefd[1]}};
 }
 #else
 /**
  * Create pipe.
  */
-inline std::pair<File, File> pipe2(int flags, std::error_code& ec) noexcept
+inline std::pair<FileHandle, FileHandle> pipe2(int flags, std::error_code& ec) noexcept
 {
     int pipefd[2];
     if (::pipe(pipefd) < 0) {
@@ -153,13 +153,13 @@ inline std::pair<File, File> pipe2(int flags, std::error_code& ec) noexcept
             ec = makeError(errno);
         }
     }
-    return {File{pipefd[0]}, File{pipefd[1]}};
+    return {FileHandle{pipefd[0]}, FileHandle{pipefd[1]}};
 }
 
 /**
  * Create pipe.
  */
-inline std::pair<File, File> pipe2(int flags)
+inline std::pair<FileHandle, FileHandle> pipe2(int flags)
 {
     int pipefd[2];
     if (::pipe(pipefd) < 0) {
@@ -170,7 +170,7 @@ inline std::pair<File, File> pipe2(int flags)
             throw std::system_error{makeError(errno), "fcntl"};
         }
     }
-    return {File{pipefd[0]}, File{pipefd[1]}};
+    return {FileHandle{pipefd[0]}, FileHandle{pipefd[1]}};
 }
 #endif
 

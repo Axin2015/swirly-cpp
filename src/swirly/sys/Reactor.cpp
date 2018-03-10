@@ -16,7 +16,7 @@
  */
 #include "Reactor.hpp"
 
-#include "EventFile.hpp"
+#include "Event.hpp"
 #include "Log.hpp"
 
 #include <algorithm>
@@ -30,115 +30,94 @@ namespace {
 
 constexpr size_t MaxEvents{16};
 
-struct Data {
-    int sid{};
-    FileEvents mask{};
-    EventHandlerPtr handler;
-};
-
 } // namespace
-
-struct Reactor::Impl {
-
-    explicit Impl(size_t sizeHint)
-    : mux{sizeHint}
-    {
-        const auto fd = ef.fd();
-        data.resize(max<size_t>(fd + 1, sizeHint));
-        mux.subscribe(fd, 0, In);
-
-        auto& ref = data[fd];
-        ref.sid = 0;
-        ref.mask = In;
-        ref.handler = {};
-    }
-    ~Impl() noexcept { mux.unsubscribe(ef.fd()); }
-
-    Muxer mux;
-    vector<Data> data;
-    EventFile ef;
-    TimerQueue tq;
-    std::atomic<bool> closed{false};
-};
-
-Reactor::Reactor(size_t sizeHint)
-: impl_{make_unique<Impl>(sizeHint)}
-{
-}
 
 Reactor::~Reactor() noexcept = default;
 
-// Move.
-Reactor::Reactor(Reactor&&) = default;
-Reactor& Reactor::operator=(Reactor&&) = default;
-
-bool Reactor::closed() const noexcept
+EpollReactor::EpollReactor(size_t sizeHint)
+: mux_{sizeHint}
 {
-    return impl_->closed.load(std::memory_order_acquire);
+    const auto fd = efd_.fd();
+    data_.resize(max<size_t>(fd + 1, sizeHint));
+    mux_.subscribe(fd, 0, EventIn);
+
+    auto& ref = data_[fd];
+    ref.sid = 0;
+    ref.events = EventIn;
+    ref.handler = {};
 }
 
-void Reactor::close() noexcept
+EpollReactor::~EpollReactor() noexcept
 {
-    impl_->closed.store(true, std::memory_order_release);
-    impl_->ef.notify();
+    mux_.unsubscribe(efd_.fd());
 }
 
-FileToken Reactor::subscribe(int fd, FileEvents mask, const EventHandlerPtr& handler)
+bool EpollReactor::doClosed() const noexcept
+{
+    return closed_.load(std::memory_order_acquire);
+}
+
+void EpollReactor::doClose() noexcept
+{
+    closed_.store(true, std::memory_order_release);
+    efd_.notify();
+}
+
+SubHandle EpollReactor::doSubscribe(int fd, unsigned events, const EventHandlerPtr& handler)
 {
     assert(fd >= 0);
     assert(handler);
-    if (fd >= static_cast<int>(impl_->data.size())) {
-        impl_->data.resize(fd + 1);
+    if (fd >= static_cast<int>(data_.size())) {
+        data_.resize(fd + 1);
     }
-    auto& ref = impl_->data[fd];
-    impl_->mux.subscribe(fd, ++ref.sid, mask);
-    ref.mask = mask;
+    auto& ref = data_[fd];
+    mux_.subscribe(fd, ++ref.sid, events);
+    ref.events = events;
     ref.handler = handler;
-    return FileToken{{this, fd}};
+    return SubHandle{{this, fd}};
 }
 
-void Reactor::unsubscribe(int fd) noexcept
+void EpollReactor::doUnsubscribe(int fd) noexcept
 {
-    impl_->mux.unsubscribe(fd);
-    auto& ref = impl_->data[fd];
-    ref.mask = 0;
+    mux_.unsubscribe(fd);
+    auto& ref = data_[fd];
+    ref.events = 0;
     ref.handler.reset();
 }
 
-void Reactor::setMask(int fd, FileEvents mask)
+void EpollReactor::doSetEvents(int fd, unsigned events)
 {
-    auto& ref = impl_->data[fd];
-    if (ref.mask != mask) {
-        impl_->mux.setMask(fd, ref.sid, mask);
-        impl_->data[fd].mask = mask;
+    auto& ref = data_[fd];
+    if (ref.events != events) {
+        mux_.setEvents(fd, ref.sid, events);
+        data_[fd].events = events;
     }
 }
 
-Timer Reactor::setTimer(Time expiry, Duration interval, const EventHandlerPtr& handler)
+Timer EpollReactor::doSetTimer(Time expiry, Duration interval, const EventHandlerPtr& handler)
 {
-    return impl_->tq.insert(expiry, interval, handler);
+    return tq_.insert(expiry, interval, handler);
 }
 
-Timer Reactor::setTimer(Time expiry, const EventHandlerPtr& handler)
+Timer EpollReactor::doSetTimer(Time expiry, const EventHandlerPtr& handler)
 {
-    return impl_->tq.insert(expiry, handler);
+    return tq_.insert(expiry, handler);
 }
 
-int Reactor::poll(chrono::milliseconds timeout)
+int EpollReactor::doPoll(chrono::milliseconds timeout)
 {
     using namespace chrono;
 
-    if (!impl_->tq.empty()) {
+    if (!tq_.empty()) {
         // Millis until next expiry.
-        const auto expiry
-            = duration_cast<milliseconds>(impl_->tq.front().expiry() - UnixClock::now());
+        const auto expiry = duration_cast<milliseconds>(tq_.front().expiry() - UnixClock::now());
         if (expiry < timeout) {
             timeout = max(expiry, 0ms);
         }
     }
-    FileEvent buf[MaxEvents];
+    Event buf[MaxEvents];
     error_code ec;
-    const auto ret = impl_->mux.wait(buf, MaxEvents, timeout, ec);
+    const auto ret = mux_.wait(buf, MaxEvents, timeout, ec);
     if (ret < 0) {
         if (ec.value() != EINTR) {
             throw system_error{ec};
@@ -146,40 +125,39 @@ int Reactor::poll(chrono::milliseconds timeout)
         return 0;
     }
     const auto now = UnixClock::now();
-    return impl_->tq.dispatch(now) + dispatch(buf, ret, now);
+    return tq_.dispatch(now) + dispatch(buf, ret, now);
 }
 
-int Reactor::dispatch(FileEvent* buf, int size, Time now)
+int EpollReactor::dispatch(Event* buf, int size, Time now)
 {
     int n{0};
     for (int i{0}; i < size; ++i) {
 
         auto& ev = buf[i];
-        const auto fd = static_cast<int>(ev.data.u64 & 0xffffffff);
-        if (fd == impl_->ef.fd()) {
+        const auto fd = mux_.fd(ev);
+        if (fd == efd_.fd()) {
             SWIRLY_INFO("reactor wakeup"sv);
-            impl_->ef.flush();
+            efd_.flush();
             continue;
         }
+        const auto& ref = data_[fd];
 
-        const auto sid = static_cast<int>(ev.data.u64 >> 32);
-
-        const auto& ref = impl_->data[fd];
+        const auto sid = mux_.sid(ev);
         // Skip this socket if it was modified after the call to wait().
         if (ref.sid > sid) {
             continue;
         }
-        // Apply the interest mask to filter-out any events that the user may have removed from the
-        // mask since the call to wait() was made. This would typically happen via a reentrant call
-        // into the reactor from an event-handler.
-        ev.events &= ref.mask;
-        if (!(ev.events)) {
+        // Apply the interest events to filter-out any events that the user may have removed from
+        // the events since the call to wait() was made. This would typically happen via a reentrant
+        // call into the reactor from an event-handler.
+        const auto events = mux_.events(ev) & ref.events;
+        if (!events) {
             continue;
         }
 
         EventHandlerPtr eh{ref.handler};
         try {
-            eh->onReady(fd, ev.events, now);
+            eh->onReady(fd, events, now);
         } catch (const std::exception& e) {
             using namespace string_literals;
             SWIRLY_ERROR("error handling io event: "s + e.what());

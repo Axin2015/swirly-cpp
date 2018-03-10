@@ -14,7 +14,9 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Journ.hxx"
+#include "Journ.hpp"
+
+#include "Utility.hxx"
 
 #include <swirly/fin/Exec.hpp>
 
@@ -177,11 +179,6 @@ void SqlJourn::onArchiveTrade(const ArchiveTrade& body)
         stepOnce(stmt);
     }
     trans.commit();
-}
-
-unique_ptr<Journ> makeJourn(const Config& config)
-{
-    return make_unique<SqlJourn>(config);
 }
 
 } // namespace swirly

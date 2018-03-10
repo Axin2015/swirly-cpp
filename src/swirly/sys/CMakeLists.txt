@@ -31,7 +31,6 @@ set(lib_SOURCES
   Daemon.cpp
   Error.cpp
   Event.cpp
-  EventFile.cpp
   EventHandler.cpp
   File.cpp
   Handle.cpp

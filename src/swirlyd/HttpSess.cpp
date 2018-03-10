@@ -39,7 +39,7 @@ HttpSess::HttpSess(Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, RestServ&
     SWIRLY_INFO(logMsg() << "accept session");
 
     const auto eh = self();
-    tok_ = r.subscribe(*sock_, Reactor::In, eh);
+    sub_ = r.subscribe(*sock_, EventIn, eh);
     tmr_ = r.setTimer(now + IdleTimeout, eh);
 }
 
@@ -50,20 +50,20 @@ void HttpSess::doClose() noexcept
     SWIRLY_INFO(logMsg() << "close session");
     pause();
     tmr_.cancel();
-    tok_.reset();
+    sub_.reset();
 }
 
-void HttpSess::doReady(int fd, FileEvents events, Time now)
+void HttpSess::doReady(int fd, unsigned events, Time now)
 {
     try {
-        if (events & Reactor::Out) {
+        if (events & EventOut) {
             outbuf_.consume(sys::write(fd, outbuf_.data()));
             if (outbuf_.empty()) {
                 // May throw.
-                reactor().setMask(*sock_, Reactor::In);
+                reactor().setEvents(*sock_, EventIn);
             }
         }
-        if (events & Reactor::In) {
+        if (events & EventIn) {
             char in[MaxData];
             const auto size = sys::read(fd, in, sizeof(in));
             if (size == 0) {
@@ -155,7 +155,7 @@ bool HttpSess::doMessageEnd() noexcept
 
         if (wasEmpty) {
             // May throw.
-            reactor().setMask(*sock_, Reactor::In | Reactor::Out);
+            reactor().setEvents(*sock_, EventIn | EventOut);
         }
         ret = true;
     } catch (const std::exception& e) {

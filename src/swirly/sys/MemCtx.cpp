@@ -27,11 +27,11 @@ using namespace std;
 namespace swirly {
 namespace {
 
-File reserveFile(const char* path, size_t size)
+FileHandle reserveFile(const char* path, size_t size)
 {
-    File file{sys::open(path, O_RDWR | O_CREAT, 0644)};
-    sys::ftruncate(file.get(), size);
-    return file;
+    FileHandle fh{sys::open(path, O_RDWR | O_CREAT, 0644)};
+    sys::ftruncate(fh.get(), size);
+    return fh;
 }
 
 } // namespace
@@ -46,8 +46,8 @@ struct MemCtx::Impl {
     }
     Impl(const char* path, size_t maxSize)
     : maxSize{maxSize}
-    , file{reserveFile(path, PageSize + maxSize)}
-    , memMap{sys::mmap(nullptr, PageSize + maxSize, PROT_READ | PROT_WRITE, MAP_SHARED, file.get(),
+    , fh{reserveFile(path, PageSize + maxSize)}
+    , memMap{sys::mmap(nullptr, PageSize + maxSize, PROT_READ | PROT_WRITE, MAP_SHARED, fh.get(),
                        0)}
     , pool(*static_cast<MemPool*>(memMap.get().data()))
     {
@@ -120,7 +120,7 @@ struct MemCtx::Impl {
         }
     }
     const size_t maxSize;
-    File file;
+    FileHandle fh;
     MMap memMap;
     MemPool& pool;
 };

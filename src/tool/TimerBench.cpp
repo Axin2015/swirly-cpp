@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
         mt19937 gen{rd()};
         uniform_int_distribution<> dis;
 
-        Reactor r{1024};
+        EpollReactor r{1024};
         priority_queue<pair<int, Timer>> pq;
 
         auto h = makeIntrusive<TimerHandler>(r);

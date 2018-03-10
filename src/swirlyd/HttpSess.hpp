@@ -55,7 +55,7 @@ class SWIRLY_API HttpSess
 
   protected:
     void doClose() noexcept override;
-    void doReady(int fd, FileEvents events, Time now) override;
+    void doReady(int fd, unsigned events, Time now) override;
     void doTimer(const Timer& tmr, Time now) override;
 
     bool doMessageBegin() noexcept { return true; }
@@ -84,7 +84,7 @@ class SWIRLY_API HttpSess
     IoSocket sock_;
     TcpEndpoint ep_;
     RestServ& restServ_;
-    FileToken tok_;
+    SubHandle sub_;
     Timer tmr_;
     HttpRequest req_;
     Buffer outbuf_;

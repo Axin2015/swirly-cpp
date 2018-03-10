@@ -14,6 +14,9 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
+#include <swirly/sqlite/Journ.hpp>
+#include <swirly/sqlite/Model.hpp>
+
 #include <swirly/clob/Accnt.hpp>
 #include <swirly/clob/Response.hpp>
 #include <swirly/clob/Serv.hpp>
@@ -104,8 +107,8 @@ int main(int argc, char* argv[])
             Config config;
             config.set("sqlite_journ", argv[1]);
             config.set("sqlite_model", argv[1]);
-            journ = swirly::makeJourn(config);
-            model = swirly::makeModel(config);
+            journ = make_unique<SqlJourn>(config);
+            model = make_unique<SqlModel>(config);
         } else {
             journ = make_unique<TestJourn>();
             model = make_unique<TestModel>();

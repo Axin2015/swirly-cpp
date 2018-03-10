@@ -23,173 +23,135 @@
 #include <swirly/Config.h>
 
 #include <chrono>
-#include <vector>
 
 #include <unistd.h>
 
 namespace swirly {
 
-template <typename PolicyT>
-class BasicMuxer {
+class EpollMuxer {
   public:
-    enum : FileEvents {
-        In = PolicyT::In,
-        Pri = PolicyT::Pri,
-        Out = PolicyT::Out,
-        Err = PolicyT::Err,
-        Hup = PolicyT::Hup
-    };
-    using Id = typename PolicyT::Id;
-    static constexpr Id invalid() noexcept { return PolicyT::invalid(); }
+    using Event = epoll_event;
 
-    using FileEvent = typename PolicyT::FileEvent;
+    static constexpr int fd(const Event& ev) noexcept
+    {
+        return static_cast<int>(ev.data.u64 & 0xffffffff);
+    }
+    static constexpr int sid(const Event& ev) noexcept
+    {
+        return static_cast<int>(ev.data.u64 >> 32);
+    }
+    static constexpr unsigned events(const Event& ev) noexcept
+    {
+        unsigned n{};
+        if (ev.events & EPOLLIN) {
+            n |= EventIn;
+        }
+        if (ev.events & EPOLLPRI) {
+            n |= EventPri;
+        }
+        if (ev.events & EPOLLOUT) {
+            n |= EventOut;
+        }
+        if (ev.events & EPOLLERR) {
+            n |= EventErr;
+        }
+        if (ev.events & EPOLLHUP) {
+            n |= EventHup;
+        }
+        return n;
+    }
 
-    explicit BasicMuxer(std::size_t sizeHint)
-    : md_{PolicyT::create(sizeHint)}
+    explicit EpollMuxer(std::size_t sizeHint)
+    : md_{sys::epoll_create(sizeHint)}
     {
     }
-    ~BasicMuxer() noexcept
+    ~EpollMuxer() noexcept
     {
-        if (md_ != invalid()) {
-            PolicyT::destroy(md_);
+        if (md_ != -1) {
+            ::close(md_);
         }
     }
 
     // Copy.
-    BasicMuxer(const BasicMuxer&) = delete;
-    BasicMuxer& operator=(const BasicMuxer&) = delete;
+    EpollMuxer(const EpollMuxer&) = delete;
+    EpollMuxer& operator=(const EpollMuxer&) = delete;
 
     // Move.
-    BasicMuxer(BasicMuxer&& rhs)
+    EpollMuxer(EpollMuxer&& rhs)
     : md_{rhs.md_}
     {
-        rhs.md_ = invalid();
+        rhs.md_ = -1;
     }
-    BasicMuxer& operator=(BasicMuxer&& rhs)
+    EpollMuxer& operator=(EpollMuxer&& rhs)
     {
         close();
         std::swap(md_, rhs.md_);
         return *this;
     }
 
-    void swap(BasicMuxer& rhs) noexcept { std::swap(md_, rhs.md_); }
-    int wait(FileEvent* buf, std::size_t size, std::chrono::milliseconds timeout,
+    void swap(EpollMuxer& rhs) noexcept { std::swap(md_, rhs.md_); }
+    int wait(Event buf[], std::size_t size, std::chrono::milliseconds timeout,
              std::error_code& ec) const
     {
-        return PolicyT::wait(md_, buf, size, timeout, ec);
+        return sys::epoll_wait(
+            md_, buf, size, timeout == std::chrono::milliseconds::max() ? -1 : timeout.count(), ec);
     }
-    int wait(FileEvent* buf, std::size_t size, std::error_code& ec) const
+    int wait(Event buf[], std::size_t size, std::error_code& ec) const
     {
         return wait(buf, size, std::chrono::milliseconds::max(), ec);
     }
-    void subscribe(int fd, int sid, FileEvents mask) { PolicyT::subscribe(md_, fd, sid, mask); }
-    void unsubscribe(int fd) noexcept { PolicyT::unsubscribe(md_, fd); }
-    void setMask(int fd, int sid, FileEvents mask) { PolicyT::setMask(md_, fd, sid, mask); }
-
-  private:
-    void close() noexcept
+    void subscribe(int fd, int sid, unsigned events)
     {
-        if (md_ != invalid()) {
-            PolicyT::close(md_);
-            md_ = invalid();
-        }
+        Event ev;
+        setEvents(ev, fd, sid, events);
+        sys::epoll_ctl(md_, EPOLL_CTL_ADD, fd, ev);
     }
-    Id md_{invalid()};
-};
-
-struct SWIRLY_API PollPolicy {
-    struct Cmp {
-        bool operator()(const pollfd& lhs, const pollfd& rhs) const noexcept
-        {
-            return lhs.fd < rhs.fd;
-        }
-    };
-    struct Impl {
-        explicit Impl(std::size_t sizeHint) { pfds.reserve(sizeHint); }
-        std::vector<pollfd> pfds;
-        std::vector<int> sids;
-    };
-    enum : FileEvents { In = POLLIN, Pri = POLLPRI, Out = POLLOUT, Err = POLLERR, Hup = POLLHUP };
-    using Id = Impl*;
-    struct FileEvent {
-        FileEvents events;
-        struct {
-            std::uint64_t u64;
-        } data;
-    };
-    static constexpr Impl* invalid() noexcept { return nullptr; }
-
-    static Impl* create(std::size_t sizeHint) { return new Impl{sizeHint}; }
-    static void destroy(Impl* md) noexcept { delete md; }
-    static int wait(Impl* md, FileEvent* buf, std::size_t size, std::chrono::milliseconds timeout,
-                    std::error_code& ec)
-    {
-        return wait(md, buf, size,
-                    timeout == std::chrono::milliseconds::max() ? -1 : timeout.count(), ec);
-    }
-    static void subscribe(Impl* md, int fd, int sid, FileEvents mask);
-    static void unsubscribe(Impl* md, int fd) noexcept;
-    static void setMask(Impl* md, int fd, int sid, FileEvents mask);
-
-  private:
-    static int wait(Impl* md, FileEvent* buf, std::size_t size, int timeout, std::error_code& ec);
-};
-
-using PollMuxer = BasicMuxer<PollPolicy>;
-
-#if defined(__linux__)
-struct EpollPolicy {
-    enum : FileEvents {
-        In = EPOLLIN,
-        Pri = EPOLLPRI,
-        Out = EPOLLOUT,
-        Err = EPOLLERR,
-        Hup = EPOLLHUP
-    };
-    using Id = int;
-    using FileEvent = epoll_event;
-    static constexpr int invalid() noexcept { return -1; }
-
-    static int create(int sizeHint) { return sys::epoll_create(sizeHint); }
-    static void destroy(int md) noexcept { ::close(md); }
-    static int wait(int md, FileEvent* buf, std::size_t size, std::chrono::milliseconds timeout,
-                    std::error_code& ec)
-    {
-        return sys::epoll_wait(
-            md, buf, size, timeout == std::chrono::milliseconds::max() ? -1 : timeout.count(), ec);
-    }
-    static void subscribe(int md, int fd, int sid, FileEvents mask)
-    {
-        FileEvent ev;
-        ev.events = mask;
-        ev.data.u64 = static_cast<std::uint64_t>(sid) << 32 | fd;
-        sys::epoll_ctl(md, EPOLL_CTL_ADD, fd, ev);
-    }
-    static void unsubscribe(int md, int fd) noexcept
+    void unsubscribe(int fd) noexcept
     {
         // In kernel versions before 2.6.9, the EPOLL_CTL_DEL operation required a non-null pointer
         // in event, even though this argument is ignored.
-        FileEvent ev{};
+        Event ev{};
         std::error_code ec;
-        sys::epoll_ctl(md, EPOLL_CTL_DEL, fd, ev, ec);
+        sys::epoll_ctl(md_, EPOLL_CTL_DEL, fd, ev, ec);
     }
-    static void setMask(int md, int fd, int sid, FileEvents mask)
+    void setEvents(int fd, int sid, unsigned events)
     {
-        FileEvent ev;
-        ev.events = mask;
-        ev.data.u64 = static_cast<std::uint64_t>(sid) << 32 | fd;
-        sys::epoll_ctl(md, EPOLL_CTL_MOD, fd, ev);
+        Event ev;
+        setEvents(ev, fd, sid, events);
+        sys::epoll_ctl(md_, EPOLL_CTL_MOD, fd, ev);
     }
+
+  private:
+    static void setEvents(Event& ev, int fd, int sid, unsigned events) noexcept
+    {
+        unsigned n{};
+        if (events & EventIn) {
+            n |= EPOLLIN;
+        }
+        if (events & EventPri) {
+            n |= EPOLLPRI;
+        }
+        if (events & EventOut) {
+            n |= EPOLLOUT;
+        }
+        if (events & EventErr) {
+            n |= EPOLLERR;
+        }
+        if (events & EventHup) {
+            n |= EPOLLHUP;
+        }
+        ev.events = n;
+        ev.data.u64 = static_cast<std::uint64_t>(sid) << 32 | fd;
+    }
+    void close() noexcept
+    {
+        if (md_ != -1) {
+            ::close(md_);
+            md_ = -1;
+        }
+    }
+    int md_{-1};
 };
-
-using EpollMuxer = BasicMuxer<EpollPolicy>;
-#endif
-
-#if defined(__linux__)
-using Muxer = EpollMuxer;
-#else
-using Muxer = PollMuxer;
-#endif
 
 } // namespace swirly
 

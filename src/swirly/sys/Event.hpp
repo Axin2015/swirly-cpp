@@ -17,13 +17,17 @@
 #ifndef SWIRLY_SYS_EVENT_HPP
 #define SWIRLY_SYS_EVENT_HPP
 
-#include <cstdint>
-#include <type_traits>
-#include <utility>
+#include <swirly/sys/File.hpp>
 
 namespace swirly {
 
-using FileEvents = std::uint32_t;
+enum : unsigned {
+    EventIn = 1 << 0,
+    EventPri = 1 << 1,
+    EventOut = 1 << 2,
+    EventErr = 1 << 3,
+    EventHup = 1 << 4
+};
 
 struct MsgEvent {
     int type;
@@ -63,6 +67,89 @@ DataT& data(MsgEvent& ev) noexcept
 {
     return *reinterpret_cast<DataT*>(ev.data);
 }
+
+#if defined(__linux__)
+class EventFd {
+  public:
+    explicit EventFd(int flags = 0)
+    : fh_{sys::eventfd(0, eventFlags(flags) | EFD_NONBLOCK)}
+    {
+    }
+    ~EventFd() noexcept = default;
+
+    // Copy.
+    EventFd(const EventFd&) = delete;
+    EventFd& operator=(const EventFd&) = delete;
+
+    // Move.
+    EventFd(EventFd&&) = default;
+    EventFd& operator=(EventFd&&) = default;
+
+    int fd() const noexcept { return fh_.get(); }
+    void flush()
+    {
+        // Adds the 8-byte integer value supplied in its buffer to the counter.
+        char buf[sizeof(std::int64_t)];
+        sys::read(*fh_, buf, sizeof(buf));
+    }
+    void notify()
+    {
+        // Adds the 8-byte integer value supplied in its buffer to the counter.
+        union {
+            char buf[sizeof(std::int64_t)];
+            std::int64_t val;
+        } u;
+        u.val = 1;
+        sys::write(*fh_, u.buf, sizeof(u.buf));
+    }
+
+  private:
+    static int eventFlags(int in) noexcept
+    {
+        int out{};
+        if (in & O_CLOEXEC) {
+            out |= EFD_CLOEXEC;
+        }
+        return out;
+    }
+    FileHandle fh_;
+};
+#endif
+
+// Emulate using a Unix pipe.
+class EventPipe {
+  public:
+    explicit EventPipe(int flags = 0)
+    : pipe_{sys::pipe2(flags | O_NONBLOCK)}
+    {
+    }
+    ~EventPipe() noexcept = default;
+
+    // Copy.
+    EventPipe(const EventPipe&) = delete;
+    EventPipe& operator=(const EventPipe&) = delete;
+
+    // Move.
+    EventPipe(EventPipe&&) = default;
+    EventPipe& operator=(EventPipe&&) = default;
+
+    int fd() const noexcept { return pipe_.first.get(); }
+    void flush()
+    {
+        // Drain block of bytes.
+        char buf[1 << 10];
+        sys::read(*pipe_.first, buf, sizeof(buf));
+    }
+    void notify()
+    {
+        // Post a single charactor.
+        const char ch{'\0'};
+        sys::write(*pipe_.second, &ch, 1);
+    }
+
+  private:
+    std::pair<FileHandle, FileHandle> pipe_;
+};
 
 } // namespace swirly
 
