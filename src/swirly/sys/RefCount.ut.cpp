@@ -16,7 +16,8 @@
  */
 #include "RefCount.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 using namespace std;
 using namespace swirly;
@@ -36,18 +37,22 @@ class Foo : public RefCount<Foo, ThreadUnsafePolicy> {
 };
 } // namespace
 
-SWIRLY_TEST_CASE(RefCount)
+BOOST_AUTO_TEST_SUITE(RefCountSuite)
+
+BOOST_AUTO_TEST_CASE(RefCountCase)
 {
     int alive{0};
     {
         auto ptr1 = makeIntrusive<Foo>(alive);
-        SWIRLY_CHECK(alive == 1);
-        SWIRLY_CHECK(ptr1->refCount() == 1);
+        BOOST_TEST(alive == 1);
+        BOOST_TEST(ptr1->refCount() == 1);
         {
             auto ptr2 = ptr1;
-            SWIRLY_CHECK(ptr1->refCount() == 2);
+            BOOST_TEST(ptr1->refCount() == 2);
         }
-        SWIRLY_CHECK(ptr1->refCount() == 1);
+        BOOST_TEST(ptr1->refCount() == 1);
     }
-    SWIRLY_CHECK(alive == 0);
+    BOOST_TEST(alive == 0);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

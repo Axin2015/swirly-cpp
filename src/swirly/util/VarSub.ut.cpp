@@ -16,7 +16,8 @@
  */
 #include "VarSub.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 using namespace std;
 using namespace swirly;
@@ -49,65 +50,67 @@ string getVar(const string& name)
 
 } // namespace
 
-SWIRLY_TEST_CASE(VarSubBasic)
+BOOST_AUTO_TEST_SUITE(VarSubSuite)
+
+BOOST_AUTO_TEST_CASE(VarSubBasicCase)
 {
     VarSub fn{getVar};
 
-    SWIRLY_CHECK(applyCopy(fn, "${FOO}") == "101");
-    SWIRLY_CHECK(applyCopy(fn, "${BAR}") == "202");
-    SWIRLY_CHECK(applyCopy(fn, "<${FOO}>") == "<101>");
-    SWIRLY_CHECK(applyCopy(fn, "<${FOO} ${BAR}>") == "<101 202>");
+    BOOST_TEST(applyCopy(fn, "${FOO}") == "101");
+    BOOST_TEST(applyCopy(fn, "${BAR}") == "202");
+    BOOST_TEST(applyCopy(fn, "<${FOO}>") == "<101>");
+    BOOST_TEST(applyCopy(fn, "<${FOO} ${BAR}>") == "<101 202>");
 }
 
-SWIRLY_TEST_CASE(VarSubEmpty)
+BOOST_AUTO_TEST_CASE(VarSubEmptyCase)
 {
     VarSub fn{getVar};
 
-    SWIRLY_CHECK(applyCopy(fn, "${}").empty());
-    SWIRLY_CHECK(applyCopy(fn, "${123}").empty());
-    SWIRLY_CHECK(applyCopy(fn, "${EMPTY}").empty());
+    BOOST_TEST(applyCopy(fn, "${}").empty());
+    BOOST_TEST(applyCopy(fn, "${123}").empty());
+    BOOST_TEST(applyCopy(fn, "${EMPTY}").empty());
 }
 
-SWIRLY_TEST_CASE(VarSubEscape)
+BOOST_AUTO_TEST_CASE(VarSubEscapeCase)
 {
     VarSub fn{getVar};
 
-    SWIRLY_CHECK(applyCopy(fn, "\\\\") == "\\");
-    SWIRLY_CHECK(applyCopy(fn, "\\\\>") == "\\>");
-    SWIRLY_CHECK(applyCopy(fn, "<\\\\") == "<\\");
-    SWIRLY_CHECK(applyCopy(fn, "\\${FOO}") == "${FOO}");
-    SWIRLY_CHECK(applyCopy(fn, "$\\{FOO}") == "${FOO}");
-    SWIRLY_CHECK(applyCopy(fn, "${\\FOO}") == "101");
-    SWIRLY_CHECK(applyCopy(fn, "${FOO\\}") == "${FOO}");
-    SWIRLY_CHECK(applyCopy(fn, "${FOO}\\") == "101\\");
+    BOOST_TEST(applyCopy(fn, "\\\\") == "\\");
+    BOOST_TEST(applyCopy(fn, "\\\\>") == "\\>");
+    BOOST_TEST(applyCopy(fn, "<\\\\") == "<\\");
+    BOOST_TEST(applyCopy(fn, "\\${FOO}") == "${FOO}");
+    BOOST_TEST(applyCopy(fn, "$\\{FOO}") == "${FOO}");
+    BOOST_TEST(applyCopy(fn, "${\\FOO}") == "101");
+    BOOST_TEST(applyCopy(fn, "${FOO\\}") == "${FOO}");
+    BOOST_TEST(applyCopy(fn, "${FOO}\\") == "101\\");
 }
 
-SWIRLY_TEST_CASE(VarSubPartial)
+BOOST_AUTO_TEST_CASE(VarSubPartialCase)
 {
     VarSub fn{getVar};
 
-    SWIRLY_CHECK(applyCopy(fn, "$") == "$");
-    SWIRLY_CHECK(applyCopy(fn, "{") == "{");
-    SWIRLY_CHECK(applyCopy(fn, "}") == "}");
-    SWIRLY_CHECK(applyCopy(fn, "$FOO") == "$FOO");
-    SWIRLY_CHECK(applyCopy(fn, "{FOO") == "{FOO");
-    SWIRLY_CHECK(applyCopy(fn, "${FOO") == "${FOO");
-    SWIRLY_CHECK(applyCopy(fn, "FOO}") == "FOO}");
-    SWIRLY_CHECK(applyCopy(fn, "$${FOO}") == "$101");
+    BOOST_TEST(applyCopy(fn, "$") == "$");
+    BOOST_TEST(applyCopy(fn, "{") == "{");
+    BOOST_TEST(applyCopy(fn, "}") == "}");
+    BOOST_TEST(applyCopy(fn, "$FOO") == "$FOO");
+    BOOST_TEST(applyCopy(fn, "{FOO") == "{FOO");
+    BOOST_TEST(applyCopy(fn, "${FOO") == "${FOO");
+    BOOST_TEST(applyCopy(fn, "FOO}") == "FOO}");
+    BOOST_TEST(applyCopy(fn, "$${FOO}") == "$101");
 }
 
-SWIRLY_TEST_CASE(VarSubNested)
+BOOST_AUTO_TEST_CASE(VarSubNestedCase)
 {
     VarSub fn{getVar};
 
-    SWIRLY_CHECK(applyCopy(fn, "${FOOBAR}") == "101202");
-    SWIRLY_CHECK(applyCopy(fn, "${${BAZ}}") == "101");
-    SWIRLY_CHECK(applyCopy(fn, "${${BAZ}BAR}") == "101202");
-    SWIRLY_CHECK(applyCopy(fn, "${FOO${QUX}}") == "101202");
-    SWIRLY_CHECK(applyCopy(fn, "${${BAZ}${QUX}}") == "101202");
+    BOOST_TEST(applyCopy(fn, "${FOOBAR}") == "101202");
+    BOOST_TEST(applyCopy(fn, "${${BAZ}}") == "101");
+    BOOST_TEST(applyCopy(fn, "${${BAZ}BAR}") == "101202");
+    BOOST_TEST(applyCopy(fn, "${FOO${QUX}}") == "101202");
+    BOOST_TEST(applyCopy(fn, "${${BAZ}${QUX}}") == "101202");
 }
 
-SWIRLY_TEST_CASE(VarSubLoop)
+BOOST_AUTO_TEST_CASE(VarSubLoopCase)
 {
     VarSub fn{[](const string& name) {
         string val;
@@ -123,10 +126,12 @@ SWIRLY_TEST_CASE(VarSubLoop)
         return val;
     }};
 
-    SWIRLY_CHECK(applyCopy(fn, "${FOO}").empty());
-    SWIRLY_CHECK(applyCopy(fn, "${FOO}${FOO}").empty());
-    SWIRLY_CHECK(applyCopy(fn, "${FOO${FOO}}").empty());
-    SWIRLY_CHECK(applyCopy(fn, "<${FOO}>") == "<>");
-    SWIRLY_CHECK(applyCopy(fn, "<${FOO${FOO}}>") == "<>");
-    SWIRLY_CHECK(applyCopy(fn, "<${FOO} ${FOO}>") == "< >");
+    BOOST_TEST(applyCopy(fn, "${FOO}").empty());
+    BOOST_TEST(applyCopy(fn, "${FOO}${FOO}").empty());
+    BOOST_TEST(applyCopy(fn, "${FOO${FOO}}").empty());
+    BOOST_TEST(applyCopy(fn, "<${FOO}>") == "<>");
+    BOOST_TEST(applyCopy(fn, "<${FOO${FOO}}>") == "<>");
+    BOOST_TEST(applyCopy(fn, "<${FOO} ${FOO}>") == "< >");
 }
+
+BOOST_AUTO_TEST_SUITE_END()

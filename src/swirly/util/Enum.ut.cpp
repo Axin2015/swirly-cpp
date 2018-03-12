@@ -16,7 +16,8 @@
  */
 #include "Enum.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 #include <boost/lexical_cast.hpp>
 
@@ -55,10 +56,14 @@ inline ostream& operator<<(ostream& os, Test t)
 
 } // namespace swirly
 
-SWIRLY_TEST_CASE(EnumString)
+BOOST_AUTO_TEST_SUITE(EnumSuite)
+
+BOOST_AUTO_TEST_CASE(EnumStringCase)
 {
-    SWIRLY_CHECK(lexical_cast<string>(Test::Foo) == "FOO");
-    SWIRLY_CHECK(lexical_cast<string>(Test::Bar) == "BAR");
-    SWIRLY_CHECK(lexical_cast<string>(Test::Baz) == "BAZ");
-    SWIRLY_CHECK(lexical_cast<string>(Test::Qux) == "QUX");
+    BOOST_TEST(lexical_cast<string>(Test::Foo) == "FOO");
+    BOOST_TEST(lexical_cast<string>(Test::Bar) == "BAR");
+    BOOST_TEST(lexical_cast<string>(Test::Baz) == "BAZ");
+    BOOST_TEST(lexical_cast<string>(Test::Qux) == "QUX");
 }
+
+BOOST_AUTO_TEST_SUITE_END()

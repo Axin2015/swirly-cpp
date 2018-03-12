@@ -16,7 +16,8 @@
  */
 #include "Array.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 #include <algorithm> // equal()
 #include <numeric>   // accumulate()
@@ -24,31 +25,35 @@
 using namespace std;
 using namespace swirly;
 
-SWIRLY_TEST_CASE(ArrayView)
+BOOST_AUTO_TEST_SUITE(ArraySuite)
+
+BOOST_AUTO_TEST_CASE(ArrayViewCase)
 {
-    SWIRLY_CHECK(!ArrayView<int>{}.data());
-    SWIRLY_CHECK(ArrayView<int>{}.empty());
-    SWIRLY_CHECK(ArrayView<int>{}.size() == 0UL);
+    BOOST_TEST(!ArrayView<int>{}.data());
+    BOOST_TEST(ArrayView<int>{}.empty());
+    BOOST_TEST(ArrayView<int>{}.size() == 0UL);
 
     const int arr[] = {101, 202, 303};
     ArrayView<int> av{arr};
 
-    SWIRLY_CHECK(av.data());
-    SWIRLY_CHECK(!av.empty());
-    SWIRLY_CHECK(av.size() == 3UL);
+    BOOST_TEST(av.data());
+    BOOST_TEST(!av.empty());
+    BOOST_TEST(av.size() == 3UL);
 
-    SWIRLY_CHECK(av[0] == arr[0]);
-    SWIRLY_CHECK(av[1] == arr[1]);
-    SWIRLY_CHECK(av[2] == arr[2]);
+    BOOST_TEST(av[0] == arr[0]);
+    BOOST_TEST(av[1] == arr[1]);
+    BOOST_TEST(av[2] == arr[2]);
 
-    SWIRLY_CHECK(av.front() == arr[0]);
-    SWIRLY_CHECK(av.back() == arr[2]);
+    BOOST_TEST(av.front() == arr[0]);
+    BOOST_TEST(av.back() == arr[2]);
 
-    SWIRLY_CHECK(equal(av.begin(), av.end(), arr));
+    BOOST_TEST(equal(av.begin(), av.end(), arr));
     int rev[] = {303, 202, 101};
 
-    SWIRLY_CHECK(equal(av.rbegin(), av.rend(), rev));
+    BOOST_TEST(equal(av.rbegin(), av.rend(), rev));
 
-    SWIRLY_CHECK(makeArrayView(arr, 2).size() == 2UL);
-    SWIRLY_CHECK(makeArrayView(arr).size() == 3UL);
+    BOOST_TEST(makeArrayView(arr, 2).size() == 2UL);
+    BOOST_TEST(makeArrayView(arr).size() == 3UL);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

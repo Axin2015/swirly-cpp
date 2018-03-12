@@ -25,10 +25,48 @@
 
 #include <swirly/sys/Time.hpp>
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 #include <algorithm>
 #include <queue>
+
+namespace swirly {
+std::ostream& operator<<(std::ostream& os, More more)
+{
+    switch (more) {
+    case More::Yes:
+        os << "Yes";
+        break;
+    case More::No:
+        os << "No";
+        break;
+    }
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, MsgType type)
+{
+    switch (type) {
+    case MsgType::Reset:
+        os << "Reset";
+        break;
+    case MsgType::CreateMarket:
+        os << "CreateMarket";
+        break;
+    case MsgType::UpdateMarket:
+        os << "UpdateMarket";
+        break;
+    case MsgType::CreateExec:
+        os << "CreateExec";
+        break;
+    case MsgType::ArchiveTrade:
+        os << "ArchiveTrade";
+        break;
+    }
+    return os;
+}
+} // namespace swirly
 
 using namespace std;
 using namespace swirly;
@@ -92,105 +130,107 @@ struct AsyncJournFixture {
 
 } // namespace
 
-SWIRLY_TEST_CASE(AsyncWindow)
+BOOST_AUTO_TEST_SUITE(AsyncJournSuite)
+
+BOOST_AUTO_TEST_CASE(AsyncWindowCase)
 {
     {
         detail::AsyncWindow<1> aw{3};
         // 1.
-        SWIRLY_CHECK(aw.index() == 0);
-        SWIRLY_CHECK(aw.size() == 1);
-        SWIRLY_CHECK(aw.more() == More::Yes);
-        SWIRLY_CHECK(aw.next());
-        SWIRLY_CHECK(!aw.done());
+        BOOST_TEST(aw.index() == 0);
+        BOOST_TEST(aw.size() == 1);
+        BOOST_TEST(aw.more() == More::Yes);
+        BOOST_TEST(aw.next());
+        BOOST_TEST(!aw.done());
         // 2.
-        SWIRLY_CHECK(aw.index() == 1);
-        SWIRLY_CHECK(aw.size() == 1);
-        SWIRLY_CHECK(aw.more() == More::Yes);
-        SWIRLY_CHECK(aw.next());
-        SWIRLY_CHECK(!aw.done());
+        BOOST_TEST(aw.index() == 1);
+        BOOST_TEST(aw.size() == 1);
+        BOOST_TEST(aw.more() == More::Yes);
+        BOOST_TEST(aw.next());
+        BOOST_TEST(!aw.done());
         // 3.
-        SWIRLY_CHECK(aw.index() == 2);
-        SWIRLY_CHECK(aw.size() == 1);
-        SWIRLY_CHECK(aw.more() == More::No);
-        SWIRLY_CHECK(!aw.next());
-        SWIRLY_CHECK(aw.done());
+        BOOST_TEST(aw.index() == 2);
+        BOOST_TEST(aw.size() == 1);
+        BOOST_TEST(aw.more() == More::No);
+        BOOST_TEST(!aw.next());
+        BOOST_TEST(aw.done());
     }
     {
         detail::AsyncWindow<8> aw{4};
         // 0-3.
-        SWIRLY_CHECK(aw.index() == 0);
-        SWIRLY_CHECK(aw.size() == 4);
-        SWIRLY_CHECK(aw.more() == More::No);
-        SWIRLY_CHECK(!aw.next());
-        SWIRLY_CHECK(aw.done());
+        BOOST_TEST(aw.index() == 0);
+        BOOST_TEST(aw.size() == 4);
+        BOOST_TEST(aw.more() == More::No);
+        BOOST_TEST(!aw.next());
+        BOOST_TEST(aw.done());
     }
     {
         detail::AsyncWindow<8> aw{16};
         // 0-7.
-        SWIRLY_CHECK(aw.index() == 0);
-        SWIRLY_CHECK(aw.size() == 8);
-        SWIRLY_CHECK(aw.more() == More::Yes);
-        SWIRLY_CHECK(aw.next());
-        SWIRLY_CHECK(!aw.done());
+        BOOST_TEST(aw.index() == 0);
+        BOOST_TEST(aw.size() == 8);
+        BOOST_TEST(aw.more() == More::Yes);
+        BOOST_TEST(aw.next());
+        BOOST_TEST(!aw.done());
         // 8-15
-        SWIRLY_CHECK(aw.index() == 8);
-        SWIRLY_CHECK(aw.size() == 8);
-        SWIRLY_CHECK(aw.more() == More::No);
-        SWIRLY_CHECK(!aw.next());
-        SWIRLY_CHECK(aw.done());
+        BOOST_TEST(aw.index() == 8);
+        BOOST_TEST(aw.size() == 8);
+        BOOST_TEST(aw.more() == More::No);
+        BOOST_TEST(!aw.next());
+        BOOST_TEST(aw.done());
     }
     {
         detail::AsyncWindow<8> aw{20};
         // 0-7.
-        SWIRLY_CHECK(aw.index() == 0);
-        SWIRLY_CHECK(aw.size() == 8);
-        SWIRLY_CHECK(aw.more() == More::Yes);
-        SWIRLY_CHECK(aw.next());
-        SWIRLY_CHECK(!aw.done());
+        BOOST_TEST(aw.index() == 0);
+        BOOST_TEST(aw.size() == 8);
+        BOOST_TEST(aw.more() == More::Yes);
+        BOOST_TEST(aw.next());
+        BOOST_TEST(!aw.done());
         // 8-15
-        SWIRLY_CHECK(aw.index() == 8);
-        SWIRLY_CHECK(aw.size() == 8);
-        SWIRLY_CHECK(aw.more() == More::Yes);
-        SWIRLY_CHECK(aw.next());
-        SWIRLY_CHECK(!aw.done());
+        BOOST_TEST(aw.index() == 8);
+        BOOST_TEST(aw.size() == 8);
+        BOOST_TEST(aw.more() == More::Yes);
+        BOOST_TEST(aw.next());
+        BOOST_TEST(!aw.done());
         // 16-19.
-        SWIRLY_CHECK(aw.index() == 16);
-        SWIRLY_CHECK(aw.size() == 4);
-        SWIRLY_CHECK(aw.more() == More::No);
-        SWIRLY_CHECK(!aw.next());
-        SWIRLY_CHECK(aw.done());
+        BOOST_TEST(aw.index() == 16);
+        BOOST_TEST(aw.size() == 4);
+        BOOST_TEST(aw.more() == More::No);
+        BOOST_TEST(!aw.next());
+        BOOST_TEST(aw.done());
     }
 }
 
-SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateMarket, AsyncJournFixture)
+BOOST_FIXTURE_TEST_CASE(AsyncJournCreateMarket, AsyncJournFixture)
 {
     asyncJourn.createMarket(MarketId, "EURUSD"sv, SettlDay, 0x1);
 
     Msg msg;
-    SWIRLY_CHECK(journ.pop(msg));
-    SWIRLY_CHECK(msg.type == MsgType::CreateMarket);
+    BOOST_TEST(journ.pop(msg));
+    BOOST_CHECK_EQUAL(msg.type, MsgType::CreateMarket);
     const auto& body = msg.createMarket;
 
-    SWIRLY_CHECK(body.id == MarketId);
-    SWIRLY_CHECK(strncmp(body.instr, "EURUSD", sizeof(body.instr)) == 0);
-    SWIRLY_CHECK(body.settlDay == SettlDay);
-    SWIRLY_CHECK(body.state == 0x1);
+    BOOST_CHECK_EQUAL(body.id, MarketId);
+    BOOST_CHECK_EQUAL(strncmp(body.instr, "EURUSD", sizeof(body.instr)), 0);
+    BOOST_CHECK_EQUAL(body.settlDay, SettlDay);
+    BOOST_CHECK_EQUAL(body.state, 0x1);
 }
 
-SWIRLY_FIXTURE_TEST_CASE(AsyncJournUpdateMarket, AsyncJournFixture)
+BOOST_FIXTURE_TEST_CASE(AsyncJournUpdateMarket, AsyncJournFixture)
 {
     asyncJourn.updateMarket(MarketId, 0x1);
 
     Msg msg;
-    SWIRLY_CHECK(journ.pop(msg));
-    SWIRLY_CHECK(msg.type == MsgType::UpdateMarket);
+    BOOST_TEST(journ.pop(msg));
+    BOOST_CHECK_EQUAL(msg.type, MsgType::UpdateMarket);
     const auto& body = msg.updateMarket;
 
-    SWIRLY_CHECK(body.id == MarketId);
-    SWIRLY_CHECK(body.state == 0x1);
+    BOOST_CHECK_EQUAL(body.id, MarketId);
+    BOOST_CHECK_EQUAL(body.state, 0x1);
 }
 
-SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
+BOOST_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
 {
     ConstExecPtr execs[2];
     execs[0] = makeIntrusive<Exec>("MARAYL"sv, MarketId, "EURUSD"sv, SettlDay, 1_id64, 2_id64,
@@ -203,63 +243,63 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
     asyncJourn.createExec(execs);
     {
         Msg msg;
-        SWIRLY_CHECK(journ.pop(msg));
-        SWIRLY_CHECK(msg.type == MsgType::CreateExec);
+        BOOST_TEST(journ.pop(msg));
+        BOOST_CHECK_EQUAL(msg.type, MsgType::CreateExec);
         const auto& body = msg.createExec;
 
-        SWIRLY_CHECK(strncmp(body.accnt, "MARAYL", sizeof(body.accnt)) == 0);
-        SWIRLY_CHECK(body.marketId == MarketId);
-        SWIRLY_CHECK(strncmp(body.instr, "EURUSD", sizeof(body.instr)) == 0);
-        SWIRLY_CHECK(body.settlDay == SettlDay);
-        SWIRLY_CHECK(body.id == 1_id64);
-        SWIRLY_CHECK(body.orderId == 2_id64);
-        SWIRLY_CHECK(strncmp(body.ref, "REF", sizeof(body.ref)) == 0);
-        SWIRLY_CHECK(body.state == State::New);
-        SWIRLY_CHECK(body.side == Side::Buy);
-        SWIRLY_CHECK(body.lots == 10_lts);
-        SWIRLY_CHECK(body.ticks == 12345_tks);
-        SWIRLY_CHECK(body.resdLots == 10_lts);
-        SWIRLY_CHECK(body.execLots == 0_lts);
-        SWIRLY_CHECK(body.execCost == 0_cst);
-        SWIRLY_CHECK(body.lastLots == 0_lts);
-        SWIRLY_CHECK(body.lastTicks == 0_tks);
-        SWIRLY_CHECK(body.minLots == 1_lts);
-        SWIRLY_CHECK(body.matchId == 0_id64);
-        SWIRLY_CHECK(body.liqInd == LiqInd::None);
-        SWIRLY_CHECK(strncmp(body.cpty, "", sizeof(body.cpty)) == 0);
-        SWIRLY_CHECK(body.created == msSinceEpoch(Now));
+        BOOST_CHECK_EQUAL(strncmp(body.accnt, "MARAYL", sizeof(body.accnt)), 0);
+        BOOST_CHECK_EQUAL(body.marketId, MarketId);
+        BOOST_CHECK_EQUAL(strncmp(body.instr, "EURUSD", sizeof(body.instr)), 0);
+        BOOST_CHECK_EQUAL(body.settlDay, SettlDay);
+        BOOST_CHECK_EQUAL(body.id, 1_id64);
+        BOOST_CHECK_EQUAL(body.orderId, 2_id64);
+        BOOST_CHECK_EQUAL(strncmp(body.ref, "REF", sizeof(body.ref)), 0);
+        BOOST_CHECK_EQUAL(body.state, State::New);
+        BOOST_CHECK_EQUAL(body.side, Side::Buy);
+        BOOST_CHECK_EQUAL(body.lots, 10_lts);
+        BOOST_CHECK_EQUAL(body.ticks, 12345_tks);
+        BOOST_CHECK_EQUAL(body.resdLots, 10_lts);
+        BOOST_CHECK_EQUAL(body.execLots, 0_lts);
+        BOOST_CHECK_EQUAL(body.execCost, 0_cst);
+        BOOST_CHECK_EQUAL(body.lastLots, 0_lts);
+        BOOST_CHECK_EQUAL(body.lastTicks, 0_tks);
+        BOOST_CHECK_EQUAL(body.minLots, 1_lts);
+        BOOST_CHECK_EQUAL(body.matchId, 0_id64);
+        BOOST_CHECK_EQUAL(body.liqInd, LiqInd::None);
+        BOOST_CHECK_EQUAL(strncmp(body.cpty, "", sizeof(body.cpty)), 0);
+        BOOST_CHECK_EQUAL(body.created, msSinceEpoch(Now));
     }
     {
         Msg msg;
-        SWIRLY_CHECK(journ.pop(msg));
-        SWIRLY_CHECK(msg.type == MsgType::CreateExec);
+        BOOST_TEST(journ.pop(msg));
+        BOOST_CHECK_EQUAL(msg.type, MsgType::CreateExec);
         const auto& body = msg.createExec;
 
-        SWIRLY_CHECK(body.marketId == MarketId);
-        SWIRLY_CHECK(strncmp(body.instr, "EURUSD", sizeof(body.instr)) == 0);
-        SWIRLY_CHECK(body.settlDay == SettlDay);
-        SWIRLY_CHECK(body.id == 3_id64);
-        SWIRLY_CHECK(body.orderId == 2_id64);
-        SWIRLY_CHECK(strncmp(body.accnt, "MARAYL", sizeof(body.accnt)) == 0);
-        SWIRLY_CHECK(strncmp(body.ref, "REF", sizeof(body.ref)) == 0);
-        SWIRLY_CHECK(body.state == State::Trade);
-        SWIRLY_CHECK(body.side == Side::Buy);
-        SWIRLY_CHECK(body.lots == 10_lts);
-        SWIRLY_CHECK(body.ticks == 12345_tks);
-        SWIRLY_CHECK(body.resdLots == 5_lts);
-        SWIRLY_CHECK(body.execLots == 5_lts);
-        SWIRLY_CHECK(body.execCost == 61725_cst);
-        SWIRLY_CHECK(body.lastLots == 5_lts);
-        SWIRLY_CHECK(body.lastTicks == 12345_tks);
-        SWIRLY_CHECK(body.minLots == 1_lts);
-        SWIRLY_CHECK(body.matchId == 4_id64);
-        SWIRLY_CHECK(body.liqInd == LiqInd::Maker);
-        SWIRLY_CHECK(strncmp(body.cpty, "GOSAYL", sizeof(body.cpty)) == 0);
-        SWIRLY_CHECK(body.created == msSinceEpoch(Now + 1ms));
+        BOOST_CHECK_EQUAL(body.marketId, MarketId);
+        BOOST_CHECK_EQUAL(strncmp(body.instr, "EURUSD", sizeof(body.instr)), 0);
+        BOOST_CHECK_EQUAL(body.settlDay, SettlDay);
+        BOOST_CHECK_EQUAL(body.id, 3_id64);
+        BOOST_CHECK_EQUAL(body.orderId, 2_id64);
+        BOOST_CHECK_EQUAL(strncmp(body.accnt, "MARAYL", sizeof(body.accnt)), 0);
+        BOOST_CHECK_EQUAL(strncmp(body.ref, "REF", sizeof(body.ref)), 0);
+        BOOST_CHECK_EQUAL(body.state, State::Trade);
+        BOOST_CHECK_EQUAL(body.side, Side::Buy);
+        BOOST_CHECK_EQUAL(body.lots, 10_lts);
+        BOOST_CHECK_EQUAL(body.ticks, 12345_tks);
+        BOOST_CHECK_EQUAL(body.resdLots, 5_lts);
+        BOOST_CHECK_EQUAL(body.execLots, 5_lts);
+        BOOST_CHECK_EQUAL(body.execCost, 61725_cst);
+        BOOST_CHECK_EQUAL(body.lastLots, 5_lts);
+        BOOST_CHECK_EQUAL(body.lastTicks, 12345_tks);
+        BOOST_CHECK_EQUAL(body.minLots, 1_lts);
+        BOOST_CHECK_EQUAL(body.matchId, 4_id64);
+        BOOST_CHECK_EQUAL(body.liqInd, LiqInd::Maker);
+        BOOST_CHECK_EQUAL(strncmp(body.cpty, "GOSAYL", sizeof(body.cpty)), 0);
+        BOOST_CHECK_EQUAL(body.created, msSinceEpoch(Now + 1ms));
     }
 }
 
-SWIRLY_FIXTURE_TEST_CASE(AsyncJournArchiveTrade, AsyncJournFixture)
+BOOST_FIXTURE_TEST_CASE(AsyncJournArchiveTrade, AsyncJournFixture)
 {
     vector<Id64> ids;
     ids.reserve(101);
@@ -271,17 +311,19 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournArchiveTrade, AsyncJournFixture)
     auto it = ids.begin();
     while (it != ids.end()) {
         Msg msg;
-        SWIRLY_CHECK(journ.pop(msg));
-        SWIRLY_CHECK(msg.type == MsgType::ArchiveTrade);
+        BOOST_TEST(journ.pop(msg));
+        BOOST_CHECK_EQUAL(msg.type, MsgType::ArchiveTrade);
         const auto& body = msg.archiveTrade;
-        SWIRLY_CHECK(body.marketId == MarketId);
-        SWIRLY_CHECK(body.modified == msSinceEpoch(Now));
+        BOOST_CHECK_EQUAL(body.marketId, MarketId);
+        BOOST_CHECK_EQUAL(body.modified, msSinceEpoch(Now));
         for (const auto id : body.ids) {
             if (it != ids.end()) {
-                SWIRLY_CHECK(id == *it++);
+                BOOST_CHECK_EQUAL(id, *it++);
             } else {
-                SWIRLY_CHECK(id == 0_id64);
+                BOOST_CHECK_EQUAL(id, 0_id64);
             }
         }
     }
 }
+
+BOOST_AUTO_TEST_SUITE_END()

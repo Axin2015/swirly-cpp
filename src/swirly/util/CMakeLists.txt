@@ -17,10 +17,12 @@ if(ENABLE_SHARED_LIBS)
   add_custom_target(swirly_util DEPENDS
     swirly_util_static
     swirly_util_shared
+    swirly_util_test
   )
 else()
   add_custom_target(swirly_util DEPENDS
     swirly_util_static
+    swirly_util_test
   )
 endif()
 
@@ -85,10 +87,12 @@ set(test_SOURCES
   Utility.ut.cpp
   VarSub.ut.cpp)
 
+add_executable(swirly_util_test
+  ${test_SOURCES}
+  Main.ut.cpp)
+target_link_libraries(swirly_util_test ${swirly_util_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+
 foreach(file ${test_SOURCES})
   get_filename_component (name ${file} NAME_WE)
-  set(name "swirly_util_${name}")
-  add_executable(${name} ${file})
-  target_link_libraries(${name} ${swirly_util_LIBRARY} ${swirly_unit_LIBRARY})
-  add_test(NAME ${name} COMMAND ${name})
+  add_test(NAME util::${name}Suite COMMAND swirly_util_test -l error -t ${name}Suite)
 endforeach()

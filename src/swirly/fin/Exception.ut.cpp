@@ -18,17 +18,22 @@
 
 #include <swirly/util/String.hpp>
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 using namespace swirly;
 
-SWIRLY_TEST_CASE(ExceptionToString)
+BOOST_AUTO_TEST_SUITE(ExceptionSuite)
+
+BOOST_AUTO_TEST_CASE(ExceptionToStringCase)
 {
     const NotFoundException e{"this is a test"};
 
-    SWIRLY_CHECK(toString(e) == //
-                 "{\"status\":404"
-                 ",\"reason\":\"Not Found\""
-                 ",\"detail\":\"this is a test\""
-                 "}");
+    BOOST_TEST(toString(e) == //
+               "{\"status\":404"
+               ",\"reason\":\"Not Found\""
+               ",\"detail\":\"this is a test\""
+               "}");
 }
+
+BOOST_AUTO_TEST_SUITE_END()

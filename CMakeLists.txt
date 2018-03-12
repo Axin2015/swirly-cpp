@@ -76,15 +76,14 @@ if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
   add_definitions(-DSWIRLY_ENABLE_DEBUG=1)
 endif()
 
-set(EXECUTABLE_OUTPUT_PATH "${PROJECT_BINARY_DIR}/bin")
-set(LIBRARY_OUTPUT_PATH "${PROJECT_BINARY_DIR}/lib64")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib64")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib64")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
 
 set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
 set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib64")
 
-file(MAKE_DIRECTORY "${EXECUTABLE_OUTPUT_PATH}")
-file(MAKE_DIRECTORY "${LIBRARY_OUTPUT_PATH}")
 file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/share/doc/html")
 
 find_program(DOT_EXECUTABLE dot)
@@ -92,7 +91,7 @@ find_program(ENV_EXECUTABLE env)
 find_program(RAGEL_EXECUTABLE ragel)
 
 set(Boost_USE_STATIC_LIBS ON)
-find_package(Boost 1.60 REQUIRED COMPONENTS date_time filesystem system)
+find_package(Boost 1.60 REQUIRED COMPONENTS date_time filesystem system unit_test_framework)
 # The sqlite3_errstr() function was added in 3.7.15.
 find_package(SQLite3 3.7.15 REQUIRED)
 
@@ -123,7 +122,6 @@ include_directories("${PROJECT_BINARY_DIR}/include" "${PROJECT_SOURCE_DIR}/src")
 
 if(ENABLE_SHARED_LIBS)
   set(swirly_sys_LIBRARY swirly_sys_shared)
-  set(swirly_unit_LIBRARY swirly_unit_shared)
   set(swirly_util_LIBRARY swirly_util_shared)
   set(swirly_fin_LIBRARY swirly_fin_shared)
   set(swirly_clob_LIBRARY swirly_clob_shared)
@@ -131,7 +129,6 @@ if(ENABLE_SHARED_LIBS)
   set(swirly_sqlite_LIBRARY swirly_sqlite_shared)
 else()
   set(swirly_sys_LIBRARY swirly_sys_static)
-  set(swirly_unit_LIBRARY swirly_unit_static)
   set(swirly_util_LIBRARY swirly_util_static)
   set(swirly_fin_LIBRARY swirly_fin_static)
   set(swirly_clob_LIBRARY swirly_clob_static)

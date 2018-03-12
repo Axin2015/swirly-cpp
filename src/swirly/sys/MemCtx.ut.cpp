@@ -16,7 +16,8 @@
  */
 #include "MemCtx.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 #include <cstring>
 
@@ -35,20 +36,22 @@ struct Bar {
 
 } // namespace
 
-SWIRLY_TEST_CASE(MemCtx)
+BOOST_AUTO_TEST_SUITE(MemCtxSuite)
+
+BOOST_AUTO_TEST_CASE(MemCtxCase)
 {
     MemCtx memCtx{0};
 
     // Throw if no memory has been reserved.
-    SWIRLY_CHECK(memCtx.maxSize() == 0);
+    BOOST_TEST(memCtx.maxSize() == 0);
 
     // These should all call the custom allocator with zero capacity.
-    SWIRLY_CHECK_THROW(memCtx.alloc(sizeof(Foo)), bad_alloc);
-    SWIRLY_CHECK_THROW(memCtx.alloc(sizeof(Bar)), bad_alloc);
+    BOOST_CHECK_THROW(memCtx.alloc(sizeof(Foo)), bad_alloc);
+    BOOST_CHECK_THROW(memCtx.alloc(sizeof(Bar)), bad_alloc);
 
     {
         memCtx = MemCtx{4096};
-        SWIRLY_CHECK(memCtx.maxSize() == 4096);
+        BOOST_TEST(memCtx.maxSize() == 4096);
     }
 
     char* p1{static_cast<char*>(memCtx.alloc(sizeof(Foo)))};
@@ -58,6 +61,8 @@ SWIRLY_TEST_CASE(MemCtx)
 
     // Check that the same address is returned.
     char* p2{static_cast<char*>(memCtx.alloc(sizeof(Foo)))};
-    SWIRLY_CHECK(p1 == p2);
+    BOOST_TEST(p1 == p2);
     memCtx.dealloc(p2, sizeof(Foo));
 }
+
+BOOST_AUTO_TEST_SUITE_END()

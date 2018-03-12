@@ -16,91 +16,96 @@
  */
 #include "Tokeniser.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 using namespace swirly;
 
-SWIRLY_TEST_CASE(TokeniserEmpty)
+BOOST_AUTO_TEST_SUITE(TokeniserSuite)
+
+BOOST_AUTO_TEST_CASE(TokeniserEmptyCase)
 {
     Tokeniser toks;
 
-    SWIRLY_CHECK(toks.empty());
+    BOOST_TEST(toks.empty());
 
     toks = Tokeniser{""sv, ","sv};
-    SWIRLY_CHECK(toks.empty());
+    BOOST_TEST(toks.empty());
 }
 
-SWIRLY_TEST_CASE(TokeniserMultiEmpty)
+BOOST_AUTO_TEST_CASE(TokeniserMultiEmptyCase)
 {
     Tokeniser toks{","sv, ","sv};
 
-    SWIRLY_CHECK(toks.top().empty());
+    BOOST_TEST(toks.top().empty());
 
     toks.pop();
-    SWIRLY_CHECK(toks.empty());
+    BOOST_TEST(toks.empty());
 }
 
-SWIRLY_TEST_CASE(TokeniserSingleValue)
+BOOST_AUTO_TEST_CASE(TokeniserSingleValueCase)
 {
     Tokeniser toks{"foo"sv, ","sv};
 
-    SWIRLY_CHECK(toks.top() == "foo");
+    BOOST_TEST(toks.top() == "foo");
 
     toks.pop();
-    SWIRLY_CHECK(toks.empty());
+    BOOST_TEST(toks.empty());
 }
 
-SWIRLY_TEST_CASE(TokeniserMultiValue)
+BOOST_AUTO_TEST_CASE(TokeniserMultiValueCase)
 {
     Tokeniser toks{"foo,bar,baz"sv, ","sv};
 
-    SWIRLY_CHECK(toks.top() == "foo");
+    BOOST_TEST(toks.top() == "foo");
 
     toks.pop();
-    SWIRLY_CHECK(toks.top() == "bar");
+    BOOST_TEST(toks.top() == "bar");
 
     toks.pop();
-    SWIRLY_CHECK(toks.top() == "baz");
+    BOOST_TEST(toks.top() == "baz");
 
     toks.pop();
-    SWIRLY_CHECK(toks.empty());
+    BOOST_TEST(toks.empty());
 }
 
-SWIRLY_TEST_CASE(TokeniserMultiSep)
+BOOST_AUTO_TEST_CASE(TokeniserMultiSepCase)
 {
     Tokeniser toks{"foo,bar;baz"sv, ",;"sv};
 
-    SWIRLY_CHECK(toks.top() == "foo");
+    BOOST_TEST(toks.top() == "foo");
 
     toks.pop();
-    SWIRLY_CHECK(toks.top() == "bar");
+    BOOST_TEST(toks.top() == "bar");
 
     toks.pop();
-    SWIRLY_CHECK(toks.top() == "baz");
+    BOOST_TEST(toks.top() == "baz");
 
     toks.pop();
-    SWIRLY_CHECK(toks.empty());
+    BOOST_TEST(toks.empty());
 }
 
-SWIRLY_TEST_CASE(TokeniserLeading)
+BOOST_AUTO_TEST_CASE(TokeniserLeadingCase)
 {
     Tokeniser toks{",foo"sv, ","sv};
 
-    SWIRLY_CHECK(toks.top().empty());
+    BOOST_TEST(toks.top().empty());
 
     toks.pop();
-    SWIRLY_CHECK(toks.top() == "foo");
+    BOOST_TEST(toks.top() == "foo");
 
     toks.pop();
-    SWIRLY_CHECK(toks.empty());
+    BOOST_TEST(toks.empty());
 }
 
-SWIRLY_TEST_CASE(TokeniserTrailing)
+BOOST_AUTO_TEST_CASE(TokeniserTrailingCase)
 {
     Tokeniser toks{"foo,"sv, ","sv};
 
-    SWIRLY_CHECK(toks.top() == "foo");
+    BOOST_TEST(toks.top() == "foo");
 
     toks.pop();
-    SWIRLY_CHECK(toks.empty());
+    BOOST_TEST(toks.empty());
 }
+
+BOOST_AUTO_TEST_SUITE_END()

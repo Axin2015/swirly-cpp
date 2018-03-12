@@ -26,7 +26,8 @@
 
 #include <swirly/sys/Time.hpp>
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 using namespace std;
 using namespace swirly;
@@ -59,95 +60,99 @@ struct ServFixture {
 
 } // namespace
 
-SWIRLY_FIXTURE_TEST_CASE(ServAssets, ServFixture)
+namespace utf = boost::unit_test;
+
+BOOST_AUTO_TEST_SUITE(ServSuite)
+
+BOOST_FIXTURE_TEST_CASE(ServAssets, ServFixture)
 {
-    SWIRLY_CHECK(distance(serv.assets().begin(), serv.assets().end()) == 24);
+    BOOST_TEST(distance(serv.assets().begin(), serv.assets().end()) == 24);
 
     auto it = serv.assets().find("CHF"sv);
-    SWIRLY_CHECK(it != serv.assets().end());
-    SWIRLY_CHECK(it->id() == 1_id32);
-    SWIRLY_CHECK(it->symbol() == "CHF"sv);
-    SWIRLY_CHECK(it->display() == "Switzerland, Francs"sv);
+    BOOST_TEST(it != serv.assets().end());
+    BOOST_TEST(it->id() == 1_id32);
+    BOOST_TEST(it->symbol() == "CHF"sv);
+    BOOST_TEST(it->display() == "Switzerland, Francs"sv);
 
-    SWIRLY_CHECK(it->type() == AssetType::Ccy);
+    BOOST_TEST(it->type() == AssetType::Ccy);
 }
 
-SWIRLY_FIXTURE_TEST_CASE(ServInstrs, ServFixture)
+BOOST_FIXTURE_TEST_CASE(ServInstrs, ServFixture, *utf::tolerance(0.0000001))
 {
-    SWIRLY_CHECK(distance(serv.instrs().begin(), serv.instrs().end()) == 21);
+    BOOST_TEST(distance(serv.instrs().begin(), serv.instrs().end()) == 21);
 
     auto it = serv.instrs().find("EURUSD"sv);
-    SWIRLY_CHECK(it != serv.instrs().end());
-    SWIRLY_CHECK(it->id() == 1_id32);
-    SWIRLY_CHECK(it->symbol() == "EURUSD"sv);
-    SWIRLY_CHECK(it->display() == "EURUSD"sv);
+    BOOST_TEST(it != serv.instrs().end());
+    BOOST_TEST(it->id() == 1_id32);
+    BOOST_TEST(it->symbol() == "EURUSD"sv);
+    BOOST_TEST(it->display() == "EURUSD"sv);
 
-    SWIRLY_CHECK(it->baseAsset() == "EUR"sv);
-    SWIRLY_CHECK(it->termCcy() == "USD"sv);
-    SWIRLY_CHECK(it->lotNumer() == 1000000);
-    SWIRLY_CHECK(it->lotDenom() == 1);
-    SWIRLY_CHECK(test::isSame(it->qtyInc(), 1e6, 0.1));
-    SWIRLY_CHECK(it->tickNumer() == 1);
-    SWIRLY_CHECK(it->tickDenom() == 10000);
-    SWIRLY_CHECK(test::isSame(it->priceInc(), 1e-4));
-    SWIRLY_CHECK(it->pipDp() == 4);
-    SWIRLY_CHECK(it->qtyDp() == 0);
-    SWIRLY_CHECK(it->minLots() == 1_lts);
-    SWIRLY_CHECK(it->maxLots() == 10_lts);
+    BOOST_TEST(it->baseAsset() == "EUR"sv);
+    BOOST_TEST(it->termCcy() == "USD"sv);
+    BOOST_TEST(it->lotNumer() == 1000000);
+    BOOST_TEST(it->lotDenom() == 1);
+    BOOST_TEST(it->qtyInc() == 1e6);
+    BOOST_TEST(it->tickNumer() == 1);
+    BOOST_TEST(it->tickDenom() == 10000);
+    BOOST_TEST(it->priceInc() == 1e-4);
+    BOOST_TEST(it->pipDp() == 4);
+    BOOST_TEST(it->qtyDp() == 0);
+    BOOST_TEST(it->minLots() == 1_lts);
+    BOOST_TEST(it->maxLots() == 10_lts);
 }
 
-SWIRLY_FIXTURE_TEST_CASE(ServMarkets, ServFixture)
+BOOST_FIXTURE_TEST_CASE(ServMarkets, ServFixture)
 {
-    SWIRLY_CHECK(distance(serv.markets().begin(), serv.markets().end()) == 1);
+    BOOST_TEST(distance(serv.markets().begin(), serv.markets().end()) == 1);
 
     auto it = serv.markets().find(MarketId);
-    SWIRLY_CHECK(it != serv.markets().end());
-    SWIRLY_CHECK(it->id() == MarketId);
+    BOOST_TEST(it != serv.markets().end());
+    BOOST_TEST(it->id() == MarketId);
 
-    SWIRLY_CHECK(it->instr() == "EURUSD"sv);
-    SWIRLY_CHECK(it->settlDay() == SettlDay);
-    SWIRLY_CHECK(it->state() == 0x1);
+    BOOST_TEST(it->instr() == "EURUSD"sv);
+    BOOST_TEST(it->settlDay() == SettlDay);
+    BOOST_TEST(it->state() == 0x1);
 }
 
-SWIRLY_FIXTURE_TEST_CASE(ServMarket, ServFixture)
+BOOST_FIXTURE_TEST_CASE(ServMarket, ServFixture)
 {
     // Not found.
-    SWIRLY_CHECK_THROW(serv.market(1_id64), MarketNotFoundException);
+    BOOST_CHECK_THROW(serv.market(1_id64), MarketNotFoundException);
 
     auto& market = serv.market(MarketId);
-    SWIRLY_CHECK(market.id() == MarketId);
+    BOOST_TEST(market.id() == MarketId);
 
-    SWIRLY_CHECK(market.instr() == "EURUSD"sv);
-    SWIRLY_CHECK(market.settlDay() == SettlDay);
-    SWIRLY_CHECK(market.state() == 0x1);
+    BOOST_TEST(market.instr() == "EURUSD"sv);
+    BOOST_TEST(market.settlDay() == SettlDay);
+    BOOST_TEST(market.state() == 0x1);
 }
 
-SWIRLY_FIXTURE_TEST_CASE(ServCreateMarket, ServFixture)
+BOOST_FIXTURE_TEST_CASE(ServCreateMarket, ServFixture)
 {
     const Instr& instr = serv.instr("USDJPY"sv);
     const auto marketId = toMarketId(instr.id(), SettlDay);
 
     // Settl-day before bus-day.
-    SWIRLY_CHECK_THROW(serv.createMarket(instr, Today - 1_jd, 0x1, Now), InvalidException);
+    BOOST_CHECK_THROW(serv.createMarket(instr, Today - 1_jd, 0x1, Now), InvalidException);
 
     auto& market = serv.createMarket(instr, SettlDay, 0x1, Now);
 
-    SWIRLY_CHECK(market.id() == marketId);
+    BOOST_TEST(market.id() == marketId);
 
-    SWIRLY_CHECK(market.instr() == "USDJPY"sv);
-    SWIRLY_CHECK(market.settlDay() == SettlDay);
-    SWIRLY_CHECK(market.state() == 0x1);
+    BOOST_TEST(market.instr() == "USDJPY"sv);
+    BOOST_TEST(market.settlDay() == SettlDay);
+    BOOST_TEST(market.state() == 0x1);
 
-    SWIRLY_CHECK(distance(serv.markets().begin(), serv.markets().end()) == 2);
+    BOOST_TEST(distance(serv.markets().begin(), serv.markets().end()) == 2);
     auto it = serv.markets().find(marketId);
-    SWIRLY_CHECK(it != serv.markets().end());
-    SWIRLY_CHECK(&*it == &market);
+    BOOST_TEST(it != serv.markets().end());
+    BOOST_TEST(&*it == &market);
 
     // Already exists.
-    SWIRLY_CHECK_THROW(serv.createMarket(instr, SettlDay, 0x1, Now), AlreadyExistsException);
+    BOOST_CHECK_THROW(serv.createMarket(instr, SettlDay, 0x1, Now), AlreadyExistsException);
 }
 
-SWIRLY_FIXTURE_TEST_CASE(ServUpdateMarket, ServFixture)
+BOOST_FIXTURE_TEST_CASE(ServUpdateMarket, ServFixture)
 {
     const Instr& instr = serv.instr("USDJPY"sv);
     const auto marketId = toMarketId(instr.id(), SettlDay);
@@ -155,14 +160,14 @@ SWIRLY_FIXTURE_TEST_CASE(ServUpdateMarket, ServFixture)
 
     serv.updateMarket(market, 0x2, Now);
 
-    SWIRLY_CHECK(market.id() == marketId);
+    BOOST_TEST(market.id() == marketId);
 
-    SWIRLY_CHECK(market.instr() == "USDJPY"sv);
-    SWIRLY_CHECK(market.settlDay() == SettlDay);
-    SWIRLY_CHECK(market.state() == 0x2);
+    BOOST_TEST(market.instr() == "USDJPY"sv);
+    BOOST_TEST(market.settlDay() == SettlDay);
+    BOOST_TEST(market.state() == 0x2);
 }
 
-SWIRLY_FIXTURE_TEST_CASE(ServCreateOrder, ServFixture)
+BOOST_FIXTURE_TEST_CASE(ServCreateOrder, ServFixture)
 {
     auto& accnt = serv.accnt("MARAYL"sv);
     const Instr& instr = serv.instr("EURUSD"sv);
@@ -172,26 +177,28 @@ SWIRLY_FIXTURE_TEST_CASE(ServCreateOrder, ServFixture)
     Response resp;
     serv.createOrder(accnt, market, ""sv, Side::Buy, 5_lts, 12345_tks, 1_lts, Now, resp);
 
-    SWIRLY_CHECK(resp.orders().size() == 1);
-    SWIRLY_CHECK(resp.execs().size() == 1);
+    BOOST_TEST(resp.orders().size() == 1);
+    BOOST_TEST(resp.execs().size() == 1);
 
     ConstOrderPtr order{resp.orders().front()};
-    SWIRLY_CHECK(order->marketId() == market.id());
-    SWIRLY_CHECK(order->instr() == instr.symbol());
-    SWIRLY_CHECK(order->settlDay() == SettlDay);
-    SWIRLY_CHECK(order->id() == 1_id64);
-    SWIRLY_CHECK(order->accnt() == accnt.symbol());
-    SWIRLY_CHECK(order->ref().empty());
-    SWIRLY_CHECK(order->state() == State::New);
-    SWIRLY_CHECK(order->side() == Side::Buy);
-    SWIRLY_CHECK(order->lots() == 5_lts);
-    SWIRLY_CHECK(order->ticks() == 12345_tks);
-    SWIRLY_CHECK(order->resdLots() == 5_lts);
-    SWIRLY_CHECK(order->execLots() == 0_lts);
-    SWIRLY_CHECK(order->execCost() == 0_cst);
-    SWIRLY_CHECK(order->lastLots() == 0_lts);
-    SWIRLY_CHECK(order->lastTicks() == 0_tks);
-    SWIRLY_CHECK(order->minLots() == 1_lts);
-    SWIRLY_CHECK(order->created() == Now);
-    SWIRLY_CHECK(order->modified() == Now);
+    BOOST_TEST(order->marketId() == market.id());
+    BOOST_TEST(order->instr() == instr.symbol());
+    BOOST_TEST(order->settlDay() == SettlDay);
+    BOOST_TEST(order->id() == 1_id64);
+    BOOST_TEST(order->accnt() == accnt.symbol());
+    BOOST_TEST(order->ref().empty());
+    BOOST_TEST(order->state() == State::New);
+    BOOST_TEST(order->side() == Side::Buy);
+    BOOST_TEST(order->lots() == 5_lts);
+    BOOST_TEST(order->ticks() == 12345_tks);
+    BOOST_TEST(order->resdLots() == 5_lts);
+    BOOST_TEST(order->execLots() == 0_lts);
+    BOOST_TEST(order->execCost() == 0_cst);
+    BOOST_TEST(order->lastLots() == 0_lts);
+    BOOST_TEST(order->lastTicks() == 0_tks);
+    BOOST_TEST(order->minLots() == 1_lts);
+    BOOST_TEST(order->created() == Now);
+    BOOST_TEST(order->modified() == Now);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

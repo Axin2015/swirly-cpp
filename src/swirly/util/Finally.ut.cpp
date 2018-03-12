@@ -16,16 +16,21 @@
  */
 #include "Finally.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 using namespace swirly;
 
-SWIRLY_TEST_CASE(Finally)
+BOOST_AUTO_TEST_SUITE(FinallySuite)
+
+BOOST_AUTO_TEST_CASE(FinallyCase)
 {
     bool success{false};
     {
         auto finally = makeFinally([&success]() { success = true; });
-        SWIRLY_CHECK(!success);
+        BOOST_TEST(!success);
     }
-    SWIRLY_CHECK(success);
+    BOOST_TEST(success);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

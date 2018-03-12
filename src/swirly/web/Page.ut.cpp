@@ -18,54 +18,59 @@
 
 #include <swirly/util/String.hpp>
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 #include <tuple>
 
 using namespace std;
 using namespace swirly;
 
-SWIRLY_TEST_CASE(ParseQueryNone)
+BOOST_AUTO_TEST_SUITE(PageSuite)
+
+BOOST_AUTO_TEST_CASE(ParseQueryNoneCase)
 {
     auto page = parseQuery(""sv);
-    SWIRLY_CHECK(page.offset == 0);
-    SWIRLY_CHECK(!page.limit);
+    BOOST_TEST(page.offset == 0);
+    BOOST_TEST(!page.limit);
 }
 
-SWIRLY_TEST_CASE(ParseQueryOffset)
+BOOST_AUTO_TEST_CASE(ParseQueryOffsetCase)
 {
     auto page = parseQuery("offset=1"sv);
-    SWIRLY_CHECK(page.offset == 1);
-    SWIRLY_CHECK(!page.limit);
+    BOOST_TEST(page.offset == 1);
+    BOOST_TEST(!page.limit);
 }
 
-SWIRLY_TEST_CASE(ParseQueryLimit)
+BOOST_AUTO_TEST_CASE(ParseQueryLimitCase)
 {
     auto page = parseQuery("limit=2"sv);
-    SWIRLY_CHECK(page.offset == 0);
-    SWIRLY_CHECK(page.limit);
-    SWIRLY_CHECK(*page.limit == 2);
+    BOOST_TEST(page.offset == 0);
+    BOOST_TEST(!!page.limit);
+    BOOST_TEST(*page.limit == 2);
 }
 
-SWIRLY_TEST_CASE(ParseQueryOffsetAndLimit)
+BOOST_AUTO_TEST_CASE(ParseQueryOffsetAndLimitCase)
 {
     auto page = parseQuery("offset=1&limit=2"sv);
-    SWIRLY_CHECK(page.offset == 1);
-    SWIRLY_CHECK(page.limit);
-    SWIRLY_CHECK(*page.limit == 2);
+    BOOST_TEST(page.offset == 1);
+    BOOST_TEST(!!page.limit);
+    BOOST_TEST(*page.limit == 2);
 }
 
-SWIRLY_TEST_CASE(ParseQueryLimitAndOffset)
+BOOST_AUTO_TEST_CASE(ParseQueryLimitAndOffsetCase)
 {
     auto page = parseQuery("limit=2&offset=1"sv);
-    SWIRLY_CHECK(page.offset == 1);
-    SWIRLY_CHECK(page.limit);
-    SWIRLY_CHECK(*page.limit == 2);
+    BOOST_TEST(page.offset == 1);
+    BOOST_TEST(!!page.limit);
+    BOOST_TEST(*page.limit == 2);
 }
 
-SWIRLY_TEST_CASE(ParseQueryOther)
+BOOST_AUTO_TEST_CASE(ParseQueryOtherCase)
 {
     auto page = parseQuery("foo=1&bar=2"sv);
-    SWIRLY_CHECK(page.offset == 0);
-    SWIRLY_CHECK(!page.limit);
+    BOOST_TEST(page.offset == 0);
+    BOOST_TEST(!page.limit);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

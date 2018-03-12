@@ -16,28 +16,33 @@
  */
 #include "Math.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 using namespace std;
 using namespace swirly;
 
-SWIRLY_TEST_CASE(NextPow2)
-{
-    SWIRLY_CHECK(nextPow2(1U) == 1U);
-    SWIRLY_CHECK(nextPow2(2U) == 2U);
-    SWIRLY_CHECK(nextPow2(3U) == 4U);
-    SWIRLY_CHECK(nextPow2(4U) == 4U);
-    SWIRLY_CHECK(nextPow2(5U) == 8U);
-    SWIRLY_CHECK(nextPow2(6U) == 8U);
-    SWIRLY_CHECK(nextPow2(7U) == 8U);
-    SWIRLY_CHECK(nextPow2(8U) == 8U);
+BOOST_AUTO_TEST_SUITE(MathSuite)
 
-    SWIRLY_CHECK(nextPow2(1UL) == 1UL);
-    SWIRLY_CHECK(nextPow2(2UL) == 2UL);
-    SWIRLY_CHECK(nextPow2(3UL) == 4UL);
-    SWIRLY_CHECK(nextPow2(4UL) == 4UL);
-    SWIRLY_CHECK(nextPow2(5UL) == 8UL);
-    SWIRLY_CHECK(nextPow2(6UL) == 8UL);
-    SWIRLY_CHECK(nextPow2(7UL) == 8UL);
-    SWIRLY_CHECK(nextPow2(8UL) == 8UL);
+BOOST_AUTO_TEST_CASE(NextPow2Case)
+{
+    BOOST_TEST(nextPow2(1U) == 1U);
+    BOOST_TEST(nextPow2(2U) == 2U);
+    BOOST_TEST(nextPow2(3U) == 4U);
+    BOOST_TEST(nextPow2(4U) == 4U);
+    BOOST_TEST(nextPow2(5U) == 8U);
+    BOOST_TEST(nextPow2(6U) == 8U);
+    BOOST_TEST(nextPow2(7U) == 8U);
+    BOOST_TEST(nextPow2(8U) == 8U);
+
+    BOOST_TEST(nextPow2(1UL) == 1UL);
+    BOOST_TEST(nextPow2(2UL) == 2UL);
+    BOOST_TEST(nextPow2(3UL) == 4UL);
+    BOOST_TEST(nextPow2(4UL) == 4UL);
+    BOOST_TEST(nextPow2(5UL) == 8UL);
+    BOOST_TEST(nextPow2(6UL) == 8UL);
+    BOOST_TEST(nextPow2(7UL) == 8UL);
+    BOOST_TEST(nextPow2(8UL) == 8UL);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

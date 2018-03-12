@@ -16,7 +16,8 @@
  */
 #include "Buffer.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 using namespace std;
 using namespace swirly;
@@ -49,44 +50,46 @@ string read(Buffer& buf, std::size_t limit)
 
 } // namespace
 
-SWIRLY_TEST_CASE(BufferReadWrite)
+BOOST_AUTO_TEST_SUITE(BufferSuite)
+
+BOOST_AUTO_TEST_CASE(ReadWriteCase)
 {
     Buffer buf;
-    SWIRLY_CHECK(buf.empty());
-    SWIRLY_CHECK(buf.size() == 0);
-    SWIRLY_CHECK(buffer_size(buf.data()) == 0);
+    BOOST_TEST(buf.empty());
+    BOOST_TEST(buf.size() == 0);
+    BOOST_TEST(buffer_size(buf.data()) == 0);
 
     write(buf, "foo");
-    SWIRLY_CHECK(!buf.empty());
-    SWIRLY_CHECK(buf.size() == 3);
-    SWIRLY_CHECK(buffer_size(buf.data()) == 3);
-    SWIRLY_CHECK(memcmp(buffer_cast<const char*>(buf.data()), "foo", 3) == 0);
+    BOOST_TEST(!buf.empty());
+    BOOST_TEST(buf.size() == 3);
+    BOOST_TEST(buffer_size(buf.data()) == 3);
+    BOOST_TEST(memcmp(buffer_cast<const char*>(buf.data()), "foo", 3) == 0);
 
     write(buf, "bar");
-    SWIRLY_CHECK(!buf.empty());
-    SWIRLY_CHECK(buf.size() == 6);
-    SWIRLY_CHECK(buffer_size(buf.data()) == 6);
-    SWIRLY_CHECK(memcmp(buffer_cast<const char*>(buf.data()), "foobar", 6) == 0);
+    BOOST_TEST(!buf.empty());
+    BOOST_TEST(buf.size() == 6);
+    BOOST_TEST(buffer_size(buf.data()) == 6);
+    BOOST_TEST(memcmp(buffer_cast<const char*>(buf.data()), "foobar", 6) == 0);
 
-    SWIRLY_CHECK(read(buf, 4) == "foob");
-    SWIRLY_CHECK(!buf.empty());
-    SWIRLY_CHECK(buf.size() == 2);
-    SWIRLY_CHECK(buffer_size(buf.data()) == 2);
-    SWIRLY_CHECK(memcmp(buffer_cast<const char*>(buf.data()), "ar", 2) == 0);
+    BOOST_TEST(read(buf, 4) == "foob");
+    BOOST_TEST(!buf.empty());
+    BOOST_TEST(buf.size() == 2);
+    BOOST_TEST(buffer_size(buf.data()) == 2);
+    BOOST_TEST(memcmp(buffer_cast<const char*>(buf.data()), "ar", 2) == 0);
 
     write(buf, "baz");
-    SWIRLY_CHECK(!buf.empty());
-    SWIRLY_CHECK(buf.size() == 5);
-    SWIRLY_CHECK(buffer_size(buf.data()) == 5);
-    SWIRLY_CHECK(memcmp(buffer_cast<const char*>(buf.data()), "arbaz", 5) == 0);
+    BOOST_TEST(!buf.empty());
+    BOOST_TEST(buf.size() == 5);
+    BOOST_TEST(buffer_size(buf.data()) == 5);
+    BOOST_TEST(memcmp(buffer_cast<const char*>(buf.data()), "arbaz", 5) == 0);
 
-    SWIRLY_CHECK(read(buf) == "arbaz");
-    SWIRLY_CHECK(buf.empty());
-    SWIRLY_CHECK(buf.size() == 0);
-    SWIRLY_CHECK(buffer_size(buf.data()) == 0);
+    BOOST_TEST(read(buf) == "arbaz");
+    BOOST_TEST(buf.empty());
+    BOOST_TEST(buf.size() == 0);
+    BOOST_TEST(buffer_size(buf.data()) == 0);
 }
 
-SWIRLY_TEST_CASE(BufferNoShrinkSmall)
+BOOST_AUTO_TEST_CASE(NoShrinkSmallCase)
 {
     Buffer buf;
 
@@ -98,28 +101,28 @@ SWIRLY_TEST_CASE(BufferNoShrinkSmall)
     // Simulated write.
     buf.prepare(16);
     buf.commit(16);
-    SWIRLY_CHECK(!buf.empty());
-    SWIRLY_CHECK(buf.size() == 16);
-    SWIRLY_CHECK(buffer_size(buf.data()) == 16);
-    SWIRLY_CHECK(buffer_cast<const char*>(buf.data()) == base);
+    BOOST_TEST(!buf.empty());
+    BOOST_TEST(buf.size() == 16);
+    BOOST_TEST(buffer_size(buf.data()) == 16);
+    BOOST_TEST(distance(base, buffer_cast<const char*>(buf.data())) == 0);
 
     // Consume less than half.
     buf.consume(7);
-    SWIRLY_CHECK(!buf.empty());
-    SWIRLY_CHECK(buf.size() == 9);
-    SWIRLY_CHECK(buffer_size(buf.data()) == 9);
-    SWIRLY_CHECK(buffer_cast<const char*>(buf.data()) == base + 7);
+    BOOST_TEST(!buf.empty());
+    BOOST_TEST(buf.size() == 9);
+    BOOST_TEST(buffer_size(buf.data()) == 9);
+    BOOST_TEST(distance(base, buffer_cast<const char*>(buf.data())) == 7);
 
     // Consuming one more should not trigger shrink, because the buffer size is less than the shrink
     // threshold.
     buf.consume(1);
-    SWIRLY_CHECK(!buf.empty());
-    SWIRLY_CHECK(buf.size() == 8);
-    SWIRLY_CHECK(buffer_size(buf.data()) == 8);
-    SWIRLY_CHECK(buffer_cast<const char*>(buf.data()) != base);
+    BOOST_TEST(!buf.empty());
+    BOOST_TEST(buf.size() == 8);
+    BOOST_TEST(buffer_size(buf.data()) == 8);
+    BOOST_TEST(distance(base, buffer_cast<const char*>(buf.data())) != 0);
 }
 
-SWIRLY_TEST_CASE(BufferShrinkLarge)
+BOOST_AUTO_TEST_CASE(ShrinkLargeCase)
 {
     Buffer buf;
 
@@ -131,23 +134,25 @@ SWIRLY_TEST_CASE(BufferShrinkLarge)
     // Simulated write.
     buf.prepare(2048);
     buf.commit(2048);
-    SWIRLY_CHECK(!buf.empty());
-    SWIRLY_CHECK(buf.size() == 2048);
-    SWIRLY_CHECK(buffer_size(buf.data()) == 2048);
-    SWIRLY_CHECK(buffer_cast<const char*>(buf.data()) == base);
+    BOOST_TEST(!buf.empty());
+    BOOST_TEST(buf.size() == 2048);
+    BOOST_TEST(buffer_size(buf.data()) == 2048);
+    BOOST_TEST(buffer_cast<const char*>(buf.data()) == base);
 
     // Consume less than half.
     buf.consume(1023);
-    SWIRLY_CHECK(!buf.empty());
-    SWIRLY_CHECK(buf.size() == 1025);
-    SWIRLY_CHECK(buffer_size(buf.data()) == 1025);
-    SWIRLY_CHECK(buffer_cast<const char*>(buf.data()) == base + 1023);
+    BOOST_TEST(!buf.empty());
+    BOOST_TEST(buf.size() == 1025);
+    BOOST_TEST(buffer_size(buf.data()) == 1025);
+    BOOST_TEST(buffer_cast<const char*>(buf.data()) == base + 1023);
 
     // Consuming one more should not trigger shrink, because the buffer size is less than the shrink
     // threshold.
     buf.consume(1);
-    SWIRLY_CHECK(!buf.empty());
-    SWIRLY_CHECK(buf.size() == 1024);
-    SWIRLY_CHECK(buffer_size(buf.data()) == 1024);
-    SWIRLY_CHECK(buffer_cast<const char*>(buf.data()) == base);
+    BOOST_TEST(!buf.empty());
+    BOOST_TEST(buf.size() == 1024);
+    BOOST_TEST(buffer_size(buf.data()) == 1024);
+    BOOST_TEST(buffer_cast<const char*>(buf.data()) == base);
 }
+
+BOOST_AUTO_TEST_SUITE_END()

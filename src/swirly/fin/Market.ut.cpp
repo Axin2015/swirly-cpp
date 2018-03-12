@@ -18,48 +18,53 @@
 
 #include <swirly/util/Date.hpp>
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 using namespace swirly;
 
-SWIRLY_TEST_CASE(MarketToString)
+BOOST_AUTO_TEST_SUITE(MarketSuite)
+
+BOOST_AUTO_TEST_CASE(MarketToStringCase)
 {
     Market market{1_id64, "EURUSD"sv, ymdToJd(2014, 2, 14), 0x01};
 
-    SWIRLY_CHECK(toString(market) == //
-                 "{\"id\":1"
-                 ",\"instr\":\"EURUSD\""
-                 ",\"settlDate\":20140314"
-                 ",\"state\":1"
-                 ",\"lastLots\":null"
-                 ",\"lastTicks\":null"
-                 ",\"lastTime\":null"
-                 ",\"bidTicks\":[null,null,null]"
-                 ",\"bidLots\":[null,null,null]"
-                 ",\"bidCount\":[null,null,null]"
-                 ",\"offerTicks\":[null,null,null]"
-                 ",\"offerLots\":[null,null,null]"
-                 ",\"offerCount\":[null,null,null]"
-                 "}");
+    BOOST_TEST(toString(market) == //
+               "{\"id\":1"
+               ",\"instr\":\"EURUSD\""
+               ",\"settlDate\":20140314"
+               ",\"state\":1"
+               ",\"lastLots\":null"
+               ",\"lastTicks\":null"
+               ",\"lastTime\":null"
+               ",\"bidTicks\":[null,null,null]"
+               ",\"bidLots\":[null,null,null]"
+               ",\"bidCount\":[null,null,null]"
+               ",\"offerTicks\":[null,null,null]"
+               ",\"offerLots\":[null,null,null]"
+               ",\"offerCount\":[null,null,null]"
+               "}");
 }
 
-SWIRLY_TEST_CASE(MarketToStringNull)
+BOOST_AUTO_TEST_CASE(MarketToStringNullCase)
 {
     Market market{1_id64, "EURUSD"sv, 0_jd, 0x01};
 
-    SWIRLY_CHECK(toString(market) == //
-                 "{\"id\":1"
-                 ",\"instr\":\"EURUSD\""
-                 ",\"settlDate\":null"
-                 ",\"state\":1"
-                 ",\"lastLots\":null"
-                 ",\"lastTicks\":null"
-                 ",\"lastTime\":null"
-                 ",\"bidTicks\":[null,null,null]"
-                 ",\"bidLots\":[null,null,null]"
-                 ",\"bidCount\":[null,null,null]"
-                 ",\"offerTicks\":[null,null,null]"
-                 ",\"offerLots\":[null,null,null]"
-                 ",\"offerCount\":[null,null,null]"
-                 "}");
+    BOOST_TEST(toString(market) == //
+               "{\"id\":1"
+               ",\"instr\":\"EURUSD\""
+               ",\"settlDate\":null"
+               ",\"state\":1"
+               ",\"lastLots\":null"
+               ",\"lastTicks\":null"
+               ",\"lastTime\":null"
+               ",\"bidTicks\":[null,null,null]"
+               ",\"bidLots\":[null,null,null]"
+               ",\"bidCount\":[null,null,null]"
+               ",\"offerTicks\":[null,null,null]"
+               ",\"offerLots\":[null,null,null]"
+               ",\"offerCount\":[null,null,null]"
+               "}");
 }
+
+BOOST_AUTO_TEST_SUITE_END()

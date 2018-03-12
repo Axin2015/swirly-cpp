@@ -16,12 +16,17 @@
  */
 #include "Response.hpp"
 
-#include <swirly/unit/Test.hpp>
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 using namespace swirly;
 
-SWIRLY_TEST_CASE(Response)
+BOOST_AUTO_TEST_SUITE(ResponseSuite)
+
+BOOST_AUTO_TEST_CASE(ResponseCase)
 {
     Response r;
     Response s{r};
 }
+
+BOOST_AUTO_TEST_SUITE_END()
