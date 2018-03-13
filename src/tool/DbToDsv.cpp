@@ -14,6 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
+#include <swirly/sqlite/Model.hpp>
+
 #include <swirly/fin/Asset.hpp>
 #include <swirly/fin/Date.hpp>
 #include <swirly/fin/Exec.hpp>
@@ -45,11 +47,11 @@ int main(int argc, char* argv[])
         const BusinessDay busDay{MarketZone};
 
         const auto now = UnixClock::now();
-        auto model = makeModel(config);
+        SqlModel model{config};
         {
             ofstream os{"asset.txt"};
             os << "id\tsymbol\tdisplay\ttype\n";
-            model->readAsset([&os](auto ptr) {
+            model.readAsset([&os](auto ptr) {
                 ptr->toDsv(os, '\t');
                 os << '\n';
             });
@@ -58,7 +60,7 @@ int main(int argc, char* argv[])
             ofstream os{"instr.txt"};
             os << "id\tsymbol\tdisplay\tbaseAsset\ttermCcy\tlotNumer\tlotDenom\ttickNumer\t"
                   "tickDenom\tpipDp\tminLots\tmaxLots\n";
-            model->readInstr([&os](auto ptr) {
+            model.readInstr([&os](auto ptr) {
                 ptr->toDsv(os, '\t');
                 os << '\n';
             });
@@ -66,7 +68,7 @@ int main(int argc, char* argv[])
         {
             ofstream os{"market.txt"};
             os << "id\tinstr\tsettlDay\tstate\tlastLots\tlastTicks\tlastTime\tmaxId\n";
-            model->readMarket([&os](auto ptr) {
+            model.readMarket([&os](auto ptr) {
                 ptr->toDsv(os, '\t');
                 os << '\n';
             });
@@ -76,7 +78,7 @@ int main(int argc, char* argv[])
             os << "accnt\tmarketId\tinstr\tsettlDate\tid\tref\tstate\tside\tlots\tticks\t"
                   "resdLots\texecLots\texecCost\tlastLots\tlastTicks\tminLots\tcreated\t"
                   "modified\n";
-            model->readOrder([&os](auto ptr) {
+            model.readOrder([&os](auto ptr) {
                 ptr->toDsv(os, '\t');
                 os << '\n';
             });
@@ -87,7 +89,7 @@ int main(int argc, char* argv[])
                   "ticks\tresdLots\texecLots\texecCost\tlastLots\tlastTicks\tminLots\tmatchId\t"
                   "liqInd\tcpty\tcreated\n";
             // One week ago.
-            model->readExec(now - 604800000ms, [&os](auto ptr) {
+            model.readExec(now - 604800000ms, [&os](auto ptr) {
                 ptr->toDsv(os, '\t');
                 os << '\n';
             });
@@ -97,7 +99,7 @@ int main(int argc, char* argv[])
             os << "accnt\tmarketId\tinstr\tsettlDate\tid\torderId\tref\tstate\tside\tlots\t"
                   "ticks\tresdLots\texecLots\texecCost\tlastLots\tlastTicks\tminLots\tmatchId\t"
                   "liqInd\tcpty\tcreated\n";
-            model->readTrade([&os](auto ptr) {
+            model.readTrade([&os](auto ptr) {
                 ptr->toDsv(os, '\t');
                 os << '\n';
             });
@@ -105,7 +107,7 @@ int main(int argc, char* argv[])
         {
             ofstream os{"posn.txt"};
             os << "accnt\tmarketId\tinstr\tsettlDate\tbuyLots\tbuyCost\tsellLots\tsellCost\n";
-            model->readPosn(busDay(now), [&os](auto ptr) {
+            model.readPosn(busDay(now), [&os](auto ptr) {
                 ptr->toDsv(os, '\t');
                 os << '\n';
             });

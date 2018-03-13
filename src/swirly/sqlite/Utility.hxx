@@ -17,6 +17,8 @@
 #ifndef SWIRLY_SQLITE_UTILITY_HXX
 #define SWIRLY_SQLITE_UTILITY_HXX
 
+#include <swirly/sqlite/Types.hpp>
+
 #include <swirly/util/Enum.hpp>
 #include <swirly/util/Finally.hpp>
 #include <swirly/util/IntWrapper.hpp>
@@ -25,10 +27,7 @@
 
 #include <string_view>
 
-#include <memory>
 #include <type_traits>
-
-#include <sqlite3.h>
 
 namespace swirly {
 
@@ -138,9 +137,6 @@ struct DbTraits<std::string_view> {
 };
 
 } // namespace detail
-
-using DbPtr = std::unique_ptr<sqlite3, int (*)(sqlite3*)>;
-using StmtPtr = std::unique_ptr<sqlite3_stmt, int (*)(sqlite3_stmt*)>;
 
 DbPtr openDb(const char* path, int flags, const Config& config);
 

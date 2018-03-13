@@ -14,10 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SQLITE_JOURN_HXX
-#define SWIRLY_SQLITE_JOURN_HXX
+#ifndef SWIRLY_SQLITE_JOURN_HPP
+#define SWIRLY_SQLITE_JOURN_HPP
 
-#include "Utility.hxx"
+#include <swirly/sqlite/Types.hpp>
 
 #include <swirly/fin/Journ.hpp>
 #include <swirly/fin/MsgHandler.hpp>
@@ -25,7 +25,7 @@
 
 namespace swirly {
 
-class SqlJourn
+class SWIRLY_API SqlJourn
 : public Transactional
 , public Journ
 , BasicMsgHandler<SqlJourn> {
@@ -76,4 +76,4 @@ class SqlJourn
 
 } // namespace swirly
 
-#endif // SWIRLY_SQLITE_JOURN_HXX
+#endif // SWIRLY_SQLITE_JOURN_HPP

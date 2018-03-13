@@ -28,6 +28,7 @@ set(lib_SOURCES
   Exception.cpp
   Journ.cpp
   Model.cpp
+  Types.cpp
   Utility.cpp)
 
 include_directories(${SQLITE3_INCLUDE_DIRS})

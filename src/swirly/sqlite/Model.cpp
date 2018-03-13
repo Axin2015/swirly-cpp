@@ -14,7 +14,9 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Model.hxx"
+#include "Model.hpp"
+
+#include "Utility.hxx"
 
 #include <swirly/fin/Asset.hpp>
 #include <swirly/fin/Exec.hpp>
@@ -352,11 +354,6 @@ void SqlModel::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const
     for (it = ps.begin(); it != ps.end();) {
         cb(ps.remove(it++));
     }
-}
-
-unique_ptr<Model> makeModel(const Config& config)
-{
-    return make_unique<SqlModel>(config);
 }
 
 } // namespace swirly

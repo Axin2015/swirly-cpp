@@ -14,6 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
+#include <swirly/sqlite/Model.hpp>
+
 #include <swirly/fin/Asset.hpp>
 #include <swirly/fin/Date.hpp>
 #include <swirly/fin/Exec.hpp>
@@ -45,43 +47,43 @@ int main(int argc, char* argv[])
         const BusinessDay busDay{MarketZone};
 
         const auto now = UnixClock::now();
-        auto model = makeModel(config);
+        SqlModel model{config};
 
         cout << "{\"assets\":[";
         {
             OStreamJoiner it(cout, ',');
-            model->readAsset([&it](auto ptr) { it = *ptr; });
+            model.readAsset([&it](auto ptr) { it = *ptr; });
         }
         cout << "],\"instrs\":[";
         {
             OStreamJoiner it(cout, ',');
-            model->readInstr([&it](auto ptr) { it = *ptr; });
+            model.readInstr([&it](auto ptr) { it = *ptr; });
         }
         cout << "],\"markets\":[";
         {
             OStreamJoiner it(cout, ',');
-            model->readMarket([&it](MarketPtr ptr) { it = *ptr; });
+            model.readMarket([&it](MarketPtr ptr) { it = *ptr; });
         }
         cout << "],\"orders\":[";
         {
             OStreamJoiner it(cout, ',');
-            model->readOrder([&it](auto ptr) { it = *ptr; });
+            model.readOrder([&it](auto ptr) { it = *ptr; });
         }
         cout << "],\"execs\":[";
         {
             OStreamJoiner it(cout, ',');
             // One week ago.
-            model->readExec(now - 604800000ms, [&it](auto ptr) { it = *ptr; });
+            model.readExec(now - 604800000ms, [&it](auto ptr) { it = *ptr; });
         }
         cout << "],\"trades\":[";
         {
             OStreamJoiner it(cout, ',');
-            model->readTrade([&it](auto ptr) { it = *ptr; });
+            model.readTrade([&it](auto ptr) { it = *ptr; });
         }
         cout << "],\"posns\":[";
         {
             OStreamJoiner it(cout, ',');
-            model->readPosn(busDay(now), [&it](auto ptr) { it = *ptr; });
+            model.readPosn(busDay(now), [&it](auto ptr) { it = *ptr; });
         }
         cout << "]}\n";
 

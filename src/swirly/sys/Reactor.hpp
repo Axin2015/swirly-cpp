@@ -24,7 +24,7 @@
 
 namespace swirly {
 
-struct FileTokenPolicy {
+struct SubPolicy {
     struct Id {
         Reactor* reactor{nullptr};
         int value{-1};
@@ -33,76 +33,135 @@ struct FileTokenPolicy {
     static void close(Id id) noexcept;
 };
 
-inline bool operator==(FileTokenPolicy::Id lhs, FileTokenPolicy::Id rhs) noexcept
+inline bool operator==(SubPolicy::Id lhs, SubPolicy::Id rhs) noexcept
 {
     assert(lhs.reactor == rhs.reactor || !lhs.reactor || !rhs.reactor);
     return lhs.value == rhs.value;
 }
 
-inline bool operator!=(FileTokenPolicy::Id lhs, FileTokenPolicy::Id rhs) noexcept
+inline bool operator!=(SubPolicy::Id lhs, SubPolicy::Id rhs) noexcept
 {
     assert(lhs.reactor == rhs.reactor || !lhs.reactor || !rhs.reactor);
     return lhs.value != rhs.value;
 }
 
-using FileToken = Handle<FileTokenPolicy>;
+using SubHandle = Handle<SubPolicy>;
 
 class SWIRLY_API Reactor {
   public:
-    enum : FileEvents {
-        In = Muxer::In,
-        Pri = Muxer::Pri,
-        Out = Muxer::Out,
-        Err = Muxer::Err,
-        Hup = Muxer::Hup
-    };
-    using Id = typename Muxer::Id;
-    using FileEvent = typename Muxer::FileEvent;
-
-    explicit Reactor(std::size_t sizeHint = 1024);
-    ~Reactor() noexcept;
+    Reactor() noexcept = default;
+    virtual ~Reactor() noexcept;
 
     // Copy.
-    Reactor(const Reactor&) = delete;
-    Reactor& operator=(const Reactor&) = delete;
+    Reactor(const Reactor&) noexcept = default;
+    Reactor& operator=(const Reactor&) noexcept = default;
 
     // Move.
-    Reactor(Reactor&&);
-    Reactor& operator=(Reactor&&);
+    Reactor(Reactor&&) noexcept = default;
+    Reactor& operator=(Reactor&&) noexcept = default;
 
-    void swap(Reactor& rhs) noexcept { impl_.swap(rhs.impl_); }
-
-    /**
-     * Thread-safe.
-     */
-    bool closed() const noexcept;
+    bool closed() const noexcept { return doClosed(); }
 
     /**
      * Thread-safe.
      */
-    void close() noexcept;
+    void close() noexcept { doClose(); }
+    SubHandle subscribe(int fd, unsigned events, const EventHandlerPtr& handler)
+    {
+        return doSubscribe(fd, events, handler);
+    }
+    void unsubscribe(int fd) noexcept { doUnsubscribe(fd); }
+    void setEvents(int fd, unsigned events) { doSetEvents(fd, events); }
+    Timer setTimer(Time expiry, Duration interval, const EventHandlerPtr& handler)
+    {
+        return doSetTimer(expiry, interval, handler);
+    }
+    Timer setTimer(Time expiry, const EventHandlerPtr& handler)
+    {
+        return doSetTimer(expiry, handler);
+    }
+    int poll(std::chrono::milliseconds timeout = std::chrono::milliseconds::max())
+    {
+        return doPoll(timeout);
+    }
 
-    FileToken subscribe(int fd, FileEvents mask, const EventHandlerPtr& handler);
-    void unsubscribe(int fd) noexcept;
+  protected:
+    /**
+     * Thread-safe.
+     */
+    virtual bool doClosed() const noexcept = 0;
 
-    void setMask(int fd, FileEvents mask);
+    /**
+     * Thread-safe.
+     */
+    virtual void doClose() noexcept = 0;
 
-    Timer setTimer(Time expiry, Duration interval, const EventHandlerPtr& handler);
-    Timer setTimer(Time expiry, const EventHandlerPtr& handler);
+    virtual SubHandle doSubscribe(int fd, unsigned events, const EventHandlerPtr& handler) = 0;
+    virtual void doUnsubscribe(int fd) noexcept = 0;
 
-    int poll(std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
+    virtual void doSetEvents(int fd, unsigned events) = 0;
 
-  private:
-    int dispatch(FileEvent* buf, int size, Time now);
+    virtual Timer doSetTimer(Time expiry, Duration interval, const EventHandlerPtr& handler) = 0;
+    virtual Timer doSetTimer(Time expiry, const EventHandlerPtr& handler) = 0;
 
-    struct Impl;
-    std::unique_ptr<Impl> impl_;
+    virtual int doPoll(std::chrono::milliseconds timeout) = 0;
 };
 
-inline void FileTokenPolicy::close(Id id) noexcept
+inline void SubPolicy::close(Id id) noexcept
 {
     id.reactor->unsubscribe(id.value);
 }
+
+class SWIRLY_API EpollReactor : public Reactor {
+  public:
+    using Event = typename EpollMuxer::Event;
+
+    explicit EpollReactor(std::size_t sizeHint = 1024);
+    ~EpollReactor() noexcept override;
+
+    // Copy.
+    EpollReactor(const EpollReactor&) = delete;
+    EpollReactor& operator=(const EpollReactor&) = delete;
+
+    // Move.
+    EpollReactor(EpollReactor&&) = delete;
+    EpollReactor& operator=(EpollReactor&&) = delete;
+
+  protected:
+    /**
+     * Thread-safe.
+     */
+    bool doClosed() const noexcept override;
+
+    /**
+     * Thread-safe.
+     */
+    void doClose() noexcept override;
+
+    SubHandle doSubscribe(int fd, unsigned events, const EventHandlerPtr& handler) override;
+    void doUnsubscribe(int fd) noexcept override;
+
+    void doSetEvents(int fd, unsigned events) override;
+
+    Timer doSetTimer(Time expiry, Duration interval, const EventHandlerPtr& handler) override;
+    Timer doSetTimer(Time expiry, const EventHandlerPtr& handler) override;
+
+    int doPoll(std::chrono::milliseconds timeout) override;
+
+  private:
+    int dispatch(Event* buf, int size, Time now);
+
+    struct Data {
+        int sid{};
+        unsigned events{};
+        EventHandlerPtr handler;
+    };
+    EpollMuxer mux_;
+    std::vector<Data> data_;
+    EventFd efd_;
+    TimerQueue tq_;
+    std::atomic<bool> closed_{false};
+};
 
 } // namespace swirly
 

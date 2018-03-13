@@ -14,15 +14,20 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "EventHandler.hpp"
+#ifndef SWIRLY_SQLITE_TYPES_HPP
+#define SWIRLY_SQLITE_TYPES_HPP
 
-#include <csignal>
+#include <memory>
+
+#include <sqlite3.h>
 
 namespace swirly {
+namespace sqlite {
 
-EventHandler::~EventHandler() noexcept = default;
+using DbPtr = std::unique_ptr<sqlite3, int (*)(sqlite3*)>;
+using StmtPtr = std::unique_ptr<sqlite3_stmt, int (*)(sqlite3_stmt*)>;
 
-void EventHandler::doReady(int fd, unsigned mask, Time now) {}
-void EventHandler::doTimer(const Timer& tmr, Time now) {}
-
+} // namespace sqlite
 } // namespace swirly
+
+#endif // SWIRLY_SQLITE_TYPES_HPP

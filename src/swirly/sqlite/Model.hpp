@@ -14,16 +14,16 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SQLITE_MODEL_HXX
-#define SWIRLY_SQLITE_MODEL_HXX
+#ifndef SWIRLY_SQLITE_MODEL_HPP
+#define SWIRLY_SQLITE_MODEL_HPP
 
-#include "Utility.hxx"
+#include <swirly/sqlite/Types.hpp>
 
 #include <swirly/fin/Model.hpp>
 
 namespace swirly {
 
-class SqlModel : public Model {
+class SWIRLY_API SqlModel : public Model {
   public:
     explicit SqlModel(const Config& config);
     ~SqlModel() noexcept;
@@ -57,4 +57,4 @@ class SqlModel : public Model {
 
 } // namespace swirly
 
-#endif // SWIRLY_SQLITE_MODEL_HXX
+#endif // SWIRLY_SQLITE_MODEL_HPP

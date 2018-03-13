@@ -41,12 +41,12 @@ class SWIRLY_API TcpAcceptor : public EventHandler {
     TcpAcceptor& operator=(TcpAcceptor&&) = delete;
 
   protected:
-    void doReady(int fd, FileEvents events, Time now) override;
+    void doReady(int fd, unsigned events, Time now) override;
     virtual void doAccept(IoSocket&& sock, const Endpoint& ep, Time now) = 0;
 
   private:
     TcpSocketServ serv_;
-    FileToken tok_;
+    SubHandle sub_;
 };
 
 } // namespace swirly

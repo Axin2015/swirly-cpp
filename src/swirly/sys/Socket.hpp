@@ -57,7 +57,7 @@ inline unsigned if_nametoindex(const char* ifname)
 /**
  * Create an endpoint for communication.
  */
-inline File socket(int family, int type, int protocol, std::error_code& ec) noexcept
+inline FileHandle socket(int family, int type, int protocol, std::error_code& ec) noexcept
 {
     const auto sockfd = ::socket(family, type, protocol);
     if (sockfd < 0) {
@@ -69,7 +69,7 @@ inline File socket(int family, int type, int protocol, std::error_code& ec) noex
 /**
  * Create an endpoint for communication.
  */
-inline File socket(int family, int type, int protocol)
+inline FileHandle socket(int family, int type, int protocol)
 {
     const auto sockfd = ::socket(family, type, protocol);
     if (sockfd < 0) {
@@ -82,7 +82,7 @@ inline File socket(int family, int type, int protocol)
  * Create an endpoint for communication.
  */
 template <typename TransportT>
-inline File socket(TransportT trans, std::error_code& ec) noexcept
+inline FileHandle socket(TransportT trans, std::error_code& ec) noexcept
 {
     return socket(trans.family(), trans.type(), trans.protocol(), ec);
 }
@@ -91,7 +91,7 @@ inline File socket(TransportT trans, std::error_code& ec) noexcept
  * Create an endpoint for communication.
  */
 template <typename TransportT>
-inline File socket(TransportT trans)
+inline FileHandle socket(TransportT trans)
 {
     return socket(trans.family(), trans.type(), trans.protocol());
 }
@@ -99,33 +99,33 @@ inline File socket(TransportT trans)
 /**
  * Create a pair of connected sockets.
  */
-inline std::pair<File, File> socketpair(int family, int type, int protocol,
-                                        std::error_code& ec) noexcept
+inline std::pair<FileHandle, FileHandle> socketpair(int family, int type, int protocol,
+                                                    std::error_code& ec) noexcept
 {
     int sv[2];
     if (::socketpair(family, type, protocol, sv) < 0) {
         ec = makeError(errno);
     }
-    return {File{sv[0]}, File{sv[1]}};
+    return {FileHandle{sv[0]}, FileHandle{sv[1]}};
 }
 
 /**
  * Create a pair of connected sockets.
  */
-inline std::pair<File, File> socketpair(int family, int type, int protocol)
+inline std::pair<FileHandle, FileHandle> socketpair(int family, int type, int protocol)
 {
     int sv[2];
     if (::socketpair(family, type, protocol, sv) < 0) {
         throw std::system_error{makeError(errno), "socketpair"};
     }
-    return {File{sv[0]}, File{sv[1]}};
+    return {FileHandle{sv[0]}, FileHandle{sv[1]}};
 }
 
 /**
  * Create a pair of connected sockets.
  */
 template <typename TransportT>
-inline std::pair<File, File> socketpair(TransportT trans, std::error_code& ec) noexcept
+inline std::pair<FileHandle, FileHandle> socketpair(TransportT trans, std::error_code& ec) noexcept
 {
     return socketpair(trans.family(), trans.type(), trans.protocol(), ec);
 }
@@ -134,7 +134,7 @@ inline std::pair<File, File> socketpair(TransportT trans, std::error_code& ec) n
  * Create a pair of connected sockets.
  */
 template <typename TransportT>
-inline std::pair<File, File> socketpair(TransportT trans)
+inline std::pair<FileHandle, FileHandle> socketpair(TransportT trans)
 {
     return socketpair(trans.family(), trans.type(), trans.protocol());
 }
@@ -142,7 +142,8 @@ inline std::pair<File, File> socketpair(TransportT trans)
 /**
  * Accept a connection on a socket.
  */
-inline File accept(int sockfd, sockaddr& addr, socklen_t& addrlen, std::error_code& ec) noexcept
+inline FileHandle accept(int sockfd, sockaddr& addr, socklen_t& addrlen,
+                         std::error_code& ec) noexcept
 {
     // The addrlen argument is updated to contain the actual size of the source address.
     // The returned address is truncated if the buffer provided is too small.
@@ -156,7 +157,7 @@ inline File accept(int sockfd, sockaddr& addr, socklen_t& addrlen, std::error_co
 /**
  * Accept a connection on a socket.
  */
-inline File accept(int sockfd, sockaddr& addr, socklen_t& addrlen)
+inline FileHandle accept(int sockfd, sockaddr& addr, socklen_t& addrlen)
 {
     // The addrlen argument is updated to contain the actual size of the source address.
     // The returned address is truncated if the buffer provided is too small.
@@ -170,7 +171,7 @@ inline File accept(int sockfd, sockaddr& addr, socklen_t& addrlen)
 /**
  * Accept a connection on a socket.
  */
-inline File accept(int sockfd, std::error_code& ec) noexcept
+inline FileHandle accept(int sockfd, std::error_code& ec) noexcept
 {
     const auto fd = ::accept(sockfd, nullptr, nullptr);
     if (fd < 0) {
@@ -182,7 +183,7 @@ inline File accept(int sockfd, std::error_code& ec) noexcept
 /**
  * Accept a connection on a socket.
  */
-inline File accept(int sockfd)
+inline FileHandle accept(int sockfd)
 {
     const auto fd = ::accept(sockfd, nullptr, nullptr);
     if (fd < 0) {
@@ -195,10 +196,10 @@ inline File accept(int sockfd)
  * Accept a connection on a socket.
  */
 template <typename TransportT>
-inline File accept(int sockfd, BasicEndpoint<TransportT>& ep, std::error_code& ec) noexcept
+inline FileHandle accept(int sockfd, BasicEndpoint<TransportT>& ep, std::error_code& ec) noexcept
 {
     socklen_t addrlen = ep.capacity();
-    File fh{accept(sockfd, *ep.data(), addrlen, ec)};
+    FileHandle fh{accept(sockfd, *ep.data(), addrlen, ec)};
     if (fh) {
         ep.resize(std::min<std::size_t>(addrlen, ep.capacity()));
     }
@@ -209,10 +210,10 @@ inline File accept(int sockfd, BasicEndpoint<TransportT>& ep, std::error_code& e
  * Accept a connection on a socket.
  */
 template <typename TransportT>
-inline File accept(int sockfd, BasicEndpoint<TransportT>& ep)
+inline FileHandle accept(int sockfd, BasicEndpoint<TransportT>& ep)
 {
     socklen_t addrlen = ep.capacity();
-    File fh{accept(sockfd, *ep.data(), addrlen)};
+    FileHandle fh{accept(sockfd, *ep.data(), addrlen)};
     ep.resize(std::min<std::size_t>(addrlen, ep.capacity()));
     return fh;
 }
@@ -666,7 +667,7 @@ inline void setTcpNoDelay(int sockfd, bool enabled)
 }
 
 struct Socket {
-    Socket(File&& sock, int family)
+    Socket(FileHandle&& sock, int family)
     : sock_{std::move(sock)}
     , family_{family}
     {
@@ -711,7 +712,7 @@ struct Socket {
     void setTcpNoDelay(bool enabled) { swirly::setTcpNoDelay(*sock_, enabled); }
 
   protected:
-    File sock_;
+    FileHandle sock_;
     int family_{};
 };
 

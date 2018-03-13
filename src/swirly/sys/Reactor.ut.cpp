@@ -52,7 +52,7 @@ struct TestHandler : EventHandler {
 
   protected:
     void doClose() noexcept override {}
-    void doReady(int fd, FileEvents events, Time now) override
+    void doReady(int fd, unsigned events, Time now) override
     {
         char buf[4];
         sys::recv(fd, buf, 4, 0);
@@ -73,13 +73,13 @@ BOOST_AUTO_TEST_SUITE(ReactorSuite)
 BOOST_AUTO_TEST_CASE(ReactorHandlerCase)
 {
     Counters cntrs;
-    Reactor r{1024};
-    FileToken out, err;
+    EpollReactor r{1024};
+    SubHandle out, err;
     {
         BOOST_TEST(cntrs.dtor == 0);
         auto h = makeIntrusive<TestHandler>(r, cntrs);
-        out = r.subscribe(STDOUT_FILENO, Reactor::Out, h);
-        err = r.subscribe(STDERR_FILENO, Reactor::Out, h);
+        out = r.subscribe(STDOUT_FILENO, EventOut, h);
+        err = r.subscribe(STDERR_FILENO, EventOut, h);
     }
     BOOST_TEST(cntrs.dtor == 0);
 
@@ -90,15 +90,15 @@ BOOST_AUTO_TEST_CASE(ReactorHandlerCase)
     BOOST_TEST(cntrs.dtor == 1);
 }
 
-BOOST_AUTO_TEST_CASE(ReactorFileEventsCase)
+BOOST_AUTO_TEST_CASE(ReactorDispatchCase)
 {
     using namespace literals::chrono_literals;
 
-    Reactor r{1024};
+    EpollReactor r{1024};
     auto h = makeIntrusive<TestHandler>(r);
 
     auto socks = socketpair(LocalStream{});
-    const auto tok = r.subscribe(*socks.second, Reactor::In, h);
+    const auto tok = r.subscribe(*socks.second, EventIn, h);
 
     BOOST_TEST(r.poll(0ms) == 0);
     BOOST_TEST(h->matches() == 0);

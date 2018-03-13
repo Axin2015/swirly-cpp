@@ -67,13 +67,6 @@ class SWIRLY_API Model {
     virtual void doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const = 0;
 };
 
-/**
- * Make Model. Forward declaration for Model backend.
- *
- * @param config Configuration.
- */
-SWIRLY_API std::unique_ptr<Model> makeModel(const Config& config);
-
 } // namespace swirly
 
 #endif // SWIRLY_FIN_MODEL_HPP

@@ -43,12 +43,12 @@ class SWIRLY_API EventHandler : public RefCount<EventHandler, ThreadUnsafePolicy
     EventHandler& operator=(EventHandler&&) noexcept = delete;
 
     void close() { doClose(); }
-    void onReady(int fd, FileEvents mask, Time now) { doReady(fd, mask, now); }
+    void onReady(int fd, unsigned mask, Time now) { doReady(fd, mask, now); }
     void onTimer(const Timer& tmr, Time now) { doTimer(tmr, now); }
 
   protected:
     virtual void doClose() = 0;
-    virtual void doReady(int fd, FileEvents mask, Time now);
+    virtual void doReady(int fd, unsigned mask, Time now);
     virtual void doTimer(const Timer& tmr, Time now);
 
     const Reactor& reactor() const noexcept { return reactor_; }
