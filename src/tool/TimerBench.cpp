@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
         for (int i{0}; i < 1000000; ++i) {
             const auto now = UnixClock::now();
             if (pq.empty() || dis(gen) % 2 == 0) {
-                pq.emplace(i, r.setTimer(now + Micros{dis(gen) % 100}, h));
+                pq.emplace(i, r.setTimer(now + Micros{dis(gen) % 100}, Priority::High, h));
             } else {
                 auto tmr = pq.top().second;
                 pq.pop();

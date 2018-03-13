@@ -94,25 +94,30 @@ void EpollReactor::doSetEvents(int fd, unsigned events)
     }
 }
 
-Timer EpollReactor::doSetTimer(Time expiry, Duration interval, const EventHandlerPtr& handler)
+Timer EpollReactor::doSetTimer(Time expiry, Duration interval, Priority priority,
+                               const EventHandlerPtr& handler)
 {
-    return tq_.insert(expiry, interval, handler);
+    return tqs_[static_cast<size_t>(priority)].insert(expiry, interval, handler);
 }
 
-Timer EpollReactor::doSetTimer(Time expiry, const EventHandlerPtr& handler)
+Timer EpollReactor::doSetTimer(Time expiry, Priority priority, const EventHandlerPtr& handler)
 {
-    return tq_.insert(expiry, handler);
+    return tqs_[static_cast<size_t>(priority)].insert(expiry, handler);
 }
 
 int EpollReactor::doPoll(chrono::milliseconds timeout)
 {
+    enum { High = 0, Low = 1 };
     using namespace chrono;
 
-    if (!tq_.empty()) {
-        // Millis until next expiry.
-        const auto expiry = duration_cast<milliseconds>(tq_.front().expiry() - UnixClock::now());
-        if (expiry < timeout) {
-            timeout = max(expiry, 0ms);
+    auto now = UnixClock::now();
+    for (const auto& tq : tqs_) {
+        if (!tq.empty()) {
+            // Millis until next expiry.
+            const auto expiry = duration_cast<milliseconds>(tq.front().expiry() - now);
+            if (expiry < timeout) {
+                timeout = max(expiry, 0ms);
+            }
         }
     }
     Event buf[MaxEvents];
@@ -124,8 +129,10 @@ int EpollReactor::doPoll(chrono::milliseconds timeout)
         }
         return 0;
     }
-    const auto now = UnixClock::now();
-    return tq_.dispatch(now) + dispatch(buf, ret, now);
+    now = UnixClock::now();
+    const auto n = tqs_[High].dispatch(now) + dispatch(buf, ret, now);
+    // Low priority timers are only dispatched during empty cycles.
+    return n == 0 ? tqs_[Low].dispatch(now) : n;
 }
 
 int EpollReactor::dispatch(Event* buf, int size, Time now)
