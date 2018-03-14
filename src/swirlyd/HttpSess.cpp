@@ -40,7 +40,7 @@ HttpSess::HttpSess(Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, RestServ&
 
     const auto eh = self();
     sub_ = r.subscribe(*sock_, EventIn, eh);
-    tmr_ = r.setTimer(now + IdleTimeout, eh);
+    tmr_ = r.setTimer(now + IdleTimeout, Priority::Low, eh);
 }
 
 HttpSess::~HttpSess() noexcept = default;
@@ -71,7 +71,7 @@ void HttpSess::doReady(int fd, unsigned events, Time now)
             } else {
                 parse({in, size});
                 tmr_.cancel();
-                tmr_ = reactor().setTimer(now + IdleTimeout, self());
+                tmr_ = reactor().setTimer(now + IdleTimeout, Priority::Low, self());
             }
         }
     } catch (const std::exception& e) {

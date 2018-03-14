@@ -24,6 +24,8 @@
 
 namespace swirly {
 
+enum class Priority { High = 0, Low = 1 };
+
 struct SubPolicy {
     struct Id {
         Reactor* reactor{nullptr};
@@ -72,13 +74,14 @@ class SWIRLY_API Reactor {
     }
     void unsubscribe(int fd) noexcept { doUnsubscribe(fd); }
     void setEvents(int fd, unsigned events) { doSetEvents(fd, events); }
-    Timer setTimer(Time expiry, Duration interval, const EventHandlerPtr& handler)
+    Timer setTimer(Time expiry, Duration interval, Priority priority,
+                   const EventHandlerPtr& handler)
     {
-        return doSetTimer(expiry, interval, handler);
+        return doSetTimer(expiry, interval, priority, handler);
     }
-    Timer setTimer(Time expiry, const EventHandlerPtr& handler)
+    Timer setTimer(Time expiry, Priority priority, const EventHandlerPtr& handler)
     {
-        return doSetTimer(expiry, handler);
+        return doSetTimer(expiry, priority, handler);
     }
     int poll(std::chrono::milliseconds timeout = std::chrono::milliseconds::max())
     {
@@ -101,8 +104,10 @@ class SWIRLY_API Reactor {
 
     virtual void doSetEvents(int fd, unsigned events) = 0;
 
-    virtual Timer doSetTimer(Time expiry, Duration interval, const EventHandlerPtr& handler) = 0;
-    virtual Timer doSetTimer(Time expiry, const EventHandlerPtr& handler) = 0;
+    virtual Timer doSetTimer(Time expiry, Duration interval, Priority priority,
+                             const EventHandlerPtr& handler)
+        = 0;
+    virtual Timer doSetTimer(Time expiry, Priority priority, const EventHandlerPtr& handler) = 0;
 
     virtual int doPoll(std::chrono::milliseconds timeout) = 0;
 };
@@ -143,8 +148,9 @@ class SWIRLY_API EpollReactor : public Reactor {
 
     void doSetEvents(int fd, unsigned events) override;
 
-    Timer doSetTimer(Time expiry, Duration interval, const EventHandlerPtr& handler) override;
-    Timer doSetTimer(Time expiry, const EventHandlerPtr& handler) override;
+    Timer doSetTimer(Time expiry, Duration interval, Priority priority,
+                     const EventHandlerPtr& handler) override;
+    Timer doSetTimer(Time expiry, Priority priority, const EventHandlerPtr& handler) override;
 
     int doPoll(std::chrono::milliseconds timeout) override;
 
@@ -159,7 +165,9 @@ class SWIRLY_API EpollReactor : public Reactor {
     EpollMuxer mux_;
     std::vector<Data> data_;
     EventFd efd_;
-    TimerQueue tq_;
+    static_assert(static_cast<int>(Priority::High) == 0);
+    static_assert(static_cast<int>(Priority::Low) == 1);
+    std::array<TimerQueue, 2> tqs_;
     std::atomic<bool> closed_{false};
 };
 
