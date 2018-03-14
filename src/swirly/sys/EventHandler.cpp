@@ -22,7 +22,7 @@ namespace swirly {
 
 EventHandler::~EventHandler() noexcept = default;
 
-void EventHandler::doReady(int fd, unsigned mask, Time now) {}
+void EventHandler::doReady(int fd, unsigned events, Time now) {}
 void EventHandler::doTimer(const Timer& tmr, Time now) {}
 
 } // namespace swirly

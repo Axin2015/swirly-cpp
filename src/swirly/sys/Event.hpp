@@ -26,7 +26,8 @@ enum : unsigned {
     EventPri = 1 << 1,
     EventOut = 1 << 2,
     EventErr = 1 << 3,
-    EventHup = 1 << 4
+    EventHup = 1 << 4,
+    EventEt = 1u << 31
 };
 
 struct MsgEvent {

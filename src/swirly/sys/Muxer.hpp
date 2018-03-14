@@ -58,6 +58,9 @@ class EpollMuxer {
         if (ev.events & EPOLLHUP) {
             n |= EventHup;
         }
+        if (ev.events & EPOLLET) {
+            n |= EventEt;
+        }
         return n;
     }
 
@@ -139,6 +142,9 @@ class EpollMuxer {
         }
         if (events & EventHup) {
             n |= EPOLLHUP;
+        }
+        if (events & EventEt) {
+            n |= EPOLLET;
         }
         ev.events = n;
         ev.data.u64 = static_cast<std::uint64_t>(sid) << 32 | fd;

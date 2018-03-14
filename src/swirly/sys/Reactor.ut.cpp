@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(ReactorHandlerCase)
     BOOST_TEST(cntrs.dtor == 1);
 }
 
-BOOST_AUTO_TEST_CASE(ReactorDispatchCase)
+BOOST_AUTO_TEST_CASE(ReactorLevelCase)
 {
     using namespace literals::chrono_literals;
 
@@ -104,16 +104,57 @@ BOOST_AUTO_TEST_CASE(ReactorDispatchCase)
     BOOST_TEST(h->matches() == 0);
 
     socks.first.send("foo", 4, 0);
-    BOOST_TEST(r.poll() == 1);
+    socks.first.send("foo", 4, 0);
+    BOOST_TEST(r.poll(0ms) == 1);
+    BOOST_TEST(h->matches() == 1);
+    BOOST_TEST(r.poll(0ms) == 1);
+    BOOST_TEST(h->matches() == 2);
+
+    BOOST_TEST(r.poll(0ms) == 0);
+    BOOST_TEST(h->matches() == 2);
+
+    socks.first.send("foo", 4, 0);
+    BOOST_TEST(r.poll(0ms) == 1);
+    BOOST_TEST(h->matches() == 3);
+
+    BOOST_TEST(r.poll(0ms) == 0);
+    BOOST_TEST(h->matches() == 3);
+
+    r.unsubscribe(*socks.second);
+}
+
+BOOST_AUTO_TEST_CASE(ReactorEdgeCase)
+{
+    using namespace literals::chrono_literals;
+
+    EpollReactor r{1024};
+    auto h = makeIntrusive<TestHandler>(r);
+
+    auto socks = socketpair(LocalStream{});
+    const auto tok = r.subscribe(*socks.second, EventIn | EventEt, h);
+
+    BOOST_TEST(r.poll(0ms) == 0);
+    BOOST_TEST(h->matches() == 0);
+
+    socks.first.send("foo", 4, 0);
+    socks.first.send("foo", 4, 0);
+    BOOST_TEST(r.poll(0ms) == 1);
     BOOST_TEST(h->matches() == 1);
 
+    // No notification for second message.
     BOOST_TEST(r.poll(0ms) == 0);
     BOOST_TEST(h->matches() == 1);
 
-    socks.first.send("foo\0foo", 8, 0);
-    BOOST_TEST(r.poll() == 1);
+    // Revert to level-triggered.
+    r.setEvents(*socks.second, EventIn);
+    BOOST_TEST(r.poll(0ms) == 1);
     BOOST_TEST(h->matches() == 2);
-    BOOST_TEST(r.poll() == 1);
+
+    BOOST_TEST(r.poll(0ms) == 0);
+    BOOST_TEST(h->matches() == 2);
+
+    socks.first.send("foo", 4, 0);
+    BOOST_TEST(r.poll(0ms) == 1);
     BOOST_TEST(h->matches() == 3);
 
     BOOST_TEST(r.poll(0ms) == 0);
