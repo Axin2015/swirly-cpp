@@ -62,6 +62,16 @@ if(ENABLE_SHARED_LIBS)
   install(TARGETS swirly_fin_shared DESTINATION lib COMPONENT shared)
 endif()
 
+foreach(file ${lib_SOURCES})
+  get_filename_component (name "${file}" NAME_WE)
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${name}.hpp")
+    install(FILES "${name}.hpp"
+      DESTINATION include/swirly/fin
+      COMPONENT header
+    )
+  endif()
+endforeach()
+
 set(test_SOURCES
   Asset.ut.cpp
   BasicTypes.ut.cpp
@@ -82,6 +92,6 @@ add_executable(swirly_fin_test
 target_link_libraries(swirly_fin_test ${swirly_fin_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
 foreach(file ${test_SOURCES})
-  get_filename_component (name ${file} NAME_WE)
+  get_filename_component (name "${file}" NAME_WE)
   add_test(NAME fin::${name}Suite COMMAND swirly_fin_test -l error -t ${name}Suite)
 endforeach()

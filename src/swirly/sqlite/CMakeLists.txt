@@ -44,3 +44,13 @@ if(ENABLE_SHARED_LIBS)
   target_link_libraries(swirly_sqlite_shared swirly_fin_shared ${SQLITE3_LIBRARIES})
   install(TARGETS swirly_sqlite_shared DESTINATION lib COMPONENT shared)
 endif()
+
+foreach(file ${lib_SOURCES})
+  get_filename_component (name "${file}" NAME_WE)
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${name}.hpp")
+    install(FILES "${name}.hpp"
+      DESTINATION include/swirly/sqlite
+      COMPONENT header
+    )
+  endif()
+endforeach()

@@ -46,6 +46,16 @@ if(ENABLE_SHARED_LIBS)
   install(TARGETS swirly_clob_shared DESTINATION lib COMPONENT shared)
 endif()
 
+foreach(file ${lib_SOURCES})
+  get_filename_component (name "${file}" NAME_WE)
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${name}.hpp")
+    install(FILES "${name}.hpp"
+      DESTINATION include/swirly/clob
+      COMPONENT header
+    )
+  endif()
+endforeach()
+
 set(test_SOURCES
   AsyncJourn.ut.cpp
   Response.ut.cpp
@@ -57,6 +67,6 @@ add_executable(swirly_clob_test
 target_link_libraries(swirly_clob_test ${swirly_clob_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
 foreach(file ${test_SOURCES})
-  get_filename_component (name ${file} NAME_WE)
+  get_filename_component (name "${file}" NAME_WE)
   add_test(NAME clob::${name}Suite COMMAND swirly_clob_test -l error -t ${name}Suite)
 endforeach()
