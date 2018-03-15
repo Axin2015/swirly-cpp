@@ -13,37 +13,37 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-add_custom_target(swirly_tool DEPENDS
-  swirly_dbtodsv
-  swirly_dbtojson
-  swirly_queue_bench
-  swirly_scratch
-  swirly_serv_bench
-  swirly_timer_bench
+add_custom_target(swirly-tool DEPENDS
+  swirly-db-to-dsv
+  swirly-db-to-json
+  swirly-queue-bench
+  swirly-scratch
+  swirly-serv-bench
+  swirly-timer-bench
 )
 
 install(PROGRAMS ${bin_FILES} DESTINATION bin COMPONENT program)
 
-add_executable(swirly_dbtodsv DbToDsv.cpp)
-target_link_libraries(swirly_dbtodsv ${swirly_sqlite_LIBRARY})
-install(TARGETS swirly_dbtodsv DESTINATION bin COMPONENT program)
+add_executable(swirly-db-to-dsv DbToDsv.cpp)
+target_link_libraries(swirly-db-to-dsv ${swirly_sqlite_LIBRARY})
+install(TARGETS swirly-db-to-dsv DESTINATION bin COMPONENT program)
 
-add_executable(swirly_dbtojson DbToJson.cpp)
-target_link_libraries(swirly_dbtojson ${swirly_sqlite_LIBRARY})
-install(TARGETS swirly_dbtojson DESTINATION bin COMPONENT program)
+add_executable(swirly-db-to-json DbToJson.cpp)
+target_link_libraries(swirly-db-to-json ${swirly_sqlite_LIBRARY})
+install(TARGETS swirly-db-to-json DESTINATION bin COMPONENT program)
 
-add_executable(swirly_queue_bench QueueBench.cpp)
-target_link_libraries(swirly_queue_bench ${swirly_util_LIBRARY})
-install(TARGETS swirly_queue_bench DESTINATION bin COMPONENT program)
+add_executable(swirly-queue-bench QueueBench.cpp)
+target_link_libraries(swirly-queue-bench ${swirly_util_LIBRARY})
+install(TARGETS swirly-queue-bench DESTINATION bin COMPONENT program)
 
 # Reserved as an ad-hoc scratch pad.
-add_executable(swirly_scratch Scratch.cpp)
-target_link_libraries(swirly_scratch ${swirly_fin_LIBRARY})
+add_executable(swirly-scratch Scratch.cpp)
+target_link_libraries(swirly-scratch ${swirly_fin_LIBRARY})
 
-add_executable(swirly_serv_bench ServBench.cpp)
-target_link_libraries(swirly_serv_bench ${swirly_clob_LIBRARY} ${swirly_sqlite_LIBRARY})
-install(TARGETS swirly_serv_bench DESTINATION bin COMPONENT program)
+add_executable(swirly-serv-bench ServBench.cpp)
+target_link_libraries(swirly-serv-bench ${swirly_clob_LIBRARY} ${swirly_sqlite_LIBRARY})
+install(TARGETS swirly-serv-bench DESTINATION bin COMPONENT program)
 
-add_executable(swirly_timer_bench TimerBench.cpp)
-target_link_libraries(swirly_timer_bench ${swirly_util_LIBRARY})
-install(TARGETS swirly_timer_bench DESTINATION bin COMPONENT program)
+add_executable(swirly-timer-bench TimerBench.cpp)
+target_link_libraries(swirly-timer-bench ${swirly_util_LIBRARY})
+install(TARGETS swirly-timer-bench DESTINATION bin COMPONENT program)

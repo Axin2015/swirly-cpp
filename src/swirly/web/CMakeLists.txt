@@ -14,15 +14,15 @@
 # 02110-1301, USA.
 
 if(ENABLE_SHARED_LIBS)
-  add_custom_target(swirly_web DEPENDS
-    swirly_web_static
-    swirly_web_shared
-    swirly_web_test
+  add_custom_target(swirly-web DEPENDS
+    swirly-web-static
+    swirly-web-shared
+    swirly-web-test
   )
 else()
-  add_custom_target(swirly_web DEPENDS
-    swirly_web_static
-    swirly_web_test
+  add_custom_target(swirly-web DEPENDS
+    swirly-web-static
+    swirly-web-test
   )
 endif()
 
@@ -47,17 +47,27 @@ set(lib_SOURCES
   Url.cpp
   "${PROJECT_SOURCE_DIR}/src/swirly/contrib/http_parser.c")
 
-add_library(swirly_web_static STATIC ${lib_SOURCES})
-set_target_properties(swirly_web_static PROPERTIES OUTPUT_NAME swirly_web)
-target_link_libraries(swirly_web_static swirly_clob_static)
-install(TARGETS swirly_web_static DESTINATION lib COMPONENT static)
+add_library(swirly-web-static STATIC ${lib_SOURCES})
+set_target_properties(swirly-web-static PROPERTIES OUTPUT_NAME swirly-web)
+target_link_libraries(swirly-web-static swirly-clob-static)
+install(TARGETS swirly-web-static DESTINATION lib COMPONENT static)
 
 if(ENABLE_SHARED_LIBS)
-  add_library(swirly_web_shared SHARED ${lib_SOURCES})
-  set_target_properties(swirly_web_shared PROPERTIES OUTPUT_NAME swirly_web)
-  target_link_libraries(swirly_web_shared swirly_clob_shared)
-  install(TARGETS swirly_web_shared DESTINATION lib COMPONENT shared)
+  add_library(swirly-web-shared SHARED ${lib_SOURCES})
+  set_target_properties(swirly-web-shared PROPERTIES OUTPUT_NAME swirly-web)
+  target_link_libraries(swirly-web-shared swirly-clob-shared)
+  install(TARGETS swirly-web-shared DESTINATION lib COMPONENT shared)
 endif()
+
+foreach(file ${lib_SOURCES})
+  get_filename_component (name "${file}" NAME_WE)
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${name}.hpp")
+    install(FILES "${name}.hpp"
+      DESTINATION include/swirly/web
+      COMPONENT header
+    )
+  endif()
+endforeach()
 
 set(test_SOURCES
   EntitySet.ut.cpp
@@ -66,12 +76,12 @@ set(test_SOURCES
   RestBody.ut.cpp
   Url.ut.cpp)
 
-add_executable(swirly_web_test
+add_executable(swirly-web-test
   ${test_SOURCES}
   Main.ut.cpp)
-target_link_libraries(swirly_web_test ${swirly_web_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+target_link_libraries(swirly-web-test ${swirly_web_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
 foreach(file ${test_SOURCES})
-  get_filename_component (name ${file} NAME_WE)
-  add_test(NAME web::${name}Suite COMMAND swirly_web_test -l error -t ${name}Suite)
+  get_filename_component (name "${file}" NAME_WE)
+  add_test(NAME web::${name}Suite COMMAND swirly-web-test -l error -t ${name}Suite)
 endforeach()

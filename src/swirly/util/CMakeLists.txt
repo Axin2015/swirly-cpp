@@ -14,15 +14,15 @@
 # 02110-1301, USA.
 
 if(ENABLE_SHARED_LIBS)
-  add_custom_target(swirly_util DEPENDS
-    swirly_util_static
-    swirly_util_shared
-    swirly_util_test
+  add_custom_target(swirly-util DEPENDS
+    swirly-util-static
+    swirly-util-shared
+    swirly-util-test
   )
 else()
-  add_custom_target(swirly_util DEPENDS
-    swirly_util_static
-    swirly_util_test
+  add_custom_target(swirly-util DEPENDS
+    swirly-util-static
+    swirly-util-test
   )
 endif()
 
@@ -54,17 +54,27 @@ set(lib_SOURCES
   Utility.cpp
   VarSub.cpp)
 
-add_library(swirly_util_static STATIC ${lib_SOURCES})
-set_target_properties(swirly_util_static PROPERTIES OUTPUT_NAME swirly_util)
-target_link_libraries(swirly_util_static swirly_sys_static pthread)
-install(TARGETS swirly_util_static DESTINATION lib COMPONENT static)
+add_library(swirly-util-static STATIC ${lib_SOURCES})
+set_target_properties(swirly-util-static PROPERTIES OUTPUT_NAME swirly-util)
+target_link_libraries(swirly-util-static swirly-sys-static pthread)
+install(TARGETS swirly-util-static DESTINATION lib COMPONENT static)
 
 if(ENABLE_SHARED_LIBS)
-  add_library(swirly_util_shared SHARED ${lib_SOURCES})
-  set_target_properties(swirly_util_shared PROPERTIES OUTPUT_NAME swirly_util)
-  target_link_libraries(swirly_util_shared swirly_sys_shared pthread)
-  install(TARGETS swirly_util_shared DESTINATION lib COMPONENT shared)
+  add_library(swirly-util-shared SHARED ${lib_SOURCES})
+  set_target_properties(swirly-util-shared PROPERTIES OUTPUT_NAME swirly-util)
+  target_link_libraries(swirly-util-shared swirly-sys-shared pthread)
+  install(TARGETS swirly-util-shared DESTINATION lib COMPONENT shared)
 endif()
+
+foreach(file ${lib_SOURCES})
+  get_filename_component (name "${file}" NAME_WE)
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${name}.hpp")
+    install(FILES "${name}.hpp"
+      DESTINATION include/swirly/util
+      COMPONENT header
+    )
+  endif()
+endforeach()
 
 set(test_SOURCES
   Array.ut.cpp
@@ -87,12 +97,12 @@ set(test_SOURCES
   Utility.ut.cpp
   VarSub.ut.cpp)
 
-add_executable(swirly_util_test
+add_executable(swirly-util-test
   ${test_SOURCES}
   Main.ut.cpp)
-target_link_libraries(swirly_util_test ${swirly_util_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+target_link_libraries(swirly-util-test ${swirly_util_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
 foreach(file ${test_SOURCES})
-  get_filename_component (name ${file} NAME_WE)
-  add_test(NAME util::${name}Suite COMMAND swirly_util_test -l error -t ${name}Suite)
+  get_filename_component (name "${file}" NAME_WE)
+  add_test(NAME util::${name}Suite COMMAND swirly-util-test -l error -t ${name}Suite)
 endforeach()

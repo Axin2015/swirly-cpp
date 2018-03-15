@@ -14,15 +14,15 @@
 # 02110-1301, USA.
 
 if(ENABLE_SHARED_LIBS)
-  add_custom_target(swirly_fin DEPENDS
-    swirly_fin_static
-    swirly_fin_shared
-    swirly_fin_test
+  add_custom_target(swirly-fin DEPENDS
+    swirly-fin-static
+    swirly-fin-shared
+    swirly-fin-test
   )
 else()
-  add_custom_target(swirly_fin DEPENDS
-    swirly_fin_static
-    swirly_fin_test
+  add_custom_target(swirly-fin DEPENDS
+    swirly-fin-static
+    swirly-fin-test
   )
 endif()
 
@@ -50,17 +50,27 @@ set(lib_SOURCES
   Transaction.cpp
   Types.cpp)
 
-add_library(swirly_fin_static STATIC ${lib_SOURCES})
-set_target_properties(swirly_fin_static PROPERTIES OUTPUT_NAME swirly_fin)
-target_link_libraries(swirly_fin_static swirly_util_static)
-install(TARGETS swirly_fin_static DESTINATION lib COMPONENT static)
+add_library(swirly-fin-static STATIC ${lib_SOURCES})
+set_target_properties(swirly-fin-static PROPERTIES OUTPUT_NAME swirly-fin)
+target_link_libraries(swirly-fin-static swirly-util-static)
+install(TARGETS swirly-fin-static DESTINATION lib COMPONENT static)
 
 if(ENABLE_SHARED_LIBS)
-  add_library(swirly_fin_shared SHARED ${lib_SOURCES})
-  set_target_properties(swirly_fin_shared PROPERTIES OUTPUT_NAME swirly_fin)
-  target_link_libraries(swirly_fin_shared swirly_util_shared)
-  install(TARGETS swirly_fin_shared DESTINATION lib COMPONENT shared)
+  add_library(swirly-fin-shared SHARED ${lib_SOURCES})
+  set_target_properties(swirly-fin-shared PROPERTIES OUTPUT_NAME swirly-fin)
+  target_link_libraries(swirly-fin-shared swirly-util-shared)
+  install(TARGETS swirly-fin-shared DESTINATION lib COMPONENT shared)
 endif()
+
+foreach(file ${lib_SOURCES})
+  get_filename_component (name "${file}" NAME_WE)
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${name}.hpp")
+    install(FILES "${name}.hpp"
+      DESTINATION include/swirly/fin
+      COMPONENT header
+    )
+  endif()
+endforeach()
 
 set(test_SOURCES
   Asset.ut.cpp
@@ -76,12 +86,12 @@ set(test_SOURCES
   Request.ut.cpp
   Transaction.ut.cpp)
 
-add_executable(swirly_fin_test
+add_executable(swirly-fin-test
   ${test_SOURCES}
   Main.ut.cpp)
-target_link_libraries(swirly_fin_test ${swirly_fin_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+target_link_libraries(swirly-fin-test ${swirly_fin_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
 foreach(file ${test_SOURCES})
-  get_filename_component (name ${file} NAME_WE)
-  add_test(NAME fin::${name}Suite COMMAND swirly_fin_test -l error -t ${name}Suite)
+  get_filename_component (name "${file}" NAME_WE)
+  add_test(NAME fin::${name}Suite COMMAND swirly-fin-test -l error -t ${name}Suite)
 endforeach()
