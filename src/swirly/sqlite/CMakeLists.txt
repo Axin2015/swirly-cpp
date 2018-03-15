@@ -14,13 +14,13 @@
 # 02110-1301, USA.
 
 if(ENABLE_SHARED_LIBS)
-  add_custom_target(swirly_sqlite DEPENDS
-    swirly_sqlite_static
-    swirly_sqlite_shared
+  add_custom_target(swirly-sqlite DEPENDS
+    swirly-sqlite-static
+    swirly-sqlite-shared
   )
 else()
-  add_custom_target(swirly_sqlite DEPENDS
-    swirly_sqlite_static
+  add_custom_target(swirly-sqlite DEPENDS
+    swirly-sqlite-static
   )
 endif()
 
@@ -33,16 +33,16 @@ set(lib_SOURCES
 
 include_directories(${SQLITE3_INCLUDE_DIRS})
 
-add_library(swirly_sqlite_static STATIC ${lib_SOURCES})
-set_target_properties(swirly_sqlite_static PROPERTIES OUTPUT_NAME swirly_sqlite)
-target_link_libraries(swirly_sqlite_static swirly_fin_static ${SQLITE3_LIBRARIES})
-install(TARGETS swirly_sqlite_static DESTINATION lib COMPONENT static)
+add_library(swirly-sqlite-static STATIC ${lib_SOURCES})
+set_target_properties(swirly-sqlite-static PROPERTIES OUTPUT_NAME swirly-sqlite)
+target_link_libraries(swirly-sqlite-static swirly-fin-static ${SQLITE3_LIBRARIES})
+install(TARGETS swirly-sqlite-static DESTINATION lib COMPONENT static)
 
 if(ENABLE_SHARED_LIBS)
-  add_library(swirly_sqlite_shared SHARED ${lib_SOURCES})
-  set_target_properties(swirly_sqlite_shared PROPERTIES OUTPUT_NAME swirly_sqlite)
-  target_link_libraries(swirly_sqlite_shared swirly_fin_shared ${SQLITE3_LIBRARIES})
-  install(TARGETS swirly_sqlite_shared DESTINATION lib COMPONENT shared)
+  add_library(swirly-sqlite-shared SHARED ${lib_SOURCES})
+  set_target_properties(swirly-sqlite-shared PROPERTIES OUTPUT_NAME swirly-sqlite)
+  target_link_libraries(swirly-sqlite-shared swirly-fin-shared ${SQLITE3_LIBRARIES})
+  install(TARGETS swirly-sqlite-shared DESTINATION lib COMPONENT shared)
 endif()
 
 foreach(file ${lib_SOURCES})
