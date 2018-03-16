@@ -73,7 +73,7 @@ DataT& data(MsgEvent& ev) noexcept
 class EventFd {
   public:
     explicit EventFd(int flags = 0)
-    : fh_{sys::eventfd(0, eventFlags(flags) | EFD_NONBLOCK)}
+    : fh_{os::eventfd(0, eventFlags(flags) | EFD_NONBLOCK)}
     {
     }
     ~EventFd() noexcept = default;
@@ -91,7 +91,7 @@ class EventFd {
     {
         // Adds the 8-byte integer value supplied in its buffer to the counter.
         char buf[sizeof(std::int64_t)];
-        sys::read(*fh_, buf, sizeof(buf));
+        os::read(*fh_, buf, sizeof(buf));
     }
     void notify()
     {
@@ -101,7 +101,7 @@ class EventFd {
             std::int64_t val;
         } u;
         u.val = 1;
-        sys::write(*fh_, u.buf, sizeof(u.buf));
+        os::write(*fh_, u.buf, sizeof(u.buf));
     }
 
   private:
@@ -121,7 +121,7 @@ class EventFd {
 class EventPipe {
   public:
     explicit EventPipe(int flags = 0)
-    : pipe_{sys::pipe2(flags | O_NONBLOCK)}
+    : pipe_{os::pipe2(flags | O_NONBLOCK)}
     {
     }
     ~EventPipe() noexcept = default;
@@ -139,13 +139,13 @@ class EventPipe {
     {
         // Drain block of bytes.
         char buf[1 << 10];
-        sys::read(*pipe_.first, buf, sizeof(buf));
+        os::read(*pipe_.first, buf, sizeof(buf));
     }
     void notify()
     {
         // Post a single charactor.
         const char ch{'\0'};
-        sys::write(*pipe_.second, &ch, 1);
+        os::write(*pipe_.second, &ch, 1);
     }
 
   private:

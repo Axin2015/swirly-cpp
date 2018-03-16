@@ -35,7 +35,7 @@ TcpAcceptor::~TcpAcceptor() noexcept = default;
 void TcpAcceptor::doReady(int fd, unsigned events, Time now)
 {
     Endpoint ep;
-    IoSocket sock{sys::accept(fd, ep), serv_.family()};
+    IoSocket sock{os::accept(fd, ep), serv_.family()};
     doAccept(move(sock), ep, now);
 }
 

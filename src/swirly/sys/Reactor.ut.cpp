@@ -55,7 +55,7 @@ struct TestHandler : EventHandler {
     void doReady(int fd, unsigned events, Time now) override
     {
         char buf[4];
-        sys::recv(fd, buf, 4, 0);
+        os::recv(fd, buf, 4, 0);
         if (strcmp(buf, "foo") == 0) {
             ++matches_;
         }

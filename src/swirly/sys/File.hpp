@@ -40,7 +40,7 @@ struct FilePolicy {
 
 using FileHandle = Handle<FilePolicy>;
 
-namespace sys {
+namespace os {
 
 /**
  * Open and possibly create a file.
@@ -348,7 +348,7 @@ inline int fcntl(int fd, int cmd, ArgT arg)
     return ret;
 }
 
-} // namespace sys
+} // namespace os
 
 inline void setNonBlock(int fd, std::error_code& ec) noexcept
 {

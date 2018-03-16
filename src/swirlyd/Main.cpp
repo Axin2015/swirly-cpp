@@ -64,7 +64,7 @@ namespace {
 
 void openLogFile(const char* path)
 {
-    const auto file = sys::open(path, O_RDWR | O_CREAT | O_APPEND, 0644);
+    const auto file = os::open(path, O_RDWR | O_CREAT | O_APPEND, 0644);
     dup2(*file, STDOUT_FILENO);
     dup2(*file, STDERR_FILENO);
 }
@@ -199,7 +199,7 @@ int main(int argc, char* argv[])
         if (!runDir.empty()) {
             // Change the current working directory if specified.
             runDir = fs::canonical(runDir, fs::current_path());
-            sys::chdir(runDir.c_str());
+            os::chdir(runDir.c_str());
         } else if (opts.daemon) {
             // Default to root directory if daemon.
             runDir = fs::current_path().root_path();

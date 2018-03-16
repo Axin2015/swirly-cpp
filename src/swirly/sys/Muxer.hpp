@@ -65,7 +65,7 @@ class EpollMuxer {
     }
 
     explicit EpollMuxer(std::size_t sizeHint)
-    : md_{sys::epoll_create(sizeHint)}
+    : md_{os::epoll_create(sizeHint)}
     {
     }
     ~EpollMuxer() noexcept
@@ -96,7 +96,7 @@ class EpollMuxer {
     int wait(Event buf[], std::size_t size, std::chrono::milliseconds timeout,
              std::error_code& ec) const
     {
-        return sys::epoll_wait(
+        return os::epoll_wait(
             md_, buf, size, timeout == std::chrono::milliseconds::max() ? -1 : timeout.count(), ec);
     }
     int wait(Event buf[], std::size_t size, std::error_code& ec) const
@@ -107,7 +107,7 @@ class EpollMuxer {
     {
         Event ev;
         setEvents(ev, fd, sid, events);
-        sys::epoll_ctl(md_, EPOLL_CTL_ADD, fd, ev);
+        os::epoll_ctl(md_, EPOLL_CTL_ADD, fd, ev);
     }
     void unsubscribe(int fd) noexcept
     {
@@ -115,13 +115,13 @@ class EpollMuxer {
         // in event, even though this argument is ignored.
         Event ev{};
         std::error_code ec;
-        sys::epoll_ctl(md_, EPOLL_CTL_DEL, fd, ev, ec);
+        os::epoll_ctl(md_, EPOLL_CTL_DEL, fd, ev, ec);
     }
     void setEvents(int fd, int sid, unsigned events)
     {
         Event ev;
         setEvents(ev, fd, sid, events);
-        sys::epoll_ctl(md_, EPOLL_CTL_MOD, fd, ev);
+        os::epoll_ctl(md_, EPOLL_CTL_MOD, fd, ev);
     }
 
   private:

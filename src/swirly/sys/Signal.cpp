@@ -31,7 +31,7 @@ SigWait::SigWait()
 
     const auto err = pthread_sigmask(SIG_BLOCK, &newMask_, &oldMask_);
     if (err != 0) {
-        throw std::system_error{sys::makeError(err), "pthread_sigmask"};
+        throw std::system_error{os::makeError(err), "pthread_sigmask"};
     }
 }
 
@@ -46,7 +46,7 @@ int SigWait::operator()() const
     int sig;
     const auto err = sigwait(&newMask_, &sig);
     if (err != 0) {
-        throw std::system_error{sys::makeError(err), "sigwait"};
+        throw std::system_error{os::makeError(err), "sigwait"};
     }
     return sig;
 }
@@ -57,7 +57,7 @@ void sigBlockAll()
     sigemptyset(&ss);
     const auto err = pthread_sigmask(SIG_SETMASK, &ss, nullptr);
     if (err != 0) {
-        throw std::system_error{sys::makeError(err), "pthread_sigmask"};
+        throw std::system_error{os::makeError(err), "pthread_sigmask"};
     }
 }
 

@@ -25,11 +25,11 @@ struct SWIRLY_API IpMcastGroup {
     IpMcastGroup(const IpAddress& addr, unsigned ifindex = 0) noexcept;
 
     IpMcastGroup(const IpAddress& addr, const char* ifname, std::error_code& ec) noexcept
-    : IpMcastGroup(addr, sys::if_nametoindex(ifname, ec))
+    : IpMcastGroup(addr, os::if_nametoindex(ifname, ec))
     {
     }
     IpMcastGroup(const IpAddress& addr, const char* ifname)
-    : IpMcastGroup(addr, sys::if_nametoindex(ifname))
+    : IpMcastGroup(addr, os::if_nametoindex(ifname))
     {
     }
 
@@ -46,10 +46,10 @@ struct SWIRLY_API IpMcastGroup {
 inline void joinGroup(int sockfd, const IpMcastGroup& group, std::error_code& ec) noexcept
 {
     if (group.family == AF_INET6) {
-        sys::setsockopt(sockfd, IPPROTO_IPV6, IPV6_JOIN_GROUP, &group.ipv6, sizeof(group.ipv6), ec);
+        os::setsockopt(sockfd, IPPROTO_IPV6, IPV6_JOIN_GROUP, &group.ipv6, sizeof(group.ipv6), ec);
     } else {
         assert(group.family == AF_INET);
-        sys::setsockopt(sockfd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &group.ipv4, sizeof(group.ipv4), ec);
+        os::setsockopt(sockfd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &group.ipv4, sizeof(group.ipv4), ec);
     }
 }
 
@@ -59,10 +59,10 @@ inline void joinGroup(int sockfd, const IpMcastGroup& group, std::error_code& ec
 inline void joinGroup(int sockfd, const IpMcastGroup& group)
 {
     if (group.family == AF_INET6) {
-        sys::setsockopt(sockfd, IPPROTO_IPV6, IPV6_JOIN_GROUP, &group.ipv6, sizeof(group.ipv6));
+        os::setsockopt(sockfd, IPPROTO_IPV6, IPV6_JOIN_GROUP, &group.ipv6, sizeof(group.ipv6));
     } else {
         assert(group.family == AF_INET);
-        sys::setsockopt(sockfd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &group.ipv4, sizeof(group.ipv4));
+        os::setsockopt(sockfd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &group.ipv4, sizeof(group.ipv4));
     }
 }
 
@@ -106,11 +106,11 @@ inline void joinGroup(int sockfd, const IpAddress& addr, const char* ifname)
 inline void leaveGroup(int sockfd, const IpMcastGroup& group, std::error_code& ec) noexcept
 {
     if (group.family == AF_INET6) {
-        sys::setsockopt(sockfd, IPPROTO_IPV6, IPV6_LEAVE_GROUP, &group.ipv6, sizeof(group.ipv6),
+        os::setsockopt(sockfd, IPPROTO_IPV6, IPV6_LEAVE_GROUP, &group.ipv6, sizeof(group.ipv6),
                         ec);
     } else {
         assert(group.family == AF_INET);
-        sys::setsockopt(sockfd, IPPROTO_IP, IP_DROP_MEMBERSHIP, &group.ipv4, sizeof(group.ipv4),
+        os::setsockopt(sockfd, IPPROTO_IP, IP_DROP_MEMBERSHIP, &group.ipv4, sizeof(group.ipv4),
                         ec);
     }
 }
@@ -121,10 +121,10 @@ inline void leaveGroup(int sockfd, const IpMcastGroup& group, std::error_code& e
 inline void leaveGroup(int sockfd, const IpMcastGroup& group)
 {
     if (group.family == AF_INET6) {
-        sys::setsockopt(sockfd, IPPROTO_IPV6, IPV6_LEAVE_GROUP, &group.ipv6, sizeof(group.ipv6));
+        os::setsockopt(sockfd, IPPROTO_IPV6, IPV6_LEAVE_GROUP, &group.ipv6, sizeof(group.ipv6));
     } else {
         assert(group.family == AF_INET);
-        sys::setsockopt(sockfd, IPPROTO_IP, IP_DROP_MEMBERSHIP, &group.ipv4, sizeof(group.ipv4));
+        os::setsockopt(sockfd, IPPROTO_IP, IP_DROP_MEMBERSHIP, &group.ipv4, sizeof(group.ipv4));
     }
 }
 
@@ -165,35 +165,35 @@ inline void leaveGroup(int sockfd, const IpAddress& addr, const char* ifname)
 inline void setIpMcastIf(int sockfd, int family, unsigned ifindex, std::error_code& ec) noexcept
 {
     if (family == AF_INET6) {
-        sys::setsockopt(sockfd, IPPROTO_IPV6, IPV6_MULTICAST_IF, &ifindex, sizeof(ifindex), ec);
+        os::setsockopt(sockfd, IPPROTO_IPV6, IPV6_MULTICAST_IF, &ifindex, sizeof(ifindex), ec);
     } else {
         assert(family == AF_INET);
         ip_mreqn mreqn{};
         mreqn.imr_ifindex = ifindex;
-        sys::setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_IF, &mreqn, sizeof(mreqn), ec);
+        os::setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_IF, &mreqn, sizeof(mreqn), ec);
     }
 }
 
 inline void setIpMcastIf(int sockfd, int family, unsigned ifindex)
 {
     if (family == AF_INET6) {
-        sys::setsockopt(sockfd, IPPROTO_IPV6, IPV6_MULTICAST_IF, &ifindex, sizeof(ifindex));
+        os::setsockopt(sockfd, IPPROTO_IPV6, IPV6_MULTICAST_IF, &ifindex, sizeof(ifindex));
     } else {
         assert(family == AF_INET);
         ip_mreqn mreqn{};
         mreqn.imr_ifindex = ifindex;
-        sys::setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_IF, &mreqn, sizeof(mreqn));
+        os::setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_IF, &mreqn, sizeof(mreqn));
     }
 }
 
 inline void setIpMcastIf(int sockfd, int family, const char* ifname, std::error_code& ec) noexcept
 {
-    setIpMcastIf(sockfd, family, sys::if_nametoindex(ifname), ec);
+    setIpMcastIf(sockfd, family, os::if_nametoindex(ifname), ec);
 }
 
 inline void setIpMcastIf(int sockfd, int family, const char* ifname)
 {
-    setIpMcastIf(sockfd, family, sys::if_nametoindex(ifname));
+    setIpMcastIf(sockfd, family, os::if_nametoindex(ifname));
 }
 
 /**
@@ -203,11 +203,11 @@ inline void setIpMcastLoop(int sockfd, int family, bool enabled, std::error_code
 {
     if (family == AF_INET6) {
         const unsigned optval{enabled ? 1U : 0U};
-        sys::setsockopt(sockfd, IPPROTO_IPV6, IPV6_MULTICAST_LOOP, &optval, sizeof(optval), ec);
+        os::setsockopt(sockfd, IPPROTO_IPV6, IPV6_MULTICAST_LOOP, &optval, sizeof(optval), ec);
     } else {
         assert(family == AF_INET);
         const unsigned char optval = enabled ? 1 : 0;
-        sys::setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_LOOP, &optval, sizeof(optval), ec);
+        os::setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_LOOP, &optval, sizeof(optval), ec);
     }
 }
 
@@ -218,11 +218,11 @@ inline void setIpMcastLoop(int sockfd, int family, bool enabled)
 {
     if (family == AF_INET6) {
         const unsigned optval{enabled ? 1U : 0U};
-        sys::setsockopt(sockfd, IPPROTO_IPV6, IPV6_MULTICAST_LOOP, &optval, sizeof(optval));
+        os::setsockopt(sockfd, IPPROTO_IPV6, IPV6_MULTICAST_LOOP, &optval, sizeof(optval));
     } else {
         assert(family == AF_INET);
         const unsigned char optval = enabled ? 1 : 0;
-        sys::setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_LOOP, &optval, sizeof(optval));
+        os::setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_LOOP, &optval, sizeof(optval));
     }
 }
 
@@ -233,11 +233,11 @@ inline void setIpMcastTtl(int sockfd, int family, int ttl, std::error_code& ec) 
 {
     if (family == AF_INET6) {
         const int optval{ttl};
-        sys::setsockopt(sockfd, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &optval, sizeof(optval), ec);
+        os::setsockopt(sockfd, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &optval, sizeof(optval), ec);
     } else {
         assert(family == AF_INET);
         const unsigned char optval = ttl;
-        sys::setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL, &optval, sizeof(optval), ec);
+        os::setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL, &optval, sizeof(optval), ec);
     }
 }
 
@@ -248,11 +248,11 @@ inline void setIpMcastTtl(int sockfd, int family, int ttl)
 {
     if (family == AF_INET6) {
         const int optval{ttl};
-        sys::setsockopt(sockfd, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &optval, sizeof(optval));
+        os::setsockopt(sockfd, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &optval, sizeof(optval));
     } else {
         assert(family == AF_INET);
         const unsigned char optval = ttl;
-        sys::setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL, &optval, sizeof(optval));
+        os::setsockopt(sockfd, IPPROTO_IP, IP_MULTICAST_TTL, &optval, sizeof(optval));
     }
 }
 
@@ -265,56 +265,56 @@ struct UdpSocket : IoSocket {
 
     using IoSocket::IoSocket;
     UdpSocket(Transport trans, std::error_code& ec) noexcept
-    : IoSocket{sys::socket(trans, ec), trans.family()}
+    : IoSocket{os::socket(trans, ec), trans.family()}
     {
     }
     explicit UdpSocket(Transport trans)
-    : IoSocket{sys::socket(trans), trans.family()}
+    : IoSocket{os::socket(trans), trans.family()}
     {
     }
     UdpSocket() noexcept = default;
 
-    void bind(const Endpoint& ep, std::error_code& ec) noexcept { sys::bind(*sock_, ep, ec); }
-    void bind(const Endpoint& ep) { sys::bind(*sock_, ep); }
+    void bind(const Endpoint& ep, std::error_code& ec) noexcept { os::bind(*sock_, ep, ec); }
+    void bind(const Endpoint& ep) { os::bind(*sock_, ep); }
 
     ssize_t recvfrom(void* buf, std::size_t len, int flags, Endpoint& ep,
                      std::error_code& ec) noexcept
     {
-        return sys::recvfrom(*sock_, buf, len, flags, ep, ec);
+        return os::recvfrom(*sock_, buf, len, flags, ep, ec);
     }
     std::size_t recvfrom(void* buf, std::size_t len, int flags, Endpoint& ep)
     {
-        return sys::recvfrom(*sock_, buf, len, flags, ep);
+        return os::recvfrom(*sock_, buf, len, flags, ep);
     }
 
     ssize_t recvfrom(const MutableBuffer& buf, int flags, Endpoint& ep,
                      std::error_code& ec) noexcept
     {
-        return sys::recvfrom(*sock_, buf, flags, ep, ec);
+        return os::recvfrom(*sock_, buf, flags, ep, ec);
     }
     std::size_t recvfrom(const MutableBuffer& buf, int flags, Endpoint& ep)
     {
-        return sys::recvfrom(*sock_, buf, flags, ep);
+        return os::recvfrom(*sock_, buf, flags, ep);
     }
 
     ssize_t sendto(const void* buf, std::size_t len, int flags, const Endpoint& ep,
                    std::error_code& ec) noexcept
     {
-        return sys::sendto(*sock_, buf, len, flags, ep, ec);
+        return os::sendto(*sock_, buf, len, flags, ep, ec);
     }
     std::size_t sendto(const void* buf, std::size_t len, int flags, const Endpoint& ep)
     {
-        return sys::sendto(*sock_, buf, len, flags, ep);
+        return os::sendto(*sock_, buf, len, flags, ep);
     }
 
     ssize_t sendto(const ConstBuffer& buf, int flags, const Endpoint& ep,
                    std::error_code& ec) noexcept
     {
-        return sys::sendto(*sock_, buf, flags, ep, ec);
+        return os::sendto(*sock_, buf, flags, ep, ec);
     }
     std::size_t sendto(const ConstBuffer& buf, int flags, const Endpoint& ep)
     {
-        return sys::sendto(*sock_, buf, flags, ep);
+        return os::sendto(*sock_, buf, flags, ep);
     }
 
     void joinGroup(const IpAddress& addr, unsigned ifindex, std::error_code& ec) noexcept

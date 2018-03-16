@@ -57,7 +57,7 @@ void HttpSess::doReady(int fd, unsigned events, Time now)
 {
     try {
         if (events & EventOut) {
-            outbuf_.consume(sys::write(fd, outbuf_.data()));
+            outbuf_.consume(os::write(fd, outbuf_.data()));
             if (outbuf_.empty()) {
                 // May throw.
                 reactor().setEvents(*sock_, EventIn);
@@ -65,7 +65,7 @@ void HttpSess::doReady(int fd, unsigned events, Time now)
         }
         if (events & EventIn) {
             char in[MaxData];
-            const auto size = sys::read(fd, in, sizeof(in));
+            const auto size = os::read(fd, in, sizeof(in));
             if (size == 0) {
                 close();
             } else {

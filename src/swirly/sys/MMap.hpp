@@ -71,7 +71,7 @@ struct MMapDeleter {
 
 using MMap = std::unique_ptr<MMapPointer, MMapDeleter>;
 
-namespace sys {
+namespace os {
 
 /**
  * Map files or devices into memory.
@@ -95,7 +95,7 @@ inline MMap mmap(void* addr, size_t len, int prot, int flags, int fd, off_t off)
     return MMap{p};
 }
 
-} // namespace sys
+} // namespace os
 } // namespace swirly
 
 #endif // SWIRLY_SYS_MMAP_HPP

@@ -20,14 +20,14 @@
 #include <system_error>
 
 namespace swirly {
-namespace sys {
+namespace os {
 
 inline std::error_code makeError(int err)
 {
     return std::error_code{err, std::system_category()};
 }
 
-} // namespace sys
+} // namespace os
 } // namespace swirly
 
 #endif // SWIRLY_SYS_ERROR_HPP

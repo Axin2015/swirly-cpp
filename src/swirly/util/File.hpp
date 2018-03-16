@@ -27,7 +27,7 @@ namespace swirly {
 inline std::size_t fileSize(int fd)
 {
     struct stat st;
-    sys::fstat(fd, st);
+    os::fstat(fd, st);
     return st.st_size;
 }
 
