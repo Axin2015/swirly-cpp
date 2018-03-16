@@ -24,6 +24,7 @@
 #include <exception>
 
 namespace swirly {
+inline namespace util {
 
 using ErrMsg = StringStream<MaxErrMsg>;
 
@@ -58,6 +59,7 @@ class SWIRLY_API Exception : public std::exception {
  */
 SWIRLY_API ErrMsg& errMsg() noexcept;
 
+} // namespace util
 } // namespace swirly
 
 #endif // SWIRLY_UTIL_EXCEPTION_HPP

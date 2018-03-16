@@ -20,6 +20,7 @@
 #include <swirly/util/IntWrapper.hpp>
 
 namespace swirly {
+inline namespace util {
 struct Id32Policy : Int32Policy {
 };
 struct Id64Policy : Int64Policy {
@@ -45,6 +46,7 @@ constexpr Id64 operator""_id64(unsigned long long val) noexcept
     return Id64{val};
 }
 
+} // namespace util
 } // namespace swirly
 
 #endif // SWIRLY_UTIL_BASICTYPES_HPP

@@ -28,10 +28,9 @@
 
 #include <memory>
 
-using namespace std;
-
 namespace swirly {
 namespace ui {
+using namespace std;
 
 MainWindow::MainWindow()
 {

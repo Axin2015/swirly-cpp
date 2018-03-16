@@ -26,6 +26,7 @@
 #endif
 
 namespace swirly {
+inline namespace sys {
 namespace os {
 
 inline int poll(pollfd* fds, nfds_t nfds, int timeout, std::error_code& ec) noexcept
@@ -104,6 +105,7 @@ inline int epoll_wait(int epfd, epoll_event* events, int maxevents, int timeout)
 #endif
 
 } // namespace os
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_POLL_HPP

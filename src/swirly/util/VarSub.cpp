@@ -18,9 +18,9 @@
 
 #include <cstdlib> // getenv()
 
-using namespace std;
-
 namespace swirly {
+inline namespace util {
+using namespace std;
 
 string getEnv(const string& name)
 {
@@ -101,4 +101,5 @@ bool VarSub::substitute(string& s, const size_t i, size_t j, set<string>* outer)
     return false;
 }
 
+} // namespace util
 } // namespace swirly

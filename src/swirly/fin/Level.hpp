@@ -24,6 +24,7 @@
 #include <boost/intrusive/set.hpp>
 
 namespace swirly {
+inline namespace fin {
 
 using LevelKey = Ticks::ValueType;
 
@@ -184,6 +185,7 @@ class SWIRLY_API LevelSet {
     Set set_;
 };
 
+} // namespace fin
 } // namespace swirly
 
 #endif // SWIRLY_FIN_LEVEL_HPP

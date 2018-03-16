@@ -31,17 +31,17 @@ BOOST_AUTO_TEST_CASE(RingBufferCase)
     IntRingBuffer rb{4};
     BOOST_TEST(rb.empty());
     BOOST_TEST(!rb.full());
-    BOOST_TEST(rb.size() == 0);
+    BOOST_TEST(rb.size() == 0U);
 
     rb.post([](int& val) { val = 1; });
     BOOST_TEST(!rb.empty());
     BOOST_TEST(!rb.full());
-    BOOST_TEST(rb.size() == 1);
+    BOOST_TEST(rb.size() == 1U);
 
     rb.clear();
     BOOST_TEST(rb.empty());
     BOOST_TEST(!rb.full());
-    BOOST_TEST(rb.size() == 0);
+    BOOST_TEST(rb.size() == 0U);
 
     rb.push(1);
     rb.push(2);
@@ -49,19 +49,19 @@ BOOST_AUTO_TEST_CASE(RingBufferCase)
     rb.push(4);
     BOOST_TEST(!rb.empty());
     BOOST_TEST(rb.full());
-    BOOST_TEST(rb.size() == 4);
+    BOOST_TEST(rb.size() == 4U);
 
     rb.push(5);
     BOOST_TEST(!rb.empty());
     BOOST_TEST(rb.full());
-    BOOST_TEST(rb.size() == 4);
+    BOOST_TEST(rb.size() == 4U);
 
     int val;
     rb.fetch([&val](const int& ref) { val = ref; });
     BOOST_TEST(2);
     BOOST_TEST(!rb.empty());
     BOOST_TEST(!rb.full());
-    BOOST_TEST(rb.size() == 3);
+    BOOST_TEST(rb.size() == 3U);
 
     BOOST_TEST(rb.front() == 3);
     rb.pop();
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(RingBufferCase)
 
     BOOST_TEST(rb.empty());
     BOOST_TEST(!rb.full());
-    BOOST_TEST(rb.size() == 0);
+    BOOST_TEST(rb.size() == 0U);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

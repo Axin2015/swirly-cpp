@@ -28,10 +28,9 @@
 
 #include <swirly/util/Config.hpp>
 
-using namespace std;
-
 namespace swirly {
-using namespace sqlite;
+inline namespace sqlite {
+using namespace std;
 namespace {
 
 constexpr auto SelectAssetSql = //
@@ -356,4 +355,5 @@ void SqlModel::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const
     }
 }
 
+} // namespace sqlite
 } // namespace swirly

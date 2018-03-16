@@ -22,6 +22,7 @@
 #include <cmath>
 
 namespace swirly {
+inline namespace fin {
 
 constexpr int64_t roundHalfAway(double real) noexcept
 {
@@ -113,6 +114,7 @@ constexpr Cost cost(Lots lots, Ticks ticks) noexcept
     return Cost{lots.count() * ticks.count()};
 }
 
+} // namespace fin
 } // namespace swirly
 
 #endif // SWIRLY_FIN_CONV_HPP

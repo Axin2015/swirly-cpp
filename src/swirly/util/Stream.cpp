@@ -18,9 +18,9 @@
 
 #include <sys/time.h>
 
-using namespace std;
-
 namespace swirly {
+inline namespace util {
+using namespace std;
 
 void reset(ostream& os) noexcept
 {
@@ -33,4 +33,5 @@ void reset(ostream& os) noexcept
 
 OStreamJoiner::~OStreamJoiner() noexcept = default;
 
+} // namespace util
 } // namespace swirly

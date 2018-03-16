@@ -20,6 +20,7 @@
 #include <type_traits>
 
 namespace swirly {
+inline namespace util {
 
 template <typename ValueT>
 class Comparable {
@@ -81,6 +82,7 @@ constexpr int compare(ValueT lhs, ValueT rhs) noexcept
     return i;
 }
 
+} // namespace util
 } // namespace swirly
 
 #endif // SWIRLY_UTIL_COMPARE_HPP

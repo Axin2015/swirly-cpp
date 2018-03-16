@@ -19,7 +19,6 @@
 #include "RestServ.hpp"
 
 namespace swirly {
-
 using namespace std;
 
 namespace {

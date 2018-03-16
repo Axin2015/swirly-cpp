@@ -19,9 +19,8 @@
 
 #include <swirly/fin/Types.hpp>
 
-using namespace std;
-
 namespace swirly {
+inline namespace fin {
 
 class SWIRLY_API Transactional {
   public:
@@ -134,6 +133,7 @@ class SWIRLY_API Transaction {
     bool done_{false};
 };
 
+} // namespace fin
 } // namespace swirly
 
 #endif // SWIRLY_FIN_TRANSACTIONAL_HPP

@@ -31,45 +31,45 @@ BOOST_AUTO_TEST_SUITE(PageSuite)
 BOOST_AUTO_TEST_CASE(ParseQueryNoneCase)
 {
     auto page = parseQuery(""sv);
-    BOOST_TEST(page.offset == 0);
+    BOOST_TEST(page.offset == 0U);
     BOOST_TEST(!page.limit);
 }
 
 BOOST_AUTO_TEST_CASE(ParseQueryOffsetCase)
 {
     auto page = parseQuery("offset=1"sv);
-    BOOST_TEST(page.offset == 1);
+    BOOST_TEST(page.offset == 1U);
     BOOST_TEST(!page.limit);
 }
 
 BOOST_AUTO_TEST_CASE(ParseQueryLimitCase)
 {
     auto page = parseQuery("limit=2"sv);
-    BOOST_TEST(page.offset == 0);
+    BOOST_TEST(page.offset == 0U);
     BOOST_TEST(!!page.limit);
-    BOOST_TEST(*page.limit == 2);
+    BOOST_TEST(*page.limit == 2U);
 }
 
 BOOST_AUTO_TEST_CASE(ParseQueryOffsetAndLimitCase)
 {
     auto page = parseQuery("offset=1&limit=2"sv);
-    BOOST_TEST(page.offset == 1);
+    BOOST_TEST(page.offset == 1U);
     BOOST_TEST(!!page.limit);
-    BOOST_TEST(*page.limit == 2);
+    BOOST_TEST(*page.limit == 2U);
 }
 
 BOOST_AUTO_TEST_CASE(ParseQueryLimitAndOffsetCase)
 {
     auto page = parseQuery("limit=2&offset=1"sv);
-    BOOST_TEST(page.offset == 1);
+    BOOST_TEST(page.offset == 1U);
     BOOST_TEST(!!page.limit);
-    BOOST_TEST(*page.limit == 2);
+    BOOST_TEST(*page.limit == 2U);
 }
 
 BOOST_AUTO_TEST_CASE(ParseQueryOtherCase)
 {
     auto page = parseQuery("foo=1&bar=2"sv);
-    BOOST_TEST(page.offset == 0);
+    BOOST_TEST(page.offset == 0U);
     BOOST_TEST(!page.limit);
 }
 

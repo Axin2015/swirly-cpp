@@ -18,9 +18,8 @@
 
 #include <iostream>
 
-using namespace std;
-
 namespace swirly {
+using namespace std;
 
 ServException::~ServException() noexcept = default;
 

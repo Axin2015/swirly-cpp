@@ -28,6 +28,7 @@
 #include <boost/intrusive/set.hpp>
 
 namespace swirly {
+inline namespace fin {
 
 class SWIRLY_API Request {
   public:
@@ -242,6 +243,7 @@ class RequestIdSet {
     Set set_;
 };
 
+} // namespace fin
 } // namespace swirly
 
 #endif // SWIRLY_FIN_REQUEST_HPP

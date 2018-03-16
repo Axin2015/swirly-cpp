@@ -31,14 +31,14 @@ BOOST_AUTO_TEST_CASE(ArrayViewCase)
 {
     BOOST_TEST(!ArrayView<int>{}.data());
     BOOST_TEST(ArrayView<int>{}.empty());
-    BOOST_TEST(ArrayView<int>{}.size() == 0UL);
+    BOOST_TEST(ArrayView<int>{}.size() == 0U);
 
     const int arr[] = {101, 202, 303};
     ArrayView<int> av{arr};
 
     BOOST_TEST(av.data());
     BOOST_TEST(!av.empty());
-    BOOST_TEST(av.size() == 3UL);
+    BOOST_TEST(av.size() == 3U);
 
     BOOST_TEST(av[0] == arr[0]);
     BOOST_TEST(av[1] == arr[1]);
@@ -52,8 +52,8 @@ BOOST_AUTO_TEST_CASE(ArrayViewCase)
 
     BOOST_TEST(equal(av.rbegin(), av.rend(), rev));
 
-    BOOST_TEST(makeArrayView(arr, 2).size() == 2UL);
-    BOOST_TEST(makeArrayView(arr).size() == 3UL);
+    BOOST_TEST(makeArrayView(arr, 2).size() == 2U);
+    BOOST_TEST(makeArrayView(arr).size() == 3U);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

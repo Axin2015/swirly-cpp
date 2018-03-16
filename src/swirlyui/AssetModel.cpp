@@ -16,11 +16,10 @@
  */
 #include "AssetModel.hxx"
 
-using namespace std;
-
 namespace swirly {
 namespace ui {
 using namespace asset;
+using namespace std;
 
 AssetModel::AssetModel(QObject* parent)
 : TableModel{parent}

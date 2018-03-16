@@ -22,9 +22,6 @@
 #include <queue>
 #include <random>
 
-namespace swirly {
-} // namespace swirly
-
 using namespace std;
 using namespace swirly;
 

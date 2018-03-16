@@ -19,9 +19,9 @@
 #include "File.hpp"
 #include "System.hpp"
 
-using namespace std;
-
 namespace swirly {
+inline namespace sys {
+using namespace std;
 
 void closeAll() noexcept
 {
@@ -56,4 +56,5 @@ void daemon()
     os::open("/dev/null", O_RDONLY);
 }
 
+} // namespace sys
 } // namespace swirly

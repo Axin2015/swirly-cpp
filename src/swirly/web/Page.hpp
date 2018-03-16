@@ -23,6 +23,7 @@
 #include <string_view>
 
 namespace swirly {
+inline namespace web {
 
 struct Page {
     std::size_t offset{0};
@@ -33,6 +34,7 @@ struct Page {
 // are not supported for simplicity.
 SWIRLY_API Page parseQuery(std::string_view query) noexcept;
 
+} // namespace web
 } // namespace swirly
 
 #endif // SWIRLY_WEB_PAGE_HPP

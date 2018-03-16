@@ -22,6 +22,7 @@
 #include <new>
 
 namespace swirly {
+inline namespace sys {
 
 SWIRLY_API void* alloc(std::size_t size);
 SWIRLY_API void* alloc(std::size_t size, std::align_val_t al);
@@ -36,6 +37,7 @@ struct MemAlloc {
     ~MemAlloc() noexcept = default;
 };
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_MEMALLOC_HPP

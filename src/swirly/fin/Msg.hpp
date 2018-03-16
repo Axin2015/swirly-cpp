@@ -25,6 +25,7 @@
 #include <swirly/util/Symbol.hpp>
 
 namespace swirly {
+inline namespace fin {
 
 enum class MsgType : int { Reset, CreateMarket, UpdateMarket, CreateExec, ArchiveTrade };
 
@@ -94,6 +95,7 @@ static_assert(sizeof(Msg) == 240, "must be specific size");
 
 using MsgPipe = Pipe<Msg>;
 
+} // namespace fin
 } // namespace swirly
 
 #endif // SWIRLY_FIN_MSG_HPP

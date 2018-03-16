@@ -20,9 +20,9 @@
 
 #include <tuple>
 
-using namespace std;
-
 namespace swirly {
+inline namespace web {
+using namespace std;
 
 Page parseQuery(string_view query) noexcept
 {
@@ -41,4 +41,5 @@ Page parseQuery(string_view query) noexcept
     return page;
 }
 
+} // namespace web
 } // namespace swirly

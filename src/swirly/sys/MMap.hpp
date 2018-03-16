@@ -27,6 +27,7 @@
 #include <sys/mman.h>
 
 namespace swirly {
+inline namespace sys {
 
 /**
  * Memory-mapped addressed may be zero (in rare situations), but can never be MAP_FAILED.
@@ -96,6 +97,7 @@ inline MMap mmap(void* addr, size_t len, int prot, int flags, int fd, off_t off)
 }
 
 } // namespace os
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_MMAP_HPP

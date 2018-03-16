@@ -23,6 +23,7 @@
 #include <swirly/util/Set.hpp>
 
 namespace swirly {
+inline namespace fin {
 
 using MarketPtr = boost::intrusive_ptr<Market>;
 using ConstMarketPtr = boost::intrusive_ptr<const Market>;
@@ -135,6 +136,7 @@ inline std::ostream& operator<<(std::ostream& os, const Market& market)
 
 using MarketSet = IdSet<Market>;
 
+} // namespace fin
 } // namespace swirly
 
 #endif // SWIRLY_FIN_MARKET_HPP

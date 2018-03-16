@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(StringBufEmptyCase)
 {
     StringBuf<3> sb;
     BOOST_TEST(sb.empty());
-    BOOST_TEST(sb.size() == 0UL);
+    BOOST_TEST(sb.size() == 0U);
     BOOST_TEST(sb.compare(""sv) == 0);
     BOOST_TEST(sb == StringBuf<3>{""sv});
 }
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(StringBufNonEmptyCase)
 {
     StringBuf<3> sb{"Foo"sv};
     BOOST_TEST(!sb.empty());
-    BOOST_TEST(sb.size() == 3UL);
+    BOOST_TEST(sb.size() == 3U);
     BOOST_TEST(sb.compare("Foo"sv) == 0);
     BOOST_TEST(sb == StringBuf<3>{"Foo"sv});
 }
@@ -49,11 +49,11 @@ BOOST_AUTO_TEST_CASE(StringBufNonEmptyCase)
 BOOST_AUTO_TEST_CASE(StringBufUpperBoundCase)
 {
     StringBuf<3> sb{"Foox"sv};
-    BOOST_TEST(sb.size() == 3UL);
+    BOOST_TEST(sb.size() == 3U);
     BOOST_TEST(sb == "Foo"sv);
 
     sb = "Barx"sv;
-    BOOST_TEST(sb.size() == 3UL);
+    BOOST_TEST(sb.size() == 3U);
     BOOST_TEST(sb == "Bar"sv);
 }
 
@@ -68,12 +68,12 @@ BOOST_AUTO_TEST_CASE(StringBufAssignCase)
 {
     StringBuf<3> sb;
     sb = "Foo"sv;
-    BOOST_TEST(sb.size() == 3UL);
+    BOOST_TEST(sb.size() == 3U);
     BOOST_TEST(sb == "Foo"sv);
 
     sb.clear();
     sb = "Foox"sv;
-    BOOST_TEST(sb.size() == 3UL);
+    BOOST_TEST(sb.size() == 3U);
     BOOST_TEST(sb == "Foo"sv);
 }
 
@@ -82,12 +82,12 @@ BOOST_AUTO_TEST_CASE(StringBufAppendCase)
     StringBuf<6> sb;
     sb = "Foo"sv;
     sb += "Bar"sv;
-    BOOST_TEST(sb.size() == 6UL);
+    BOOST_TEST(sb.size() == 6U);
     BOOST_TEST(sb == "FooBar"sv);
 
     sb = "Foo"sv;
     sb += "Barx"sv;
-    BOOST_TEST(sb.size() == 6UL);
+    BOOST_TEST(sb.size() == 6U);
     BOOST_TEST(sb == "FooBar"sv);
 }
 

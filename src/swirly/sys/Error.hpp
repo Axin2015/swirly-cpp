@@ -20,6 +20,7 @@
 #include <system_error>
 
 namespace swirly {
+inline namespace sys {
 namespace os {
 
 inline std::error_code makeError(int err)
@@ -28,6 +29,7 @@ inline std::error_code makeError(int err)
 }
 
 } // namespace os
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_ERROR_HPP

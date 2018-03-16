@@ -24,6 +24,7 @@
 #include <string_view>
 
 namespace swirly {
+inline namespace util {
 
 using namespace std::literals::string_view_literals;
 
@@ -146,6 +147,7 @@ SWIRLY_API std::pair<std::string_view, std::string_view> splitPair(std::string_v
 
 SWIRLY_API std::pair<std::string, std::string> splitPair(const std::string& s, char sep);
 
+} // namespace util
 } // namespace swirly
 
 #endif // SWIRLY_UTIL_STRING_HPP

@@ -25,6 +25,7 @@
 #include <boost/intrusive/set.hpp>
 
 namespace swirly {
+inline namespace util {
 
 template <typename ValueT>
 struct IdTraits {
@@ -280,6 +281,7 @@ class SymbolSet {
     Set set_;
 };
 
+} // namespace util
 } // namespace swirly
 
 #endif // SWIRLY_UTIL_SET_HPP

@@ -23,6 +23,7 @@
 #include <sys/socket.h>
 
 namespace swirly {
+inline namespace sys {
 
 namespace os {
 
@@ -716,6 +717,7 @@ struct Socket {
     int family_{};
 };
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_SOCKET_HPP

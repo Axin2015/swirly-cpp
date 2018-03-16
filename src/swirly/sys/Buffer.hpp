@@ -22,6 +22,7 @@
 #include <boost/asio/buffer.hpp>
 
 namespace swirly {
+inline namespace sys {
 
 using ConstBuffer = boost::asio::const_buffer;
 using MutableBuffer = boost::asio::mutable_buffer;
@@ -55,7 +56,7 @@ class SWIRLY_API Buffer {
     /**
      * Returns true if read buffer is empty.
      */
-    bool empty() const noexcept { return size() == 0; };
+    bool empty() const noexcept { return size() == 0U; };
 
     /**
      * Returns number of bytes available for read.
@@ -100,6 +101,7 @@ class SWIRLY_API Buffer {
     std::vector<char> buf_;
 };
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_BUFFER_HPP

@@ -22,6 +22,7 @@
 #include <vector>
 
 namespace swirly {
+inline namespace clob {
 
 class SWIRLY_API Response {
   public:
@@ -71,6 +72,7 @@ inline std::ostream& operator<<(std::ostream& os, const Response& resp)
     return os;
 }
 
+} // namespace clob
 } // namespace swirly
 
 #endif // SWIRLY_CLOB_RESPONSE_HPP

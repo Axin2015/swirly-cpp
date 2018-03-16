@@ -24,6 +24,7 @@
 #include <string_view>
 
 namespace swirly {
+inline namespace web {
 
 enum class HttpMethod : int {
     Delete = HTTP_DELETE,
@@ -207,6 +208,7 @@ class BasicHttpParser {
     enum { None = 0, Field, Value } lastHeaderElem_;
 };
 
+} // namespace web
 } // namespace swirly
 
 #endif // SWIRLY_WEB_HTTPPARSER_HPP

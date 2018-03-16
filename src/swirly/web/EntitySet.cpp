@@ -20,10 +20,9 @@
 
 #include <swirly/util/Tokeniser.hpp>
 
-using namespace std;
-
 namespace swirly {
-
+inline namespace web {
+using namespace std;
 namespace {
 
 int bit(string_view sv)
@@ -68,4 +67,5 @@ EntitySet EntitySet::parse(string_view sv)
     return {bs};
 }
 
+} // namespace web
 } // namespace swirly

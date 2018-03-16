@@ -22,6 +22,7 @@
 #include <unistd.h>
 
 namespace swirly {
+inline namespace sys {
 namespace os {
 
 /**
@@ -95,6 +96,7 @@ inline pid_t setsid()
 }
 
 } // namespace os
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_SYSTEM_HPP

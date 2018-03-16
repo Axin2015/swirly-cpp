@@ -23,6 +23,7 @@
 #include <memory>
 
 namespace swirly {
+inline namespace sys {
 
 class SWIRLY_API MemCtx {
   public:
@@ -60,6 +61,7 @@ class SWIRLY_API MemCtx {
     std::unique_ptr<Impl> impl_;
 };
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_MEMCTX_HPP

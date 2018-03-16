@@ -23,9 +23,8 @@
 #include <unordered_map>
 
 namespace swirly {
-
+inline namespace sys {
 using namespace std;
-
 namespace {
 
 constexpr size_t MaxEvents{16};
@@ -174,4 +173,5 @@ int EpollReactor::dispatch(Event* buf, int size, Time now)
     return n;
 }
 
+} // namespace sys
 } // namespace swirly

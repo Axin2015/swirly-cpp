@@ -24,11 +24,15 @@
 #include <swirly/util/Array.hpp>
 
 namespace swirly {
-
-class Accnt;
+inline namespace fin {
 class Journ;
 class Market;
 class Model;
+} // namespace fin
+
+inline namespace clob {
+
+class Accnt;
 class Response;
 
 using TradePair = std::pair<ConstExecPtr, ConstExecPtr>;
@@ -127,6 +131,7 @@ class SWIRLY_API Serv {
     std::unique_ptr<Impl> impl_;
 };
 
+} // namespace clob
 } // namespace swirly
 
 #endif // SWIRLY_CLOB_SERV_HPP

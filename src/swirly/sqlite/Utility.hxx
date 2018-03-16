@@ -30,10 +30,13 @@
 #include <type_traits>
 
 namespace swirly {
-
+inline namespace util {
 class Config;
+} // namespace util
+} // namespace swirly
 
-namespace sqlite {
+namespace swirly {
+inline namespace sqlite {
 namespace detail {
 
 void bind32(sqlite3_stmt& stmt, int col, int32_t val);
@@ -41,13 +44,13 @@ void bind64(sqlite3_stmt& stmt, int col, int64_t val);
 void bindsv(sqlite3_stmt& stmt, int col, std::string_view val);
 
 template <typename ValueT, typename EnableT = void>
-struct DbTraits;
+struct SqlTraits;
 
 /**
  * Integer 32bit.
  */
 template <typename ValueT>
-struct DbTraits<ValueT, std::enable_if_t<std::is_integral_v<ValueT> && (sizeof(ValueT) <= 4)>> {
+struct SqlTraits<ValueT, std::enable_if_t<std::is_integral_v<ValueT> && (sizeof(ValueT) <= 4)>> {
     static constexpr bool isNull(ValueT val) noexcept { return val == 0; }
     static void bind(sqlite3_stmt& stmt, int col, ValueT val) { bind32(stmt, col, val); }
     static auto column(sqlite3_stmt& stmt, int col) noexcept
@@ -60,7 +63,7 @@ struct DbTraits<ValueT, std::enable_if_t<std::is_integral_v<ValueT> && (sizeof(V
  * Integer 64bit.
  */
 template <typename ValueT>
-struct DbTraits<ValueT, std::enable_if_t<std::is_integral_v<ValueT> && (sizeof(ValueT) > 4)>> {
+struct SqlTraits<ValueT, std::enable_if_t<std::is_integral_v<ValueT> && (sizeof(ValueT) > 4)>> {
     static constexpr bool isNull(ValueT val) noexcept { return val == 0; }
     static void bind(sqlite3_stmt& stmt, int col, ValueT val) { bind64(stmt, col, val); }
     static auto column(sqlite3_stmt& stmt, int col) noexcept
@@ -73,9 +76,9 @@ struct DbTraits<ValueT, std::enable_if_t<std::is_integral_v<ValueT> && (sizeof(V
  * IntWrapper.
  */
 template <typename ValueT>
-struct DbTraits<ValueT, std::enable_if_t<isIntWrapper<ValueT>>> {
+struct SqlTraits<ValueT, std::enable_if_t<isIntWrapper<ValueT>>> {
 
-    using UnderlyingTraits = DbTraits<typename ValueT::ValueType>;
+    using UnderlyingTraits = SqlTraits<typename ValueT::ValueType>;
 
     static constexpr bool isNull(ValueT val) noexcept { return val == ValueT{0}; }
     static void bind(sqlite3_stmt& stmt, int col, ValueT val)
@@ -92,9 +95,9 @@ struct DbTraits<ValueT, std::enable_if_t<isIntWrapper<ValueT>>> {
  * Enum.
  */
 template <typename ValueT>
-struct DbTraits<ValueT, std::enable_if_t<std::is_enum_v<ValueT>>> {
+struct SqlTraits<ValueT, std::enable_if_t<std::is_enum_v<ValueT>>> {
 
-    using UnderlyingTraits = DbTraits<std::underlying_type_t<ValueT>>;
+    using UnderlyingTraits = SqlTraits<std::underlying_type_t<ValueT>>;
 
     static constexpr bool isNull(ValueT val) noexcept { return unbox(val) == 0; }
     static void bind(sqlite3_stmt& stmt, int col, ValueT val)
@@ -111,7 +114,7 @@ struct DbTraits<ValueT, std::enable_if_t<std::is_enum_v<ValueT>>> {
  * Time.
  */
 template <>
-struct DbTraits<Time> {
+struct SqlTraits<Time> {
     static constexpr bool isNull(Time val) noexcept { return val == Time{}; }
     static void bind(sqlite3_stmt& stmt, int col, Time val)
     {
@@ -127,7 +130,7 @@ struct DbTraits<Time> {
  * StringView.
  */
 template <>
-struct DbTraits<std::string_view> {
+struct SqlTraits<std::string_view> {
     static constexpr bool isNull(std::string_view val) noexcept { return val.empty(); }
     static void bind(sqlite3_stmt& stmt, int col, std::string_view val) { bindsv(stmt, col, val); }
     static std::string_view column(sqlite3_stmt& stmt, int col) noexcept
@@ -153,7 +156,7 @@ inline bool stepOnce(sqlite3_stmt& stmt)
 template <typename ValueT>
 inline ValueT column(sqlite3_stmt& stmt, int col) noexcept
 {
-    using Traits = detail::DbTraits<ValueT>;
+    using Traits = detail::SqlTraits<ValueT>;
     return Traits::column(stmt, col);
 }
 
@@ -165,14 +168,14 @@ void bind(sqlite3_stmt& stmt, int col, std::nullptr_t);
 template <typename ValueT>
 void bind(sqlite3_stmt& stmt, int col, ValueT val)
 {
-    using Traits = detail::DbTraits<ValueT>;
+    using Traits = detail::SqlTraits<ValueT>;
     Traits::bind(stmt, col, val);
 }
 
 template <typename ValueT>
 void bind(sqlite3_stmt& stmt, int col, ValueT val, MaybeNullTag)
 {
-    using Traits = detail::DbTraits<ValueT>;
+    using Traits = detail::SqlTraits<ValueT>;
     if (!Traits::isNull(val)) {
         bind(stmt, col, val);
     } else {

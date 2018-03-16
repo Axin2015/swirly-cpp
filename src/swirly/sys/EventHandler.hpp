@@ -22,6 +22,7 @@
 #include <swirly/sys/Time.hpp>
 
 namespace swirly {
+inline namespace sys {
 
 class Reactor;
 class Timer;
@@ -62,6 +63,7 @@ class SWIRLY_API EventHandler : public RefCount<EventHandler, ThreadUnsafePolicy
 
 using EventHandlerPtr = boost::intrusive_ptr<EventHandler>;
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_EVENTHANDLER_HPP

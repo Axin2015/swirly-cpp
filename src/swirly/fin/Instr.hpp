@@ -22,6 +22,7 @@
 #include <swirly/util/Set.hpp>
 
 namespace swirly {
+inline namespace fin {
 
 /**
  * A specification that stipulates the terms and conditions of sale.
@@ -101,6 +102,7 @@ inline std::ostream& operator<<(std::ostream& os, const Instr& instr)
 
 using InstrSet = SymbolSet<Instr>;
 
+} // namespace fin
 } // namespace swirly
 
 #endif // SWIRLY_FIN_INSTR_HPP

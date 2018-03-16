@@ -16,7 +16,7 @@
  */
 #include "Utility.hxx"
 
-#include "Exception.hxx"
+#include "Exception.hpp"
 
 #include <swirly/util/Config.hpp>
 #include <swirly/util/Log.hpp>
@@ -24,10 +24,9 @@
 
 #include <cassert>
 
-using namespace std;
-
 namespace swirly {
-namespace sqlite {
+inline namespace sqlite {
+using namespace std;
 namespace {
 
 const char* lastError(sqlite3& db)

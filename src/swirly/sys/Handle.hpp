@@ -21,6 +21,7 @@
 #include <utility> // swap<>
 
 namespace swirly {
+inline namespace sys {
 
 template <typename PolicyT>
 class Handle {
@@ -104,6 +105,7 @@ inline bool operator!=(const Handle<PolicyT>& lhs, const Handle<PolicyT>& rhs)
     return !(lhs == rhs);
 }
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_HANDLE_HPP

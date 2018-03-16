@@ -22,6 +22,7 @@
 #include <memory>
 
 namespace swirly {
+inline namespace util {
 
 template <typename ValueT>
 class RingBuffer {
@@ -90,6 +91,7 @@ class RingBuffer {
     std::unique_ptr<ValueT[]> buf_;
 };
 
+} // namespace util
 } // namespace swirly
 
 #endif // SWIRLY_UTIL_RINGBUFFER_HPP

@@ -17,6 +17,7 @@
 #include "IpAddress.hpp"
 
 namespace swirly {
+inline namespace sys {
 namespace {
 
 std::pair<std::string, int> splitPair(const std::string& s, char sep)
@@ -97,6 +98,7 @@ UdpEndpoint TransportTraits<Udp>::parseEndpoint(const std::string& s)
 {
     return parseImpl<Udp>(s);
 }
+} // namespace sys
 } // namespace swirly
 
 std::istream& boost::asio::ip::operator>>(std::istream& is, basic_endpoint<tcp>& ep)

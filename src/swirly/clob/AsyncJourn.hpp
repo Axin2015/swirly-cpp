@@ -14,17 +14,18 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_FIN_ASYNCJOURN_HPP
-#define SWIRLY_FIN_ASYNCJOURN_HPP
+#ifndef SWIRLY_CLOB_ASYNCJOURN_HPP
+#define SWIRLY_CLOB_ASYNCJOURN_HPP
 
 #include <swirly/fin/Msg.hpp>
 
 #include <swirly/util/Array.hpp>
 
 namespace swirly {
-
+inline namespace fin {
 class Journ;
-
+} // namespace fin
+inline namespace clob {
 namespace detail {
 
 template <std::size_t StepN>
@@ -125,6 +126,7 @@ class SWIRLY_API AsyncJourn {
     std::thread thread_;
 };
 
+} // namespace clob
 } // namespace swirly
 
-#endif // SWIRLY_FIN_ASYNCJOURN_HPP
+#endif // SWIRLY_CLOB_ASYNCJOURN_HPP

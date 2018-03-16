@@ -17,7 +17,7 @@
 #include "TcpAcceptor.hpp"
 
 namespace swirly {
-
+inline namespace sys {
 using namespace std;
 
 TcpAcceptor::TcpAcceptor(Reactor& r, const Endpoint& ep)
@@ -39,4 +39,5 @@ void TcpAcceptor::doReady(int fd, unsigned events, Time now)
     doAccept(move(sock), ep, now);
 }
 
+} // namespace sys
 } // namespace swirly

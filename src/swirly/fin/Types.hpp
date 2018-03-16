@@ -27,6 +27,7 @@
 #include <memory>
 
 namespace swirly {
+inline namespace fin {
 
 /**
  * Description suitable for display on user-interface.
@@ -72,6 +73,7 @@ using ConstPosnPtr = boost::intrusive_ptr<const Posn>;
 
 enum class More : int { No, Yes };
 
+} // namespace fin
 } // namespace swirly
 
 #endif // SWIRLY_FIN_TYPES_HPP

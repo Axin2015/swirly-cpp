@@ -22,9 +22,11 @@
 #include <cstdint>
 
 namespace swirly {
+inline namespace util {
 
 SWIRLY_API int hexDigits(int64_t i) noexcept;
 
+} // namespace util
 } // namespace swirly
 
 #endif // SWIRLY_UTIL_UTILITY_HPP

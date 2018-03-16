@@ -26,6 +26,7 @@
 #include <memory>
 
 namespace swirly {
+inline namespace sys {
 namespace detail {
 inline std::size_t fileSize(int fd)
 {
@@ -61,8 +62,8 @@ class MemQueue {
     explicit MemQueue(std::size_t capacity)
     : capacity_{nextPow2(capacity)}
     , mask_{capacity_ - 1}
-    , memMap_{os::mmap(nullptr, size(capacity_), PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE,
-                        -1, 0)}
+    , memMap_{os::mmap(nullptr, size(capacity_), PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1,
+                       0)}
     , impl_{*static_cast<Impl*>(memMap_.get().data())}
     {
         assert(capacity >= 2);
@@ -239,6 +240,7 @@ void createMemQueue(const char* path, std::size_t capacity, mode_t mode)
     }
 }
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_MEMQUEUE_HPP

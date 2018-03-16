@@ -27,6 +27,7 @@
 #include <unistd.h>
 
 namespace swirly {
+inline namespace sys {
 
 class EpollMuxer {
   public:
@@ -159,6 +160,7 @@ class EpollMuxer {
     int md_{-1};
 };
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_MUXER_HPP

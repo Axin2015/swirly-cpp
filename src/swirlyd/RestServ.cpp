@@ -27,9 +27,8 @@
 
 #include <chrono>
 
-using namespace std;
-
 namespace swirly {
+using namespace std;
 namespace {
 
 class ScopedIds {

@@ -23,11 +23,13 @@
 #include <boost/asio/local/stream_protocol.hpp>
 
 namespace swirly {
+inline namespace sys {
 
 // Unix domain sockets.
 using LocalDgram = boost::asio::local::datagram_protocol;
 using LocalStream = boost::asio::local::stream_protocol;
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_LOCALADDRESS_HPP

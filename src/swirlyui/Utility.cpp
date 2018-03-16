@@ -16,8 +16,6 @@
  */
 #include "Utility.hxx"
 
-using namespace std;
-
 namespace swirly {
 namespace ui {
 

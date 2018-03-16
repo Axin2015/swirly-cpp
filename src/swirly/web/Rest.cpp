@@ -25,9 +25,9 @@
 
 #include <algorithm>
 
-using namespace std;
-
 namespace swirly {
+inline namespace web {
+using namespace std;
 namespace detail {
 namespace {
 
@@ -417,4 +417,5 @@ void Rest::deleteTrade(Symbol accntSymbol, Symbol instrSymbol, IsoDate settlDate
     serv_.archiveTrade(accnt, marketId, ids, now);
 }
 
+} // namespace web
 } // namespace swirly

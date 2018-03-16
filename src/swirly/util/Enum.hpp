@@ -21,6 +21,7 @@
 #include <type_traits>
 
 namespace swirly {
+inline namespace util {
 
 template <typename EnumT, typename = std::enable_if_t<std::is_enum_v<EnumT>>>
 constexpr EnumT box(typename std::underlying_type_t<EnumT> val) noexcept
@@ -40,6 +41,7 @@ std::ostream& operator<<(std::ostream& os, EnumT val)
     return os << unbox(val);
 }
 
+} // namespace util
 } // namespace swirly
 
 #endif // SWIRLY_UTIL_ENUM_HPP

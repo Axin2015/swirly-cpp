@@ -24,6 +24,7 @@
 struct pidfh;
 
 namespace swirly {
+inline namespace sys {
 namespace detail {
 struct SWIRLY_API PidFileDeleter {
     void operator()(pidfh* pfh) const noexcept;
@@ -49,6 +50,7 @@ SWIRLY_API void closePidFile(PidFile& pf) noexcept;
  */
 SWIRLY_API void writePidFile(PidFile& pf);
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_PIDFILE_HPP

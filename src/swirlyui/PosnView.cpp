@@ -25,11 +25,10 @@
 
 #include <memory>
 
-using namespace std;
-
 namespace swirly {
 namespace ui {
 using namespace posn;
+using namespace std;
 
 PosnView::PosnView(PosnModel& model, QWidget* parent, Qt::WindowFlags f)
 : QWidget{parent, f}

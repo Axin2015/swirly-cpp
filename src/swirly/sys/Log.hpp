@@ -22,6 +22,7 @@
 #include <string_view>
 
 namespace swirly {
+inline namespace sys {
 
 /**
  * Logger callback function.
@@ -111,6 +112,7 @@ SWIRLY_API void stdLogger(int level, std::string_view msg) noexcept;
  */
 SWIRLY_API void sysLogger(int level, std::string_view msg) noexcept;
 
+} // namespace sys
 } // namespace swirly
 
 // N.B. varargs help ensure that expressions such as the following work correctly:

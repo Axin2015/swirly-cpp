@@ -16,9 +16,9 @@
  */
 #include "Log.hpp"
 
-using namespace std;
-
 namespace swirly {
+inline namespace util {
+using namespace std;
 namespace {
 thread_local LogMsg logMsg_;
 } // namespace
@@ -29,4 +29,5 @@ LogMsg& logMsg() noexcept
     return logMsg_;
 }
 
+} // namespace util
 } // namespace swirly

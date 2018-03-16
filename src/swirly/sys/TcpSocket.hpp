@@ -20,6 +20,7 @@
 #include <swirly/sys/IoSocket.hpp>
 
 namespace swirly {
+inline namespace sys {
 
 /**
  * Passive TCP Server Socket. All state is in base class, so object can be sliced.
@@ -81,6 +82,7 @@ struct TcpSocketClnt : IoSocket {
     void connect(const Endpoint& ep) { return os::connect(*sock_, ep); }
 };
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_TCPSOCKET_HPP

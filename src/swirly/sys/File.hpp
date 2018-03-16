@@ -31,6 +31,7 @@
 #include <sys/types.h>
 
 namespace swirly {
+inline namespace sys {
 
 struct FilePolicy {
     using Id = int;
@@ -360,6 +361,7 @@ inline void setNonBlock(int fd)
     fcntl(fd, F_SETFL, O_NONBLOCK);
 }
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_FILE_HPP

@@ -16,9 +16,9 @@
  */
 #include "Exception.hpp"
 
-using namespace std;
-
 namespace swirly {
+inline namespace util {
+using namespace std;
 namespace {
 thread_local ErrMsg errMsg_;
 } // namespace
@@ -45,4 +45,5 @@ ErrMsg& errMsg() noexcept
     return errMsg_;
 }
 
+} // namespace util
 } // namespace swirly

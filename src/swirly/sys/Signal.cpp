@@ -19,6 +19,7 @@
 #include <swirly/sys/Error.hpp>
 
 namespace swirly {
+inline namespace sys {
 
 SigWait::SigWait()
 {
@@ -61,4 +62,5 @@ void sigBlockAll()
     }
 }
 
+} // namespace sys
 } // namespace swirly

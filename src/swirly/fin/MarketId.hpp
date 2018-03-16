@@ -21,6 +21,7 @@
 #include <swirly/util/Date.hpp>
 
 namespace swirly {
+inline namespace fin {
 
 constexpr Id64 toMarketId(Id32 instrId, JDay settlDay) noexcept
 {
@@ -38,6 +39,7 @@ struct MarketIdTraits {
     static Id id(const ValueT& value) noexcept { return value.marketId(); }
 };
 
+} // namespace fin
 } // namespace swirly
 
 #endif // SWIRLY_FIN_MARKETID_HPP

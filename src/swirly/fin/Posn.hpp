@@ -29,6 +29,7 @@
 #include <boost/intrusive/set.hpp>
 
 namespace swirly {
+inline namespace fin {
 
 class SWIRLY_API Posn : public RefCount<Posn, ThreadUnsafePolicy> {
   public:
@@ -251,6 +252,7 @@ class SWIRLY_API PosnSet {
     Set set_;
 };
 
+} // namespace fin
 } // namespace swirly
 
 #endif // SWIRLY_FIN_POSN_HPP

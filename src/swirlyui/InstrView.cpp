@@ -25,11 +25,10 @@
 
 #include <memory>
 
-using namespace std;
-
 namespace swirly {
 namespace ui {
 using namespace instr;
+using namespace std;
 
 InstrView::InstrView(InstrModel& model, QWidget* parent, Qt::WindowFlags f)
 : QWidget{parent, f}

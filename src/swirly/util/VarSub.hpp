@@ -24,6 +24,7 @@
 #include <string>
 
 namespace swirly {
+inline namespace util {
 
 SWIRLY_API std::string getEnv(const std::string& name);
 
@@ -68,6 +69,7 @@ class SWIRLY_API VarSub {
     std::function<std::string(const std::string&)> fn_;
 };
 
+} // namespace util
 } // namespace swirly
 
 #endif // SWIRLY_UTIL_VARSUB_HPP

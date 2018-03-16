@@ -23,7 +23,7 @@
 #include <swirly/util/Config.hpp>
 
 namespace swirly {
-using namespace sqlite;
+inline namespace sqlite {
 using namespace std;
 namespace {
 
@@ -181,4 +181,5 @@ void SqlJourn::onArchiveTrade(const ArchiveTrade& body)
     trans.commit();
 }
 
+} // namespace sqlite
 } // namespace swirly

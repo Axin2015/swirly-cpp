@@ -20,6 +20,7 @@
 #include <swirly/sys/Socket.hpp>
 
 namespace swirly {
+inline namespace sys {
 
 /**
  * Socket with IO operations. I.e. not a passive listener. All state is in base class, so object can
@@ -71,6 +72,7 @@ inline std::pair<IoSocket, IoSocket> socketpair(TransportT trans)
             IoSocket{std::move(socks.second), trans.family()}};
 }
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_IOSOCKET_HPP

@@ -22,7 +22,7 @@
 #include <sqlite3.h>
 
 namespace swirly {
-namespace sqlite {
+inline namespace sqlite {
 
 using DbPtr = std::unique_ptr<sqlite3, int (*)(sqlite3*)>;
 using StmtPtr = std::unique_ptr<sqlite3_stmt, int (*)(sqlite3_stmt*)>;

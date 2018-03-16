@@ -16,8 +16,6 @@
  */
 #include "Model.hpp"
 
-using namespace std;
-
 namespace swirly {
 
 Model::~Model() noexcept = default;

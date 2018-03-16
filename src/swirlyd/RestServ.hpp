@@ -27,10 +27,11 @@
 #include <vector>
 
 namespace swirly {
-
+inline namespace web {
 class HttpRequest;
 class HttpResponse;
 class Rest;
+} // namespace web
 
 class RestServ {
   public:

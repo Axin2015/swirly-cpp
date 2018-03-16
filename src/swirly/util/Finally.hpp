@@ -20,6 +20,7 @@
 #include <utility>
 
 namespace swirly {
+inline namespace util {
 
 template <typename FnT>
 class Finally {
@@ -47,6 +48,7 @@ auto makeFinally(FnT fn) noexcept
     return Finally<FnT>{std::move(fn)};
 }
 
+} // namespace util
 } // namespace swirly
 
 #endif // SWIRLY_UTIL_FINALLY_HPP

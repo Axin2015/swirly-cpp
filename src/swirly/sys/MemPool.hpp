@@ -27,6 +27,7 @@
 #include <type_traits>
 
 namespace swirly {
+inline namespace sys {
 
 /**
  * Size type used for 32bit index or offset into shared memory segment.
@@ -188,6 +189,7 @@ inline void deallocBlock(MemPool& pool, MemStack<SizeN>& stack, void* addr)
     push(pool, stack, static_cast<MemNode<SizeN>*>(addr));
 }
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_MEMPOOL_HPP

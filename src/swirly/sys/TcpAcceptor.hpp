@@ -21,6 +21,7 @@
 #include <swirly/sys/TcpSocket.hpp>
 
 namespace swirly {
+inline namespace sys {
 
 class SWIRLY_API TcpAcceptor : public EventHandler {
     using IntrusivePtr = boost::intrusive_ptr<TcpAcceptor>;
@@ -49,6 +50,7 @@ class SWIRLY_API TcpAcceptor : public EventHandler {
     SubHandle sub_;
 };
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_TCPACCEPTOR_HPP

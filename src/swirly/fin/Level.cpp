@@ -18,9 +18,8 @@
 
 #include <swirly/fin/Order.hpp>
 
-using namespace std;
-
 namespace swirly {
+using namespace std;
 
 static_assert(sizeof(Level) <= 2 * 64, "no greater than specified cache-lines");
 

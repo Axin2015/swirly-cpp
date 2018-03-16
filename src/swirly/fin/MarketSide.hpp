@@ -21,6 +21,7 @@
 #include <swirly/fin/Order.hpp>
 
 namespace swirly {
+inline namespace fin {
 
 class SWIRLY_API MarketSide {
   public:
@@ -120,6 +121,7 @@ class SWIRLY_API MarketSide {
     OrderList orders_;
 };
 
+} // namespace fin
 } // namespace swirly
 
 #endif // SWIRLY_FIN_MARKETSIDE_HPP

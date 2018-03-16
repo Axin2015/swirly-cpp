@@ -23,6 +23,7 @@
 #include <swirly/sys/Timer.hpp>
 
 namespace swirly {
+inline namespace sys {
 
 enum class Priority { High = 0, Low = 1 };
 
@@ -171,6 +172,7 @@ class SWIRLY_API EpollReactor : public Reactor {
     std::atomic<bool> closed_{false};
 };
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_REACTOR_HPP

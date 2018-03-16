@@ -20,6 +20,7 @@
 #include <swirly/sys/Math.hpp>
 
 namespace swirly {
+inline namespace sys {
 
 // Assumptions:
 // sysconf(_SC_LEVEL1_DCACHE_LINESIZE) == 64
@@ -51,6 +52,7 @@ inline void cpuPause() noexcept
 #endif
 }
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_MEMORY_HPP

@@ -22,6 +22,7 @@
 #include <sys/types.h>
 
 namespace swirly {
+inline namespace sys {
 
 /**
  * Close all non-standard file handles.
@@ -33,6 +34,7 @@ SWIRLY_API void closeAll() noexcept;
  */
 SWIRLY_API void daemon();
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_DAEMON_HPP

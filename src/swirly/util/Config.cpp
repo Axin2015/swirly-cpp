@@ -18,9 +18,9 @@
 
 #include <swirly/util/VarSub.hpp>
 
-using namespace std;
-
 namespace swirly {
+inline namespace util {
+using namespace std;
 
 Config::Config() = default;
 Config::~Config() noexcept = default;
@@ -42,4 +42,5 @@ void Config::read(istream& is)
     });
 }
 
+} // namespace util
 } // namespace swirly

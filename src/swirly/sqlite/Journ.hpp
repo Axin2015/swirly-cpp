@@ -24,6 +24,7 @@
 #include <swirly/fin/Transaction.hpp>
 
 namespace swirly {
+inline namespace sqlite {
 
 class SWIRLY_API SqlJourn
 : public Transactional
@@ -74,6 +75,7 @@ class SWIRLY_API SqlJourn
     sqlite::StmtPtr updateExecStmt_;
 };
 
+} // namespace sqlite
 } // namespace swirly
 
 #endif // SWIRLY_SQLITE_JOURN_HPP

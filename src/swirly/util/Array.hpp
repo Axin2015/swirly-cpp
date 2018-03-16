@@ -22,6 +22,7 @@
 #include <vector>
 
 namespace swirly {
+inline namespace util {
 
 template <typename ValueT>
 class ArrayView {
@@ -114,6 +115,7 @@ constexpr ArrayView<std::remove_cv_t<ValueT>> makeArrayView(ValueT (&arr)[SizeN]
     return {arr};
 }
 
+} // namespace util
 } // namespace swirly
 
 #endif // SWIRLY_UTIL_ARRAY_HPP

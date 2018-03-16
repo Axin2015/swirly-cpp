@@ -32,6 +32,7 @@
 #include <queue>
 
 namespace swirly {
+inline namespace clob {
 std::ostream& operator<<(std::ostream& os, More more)
 {
     switch (more) {
@@ -66,6 +67,7 @@ std::ostream& operator<<(std::ostream& os, MsgType type)
     }
     return os;
 }
+} // namespace clob
 } // namespace swirly
 
 using namespace std;
@@ -137,20 +139,20 @@ BOOST_AUTO_TEST_CASE(AsyncWindowCase)
     {
         detail::AsyncWindow<1> aw{3};
         // 1.
-        BOOST_TEST(aw.index() == 0);
-        BOOST_TEST(aw.size() == 1);
+        BOOST_TEST(aw.index() == 0U);
+        BOOST_TEST(aw.size() == 1U);
         BOOST_TEST(aw.more() == More::Yes);
         BOOST_TEST(aw.next());
         BOOST_TEST(!aw.done());
         // 2.
-        BOOST_TEST(aw.index() == 1);
-        BOOST_TEST(aw.size() == 1);
+        BOOST_TEST(aw.index() == 1U);
+        BOOST_TEST(aw.size() == 1U);
         BOOST_TEST(aw.more() == More::Yes);
         BOOST_TEST(aw.next());
         BOOST_TEST(!aw.done());
         // 3.
-        BOOST_TEST(aw.index() == 2);
-        BOOST_TEST(aw.size() == 1);
+        BOOST_TEST(aw.index() == 2U);
+        BOOST_TEST(aw.size() == 1U);
         BOOST_TEST(aw.more() == More::No);
         BOOST_TEST(!aw.next());
         BOOST_TEST(aw.done());
@@ -158,8 +160,8 @@ BOOST_AUTO_TEST_CASE(AsyncWindowCase)
     {
         detail::AsyncWindow<8> aw{4};
         // 0-3.
-        BOOST_TEST(aw.index() == 0);
-        BOOST_TEST(aw.size() == 4);
+        BOOST_TEST(aw.index() == 0U);
+        BOOST_TEST(aw.size() == 4U);
         BOOST_TEST(aw.more() == More::No);
         BOOST_TEST(!aw.next());
         BOOST_TEST(aw.done());
@@ -167,14 +169,14 @@ BOOST_AUTO_TEST_CASE(AsyncWindowCase)
     {
         detail::AsyncWindow<8> aw{16};
         // 0-7.
-        BOOST_TEST(aw.index() == 0);
-        BOOST_TEST(aw.size() == 8);
+        BOOST_TEST(aw.index() == 0U);
+        BOOST_TEST(aw.size() == 8U);
         BOOST_TEST(aw.more() == More::Yes);
         BOOST_TEST(aw.next());
         BOOST_TEST(!aw.done());
         // 8-15
-        BOOST_TEST(aw.index() == 8);
-        BOOST_TEST(aw.size() == 8);
+        BOOST_TEST(aw.index() == 8U);
+        BOOST_TEST(aw.size() == 8U);
         BOOST_TEST(aw.more() == More::No);
         BOOST_TEST(!aw.next());
         BOOST_TEST(aw.done());
@@ -182,20 +184,20 @@ BOOST_AUTO_TEST_CASE(AsyncWindowCase)
     {
         detail::AsyncWindow<8> aw{20};
         // 0-7.
-        BOOST_TEST(aw.index() == 0);
-        BOOST_TEST(aw.size() == 8);
+        BOOST_TEST(aw.index() == 0U);
+        BOOST_TEST(aw.size() == 8U);
         BOOST_TEST(aw.more() == More::Yes);
         BOOST_TEST(aw.next());
         BOOST_TEST(!aw.done());
         // 8-15
-        BOOST_TEST(aw.index() == 8);
-        BOOST_TEST(aw.size() == 8);
+        BOOST_TEST(aw.index() == 8U);
+        BOOST_TEST(aw.size() == 8U);
         BOOST_TEST(aw.more() == More::Yes);
         BOOST_TEST(aw.next());
         BOOST_TEST(!aw.done());
         // 16-19.
-        BOOST_TEST(aw.index() == 16);
-        BOOST_TEST(aw.size() == 4);
+        BOOST_TEST(aw.index() == 16U);
+        BOOST_TEST(aw.size() == 4U);
         BOOST_TEST(aw.more() == More::No);
         BOOST_TEST(!aw.next());
         BOOST_TEST(aw.done());
@@ -214,7 +216,7 @@ BOOST_FIXTURE_TEST_CASE(AsyncJournCreateMarket, AsyncJournFixture)
     BOOST_CHECK_EQUAL(body.id, MarketId);
     BOOST_CHECK_EQUAL(strncmp(body.instr, "EURUSD", sizeof(body.instr)), 0);
     BOOST_CHECK_EQUAL(body.settlDay, SettlDay);
-    BOOST_CHECK_EQUAL(body.state, 0x1);
+    BOOST_CHECK_EQUAL(body.state, 0x1U);
 }
 
 BOOST_FIXTURE_TEST_CASE(AsyncJournUpdateMarket, AsyncJournFixture)
@@ -227,7 +229,7 @@ BOOST_FIXTURE_TEST_CASE(AsyncJournUpdateMarket, AsyncJournFixture)
     const auto& body = msg.updateMarket;
 
     BOOST_CHECK_EQUAL(body.id, MarketId);
-    BOOST_CHECK_EQUAL(body.state, 0x1);
+    BOOST_CHECK_EQUAL(body.state, 0x1U);
 }
 
 BOOST_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)

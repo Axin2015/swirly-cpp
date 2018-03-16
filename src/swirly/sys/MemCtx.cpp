@@ -22,9 +22,9 @@
 
 #include <fcntl.h>
 
-using namespace std;
-
 namespace swirly {
+inline namespace sys {
+using namespace std;
 namespace {
 
 FileHandle reserveFile(const char* path, size_t size)
@@ -40,15 +40,14 @@ struct MemCtx::Impl {
     explicit Impl(size_t maxSize)
     : maxSize{maxSize}
     , memMap{os::mmap(nullptr, PageSize + maxSize, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE,
-                       -1, 0)}
+                      -1, 0)}
     , pool(*static_cast<MemPool*>(memMap.get().data()))
     {
     }
     Impl(const char* path, size_t maxSize)
     : maxSize{maxSize}
     , fh{reserveFile(path, PageSize + maxSize)}
-    , memMap{os::mmap(nullptr, PageSize + maxSize, PROT_READ | PROT_WRITE, MAP_SHARED, fh.get(),
-                       0)}
+    , memMap{os::mmap(nullptr, PageSize + maxSize, PROT_READ | PROT_WRITE, MAP_SHARED, fh.get(), 0)}
     , pool(*static_cast<MemPool*>(memMap.get().data()))
     {
     }
@@ -168,4 +167,5 @@ void MemCtx::dealloc(void* addr, size_t size) noexcept
     impl_->dealloc(addr, size);
 }
 
+} // namespace sys
 } // namespace swirly

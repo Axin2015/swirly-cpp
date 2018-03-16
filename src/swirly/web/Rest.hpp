@@ -23,6 +23,7 @@
 #include <swirly/clob/Serv.hpp>
 
 namespace swirly {
+inline namespace web {
 
 class SWIRLY_API Rest {
   public:
@@ -112,6 +113,7 @@ class SWIRLY_API Rest {
     Serv serv_;
 };
 
+} // namespace web
 } // namespace swirly
 
 #endif // SWIRLY_WEB_REST_HPP

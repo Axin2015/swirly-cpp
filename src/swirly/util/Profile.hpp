@@ -23,6 +23,7 @@
 #include <chrono>
 
 namespace swirly {
+inline namespace util {
 
 /**
  * A statistical profile of observations.
@@ -97,6 +98,7 @@ class SWIRLY_API TimeRecorder {
     std::chrono::time_point<std::chrono::high_resolution_clock> start_;
 };
 
+} // namespace util
 } // namespace swirly
 
 #endif // SWIRLY_UTIL_PROFILE_HPP

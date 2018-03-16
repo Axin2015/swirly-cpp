@@ -19,6 +19,7 @@
 #include <cassert>
 
 namespace swirly {
+inline namespace util {
 using namespace std;
 
 namespace {
@@ -243,4 +244,5 @@ pair<string, string> splitPair(const string& s, char sep)
     return {key, val};
 }
 
+} // namespace util
 } // namespace swirly

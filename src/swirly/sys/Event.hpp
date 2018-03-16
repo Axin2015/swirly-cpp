@@ -20,6 +20,7 @@
 #include <swirly/sys/File.hpp>
 
 namespace swirly {
+inline namespace sys {
 
 enum : unsigned {
     EventIn = 1 << 0,
@@ -152,6 +153,7 @@ class EventPipe {
     std::pair<FileHandle, FileHandle> pipe_;
 };
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_EVENT_HPP

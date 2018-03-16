@@ -23,6 +23,7 @@
 #include <swirly/sys/Log.hpp>
 
 namespace swirly {
+inline namespace util {
 
 /**
  * Logger callback function.
@@ -36,6 +37,7 @@ using LogMsg = StringStream<MaxLogMsg>;
  */
 SWIRLY_API LogMsg& logMsg() noexcept;
 
+} // namespace util
 } // namespace swirly
 
 #endif // SWIRLY_UTIL_LOG_HPP

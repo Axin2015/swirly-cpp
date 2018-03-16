@@ -19,9 +19,9 @@
 #include <iomanip>
 #include <sstream>
 
-using namespace std;
-
 namespace swirly {
+inline namespace sys {
+using namespace std;
 namespace {
 constexpr size_t operator""_strlen(const char* data, size_t len) noexcept
 {
@@ -64,4 +64,5 @@ ostream& operator<<(ostream& os, Time time)
     return os << msSinceEpoch(time);
 }
 
+} // namespace sys
 } // namespace swirly

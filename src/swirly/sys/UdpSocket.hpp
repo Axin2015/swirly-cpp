@@ -20,6 +20,7 @@
 #include <swirly/sys/IoSocket.hpp>
 
 namespace swirly {
+inline namespace sys {
 
 struct SWIRLY_API IpMcastGroup {
     IpMcastGroup(const IpAddress& addr, unsigned ifindex = 0) noexcept;
@@ -106,12 +107,10 @@ inline void joinGroup(int sockfd, const IpAddress& addr, const char* ifname)
 inline void leaveGroup(int sockfd, const IpMcastGroup& group, std::error_code& ec) noexcept
 {
     if (group.family == AF_INET6) {
-        os::setsockopt(sockfd, IPPROTO_IPV6, IPV6_LEAVE_GROUP, &group.ipv6, sizeof(group.ipv6),
-                        ec);
+        os::setsockopt(sockfd, IPPROTO_IPV6, IPV6_LEAVE_GROUP, &group.ipv6, sizeof(group.ipv6), ec);
     } else {
         assert(group.family == AF_INET);
-        os::setsockopt(sockfd, IPPROTO_IP, IP_DROP_MEMBERSHIP, &group.ipv4, sizeof(group.ipv4),
-                        ec);
+        os::setsockopt(sockfd, IPPROTO_IP, IP_DROP_MEMBERSHIP, &group.ipv4, sizeof(group.ipv4), ec);
     }
 }
 
@@ -372,6 +371,7 @@ struct UdpSocket : IoSocket {
     void setIpMcastTtl(int ttl) { return swirly::setIpMcastTtl(*sock_, family_, ttl); }
 };
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_UDPSOCKET_HPP

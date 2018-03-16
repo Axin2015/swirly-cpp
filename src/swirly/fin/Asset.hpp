@@ -22,6 +22,7 @@
 #include <swirly/util/Set.hpp>
 
 namespace swirly {
+inline namespace fin {
 
 /**
  * An item of value.
@@ -77,6 +78,7 @@ inline std::ostream& operator<<(std::ostream& os, const Asset& asset)
 
 using AssetSet = SymbolSet<Asset>;
 
+} // namespace fin
 } // namespace swirly
 
 #endif // SWIRLY_FIN_ASSET_HPP

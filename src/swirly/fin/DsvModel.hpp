@@ -20,6 +20,7 @@
 #include <swirly/fin/Model.hpp>
 
 namespace swirly {
+inline namespace fin {
 
 class SWIRLY_API DsvModel : public Model {
   public:
@@ -50,6 +51,7 @@ class SWIRLY_API DsvModel : public Model {
     void doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const override;
 };
 
+} // namespace fin
 } // namespace swirly
 
 #endif // SWIRLY_FIN_DSVMODEL_HPP

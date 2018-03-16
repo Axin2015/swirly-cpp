@@ -19,9 +19,9 @@
 #include <swirly/util/Stream.hpp>
 #include <swirly/util/String.hpp>
 
-using namespace std;
-
 namespace swirly {
+inline namespace web {
+using namespace std;
 namespace {
 
 // All 1xx (informational), 204 (no content), and 304 (not modified) responses must not include a
@@ -98,4 +98,5 @@ void HttpResponse::reset(int status, const char* reason, bool cache)
     hcount_ = pcount();
 }
 
+} // namespace web
 } // namespace swirly

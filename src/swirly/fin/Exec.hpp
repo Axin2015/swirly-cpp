@@ -23,6 +23,7 @@
 #include <swirly/sys/MemAlloc.hpp>
 
 namespace swirly {
+inline namespace fin {
 
 /**
  * A transaction that occurs as an @ref Order transitions through a workflow.
@@ -144,6 +145,7 @@ inline std::ostream& operator<<(std::ostream& os, const Exec& exec)
 
 using ExecIdSet = RequestIdSet<Exec>;
 
+} // namespace fin
 } // namespace swirly
 
 #endif // SWIRLY_FIN_EXEC_HPP

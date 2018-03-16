@@ -16,9 +16,8 @@
  */
 #include "MarketSide.hpp"
 
-using namespace std;
-
 namespace swirly {
+using namespace std;
 
 MarketSide::~MarketSide() noexcept = default;
 

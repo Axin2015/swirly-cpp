@@ -17,6 +17,7 @@
 #include "Buffer.hpp"
 
 namespace swirly {
+inline namespace sys {
 
 void Buffer::consume(std::size_t count) noexcept
 {
@@ -52,4 +53,5 @@ MutableBuffer Buffer::prepare(std::size_t size)
     return {wptr(), size};
 }
 
+} // namespace sys
 } // namespace swirly

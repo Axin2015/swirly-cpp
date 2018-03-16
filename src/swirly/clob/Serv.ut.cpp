@@ -31,7 +31,6 @@
 
 using namespace std;
 using namespace swirly;
-
 namespace {
 
 constexpr auto Today = ymdToJd(2014, 2, 11);
@@ -111,7 +110,7 @@ BOOST_FIXTURE_TEST_CASE(ServMarkets, ServFixture)
 
     BOOST_TEST(it->instr() == "EURUSD"sv);
     BOOST_TEST(it->settlDay() == SettlDay);
-    BOOST_TEST(it->state() == 0x1);
+    BOOST_TEST(it->state() == 0x1U);
 }
 
 BOOST_FIXTURE_TEST_CASE(ServMarket, ServFixture)
@@ -124,7 +123,7 @@ BOOST_FIXTURE_TEST_CASE(ServMarket, ServFixture)
 
     BOOST_TEST(market.instr() == "EURUSD"sv);
     BOOST_TEST(market.settlDay() == SettlDay);
-    BOOST_TEST(market.state() == 0x1);
+    BOOST_TEST(market.state() == 0x1U);
 }
 
 BOOST_FIXTURE_TEST_CASE(ServCreateMarket, ServFixture)
@@ -141,7 +140,7 @@ BOOST_FIXTURE_TEST_CASE(ServCreateMarket, ServFixture)
 
     BOOST_TEST(market.instr() == "USDJPY"sv);
     BOOST_TEST(market.settlDay() == SettlDay);
-    BOOST_TEST(market.state() == 0x1);
+    BOOST_TEST(market.state() == 0x1U);
 
     BOOST_TEST(distance(serv.markets().begin(), serv.markets().end()) == 2);
     auto it = serv.markets().find(marketId);
@@ -164,7 +163,7 @@ BOOST_FIXTURE_TEST_CASE(ServUpdateMarket, ServFixture)
 
     BOOST_TEST(market.instr() == "USDJPY"sv);
     BOOST_TEST(market.settlDay() == SettlDay);
-    BOOST_TEST(market.state() == 0x2);
+    BOOST_TEST(market.state() == 0x2U);
 }
 
 BOOST_FIXTURE_TEST_CASE(ServCreateOrder, ServFixture)
@@ -177,8 +176,8 @@ BOOST_FIXTURE_TEST_CASE(ServCreateOrder, ServFixture)
     Response resp;
     serv.createOrder(accnt, market, ""sv, Side::Buy, 5_lts, 12345_tks, 1_lts, Now, resp);
 
-    BOOST_TEST(resp.orders().size() == 1);
-    BOOST_TEST(resp.execs().size() == 1);
+    BOOST_TEST(resp.orders().size() == 1U);
+    BOOST_TEST(resp.execs().size() == 1U);
 
     ConstOrderPtr order{resp.orders().front()};
     BOOST_TEST(order->marketId() == market.id());

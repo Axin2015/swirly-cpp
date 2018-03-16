@@ -24,6 +24,7 @@
 #include <boost/asio/ip/udp.hpp>
 
 namespace swirly {
+inline namespace sys {
 
 using IpAddress = boost::asio::ip::address;
 using IpAddressV4 = boost::asio::ip::address_v4;
@@ -65,6 +66,7 @@ BasicEndpoint<TransportT> parseEndpoint(const std::string& s)
     return TransportTraits<TransportT>::parseEndpoint(s);
 }
 
+} // namespace sys
 } // namespace swirly
 
 namespace boost {

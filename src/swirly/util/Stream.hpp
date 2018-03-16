@@ -23,6 +23,7 @@
 #include <string_view>
 
 namespace swirly {
+inline namespace util {
 
 SWIRLY_API void reset(std::ostream& os) noexcept;
 
@@ -147,6 +148,7 @@ OStreamJoiner& operator<<(OStreamJoiner& osj, const ValueT& value)
     return osj;
 }
 
+} // namespace util
 } // namespace swirly
 
 #endif // SWIRLY_UTIL_STREAM_HPP

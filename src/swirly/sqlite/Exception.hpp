@@ -14,12 +14,13 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SQLITE_EXCEPTION_HXX
-#define SWIRLY_SQLITE_EXCEPTION_HXX
+#ifndef SWIRLY_SQLITE_EXCEPTION_HPP
+#define SWIRLY_SQLITE_EXCEPTION_HPP
 
 #include <swirly/util/Exception.hpp>
 
 namespace swirly {
+inline namespace sqlite {
 
 class SqlException : public Exception {
   public:
@@ -38,6 +39,7 @@ class SqlException : public Exception {
     SqlException& operator=(SqlException&&) noexcept = default;
 };
 
+} // namespace sqlite
 } // namespace swirly
 
-#endif // SWIRLY_SQLITE_EXCEPTION_HXX
+#endif // SWIRLY_SQLITE_EXCEPTION_HPP
