@@ -19,6 +19,7 @@
 #include <swirly/util/Stream.hpp>
 
 namespace swirly {
+inline namespace fin {
 using namespace std;
 
 static_assert(sizeof(Asset) <= 3 * 64, "no greater than specified cache-lines");
@@ -46,4 +47,5 @@ void Asset::toJson(ostream& os) const
        << "\"}";
 }
 
+} // namespace fin
 } // namespace swirly

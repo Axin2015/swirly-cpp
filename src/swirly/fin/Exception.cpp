@@ -19,6 +19,7 @@
 #include <iostream>
 
 namespace swirly {
+inline namespace fin {
 using namespace std;
 
 ServException::~ServException() noexcept = default;
@@ -133,4 +134,5 @@ const char* UnauthorizedException::httpReason() const noexcept
     return "Unauthorized";
 }
 
+} // namespace fin
 } // namespace swirly

@@ -19,6 +19,7 @@
 #include <swirly/fin/Order.hpp>
 
 namespace swirly {
+inline namespace fin {
 using namespace std;
 
 static_assert(sizeof(Level) <= 2 * 64, "no greater than specified cache-lines");
@@ -98,4 +99,5 @@ void LevelSet::remove(const Level& level) noexcept
     set_.erase_and_dispose(Set::s_iterator_to(level), [](Level* ptr) { delete ptr; });
 }
 
+} // namespace fin
 } // namespace swirly

@@ -17,9 +17,11 @@
 #include "Request.hpp"
 
 namespace swirly {
+inline namespace fin {
 
 Request::Request(Request&&) = default;
 
 Request::~Request() noexcept = default;
 
+} // namespace fin
 } // namespace swirly

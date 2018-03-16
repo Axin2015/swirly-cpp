@@ -20,6 +20,7 @@
 #include <swirly/util/Stream.hpp>
 
 namespace swirly {
+inline namespace fin {
 using namespace std;
 
 static_assert(sizeof(Order) <= 6 * 64, "no greater than specified cache-lines");
@@ -189,4 +190,5 @@ OrderList::ValuePtr OrderList::remove(const Order& ref) noexcept
     return value;
 }
 
+} // namespace fin
 } // namespace swirly

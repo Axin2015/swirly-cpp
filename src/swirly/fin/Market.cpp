@@ -22,6 +22,7 @@
 #include <cassert>
 
 namespace swirly {
+inline namespace fin {
 using namespace std;
 
 static_assert(sizeof(Market) <= 4 * 64, "no greater than specified cache-lines");
@@ -114,4 +115,5 @@ void Market::toJson(ostream& os) const
     os << "]}";
 }
 
+} // namespace fin
 } // namespace swirly

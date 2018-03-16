@@ -33,6 +33,7 @@
 #include <regex>
 
 namespace swirly {
+inline namespace clob {
 using namespace std;
 namespace {
 
@@ -847,4 +848,5 @@ void Serv::settlEndOfDay(Time now)
     impl_->settlEndOfDay(now);
 }
 
+} // namespace clob
 } // namespace swirly

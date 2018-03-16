@@ -20,6 +20,7 @@
 #include <swirly/fin/Instr.hpp>
 
 namespace swirly {
+inline namespace clob {
 using namespace std;
 
 TestModel::TestModel() noexcept = default;
@@ -134,4 +135,5 @@ TestJourn& TestJourn::operator=(TestJourn&&) noexcept = default;
 
 void TestJourn::doUpdate(const Msg& msg) {}
 
+} // namespace clob
 } // namespace swirly

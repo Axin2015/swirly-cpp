@@ -17,8 +17,10 @@
 #include "Journ.hpp"
 
 namespace swirly {
+inline namespace fin {
 using namespace std;
 
 Journ::~Journ() noexcept = default;
 
+} // namespace fin
 } // namespace swirly

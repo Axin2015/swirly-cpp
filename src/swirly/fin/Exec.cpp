@@ -20,6 +20,7 @@
 #include <swirly/util/Stream.hpp>
 
 namespace swirly {
+inline namespace fin {
 using namespace std;
 
 static_assert(sizeof(Exec) <= 5 * 64, "no greater than specified cache-lines");
@@ -165,4 +166,5 @@ void Exec::trade(Lots sumLots, Cost sumCost, Lots lastLots, Ticks lastTicks, Id6
     cpty_ = cpty;
 }
 
+} // namespace fin
 } // namespace swirly

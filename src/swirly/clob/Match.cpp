@@ -21,6 +21,7 @@
 #include <swirly/fin/Posn.hpp>
 
 namespace swirly {
+inline namespace clob {
 
 Match::Match(Lots lots, const OrderPtr& makerOrder, const ExecPtr& makerTrade,
              const PosnPtr& makerPosn, const ExecPtr& takerTrade) noexcept
@@ -38,4 +39,5 @@ Match::Match(const Match&) = default;
 
 Match::Match(Match&&) = default;
 
+} // namespace clob
 } // namespace swirly

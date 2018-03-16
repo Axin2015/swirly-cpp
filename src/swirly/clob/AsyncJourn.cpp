@@ -22,6 +22,7 @@
 #include <swirly/util/Log.hpp>
 
 namespace swirly {
+inline namespace clob {
 using namespace std;
 namespace {
 template <size_t StepN>
@@ -193,4 +194,5 @@ void AsyncJourn::doArchiveTrade(Id64 marketId, ArrayView<Id64> ids, Time modifie
     });
 }
 
+} // namespace clob
 } // namespace swirly

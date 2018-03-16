@@ -26,6 +26,7 @@ namespace lt = boost::local_time;
 namespace pt = boost::posix_time;
 
 namespace swirly {
+inline namespace fin {
 using namespace std;
 
 BusinessDay::BusinessDay(const char* timeZone)
@@ -59,4 +60,5 @@ JDay BusinessDay::operator()(Time time) const
     return jd;
 }
 
+} // namespace fin
 } // namespace swirly

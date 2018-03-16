@@ -19,6 +19,7 @@
 #include <swirly/util/Log.hpp>
 
 namespace swirly {
+inline namespace fin {
 using namespace std;
 
 Transactional::~Transactional() noexcept = default;
@@ -40,4 +41,5 @@ Transaction::~Transaction() noexcept
     }
 }
 
+} // namespace fin
 } // namespace swirly

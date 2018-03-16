@@ -21,6 +21,7 @@
 #include <swirly/util/Symbol.hpp>
 
 namespace swirly {
+inline namespace fin {
 using namespace std;
 
 static_assert(sizeof(Posn) <= 2 * 64, "no greater than specified cache-lines");
@@ -125,4 +126,5 @@ PosnSet::Iterator PosnSet::insertOrReplace(const ValuePtr& value) noexcept
     return it;
 }
 
+} // namespace fin
 } // namespace swirly

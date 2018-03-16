@@ -17,7 +17,9 @@
 #include "Model.hpp"
 
 namespace swirly {
+inline namespace fin {
 
 Model::~Model() noexcept = default;
 
+} // namespace fin
 } // namespace swirly

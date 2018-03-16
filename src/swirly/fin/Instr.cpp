@@ -21,6 +21,7 @@
 #include <swirly/util/Stream.hpp>
 
 namespace swirly {
+inline namespace fin {
 using namespace std;
 
 static_assert(sizeof(Instr) <= 4 * 64, "no greater than specified cache-lines");
@@ -86,4 +87,5 @@ void Instr::toJson(ostream& os) const
        << "}";
 }
 
+} // namespace fin
 } // namespace swirly

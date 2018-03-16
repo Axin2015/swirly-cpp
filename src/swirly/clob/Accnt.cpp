@@ -17,6 +17,7 @@
 #include "Accnt.hpp"
 
 namespace swirly {
+inline namespace clob {
 using namespace std;
 
 static_assert(sizeof(Accnt) <= 6 * 64, "no greater than specified cache-lines");
@@ -36,4 +37,5 @@ PosnPtr Accnt::posn(Id64 marketId, Symbol instr, JDay settlDay)
     return &*it;
 }
 
+} // namespace clob
 } // namespace swirly

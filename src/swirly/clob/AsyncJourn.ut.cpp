@@ -33,6 +33,7 @@
 
 namespace swirly {
 inline namespace clob {
+inline namespace clob {
 std::ostream& operator<<(std::ostream& os, More more)
 {
     switch (more) {
@@ -67,6 +68,7 @@ std::ostream& operator<<(std::ostream& os, MsgType type)
     }
     return os;
 }
+} // namespace clob
 } // namespace clob
 } // namespace swirly
 

@@ -17,6 +17,7 @@
 #include "MarketSide.hpp"
 
 namespace swirly {
+inline namespace fin {
 using namespace std;
 
 MarketSide::~MarketSide() noexcept = default;
@@ -92,4 +93,5 @@ void MarketSide::reduceLevel(Level& level, const Order& order, Lots delta) noexc
     }
 }
 
+} // namespace fin
 } // namespace swirly

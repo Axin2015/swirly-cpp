@@ -27,6 +27,7 @@
 #include <fstream>
 
 namespace swirly {
+inline namespace fin {
 using namespace std;
 
 DsvModel::DsvModel() noexcept = default;
@@ -362,4 +363,5 @@ void DsvModel::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const
     }
 }
 
+} // namespace fin
 } // namespace swirly
