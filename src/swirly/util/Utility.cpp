@@ -17,6 +17,7 @@
 #include "Utility.hpp"
 
 namespace swirly {
+inline namespace util {
 
 int hexDigits(int64_t i) noexcept
 {
@@ -41,4 +42,5 @@ int hexDigits(int64_t i) noexcept
     return n;
 }
 
+} // namespace util
 } // namespace swirly

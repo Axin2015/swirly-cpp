@@ -21,6 +21,7 @@
 #include <swirly/fin/Model.hpp>
 
 namespace swirly {
+inline namespace clob {
 
 class SWIRLY_API TestModel : public Model {
   public:
@@ -68,6 +69,7 @@ class SWIRLY_API TestJourn : public Journ {
     void doUpdate(const Msg& msg) override;
 };
 
+} // namespace clob
 } // namespace swirly
 
 #endif // SWIRLY_CLOB_TEST_HPP

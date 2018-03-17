@@ -18,11 +18,10 @@
 
 #include <algorithm>
 
-using namespace std;
-
 namespace swirly {
 namespace ui {
 using namespace exec;
+using namespace std;
 
 ExecModel::ExecModel(QObject* parent)
 : QAbstractTableModel{parent}

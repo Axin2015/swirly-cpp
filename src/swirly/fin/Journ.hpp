@@ -22,8 +22,11 @@
 #include <memory>
 
 namespace swirly {
-
+inline namespace util {
 class Config;
+} // namespace util
+
+inline namespace fin {
 struct Msg;
 
 class SWIRLY_API Journ {
@@ -52,6 +55,7 @@ class SWIRLY_API Journ {
  */
 SWIRLY_API std::unique_ptr<Journ> makeJourn(const Config& config);
 
+} // namespace fin
 } // namespace swirly
 
 #endif // SWIRLY_FIN_JOURN_HPP

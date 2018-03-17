@@ -22,6 +22,7 @@
 #include <swirly/sys/Buffer.hpp>
 
 namespace swirly {
+inline namespace web {
 
 class SWIRLY_API HttpResponseBuf : public std::streambuf {
   public:
@@ -99,6 +100,7 @@ class SWIRLY_API HttpResponse : public std::ostream {
     std::streamsize hcount_{0};
 };
 
+} // namespace web
 } // namespace swirly
 
 #endif // SWIRLY_WEB_HTTPRESPONSE_HPP

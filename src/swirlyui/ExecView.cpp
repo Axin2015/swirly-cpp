@@ -25,11 +25,10 @@
 
 #include <memory>
 
-using namespace std;
-
 namespace swirly {
 namespace ui {
 using namespace exec;
+using namespace std;
 
 ExecView::ExecView(ExecModel& model, QWidget* parent, Qt::WindowFlags f)
 : QWidget{parent, f}

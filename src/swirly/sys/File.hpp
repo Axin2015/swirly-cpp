@@ -31,6 +31,7 @@
 #include <sys/types.h>
 
 namespace swirly {
+inline namespace sys {
 
 struct FilePolicy {
     using Id = int;
@@ -40,7 +41,7 @@ struct FilePolicy {
 
 using FileHandle = Handle<FilePolicy>;
 
-namespace sys {
+namespace os {
 
 /**
  * Open and possibly create a file.
@@ -348,7 +349,7 @@ inline int fcntl(int fd, int cmd, ArgT arg)
     return ret;
 }
 
-} // namespace sys
+} // namespace os
 
 inline void setNonBlock(int fd, std::error_code& ec) noexcept
 {
@@ -360,6 +361,7 @@ inline void setNonBlock(int fd)
     fcntl(fd, F_SETFL, O_NONBLOCK);
 }
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_FILE_HPP

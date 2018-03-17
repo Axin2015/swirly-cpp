@@ -19,9 +19,9 @@
 #include "File.hpp"
 #include "System.hpp"
 
-using namespace std;
-
 namespace swirly {
+inline namespace sys {
+using namespace std;
 
 void closeAll() noexcept
 {
@@ -33,7 +33,7 @@ void closeAll() noexcept
 
 void daemon()
 {
-    pid_t pid{sys::fork()};
+    pid_t pid{os::fork()};
     if (pid != 0) {
         // Exit parent process using system version of exit() to avoid flushing standard streams.
         // FIXME: use quick_exit() when available on OSX.
@@ -41,11 +41,11 @@ void daemon()
     }
 
     // Detach from controlling terminal by making process a session leader.
-    sys::setsid();
+    os::setsid();
 
     // Forking again ensures that the daemon process is not a session leader, and therefore cannot
     // regain access to a controlling terminal.
-    pid = sys::fork();
+    pid = os::fork();
     if (pid != 0) {
         // FIXME: use quick_exit() when available on OSX.
         _exit(0);
@@ -53,7 +53,8 @@ void daemon()
 
     // Re-open standard input.
     close(STDIN_FILENO);
-    sys::open("/dev/null", O_RDONLY);
+    os::open("/dev/null", O_RDONLY);
 }
 
+} // namespace sys
 } // namespace swirly

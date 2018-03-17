@@ -17,7 +17,9 @@
 #include "Exception.hpp"
 
 namespace swirly {
+inline namespace web {
 
 ParseException::~ParseException() noexcept = default;
 
+} // namespace web
 } // namespace swirly

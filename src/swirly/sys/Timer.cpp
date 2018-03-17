@@ -22,9 +22,8 @@
 #include <string>
 
 namespace swirly {
-
+inline namespace sys {
 using namespace std;
-
 namespace {
 // Number of entries per 4K slab, assuming that malloc overhead is no more than 16 bytes.
 constexpr size_t Overhead = 16;
@@ -158,4 +157,5 @@ void TimerQueue::purge() noexcept
     cancelled_ = 0;
 }
 
+} // namespace sys
 } // namespace swirly

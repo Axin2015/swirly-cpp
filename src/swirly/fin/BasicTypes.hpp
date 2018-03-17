@@ -22,6 +22,7 @@
 #include <ostream>
 
 namespace swirly {
+inline namespace fin {
 
 using Incs = std::int64_t;
 using IncsPolicy = IntPolicy<Incs>;
@@ -285,6 +286,7 @@ inline std::ostream& operator<<(std::ostream& os, State state)
     return os << enumString(state);
 }
 
+} // namespace fin
 } // namespace swirly
 
 #endif // SWIRLY_FIN_BASICTYPES_HPP

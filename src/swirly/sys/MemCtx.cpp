@@ -22,15 +22,15 @@
 
 #include <fcntl.h>
 
-using namespace std;
-
 namespace swirly {
+inline namespace sys {
+using namespace std;
 namespace {
 
 FileHandle reserveFile(const char* path, size_t size)
 {
-    FileHandle fh{sys::open(path, O_RDWR | O_CREAT, 0644)};
-    sys::ftruncate(fh.get(), size);
+    FileHandle fh{os::open(path, O_RDWR | O_CREAT, 0644)};
+    os::ftruncate(fh.get(), size);
     return fh;
 }
 
@@ -39,16 +39,15 @@ FileHandle reserveFile(const char* path, size_t size)
 struct MemCtx::Impl {
     explicit Impl(size_t maxSize)
     : maxSize{maxSize}
-    , memMap{sys::mmap(nullptr, PageSize + maxSize, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE,
-                       -1, 0)}
+    , memMap{os::mmap(nullptr, PageSize + maxSize, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE,
+                      -1, 0)}
     , pool(*static_cast<MemPool*>(memMap.get().data()))
     {
     }
     Impl(const char* path, size_t maxSize)
     : maxSize{maxSize}
     , fh{reserveFile(path, PageSize + maxSize)}
-    , memMap{sys::mmap(nullptr, PageSize + maxSize, PROT_READ | PROT_WRITE, MAP_SHARED, fh.get(),
-                       0)}
+    , memMap{os::mmap(nullptr, PageSize + maxSize, PROT_READ | PROT_WRITE, MAP_SHARED, fh.get(), 0)}
     , pool(*static_cast<MemPool*>(memMap.get().data()))
     {
     }
@@ -168,4 +167,5 @@ void MemCtx::dealloc(void* addr, size_t size) noexcept
     impl_->dealloc(addr, size);
 }
 
+} // namespace sys
 } // namespace swirly

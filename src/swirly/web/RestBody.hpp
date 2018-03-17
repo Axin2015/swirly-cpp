@@ -23,6 +23,7 @@
 #include <swirly/util/Symbol.hpp>
 
 namespace swirly {
+inline namespace web {
 
 template <std::size_t MaxN>
 struct StringData {
@@ -128,6 +129,7 @@ class SWIRLY_API RestBody {
     long num() const noexcept { return num_.sign * num_.digits; }
 };
 
+} // namespace web
 } // namespace swirly
 
 #endif // SWIRLY_WEB_RESTBODY_HPP

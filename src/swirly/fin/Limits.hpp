@@ -22,6 +22,7 @@
 #include <cstddef> // size_t
 
 namespace swirly {
+inline namespace fin {
 
 /**
  * Maximum display characters.
@@ -38,6 +39,7 @@ constexpr std::size_t MaxLevels{SWIRLY_MAX_LEVELS};
  */
 constexpr std::size_t MaxRef{64};
 
+} // namespace fin
 } // namespace swirly
 
 #endif // SWIRLY_FIN_LIMITS_HPP

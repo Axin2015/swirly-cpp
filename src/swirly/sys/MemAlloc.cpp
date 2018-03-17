@@ -16,9 +16,9 @@
  */
 #include "MemAlloc.hpp"
 
-using namespace std;
-
 namespace swirly {
+inline namespace sys {
+using namespace std;
 
 SWIRLY_WEAK void* alloc(size_t size);
 SWIRLY_WEAK void* alloc(size_t size, align_val_t al);
@@ -39,4 +39,5 @@ void dealloc(void* ptr, size_t size) noexcept
     ::operator delete(ptr);
 }
 
+} // namespace sys
 } // namespace swirly

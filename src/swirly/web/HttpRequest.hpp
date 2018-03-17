@@ -22,6 +22,7 @@
 #include <swirly/web/Url.hpp>
 
 namespace swirly {
+inline namespace web {
 
 class SWIRLY_API HttpRequest : public BasicUrl<HttpRequest> {
   public:
@@ -100,6 +101,7 @@ class SWIRLY_API HttpRequest : public BasicUrl<HttpRequest> {
     bool partial_{false};
 };
 
+} // namespace web
 } // namespace swirly
 
 #endif // SWIRLY_WEB_HTTPREQUEST_HPP

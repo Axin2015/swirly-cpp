@@ -25,9 +25,8 @@
 
 #include <algorithm> // transform()
 
-using namespace std;
-
 namespace swirly {
+using namespace std;
 
 Response::Response() noexcept = default;
 

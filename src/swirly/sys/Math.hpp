@@ -21,6 +21,7 @@
 #include <cstdint>
 
 namespace swirly {
+inline namespace sys {
 
 /**
  * @return true if size is a power of two.
@@ -55,6 +56,7 @@ constexpr std::size_t ceilPow2(std::size_t size) noexcept
     return ((size + Max) >> BitsN) << BitsN;
 }
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_MATH_HPP

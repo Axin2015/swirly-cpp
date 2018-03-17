@@ -23,6 +23,7 @@
 #include <string_view>
 
 namespace swirly {
+inline namespace util {
 
 /**
  * String buffer with fixed upper-bound.
@@ -238,6 +239,7 @@ std::ostream& operator<<(std::ostream& os, const StringBuf<MaxN>& rhs)
     return std::operator<<(os, std::string_view{rhs.data(), rhs.size()});
 }
 
+} // namespace util
 } // namespace swirly
 
 #endif // SWIRLY_UTIL_STRINGBUF_HPP

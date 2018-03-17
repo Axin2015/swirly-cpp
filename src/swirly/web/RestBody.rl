@@ -19,10 +19,9 @@
 
 #include <swirly/fin/Exception.hpp>
 
-using namespace std;
-
 namespace swirly {
-
+inline namespace web {
+using namespace std;
 namespace {
 
 %%{
@@ -312,4 +311,5 @@ bool RestBody::parse(string_view buf)
   return true;
 }
 
-} // swirly
+} // namespace web
+} // namespace swirly

@@ -20,6 +20,7 @@
 #include <swirly/fin/Types.hpp>
 
 namespace swirly {
+inline namespace clob {
 
 struct Match {
     Match(Lots lots, const OrderPtr& makerOrder, const ExecPtr& makerTrade,
@@ -42,6 +43,7 @@ struct Match {
     const ExecPtr takerTrade;
 };
 
+} // namespace clob
 } // namespace swirly
 
 #endif // SWIRLY_CLOB_MATCH_HXX

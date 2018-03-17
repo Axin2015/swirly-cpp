@@ -19,9 +19,8 @@
 #include <swirly/fin/Asset.hpp>
 #include <swirly/fin/Instr.hpp>
 
-using namespace std;
-
 namespace swirly {
+using namespace std;
 
 TestModel::TestModel() noexcept = default;
 TestModel::~TestModel() noexcept = default;

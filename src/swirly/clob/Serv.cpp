@@ -32,9 +32,8 @@
 
 #include <regex>
 
-using namespace std;
-
 namespace swirly {
+using namespace std;
 namespace {
 
 const regex SymbolPattern{R"(^[0-9A-Za-z-._]{3,16}$)"};

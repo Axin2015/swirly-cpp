@@ -16,11 +16,10 @@
  */
 #include "OrderModel.hxx"
 
-using namespace std;
-
 namespace swirly {
 namespace ui {
 using namespace order;
+using namespace std;
 
 OrderModel::OrderModel(QObject* parent)
 : TableModel{parent}

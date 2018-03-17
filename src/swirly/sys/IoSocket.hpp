@@ -20,6 +20,7 @@
 #include <swirly/sys/Socket.hpp>
 
 namespace swirly {
+inline namespace sys {
 
 /**
  * Socket with IO operations. I.e. not a passive listener. All state is in base class, so object can
@@ -30,47 +31,48 @@ struct IoSocket : Socket {
 
     IoSocket() noexcept = default;
 
-    void shutdown(int how) { return sys::shutdown(*sock_, how); }
+    void shutdown(int how) { return os::shutdown(*sock_, how); }
 
     ssize_t recv(void* buf, std::size_t len, int flags, std::error_code& ec) noexcept
     {
-        return sys::recv(*sock_, buf, len, flags, ec);
+        return os::recv(*sock_, buf, len, flags, ec);
     }
     std::size_t recv(void* buf, std::size_t len, int flags)
     {
-        return sys::recv(*sock_, buf, len, flags);
+        return os::recv(*sock_, buf, len, flags);
     }
 
     ssize_t recv(const MutableBuffer& buf, int flags, std::error_code& ec) noexcept
     {
-        return sys::recv(*sock_, buf, flags, ec);
+        return os::recv(*sock_, buf, flags, ec);
     }
-    std::size_t recv(const MutableBuffer& buf, int flags) { return sys::recv(*sock_, buf, flags); }
+    std::size_t recv(const MutableBuffer& buf, int flags) { return os::recv(*sock_, buf, flags); }
 
     ssize_t send(const void* buf, std::size_t len, int flags, std::error_code& ec) noexcept
     {
-        return sys::send(*sock_, buf, len, flags, ec);
+        return os::send(*sock_, buf, len, flags, ec);
     }
     std::size_t send(const void* buf, std::size_t len, int flags)
     {
-        return sys::send(*sock_, buf, len, flags);
+        return os::send(*sock_, buf, len, flags);
     }
 
     ssize_t send(const ConstBuffer& buf, int flags, std::error_code& ec) noexcept
     {
-        return sys::send(*sock_, buf, flags, ec);
+        return os::send(*sock_, buf, flags, ec);
     }
-    std::size_t send(const ConstBuffer& buf, int flags) { return sys::send(*sock_, buf, flags); }
+    std::size_t send(const ConstBuffer& buf, int flags) { return os::send(*sock_, buf, flags); }
 };
 
 template <typename TransportT>
 inline std::pair<IoSocket, IoSocket> socketpair(TransportT trans)
 {
-    auto socks = sys::socketpair(trans);
+    auto socks = os::socketpair(trans);
     return {IoSocket{std::move(socks.first), trans.family()},
             IoSocket{std::move(socks.second), trans.family()}};
 }
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_IOSOCKET_HPP

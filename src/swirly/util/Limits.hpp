@@ -20,6 +20,7 @@
 #include <cstddef> // size_t
 
 namespace swirly {
+inline namespace util {
 
 /**
  * Maximum error message length.
@@ -36,6 +37,7 @@ constexpr std::size_t MaxLogMsg{2048};
  */
 constexpr std::size_t MaxSymbol{16};
 
+} // namespace util
 } // namespace swirly
 
 #endif // SWIRLY_UTIL_LIMITS_HPP

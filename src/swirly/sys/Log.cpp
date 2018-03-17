@@ -42,6 +42,7 @@ inline pid_t gettid()
 #endif
 
 namespace swirly {
+inline namespace sys {
 using namespace std;
 namespace {
 
@@ -157,4 +158,5 @@ void sysLogger(int level, string_view msg) noexcept
     syslog(prio, "%.*s", static_cast<int>(msg.size()), msg.data());
 }
 
+} // namespace sys
 } // namespace swirly

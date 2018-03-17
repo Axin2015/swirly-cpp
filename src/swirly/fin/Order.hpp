@@ -25,6 +25,7 @@
 #include <boost/intrusive/list.hpp>
 
 namespace swirly {
+inline namespace fin {
 
 class Level;
 
@@ -323,6 +324,7 @@ inline std::ostream& operator<<(std::ostream& os, const Order& order)
     return os;
 }
 
+} // namespace fin
 } // namespace swirly
 
 #endif // SWIRLY_FIN_ORDER_HPP

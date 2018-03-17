@@ -22,6 +22,7 @@
 #include <string_view>
 
 namespace swirly {
+inline namespace web {
 
 class SWIRLY_API EntitySet {
   public:
@@ -81,6 +82,7 @@ class SWIRLY_API EntitySet {
     int bs_;
 };
 
+} // namespace web
 } // namespace swirly
 
 #endif // SWIRLY_WEB_ENTITYSET_HPP

@@ -23,6 +23,7 @@
 #include <cmath>
 
 namespace swirly {
+inline namespace util {
 
 class SWIRLY_API VarAccum {
   public:
@@ -128,6 +129,7 @@ constexpr std::size_t ceil(std::size_t dividend, std::size_t divisor) noexcept
     return (dividend - 1) / divisor + 1;
 }
 
+} // namespace util
 } // namespace swirly
 
 #endif // SWIRLY_UTIL_MATH_HPP

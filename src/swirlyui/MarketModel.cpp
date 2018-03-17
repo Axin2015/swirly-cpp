@@ -16,11 +16,10 @@
  */
 #include "MarketModel.hxx"
 
-using namespace std;
-
 namespace swirly {
 namespace ui {
 using namespace market;
+using namespace std;
 
 MarketModel::MarketModel(QObject* parent)
 : TableModel{parent}

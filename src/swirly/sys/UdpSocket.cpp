@@ -17,6 +17,7 @@
 #include "UdpSocket.hpp"
 
 namespace swirly {
+inline namespace sys {
 
 IpMcastGroup::IpMcastGroup(const IpAddress& addr, unsigned ifindex) noexcept
 {
@@ -34,4 +35,5 @@ IpMcastGroup::IpMcastGroup(const IpAddress& addr, unsigned ifindex) noexcept
     }
 }
 
+} // namespace sys
 } // namespace swirly

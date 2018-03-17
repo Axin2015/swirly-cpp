@@ -23,8 +23,9 @@
 #include <sys/socket.h>
 
 namespace swirly {
+inline namespace sys {
 
-namespace sys {
+namespace os {
 
 /**
  * Returns the index of the network interface corresponding to the name ifname.
@@ -604,13 +605,13 @@ inline void setsockopt(int sockfd, int level, int optname, const void* optval, s
     }
 }
 
-} // namespace sys
+} // namespace os
 
 inline int getSoError(int sockfd, std::error_code& ec) noexcept
 {
     int optval{};
     socklen_t optlen{sizeof(optval)};
-    sys::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &optval, optlen);
+    os::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &optval, optlen);
     return optval;
 }
 
@@ -618,52 +619,52 @@ inline int getSoError(int sockfd)
 {
     int optval{};
     socklen_t optlen{sizeof(optval)};
-    sys::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &optval, optlen);
+    os::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &optval, optlen);
     return optval;
 }
 
 inline void setSoReuseAddr(int sockfd, bool enabled, std::error_code& ec) noexcept
 {
     int optval{enabled ? 1 : 0};
-    sys::setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval), ec);
+    os::setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval), ec);
 }
 
 inline void setSoReuseAddr(int sockfd, bool enabled)
 {
     int optval{enabled ? 1 : 0};
-    sys::setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
+    os::setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
 }
 
 inline void setSoRcvBuf(int sockfd, int size, std::error_code& ec) noexcept
 {
-    sys::setsockopt(sockfd, SOL_SOCKET, SO_RCVBUF, &size, sizeof(size), ec);
+    os::setsockopt(sockfd, SOL_SOCKET, SO_RCVBUF, &size, sizeof(size), ec);
 }
 
 inline void setSoRcvBuf(int sockfd, int size)
 {
-    sys::setsockopt(sockfd, SOL_SOCKET, SO_RCVBUF, &size, sizeof(size));
+    os::setsockopt(sockfd, SOL_SOCKET, SO_RCVBUF, &size, sizeof(size));
 }
 
 inline void setSoSndBuf(int sockfd, int size, std::error_code& ec) noexcept
 {
-    sys::setsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, &size, sizeof(size), ec);
+    os::setsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, &size, sizeof(size), ec);
 }
 
 inline void setSoSndBuf(int sockfd, int size)
 {
-    sys::setsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, &size, sizeof(size));
+    os::setsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, &size, sizeof(size));
 }
 
 inline void setTcpNoDelay(int sockfd, bool enabled, std::error_code& ec) noexcept
 {
     int optval{enabled ? 1 : 0};
-    sys::setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval), ec);
+    os::setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval), ec);
 }
 
 inline void setTcpNoDelay(int sockfd, bool enabled)
 {
     int optval{enabled ? 1 : 0};
-    sys::setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
+    os::setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
 }
 
 struct Socket {
@@ -716,6 +717,7 @@ struct Socket {
     int family_{};
 };
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_SOCKET_HPP

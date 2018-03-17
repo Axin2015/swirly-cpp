@@ -29,6 +29,7 @@
 #include <tuple>
 
 namespace swirly {
+inline namespace util {
 
 template <typename FnT>
 void parsePairs(std::istream& is, FnT fn)
@@ -95,6 +96,7 @@ class SWIRLY_API Config {
     boost::container::flat_map<std::string, std::string> map_;
 };
 
+} // namespace util
 } // namespace swirly
 
 #endif // SWIRLY_UTIL_CONFIG_HPP

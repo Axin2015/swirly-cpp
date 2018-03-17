@@ -31,6 +31,7 @@
 #pragma GCC diagnostic pop
 
 namespace swirly {
+inline namespace clob {
 
 class Accnt;
 
@@ -154,6 +155,7 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
 
 using AccntSet = SymbolSet<Accnt>;
 
+} // namespace clob
 } // namespace swirly
 
 #endif // SWIRLY_CLOB_ACCNT_HPP

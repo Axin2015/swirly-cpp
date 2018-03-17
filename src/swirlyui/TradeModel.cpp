@@ -16,11 +16,10 @@
  */
 #include "TradeModel.hxx"
 
-using namespace std;
-
 namespace swirly {
 namespace ui {
 using namespace exec;
+using namespace std;
 
 TradeModel::TradeModel(QObject* parent)
 : TableModel{parent}

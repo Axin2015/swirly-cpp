@@ -22,6 +22,7 @@
 #include <swirly/contrib/http_parser.h>
 
 namespace swirly {
+inline namespace web {
 
 template <typename DerivedT>
 class BasicUrl {
@@ -90,6 +91,7 @@ class BasicUrl {
     http_parser_url parser_{};
 };
 
+} // namespace web
 } // namespace swirly
 
 #endif // SWIRLY_WEB_URL_HPP

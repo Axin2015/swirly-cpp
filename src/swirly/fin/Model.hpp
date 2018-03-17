@@ -24,8 +24,11 @@
 #include <swirly/sys/Time.hpp>
 
 namespace swirly {
-
+inline namespace util {
 class Config;
+} // namespace util
+
+inline namespace fin {
 
 template <typename ValueT>
 using ModelCallback = std::function<void(ValueT)>;
@@ -67,6 +70,7 @@ class SWIRLY_API Model {
     virtual void doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const = 0;
 };
 
+} // namespace fin
 } // namespace swirly
 
 #endif // SWIRLY_FIN_MODEL_HPP

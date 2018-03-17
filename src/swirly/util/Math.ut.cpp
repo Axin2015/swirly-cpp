@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(VarAccumCase, *utf::tolerance(0.0000001))
 {
     VarAccum v;
     v.append(1345, 1301, 1368, 1322, 1310, 1370, 1318, 1350, 1303, 1299);
-    BOOST_TEST(v.size() == 10);
+    BOOST_TEST(v.size() == 10U);
     BOOST_TEST(v.mean() == 1328.6);
     BOOST_TEST(var(v) == 754.2666667);
     BOOST_TEST(varp(v) == 678.84);

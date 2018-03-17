@@ -22,6 +22,7 @@
 #include <swirly/fin/Model.hpp>
 
 namespace swirly {
+inline namespace sqlite {
 
 class SWIRLY_API SqlModel : public Model {
   public:
@@ -55,6 +56,7 @@ class SWIRLY_API SqlModel : public Model {
     sqlite::DbPtr db_;
 };
 
+} // namespace sqlite
 } // namespace swirly
 
 #endif // SWIRLY_SQLITE_MODEL_HPP

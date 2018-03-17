@@ -24,6 +24,7 @@
 #include <atomic>
 
 namespace swirly {
+inline namespace sys {
 
 struct ThreadSafePolicy {
     using Type = std::atomic<int>;
@@ -101,6 +102,7 @@ boost::intrusive_ptr<ValueT> makeIntrusive(ArgsT&&... args)
     return {new (std::align_val_t(alignof(ValueT))) ValueT{std::forward<ArgsT>(args)...}, false};
 }
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_REFCOUNT_HPP

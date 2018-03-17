@@ -23,10 +23,9 @@
 
 #include <memory>
 
-using namespace std;
-
 namespace swirly {
 namespace ui {
+using namespace std;
 
 OrderForm::OrderForm(OrderModel& orderModel, QWidget* parent, Qt::WindowFlags f)
 : QWidget{parent, f}

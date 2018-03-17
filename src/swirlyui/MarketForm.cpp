@@ -30,10 +30,9 @@
 
 #include <memory>
 
-using namespace std;
-
 namespace swirly {
 namespace ui {
+using namespace std;
 
 MarketForm::MarketForm(InstrModel& instrModel, QWidget* parent, Qt::WindowFlags f)
 : QWidget{parent, f}

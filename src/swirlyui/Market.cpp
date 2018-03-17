@@ -19,10 +19,9 @@
 #include <QJsonArray>
 #include <QJsonObject>
 
-using namespace std;
-
 namespace swirly {
 namespace ui {
+using namespace std;
 namespace {
 
 void toLevels(const QJsonArray& ticks, const QJsonArray& resd, const QJsonArray& count,

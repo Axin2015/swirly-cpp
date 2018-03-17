@@ -18,10 +18,9 @@
 
 #include <QJsonObject>
 
-using namespace std;
-
 namespace swirly {
 namespace ui {
+using namespace std;
 
 Instr::Impl::Impl(const QString& symbol, const QString& display, const QString& baseAsset,
                   const QString& termCcy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,

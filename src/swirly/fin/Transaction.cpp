@@ -18,9 +18,8 @@
 
 #include <swirly/util/Log.hpp>
 
-using namespace std;
-
 namespace swirly {
+using namespace std;
 
 Transactional::~Transactional() noexcept = default;
 

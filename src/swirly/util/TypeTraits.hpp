@@ -22,6 +22,7 @@
 #include <swirly/sys/Time.hpp>
 
 namespace swirly {
+inline namespace util {
 
 template <typename ValueT, typename EnableT = void>
 struct TypeTraits;
@@ -143,6 +144,7 @@ inline ValueT fromString(const std::string& s) noexcept
     return Traits::fromString(s);
 }
 
+} // namespace util
 } // namespace swirly
 
 #endif // SWIRLY_UTIL_TYPETRAITS_HPP

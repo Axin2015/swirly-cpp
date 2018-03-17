@@ -20,6 +20,7 @@
 #include <swirly/util/Exception.hpp>
 
 namespace swirly {
+inline namespace web {
 
 class SWIRLY_API ParseException : public Exception {
   public:
@@ -38,6 +39,7 @@ class SWIRLY_API ParseException : public Exception {
     ParseException& operator=(ParseException&&) noexcept = default;
 };
 
+} // namespace web
 } // namespace swirly
 
 #endif // SWIRLY_WEB_EXCEPTION_HPP

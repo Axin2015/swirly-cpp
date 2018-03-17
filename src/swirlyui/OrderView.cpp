@@ -26,11 +26,10 @@
 
 #include <memory>
 
-using namespace std;
-
 namespace swirly {
 namespace ui {
 using namespace order;
+using namespace std;
 
 OrderView::OrderView(OrderModel& model, QWidget* parent, Qt::WindowFlags f)
 : QWidget{parent, f}

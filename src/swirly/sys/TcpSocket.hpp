@@ -20,6 +20,7 @@
 #include <swirly/sys/IoSocket.hpp>
 
 namespace swirly {
+inline namespace sys {
 
 /**
  * Passive TCP Server Socket. All state is in base class, so object can be sliced.
@@ -31,27 +32,27 @@ struct TcpSocketServ : Socket {
     using Socket::Socket;
 
     TcpSocketServ(Transport trans, std::error_code& ec) noexcept
-    : Socket{sys::socket(trans, ec), trans.family()}
+    : Socket{os::socket(trans, ec), trans.family()}
     {
     }
     explicit TcpSocketServ(Transport trans)
-    : Socket{sys::socket(trans), trans.family()}
+    : Socket{os::socket(trans), trans.family()}
     {
     }
 
     TcpSocketServ() noexcept = default;
 
-    void bind(const Endpoint& ep, std::error_code& ec) noexcept { sys::bind(*sock_, ep, ec); }
-    void bind(const Endpoint& ep) { sys::bind(*sock_, ep); }
+    void bind(const Endpoint& ep, std::error_code& ec) noexcept { os::bind(*sock_, ep, ec); }
+    void bind(const Endpoint& ep) { os::bind(*sock_, ep); }
 
-    void listen(int backlog, std::error_code& ec) noexcept { sys::listen(*sock_, backlog, ec); }
-    void listen(int backlog) { sys::listen(*sock_, backlog); }
+    void listen(int backlog, std::error_code& ec) noexcept { os::listen(*sock_, backlog, ec); }
+    void listen(int backlog) { os::listen(*sock_, backlog); }
 
     IoSocket accept(Endpoint& ep, std::error_code& ec) noexcept
     {
-        return IoSocket{sys::accept(*sock_, ep, ec), family_};
+        return IoSocket{os::accept(*sock_, ep, ec), family_};
     }
-    IoSocket accept(Endpoint& ep) { return IoSocket{sys::accept(*sock_, ep), family_}; }
+    IoSocket accept(Endpoint& ep) { return IoSocket{os::accept(*sock_, ep), family_}; }
 };
 
 /**
@@ -64,11 +65,11 @@ struct TcpSocketClnt : IoSocket {
     using IoSocket::IoSocket;
 
     TcpSocketClnt(Transport trans, std::error_code& ec) noexcept
-    : IoSocket{sys::socket(trans, ec), trans.family()}
+    : IoSocket{os::socket(trans, ec), trans.family()}
     {
     }
     explicit TcpSocketClnt(Transport trans)
-    : IoSocket{sys::socket(trans), trans.family()}
+    : IoSocket{os::socket(trans), trans.family()}
     {
     }
 
@@ -76,11 +77,12 @@ struct TcpSocketClnt : IoSocket {
 
     void connect(const Endpoint& ep, std::error_code& ec) noexcept
     {
-        return sys::connect(*sock_, ep, ec);
+        return os::connect(*sock_, ep, ec);
     }
-    void connect(const Endpoint& ep) { return sys::connect(*sock_, ep); }
+    void connect(const Endpoint& ep) { return os::connect(*sock_, ep); }
 };
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_TCPSOCKET_HPP

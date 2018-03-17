@@ -173,7 +173,7 @@ BOOST_AUTO_TEST_CASE(HttpBasicRequestCase)
     BOOST_TEST(h.method() == HttpMethod::Get);
     BOOST_TEST(h.url() == "/path/file.html"s);
 
-    BOOST_TEST(h.headers().size() == 2);
+    BOOST_TEST(h.headers().size() == 2U);
     BOOST_TEST(h.headers()[0] == make_pair("From"s, "someuser@swirlycloud.com"s));
     BOOST_TEST(h.headers()[1] == make_pair("User-Agent"s, "HTTPTool/1.0"s));
 
@@ -199,7 +199,7 @@ BOOST_AUTO_TEST_CASE(HttpBasicResponseCase)
     BOOST_TEST(h.statusCode() == 200);
     BOOST_TEST(h.status() == "OK"s);
 
-    BOOST_TEST(h.headers().size() == 3);
+    BOOST_TEST(h.headers().size() == 3U);
     BOOST_TEST(h.headers()[0] == make_pair("Date"s, "Fri, 31 Dec 1999 23:59:59 GMT"s));
     BOOST_TEST(h.headers()[1] == make_pair("Content-Type"s, "text/plain"s));
     BOOST_TEST(h.headers()[2] == make_pair("Content-Length"s, "13"s));
@@ -227,7 +227,7 @@ BOOST_AUTO_TEST_CASE(HttpPostRequestCase)
     BOOST_TEST(h.method() == HttpMethod::Post);
     BOOST_TEST(h.url() == "/path/script.cgi"s);
 
-    BOOST_TEST(h.headers().size() == 4);
+    BOOST_TEST(h.headers().size() == 4U);
     BOOST_TEST(h.headers()[0] == make_pair("From"s, "frog@swirlycloud.com"s));
     BOOST_TEST(h.headers()[1] == make_pair("User-Agent"s, "HTTPTool/1.0"s));
     BOOST_TEST(h.headers()[2] == make_pair("Content-Type"s, "application/x-www-form-urlencoded"s));
@@ -252,7 +252,7 @@ BOOST_AUTO_TEST_CASE(HttpKeepAliveRequestCase)
     BOOST_TEST(h.method() == HttpMethod::Get);
     BOOST_TEST(h.url() == "/path/file.html"s);
 
-    BOOST_TEST(h.headers().size() == 1);
+    BOOST_TEST(h.headers().size() == 1U);
     BOOST_TEST(h.headers()[0] == make_pair("Host"s, "www.host1.com:80"s));
 
     BOOST_TEST(h.body().empty());
@@ -284,7 +284,7 @@ BOOST_AUTO_TEST_CASE(HttpChunkedResponseCase)
     BOOST_TEST(h.statusCode() == 200);
     BOOST_TEST(h.status() == "OK"s);
 
-    BOOST_TEST(h.headers().size() == 5);
+    BOOST_TEST(h.headers().size() == 5U);
     BOOST_TEST(h.headers()[0] == make_pair("Date"s, "Fri, 31 Dec 1999 23:59:59 GMT"s));
     BOOST_TEST(h.headers()[1] == make_pair("Content-Type"s, "text/plain"s));
     BOOST_TEST(h.headers()[2] == make_pair("Transfer-Encoding"s, "chunked"s));
@@ -317,7 +317,7 @@ BOOST_AUTO_TEST_CASE(HttpMultiResponseCase)
     BOOST_TEST(h.method() == HttpMethod::Post);
     BOOST_TEST(h.url() == "/path/script.cgi"s);
 
-    BOOST_TEST(h.headers().size() == 2);
+    BOOST_TEST(h.headers().size() == 2U);
     BOOST_TEST(h.headers()[0] == make_pair("Content-Type"s, "text/plain"s));
     BOOST_TEST(h.headers()[1] == make_pair("Content-Length"s, "6"s));
 

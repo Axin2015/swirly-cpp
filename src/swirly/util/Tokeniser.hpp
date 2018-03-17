@@ -23,6 +23,7 @@
 #include <array>
 
 namespace swirly {
+inline namespace util {
 
 class Tokeniser {
   public:
@@ -79,6 +80,7 @@ void split(std::string_view line, std::string_view seps, Row<N>& row) noexcept
     }
 }
 
+} // namespace util
 } // namespace swirly
 
 #endif // SWIRLY_UTIL_TOKENISER_HPP

@@ -25,6 +25,7 @@
 #pragma GCC diagnostic pop
 
 namespace swirly {
+inline namespace fin {
 
 /**
  * America/New_York.
@@ -72,6 +73,7 @@ class SWIRLY_API BusinessDay {
     mutable std::pair<int64_t, JDay> cache_[2]{};
 };
 
+} // namespace fin
 } // namespace swirly
 
 #endif // SWIRLY_FIN_DATE_HPP

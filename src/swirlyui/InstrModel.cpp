@@ -16,11 +16,10 @@
  */
 #include "InstrModel.hxx"
 
-using namespace std;
-
 namespace swirly {
 namespace ui {
 using namespace instr;
+using namespace std;
 
 InstrModel::InstrModel(QObject* parent)
 : TableModel{parent}

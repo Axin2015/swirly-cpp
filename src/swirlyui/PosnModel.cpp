@@ -18,11 +18,10 @@
 
 #include <algorithm>
 
-using namespace std;
-
 namespace swirly {
 namespace ui {
 using namespace posn;
+using namespace std;
 
 PosnModel::PosnModel(QObject* parent)
 : TableModel{parent}

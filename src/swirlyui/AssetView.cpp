@@ -25,11 +25,10 @@
 
 #include <memory>
 
-using namespace std;
-
 namespace swirly {
 namespace ui {
 using namespace asset;
+using namespace std;
 
 AssetView::AssetView(AssetModel& model, QWidget* parent, Qt::WindowFlags f)
 : QWidget{parent, f}

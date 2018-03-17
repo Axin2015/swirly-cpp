@@ -16,9 +16,8 @@
  */
 #include "Accnt.hpp"
 
-using namespace std;
-
 namespace swirly {
+using namespace std;
 
 static_assert(sizeof(Accnt) <= 6 * 64, "no greater than specified cache-lines");
 

@@ -25,6 +25,7 @@
 #include <thread>
 
 namespace swirly {
+inline namespace util {
 
 template <typename ValueT>
 class Pipe {
@@ -101,6 +102,7 @@ class Pipe {
     RingBuffer<ValueT> buf_;
 };
 
+} // namespace util
 } // namespace swirly
 
 #endif // SWIRLY_UTIL_PIPE_HPP

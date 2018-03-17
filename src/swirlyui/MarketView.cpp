@@ -26,11 +26,10 @@
 
 #include <memory>
 
-using namespace std;
-
 namespace swirly {
 namespace ui {
 using namespace market;
+using namespace std;
 
 MarketView::MarketView(InstrModel& instrModel, MarketModel& model, QWidget* parent,
                        Qt::WindowFlags f)

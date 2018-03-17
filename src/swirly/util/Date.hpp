@@ -24,6 +24,7 @@
 #include <cassert>
 
 namespace swirly {
+inline namespace util {
 
 struct IsoDatePolicy : Int32Policy {
 };
@@ -181,6 +182,7 @@ inline bool isWeekEndDay(JDay jday) noexcept
 {
     return !isWeekDay(jday);
 }
+} // namespace util
 } // namespace swirly
 
 #endif // SWIRLY_UTIL_DATE_HPP

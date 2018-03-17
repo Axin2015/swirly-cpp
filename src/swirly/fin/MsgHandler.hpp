@@ -20,6 +20,7 @@
 #include <swirly/fin/Msg.hpp>
 
 namespace swirly {
+inline namespace fin {
 
 template <typename DerivedT>
 struct BasicMsgHandler {
@@ -60,6 +61,7 @@ struct BasicMsgHandler {
     ~BasicMsgHandler() noexcept = default;
 };
 
+} // namespace fin
 } // namespace swirly
 
 #endif // SWIRLY_FIN_MSGHANDLER_HPP

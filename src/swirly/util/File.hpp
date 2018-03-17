@@ -20,6 +20,7 @@
 #include <swirly/sys/File.hpp>
 
 namespace swirly {
+inline namespace util {
 
 /**
  * Get file size.
@@ -27,7 +28,7 @@ namespace swirly {
 inline std::size_t fileSize(int fd)
 {
     struct stat st;
-    sys::fstat(fd, st);
+    os::fstat(fd, st);
     return st.st_size;
 }
 
@@ -41,6 +42,7 @@ inline mode_t fileMode() noexcept
     return mode;
 }
 
+} // namespace util
 } // namespace swirly
 
 #endif // SWIRLY_UTIL_FILE_HPP

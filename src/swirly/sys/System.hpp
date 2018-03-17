@@ -22,7 +22,8 @@
 #include <unistd.h>
 
 namespace swirly {
-namespace sys {
+inline namespace sys {
+namespace os {
 
 /**
  * Change working directory.
@@ -94,6 +95,7 @@ inline pid_t setsid()
     return sid;
 }
 
+} // namespace os
 } // namespace sys
 } // namespace swirly
 

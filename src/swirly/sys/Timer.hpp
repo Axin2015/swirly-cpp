@@ -26,6 +26,7 @@
 #include <vector>
 
 namespace swirly {
+inline namespace sys {
 
 class TimerQueue;
 
@@ -179,6 +180,7 @@ inline void Timer::cancel() noexcept
     }
 }
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_TIMER_HPP

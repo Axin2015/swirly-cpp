@@ -26,6 +26,7 @@ using namespace std;
 using namespace swirly;
 
 namespace swirly {
+inline namespace util {
 
 enum class Test : int { Foo = 1, Bar = 2, Baz = 4, Qux = 8 };
 
@@ -54,6 +55,7 @@ inline ostream& operator<<(ostream& os, Test t)
     return os << enumString(t);
 }
 
+} // namespace util
 } // namespace swirly
 
 BOOST_AUTO_TEST_SUITE(EnumSuite)

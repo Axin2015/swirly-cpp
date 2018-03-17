@@ -19,7 +19,6 @@
 #include "HttpSess.hpp"
 
 namespace swirly {
-
 using namespace std;
 
 HttpServ::HttpServ(Reactor& r, const Endpoint& ep, RestServ& rs)

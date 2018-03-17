@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(SymbolEmptyCase)
 {
     Symbol symbol;
     BOOST_TEST(symbol.empty());
-    BOOST_TEST(symbol.size() == 0UL);
+    BOOST_TEST(symbol.size() == 0U);
     BOOST_TEST(symbol.compare(""sv) == 0);
     BOOST_TEST(symbol == Symbol{""sv});
 }
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(SymbolNonEmptyCase)
 {
     Symbol symbol{"Foo"sv};
     BOOST_TEST(!symbol.empty());
-    BOOST_TEST(symbol.size() == 3UL);
+    BOOST_TEST(symbol.size() == 3U);
     BOOST_TEST(symbol.compare("Foo"sv) == 0);
     BOOST_TEST(symbol == Symbol{"Foo"sv});
 }

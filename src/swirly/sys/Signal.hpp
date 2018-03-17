@@ -22,6 +22,7 @@
 #include <signal.h>
 
 namespace swirly {
+inline namespace sys {
 
 class SWIRLY_API SigWait {
   public:
@@ -47,6 +48,7 @@ class SWIRLY_API SigWait {
  */
 SWIRLY_API void sigBlockAll();
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_SIGNAL_HPP

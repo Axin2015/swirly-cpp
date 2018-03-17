@@ -25,6 +25,7 @@
 // functions.
 
 namespace swirly {
+inline namespace sys {
 using namespace std;
 
 void detail::PidFileDeleter::operator()(pidfh* pfh) const noexcept
@@ -41,7 +42,7 @@ PidFile openPidFile(const char* path, mode_t mode)
             using namespace string_literals;
             throw runtime_error{"daemon already running, pid: "s + to_string(pid)};
         }
-        throw system_error{sys::makeError(errno), "pidfile_open"};
+        throw system_error{os::makeError(errno), "pidfile_open"};
     }
     return pf;
 }
@@ -56,8 +57,9 @@ void closePidFile(PidFile& pf) noexcept
 void writePidFile(PidFile& pf)
 {
     if (pf && pidfile_write(pf.get()) < 0) {
-        throw system_error{sys::makeError(errno), "pidfile_write"};
+        throw system_error{os::makeError(errno), "pidfile_write"};
     }
 }
 
+} // namespace sys
 } // namespace swirly

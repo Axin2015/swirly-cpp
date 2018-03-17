@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE(MemCtxCase)
     MemCtx memCtx{0};
 
     // Throw if no memory has been reserved.
-    BOOST_TEST(memCtx.maxSize() == 0);
+    BOOST_TEST(memCtx.maxSize() == 0U);
 
     // These should all call the custom allocator with zero capacity.
     BOOST_CHECK_THROW(memCtx.alloc(sizeof(Foo)), bad_alloc);
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(MemCtxCase)
 
     {
         memCtx = MemCtx{4096};
-        BOOST_TEST(memCtx.maxSize() == 4096);
+        BOOST_TEST(memCtx.maxSize() == 4096U);
     }
 
     char* p1{static_cast<char*>(memCtx.alloc(sizeof(Foo)))};

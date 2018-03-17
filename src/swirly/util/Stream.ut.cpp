@@ -32,16 +32,16 @@ BOOST_AUTO_TEST_CASE(StringStreamCase)
     StringStream<7> ss;
     BOOST_TEST(ss.empty());
     ss << "foo";
-    BOOST_TEST(ss.size() == 3UL);
+    BOOST_TEST(ss.size() == 3U);
     BOOST_TEST(ss.str() == "foo");
     ss << ',' << "bar";
-    BOOST_TEST(ss.size() == 7UL);
+    BOOST_TEST(ss.size() == 7U);
     BOOST_TEST(ss.str() == "foo,bar");
 
     ss.reset();
     BOOST_TEST(ss.empty());
     ss << 12345678;
-    BOOST_TEST(ss.size() == 7UL);
+    BOOST_TEST(ss.size() == 7U);
     BOOST_TEST(ss.str() == "1234567");
     BOOST_TEST(!ss);
 

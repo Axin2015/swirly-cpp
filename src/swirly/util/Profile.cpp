@@ -18,9 +18,9 @@
 
 #include <swirly/util/Log.hpp>
 
-using namespace std;
-
 namespace swirly {
+inline namespace util {
+using namespace std;
 
 Profile::~Profile() noexcept
 {
@@ -66,4 +66,5 @@ TimeRecorder::~TimeRecorder() noexcept
     profile_.record(usec);
 }
 
+} // namespace util
 } // namespace swirly

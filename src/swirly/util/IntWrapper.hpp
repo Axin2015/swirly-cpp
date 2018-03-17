@@ -25,6 +25,7 @@
 #include <type_traits>
 
 namespace swirly {
+inline namespace util {
 
 template <typename ValueT>
 struct IntPolicy {
@@ -363,6 +364,7 @@ struct TypeTraits<ValueT, std::enable_if_t<isIntWrapper<ValueT>>> {
     }
 };
 
+} // namespace util
 } // namespace swirly
 
 #endif // SWIRLY_UTIL_INTWRAPPER_HPP

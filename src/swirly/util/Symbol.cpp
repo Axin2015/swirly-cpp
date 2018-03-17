@@ -17,7 +17,9 @@
 #include "Symbol.hpp"
 
 namespace swirly {
+inline namespace util {
 
 static_assert(Symbol{}.empty(), "default constructor must be constexpr");
 static_assert(Symbol{Symbol{}}.empty(), "copy constructor must be constexpr");
+} // namespace util
 } // namespace swirly

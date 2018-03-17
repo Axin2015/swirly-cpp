@@ -16,10 +16,9 @@
  */
 #include "Types.hxx"
 
-using namespace std;
-
 namespace swirly {
 namespace ui {
+using namespace std;
 
 AssetType TypeTraits<AssetType>::fromString(const QString& value)
 {

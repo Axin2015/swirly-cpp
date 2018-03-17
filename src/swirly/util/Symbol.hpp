@@ -28,6 +28,7 @@
 #include <ostream>
 
 namespace swirly {
+inline namespace util {
 
 static_assert(MaxSymbol == 16, "must be specific size");
 
@@ -257,6 +258,7 @@ struct TypeTraits<Symbol> {
     static auto fromString(std::string_view sv) noexcept { return Symbol{sv}; }
 };
 
+} // namespace util
 } // namespace swirly
 
 #endif // SWIRLY_UTIL_SYMBOL_HPP

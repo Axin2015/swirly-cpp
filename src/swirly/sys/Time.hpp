@@ -25,7 +25,7 @@
 #include <sys/time.h>
 
 namespace swirly {
-
+inline namespace sys {
 using namespace std::literals::chrono_literals;
 
 struct SWIRLY_API UnixClock {
@@ -193,6 +193,7 @@ inline timespec operator-(timespec lhs, timespec rhs) noexcept
     return ts;
 }
 
+} // namespace sys
 } // namespace swirly
 
 #endif // SWIRLY_SYS_TIME_HPP

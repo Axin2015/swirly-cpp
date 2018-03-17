@@ -16,9 +16,8 @@
  */
 #include "Journ.hpp"
 
-using namespace std;
-
 namespace swirly {
+using namespace std;
 
 Journ::~Journ() noexcept = default;
 

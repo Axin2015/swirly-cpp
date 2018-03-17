@@ -17,7 +17,9 @@
 #include "HttpRequest.hpp"
 
 namespace swirly {
+inline namespace web {
 
 HttpRequest::~HttpRequest() noexcept = default;
 
+} // namespace web
 } // namespace swirly

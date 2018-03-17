@@ -22,6 +22,7 @@
 #include <iosfwd>
 
 namespace swirly {
+inline namespace fin {
 
 class SWIRLY_API ServException : public Exception {
   public:
@@ -401,6 +402,7 @@ class SWIRLY_API UnauthorizedException : public ServException {
     const char* httpReason() const noexcept override;
 };
 
+} // namespace fin
 } // namespace swirly
 
 #endif // SWIRLY_FIN_EXCEPTION_HPP

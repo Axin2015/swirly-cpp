@@ -21,9 +21,8 @@
 
 #include <swirly/util/Log.hpp>
 
-using namespace std;
-
 namespace swirly {
+using namespace std;
 namespace {
 template <size_t StepN>
 class MultiPart {
