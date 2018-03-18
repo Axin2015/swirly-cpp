@@ -19,12 +19,14 @@ project(swirly)
 
 # Configuration options:
 set(ENABLE_SHARED_LIBS ON CACHE BOOL "Enable shared libs.")
-set(SWIRLY_MAX_LEVELS  3 CACHE STRING "Maximum price levels.")
-set(TOOLS_HOME         "/opt/tools/latest" CACHE PATH "Toolset directory.")
+set(SWIRLY_MAX_LEVELS 3 CACHE STRING "Maximum price levels.")
+set(SWIRLY_TOOLSET "" CACHE PATH "Toolchain prefix.")
 
-get_filename_component(TOOLS_HOME "${TOOLS_HOME}" REALPATH)
-set(CMAKE_PREFIX_PATH "${TOOLS_HOME}")
-message(STATUS "TOOLS_HOME: ${TOOLS_HOME}")
+if (NOT "${SWIRLY_TOOLSET}" STREQUAL "")
+  get_filename_component(SWIRLY_TOOLSET "${SWIRLY_TOOLSET}" REALPATH)
+  set(CMAKE_PREFIX_PATH "${SWIRLY_TOOLSET}")
+  message(STATUS "SWIRLY_TOOLSET: ${SWIRLY_TOOLSET}")
+endif()
 
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${PROJECT_SOURCE_DIR}/etc")
 set(CMAKE_VERBOSE_MAKEFILE ON)
