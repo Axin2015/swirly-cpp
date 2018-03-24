@@ -37,6 +37,24 @@ bool isAfter(const Timer& lhs, const Timer& rhs)
 
 } // namespace
 
+
+void Timer::cancel() noexcept
+{
+    auto& tq = *impl_->tq;
+    if (impl_->handler) {
+
+        impl_->handler.reset();
+        ++tq.cancelled_;
+
+        // Ensure that a pending timer is at the front of the queue.
+        // If not pending, then must have been cancelled.
+        while (!tq.heap_.empty() && !tq.heap_.front().pending()) {
+            tq.pop();
+            --tq.cancelled_;
+        }
+    }
+}
+
 Timer TimerQueue::insert(Time expiry, Duration interval, const EventHandlerPtr& handler)
 {
     assert(handler);
@@ -56,21 +74,21 @@ int TimerQueue::dispatch(Time now)
     int n{};
     while (!heap_.empty()) {
 
-        if (heap_.front().cancelled()) {
-
-            // Pop cancelled timer from front.
-            pop_heap(heap_.begin(), heap_.end(), isAfter);
-            heap_.pop_back();
+        // If not pending, then must have been cancelled.
+        if (!heap_.front().pending()) {
+            pop();
             --cancelled_;
-
         } else if (heap_.front().expiry() <= now) {
-
             expire(now);
             ++n;
-
         } else {
             break;
         }
+    }
+
+    // Garbage collect if more than half of the timers have been cancelled.
+    if (cancelled_ > static_cast<int>(heap_.size() >> 2)) {
+        gc();
     }
     return n;
 }
@@ -110,11 +128,9 @@ Timer TimerQueue::alloc(Time expiry, Duration interval, const EventHandlerPtr& h
 
 void TimerQueue::expire(Time now)
 {
-    // Remove timer.
-    auto tmr = heap_.front();
-    pop_heap(heap_.begin(), heap_.end(), isAfter);
-    heap_.pop_back();
-
+    // Pop timer.
+    auto tmr = pop();
+    assert(tmr.pending());
     try {
         // Notify user.
         tmr.handler()->onTimer(tmr, now);
@@ -123,7 +139,7 @@ void TimerQueue::expire(Time now)
         SWIRLY_ERROR("error handling timer event: "s + e.what());
     }
 
-    if (tmr.cancelled()) {
+    if (!tmr.pending()) {
 
         // The timer was cancelled during the callback.
         --cancelled_;
@@ -131,7 +147,7 @@ void TimerQueue::expire(Time now)
     } else if (tmr.interval().count() > 0) {
 
         // Add interval to expiry, while ensuring that next expiry is always in the future.
-        tmr.setExpiry(max(tmr.expiry() + tmr.interval(), now + Nanos{1}));
+        tmr.setExpiry(max(tmr.expiry() + tmr.interval(), now + 1ns));
 
         // Reschedule popped timer.
         heap_.push_back(tmr);
@@ -139,22 +155,26 @@ void TimerQueue::expire(Time now)
 
     } else {
 
-        // Free non-repeating timer.
+        // Free handler for non-repeating timer.
         tmr.handler().reset();
-    }
-
-    if (cancelled_ > static_cast<int>(heap_.size() >> 2)) {
-        // More than half of the timers have been cancelled, so purge them now.
-        purge();
     }
 }
 
-void TimerQueue::purge() noexcept
+void TimerQueue::gc() noexcept
 {
     const auto it
-        = remove_if(heap_.begin(), heap_.end(), [](const auto& tmr) { return tmr.cancelled(); });
+        = remove_if(heap_.begin(), heap_.end(), [](const auto& tmr) { return !tmr.pending(); });
     heap_.erase(it, heap_.end());
+    make_heap(heap_.begin(), heap_.end(), isAfter);
     cancelled_ = 0;
+}
+
+Timer TimerQueue::pop() noexcept
+{
+    auto tmr = heap_.front();
+    pop_heap(heap_.begin(), heap_.end(), isAfter);
+    heap_.pop_back();
+    return tmr;
 }
 
 } // namespace sys

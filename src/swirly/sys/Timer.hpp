@@ -30,7 +30,7 @@ inline namespace sys {
 
 class TimerQueue;
 
-class Timer {
+class SWIRLY_API Timer {
     friend class TimerQueue;
 
   public:
@@ -54,8 +54,7 @@ class Timer {
     long id() const noexcept { return impl_->id; }
     Time expiry() const noexcept { return impl_->expiry; }
     Duration interval() const noexcept { return impl_->interval; }
-    const EventHandlerPtr& handler() const noexcept { return impl_->handler; }
-    bool cancelled() const noexcept { return !impl_->handler; }
+    bool pending() const noexcept { return !!impl_->handler; }
     // Setting the interval will not reschedule any pending timer.
     void setInterval(Duration interval) noexcept { impl_->interval = interval; }
     void reset() noexcept { impl_.reset(); }
@@ -133,8 +132,9 @@ class SWIRLY_API TimerQueue {
     TimerQueue(TimerQueue&&) = default;
     TimerQueue& operator=(TimerQueue&&) = default;
 
+    std::size_t size() const noexcept { return heap_.size() - cancelled_; }
+    bool empty() const noexcept { return size() == 0; }
     const Timer& front() const { return heap_.front(); }
-    bool empty() const { return heap_.size() - cancelled_ == 0; }
 
     Timer insert(Time expiry, Duration interval, const EventHandlerPtr& handler);
     Timer insert(Time expiry, const EventHandlerPtr& handler)
@@ -147,7 +147,8 @@ class SWIRLY_API TimerQueue {
   private:
     Timer alloc(Time expiry, Duration interval, const EventHandlerPtr& handler);
     void expire(Time now);
-    void purge() noexcept;
+    void gc() noexcept;
+    Timer pop() noexcept;
 
     long maxId_{};
     int cancelled_{};
@@ -171,15 +172,6 @@ inline void intrusive_ptr_release(Timer::Impl* impl) noexcept
         tq.free_ = impl;
     }
 }
-
-inline void Timer::cancel() noexcept
-{
-    if (impl_->handler) {
-        impl_->handler.reset();
-        ++impl_->tq->cancelled_;
-    }
-}
-
 } // namespace sys
 } // namespace swirly
 
