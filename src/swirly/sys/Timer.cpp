@@ -37,24 +37,6 @@ bool isAfter(const Timer& lhs, const Timer& rhs)
 
 } // namespace
 
-
-void Timer::cancel() noexcept
-{
-    auto& tq = *impl_->tq;
-    if (impl_->handler) {
-
-        impl_->handler.reset();
-        ++tq.cancelled_;
-
-        // Ensure that a pending timer is at the front of the queue.
-        // If not pending, then must have been cancelled.
-        while (!tq.heap_.empty() && !tq.heap_.front().pending()) {
-            tq.pop();
-            --tq.cancelled_;
-        }
-    }
-}
-
 Timer TimerQueue::insert(Time expiry, Duration interval, const EventHandlerPtr& handler)
 {
     assert(handler);
@@ -124,6 +106,18 @@ Timer TimerQueue::alloc(Time expiry, Duration interval, const EventHandlerPtr& h
     impl->handler = handler;
 
     return Timer{impl};
+}
+
+void TimerQueue::cancel() noexcept
+{
+    ++cancelled_;
+
+    // Ensure that a pending timer is at the front of the queue.
+    // If not pending, then must have been cancelled.
+    while (!heap_.empty() && !heap_.front().pending()) {
+        pop();
+        --cancelled_;
+    }
 }
 
 void TimerQueue::expire(Time now)
