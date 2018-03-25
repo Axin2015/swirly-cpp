@@ -51,13 +51,14 @@ class SWIRLY_API Timer {
     : impl_{impl, false}
     {
     }
+    ~Timer() { reset(); }
     long id() const noexcept { return impl_->id; }
     Time expiry() const noexcept { return impl_->expiry; }
     Duration interval() const noexcept { return impl_->interval; }
-    bool pending() const noexcept { return !!impl_->handler; }
+    bool pending() const noexcept { return bool{impl_->handler}; }
     // Setting the interval will not reschedule any pending timer.
     void setInterval(Duration interval) noexcept { impl_->interval = interval; }
-    void reset() noexcept { impl_.reset(); }
+    void reset() noexcept;
     void cancel() noexcept;
 
   private:
@@ -136,8 +137,8 @@ class SWIRLY_API TimerQueue {
     bool empty() const noexcept { return size() == 0; }
     const Timer& front() const { return heap_.front(); }
 
-    Timer insert(Time expiry, Duration interval, const EventHandlerPtr& handler);
-    Timer insert(Time expiry, const EventHandlerPtr& handler)
+    [[nodiscard]] Timer insert(Time expiry, Duration interval, const EventHandlerPtr& handler);
+    [[nodiscard]] Timer insert(Time expiry, const EventHandlerPtr& handler)
     {
         return insert(expiry, Duration::zero(), handler);
     }
@@ -146,6 +147,7 @@ class SWIRLY_API TimerQueue {
 
   private:
     Timer alloc(Time expiry, Duration interval, const EventHandlerPtr& handler);
+    void cancel() noexcept;
     void expire(Time now);
     void gc() noexcept;
     Timer pop() noexcept;
@@ -170,6 +172,28 @@ inline void intrusive_ptr_release(Timer::Impl* impl) noexcept
         auto& tq = *impl->tq;
         impl->next = tq.free_;
         tq.free_ = impl;
+    }
+}
+
+inline void Timer::reset() noexcept
+{
+    if (impl_) {
+        // If pending, and if only two references to the timer remain (this one and the one in the
+        // queue), then reset the handler and inform the queue that the timer has been cancelled.
+        if (impl_->handler && impl_->refCount == 2) {
+            impl_->handler.reset();
+            impl_->tq->cancel();
+        }
+        impl_.reset();
+    }
+}
+
+inline void Timer::cancel() noexcept
+{
+    // If pending, then reset the handler and inform the queue that the timer has been cancelled.
+    if (impl_->handler) {
+        impl_->handler.reset();
+        impl_->tq->cancel();
     }
 }
 } // namespace sys
