@@ -54,10 +54,16 @@ class SWIRLY_API Timer {
     ~Timer() { reset(); }
     long id() const noexcept { return impl_->id; }
     Time expiry() const noexcept { return impl_->expiry; }
+
     Duration interval() const noexcept { return impl_->interval; }
     bool pending() const noexcept { return bool{impl_->handler}; }
     // Setting the interval will not reschedule any pending timer.
-    void setInterval(Duration interval) noexcept { impl_->interval = interval; }
+    template <typename RepT, typename PeriodT>
+    void setInterval(std::chrono::duration<RepT, PeriodT> interval) noexcept
+    {
+        using namespace std::chrono;
+        impl_->interval = duration_cast<Duration>(interval);
+    }
     void reset() noexcept;
     void cancel() noexcept;
 

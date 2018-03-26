@@ -45,12 +45,12 @@ class SWIRLY_API EventHandler : public RefCount<EventHandler, ThreadUnsafePolicy
 
     void close() { doClose(); }
     void onReady(int fd, unsigned events, Time now) { doReady(fd, events, now); }
-    void onTimer(const Timer& tmr, Time now) { doTimer(tmr, now); }
+    void onTimer(Timer& tmr, Time now) { doTimer(tmr, now); }
 
   protected:
     virtual void doClose() = 0;
     virtual void doReady(int fd, unsigned events, Time now);
-    virtual void doTimer(const Timer& tmr, Time now);
+    virtual void doTimer(Timer& tmr, Time now);
 
     const Reactor& reactor() const noexcept { return reactor_; }
     boost::intrusive_ptr<EventHandler> self() noexcept { return {this, true}; }
