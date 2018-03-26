@@ -79,7 +79,7 @@ void HttpSess::doReady(int fd, unsigned events, Time now)
     }
 }
 
-void HttpSess::doTimer(const Timer& tmr, Time now)
+void HttpSess::doTimer(Timer& tmr, Time now)
 {
     SWIRLY_INFO(logMsg() << "timeout");
     close();

@@ -74,7 +74,7 @@ template <typename RepT, typename PeriodT>
 constexpr Time toTime(std::chrono::duration<RepT, PeriodT> d) noexcept
 {
     using namespace std::chrono;
-    return Time{duration_cast<UnixClock::duration>(d)};
+    return Time{duration_cast<Duration>(d)};
 }
 
 constexpr Time toTime(timeval tv) noexcept
@@ -93,7 +93,7 @@ template <typename DurationT>
 constexpr DurationT timeSinceEpoch(Time time) noexcept
 {
     using namespace std::chrono;
-    const UnixClock::duration d{time.time_since_epoch()};
+    const Duration d{time.time_since_epoch()};
     return duration_cast<DurationT>(d);
 }
 
