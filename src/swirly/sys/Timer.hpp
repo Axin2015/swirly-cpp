@@ -31,9 +31,7 @@ inline namespace sys {
 class TimerQueue;
 
 class SWIRLY_API Timer {
-    friend class TimerQueue;
 
-  public:
     struct Impl {
         union {
             // Singly-linked free-list.
@@ -46,17 +44,26 @@ class SWIRLY_API Timer {
         Duration interval;
         EventHandlerPtr handler;
     };
-    Timer() = default;
+    friend class TimerQueue;
+    friend void intrusive_ptr_add_ref(Impl* impl) noexcept;
+    friend void intrusive_ptr_release(Impl* impl) noexcept;
+
     explicit Timer(Impl* impl)
     : impl_{impl, false}
     {
     }
+
+  public:
+    Timer() = default;
     ~Timer() { reset(); }
+
+    bool empty() const noexcept { return !impl_; }
+    explicit operator bool() const noexcept { return impl_ != nullptr; }
     long id() const noexcept { return impl_->id; }
     Time expiry() const noexcept { return impl_->expiry; }
 
     Duration interval() const noexcept { return impl_->interval; }
-    bool pending() const noexcept { return bool{impl_->handler}; }
+    bool pending() const noexcept { return impl_ != nullptr && bool{impl_->handler}; }
     // Setting the interval will not reschedule any pending timer.
     template <typename RepT, typename PeriodT>
     void setInterval(std::chrono::duration<RepT, PeriodT> interval) noexcept
@@ -136,8 +143,8 @@ class SWIRLY_API TimerQueue {
     TimerQueue& operator=(const TimerQueue&) = delete;
 
     // Move.
-    TimerQueue(TimerQueue&&) = default;
-    TimerQueue& operator=(TimerQueue&&) = default;
+    TimerQueue(TimerQueue&&) = delete;
+    TimerQueue& operator=(TimerQueue&&) = delete;
 
     std::size_t size() const noexcept { return heap_.size() - cancelled_; }
     bool empty() const noexcept { return size() == 0; }

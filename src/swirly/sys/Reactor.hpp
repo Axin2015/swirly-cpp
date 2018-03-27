@@ -56,12 +56,12 @@ class SWIRLY_API Reactor {
     virtual ~Reactor() noexcept;
 
     // Copy.
-    Reactor(const Reactor&) noexcept = default;
-    Reactor& operator=(const Reactor&) noexcept = default;
+    Reactor(const Reactor&) noexcept = delete;
+    Reactor& operator=(const Reactor&) noexcept = delete;
 
     // Move.
-    Reactor(Reactor&&) noexcept = default;
-    Reactor& operator=(Reactor&&) noexcept = default;
+    Reactor(Reactor&&) noexcept = delete;
+    Reactor& operator=(Reactor&&) noexcept = delete;
 
     bool closed() const noexcept { return doClosed(); }
 
