@@ -57,6 +57,14 @@ class SWIRLY_API Timer {
     Timer() = default;
     ~Timer() { reset(); }
 
+    // Copy.
+    Timer(const Timer&) = default;
+    Timer& operator=(const Timer&) = default;
+
+    // Move.
+    Timer(Timer&&) = default;
+    Timer& operator=(Timer&&) = default;
+
     bool empty() const noexcept { return !impl_; }
     explicit operator bool() const noexcept { return impl_ != nullptr; }
     long id() const noexcept { return impl_->id; }

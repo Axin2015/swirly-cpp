@@ -93,23 +93,22 @@ void EpollReactor::doSetEvents(int fd, unsigned events)
     }
 }
 
-Timer EpollReactor::doSetTimer(Time expiry, Duration interval, Priority priority,
-                               const EventHandlerPtr& handler)
+Timer EpollReactor::doTimer(Time expiry, Duration interval, Priority priority,
+                            const EventHandlerPtr& handler)
 {
     return tqs_[static_cast<size_t>(priority)].insert(expiry, interval, handler);
 }
 
-Timer EpollReactor::doSetTimer(Time expiry, Priority priority, const EventHandlerPtr& handler)
+Timer EpollReactor::doTimer(Time expiry, Priority priority, const EventHandlerPtr& handler)
 {
     return tqs_[static_cast<size_t>(priority)].insert(expiry, handler);
 }
 
-int EpollReactor::doPoll(chrono::milliseconds timeout)
+int EpollReactor::doPoll(Time now, chrono::milliseconds timeout)
 {
     enum { High = 0, Low = 1 };
     using namespace chrono;
 
-    auto now = UnixClock::now();
     for (const auto& tq : tqs_) {
         if (!tq.empty()) {
             // Millis until next expiry.

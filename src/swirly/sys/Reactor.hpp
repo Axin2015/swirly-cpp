@@ -75,21 +75,25 @@ class SWIRLY_API Reactor {
     }
     void unsubscribe(int fd) noexcept { doUnsubscribe(fd); }
     void setEvents(int fd, unsigned events) { doSetEvents(fd, events); }
-    Timer setTimer(Time expiry, Duration interval, Priority priority,
-                   const EventHandlerPtr& handler)
+    Timer timer(Time expiry, Duration interval, Priority priority, const EventHandlerPtr& handler)
     {
-        return doSetTimer(expiry, interval, priority, handler);
+        return doTimer(expiry, interval, priority, handler);
     }
-    Timer setTimer(Time expiry, Priority priority, const EventHandlerPtr& handler)
+    Timer timer(Time expiry, Priority priority, const EventHandlerPtr& handler)
     {
-        return doSetTimer(expiry, priority, handler);
+        return doTimer(expiry, priority, handler);
     }
     int poll(std::chrono::milliseconds timeout = std::chrono::milliseconds::max())
     {
-        return doPoll(timeout);
+        return doPoll(UnixClock::now(), timeout);
     }
 
   protected:
+    /**
+     * Overload for unit-testing.
+     */
+    int poll(Time now, Millis timeout) { return doPoll(now, timeout); }
+
     /**
      * Thread-safe.
      */
@@ -105,12 +109,12 @@ class SWIRLY_API Reactor {
 
     virtual void doSetEvents(int fd, unsigned events) = 0;
 
-    virtual Timer doSetTimer(Time expiry, Duration interval, Priority priority,
-                             const EventHandlerPtr& handler)
+    virtual Timer doTimer(Time expiry, Duration interval, Priority priority,
+                          const EventHandlerPtr& handler)
         = 0;
-    virtual Timer doSetTimer(Time expiry, Priority priority, const EventHandlerPtr& handler) = 0;
+    virtual Timer doTimer(Time expiry, Priority priority, const EventHandlerPtr& handler) = 0;
 
-    virtual int doPoll(std::chrono::milliseconds timeout) = 0;
+    virtual int doPoll(Time now, std::chrono::milliseconds timeout) = 0;
 };
 
 inline void SubPolicy::close(Id id) noexcept
@@ -149,11 +153,11 @@ class SWIRLY_API EpollReactor : public Reactor {
 
     void doSetEvents(int fd, unsigned events) override;
 
-    Timer doSetTimer(Time expiry, Duration interval, Priority priority,
-                     const EventHandlerPtr& handler) override;
-    Timer doSetTimer(Time expiry, Priority priority, const EventHandlerPtr& handler) override;
+    Timer doTimer(Time expiry, Duration interval, Priority priority,
+                  const EventHandlerPtr& handler) override;
+    Timer doTimer(Time expiry, Priority priority, const EventHandlerPtr& handler) override;
 
-    int doPoll(std::chrono::milliseconds timeout) override;
+    int doPoll(Time now, std::chrono::milliseconds timeout) override;
 
   private:
     int dispatch(Event* buf, int size, Time now);
