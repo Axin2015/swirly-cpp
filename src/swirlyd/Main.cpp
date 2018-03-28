@@ -310,7 +310,7 @@ int main(int argc, char* argv[])
             SWIRLY_NOTICE("stopped reactor thread"sv);
         };
         auto worker = thread{fn, ref(reactor)};
-        auto finally = makeFinally([&]() {
+        auto finally = makeFinally([&]() noexcept {
             reactor.close();
             worker.join();
             SWIRLY_NOTICE("stopped http server"sv);

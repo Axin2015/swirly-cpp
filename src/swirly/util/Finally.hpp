@@ -24,6 +24,8 @@ inline namespace util {
 
 template <typename FnT>
 class Finally {
+    static_assert(std::is_nothrow_invocable_v<FnT>);
+
   public:
     explicit Finally(FnT fn) noexcept
     : fn_{std::move(fn)}

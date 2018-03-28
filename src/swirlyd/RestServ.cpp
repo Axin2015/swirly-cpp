@@ -95,7 +95,7 @@ RestServ::~RestServ() noexcept = default;
 void RestServ::handleRequest(const HttpRequest& req, HttpResponse& resp) noexcept
 {
     TimeRecorder tr{profile_};
-    auto finally = makeFinally([this]() {
+    auto finally = makeFinally([this]() noexcept {
         if (this->profile_.size() % 10 == 0) {
             this->profile_.report();
         }
