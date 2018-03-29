@@ -54,11 +54,11 @@ constexpr auto operator""_jd(unsigned long long val) noexcept
 /**
  * Gregorian to ISO8601 date.
  */
-inline auto ymdToIso(int year, int mon, int mday) noexcept
+constexpr auto ymdToIso(int year, int mon, int mday) noexcept
 {
-    assert(mon <= 11);
-    assert(mday <= 31);
-    return IsoDate{year * 10000 + (mon + 1) * 100 + mday};
+    assert(mon > 0 && mon <= 12);
+    assert(mday > 0 && mday <= 31);
+    return IsoDate{year * 10000 + mon * 100 + mday};
 }
 
 /**
@@ -71,7 +71,7 @@ constexpr auto ymdToJd(int year, int mon, int mday) noexcept
     // See http://aa.usno.navy.mil/faq/docs/JD_Formula.php.
 
     const auto i = year;
-    const auto j = mon + 1;
+    const auto j = mon;
     const auto k = mday;
     return JDay{k - 32075 + 1461 * (i + 4800 + (j - 14) / 12) / 4
                 + 367 * (j - 2 - (j - 14) / 12 * 12) / 12
@@ -85,7 +85,7 @@ constexpr auto isoToJd(IsoDate iso) noexcept
 {
     const auto n = iso.count();
     const auto year = n / 10000;
-    const auto mon = (n / 100 % 100) - 1;
+    const auto mon = (n / 100 % 100);
     const auto mday = n % 100;
     return ymdToJd(year, mon, mday);
 }
@@ -138,7 +138,7 @@ constexpr std::int32_t jdToTjd(JDay jd) noexcept
 }
 
 /**
- * Truncated Julian day to Gregorian date. Epoch is May 24, 1968.
+ * Truncated Julian day to Julian day. Epoch is May 24, 1968.
  */
 constexpr JDay tjdToJd(std::int32_t tjd) noexcept
 {
@@ -173,12 +173,12 @@ constexpr JDay maybeIsoToJd(IsoDate iso) noexcept
     return iso != 0_ymd ? isoToJd(iso) : 0_jd;
 }
 
-inline bool isWeekDay(JDay jday) noexcept
+constexpr bool isWeekDay(JDay jday) noexcept
 {
     return (jday.count() % 7) < 5;
 }
 
-inline bool isWeekEndDay(JDay jday) noexcept
+constexpr bool isWeekEndDay(JDay jday) noexcept
 {
     return !isWeekDay(jday);
 }

@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_SUITE(PosnSuite)
 
 BOOST_AUTO_TEST_CASE(AccntPosnSetCase)
 {
-    constexpr auto SettlDay = ymdToJd(2014, 2, 14);
+    constexpr auto SettlDay = ymdToJd(2014, 3, 14);
     constexpr auto MarketId = toMarketId(1_id32, SettlDay);
 
     AccntPosnSet s;
