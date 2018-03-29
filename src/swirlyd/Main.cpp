@@ -34,6 +34,7 @@
 #include <swirly/util/Log.hpp>
 
 #include <swirly/sys/Daemon.hpp>
+#include <swirly/sys/EpollReactor.hpp>
 #include <swirly/sys/File.hpp>
 #include <swirly/sys/MemCtx.hpp>
 #include <swirly/sys/PidFile.hpp>

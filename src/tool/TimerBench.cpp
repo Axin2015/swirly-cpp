@@ -16,7 +16,7 @@
  */
 #include <swirly/util/Log.hpp>
 
-#include <swirly/sys/Reactor.hpp>
+#include <swirly/sys/EpollReactor.hpp>
 
 #include <iostream>
 #include <queue>

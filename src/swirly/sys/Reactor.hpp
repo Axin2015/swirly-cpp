@@ -19,7 +19,6 @@
 
 #include <swirly/sys/EventHandler.hpp>
 #include <swirly/sys/Handle.hpp>
-#include <swirly/sys/Muxer.hpp>
 #include <swirly/sys/Timer.hpp>
 
 namespace swirly {
@@ -121,60 +120,6 @@ inline void SubPolicy::close(Id id) noexcept
 {
     id.reactor->unsubscribe(id.value);
 }
-
-class SWIRLY_API EpollReactor : public Reactor {
-  public:
-    using Event = typename EpollMuxer::Event;
-
-    explicit EpollReactor(std::size_t sizeHint = 1024);
-    ~EpollReactor() noexcept override;
-
-    // Copy.
-    EpollReactor(const EpollReactor&) = delete;
-    EpollReactor& operator=(const EpollReactor&) = delete;
-
-    // Move.
-    EpollReactor(EpollReactor&&) = delete;
-    EpollReactor& operator=(EpollReactor&&) = delete;
-
-  protected:
-    /**
-     * Thread-safe.
-     */
-    bool doClosed() const noexcept override;
-
-    /**
-     * Thread-safe.
-     */
-    void doClose() noexcept override;
-
-    SubHandle doSubscribe(int fd, unsigned events, const EventHandlerPtr& handler) override;
-    void doUnsubscribe(int fd) noexcept override;
-
-    void doSetEvents(int fd, unsigned events) override;
-
-    Timer doTimer(Time expiry, Duration interval, Priority priority,
-                  const EventHandlerPtr& handler) override;
-    Timer doTimer(Time expiry, Priority priority, const EventHandlerPtr& handler) override;
-
-    int doPoll(Time now, std::chrono::milliseconds timeout) override;
-
-  private:
-    int dispatch(Event* buf, int size, Time now);
-
-    struct Data {
-        int sid{};
-        unsigned events{};
-        EventHandlerPtr handler;
-    };
-    EpollMuxer mux_;
-    std::vector<Data> data_;
-    EventFd efd_;
-    static_assert(static_cast<int>(Priority::High) == 0);
-    static_assert(static_cast<int>(Priority::Low) == 1);
-    std::array<TimerQueue, 2> tqs_;
-    std::atomic<bool> closed_{false};
-};
 
 } // namespace sys
 } // namespace swirly
