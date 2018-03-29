@@ -19,7 +19,7 @@
 namespace swirly {
 inline namespace sys {
 
-Reactor::~Reactor() noexcept = default;
+Reactor::~Reactor() = default;
 
 } // namespace sys
 } // namespace swirly

@@ -39,7 +39,7 @@ class StringBuf {
     StringBuf(std::string_view rhs) noexcept { assign(rhs.data(), rhs.size()); }
     constexpr StringBuf() noexcept = default;
 
-    ~StringBuf() noexcept = default;
+    ~StringBuf() = default;
 
     // Copy.
     StringBuf(const StringBuf& rhs) noexcept { assign(rhs.data(), rhs.size()); }

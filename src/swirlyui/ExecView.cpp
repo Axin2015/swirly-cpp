@@ -57,7 +57,7 @@ ExecView::ExecView(ExecModel& model, QWidget* parent, Qt::WindowFlags f)
     setLayout(layout.release());
 }
 
-ExecView::~ExecView() noexcept = default;
+ExecView::~ExecView() = default;
 
 void ExecView::slotClicked(const QModelIndex& index)
 {

@@ -40,7 +40,7 @@ EpollReactor::EpollReactor(size_t sizeHint)
     ref.handler = {};
 }
 
-EpollReactor::~EpollReactor() noexcept
+EpollReactor::~EpollReactor()
 {
     mux_.unsubscribe(efd_.fd());
 }

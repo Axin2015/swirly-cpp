@@ -62,7 +62,7 @@ class SWIRLY_API Config {
     explicit Config(std::istream& is) { read(is); }
 
     Config();
-    ~Config() noexcept;
+    ~Config();
 
     // Copy.
     Config(const Config&);

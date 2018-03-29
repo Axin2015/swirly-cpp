@@ -27,7 +27,7 @@ class MarketModel
 : public TableModel<Id64, Market, unbox(market::Column::CheckState), market::ColumnCount> {
   public:
     MarketModel(QObject* parent = nullptr);
-    ~MarketModel() noexcept override;
+    ~MarketModel() override;
 
     QVariant data(const QModelIndex& index, int role) const override;
 

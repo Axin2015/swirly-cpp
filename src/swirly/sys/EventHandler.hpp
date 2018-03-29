@@ -33,7 +33,7 @@ class SWIRLY_API EventHandler : public RefCount<EventHandler, ThreadUnsafePolicy
     : reactor_(r)
     {
     }
-    virtual ~EventHandler() noexcept;
+    virtual ~EventHandler();
 
     // Copy.
     EventHandler(const EventHandler&) noexcept = delete;

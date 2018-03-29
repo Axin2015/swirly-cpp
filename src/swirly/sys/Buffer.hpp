@@ -34,7 +34,7 @@ class SWIRLY_API Buffer {
   public:
     explicit Buffer(std::size_t capacity) { buf_.reserve(capacity); }
     Buffer() = default;
-    ~Buffer() noexcept = default;
+    ~Buffer() = default;
 
     // Copy.
     Buffer(const Buffer& rhs) = default;

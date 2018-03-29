@@ -54,7 +54,7 @@ class SWIRLY_API Exec
     , cpty_{cpty}
     {
     }
-    ~Exec() noexcept;
+    ~Exec();
 
     // Copy.
     Exec(const Exec&) = delete;

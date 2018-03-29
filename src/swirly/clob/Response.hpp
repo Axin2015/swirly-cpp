@@ -30,7 +30,7 @@ class SWIRLY_API Response {
     using Execs = std::vector<ConstExecPtr>;
 
     Response() noexcept;
-    ~Response() noexcept;
+    ~Response();
 
     // Copy.
     Response(const Response&);

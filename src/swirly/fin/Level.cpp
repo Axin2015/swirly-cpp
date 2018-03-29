@@ -33,7 +33,7 @@ Level::Level(const Order& firstOrder) noexcept
 {
 }
 
-Level::~Level() noexcept = default;
+Level::~Level() = default;
 
 Level::Level(Level&&) = default;
 
@@ -49,7 +49,7 @@ void Level::subOrder(const Order& order) noexcept
     --count_;
 }
 
-LevelSet::~LevelSet() noexcept
+LevelSet::~LevelSet()
 {
     set_.clear_and_dispose([](Level* ptr) { delete ptr; });
 }

@@ -189,7 +189,7 @@ class ScopedBind {
     : stmt_{stmt}
     {
     }
-    ~ScopedBind() noexcept { sqlite3_clear_bindings(&stmt_); }
+    ~ScopedBind() { sqlite3_clear_bindings(&stmt_); }
     // Copy.
     ScopedBind(const ScopedBind&) = delete;
     ScopedBind& operator=(const ScopedBind&) = delete;
@@ -221,7 +221,7 @@ class ScopedStep {
     : stmt_{stmt}
     {
     }
-    ~ScopedStep() noexcept { sqlite3_reset(&stmt_); }
+    ~ScopedStep() { sqlite3_reset(&stmt_); }
     // Copy.
     ScopedStep(const ScopedStep&) = delete;
     ScopedStep& operator=(const ScopedStep&) = delete;

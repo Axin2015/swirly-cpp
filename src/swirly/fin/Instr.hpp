@@ -33,7 +33,7 @@ class SWIRLY_API Instr : public Comparable<Instr> {
           int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
           Lots maxLots) noexcept;
 
-    ~Instr() noexcept;
+    ~Instr();
 
     // Copy.
     Instr(const Instr&);

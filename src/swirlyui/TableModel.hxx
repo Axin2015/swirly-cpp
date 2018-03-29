@@ -36,7 +36,7 @@ class TableModel : public QAbstractTableModel {
     : QAbstractTableModel{parent}
     {
     }
-    ~TableModel() noexcept override = default;
+    ~TableModel() override = default;
 
     int rowCount(const QModelIndex& parent) const override { return rows_.size(); }
     int columnCount(const QModelIndex& parent) const override { return ColumnCountN; }

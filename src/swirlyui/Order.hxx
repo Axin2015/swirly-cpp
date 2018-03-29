@@ -55,7 +55,7 @@ class Order {
           Lots execLots, Cost execCost, Lots lastLots, Ticks lastTicks, Lots minLots,
           const QDateTime& created, const QDateTime& modified);
     Order() = default;
-    ~Order() noexcept = default;
+    ~Order() = default;
 
     static Order fromJson(const Instr& instr, const QJsonObject& obj);
 

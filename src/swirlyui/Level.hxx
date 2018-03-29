@@ -35,7 +35,7 @@ class Level {
     {
     }
     Level() = default;
-    ~Level() noexcept = default;
+    ~Level() = default;
 
     static Level fromJson(const QJsonObject& obj);
 

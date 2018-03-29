@@ -35,7 +35,7 @@ class SWIRLY_API SqlJourn
 
   public:
     explicit SqlJourn(const Config& config);
-    ~SqlJourn() noexcept override;
+    ~SqlJourn() override;
 
     // Copy.
     SqlJourn(const SqlJourn&) = delete;

@@ -19,7 +19,7 @@
 namespace swirly {
 inline namespace web {
 
-HttpRequest::~HttpRequest() noexcept = default;
+HttpRequest::~HttpRequest() = default;
 
 } // namespace web
 } // namespace swirly

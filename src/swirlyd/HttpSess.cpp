@@ -42,7 +42,7 @@ HttpSess::HttpSess(Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, RestServ&
     tmr_ = r.timer(now + IdleTimeout, Priority::Low, eh);
 }
 
-HttpSess::~HttpSess() noexcept = default;
+HttpSess::~HttpSess() = default;
 
 void HttpSess::doClose() noexcept
 {

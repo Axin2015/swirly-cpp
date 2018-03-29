@@ -33,7 +33,7 @@ class MultiPart {
     , window_{total}
     {
     }
-    ~MultiPart() noexcept
+    ~MultiPart()
     {
         if (!done()) {
             try {
@@ -85,7 +85,7 @@ AsyncJourn::AsyncJourn(Journ& journ, size_t pipeCapacity)
 {
 }
 
-AsyncJourn::~AsyncJourn() noexcept
+AsyncJourn::~AsyncJourn()
 {
     try {
         pipe_.close();

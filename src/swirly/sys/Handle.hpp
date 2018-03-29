@@ -35,7 +35,7 @@ class BasicHandle {
     : id_{id}
     {
     }
-    ~BasicHandle() noexcept
+    ~BasicHandle()
     {
         if (id_ != invalid()) {
             PolicyT::close(id_);

@@ -48,7 +48,7 @@ Instr::Instr(Id32 id, Symbol symbol, string_view display, Symbol baseAsset, Symb
 {
 }
 
-Instr::~Instr() noexcept = default;
+Instr::~Instr() = default;
 
 Instr::Instr(const Instr&) = default;
 

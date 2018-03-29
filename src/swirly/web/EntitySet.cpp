@@ -54,7 +54,7 @@ int bit(string_view sv)
 
 } // namespace
 
-EntitySet::~EntitySet() noexcept = default;
+EntitySet::~EntitySet() = default;
 
 EntitySet EntitySet::parse(string_view sv)
 {

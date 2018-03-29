@@ -33,7 +33,7 @@ class RingBuffer {
     , buf_{new ValueT[capacity_]}
     {
     }
-    ~RingBuffer() noexcept = default;
+    ~RingBuffer() = default;
 
     // Copy.
     RingBuffer(const RingBuffer& rhs) = delete;

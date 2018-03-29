@@ -65,7 +65,7 @@ class SWIRLY_API Request {
     auto created() const noexcept { return created_; }
 
   protected:
-    ~Request() noexcept;
+    ~Request();
 
     /**
      * The executing accnt.
@@ -138,7 +138,7 @@ class RequestIdSet {
 
     RequestIdSet() = default;
 
-    ~RequestIdSet() noexcept
+    ~RequestIdSet()
     {
         set_.clear_and_dispose([](const RequestT* ptr) { ptr->release(); });
     }

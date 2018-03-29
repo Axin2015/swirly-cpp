@@ -63,7 +63,7 @@ SqlJourn::SqlJourn(const Config& config)
 {
 }
 
-SqlJourn::~SqlJourn() noexcept = default;
+SqlJourn::~SqlJourn() = default;
 
 SqlJourn::SqlJourn(SqlJourn&&) = default;
 

@@ -49,7 +49,7 @@ HttpClient::HttpClient(QObject* parent)
     startTimer(2000);
 }
 
-HttpClient::~HttpClient() noexcept = default;
+HttpClient::~HttpClient() = default;
 
 void HttpClient::timerEvent(QTimerEvent* event)
 {

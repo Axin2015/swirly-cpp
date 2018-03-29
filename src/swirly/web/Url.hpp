@@ -74,7 +74,7 @@ class BasicUrl {
     }
 
   protected:
-    ~BasicUrl() noexcept = default;
+    ~BasicUrl() = default;
 
     void reset() noexcept { http_parser_url_init(&parser_); }
     void parse(bool isConnect = false)

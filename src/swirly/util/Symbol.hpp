@@ -59,7 +59,7 @@ class Symbol {
     : u64_{0, 0}
     {
     }
-    ~Symbol() noexcept = default;
+    ~Symbol() = default;
 
     // Copy.
     constexpr Symbol(const Symbol& rhs) noexcept

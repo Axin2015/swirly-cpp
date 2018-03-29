@@ -69,7 +69,7 @@ class EpollMuxer {
     : md_{os::epoll_create(sizeHint)}
     {
     }
-    ~EpollMuxer() noexcept
+    ~EpollMuxer()
     {
         if (md_ != -1) {
             ::close(md_);

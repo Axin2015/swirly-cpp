@@ -29,7 +29,7 @@ class HttpClient : public Client {
 
   public:
     HttpClient(QObject* parent = nullptr);
-    ~HttpClient() noexcept override;
+    ~HttpClient() override;
 
     void createMarket(const Instr& instr, QDate settlDate) override;
 

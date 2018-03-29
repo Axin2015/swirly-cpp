@@ -29,7 +29,7 @@ class Tokeniser {
   public:
     Tokeniser(std::string_view buf, std::string_view seps) noexcept { reset(buf, seps); }
     Tokeniser() noexcept { reset(""sv, ""sv); }
-    ~Tokeniser() noexcept = default;
+    ~Tokeniser() = default;
 
     // Copy.
     Tokeniser(const Tokeniser& rhs) noexcept = default;

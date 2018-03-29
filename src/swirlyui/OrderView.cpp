@@ -61,7 +61,7 @@ OrderView::OrderView(OrderModel& model, QWidget* parent, Qt::WindowFlags f)
     setLayout(layout.release());
 }
 
-OrderView::~OrderView() noexcept = default;
+OrderView::~OrderView() = default;
 
 void OrderView::slotClicked(const QModelIndex& index)
 {

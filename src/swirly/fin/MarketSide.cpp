@@ -20,7 +20,7 @@ namespace swirly {
 inline namespace fin {
 using namespace std;
 
-MarketSide::~MarketSide() noexcept = default;
+MarketSide::~MarketSide() = default;
 
 MarketSide::MarketSide(MarketSide&&) = default;
 

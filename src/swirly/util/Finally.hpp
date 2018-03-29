@@ -31,7 +31,7 @@ class Finally {
     : fn_{std::move(fn)}
     {
     }
-    ~Finally() noexcept { fn_(); }
+    ~Finally() { fn_(); }
     // Copy.
     Finally(const Finally&) = delete;
     Finally& operator=(const Finally&) = delete;

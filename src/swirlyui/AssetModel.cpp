@@ -30,7 +30,7 @@ AssetModel::AssetModel(QObject* parent)
     header_[unbox(Column::Type)] = tr("Type");
 }
 
-AssetModel::~AssetModel() noexcept = default;
+AssetModel::~AssetModel() = default;
 
 QVariant AssetModel::data(const QModelIndex& index, int role) const
 {

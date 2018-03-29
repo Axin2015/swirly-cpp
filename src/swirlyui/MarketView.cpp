@@ -65,7 +65,7 @@ MarketView::MarketView(InstrModel& instrModel, MarketModel& model, QWidget* pare
     setLayout(layout.release());
 }
 
-MarketView::~MarketView() noexcept = default;
+MarketView::~MarketView() = default;
 
 void MarketView::setFields(const QString& instrSymbol, QDate settlDate, optional<Lots> lots,
                            optional<Ticks> ticks)

@@ -42,7 +42,7 @@ class ScopedIds {
             toks.pop();
         }
     }
-    ~ScopedIds() noexcept { ids_.clear(); }
+    ~ScopedIds() { ids_.clear(); }
 
   private:
     vector<Id64>& ids_;
@@ -90,7 +90,7 @@ string_view getTrader(const HttpRequest& req)
 
 } // namespace
 
-RestServ::~RestServ() noexcept = default;
+RestServ::~RestServ() = default;
 
 void RestServ::handleRequest(const HttpRequest& req, HttpResponse& resp) noexcept
 {

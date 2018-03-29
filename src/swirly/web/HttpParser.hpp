@@ -105,7 +105,7 @@ class BasicHttpParser {
     void pause() noexcept { http_parser_pause(&parser_, 1); }
 
   protected:
-    ~BasicHttpParser() noexcept = default;
+    ~BasicHttpParser() = default;
 
     void reset() noexcept
     {

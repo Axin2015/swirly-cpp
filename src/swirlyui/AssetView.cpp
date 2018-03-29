@@ -54,7 +54,7 @@ AssetView::AssetView(AssetModel& model, QWidget* parent, Qt::WindowFlags f)
     setLayout(layout.release());
 }
 
-AssetView::~AssetView() noexcept = default;
+AssetView::~AssetView() = default;
 
 void AssetView::resizeColumnsToContents()
 {

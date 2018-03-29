@@ -33,7 +33,7 @@ namespace ui {
 class ExecModel : public QAbstractTableModel {
   public:
     ExecModel(QObject* parent = nullptr);
-    ~ExecModel() noexcept override;
+    ~ExecModel() override;
 
     int rowCount(const QModelIndex& parent) const override;
 

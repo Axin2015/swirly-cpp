@@ -51,7 +51,7 @@ struct SWIRLY_PACKED IntWrapper : IntBase {
     }
 
     constexpr IntWrapper() noexcept = default;
-    ~IntWrapper() noexcept = default;
+    ~IntWrapper() = default;
 
     // Copy.
     constexpr IntWrapper(const IntWrapper&) noexcept = default;

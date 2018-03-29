@@ -39,7 +39,7 @@ class MarketForm : public QWidget {
   public:
     MarketForm(InstrModel& instrModel, QWidget* parent = nullptr,
                Qt::WindowFlags f = Qt::WindowFlags{});
-    ~MarketForm() noexcept override;
+    ~MarketForm() override;
 
     void setFields(const QString& instrSymbol, QDate settlDate, std::optional<Lots> lots,
                    std::optional<Ticks> ticks);

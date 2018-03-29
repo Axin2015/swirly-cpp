@@ -58,7 +58,7 @@ struct BasicMsgHandler {
     }
 
   protected:
-    ~BasicMsgHandler() noexcept = default;
+    ~BasicMsgHandler() = default;
 };
 
 } // namespace fin

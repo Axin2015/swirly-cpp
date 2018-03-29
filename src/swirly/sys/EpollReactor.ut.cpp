@@ -41,7 +41,7 @@ struct TestHandler : EventHandler {
     }
 
     TestHandler() noexcept = default;
-    ~TestHandler() noexcept override
+    ~TestHandler() override
     {
         if (cntrs_) {
             ++cntrs_->dtor;

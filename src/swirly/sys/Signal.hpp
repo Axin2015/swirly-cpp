@@ -27,7 +27,7 @@ inline namespace sys {
 class SWIRLY_API SigWait {
   public:
     SigWait();
-    ~SigWait() noexcept;
+    ~SigWait();
 
     // Copy.
     SigWait(const SigWait&) = delete;

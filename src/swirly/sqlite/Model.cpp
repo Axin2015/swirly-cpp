@@ -71,7 +71,7 @@ SqlModel::SqlModel(const Config& config)
 {
 }
 
-SqlModel::~SqlModel() noexcept = default;
+SqlModel::~SqlModel() = default;
 
 SqlModel::SqlModel(SqlModel&&) = default;
 

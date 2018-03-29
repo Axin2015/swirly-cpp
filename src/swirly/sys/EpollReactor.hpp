@@ -29,7 +29,7 @@ class SWIRLY_API EpollReactor : public Reactor {
     using Event = typename EpollMuxer::Event;
 
     explicit EpollReactor(std::size_t sizeHint = 1024);
-    ~EpollReactor() noexcept override;
+    ~EpollReactor() override;
 
     // Copy.
     EpollReactor(const EpollReactor&) = delete;

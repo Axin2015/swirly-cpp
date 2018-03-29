@@ -27,7 +27,7 @@ HttpServ::HttpServ(Reactor& r, const Endpoint& ep, RestServ& rs)
 {
 }
 
-HttpServ::~HttpServ() noexcept = default;
+HttpServ::~HttpServ() = default;
 
 void HttpServ::doClose() noexcept {}
 

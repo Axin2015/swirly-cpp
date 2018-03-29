@@ -85,7 +85,7 @@ class MemQueue {
             throw std::runtime_error{"capacity not a power of two"};
         }
     }
-    ~MemQueue() noexcept = default;
+    ~MemQueue() = default;
 
     // Copy.
     MemQueue(const MemQueue& rhs) = delete;

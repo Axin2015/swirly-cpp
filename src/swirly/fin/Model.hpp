@@ -36,7 +36,7 @@ using ModelCallback = std::function<void(ValueT)>;
 class SWIRLY_API Model {
   public:
     Model() noexcept = default;
-    virtual ~Model() noexcept;
+    virtual ~Model();
 
     // Copy.
     constexpr Model(const Model&) noexcept = default;

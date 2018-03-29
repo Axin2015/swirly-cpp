@@ -48,7 +48,7 @@ TradeModel::TradeModel(QObject* parent)
     header_[unbox(Column::Created)] = tr("Created");
 }
 
-TradeModel::~TradeModel() noexcept = default;
+TradeModel::~TradeModel() = default;
 
 QVariant TradeModel::data(const QModelIndex& index, int role) const
 {

@@ -59,7 +59,7 @@ class Instr {
     {
     }
     Instr() = default;
-    ~Instr() noexcept = default;
+    ~Instr() = default;
 
     static Instr fromJson(const QJsonObject& obj);
 
@@ -85,7 +85,7 @@ class Instr {
              const QString& termCcy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
              int pipDp, Lots minLots, Lots maxLots);
         Impl() = default;
-        ~Impl() noexcept = default;
+        ~Impl() = default;
         QString symbol{};
         QString display{};
         QString baseAsset{};

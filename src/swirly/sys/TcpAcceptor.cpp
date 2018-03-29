@@ -30,7 +30,7 @@ TcpAcceptor::TcpAcceptor(Reactor& r, const Endpoint& ep)
     sub_ = r.subscribe(*serv_, EventIn, self());
 }
 
-TcpAcceptor::~TcpAcceptor() noexcept = default;
+TcpAcceptor::~TcpAcceptor() = default;
 
 void TcpAcceptor::doReady(int fd, unsigned events, Time now)
 {

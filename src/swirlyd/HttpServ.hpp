@@ -26,7 +26,7 @@ class RestServ;
 class SWIRLY_API HttpServ : public TcpAcceptor {
   public:
     HttpServ(Reactor& r, const Endpoint& ep, RestServ& rs);
-    ~HttpServ() noexcept override;
+    ~HttpServ() override;
 
     // Copy.
     HttpServ(const HttpServ&) = delete;

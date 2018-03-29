@@ -37,7 +37,7 @@ class SWIRLY_API Asset : public Comparable<Asset> {
     {
     }
 
-    ~Asset() noexcept;
+    ~Asset();
 
     // Copy.
     Asset(const Asset&);

@@ -32,7 +32,7 @@ class SWIRLY_API Exception : public std::exception {
   public:
     explicit Exception(std::string_view what) noexcept;
 
-    ~Exception() noexcept override;
+    ~Exception() override;
 
     // Copy.
     Exception(const Exception& rhs) noexcept { *this = rhs; }

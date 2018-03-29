@@ -44,7 +44,7 @@ class SWIRLY_API Market
     , maxId_{maxId}
     {
     }
-    ~Market() noexcept;
+    ~Market();
 
     // Copy.
     Market(const Market&) = delete;

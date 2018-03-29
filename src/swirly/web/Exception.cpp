@@ -19,7 +19,7 @@
 namespace swirly {
 inline namespace web {
 
-ParseException::~ParseException() noexcept = default;
+ParseException::~ParseException() = default;
 
 } // namespace web
 } // namespace swirly

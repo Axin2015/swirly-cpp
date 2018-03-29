@@ -52,7 +52,7 @@ class SWIRLY_API Level
   public:
     explicit Level(const Order& firstOrder) noexcept;
 
-    ~Level() noexcept;
+    ~Level();
 
     // Copy.
     Level(const Level&) = delete;
@@ -114,7 +114,7 @@ class SWIRLY_API LevelSet {
     using ConstIterator = typename Set::const_iterator;
 
     LevelSet() = default;
-    ~LevelSet() noexcept;
+    ~LevelSet();
 
     // Copy.
     LevelSet(const LevelSet&) = delete;

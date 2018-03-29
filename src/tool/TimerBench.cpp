@@ -31,7 +31,7 @@ struct TimerHandler : EventHandler {
 
     using EventHandler::EventHandler;
 
-    ~TimerHandler() noexcept override = default;
+    ~TimerHandler() override = default;
 
     void doClose() noexcept override {}
     void doTimer(Timer& tmr, Time now) override {}

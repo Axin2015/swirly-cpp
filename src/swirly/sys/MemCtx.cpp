@@ -136,7 +136,7 @@ MemCtx::MemCtx(const char* path, size_t maxSize)
 
 MemCtx::MemCtx() = default;
 
-MemCtx::~MemCtx() noexcept = default;
+MemCtx::~MemCtx() = default;
 
 // Move.
 MemCtx::MemCtx(MemCtx&&) noexcept = default;

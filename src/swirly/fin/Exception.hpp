@@ -30,7 +30,7 @@ class SWIRLY_API ServException : public Exception {
     : Exception{what}
     {
     }
-    ~ServException() noexcept override;
+    ~ServException() override;
 
     // Copy.
     ServException(const ServException&) noexcept = default;
@@ -65,7 +65,7 @@ class SWIRLY_API BadRequestException : public ServException {
     : ServException{what}
     {
     }
-    ~BadRequestException() noexcept override;
+    ~BadRequestException() override;
 
     // Copy.
     BadRequestException(const BadRequestException&) noexcept = default;
@@ -86,7 +86,7 @@ class SWIRLY_API AlreadyExistsException : public BadRequestException {
     : BadRequestException{what}
     {
     }
-    ~AlreadyExistsException() noexcept override;
+    ~AlreadyExistsException() override;
 
     // Copy.
     AlreadyExistsException(const AlreadyExistsException&) noexcept = default;
@@ -105,7 +105,7 @@ class SWIRLY_API RefAlreadyExistsException : public AlreadyExistsException {
     }
     RefAlreadyExistsException() noexcept = default;
 
-    ~RefAlreadyExistsException() noexcept override;
+    ~RefAlreadyExistsException() override;
 
     // Copy.
     RefAlreadyExistsException(const RefAlreadyExistsException&) noexcept = default;
@@ -122,7 +122,7 @@ class SWIRLY_API InvalidException : public BadRequestException {
     : BadRequestException{what}
     {
     }
-    ~InvalidException() noexcept override;
+    ~InvalidException() override;
 
     // Copy.
     InvalidException(const InvalidException&) noexcept = default;
@@ -139,7 +139,7 @@ class SWIRLY_API InvalidLotsException : public InvalidException {
     : InvalidException{what}
     {
     }
-    ~InvalidLotsException() noexcept override;
+    ~InvalidLotsException() override;
 
     // Copy.
     InvalidLotsException(const InvalidLotsException&) noexcept = default;
@@ -156,7 +156,7 @@ class SWIRLY_API InvalidTicksException : public InvalidException {
     : InvalidException{what}
     {
     }
-    ~InvalidTicksException() noexcept override;
+    ~InvalidTicksException() override;
 
     // Copy.
     InvalidTicksException(const InvalidTicksException&) noexcept = default;
@@ -173,7 +173,7 @@ class SWIRLY_API TooLateException : public BadRequestException {
     : BadRequestException{what}
     {
     }
-    ~TooLateException() noexcept override;
+    ~TooLateException() override;
 
     // Copy.
     TooLateException(const TooLateException&) noexcept = default;
@@ -197,7 +197,7 @@ class SWIRLY_API ForbiddenException : public ServException {
     : ServException{what}
     {
     }
-    ~ForbiddenException() noexcept override;
+    ~ForbiddenException() override;
 
     // Copy.
     ForbiddenException(const ForbiddenException&) noexcept = default;
@@ -221,7 +221,7 @@ class SWIRLY_API InternalException : public ServException {
     : ServException{what}
     {
     }
-    ~InternalException() noexcept override;
+    ~InternalException() override;
 
     // Copy.
     InternalException(const InternalException&) noexcept = default;
@@ -247,7 +247,7 @@ class SWIRLY_API MethodNotAllowedException : public ServException {
     : ServException{what}
     {
     }
-    ~MethodNotAllowedException() noexcept override;
+    ~MethodNotAllowedException() override;
 
     // Copy.
     MethodNotAllowedException(const MethodNotAllowedException&) noexcept = default;
@@ -276,7 +276,7 @@ class SWIRLY_API NotFoundException : public ServException {
     : ServException{what}
     {
     }
-    ~NotFoundException() noexcept override;
+    ~NotFoundException() override;
 
     // Copy.
     NotFoundException(const NotFoundException&) noexcept = default;
@@ -297,7 +297,7 @@ class SWIRLY_API MarketClosedException : public NotFoundException {
     : NotFoundException{what}
     {
     }
-    ~MarketClosedException() noexcept override;
+    ~MarketClosedException() override;
 
     // Copy.
     MarketClosedException(const MarketClosedException&) noexcept = default;
@@ -314,7 +314,7 @@ class SWIRLY_API MarketNotFoundException : public NotFoundException {
     : NotFoundException{what}
     {
     }
-    ~MarketNotFoundException() noexcept override;
+    ~MarketNotFoundException() override;
 
     // Copy.
     MarketNotFoundException(const MarketNotFoundException&) noexcept = default;
@@ -331,7 +331,7 @@ class SWIRLY_API OrderNotFoundException : public NotFoundException {
     : NotFoundException{what}
     {
     }
-    ~OrderNotFoundException() noexcept override;
+    ~OrderNotFoundException() override;
 
     // Copy.
     OrderNotFoundException(const OrderNotFoundException&) noexcept = default;
@@ -355,7 +355,7 @@ class SWIRLY_API ServiceUnavailableException : public ServException {
     : ServException{what}
     {
     }
-    ~ServiceUnavailableException() noexcept override;
+    ~ServiceUnavailableException() override;
 
     // Copy.
     ServiceUnavailableException(const ServiceUnavailableException&) noexcept = default;
@@ -387,7 +387,7 @@ class SWIRLY_API UnauthorizedException : public ServException {
     : ServException{what}
     {
     }
-    ~UnauthorizedException() noexcept override;
+    ~UnauthorizedException() override;
 
     // Copy.
     UnauthorizedException(const UnauthorizedException&) noexcept = default;

@@ -32,7 +32,7 @@ using namespace std;
 
 DsvModel::DsvModel() noexcept = default;
 
-DsvModel::~DsvModel() noexcept = default;
+DsvModel::~DsvModel() = default;
 
 void DsvModel::doReadAsset(const ModelCallback<AssetPtr>& cb) const
 {

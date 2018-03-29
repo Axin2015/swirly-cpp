@@ -31,7 +31,7 @@ class SWIRLY_API Rest {
     : serv_{journ, pipeCapacity, maxExecs}
     {
     }
-    ~Rest() noexcept;
+    ~Rest();
 
     // Copy.
     Rest(const Rest&) = delete;

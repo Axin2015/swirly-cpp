@@ -34,7 +34,7 @@ class TradeView : public QWidget {
 
   public:
     TradeView(TradeModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
-    ~TradeView() noexcept override;
+    ~TradeView() override;
 
   signals:
     void setFields(const QString& instrSymbol, QDate settlDate, std::optional<Lots> lots,

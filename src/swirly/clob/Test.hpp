@@ -26,7 +26,7 @@ inline namespace clob {
 class SWIRLY_API TestModel : public Model {
   public:
     TestModel() noexcept;
-    ~TestModel() noexcept override;
+    ~TestModel() override;
 
     // Copy.
     constexpr TestModel(const TestModel&) noexcept;
@@ -55,7 +55,7 @@ class SWIRLY_API TestModel : public Model {
 class SWIRLY_API TestJourn : public Journ {
   public:
     TestJourn() noexcept;
-    ~TestJourn() noexcept override;
+    ~TestJourn() override;
 
     // Copy.
     constexpr TestJourn(const TestJourn&) noexcept;

@@ -48,7 +48,7 @@ OrderForm::OrderForm(OrderModel& orderModel, QWidget* parent, Qt::WindowFlags f)
     setLayout(layout.release());
 }
 
-OrderForm::~OrderForm() noexcept = default;
+OrderForm::~OrderForm() = default;
 
 void OrderForm::slotSelectAllClicked()
 {

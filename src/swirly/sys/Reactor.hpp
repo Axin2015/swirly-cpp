@@ -52,7 +52,7 @@ using SubHandle = BasicHandle<SubPolicy>;
 class SWIRLY_API Reactor {
   public:
     Reactor() noexcept = default;
-    virtual ~Reactor() noexcept;
+    virtual ~Reactor();
 
     // Copy.
     Reactor(const Reactor&) noexcept = delete;

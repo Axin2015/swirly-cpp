@@ -28,7 +28,7 @@ class SqlException : public Exception {
     : Exception{what}
     {
     }
-    ~SqlException() noexcept;
+    ~SqlException();
 
     // Copy.
     SqlException(const SqlException&) noexcept = default;

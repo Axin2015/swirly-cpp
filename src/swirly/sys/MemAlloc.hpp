@@ -34,7 +34,7 @@ struct MemAlloc {
     static void operator delete(void* ptr, std::size_t size) noexcept { return dealloc(ptr, size); }
 
   protected:
-    ~MemAlloc() noexcept = default;
+    ~MemAlloc() = default;
 };
 
 } // namespace sys

@@ -87,7 +87,7 @@ MarketForm::MarketForm(InstrModel& instrModel, QWidget* parent, Qt::WindowFlags 
     setLayout(layout.release());
 }
 
-MarketForm::~MarketForm() noexcept = default;
+MarketForm::~MarketForm() = default;
 
 void MarketForm::setFields(const QString& instrSymbol, QDate settlDate, std::optional<Lots> lots,
                            std::optional<Ticks> ticks)

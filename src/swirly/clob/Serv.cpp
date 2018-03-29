@@ -703,7 +703,7 @@ Serv::Serv(Journ& journ, size_t pipeCapacity, size_t maxExecs)
 {
 }
 
-Serv::~Serv() noexcept = default;
+Serv::~Serv() = default;
 
 Serv::Serv(Serv&&) = default;
 

@@ -38,7 +38,7 @@ InstrModel::InstrModel(QObject* parent)
     header_[unbox(Column::MaxLots)] = tr("Max Lots");
 }
 
-InstrModel::~InstrModel() noexcept = default;
+InstrModel::~InstrModel() = default;
 
 QVariant InstrModel::data(const QModelIndex& index, int role) const
 {

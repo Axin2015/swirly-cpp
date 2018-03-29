@@ -43,7 +43,7 @@ void HttpResponseBuf::setContentLength(std::streamsize pos, std::streamsize len)
     } while (len > 0);
 }
 
-HttpResponseBuf::~HttpResponseBuf() noexcept = default;
+HttpResponseBuf::~HttpResponseBuf() = default;
 
 HttpResponseBuf::int_type HttpResponseBuf::overflow(int_type c) noexcept
 {
@@ -64,7 +64,7 @@ streamsize HttpResponseBuf::xsputn(const char_type* s, streamsize count) noexcep
     return count;
 }
 
-HttpResponse::~HttpResponse() noexcept = default;
+HttpResponse::~HttpResponse() = default;
 
 void HttpResponse::commit() noexcept
 {

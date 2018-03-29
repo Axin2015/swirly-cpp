@@ -54,7 +54,7 @@ InstrView::InstrView(InstrModel& model, QWidget* parent, Qt::WindowFlags f)
     setLayout(layout.release());
 }
 
-InstrView::~InstrView() noexcept = default;
+InstrView::~InstrView() = default;
 
 void InstrView::resizeColumnsToContents()
 {

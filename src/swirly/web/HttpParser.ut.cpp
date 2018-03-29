@@ -47,7 +47,7 @@ class HttpParser
 
   public:
     using BasicHttpParser<HttpParser>::BasicHttpParser;
-    ~HttpParser() noexcept = default;
+    ~HttpParser() = default;
 
     const auto& url() const noexcept { return url_; }
     const auto& status() const noexcept { return status_; }

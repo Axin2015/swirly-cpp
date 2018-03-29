@@ -27,7 +27,7 @@ inline namespace web {
 class SWIRLY_API HttpRequest : public BasicUrl<HttpRequest> {
   public:
     HttpRequest() noexcept = default;
-    ~HttpRequest() noexcept;
+    ~HttpRequest();
 
     // Copy.
     HttpRequest(const HttpRequest&) = delete;

@@ -36,7 +36,7 @@ SigWait::SigWait()
     }
 }
 
-SigWait::~SigWait() noexcept
+SigWait::~SigWait()
 {
     // Restore original signal mask.
     pthread_sigmask(SIG_SETMASK, &oldMask_, nullptr);

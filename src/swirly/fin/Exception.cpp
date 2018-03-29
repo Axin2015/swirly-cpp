@@ -22,7 +22,7 @@ namespace swirly {
 inline namespace fin {
 using namespace std;
 
-ServException::~ServException() noexcept = default;
+ServException::~ServException() = default;
 
 void ServException::toJson(int status, const char* reason, const char* detail, ostream& os)
 {
@@ -32,7 +32,7 @@ void ServException::toJson(int status, const char* reason, const char* detail, o
        << "\"}";
 }
 
-BadRequestException::~BadRequestException() noexcept = default;
+BadRequestException::~BadRequestException() = default;
 
 int BadRequestException::httpStatus() const noexcept
 {
@@ -44,19 +44,19 @@ const char* BadRequestException::httpReason() const noexcept
     return "Bad Request";
 }
 
-AlreadyExistsException::~AlreadyExistsException() noexcept = default;
+AlreadyExistsException::~AlreadyExistsException() = default;
 
-RefAlreadyExistsException::~RefAlreadyExistsException() noexcept = default;
+RefAlreadyExistsException::~RefAlreadyExistsException() = default;
 
-InvalidException::~InvalidException() noexcept = default;
+InvalidException::~InvalidException() = default;
 
-InvalidLotsException::~InvalidLotsException() noexcept = default;
+InvalidLotsException::~InvalidLotsException() = default;
 
-InvalidTicksException::~InvalidTicksException() noexcept = default;
+InvalidTicksException::~InvalidTicksException() = default;
 
-TooLateException::~TooLateException() noexcept = default;
+TooLateException::~TooLateException() = default;
 
-ForbiddenException::~ForbiddenException() noexcept = default;
+ForbiddenException::~ForbiddenException() = default;
 
 int ForbiddenException::httpStatus() const noexcept
 {
@@ -68,7 +68,7 @@ const char* ForbiddenException::httpReason() const noexcept
     return "Forbidden";
 }
 
-InternalException::~InternalException() noexcept = default;
+InternalException::~InternalException() = default;
 
 int InternalException::httpStatus() const noexcept
 {
@@ -80,7 +80,7 @@ const char* InternalException::httpReason() const noexcept
     return "Internal Server Error";
 }
 
-MethodNotAllowedException::~MethodNotAllowedException() noexcept = default;
+MethodNotAllowedException::~MethodNotAllowedException() = default;
 
 int MethodNotAllowedException::httpStatus() const noexcept
 {
@@ -92,7 +92,7 @@ const char* MethodNotAllowedException::httpReason() const noexcept
     return "Method Not Allowed";
 }
 
-NotFoundException::~NotFoundException() noexcept = default;
+NotFoundException::~NotFoundException() = default;
 
 int NotFoundException::httpStatus() const noexcept
 {
@@ -104,13 +104,13 @@ const char* NotFoundException::httpReason() const noexcept
     return "Not Found";
 }
 
-MarketClosedException::~MarketClosedException() noexcept = default;
+MarketClosedException::~MarketClosedException() = default;
 
-MarketNotFoundException::~MarketNotFoundException() noexcept = default;
+MarketNotFoundException::~MarketNotFoundException() = default;
 
-OrderNotFoundException::~OrderNotFoundException() noexcept = default;
+OrderNotFoundException::~OrderNotFoundException() = default;
 
-ServiceUnavailableException::~ServiceUnavailableException() noexcept = default;
+ServiceUnavailableException::~ServiceUnavailableException() = default;
 
 int ServiceUnavailableException::httpStatus() const noexcept
 {
@@ -122,7 +122,7 @@ const char* ServiceUnavailableException::httpReason() const noexcept
     return "Service Unavailable";
 }
 
-UnauthorizedException::~UnauthorizedException() noexcept = default;
+UnauthorizedException::~UnauthorizedException() = default;
 
 int UnauthorizedException::httpStatus() const noexcept
 {

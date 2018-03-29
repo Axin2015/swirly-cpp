@@ -65,7 +65,7 @@ class Comparable {
 
   protected:
     constexpr Comparable() noexcept = default;
-    ~Comparable() noexcept = default;
+    ~Comparable() = default;
 };
 
 template <typename ValueT>

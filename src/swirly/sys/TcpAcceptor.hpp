@@ -31,7 +31,7 @@ class SWIRLY_API TcpAcceptor : public EventHandler {
     using Endpoint = TcpEndpoint;
 
     TcpAcceptor(Reactor& r, const Endpoint& ep);
-    ~TcpAcceptor() noexcept override;
+    ~TcpAcceptor() override;
 
     // Copy.
     TcpAcceptor(const TcpAcceptor&) = delete;

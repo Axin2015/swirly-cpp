@@ -30,7 +30,7 @@ class Foo : public RefCount<Foo, ThreadUnsafePolicy> {
     {
         ++alive;
     }
-    ~Foo() noexcept { --alive_; }
+    ~Foo() { --alive_; }
 
   private:
     int& alive_;

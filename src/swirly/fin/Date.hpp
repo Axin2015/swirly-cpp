@@ -46,7 +46,7 @@ constexpr char MarketZone[]{"MKST+2MKDT,M3.2.0/2,M11.1.0/2"};
 class SWIRLY_API BusinessDay {
   public:
     explicit BusinessDay(const char* timeZone);
-    ~BusinessDay() noexcept;
+    ~BusinessDay();
 
     // Copy.
     BusinessDay(const BusinessDay& rhs) noexcept;

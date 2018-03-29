@@ -28,7 +28,7 @@ inline namespace util {
 class SWIRLY_API VarAccum {
   public:
     constexpr VarAccum() noexcept {};
-    ~VarAccum() noexcept = default;
+    ~VarAccum() = default;
 
     // Copy.
     constexpr VarAccum(const VarAccum& rhs) noexcept = default;

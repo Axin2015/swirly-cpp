@@ -40,7 +40,7 @@ class RestServ {
     , profile_{"profile"sv}
     {
     }
-    ~RestServ() noexcept;
+    ~RestServ();
 
     // Copy.
     RestServ(const RestServ& rhs) = delete;

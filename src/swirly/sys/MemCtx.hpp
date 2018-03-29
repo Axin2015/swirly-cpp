@@ -38,7 +38,7 @@ class SWIRLY_API MemCtx {
     MemCtx(const char* path, std::size_t maxSize);
 
     MemCtx();
-    ~MemCtx() noexcept;
+    ~MemCtx();
 
     // Copy.
     MemCtx(const MemCtx& rhs) noexcept = delete;
