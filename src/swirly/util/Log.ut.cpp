@@ -68,10 +68,12 @@ BOOST_AUTO_TEST_CASE(LogMacroCase)
 {
     auto prevLevel = setLogLevel(LogInfo);
     auto prevLogger = setLogger(testLogger);
-    auto finally = makeFinally([prevLevel, prevLogger]() {
+    // clang-format off
+    auto finally = makeFinally([prevLevel, prevLogger]() noexcept {
         setLogLevel(prevLevel);
         setLogger(prevLogger);
     });
+    // clang-format on
 
     SWIRLY_LOG(LogInfo, logMsg() << "test1: " << Foo<int, int>{10, 20});
     BOOST_TEST(lastLevel == LogInfo);

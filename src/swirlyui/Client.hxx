@@ -35,7 +35,7 @@ class Client : public QObject {
 
   public:
     Client(QObject* parent = nullptr);
-    ~Client() noexcept = default;
+    ~Client() = default;
 
     const AssetModel& assetModel() const noexcept { return assetModel_; }
     const InstrModel& instrModel() const noexcept { return instrModel_; }

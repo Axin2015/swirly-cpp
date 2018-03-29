@@ -34,7 +34,7 @@ class SWIRLY_API Profile {
     : name_{name}
     {
     }
-    ~Profile() noexcept;
+    ~Profile();
 
     // Copy.
     Profile(const Profile& rhs) noexcept = default;
@@ -83,7 +83,7 @@ class SWIRLY_API TimeRecorder {
     , start_{std::chrono::high_resolution_clock::now()}
     {
     }
-    ~TimeRecorder() noexcept;
+    ~TimeRecorder();
 
     // Copy.
     TimeRecorder(const TimeRecorder& rhs) = delete;

@@ -47,7 +47,7 @@ class Asset {
     {
     }
     Asset() = default;
-    ~Asset() noexcept = default;
+    ~Asset() = default;
 
     static Asset fromJson(const QJsonObject& obj);
 

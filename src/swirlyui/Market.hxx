@@ -60,7 +60,7 @@ class Market {
     {
     }
     Market() = default;
-    ~Market() noexcept = default;
+    ~Market() = default;
 
     static Market fromJson(const Instr& instr, const QJsonObject& obj);
 

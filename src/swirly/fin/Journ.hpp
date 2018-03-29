@@ -32,7 +32,7 @@ struct Msg;
 class SWIRLY_API Journ {
   public:
     Journ() noexcept = default;
-    virtual ~Journ() noexcept;
+    virtual ~Journ();
 
     // Copy.
     constexpr Journ(const Journ&) noexcept = default;

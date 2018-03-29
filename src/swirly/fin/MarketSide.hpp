@@ -27,7 +27,7 @@ class SWIRLY_API MarketSide {
   public:
     MarketSide() = default;
 
-    ~MarketSide() noexcept;
+    ~MarketSide();
 
     // Copy.
     MarketSide(const MarketSide&) = delete;

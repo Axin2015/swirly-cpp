@@ -41,7 +41,7 @@ class SWIRLY_API Serv {
   public:
     Serv(Journ& journ, std::size_t pipeCapacity, std::size_t maxExecs);
 
-    ~Serv() noexcept;
+    ~Serv();
 
     // Copy.
     Serv(const Serv&) = delete;

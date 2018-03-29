@@ -33,7 +33,7 @@ class Foo
     {
         ++alive;
     }
-    ~Foo() noexcept { --alive_; }
+    ~Foo() { --alive_; }
     boost::intrusive::set_member_hook<> idHook_;
 
   private:

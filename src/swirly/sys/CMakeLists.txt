@@ -29,6 +29,7 @@ endif()
 set(lib_SOURCES
   Buffer.cpp
   Daemon.cpp
+  EpollReactor.cpp
   Error.cpp
   Event.cpp
   EventHandler.cpp
@@ -83,11 +84,11 @@ endforeach()
 
 set(test_SOURCES
   Buffer.ut.cpp
+  EpollReactor.ut.cpp
   Handle.ut.cpp
   IpAddress.ut.cpp
   Math.ut.cpp
   MemCtx.ut.cpp
-  Reactor.ut.cpp
   RefCount.ut.cpp
   Socket.ut.cpp)
 

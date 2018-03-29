@@ -22,7 +22,7 @@ using namespace std;
 
 static_assert(sizeof(Accnt) <= 6 * 64, "no greater than specified cache-lines");
 
-Accnt::~Accnt() noexcept = default;
+Accnt::~Accnt() = default;
 
 Accnt::Accnt(Accnt&&) = default;
 

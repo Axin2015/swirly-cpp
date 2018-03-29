@@ -28,7 +28,7 @@ class SWIRLY_API ParseException : public Exception {
     : Exception{what}
     {
     }
-    ~ParseException() noexcept override;
+    ~ParseException() override;
 
     // Copy.
     ParseException(const ParseException&) noexcept = default;

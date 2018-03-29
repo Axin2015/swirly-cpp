@@ -38,7 +38,7 @@ class MarketView : public QWidget {
   public:
     MarketView(InstrModel& instrModel, MarketModel& model, QWidget* parent = nullptr,
                Qt::WindowFlags f = Qt::WindowFlags{});
-    ~MarketView() noexcept override;
+    ~MarketView() override;
 
     void setFields(const QString& instrSymbol, QDate settlDate, std::optional<Lots> lots,
                    std::optional<Ticks> ticks);

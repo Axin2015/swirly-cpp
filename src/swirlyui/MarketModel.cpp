@@ -40,7 +40,7 @@ MarketModel::MarketModel(QObject* parent)
     header_[unbox(Column::OfferCount)] = tr("Offer Count");
 }
 
-MarketModel::~MarketModel() noexcept = default;
+MarketModel::~MarketModel() = default;
 
 QVariant MarketModel::data(const QModelIndex& index, int role) const
 {

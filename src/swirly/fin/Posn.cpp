@@ -26,7 +26,7 @@ using namespace std;
 
 static_assert(sizeof(Posn) <= 2 * 64, "no greater than specified cache-lines");
 
-Posn::~Posn() noexcept = default;
+Posn::~Posn() = default;
 
 Posn::Posn(Posn&&) = default;
 
@@ -81,7 +81,7 @@ void Posn::toJson(ostream& os) const
     os << '}';
 }
 
-PosnSet::~PosnSet() noexcept
+PosnSet::~PosnSet()
 {
     set_.clear_and_dispose([](const Posn* ptr) { ptr->release(); });
 }

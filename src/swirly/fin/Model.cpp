@@ -19,7 +19,7 @@
 namespace swirly {
 inline namespace fin {
 
-Model::~Model() noexcept = default;
+Model::~Model() = default;
 
 } // namespace fin
 } // namespace swirly

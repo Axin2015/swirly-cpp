@@ -25,7 +25,7 @@ using namespace std;
 
 static_assert(sizeof(Order) <= 6 * 64, "no greater than specified cache-lines");
 
-Order::~Order() noexcept = default;
+Order::~Order() = default;
 
 Order::Order(Order&&) = default;
 
@@ -111,7 +111,7 @@ void Order::toJson(ostream& os) const
        << '}';
 }
 
-OrderRefSet::~OrderRefSet() noexcept
+OrderRefSet::~OrderRefSet()
 {
     set_.clear_and_dispose([](const Order* ptr) { ptr->release(); });
 }
@@ -156,7 +156,7 @@ OrderRefSet::Iterator OrderRefSet::insertOrReplace(const ValuePtr& value) noexce
     return it;
 }
 
-OrderList::~OrderList() noexcept
+OrderList::~OrderList()
 {
     list_.clear_and_dispose([](const Order* ptr) { ptr->release(); });
 }

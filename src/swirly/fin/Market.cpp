@@ -45,7 +45,7 @@ void toJsonLevels(LevelSet::ConstIterator it, LevelSet::ConstIterator end, ostre
 }
 } // namespace
 
-Market::~Market() noexcept = default;
+Market::~Market() = default;
 
 Market::Market(Market&&) = default;
 

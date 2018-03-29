@@ -22,7 +22,7 @@ namespace swirly {
 inline namespace util {
 using namespace std;
 
-Profile::~Profile() noexcept
+Profile::~Profile()
 {
     report();
 }
@@ -58,7 +58,7 @@ void Profile::record(double val) noexcept
     }
 }
 
-TimeRecorder::~TimeRecorder() noexcept
+TimeRecorder::~TimeRecorder()
 {
     const auto end = chrono::high_resolution_clock::now();
     const chrono::duration<double, micro> diff{end - start_};

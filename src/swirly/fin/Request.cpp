@@ -21,7 +21,7 @@ inline namespace fin {
 
 Request::Request(Request&&) = default;
 
-Request::~Request() noexcept = default;
+Request::~Request() = default;
 
 } // namespace fin
 } // namespace swirly

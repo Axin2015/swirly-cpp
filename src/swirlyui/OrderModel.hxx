@@ -27,7 +27,7 @@ class OrderModel
 : public TableModel<OrderKey, Order, unbox(order::Column::CheckState), order::ColumnCount> {
   public:
     OrderModel(QObject* parent = nullptr);
-    ~OrderModel() noexcept override;
+    ~OrderModel() override;
 
     QVariant data(const QModelIndex& index, int role) const override;
 

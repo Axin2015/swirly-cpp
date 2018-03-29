@@ -56,7 +56,7 @@ TradeView::TradeView(TradeModel& model, QWidget* parent, Qt::WindowFlags f)
     setLayout(layout.release());
 }
 
-TradeView::~TradeView() noexcept = default;
+TradeView::~TradeView() = default;
 
 void TradeView::slotClicked(const QModelIndex& index)
 {

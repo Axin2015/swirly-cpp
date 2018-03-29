@@ -58,7 +58,7 @@ class Exec {
          Lots resdLots, Lots execLots, Cost execCost, Lots lastLots, Ticks lastTicks, Lots minLots,
          Id64 matchId, LiqInd liqInd, const QString& cpty, const QDateTime& created);
     Exec() = default;
-    ~Exec() noexcept = default;
+    ~Exec() = default;
 
     static Exec fromJson(const Instr& instr, const QJsonObject& obj);
 

@@ -14,9 +14,9 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
+#include "EpollReactor.hpp"
 #include "IoSocket.hpp"
 #include "LocalAddress.hpp"
-#include "Reactor.hpp"
 
 #define BOOST_TEST_NO_MAIN
 #include <boost/test/unit_test.hpp>
@@ -41,7 +41,7 @@ struct TestHandler : EventHandler {
     }
 
     TestHandler() noexcept = default;
-    ~TestHandler() noexcept override
+    ~TestHandler() override
     {
         if (cntrs_) {
             ++cntrs_->dtor;
@@ -68,9 +68,9 @@ struct TestHandler : EventHandler {
 
 } // namespace
 
-BOOST_AUTO_TEST_SUITE(ReactorSuite)
+BOOST_AUTO_TEST_SUITE(EpollReactorSuite)
 
-BOOST_AUTO_TEST_CASE(ReactorHandlerCase)
+BOOST_AUTO_TEST_CASE(EpollReactorHandlerCase)
 {
     Counters cntrs;
     EpollReactor r{1024};
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(ReactorHandlerCase)
     BOOST_TEST(cntrs.dtor == 1);
 }
 
-BOOST_AUTO_TEST_CASE(ReactorLevelCase)
+BOOST_AUTO_TEST_CASE(EpollReactorLevelCase)
 {
     using namespace literals::chrono_literals;
 
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE(ReactorLevelCase)
     r.unsubscribe(*socks.second);
 }
 
-BOOST_AUTO_TEST_CASE(ReactorEdgeCase)
+BOOST_AUTO_TEST_CASE(EpollReactorEdgeCase)
 {
     using namespace literals::chrono_literals;
 

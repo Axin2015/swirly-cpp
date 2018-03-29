@@ -61,7 +61,7 @@ class ArrayView {
     {
     }
     constexpr ArrayView() noexcept = default;
-    ~ArrayView() noexcept = default;
+    ~ArrayView() = default;
 
     // Copy.
     constexpr ArrayView(const ArrayView& rhs) noexcept = default;

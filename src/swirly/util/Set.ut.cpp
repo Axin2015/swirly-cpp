@@ -35,7 +35,7 @@ class Foo : public RefCount<Foo, ThreadUnsafePolicy> {
     {
         ++alive;
     }
-    ~Foo() noexcept { --alive_; }
+    ~Foo() { --alive_; }
 
     auto symbol() const noexcept { return symbol_; }
     auto display() const noexcept { return +display_; }
@@ -56,7 +56,7 @@ class Bar : public RefCount<Bar, ThreadUnsafePolicy> {
     {
         ++alive;
     }
-    ~Bar() noexcept { --alive_; }
+    ~Bar() { --alive_; }
 
     auto id() const noexcept { return id_; }
     auto display() const noexcept { return +display_; }

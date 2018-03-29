@@ -59,7 +59,7 @@ class SWIRLY_API Order
             ticks, lots,     0_lts, 0_cst,    0_lts, 0_tks, minLots,    created, created}
     {
     }
-    ~Order() noexcept;
+    ~Order();
 
     // Copy.
     Order(const Order&) = delete;
@@ -201,7 +201,7 @@ class SWIRLY_API OrderRefSet {
 
     OrderRefSet() = default;
 
-    ~OrderRefSet() noexcept;
+    ~OrderRefSet();
 
     // Copy.
     OrderRefSet(const OrderRefSet&) = delete;
@@ -284,7 +284,7 @@ class SWIRLY_API OrderList {
 
     OrderList() = default;
 
-    ~OrderList() noexcept;
+    ~OrderList();
 
     // Copy.
     OrderList(const OrderList&) = delete;

@@ -31,7 +31,7 @@ void reset(ostream& os) noexcept
     os.width(0);
 };
 
-OStreamJoiner::~OStreamJoiner() noexcept = default;
+OStreamJoiner::~OStreamJoiner() = default;
 
 } // namespace util
 } // namespace swirly

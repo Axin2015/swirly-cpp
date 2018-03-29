@@ -33,7 +33,7 @@ class InstrView : public QWidget {
 
   public:
     InstrView(InstrModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
-    ~InstrView() noexcept override;
+    ~InstrView() override;
 
     void resizeColumnsToContents();
 

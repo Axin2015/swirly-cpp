@@ -35,7 +35,7 @@ class OrderView : public QWidget {
   public:
     explicit OrderView(OrderModel& model, QWidget* parent = nullptr,
                        Qt::WindowFlags f = Qt::WindowFlags{});
-    ~OrderView() noexcept override;
+    ~OrderView() override;
 
   signals:
     void cancelOrders(const OrderKeys& keys);

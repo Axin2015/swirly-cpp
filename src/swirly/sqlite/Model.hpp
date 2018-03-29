@@ -27,7 +27,7 @@ inline namespace sqlite {
 class SWIRLY_API SqlModel : public Model {
   public:
     explicit SqlModel(const Config& config);
-    ~SqlModel() noexcept;
+    ~SqlModel();
 
     // Copy.
     SqlModel(const SqlModel&) = delete;

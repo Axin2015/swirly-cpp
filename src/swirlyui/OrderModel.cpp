@@ -45,7 +45,7 @@ OrderModel::OrderModel(QObject* parent)
     header_[unbox(Column::Modified)] = tr("Modified");
 }
 
-OrderModel::~OrderModel() noexcept = default;
+OrderModel::~OrderModel() = default;
 
 QVariant OrderModel::data(const QModelIndex& index, int role) const
 {

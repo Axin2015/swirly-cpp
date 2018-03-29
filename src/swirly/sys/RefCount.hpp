@@ -78,7 +78,7 @@ class RefCount {
     int refCount() const noexcept { return PolicyT::load(refs_); }
 
   protected:
-    ~RefCount() noexcept = default;
+    ~RefCount() = default;
 
   private:
     mutable typename PolicyT::Type refs_{1};

@@ -265,7 +265,7 @@ namespace {
 
 } // anonymous
 
-RestBody::~RestBody() noexcept = default;
+RestBody::~RestBody() = default;
 
 void RestBody::reset(bool clear) noexcept
 {

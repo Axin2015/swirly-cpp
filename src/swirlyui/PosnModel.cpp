@@ -37,7 +37,7 @@ PosnModel::PosnModel(QObject* parent)
     header_[unbox(Column::SellAvgPrice)] = tr("Sell Avg");
 }
 
-PosnModel::~PosnModel() noexcept = default;
+PosnModel::~PosnModel() = default;
 
 QVariant PosnModel::data(const QModelIndex& index, int role) const
 {

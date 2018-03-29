@@ -386,7 +386,7 @@ static const int json_en_main = 1;
 
 } // anonymous
 
-RestBody::~RestBody() noexcept = default;
+RestBody::~RestBody() = default;
 
 void RestBody::reset(bool clear) noexcept
 {

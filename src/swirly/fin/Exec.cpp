@@ -25,7 +25,7 @@ using namespace std;
 
 static_assert(sizeof(Exec) <= 5 * 64, "no greater than specified cache-lines");
 
-Exec::~Exec() noexcept = default;
+Exec::~Exec() = default;
 
 Exec::Exec(Exec&&) = default;
 

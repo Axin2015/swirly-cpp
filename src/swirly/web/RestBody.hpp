@@ -58,7 +58,7 @@ class SWIRLY_API RestBody {
     };
 
     RestBody() noexcept { reset(); }
-    ~RestBody() noexcept;
+    ~RestBody();
 
     // Copy.
     RestBody(const RestBody&) = delete;

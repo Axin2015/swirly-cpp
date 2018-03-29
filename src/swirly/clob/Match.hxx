@@ -26,7 +26,7 @@ struct Match {
     Match(Lots lots, const OrderPtr& makerOrder, const ExecPtr& makerTrade,
           const PosnPtr& makerPosn, const ExecPtr& takerTrade) noexcept;
 
-    ~Match() noexcept;
+    ~Match();
 
     // Copy.
     Match(const Match&);

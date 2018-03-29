@@ -53,7 +53,7 @@ class Posn {
     {
     }
     Posn() = default;
-    ~Posn() noexcept = default;
+    ~Posn() = default;
 
     static Posn fromJson(const Instr& instr, const QJsonObject& obj);
 

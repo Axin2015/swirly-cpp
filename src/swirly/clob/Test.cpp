@@ -24,7 +24,7 @@ inline namespace clob {
 using namespace std;
 
 TestModel::TestModel() noexcept = default;
-TestModel::~TestModel() noexcept = default;
+TestModel::~TestModel() = default;
 
 constexpr TestModel::TestModel(const TestModel&) noexcept = default;
 TestModel& TestModel::operator=(const TestModel&) noexcept = default;
@@ -125,7 +125,7 @@ void TestModel::doReadTrade(const ModelCallback<ExecPtr>& cb) const {}
 void TestModel::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const {}
 
 TestJourn::TestJourn() noexcept = default;
-TestJourn::~TestJourn() noexcept = default;
+TestJourn::~TestJourn() = default;
 
 constexpr TestJourn::TestJourn(const TestJourn&) noexcept = default;
 TestJourn& TestJourn::operator=(const TestJourn&) noexcept = default;

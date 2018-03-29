@@ -49,7 +49,7 @@ class SWIRLY_API Posn : public RefCount<Posn, ThreadUnsafePolicy> {
     : Posn{accnt, marketId, instr, settlDay, 0_lts, 0_cst, 0_lts, 0_cst}
     {
     }
-    ~Posn() noexcept;
+    ~Posn();
 
     // Copy.
     Posn(const Posn&) = delete;
@@ -177,7 +177,7 @@ class SWIRLY_API PosnSet {
 
     PosnSet() = default;
 
-    ~PosnSet() noexcept;
+    ~PosnSet();
 
     // Copy.
     PosnSet(const PosnSet&) = delete;

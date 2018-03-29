@@ -27,7 +27,7 @@ class TradeModel
 : public TableModel<ExecKey, Exec, unbox(exec::Column::CheckState), exec::ColumnCount> {
   public:
     TradeModel(QObject* parent = nullptr);
-    ~TradeModel() noexcept override;
+    ~TradeModel() override;
 
     QVariant data(const QModelIndex& index, int role) const override;
 

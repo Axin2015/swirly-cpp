@@ -79,7 +79,7 @@ void getPosn(const Accnt& accnt, ostream& out)
 } // namespace
 } // namespace detail
 
-Rest::~Rest() noexcept = default;
+Rest::~Rest() = default;
 
 Rest::Rest(Rest&&) = default;
 

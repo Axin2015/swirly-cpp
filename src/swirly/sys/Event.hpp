@@ -77,7 +77,7 @@ class EventFd {
     : fh_{os::eventfd(0, eventFlags(flags) | EFD_NONBLOCK)}
     {
     }
-    ~EventFd() noexcept = default;
+    ~EventFd() = default;
 
     // Copy.
     EventFd(const EventFd&) = delete;
@@ -125,7 +125,7 @@ class EventPipe {
     : pipe_{os::pipe2(flags | O_NONBLOCK)}
     {
     }
-    ~EventPipe() noexcept = default;
+    ~EventPipe() = default;
 
     // Copy.
     EventPipe(const EventPipe&) = delete;

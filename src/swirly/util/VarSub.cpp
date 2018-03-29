@@ -28,7 +28,7 @@ string getEnv(const string& name)
     return val ? string{val} : string{};
 }
 
-VarSub::~VarSub() noexcept = default;
+VarSub::~VarSub() = default;
 
 // Copy.
 VarSub::VarSub(const VarSub&) = default;

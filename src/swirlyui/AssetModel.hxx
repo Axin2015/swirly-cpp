@@ -27,7 +27,7 @@ class AssetModel
 : public TableModel<QString, Asset, unbox(asset::Column::CheckState), asset::ColumnCount> {
   public:
     AssetModel(QObject* parent = nullptr);
-    ~AssetModel() noexcept override;
+    ~AssetModel() override;
 
     QVariant data(const QModelIndex& index, int role) const override;
 

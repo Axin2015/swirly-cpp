@@ -76,7 +76,7 @@ struct Serv::Impl {
             auto& accnt = this->accnt(ptr->accnt());
             accnt.insertOrder(ptr);
             bool success{false};
-            auto finally = makeFinally([&]() {
+            auto finally = makeFinally([&]() noexcept {
                 if (!success) {
                     accnt.removeOrder(*ptr);
                 }
@@ -207,7 +207,7 @@ struct Serv::Impl {
         resp.insertExec(exec);
 
         // Ensure that matches are cleared when scope exits.
-        auto finally = makeFinally([this]() {
+        auto finally = makeFinally([this]() noexcept {
             this->matches_.clear();
             this->execs_.clear();
         });
@@ -235,12 +235,14 @@ struct Serv::Impl {
             // TODO: IOC orders would need an additional revision for the unsolicited cancellation of any
             // unfilled quantity.
             bool success{false};
-            auto finally = makeFinally([&market, &order, &success]() {
+            // clang-format off
+            auto finally = makeFinally([&market, &order, &success]() noexcept {
                 if (!success && !order->done()) {
                     // Undo market insertion.
                     market.removeOrder(*order);
                 }
             });
+            // clang-format on
 
             journ_.createExec(execs_);
             success = true;
@@ -701,7 +703,7 @@ Serv::Serv(Journ& journ, size_t pipeCapacity, size_t maxExecs)
 {
 }
 
-Serv::~Serv() noexcept = default;
+Serv::~Serv() = default;
 
 Serv::Serv(Serv&&) = default;
 

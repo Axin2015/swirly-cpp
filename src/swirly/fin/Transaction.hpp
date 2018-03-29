@@ -25,7 +25,7 @@ inline namespace fin {
 class SWIRLY_API Transactional {
   public:
     Transactional() noexcept = default;
-    virtual ~Transactional() noexcept;
+    virtual ~Transactional();
 
     // Copy.
     constexpr Transactional(const Transactional&) noexcept = default;
@@ -109,7 +109,7 @@ class SWIRLY_API Transaction {
     {
         target_.tryBegin();
     }
-    ~Transaction() noexcept;
+    ~Transaction();
 
     // Copy.
     Transaction(const Transaction&) = delete;

@@ -19,7 +19,7 @@
 namespace swirly {
 inline namespace sqlite {
 
-SqlException::~SqlException() noexcept = default;
+SqlException::~SqlException() = default;
 
 } // namespace sqlite
 } // namespace swirly

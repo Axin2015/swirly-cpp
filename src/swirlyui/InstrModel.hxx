@@ -27,7 +27,7 @@ class InstrModel
 : public TableModel<QString, Instr, unbox(instr::Column::CheckState), instr::ColumnCount> {
   public:
     InstrModel(QObject* parent = nullptr);
-    ~InstrModel() noexcept override;
+    ~InstrModel() override;
 
     QVariant data(const QModelIndex& index, int role) const override;
 

@@ -21,7 +21,7 @@
 namespace swirly {
 inline namespace sys {
 
-EventHandler::~EventHandler() noexcept = default;
+EventHandler::~EventHandler() = default;
 
 void EventHandler::doReady(int fd, unsigned events, Time now) {}
 void EventHandler::doTimer(Timer& tmr, Time now) {}

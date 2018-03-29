@@ -22,9 +22,9 @@ namespace swirly {
 inline namespace fin {
 using namespace std;
 
-Transactional::~Transactional() noexcept = default;
+Transactional::~Transactional() = default;
 
-Transaction::~Transaction() noexcept
+Transaction::~Transaction()
 {
     if (more_ == More::No) {
         try {

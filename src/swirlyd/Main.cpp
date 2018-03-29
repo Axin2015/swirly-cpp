@@ -34,6 +34,7 @@
 #include <swirly/util/Log.hpp>
 
 #include <swirly/sys/Daemon.hpp>
+#include <swirly/sys/EpollReactor.hpp>
 #include <swirly/sys/File.hpp>
 #include <swirly/sys/MemCtx.hpp>
 #include <swirly/sys/PidFile.hpp>
@@ -310,7 +311,7 @@ int main(int argc, char* argv[])
             SWIRLY_NOTICE("stopped reactor thread"sv);
         };
         auto worker = thread{fn, ref(reactor)};
-        auto finally = makeFinally([&]() {
+        auto finally = makeFinally([&]() noexcept {
             reactor.close();
             worker.join();
             SWIRLY_NOTICE("stopped http server"sv);

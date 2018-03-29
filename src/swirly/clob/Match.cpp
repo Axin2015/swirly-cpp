@@ -33,7 +33,7 @@ Match::Match(Lots lots, const OrderPtr& makerOrder, const ExecPtr& makerTrade,
 {
 }
 
-Match::~Match() noexcept = default;
+Match::~Match() = default;
 
 Match::Match(const Match&) = default;
 

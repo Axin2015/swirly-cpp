@@ -34,7 +34,7 @@ class Pipe {
     : buf_{capacity}
     {
     }
-    ~Pipe() noexcept = default;
+    ~Pipe() = default;
 
     // Copy.
     Pipe(const Pipe& rhs) = delete;

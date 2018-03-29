@@ -34,7 +34,7 @@ class PosnView : public QWidget {
 
   public:
     PosnView(PosnModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
-    ~PosnView() noexcept override;
+    ~PosnView() override;
 
   signals:
     void setFields(const QString& instrSymbol, QDate settlDate, std::optional<Lots> lots,

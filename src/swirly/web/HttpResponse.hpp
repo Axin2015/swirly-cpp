@@ -30,7 +30,7 @@ class SWIRLY_API HttpResponseBuf : public std::streambuf {
     : buf_(buf)
     {
     }
-    ~HttpResponseBuf() noexcept override;
+    ~HttpResponseBuf() override;
 
     // Copy.
     HttpResponseBuf(const HttpResponseBuf& rhs) = delete;
@@ -68,7 +68,7 @@ class SWIRLY_API HttpResponse : public std::ostream {
     {
         rdbuf(&buf_);
     }
-    ~HttpResponse() noexcept override;
+    ~HttpResponse() override;
 
     // Copy.
     HttpResponse(const HttpResponse& rhs) = delete;

@@ -56,7 +56,7 @@ PosnView::PosnView(PosnModel& model, QWidget* parent, Qt::WindowFlags f)
     setLayout(layout.release());
 }
 
-PosnView::~PosnView() noexcept = default;
+PosnView::~PosnView() = default;
 
 void PosnView::slotClicked(const QModelIndex& index)
 {

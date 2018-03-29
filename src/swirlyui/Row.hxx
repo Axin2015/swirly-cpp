@@ -31,7 +31,7 @@ class Row {
         tag_ = tag;
         checked_ = 0;
     }
-    ~Row() noexcept = default;
+    ~Row() = default;
 
     std::uint64_t tag() const noexcept { return tag_; }
     bool checked() const noexcept { return checked_ == 1; }

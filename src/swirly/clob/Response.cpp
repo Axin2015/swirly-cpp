@@ -31,7 +31,7 @@ using namespace std;
 
 Response::Response() noexcept = default;
 
-Response::~Response() noexcept = default;
+Response::~Response() = default;
 
 Response::Response(const Response&) = default;
 

@@ -32,7 +32,7 @@ class OrderForm : public QWidget {
   public:
     OrderForm(OrderModel& orderModel, QWidget* parent = nullptr,
               Qt::WindowFlags f = Qt::WindowFlags{});
-    ~OrderForm() noexcept override;
+    ~OrderForm() override;
 
   signals:
     void cancelOrders(const OrderKeys& keys);

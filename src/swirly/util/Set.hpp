@@ -62,7 +62,7 @@ class IdSet {
     using ConstIterator = typename Set::const_iterator;
 
     IdSet() = default;
-    ~IdSet() noexcept
+    ~IdSet()
     {
         set_.clear_and_dispose([](const ValueT* ptr) { ptr->release(); });
     }
@@ -187,7 +187,7 @@ class SymbolSet {
     using ConstIterator = typename Set::const_iterator;
 
     SymbolSet() = default;
-    ~SymbolSet() noexcept
+    ~SymbolSet()
     {
         set_.clear_and_dispose([](ValueT* ptr) { delete ptr; });
     }

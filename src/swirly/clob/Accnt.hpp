@@ -45,7 +45,7 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
     , execs_{maxExecs}
     {
     }
-    ~Accnt() noexcept;
+    ~Accnt();
 
     // Copy.
     Accnt(const Accnt&) = delete;

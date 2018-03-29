@@ -50,7 +50,7 @@ ExecModel::ExecModel(QObject* parent)
     header_[unbox(Column::Created)] = tr("Created");
 }
 
-ExecModel::~ExecModel() noexcept = default;
+ExecModel::~ExecModel() = default;
 
 int ExecModel::rowCount(const QModelIndex& parent) const
 {

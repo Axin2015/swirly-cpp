@@ -20,7 +20,7 @@ namespace swirly {
 inline namespace fin {
 using namespace std;
 
-Journ::~Journ() noexcept = default;
+Journ::~Journ() = default;
 
 } // namespace fin
 } // namespace swirly

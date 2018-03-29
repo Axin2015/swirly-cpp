@@ -37,7 +37,7 @@ class SWIRLY_API VarSub {
     : fn_{std::move(fn)}
     {
     }
-    ~VarSub() noexcept;
+    ~VarSub();
 
     // Copy.
     VarSub(const VarSub&);

@@ -23,7 +23,7 @@ inline namespace util {
 using namespace std;
 
 Config::Config() = default;
-Config::~Config() noexcept = default;
+Config::~Config() = default;
 
 // Copy.
 Config::Config(const Config&) = default;

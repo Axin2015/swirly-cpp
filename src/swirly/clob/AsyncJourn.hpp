@@ -35,7 +35,7 @@ class AsyncWindow {
     : total_{total}
     {
     }
-    ~AsyncWindow() noexcept = default;
+    ~AsyncWindow() = default;
 
     // Copy.
     AsyncWindow(const AsyncWindow&) = delete;
@@ -65,7 +65,7 @@ class AsyncWindow {
 class SWIRLY_API AsyncJourn {
   public:
     AsyncJourn(Journ& journ, std::size_t pipeCapacity);
-    ~AsyncJourn() noexcept;
+    ~AsyncJourn();
 
     // Copy.
     AsyncJourn(const AsyncJourn&) = delete;

@@ -19,7 +19,6 @@
 
 #include <swirly/sys/EventHandler.hpp>
 #include <swirly/sys/Handle.hpp>
-#include <swirly/sys/Muxer.hpp>
 #include <swirly/sys/Timer.hpp>
 
 namespace swirly {
@@ -48,12 +47,12 @@ inline bool operator!=(SubPolicy::Id lhs, SubPolicy::Id rhs) noexcept
     return lhs.value != rhs.value;
 }
 
-using SubHandle = Handle<SubPolicy>;
+using SubHandle = BasicHandle<SubPolicy>;
 
 class SWIRLY_API Reactor {
   public:
     Reactor() noexcept = default;
-    virtual ~Reactor() noexcept;
+    virtual ~Reactor();
 
     // Copy.
     Reactor(const Reactor&) noexcept = delete;
@@ -75,21 +74,25 @@ class SWIRLY_API Reactor {
     }
     void unsubscribe(int fd) noexcept { doUnsubscribe(fd); }
     void setEvents(int fd, unsigned events) { doSetEvents(fd, events); }
-    Timer setTimer(Time expiry, Duration interval, Priority priority,
-                   const EventHandlerPtr& handler)
+    Timer timer(Time expiry, Duration interval, Priority priority, const EventHandlerPtr& handler)
     {
-        return doSetTimer(expiry, interval, priority, handler);
+        return doTimer(expiry, interval, priority, handler);
     }
-    Timer setTimer(Time expiry, Priority priority, const EventHandlerPtr& handler)
+    Timer timer(Time expiry, Priority priority, const EventHandlerPtr& handler)
     {
-        return doSetTimer(expiry, priority, handler);
+        return doTimer(expiry, priority, handler);
     }
     int poll(std::chrono::milliseconds timeout = std::chrono::milliseconds::max())
     {
-        return doPoll(timeout);
+        return doPoll(UnixClock::now(), timeout);
     }
 
   protected:
+    /**
+     * Overload for unit-testing.
+     */
+    int poll(Time now, Millis timeout) { return doPoll(now, timeout); }
+
     /**
      * Thread-safe.
      */
@@ -105,72 +108,18 @@ class SWIRLY_API Reactor {
 
     virtual void doSetEvents(int fd, unsigned events) = 0;
 
-    virtual Timer doSetTimer(Time expiry, Duration interval, Priority priority,
-                             const EventHandlerPtr& handler)
+    virtual Timer doTimer(Time expiry, Duration interval, Priority priority,
+                          const EventHandlerPtr& handler)
         = 0;
-    virtual Timer doSetTimer(Time expiry, Priority priority, const EventHandlerPtr& handler) = 0;
+    virtual Timer doTimer(Time expiry, Priority priority, const EventHandlerPtr& handler) = 0;
 
-    virtual int doPoll(std::chrono::milliseconds timeout) = 0;
+    virtual int doPoll(Time now, std::chrono::milliseconds timeout) = 0;
 };
 
 inline void SubPolicy::close(Id id) noexcept
 {
     id.reactor->unsubscribe(id.value);
 }
-
-class SWIRLY_API EpollReactor : public Reactor {
-  public:
-    using Event = typename EpollMuxer::Event;
-
-    explicit EpollReactor(std::size_t sizeHint = 1024);
-    ~EpollReactor() noexcept override;
-
-    // Copy.
-    EpollReactor(const EpollReactor&) = delete;
-    EpollReactor& operator=(const EpollReactor&) = delete;
-
-    // Move.
-    EpollReactor(EpollReactor&&) = delete;
-    EpollReactor& operator=(EpollReactor&&) = delete;
-
-  protected:
-    /**
-     * Thread-safe.
-     */
-    bool doClosed() const noexcept override;
-
-    /**
-     * Thread-safe.
-     */
-    void doClose() noexcept override;
-
-    SubHandle doSubscribe(int fd, unsigned events, const EventHandlerPtr& handler) override;
-    void doUnsubscribe(int fd) noexcept override;
-
-    void doSetEvents(int fd, unsigned events) override;
-
-    Timer doSetTimer(Time expiry, Duration interval, Priority priority,
-                     const EventHandlerPtr& handler) override;
-    Timer doSetTimer(Time expiry, Priority priority, const EventHandlerPtr& handler) override;
-
-    int doPoll(std::chrono::milliseconds timeout) override;
-
-  private:
-    int dispatch(Event* buf, int size, Time now);
-
-    struct Data {
-        int sid{};
-        unsigned events{};
-        EventHandlerPtr handler;
-    };
-    EpollMuxer mux_;
-    std::vector<Data> data_;
-    EventFd efd_;
-    static_assert(static_cast<int>(Priority::High) == 0);
-    static_assert(static_cast<int>(Priority::Low) == 1);
-    std::array<TimerQueue, 2> tqs_;
-    std::atomic<bool> closed_{false};
-};
 
 } // namespace sys
 } // namespace swirly

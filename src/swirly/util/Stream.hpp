@@ -31,7 +31,7 @@ template <std::size_t MaxN>
 class StringStreamBuf : public std::streambuf {
   public:
     StringStreamBuf() noexcept { reset(); }
-    ~StringStreamBuf() noexcept override = default;
+    ~StringStreamBuf() override = default;
 
     // Copy.
     StringStreamBuf(const StringStreamBuf& rhs) = delete;
@@ -59,7 +59,7 @@ class StringStream : public std::ostream {
     {
         rdbuf(&buf_);
     }
-    ~StringStream() noexcept override = default;
+    ~StringStream() override = default;
 
     // Copy.
     StringStream(const StringStream& rhs) = delete;
@@ -111,7 +111,7 @@ class SWIRLY_API OStreamJoiner {
     , sep_{sep}
     {
     }
-    ~OStreamJoiner() noexcept;
+    ~OStreamJoiner();
 
     // Copy.
     OStreamJoiner(const OStreamJoiner&) = default;

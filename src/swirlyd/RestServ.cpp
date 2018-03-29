@@ -42,7 +42,7 @@ class ScopedIds {
             toks.pop();
         }
     }
-    ~ScopedIds() noexcept { ids_.clear(); }
+    ~ScopedIds() { ids_.clear(); }
 
   private:
     vector<Id64>& ids_;
@@ -90,12 +90,12 @@ string_view getTrader(const HttpRequest& req)
 
 } // namespace
 
-RestServ::~RestServ() noexcept = default;
+RestServ::~RestServ() = default;
 
 void RestServ::handleRequest(const HttpRequest& req, HttpResponse& resp) noexcept
 {
     TimeRecorder tr{profile_};
-    auto finally = makeFinally([this]() {
+    auto finally = makeFinally([this]() noexcept {
         if (this->profile_.size() % 10 == 0) {
             this->profile_.report();
         }

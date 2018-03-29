@@ -33,7 +33,7 @@ class AssetView : public QWidget {
 
   public:
     AssetView(AssetModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
-    ~AssetView() noexcept override;
+    ~AssetView() override;
 
     void resizeColumnsToContents();
 

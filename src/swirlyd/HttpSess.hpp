@@ -38,7 +38,7 @@ class SWIRLY_API HttpSess
 
   public:
     HttpSess(Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, RestServ& rs, Time now);
-    ~HttpSess() noexcept override;
+    ~HttpSess() override;
 
     // Copy.
     HttpSess(const HttpSess&) = delete;

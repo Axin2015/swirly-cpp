@@ -25,7 +25,7 @@ inline namespace fin {
 class SWIRLY_API DsvModel : public Model {
   public:
     DsvModel() noexcept;
-    ~DsvModel() noexcept override;
+    ~DsvModel() override;
 
     // Copy.
     constexpr DsvModel(const DsvModel&) noexcept;
