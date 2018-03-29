@@ -77,7 +77,7 @@ using namespace swirly;
 
 namespace {
 
-constexpr auto Today = ymdToJd(2014, 2, 11);
+constexpr auto Today = ymdToJd(2014, 3, 11);
 constexpr auto SettlDay = Today + 2_jd;
 constexpr auto MarketId = toMarketId(1_id32, SettlDay);
 

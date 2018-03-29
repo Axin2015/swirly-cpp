@@ -34,25 +34,25 @@ BOOST_AUTO_TEST_SUITE(DateSuite)
 
 BOOST_AUTO_TEST_CASE(YmdToIsoCase)
 {
-    BOOST_TEST(20140314_ymd == ymdToIso(2014, 2, 14));
+    BOOST_TEST(20140314_ymd == ymdToIso(2014, 3, 14));
 }
 
 BOOST_AUTO_TEST_CASE(YmdToJdCase)
 {
-    BOOST_TEST(2456731_jd == ymdToJd(2014, 2, 14));
+    BOOST_TEST(2456731_jd == ymdToJd(2014, 3, 14));
     // AD 1978 January 1, 0h UT is JD 2443509.5 and AD 1978 July 21, 15h UT, is JD 2443711.125.
-    BOOST_TEST(2443510_jd == ymdToJd(1978, 0, 1));
-    BOOST_TEST(2443711_jd == ymdToJd(1978, 6, 21));
+    BOOST_TEST(2443510_jd == ymdToJd(1978, 1, 1));
+    BOOST_TEST(2443711_jd == ymdToJd(1978, 7, 21));
 }
 
 BOOST_AUTO_TEST_CASE(JdToIsoCase)
 {
-    BOOST_TEST(20140314_ymd == jdToIso(ymdToJd(2014, 2, 14)));
+    BOOST_TEST(20140314_ymd == jdToIso(ymdToJd(2014, 3, 14)));
 }
 
 BOOST_AUTO_TEST_CASE(JdToTimeCase)
 {
-    BOOST_TEST(1394798400000ms == jdToTime(ymdToJd(2014, 2, 14)).time_since_epoch());
+    BOOST_TEST(1394798400000ms == jdToTime(ymdToJd(2014, 3, 14)).time_since_epoch());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
