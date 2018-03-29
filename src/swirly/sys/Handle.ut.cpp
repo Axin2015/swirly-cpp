@@ -33,7 +33,7 @@ struct TestPolicy {
     static void close(int id) noexcept { lastClosed = id; }
 };
 
-using TestHandle = Handle<TestPolicy>;
+using TestHandle = BasicHandle<TestPolicy>;
 
 ostream& operator<<(ostream& os, const TestHandle& h)
 {

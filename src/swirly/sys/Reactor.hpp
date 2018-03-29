@@ -47,7 +47,7 @@ inline bool operator!=(SubPolicy::Id lhs, SubPolicy::Id rhs) noexcept
     return lhs.value != rhs.value;
 }
 
-using SubHandle = Handle<SubPolicy>;
+using SubHandle = BasicHandle<SubPolicy>;
 
 class SWIRLY_API Reactor {
   public:

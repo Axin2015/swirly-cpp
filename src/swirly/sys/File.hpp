@@ -39,7 +39,7 @@ struct FilePolicy {
     static void close(int d) noexcept { ::close(d); }
 };
 
-using FileHandle = Handle<FilePolicy>;
+using FileHandle = BasicHandle<FilePolicy>;
 
 namespace os {
 

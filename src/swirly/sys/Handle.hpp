@@ -24,18 +24,18 @@ namespace swirly {
 inline namespace sys {
 
 template <typename PolicyT>
-class Handle {
+class BasicHandle {
   public:
     using Id = typename PolicyT::Id;
 
     static constexpr Id invalid() noexcept { return PolicyT::invalid(); }
 
-    Handle(std::nullptr_t = nullptr) noexcept {}
-    Handle(Id id) noexcept
+    BasicHandle(std::nullptr_t = nullptr) noexcept {}
+    constexpr BasicHandle(Id id) noexcept
     : id_{id}
     {
     }
-    ~Handle() noexcept
+    ~BasicHandle() noexcept
     {
         if (id_ != invalid()) {
             PolicyT::close(id_);
@@ -43,27 +43,27 @@ class Handle {
     }
 
     // Copy.
-    Handle(const Handle&) = delete;
-    Handle& operator=(const Handle&) = delete;
+    BasicHandle(const BasicHandle&) = delete;
+    BasicHandle& operator=(const BasicHandle&) = delete;
 
     // Move.
-    Handle(Handle&& rhs)
+    constexpr BasicHandle(BasicHandle&& rhs)
     : id_{rhs.id_}
     {
         rhs.id_ = invalid();
     }
-    Handle& operator=(Handle&& rhs)
+    BasicHandle& operator=(BasicHandle&& rhs)
     {
         close();
         std::swap(id_, rhs.id_);
         return *this;
     }
 
-    Id operator*() const noexcept { return get(); }
+    constexpr Id operator*() const noexcept { return get(); }
 
-    Id get() const noexcept { return id_; }
+    constexpr Id get() const noexcept { return id_; }
 
-    explicit operator bool() const noexcept { return id_ != invalid(); }
+    explicit constexpr operator bool() const noexcept { return id_ != invalid(); }
 
     Id release() noexcept
     {
@@ -80,7 +80,7 @@ class Handle {
         }
     }
 
-    void swap(Handle& rhs) noexcept { std::swap(id_, rhs.id_); }
+    void swap(BasicHandle& rhs) noexcept { std::swap(id_, rhs.id_); }
 
   private:
     void close() noexcept
@@ -94,13 +94,13 @@ class Handle {
 };
 
 template <typename PolicyT>
-inline bool operator==(const Handle<PolicyT>& lhs, const Handle<PolicyT>& rhs)
+constexpr bool operator==(const BasicHandle<PolicyT>& lhs, const BasicHandle<PolicyT>& rhs)
 {
     return lhs.get() == rhs.get();
 }
 
 template <typename PolicyT>
-inline bool operator!=(const Handle<PolicyT>& lhs, const Handle<PolicyT>& rhs)
+constexpr bool operator!=(const BasicHandle<PolicyT>& lhs, const BasicHandle<PolicyT>& rhs)
 {
     return !(lhs == rhs);
 }
