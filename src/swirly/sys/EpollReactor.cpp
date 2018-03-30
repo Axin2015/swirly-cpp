@@ -53,10 +53,10 @@ bool EpollReactor::doClosed() const noexcept
 void EpollReactor::doClose() noexcept
 {
     closed_.store(true, std::memory_order_release);
-    efd_.notify();
+    efd_.write(1);
 }
 
-SubHandle EpollReactor::doSubscribe(int fd, unsigned events, const EventHandlerPtr& handler)
+Reactor::Handle EpollReactor::doSubscribe(int fd, unsigned events, const EventHandlerPtr& handler)
 {
     assert(fd >= 0);
     assert(handler);
@@ -67,7 +67,7 @@ SubHandle EpollReactor::doSubscribe(int fd, unsigned events, const EventHandlerP
     mux_.subscribe(fd, ++ref.sid, events);
     ref.events = events;
     ref.handler = handler;
-    return SubHandle{{this, fd}};
+    return {*this, fd};
 }
 
 void EpollReactor::doUnsubscribe(int fd) noexcept
@@ -98,7 +98,7 @@ Timer EpollReactor::doTimer(Time expiry, Priority priority, const EventHandlerPt
     return tqs_[static_cast<size_t>(priority)].insert(expiry, handler);
 }
 
-int EpollReactor::doPoll(Time now, chrono::milliseconds timeout)
+int EpollReactor::doPoll(Time now, Millis timeout)
 {
     enum { High = 0, Low = 1 };
     using namespace chrono;
@@ -106,7 +106,7 @@ int EpollReactor::doPoll(Time now, chrono::milliseconds timeout)
     for (const auto& tq : tqs_) {
         if (!tq.empty()) {
             // Millis until next expiry.
-            const auto expiry = duration_cast<milliseconds>(tq.front().expiry() - now);
+            const auto expiry = duration_cast<Millis>(tq.front().expiry() - now);
             if (expiry < timeout) {
                 timeout = max(expiry, 0ms);
             }
@@ -136,7 +136,7 @@ int EpollReactor::dispatch(Event* buf, int size, Time now)
         const auto fd = mux_.fd(ev);
         if (fd == efd_.fd()) {
             SWIRLY_INFO("reactor wakeup"sv);
-            efd_.flush();
+            efd_.read();
             continue;
         }
         const auto& ref = data_[fd];

@@ -47,7 +47,7 @@ class SWIRLY_API TcpAcceptor : public EventHandler {
 
   private:
     TcpSocketServ serv_;
-    SubHandle sub_;
+    Reactor::Handle sub_;
 };
 
 } // namespace sys

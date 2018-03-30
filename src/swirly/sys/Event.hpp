@@ -17,7 +17,7 @@
 #ifndef SWIRLY_SYS_EVENT_HPP
 #define SWIRLY_SYS_EVENT_HPP
 
-#include <swirly/sys/File.hpp>
+#include "File.hpp"
 
 namespace swirly {
 inline namespace sys {
@@ -70,11 +70,10 @@ DataT& data(MsgEvent& ev) noexcept
     return *reinterpret_cast<DataT*>(ev.data);
 }
 
-#if defined(__linux__)
 class EventFd {
   public:
-    explicit EventFd(int flags = 0)
-    : fh_{os::eventfd(0, eventFlags(flags) | EFD_NONBLOCK)}
+    EventFd(unsigned intval, int flags)
+    : fh_{os::eventfd(intval, flags)}
     {
     }
     ~EventFd() = default;
@@ -88,69 +87,28 @@ class EventFd {
     EventFd& operator=(EventFd&&) = default;
 
     int fd() const noexcept { return fh_.get(); }
-    void flush()
+    std::int64_t read()
     {
-        // Adds the 8-byte integer value supplied in its buffer to the counter.
-        char buf[sizeof(std::int64_t)];
-        os::read(*fh_, buf, sizeof(buf));
+        union {
+            char buf[sizeof(std::int64_t)];
+            std::int64_t val;
+        } u;
+        os::read(*fh_, u.buf, sizeof(u.buf));
+        return u.val;
     }
-    void notify()
+    void write(std::int64_t val)
     {
         // Adds the 8-byte integer value supplied in its buffer to the counter.
         union {
             char buf[sizeof(std::int64_t)];
             std::int64_t val;
         } u;
-        u.val = 1;
+        u.val = val;
         os::write(*fh_, u.buf, sizeof(u.buf));
     }
 
   private:
-    static int eventFlags(int in) noexcept
-    {
-        int out{};
-        if (in & O_CLOEXEC) {
-            out |= EFD_CLOEXEC;
-        }
-        return out;
-    }
     FileHandle fh_;
-};
-#endif
-
-// Emulate using a Unix pipe.
-class EventPipe {
-  public:
-    explicit EventPipe(int flags = 0)
-    : pipe_{os::pipe2(flags | O_NONBLOCK)}
-    {
-    }
-    ~EventPipe() = default;
-
-    // Copy.
-    EventPipe(const EventPipe&) = delete;
-    EventPipe& operator=(const EventPipe&) = delete;
-
-    // Move.
-    EventPipe(EventPipe&&) = default;
-    EventPipe& operator=(EventPipe&&) = default;
-
-    int fd() const noexcept { return pipe_.first.get(); }
-    void flush()
-    {
-        // Drain block of bytes.
-        char buf[1 << 10];
-        os::read(*pipe_.first, buf, sizeof(buf));
-    }
-    void notify()
-    {
-        // Post a single charactor.
-        const char ch{'\0'};
-        os::write(*pipe_.second, &ch, 1);
-    }
-
-  private:
-    std::pair<FileHandle, FileHandle> pipe_;
 };
 
 } // namespace sys

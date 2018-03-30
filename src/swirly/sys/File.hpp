@@ -22,24 +22,13 @@
 #include <swirly/sys/Handle.hpp>
 
 #include <fcntl.h>
-#include <unistd.h>
 
-#if defined(__linux__)
 #include <sys/eventfd.h>
-#endif
 #include <sys/stat.h>
 #include <sys/types.h>
 
 namespace swirly {
 inline namespace sys {
-
-struct FilePolicy {
-    using Id = int;
-    static constexpr int invalid() noexcept { return -1; }
-    static void close(int d) noexcept { ::close(d); }
-};
-
-using FileHandle = BasicHandle<FilePolicy>;
 
 namespace os {
 
@@ -91,7 +80,6 @@ inline FileHandle open(const char* path, int flags)
     return fd;
 }
 
-#if defined(__linux__)
 /**
  * Create a file descriptor for event notification.
  */
@@ -139,41 +127,6 @@ inline std::pair<FileHandle, FileHandle> pipe2(int flags)
     }
     return {FileHandle{pipefd[0]}, FileHandle{pipefd[1]}};
 }
-#else
-/**
- * Create pipe.
- */
-inline std::pair<FileHandle, FileHandle> pipe2(int flags, std::error_code& ec) noexcept
-{
-    int pipefd[2];
-    if (::pipe(pipefd) < 0) {
-        ec = makeError(errno);
-    }
-    if (flags != 0) {
-        if (::fcntl(pipefd[0], F_SETFL, flags) < 0 || ::fcntl(pipefd[1], F_SETFL, flags) < 0) {
-            ec = makeError(errno);
-        }
-    }
-    return {FileHandle{pipefd[0]}, FileHandle{pipefd[1]}};
-}
-
-/**
- * Create pipe.
- */
-inline std::pair<FileHandle, FileHandle> pipe2(int flags)
-{
-    int pipefd[2];
-    if (::pipe(pipefd) < 0) {
-        throw std::system_error{makeError(errno), "pipe"};
-    }
-    if (flags != 0) {
-        if (::fcntl(pipefd[0], F_SETFL, flags) < 0 || ::fcntl(pipefd[1], F_SETFL, flags) < 0) {
-            throw std::system_error{makeError(errno), "fcntl"};
-        }
-    }
-    return {FileHandle{pipefd[0]}, FileHandle{pipefd[1]}};
-}
-#endif
 
 /**
  * Get file status.

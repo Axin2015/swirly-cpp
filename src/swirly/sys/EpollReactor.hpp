@@ -50,7 +50,7 @@ class SWIRLY_API EpollReactor : public Reactor {
      */
     void doClose() noexcept override;
 
-    SubHandle doSubscribe(int fd, unsigned events, const EventHandlerPtr& handler) override;
+    Handle doSubscribe(int fd, unsigned events, const EventHandlerPtr& handler) override;
     void doUnsubscribe(int fd) noexcept override;
 
     void doSetEvents(int fd, unsigned events) override;
@@ -59,7 +59,7 @@ class SWIRLY_API EpollReactor : public Reactor {
                   const EventHandlerPtr& handler) override;
     Timer doTimer(Time expiry, Priority priority, const EventHandlerPtr& handler) override;
 
-    int doPoll(Time now, std::chrono::milliseconds timeout) override;
+    int doPoll(Time now, Millis timeout) override;
 
   private:
     int dispatch(Event* buf, int size, Time now);
@@ -71,7 +71,7 @@ class SWIRLY_API EpollReactor : public Reactor {
     };
     EpollMuxer mux_;
     std::vector<Data> data_;
-    EventFd efd_;
+    EventFd efd_{0, EFD_NONBLOCK};
     static_assert(static_cast<int>(Priority::High) == 0);
     static_assert(static_cast<int>(Priority::Low) == 1);
     std::array<TimerQueue, 2> tqs_;

@@ -17,8 +17,8 @@
 #ifndef SWIRLY_SYS_MUXER_HPP
 #define SWIRLY_SYS_MUXER_HPP
 
+#include <swirly/sys/Epoll.hpp>
 #include <swirly/sys/Event.hpp>
-#include <swirly/sys/Poll.hpp>
 
 #include <swirly/Config.h>
 
@@ -66,14 +66,8 @@ class EpollMuxer {
     }
 
     explicit EpollMuxer(std::size_t sizeHint)
-    : md_{os::epoll_create(sizeHint)}
+    : fh_{os::epoll_create(sizeHint)}
     {
-    }
-    ~EpollMuxer()
-    {
-        if (md_ != -1) {
-            ::close(md_);
-        }
     }
 
     // Copy.
@@ -81,24 +75,16 @@ class EpollMuxer {
     EpollMuxer& operator=(const EpollMuxer&) = delete;
 
     // Move.
-    EpollMuxer(EpollMuxer&& rhs)
-    : md_{rhs.md_}
-    {
-        rhs.md_ = -1;
-    }
-    EpollMuxer& operator=(EpollMuxer&& rhs)
-    {
-        close();
-        std::swap(md_, rhs.md_);
-        return *this;
-    }
+    EpollMuxer(EpollMuxer&& rhs) = default;
+    EpollMuxer& operator=(EpollMuxer&& rhs) = default;
 
-    void swap(EpollMuxer& rhs) noexcept { std::swap(md_, rhs.md_); }
+    void swap(EpollMuxer& rhs) noexcept { std::swap(fh_, rhs.fh_); }
     int wait(Event buf[], std::size_t size, std::chrono::milliseconds timeout,
              std::error_code& ec) const
     {
-        return os::epoll_wait(
-            md_, buf, size, timeout == std::chrono::milliseconds::max() ? -1 : timeout.count(), ec);
+        return os::epoll_wait(*fh_, buf, size,
+                              timeout == std::chrono::milliseconds::max() ? -1 : timeout.count(),
+                              ec);
     }
     int wait(Event buf[], std::size_t size, std::error_code& ec) const
     {
@@ -108,7 +94,7 @@ class EpollMuxer {
     {
         Event ev;
         setEvents(ev, fd, sid, events);
-        os::epoll_ctl(md_, EPOLL_CTL_ADD, fd, ev);
+        os::epoll_ctl(*fh_, EPOLL_CTL_ADD, fd, ev);
     }
     void unsubscribe(int fd) noexcept
     {
@@ -116,13 +102,13 @@ class EpollMuxer {
         // in event, even though this argument is ignored.
         Event ev{};
         std::error_code ec;
-        os::epoll_ctl(md_, EPOLL_CTL_DEL, fd, ev, ec);
+        os::epoll_ctl(*fh_, EPOLL_CTL_DEL, fd, ev, ec);
     }
     void setEvents(int fd, int sid, unsigned events)
     {
         Event ev;
         setEvents(ev, fd, sid, events);
-        os::epoll_ctl(md_, EPOLL_CTL_MOD, fd, ev);
+        os::epoll_ctl(*fh_, EPOLL_CTL_MOD, fd, ev);
     }
 
   private:
@@ -150,14 +136,7 @@ class EpollMuxer {
         ev.events = n;
         ev.data.u64 = static_cast<std::uint64_t>(sid) << 32 | fd;
     }
-    void close() noexcept
-    {
-        if (md_ != -1) {
-            ::close(md_);
-            md_ = -1;
-        }
-    }
-    int md_{-1};
+    FileHandle fh_;
 };
 
 } // namespace sys

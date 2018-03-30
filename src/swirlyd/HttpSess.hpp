@@ -84,7 +84,7 @@ class SWIRLY_API HttpSess
     IoSocket sock_;
     TcpEndpoint ep_;
     RestServ& restServ_;
-    SubHandle sub_;
+    Reactor::Handle sub_;
     Timer tmr_;
     HttpRequest req_;
     Buffer outbuf_;
