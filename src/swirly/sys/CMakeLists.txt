@@ -58,6 +58,7 @@ set(lib_SOURCES
   TcpSocket.cpp
   Time.cpp
   Timer.cpp
+  Traits.cpp
   UdpSocket.cpp)
 
 add_library(swirly-sys-static STATIC ${lib_SOURCES})
@@ -90,7 +91,8 @@ set(test_SOURCES
   Math.ut.cpp
   MemCtx.ut.cpp
   RefCount.ut.cpp
-  Socket.ut.cpp)
+  Socket.ut.cpp
+  Traits.ut.cpp)
 
 add_executable(swirly-sys-test
   ${test_SOURCES}
