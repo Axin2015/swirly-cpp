@@ -110,7 +110,7 @@ class SWIRLY_API Posn : public RefCount<Posn, ThreadUnsafePolicy> {
     void setSellLots(Lots sellLots) noexcept { sellLots_ = sellLots; }
     void setSellCost(Cost sellCost) noexcept { sellCost_ = sellCost; }
 
-    boost::intrusive::set_member_hook<> idHook_;
+    boost::intrusive::set_member_hook<> idHook;
 
   private:
     const Symbol accnt_;
@@ -166,7 +166,7 @@ class SWIRLY_API PosnSet {
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
     using CompareOption = boost::intrusive::compare<ValueCompare>;
     using MemberHookOption
-        = boost::intrusive::member_hook<Posn, decltype(Posn::idHook_), &Posn::idHook_>;
+        = boost::intrusive::member_hook<Posn, decltype(Posn::idHook), &Posn::idHook>;
     using Set
         = boost::intrusive::set<Posn, ConstantTimeSizeOption, CompareOption, MemberHookOption>;
     using ValuePtr = boost::intrusive_ptr<Posn>;

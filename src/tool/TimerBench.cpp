@@ -17,6 +17,7 @@
 #include <swirly/util/Log.hpp>
 
 #include <swirly/sys/EpollReactor.hpp>
+#include <swirly/sys/RefCount.hpp>
 
 #include <iostream>
 #include <queue>
@@ -27,14 +28,8 @@ using namespace swirly;
 
 namespace {
 
-struct TimerHandler : EventHandler {
-
-    using EventHandler::EventHandler;
-
-    ~TimerHandler() override = default;
-
-    void doClose() noexcept override {}
-    void doTimer(Timer& tmr, Time now) override {}
+struct TimerHandler : RefCount<TimerHandler, ThreadUnsafePolicy> {
+    void onTimer(Timer& tmr, Time now) {}
 };
 
 } // namespace
@@ -51,11 +46,13 @@ int main(int argc, char* argv[])
         EpollReactor r{1024};
         priority_queue<pair<int, Timer>> pq;
 
-        auto h = makeIntrusive<TimerHandler>(r);
+        auto h = makeIntrusive<TimerHandler>();
         for (int i{0}; i < 1000000; ++i) {
             const auto now = UnixClock::now();
             if (pq.empty() || dis(gen) % 2 == 0) {
-                pq.emplace(i, r.timer(now + Micros{dis(gen) % 100}, Priority::High, h));
+                pq.emplace(i,
+                           r.timer(now + Micros{dis(gen) % 100}, Priority::High,
+                                   bind<&TimerHandler::onTimer>(h.get())));
             } else {
                 auto tmr = pq.top().second;
                 pq.pop();

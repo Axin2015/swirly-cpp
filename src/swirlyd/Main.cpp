@@ -296,7 +296,7 @@ int main(int argc, char* argv[])
         EpollReactor reactor{1024};
 
         const TcpEndpoint ep{Tcp::v4(), stou16(httpPort)};
-        HttpServ::make(reactor, ep, restServ);
+        HttpServ httpServ{reactor, ep, restServ};
 
         const auto fn = [](Reactor& r) {
             sigBlockAll();

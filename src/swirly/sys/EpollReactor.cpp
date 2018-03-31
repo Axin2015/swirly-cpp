@@ -37,7 +37,7 @@ EpollReactor::EpollReactor(size_t sizeHint)
     auto& ref = data_[fd];
     ref.sid = 0;
     ref.events = EventIn;
-    ref.handler = {};
+    ref.slot = {};
 }
 
 EpollReactor::~EpollReactor()
@@ -56,17 +56,17 @@ void EpollReactor::doClose() noexcept
     efd_.write(1);
 }
 
-Reactor::Handle EpollReactor::doSubscribe(int fd, unsigned events, const EventHandlerPtr& handler)
+Reactor::Handle EpollReactor::doSubscribe(int fd, unsigned events, IoSlot slot)
 {
     assert(fd >= 0);
-    assert(handler);
+    assert(slot);
     if (fd >= static_cast<int>(data_.size())) {
         data_.resize(fd + 1);
     }
     auto& ref = data_[fd];
     mux_.subscribe(fd, ++ref.sid, events);
     ref.events = events;
-    ref.handler = handler;
+    ref.slot = slot;
     return {*this, fd};
 }
 
@@ -75,7 +75,7 @@ void EpollReactor::doUnsubscribe(int fd) noexcept
     mux_.unsubscribe(fd);
     auto& ref = data_[fd];
     ref.events = 0;
-    ref.handler.reset();
+    ref.slot.reset();
 }
 
 void EpollReactor::doSetEvents(int fd, unsigned events)
@@ -87,15 +87,14 @@ void EpollReactor::doSetEvents(int fd, unsigned events)
     }
 }
 
-Timer EpollReactor::doTimer(Time expiry, Duration interval, Priority priority,
-                            const EventHandlerPtr& handler)
+Timer EpollReactor::doTimer(Time expiry, Duration interval, Priority priority, TimerSlot slot)
 {
-    return tqs_[static_cast<size_t>(priority)].insert(expiry, interval, handler);
+    return tqs_[static_cast<size_t>(priority)].insert(expiry, interval, slot);
 }
 
-Timer EpollReactor::doTimer(Time expiry, Priority priority, const EventHandlerPtr& handler)
+Timer EpollReactor::doTimer(Time expiry, Priority priority, TimerSlot slot)
 {
-    return tqs_[static_cast<size_t>(priority)].insert(expiry, handler);
+    return tqs_[static_cast<size_t>(priority)].insert(expiry, slot);
 }
 
 int EpollReactor::doPoll(Time now, Millis timeout)
@@ -154,9 +153,8 @@ int EpollReactor::dispatch(Event* buf, int size, Time now)
             continue;
         }
 
-        EventHandlerPtr eh{ref.handler};
         try {
-            eh->onReady(fd, events, now);
+            ref.slot(fd, events, now);
         } catch (const std::exception& e) {
             using namespace string_literals;
             SWIRLY_ERROR("error handling io event: "s + e.what());

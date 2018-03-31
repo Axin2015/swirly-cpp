@@ -15,29 +15,3 @@
  * 02110-1301, USA.
  */
 #include "TcpAcceptor.hpp"
-
-namespace swirly {
-inline namespace sys {
-using namespace std;
-
-TcpAcceptor::TcpAcceptor(Reactor& r, const Endpoint& ep)
-: EventHandler{r}
-, serv_{ep.protocol()}
-{
-    serv_.setSoReuseAddr(true);
-    serv_.bind(ep);
-    serv_.listen(SOMAXCONN);
-    sub_ = r.subscribe(*serv_, EventIn, self());
-}
-
-TcpAcceptor::~TcpAcceptor() = default;
-
-void TcpAcceptor::doReady(int fd, unsigned events, Time now)
-{
-    Endpoint ep;
-    IoSocket sock{os::accept(fd, ep), serv_.family()};
-    doAccept(move(sock), ep, now);
-}
-
-} // namespace sys
-} // namespace swirly

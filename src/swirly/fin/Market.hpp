@@ -106,7 +106,7 @@ class SWIRLY_API Market
         lastTime_ = now;
     }
     Id64 allocId() noexcept { return ++maxId_; }
-    boost::intrusive::set_member_hook<> idHook_;
+    boost::intrusive::set_member_hook<> idHook;
 
   private:
     MarketSide& side(Side side) noexcept { return side == Side::Buy ? bidSide_ : offerSide_; }

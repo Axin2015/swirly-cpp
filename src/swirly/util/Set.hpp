@@ -52,7 +52,7 @@ class IdSet {
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
     using CompareOption = boost::intrusive::compare<ValueCompare>;
     using MemberHookOption
-        = boost::intrusive::member_hook<ValueT, decltype(ValueT::idHook_), &ValueT::idHook_>;
+        = boost::intrusive::member_hook<ValueT, decltype(ValueT::idHook), &ValueT::idHook>;
     using Set
         = boost::intrusive::set<ValueT, ConstantTimeSizeOption, CompareOption, MemberHookOption>;
     using ValuePtr = boost::intrusive_ptr<ValueT>;
@@ -176,8 +176,8 @@ class SymbolSet {
     };
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
     using CompareOption = boost::intrusive::compare<ValueCompare>;
-    using MemberHookOption = boost::intrusive::member_hook<ValueT, decltype(ValueT::symbolHook_),
-                                                           &ValueT::symbolHook_>;
+    using MemberHookOption
+        = boost::intrusive::member_hook<ValueT, decltype(ValueT::symbolHook), &ValueT::symbolHook>;
     using Set
         = boost::intrusive::set<ValueT, ConstantTimeSizeOption, CompareOption, MemberHookOption>;
     using ValuePtr = std::unique_ptr<ValueT>;

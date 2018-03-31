@@ -134,9 +134,9 @@ class SWIRLY_API Order
     {
         trade(lastLots, swirly::cost(lastLots, lastTicks), lastLots, lastTicks, now);
     }
-    boost::intrusive::set_member_hook<> idHook_;
-    boost::intrusive::set_member_hook<> refHook_;
-    boost::intrusive::list_member_hook<> listHook_;
+    boost::intrusive::set_member_hook<> idHook;
+    boost::intrusive::set_member_hook<> refHook;
+    boost::intrusive::list_member_hook<> listHook;
 
   private:
     // Internals.
@@ -190,7 +190,7 @@ class SWIRLY_API OrderRefSet {
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
     using CompareOption = boost::intrusive::compare<ValueCompare>;
     using MemberHookOption
-        = boost::intrusive::member_hook<Order, decltype(Order::refHook_), &Order::refHook_>;
+        = boost::intrusive::member_hook<Order, decltype(Order::refHook), &Order::refHook>;
     using Set
         = boost::intrusive::set<Order, ConstantTimeSizeOption, CompareOption, MemberHookOption>;
     using ValuePtr = boost::intrusive_ptr<Order>;
@@ -274,7 +274,7 @@ class SWIRLY_API OrderRefSet {
 class SWIRLY_API OrderList {
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
     using MemberHookOption
-        = boost::intrusive::member_hook<Order, decltype(Order::listHook_), &Order::listHook_>;
+        = boost::intrusive::member_hook<Order, decltype(Order::listHook), &Order::listHook>;
     using List = boost::intrusive::list<Order, ConstantTimeSizeOption, MemberHookOption>;
     using ValuePtr = boost::intrusive_ptr<Order>;
 

@@ -21,6 +21,8 @@
 
 #include <swirly/sys/Muxer.hpp>
 
+#include <atomic>
+
 namespace swirly {
 inline namespace sys {
 
@@ -50,14 +52,13 @@ class SWIRLY_API EpollReactor : public Reactor {
      */
     void doClose() noexcept override;
 
-    Handle doSubscribe(int fd, unsigned events, const EventHandlerPtr& handler) override;
+    Handle doSubscribe(int fd, unsigned events, IoSlot slot) override;
     void doUnsubscribe(int fd) noexcept override;
 
     void doSetEvents(int fd, unsigned events) override;
 
-    Timer doTimer(Time expiry, Duration interval, Priority priority,
-                  const EventHandlerPtr& handler) override;
-    Timer doTimer(Time expiry, Priority priority, const EventHandlerPtr& handler) override;
+    Timer doTimer(Time expiry, Duration interval, Priority priority, TimerSlot slot) override;
+    Timer doTimer(Time expiry, Priority priority, TimerSlot slot) override;
 
     int doPoll(Time now, Millis timeout) override;
 
@@ -67,7 +68,7 @@ class SWIRLY_API EpollReactor : public Reactor {
     struct Data {
         int sid{};
         unsigned events{};
-        EventHandlerPtr handler;
+        IoSlot slot;
     };
     EpollMuxer mux_;
     std::vector<Data> data_;

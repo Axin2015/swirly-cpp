@@ -74,7 +74,7 @@ class SWIRLY_API Level
 
     void subOrder(const Order& order) noexcept;
 
-    boost::intrusive::set_member_hook<> keyHook_;
+    boost::intrusive::set_member_hook<> keyHook;
 
   private:
     const Order* firstOrder_;
@@ -104,7 +104,7 @@ class SWIRLY_API LevelSet {
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
     using CompareOption = boost::intrusive::compare<ValueCompare>;
     using MemberHookOption
-        = boost::intrusive::member_hook<Level, decltype(Level::keyHook_), &Level::keyHook_>;
+        = boost::intrusive::member_hook<Level, decltype(Level::keyHook), &Level::keyHook>;
     using Set
         = boost::intrusive::set<Level, ConstantTimeSizeOption, CompareOption, MemberHookOption>;
     using ValuePtr = std::unique_ptr<Level>;

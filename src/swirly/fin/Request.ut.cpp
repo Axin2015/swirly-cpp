@@ -34,7 +34,7 @@ class Foo
         ++alive;
     }
     ~Foo() { --alive_; }
-    boost::intrusive::set_member_hook<> idHook_;
+    boost::intrusive::set_member_hook<> idHook;
 
   private:
     int& alive_;
