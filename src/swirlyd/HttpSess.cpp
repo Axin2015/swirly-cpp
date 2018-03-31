@@ -59,7 +59,7 @@ void HttpSess::doReady(int fd, unsigned events, Time now)
             outbuf_.consume(os::write(fd, outbuf_.data()));
             if (outbuf_.empty()) {
                 // May throw.
-                reactor().setEvents(*sock_, EventIn);
+                sub_.setEvents(EventIn);
             }
         }
         if (events & EventIn) {
@@ -154,7 +154,7 @@ bool HttpSess::doMessageEnd() noexcept
 
         if (wasEmpty) {
             // May throw.
-            reactor().setEvents(*sock_, EventIn | EventOut);
+            sub_.setEvents(EventIn | EventOut);
         }
         ret = true;
     } catch (const std::exception& e) {

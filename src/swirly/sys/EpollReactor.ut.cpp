@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(EpollReactorHandlerCase)
 {
     Counters cntrs;
     EpollReactor r{1024};
-    SubHandle out, err;
+    Reactor::Handle out, err;
     {
         BOOST_TEST(cntrs.dtor == 0);
         auto h = makeIntrusive<TestHandler>(r, cntrs);
@@ -83,10 +83,10 @@ BOOST_AUTO_TEST_CASE(EpollReactorHandlerCase)
     }
     BOOST_TEST(cntrs.dtor == 0);
 
-    r.unsubscribe(STDOUT_FILENO);
+    out.reset();
     BOOST_TEST(cntrs.dtor == 0);
 
-    r.unsubscribe(STDERR_FILENO);
+    err.reset();
     BOOST_TEST(cntrs.dtor == 1);
 }
 
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(EpollReactorLevelCase)
     auto h = makeIntrusive<TestHandler>(r);
 
     auto socks = socketpair(LocalStream{});
-    const auto tok = r.subscribe(*socks.second, EventIn, h);
+    const auto sub = r.subscribe(*socks.second, EventIn, h);
 
     BOOST_TEST(r.poll(0ms) == 0);
     BOOST_TEST(h->matches() == 0);
@@ -119,8 +119,6 @@ BOOST_AUTO_TEST_CASE(EpollReactorLevelCase)
 
     BOOST_TEST(r.poll(0ms) == 0);
     BOOST_TEST(h->matches() == 3);
-
-    r.unsubscribe(*socks.second);
 }
 
 BOOST_AUTO_TEST_CASE(EpollReactorEdgeCase)
@@ -131,7 +129,7 @@ BOOST_AUTO_TEST_CASE(EpollReactorEdgeCase)
     auto h = makeIntrusive<TestHandler>(r);
 
     auto socks = socketpair(LocalStream{});
-    const auto tok = r.subscribe(*socks.second, EventIn | EventEt, h);
+    auto sub = r.subscribe(*socks.second, EventIn | EventEt, h);
 
     BOOST_TEST(r.poll(0ms) == 0);
     BOOST_TEST(h->matches() == 0);
@@ -146,7 +144,7 @@ BOOST_AUTO_TEST_CASE(EpollReactorEdgeCase)
     BOOST_TEST(h->matches() == 1);
 
     // Revert to level-triggered.
-    r.setEvents(*socks.second, EventIn);
+    sub.setEvents(EventIn);
     BOOST_TEST(r.poll(0ms) == 1);
     BOOST_TEST(h->matches() == 2);
 
@@ -159,8 +157,6 @@ BOOST_AUTO_TEST_CASE(EpollReactorEdgeCase)
 
     BOOST_TEST(r.poll(0ms) == 0);
     BOOST_TEST(h->matches() == 3);
-
-    r.unsubscribe(*socks.second);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

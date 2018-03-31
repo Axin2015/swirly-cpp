@@ -20,6 +20,8 @@
 #include <cstddef> // nullptr_t
 #include <utility> // swap<>
 
+#include <unistd.h> // close()
+
 namespace swirly {
 inline namespace sys {
 
@@ -30,7 +32,7 @@ class BasicHandle {
 
     static constexpr Id invalid() noexcept { return PolicyT::invalid(); }
 
-    BasicHandle(std::nullptr_t = nullptr) noexcept {}
+    constexpr BasicHandle(std::nullptr_t = nullptr) noexcept {}
     constexpr BasicHandle(Id id) noexcept
     : id_{id}
     {
@@ -59,11 +61,11 @@ class BasicHandle {
         return *this;
     }
 
-    constexpr Id operator*() const noexcept { return get(); }
+    constexpr bool empty() const noexcept { return id_ == invalid(); }
+    explicit constexpr operator bool() const noexcept { return id_ != invalid(); }
 
     constexpr Id get() const noexcept { return id_; }
-
-    explicit constexpr operator bool() const noexcept { return id_ != invalid(); }
+    constexpr Id operator*() const noexcept { return get(); }
 
     Id release() noexcept
     {
@@ -104,6 +106,14 @@ constexpr bool operator!=(const BasicHandle<PolicyT>& lhs, const BasicHandle<Pol
 {
     return !(lhs == rhs);
 }
+
+struct FilePolicy {
+    using Id = int;
+    static constexpr int invalid() noexcept { return -1; }
+    static void close(int d) noexcept { ::close(d); }
+};
+
+using FileHandle = BasicHandle<FilePolicy>;
 
 } // namespace sys
 } // namespace swirly

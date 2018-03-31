@@ -29,6 +29,7 @@ endif()
 set(lib_SOURCES
   Buffer.cpp
   Daemon.cpp
+  Epoll.cpp
   EpollReactor.cpp
   Error.cpp
   Event.cpp
@@ -48,7 +49,6 @@ set(lib_SOURCES
   Memory.cpp
   Muxer.cpp
   PidFile.cpp
-  Poll.cpp
   Reactor.cpp
   RefCount.cpp
   Signal.cpp

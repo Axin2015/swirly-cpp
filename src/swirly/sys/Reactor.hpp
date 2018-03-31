@@ -18,7 +18,6 @@
 #define SWIRLY_SYS_REACTOR_HPP
 
 #include <swirly/sys/EventHandler.hpp>
-#include <swirly/sys/Handle.hpp>
 #include <swirly/sys/Timer.hpp>
 
 namespace swirly {
@@ -26,31 +25,62 @@ inline namespace sys {
 
 enum class Priority { High = 0, Low = 1 };
 
-struct SubPolicy {
-    struct Id {
-        Reactor* reactor{nullptr};
-        int value{-1};
-    };
-    static constexpr Id invalid() noexcept { return {}; }
-    static void close(Id id) noexcept;
-};
-
-inline bool operator==(SubPolicy::Id lhs, SubPolicy::Id rhs) noexcept
-{
-    assert(lhs.reactor == rhs.reactor || !lhs.reactor || !rhs.reactor);
-    return lhs.value == rhs.value;
-}
-
-inline bool operator!=(SubPolicy::Id lhs, SubPolicy::Id rhs) noexcept
-{
-    assert(lhs.reactor == rhs.reactor || !lhs.reactor || !rhs.reactor);
-    return lhs.value != rhs.value;
-}
-
-using SubHandle = BasicHandle<SubPolicy>;
-
 class SWIRLY_API Reactor {
   public:
+    class Handle {
+      public:
+        Handle(Reactor& reactor, int fd)
+        : reactor_{&reactor}
+        , fd_{fd}
+        {
+        }
+        Handle() = default;
+        ~Handle() noexcept { reset(); }
+
+        // Copy.
+        Handle(const Handle&) = delete;
+        Handle& operator=(const Handle&) = delete;
+
+        // Move.
+        Handle(Handle&& rhs) noexcept
+        : reactor_{rhs.reactor_}
+        , fd_{rhs.fd_}
+        {
+            rhs.reactor_ = nullptr;
+            rhs.fd_ = -1;
+        }
+        Handle& operator=(Handle&& rhs) noexcept
+        {
+            reset();
+            swap(rhs);
+            return *this;
+        }
+        bool empty() const noexcept { return reactor_ == nullptr; }
+        explicit operator bool() const noexcept { return reactor_ != nullptr; }
+        auto fd() const noexcept { return fd_; }
+
+        void reset() noexcept
+        {
+            if (reactor_) {
+                reactor_->doUnsubscribe(fd_);
+                reactor_ = nullptr;
+                fd_ = -1;
+            }
+        }
+        void swap(Handle& rhs) noexcept
+        {
+            std::swap(reactor_, rhs.reactor_);
+            std::swap(fd_, rhs.fd_);
+        }
+
+        // Modify IO event subscription.
+        void setEvents(unsigned events) { reactor_->doSetEvents(fd_, events); }
+
+      private:
+        Reactor* reactor_{nullptr};
+        int fd_{-1};
+    };
+
     Reactor() noexcept = default;
     virtual ~Reactor();
 
@@ -68,24 +98,20 @@ class SWIRLY_API Reactor {
      * Thread-safe.
      */
     void close() noexcept { doClose(); }
-    SubHandle subscribe(int fd, unsigned events, const EventHandlerPtr& handler)
+    [[nodiscard]] Handle subscribe(int fd, unsigned events, const EventHandlerPtr& handler)
     {
         return doSubscribe(fd, events, handler);
     }
-    void unsubscribe(int fd) noexcept { doUnsubscribe(fd); }
-    void setEvents(int fd, unsigned events) { doSetEvents(fd, events); }
-    Timer timer(Time expiry, Duration interval, Priority priority, const EventHandlerPtr& handler)
+    [[nodiscard]] Timer timer(Time expiry, Duration interval, Priority priority,
+                              const EventHandlerPtr& handler)
     {
         return doTimer(expiry, interval, priority, handler);
     }
-    Timer timer(Time expiry, Priority priority, const EventHandlerPtr& handler)
+    [[nodiscard]] Timer timer(Time expiry, Priority priority, const EventHandlerPtr& handler)
     {
         return doTimer(expiry, priority, handler);
     }
-    int poll(std::chrono::milliseconds timeout = std::chrono::milliseconds::max())
-    {
-        return doPoll(UnixClock::now(), timeout);
-    }
+    int poll(Millis timeout = Millis::max()) { return doPoll(UnixClock::now(), timeout); }
 
   protected:
     /**
@@ -103,7 +129,7 @@ class SWIRLY_API Reactor {
      */
     virtual void doClose() noexcept = 0;
 
-    virtual SubHandle doSubscribe(int fd, unsigned events, const EventHandlerPtr& handler) = 0;
+    virtual Handle doSubscribe(int fd, unsigned events, const EventHandlerPtr& handler) = 0;
     virtual void doUnsubscribe(int fd) noexcept = 0;
 
     virtual void doSetEvents(int fd, unsigned events) = 0;
@@ -113,13 +139,8 @@ class SWIRLY_API Reactor {
         = 0;
     virtual Timer doTimer(Time expiry, Priority priority, const EventHandlerPtr& handler) = 0;
 
-    virtual int doPoll(Time now, std::chrono::milliseconds timeout) = 0;
+    virtual int doPoll(Time now, Millis timeout) = 0;
 };
-
-inline void SubPolicy::close(Id id) noexcept
-{
-    id.reactor->unsubscribe(id.value);
-}
 
 } // namespace sys
 } // namespace swirly

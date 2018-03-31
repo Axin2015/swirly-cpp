@@ -14,41 +14,19 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SYS_POLL_HPP
-#define SWIRLY_SYS_POLL_HPP
+#ifndef SWIRLY_SYS_EPOLL_HPP
+#define SWIRLY_SYS_EPOLL_HPP
 
 #include <swirly/sys/Error.hpp>
+#include <swirly/sys/Handle.hpp>
 
-#include <poll.h>
-
-#if defined(__linux__)
 #include <sys/epoll.h>
-#endif
 
 namespace swirly {
 inline namespace sys {
 namespace os {
 
-inline int poll(pollfd* fds, nfds_t nfds, int timeout, std::error_code& ec) noexcept
-{
-    const auto ret = ::poll(fds, nfds, timeout);
-    if (ret < 0) {
-        ec = makeError(errno);
-    }
-    return ret;
-}
-
-inline int poll(pollfd* fds, nfds_t nfds, int timeout)
-{
-    const auto ret = ::poll(fds, nfds, timeout);
-    if (ret < 0) {
-        throw std::system_error{makeError(errno), "poll"};
-    }
-    return ret;
-}
-
-#if defined(__linux__)
-inline int epoll_create(int size, std::error_code& ec) noexcept
+inline FileHandle epoll_create(int size, std::error_code& ec) noexcept
 {
     const auto ret = ::epoll_create(size);
     if (ret < 0) {
@@ -57,13 +35,13 @@ inline int epoll_create(int size, std::error_code& ec) noexcept
     return ret;
 }
 
-inline int epoll_create(int size)
+inline FileHandle epoll_create(int size)
 {
-    const auto ret = ::epoll_create(size);
-    if (ret < 0) {
+    const auto fd = ::epoll_create(size);
+    if (fd < 0) {
         throw std::system_error{makeError(errno), "epoll_create"};
     }
-    return ret;
+    return fd;
 }
 
 inline int epoll_ctl(int epfd, int op, int fd, epoll_event event, std::error_code& ec) noexcept
@@ -75,13 +53,12 @@ inline int epoll_ctl(int epfd, int op, int fd, epoll_event event, std::error_cod
     return ret;
 }
 
-inline int epoll_ctl(int epfd, int op, int fd, epoll_event event)
+inline void epoll_ctl(int epfd, int op, int fd, epoll_event event)
 {
     const auto ret = ::epoll_ctl(epfd, op, fd, &event);
     if (ret < 0) {
         throw std::system_error{makeError(errno), "epoll_ctl"};
     }
-    return ret;
 }
 
 inline int epoll_wait(int epfd, epoll_event* events, int maxevents, int timeout,
@@ -102,10 +79,9 @@ inline int epoll_wait(int epfd, epoll_event* events, int maxevents, int timeout)
     }
     return ret;
 }
-#endif
 
 } // namespace os
 } // namespace sys
 } // namespace swirly
 
-#endif // SWIRLY_SYS_POLL_HPP
+#endif // SWIRLY_SYS_EPOLL_HPP
