@@ -47,6 +47,7 @@ set(lib_SOURCES
   Stream.cpp
   String.cpp
   StringBuf.cpp
+  Struct.cpp
   Symbol.cpp
   Tokeniser.cpp
   TypeTraits.cpp
@@ -92,6 +93,7 @@ set(test_SOURCES
   Stream.ut.cpp
   String.ut.cpp
   StringBuf.ut.cpp
+  Struct.ut.cpp
   Symbol.ut.cpp
   Tokeniser.ut.cpp
   Utility.ut.cpp

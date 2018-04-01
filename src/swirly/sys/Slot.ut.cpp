@@ -36,13 +36,13 @@ static_assert(!BasicSlot<int>{});
 
 BOOST_AUTO_TEST_SUITE(SlotSuite)
 
-BOOST_AUTO_TEST_CASE(EmptyCase)
+BOOST_AUTO_TEST_CASE(SlotEmptyCase)
 {
     BOOST_TEST(BasicSlot<int>{}.empty());
     BOOST_TEST(!BasicSlot<int>{});
 }
 
-BOOST_AUTO_TEST_CASE(FreeFunCase)
+BOOST_AUTO_TEST_CASE(SlotFreeFunCase)
 {
     int x{2};
     auto cb = bind<foo>();
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(FreeFunCase)
     BOOST_TEST(x == 8);
 }
 
-BOOST_AUTO_TEST_CASE(FunctorCase)
+BOOST_AUTO_TEST_CASE(SlotFunctorCase)
 {
     struct Test {
         void operator()() { x <<= 1; }
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(FunctorCase)
     BOOST_TEST(t.x == 8);
 }
 
-BOOST_AUTO_TEST_CASE(ConstFunctorCase)
+BOOST_AUTO_TEST_CASE(SlotConstFunctorCase)
 {
     struct Test {
         void operator()(int& x) const { x <<= 1; }
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(ConstFunctorCase)
     BOOST_TEST(x == 8);
 }
 
-BOOST_AUTO_TEST_CASE(LambdaCase)
+BOOST_AUTO_TEST_CASE(SlotLambdaCase)
 {
     int x{2};
     auto fn = [&x]() { x <<= 1; };
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(LambdaCase)
     BOOST_TEST(x == 8);
 }
 
-BOOST_AUTO_TEST_CASE(MemFunCase)
+BOOST_AUTO_TEST_CASE(SlotMemFunCase)
 {
     struct Test {
         void foo() { x <<= 1; }
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(MemFunCase)
     BOOST_TEST(t.x == 7);
 }
 
-BOOST_AUTO_TEST_CASE(ConstMemFunCase)
+BOOST_AUTO_TEST_CASE(SlotConstMemFunCase)
 {
     struct Test {
         void get(int& val) const { val = x; }

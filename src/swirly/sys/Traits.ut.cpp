@@ -33,7 +33,7 @@ double foo(short, int, long)
 
 BOOST_AUTO_TEST_SUITE(TraitsSuite)
 
-BOOST_AUTO_TEST_CASE(FreeFunCase)
+BOOST_AUTO_TEST_CASE(TraitsFreeFunCase)
 {
     // Call foo to avoid the following Clang error:
     // function 'foo' is not needed and will not be emitted.
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(FreeFunCase)
     BOOST_TEST(tuple_size_v<Tuple> == 3);
 }
 
-BOOST_AUTO_TEST_CASE(FunctorCase)
+BOOST_AUTO_TEST_CASE(TraitsFunctorCase)
 {
     struct Test {
         double operator()(short, int, long) { return 0.0; }
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(FunctorCase)
     BOOST_TEST(tuple_size_v<Tuple> == 3);
 }
 
-BOOST_AUTO_TEST_CASE(ConstFunctorCase)
+BOOST_AUTO_TEST_CASE(TraitsConstFunctorCase)
 {
     struct Test {
         double operator()(short, int, long) const { return 0.0; }
@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE(ConstFunctorCase)
     BOOST_TEST(tuple_size_v<Tuple> == 3);
 }
 
-BOOST_AUTO_TEST_CASE(LambdaCase)
+BOOST_AUTO_TEST_CASE(TraitsLambdaCase)
 {
     auto fn = [](short, int, long) -> double { return 0.0; };
 
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE(LambdaCase)
     BOOST_TEST(tuple_size_v<Tuple> == 3);
 }
 
-BOOST_AUTO_TEST_CASE(ConstLambdaCase)
+BOOST_AUTO_TEST_CASE(TraitsConstLambdaCase)
 {
     const auto fn = [](short, int, long) -> double { return 0.0; };
 
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(ConstLambdaCase)
     BOOST_TEST(tuple_size_v<Tuple> == 3);
 }
 
-BOOST_AUTO_TEST_CASE(MemFunCase)
+BOOST_AUTO_TEST_CASE(TraitsMemFunCase)
 {
     struct Test {
         short foo(int) { return 0; }
@@ -146,7 +146,7 @@ BOOST_AUTO_TEST_CASE(MemFunCase)
     BOOST_TEST(tuple_size_v<BarTuple> == 2);
 }
 
-BOOST_AUTO_TEST_CASE(ConstMemFunCase)
+BOOST_AUTO_TEST_CASE(TraitsConstMemFunCase)
 {
     struct Test {
         short foo(int) const { return 0; }
