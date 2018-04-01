@@ -17,6 +17,7 @@
 #include "EpollReactor.hpp"
 #include "IoSocket.hpp"
 #include "LocalAddress.hpp"
+#include "RefCount.hpp"
 
 #define BOOST_TEST_NO_MAIN
 #include <boost/test/unit_test.hpp>
@@ -26,99 +27,51 @@ using namespace swirly;
 
 namespace {
 
-struct Counters {
-    int dtor{};
-};
-
-struct TestHandler : EventHandler {
-
-    using EventHandler::EventHandler;
-
-    explicit TestHandler(Reactor& r, Counters& cntrs) noexcept
-    : EventHandler{r}
-    , cntrs_{&cntrs}
-    {
-    }
-
-    TestHandler() noexcept = default;
-    ~TestHandler() override
-    {
-        if (cntrs_) {
-            ++cntrs_->dtor;
-        }
-    }
-
-    int matches() const { return matches_; }
-
-  protected:
-    void doClose() noexcept override {}
-    void doReady(int fd, unsigned events, Time now) override
+struct TestHandler : RefCount<TestHandler, ThreadUnsafePolicy> {
+    void onReady(int fd, unsigned events, Time now)
     {
         char buf[4];
         os::recv(fd, buf, 4, 0);
         if (strcmp(buf, "foo") == 0) {
-            ++matches_;
+            ++matches;
         }
     }
-
-  private:
-    Counters* cntrs_{nullptr};
-    int matches_{};
+    int matches{};
 };
 
 } // namespace
 
 BOOST_AUTO_TEST_SUITE(EpollReactorSuite)
 
-BOOST_AUTO_TEST_CASE(EpollReactorHandlerCase)
-{
-    Counters cntrs;
-    EpollReactor r{1024};
-    Reactor::Handle out, err;
-    {
-        BOOST_TEST(cntrs.dtor == 0);
-        auto h = makeIntrusive<TestHandler>(r, cntrs);
-        out = r.subscribe(STDOUT_FILENO, EventOut, h);
-        err = r.subscribe(STDERR_FILENO, EventOut, h);
-    }
-    BOOST_TEST(cntrs.dtor == 0);
-
-    out.reset();
-    BOOST_TEST(cntrs.dtor == 0);
-
-    err.reset();
-    BOOST_TEST(cntrs.dtor == 1);
-}
-
 BOOST_AUTO_TEST_CASE(EpollReactorLevelCase)
 {
     using namespace literals::chrono_literals;
 
     EpollReactor r{1024};
-    auto h = makeIntrusive<TestHandler>(r);
+    auto h = makeIntrusive<TestHandler>();
 
     auto socks = socketpair(LocalStream{});
-    const auto sub = r.subscribe(*socks.second, EventIn, h);
+    const auto sub = r.subscribe(*socks.second, EventIn, bind<&TestHandler::onReady>(h.get()));
 
     BOOST_TEST(r.poll(0ms) == 0);
-    BOOST_TEST(h->matches() == 0);
+    BOOST_TEST(h->matches == 0);
 
     socks.first.send("foo", 4, 0);
     socks.first.send("foo", 4, 0);
     BOOST_TEST(r.poll(0ms) == 1);
-    BOOST_TEST(h->matches() == 1);
+    BOOST_TEST(h->matches == 1);
     BOOST_TEST(r.poll(0ms) == 1);
-    BOOST_TEST(h->matches() == 2);
+    BOOST_TEST(h->matches == 2);
 
     BOOST_TEST(r.poll(0ms) == 0);
-    BOOST_TEST(h->matches() == 2);
+    BOOST_TEST(h->matches == 2);
 
     socks.first.send("foo", 4, 0);
     BOOST_TEST(r.poll(0ms) == 1);
-    BOOST_TEST(h->matches() == 3);
+    BOOST_TEST(h->matches == 3);
 
     BOOST_TEST(r.poll(0ms) == 0);
-    BOOST_TEST(h->matches() == 3);
+    BOOST_TEST(h->matches == 3);
 }
 
 BOOST_AUTO_TEST_CASE(EpollReactorEdgeCase)
@@ -126,37 +79,37 @@ BOOST_AUTO_TEST_CASE(EpollReactorEdgeCase)
     using namespace literals::chrono_literals;
 
     EpollReactor r{1024};
-    auto h = makeIntrusive<TestHandler>(r);
+    auto h = makeIntrusive<TestHandler>();
 
     auto socks = socketpair(LocalStream{});
-    auto sub = r.subscribe(*socks.second, EventIn | EventEt, h);
+    auto sub = r.subscribe(*socks.second, EventIn | EventEt, bind<&TestHandler::onReady>(h.get()));
 
     BOOST_TEST(r.poll(0ms) == 0);
-    BOOST_TEST(h->matches() == 0);
+    BOOST_TEST(h->matches == 0);
 
     socks.first.send("foo", 4, 0);
     socks.first.send("foo", 4, 0);
     BOOST_TEST(r.poll(0ms) == 1);
-    BOOST_TEST(h->matches() == 1);
+    BOOST_TEST(h->matches == 1);
 
     // No notification for second message.
     BOOST_TEST(r.poll(0ms) == 0);
-    BOOST_TEST(h->matches() == 1);
+    BOOST_TEST(h->matches == 1);
 
     // Revert to level-triggered.
     sub.setEvents(EventIn);
     BOOST_TEST(r.poll(0ms) == 1);
-    BOOST_TEST(h->matches() == 2);
+    BOOST_TEST(h->matches == 2);
 
     BOOST_TEST(r.poll(0ms) == 0);
-    BOOST_TEST(h->matches() == 2);
+    BOOST_TEST(h->matches == 2);
 
     socks.first.send("foo", 4, 0);
     BOOST_TEST(r.poll(0ms) == 1);
-    BOOST_TEST(h->matches() == 3);
+    BOOST_TEST(h->matches == 3);
 
     BOOST_TEST(r.poll(0ms) == 0);
-    BOOST_TEST(h->matches() == 3);
+    BOOST_TEST(h->matches == 3);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -37,12 +37,12 @@ bool isAfter(const Timer& lhs, const Timer& rhs)
 
 } // namespace
 
-Timer TimerQueue::insert(Time expiry, Duration interval, const EventHandlerPtr& handler)
+Timer TimerQueue::insert(Time expiry, Duration interval, TimerSlot slot)
 {
-    assert(handler);
+    assert(slot);
 
     heap_.reserve(heap_.size() + 1);
-    const auto tmr = alloc(expiry, interval, handler);
+    const auto tmr = alloc(expiry, interval, slot);
 
     // Cannot fail.
     heap_.push_back(tmr);
@@ -75,7 +75,7 @@ int TimerQueue::dispatch(Time now)
     return n;
 }
 
-Timer TimerQueue::alloc(Time expiry, Duration interval, const EventHandlerPtr& handler)
+Timer TimerQueue::alloc(Time expiry, Duration interval, TimerSlot slot)
 {
     Timer::Impl* impl;
 
@@ -103,7 +103,7 @@ Timer TimerQueue::alloc(Time expiry, Duration interval, const EventHandlerPtr& h
     impl->id = ++maxId_;
     impl->expiry = expiry;
     impl->interval = interval;
-    impl->handler = handler;
+    impl->slot = slot;
 
     return Timer{impl};
 }
@@ -127,7 +127,7 @@ void TimerQueue::expire(Time now)
     assert(tmr.pending());
     try {
         // Notify user.
-        tmr.handler()->onTimer(tmr, now);
+        tmr.slot().invoke(tmr, now);
     } catch (const std::exception& e) {
         using namespace string_literals;
         SWIRLY_ERROR("error handling timer event: "s + e.what());
@@ -150,7 +150,7 @@ void TimerQueue::expire(Time now)
     } else {
 
         // Free handler for non-repeating timer.
-        tmr.handler().reset();
+        tmr.slot().reset();
     }
 }
 

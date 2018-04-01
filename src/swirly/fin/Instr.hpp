@@ -69,7 +69,7 @@ class SWIRLY_API Instr : public Comparable<Instr> {
     auto priceDp() const noexcept { return priceDp_; }
     auto minLots() const noexcept { return minLots_; }
     auto maxLots() const noexcept { return maxLots_; }
-    boost::intrusive::set_member_hook<> symbolHook_;
+    boost::intrusive::set_member_hook<> symbolHook;
 
   private:
     const Id32 id_;

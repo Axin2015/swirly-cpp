@@ -29,30 +29,33 @@ enum { MaxData = 2048 };
 } // namespace
 
 HttpSess::HttpSess(Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, RestServ& rs, Time now)
-: EventHandler{r}
-, BasicHttpParser<HttpSess>{HttpType::Request}
+: BasicHttpParser<HttpSess>{HttpType::Request}
+, reactor_(r)
 , sock_{move(sock)}
 , ep_{ep}
 , restServ_(rs)
 {
     SWIRLY_INFO(logMsg() << "accept session");
 
-    const auto eh = self();
-    sub_ = r.subscribe(*sock_, EventIn, eh);
-    tmr_ = r.timer(now + IdleTimeout, Priority::Low, eh);
+    sub_ = r.subscribe(*sock_, EventIn, bind<&HttpSess::onReady>(this));
+    tmr_ = r.timer(now + IdleTimeout, Priority::Low, bind<&HttpSess::onTimer>(this));
 }
 
-HttpSess::~HttpSess() = default;
+HttpSess::~HttpSess()
+{
+    SWIRLY_INFO(logMsg() << "~HttpSess()");
+}
 
-void HttpSess::doClose() noexcept
+void HttpSess::close() noexcept
 {
     SWIRLY_INFO(logMsg() << "close session");
     pause();
     tmr_.cancel();
     sub_.reset();
+    delete this;
 }
 
-void HttpSess::doReady(int fd, unsigned events, Time now)
+void HttpSess::onReady(int fd, unsigned events, Time now)
 {
     try {
         if (events & EventOut) {
@@ -70,7 +73,8 @@ void HttpSess::doReady(int fd, unsigned events, Time now)
             } else {
                 parse({in, size});
                 tmr_.cancel();
-                tmr_ = reactor().timer(now + IdleTimeout, Priority::Low, self());
+                tmr_ = reactor_.timer(now + IdleTimeout, Priority::Low,
+                                      bind<&HttpSess::onTimer>(this));
             }
         }
     } catch (const std::exception& e) {
@@ -79,7 +83,7 @@ void HttpSess::doReady(int fd, unsigned events, Time now)
     }
 }
 
-void HttpSess::doTimer(Timer& tmr, Time now)
+void HttpSess::onTimer(Timer& tmr, Time now)
 {
     SWIRLY_INFO(logMsg() << "timeout");
     close();

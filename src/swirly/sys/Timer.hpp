@@ -17,10 +17,12 @@
 #ifndef SWIRLY_SYS_TIMER_HPP
 #define SWIRLY_SYS_TIMER_HPP
 
-#include <swirly/sys/EventHandler.hpp>
+#include <swirly/sys/Slot.hpp>
 #include <swirly/sys/Time.hpp>
 
 #include <swirly/Config.h>
+
+#include <boost/intrusive_ptr.hpp>
 
 #include <memory>
 #include <vector>
@@ -28,7 +30,9 @@
 namespace swirly {
 inline namespace sys {
 
+class Timer;
 class TimerQueue;
+using TimerSlot = BasicSlot<Timer&, Time>;
 
 class SWIRLY_API Timer {
 
@@ -42,7 +46,7 @@ class SWIRLY_API Timer {
         long id;
         Time expiry;
         Duration interval;
-        EventHandlerPtr handler;
+        TimerSlot slot;
     };
     friend class TimerQueue;
     friend void intrusive_ptr_add_ref(Impl* impl) noexcept;
@@ -71,7 +75,7 @@ class SWIRLY_API Timer {
     Time expiry() const noexcept { return impl_->expiry; }
 
     Duration interval() const noexcept { return impl_->interval; }
-    bool pending() const noexcept { return impl_ != nullptr && bool{impl_->handler}; }
+    bool pending() const noexcept { return impl_ != nullptr && bool{impl_->slot}; }
     // Setting the interval will not reschedule any pending timer.
     template <typename RepT, typename PeriodT>
     void setInterval(std::chrono::duration<RepT, PeriodT> interval) noexcept
@@ -80,11 +84,13 @@ class SWIRLY_API Timer {
         impl_->interval = duration_cast<Duration>(interval);
     }
     void reset() noexcept;
+    void swap(Timer& rhs) noexcept { impl_.swap(rhs.impl_); }
     void cancel() noexcept;
 
   private:
     void setExpiry(Time expiry) noexcept { impl_->expiry = expiry; }
-    EventHandlerPtr& handler() noexcept { return impl_->handler; }
+    TimerSlot& slot() noexcept { return impl_->slot; }
+
     boost::intrusive_ptr<Timer::Impl> impl_;
 };
 
@@ -158,16 +164,16 @@ class SWIRLY_API TimerQueue {
     bool empty() const noexcept { return size() == 0; }
     const Timer& front() const { return heap_.front(); }
 
-    [[nodiscard]] Timer insert(Time expiry, Duration interval, const EventHandlerPtr& handler);
-    [[nodiscard]] Timer insert(Time expiry, const EventHandlerPtr& handler)
+    [[nodiscard]] Timer insert(Time expiry, Duration interval, TimerSlot slot);
+    [[nodiscard]] Timer insert(Time expiry, TimerSlot slot)
     {
-        return insert(expiry, Duration::zero(), handler);
+        return insert(expiry, Duration::zero(), slot);
     }
 
     int dispatch(Time now);
 
   private:
-    Timer alloc(Time expiry, Duration interval, const EventHandlerPtr& handler);
+    Timer alloc(Time expiry, Duration interval, TimerSlot slot);
     void cancel() noexcept;
     void expire(Time now);
     void gc() noexcept;
@@ -200,9 +206,9 @@ inline void Timer::reset() noexcept
 {
     if (impl_) {
         // If pending, and if only two references to the timer remain (this one and the one in the
-        // queue), then reset the handler and inform the queue that the timer has been cancelled.
-        if (impl_->handler && impl_->refCount == 2) {
-            impl_->handler.reset();
+        // queue), then reset the slot and inform the queue that the timer has been cancelled.
+        if (impl_->slot && impl_->refCount == 2) {
+            impl_->slot.reset();
             impl_->tq->cancel();
         }
         impl_.reset();
@@ -211,9 +217,9 @@ inline void Timer::reset() noexcept
 
 inline void Timer::cancel() noexcept
 {
-    // If pending, then reset the handler and inform the queue that the timer has been cancelled.
-    if (impl_->handler) {
-        impl_->handler.reset();
+    // If pending, then reset the slot and inform the queue that the timer has been cancelled.
+    if (impl_->slot) {
+        impl_->slot.reset();
         impl_->tq->cancel();
     }
 }

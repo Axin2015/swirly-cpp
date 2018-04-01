@@ -141,7 +141,7 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
         assert(posn->accnt() == symbol_);
         posns_.insert(posn);
     }
-    boost::intrusive::set_member_hook<> symbolHook_;
+    boost::intrusive::set_member_hook<> symbolHook;
     using PosnSet = IdSet<Posn, MarketIdTraits<Posn>>;
 
   private:

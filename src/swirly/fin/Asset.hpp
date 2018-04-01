@@ -61,7 +61,7 @@ class SWIRLY_API Asset : public Comparable<Asset> {
     auto symbol() const noexcept { return symbol_; }
     auto display() const noexcept { return +display_; }
     auto type() const noexcept { return type_; }
-    boost::intrusive::set_member_hook<> symbolHook_;
+    boost::intrusive::set_member_hook<> symbolHook;
 
   private:
     const Id32 id_;

@@ -26,19 +26,21 @@
 #include <swirly/sys/MemAlloc.hpp>
 #include <swirly/sys/TcpAcceptor.hpp>
 
+#include <boost/intrusive/list.hpp>
+
 namespace swirly {
 
 class RestServ;
 
 class SWIRLY_API HttpSess
-: public EventHandler
-, public BasicHttpParser<HttpSess>
+: public BasicHttpParser<HttpSess>
 , public MemAlloc {
     friend class BasicHttpParser<HttpSess>;
+    using AutoUnlinkOption = boost::intrusive::link_mode<boost::intrusive::auto_unlink>;
 
   public:
     HttpSess(Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, RestServ& rs, Time now);
-    ~HttpSess() override;
+    ~HttpSess();
 
     // Copy.
     HttpSess(const HttpSess&) = delete;
@@ -48,16 +50,13 @@ class SWIRLY_API HttpSess
     HttpSess(HttpSess&&) = delete;
     HttpSess& operator=(HttpSess&&) = delete;
 
-    static auto make(Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, RestServ& rs, Time now)
-    {
-        return makeIntrusive<HttpSess>(r, std::move(sock), ep, rs, now);
-    }
+    void close() noexcept;
+    void onReady(int fd, unsigned events, Time now);
+    void onTimer(Timer& tmr, Time now);
+
+    boost::intrusive::list_member_hook<AutoUnlinkOption> listHook;
 
   protected:
-    void doClose() noexcept override;
-    void doReady(int fd, unsigned events, Time now) override;
-    void doTimer(Timer& tmr, Time now) override;
-
     bool doMessageBegin() noexcept { return true; }
     bool doUrl(std::string_view sv) noexcept;
     bool doStatus(std::string_view sv) noexcept
@@ -81,6 +80,7 @@ class SWIRLY_API HttpSess
     }
 
   private:
+    Reactor& reactor_;
     IoSocket sock_;
     TcpEndpoint ep_;
     RestServ& restServ_;

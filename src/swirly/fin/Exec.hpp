@@ -109,7 +109,7 @@ class SWIRLY_API Exec
               cpty);
     }
 
-    boost::intrusive::set_member_hook<> idHook_;
+    boost::intrusive::set_member_hook<> idHook;
 
   private:
     const Id64 orderId_;

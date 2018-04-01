@@ -17,13 +17,14 @@
 #ifndef SWIRLY_SYS_REACTOR_HPP
 #define SWIRLY_SYS_REACTOR_HPP
 
-#include <swirly/sys/EventHandler.hpp>
 #include <swirly/sys/Timer.hpp>
 
 namespace swirly {
 inline namespace sys {
 
 enum class Priority { High = 0, Low = 1 };
+
+using IoSlot = BasicSlot<int, unsigned, Time>;
 
 class SWIRLY_API Reactor {
   public:
@@ -98,18 +99,17 @@ class SWIRLY_API Reactor {
      * Thread-safe.
      */
     void close() noexcept { doClose(); }
-    [[nodiscard]] Handle subscribe(int fd, unsigned events, const EventHandlerPtr& handler)
+    [[nodiscard]] Handle subscribe(int fd, unsigned events, IoSlot slot)
     {
-        return doSubscribe(fd, events, handler);
+        return doSubscribe(fd, events, slot);
     }
-    [[nodiscard]] Timer timer(Time expiry, Duration interval, Priority priority,
-                              const EventHandlerPtr& handler)
+    [[nodiscard]] Timer timer(Time expiry, Duration interval, Priority priority, TimerSlot slot)
     {
-        return doTimer(expiry, interval, priority, handler);
+        return doTimer(expiry, interval, priority, slot);
     }
-    [[nodiscard]] Timer timer(Time expiry, Priority priority, const EventHandlerPtr& handler)
+    [[nodiscard]] Timer timer(Time expiry, Priority priority, TimerSlot slot)
     {
-        return doTimer(expiry, priority, handler);
+        return doTimer(expiry, priority, slot);
     }
     int poll(Millis timeout = Millis::max()) { return doPoll(UnixClock::now(), timeout); }
 
@@ -129,15 +129,13 @@ class SWIRLY_API Reactor {
      */
     virtual void doClose() noexcept = 0;
 
-    virtual Handle doSubscribe(int fd, unsigned events, const EventHandlerPtr& handler) = 0;
+    virtual Handle doSubscribe(int fd, unsigned events, IoSlot slot) = 0;
     virtual void doUnsubscribe(int fd) noexcept = 0;
 
     virtual void doSetEvents(int fd, unsigned events) = 0;
 
-    virtual Timer doTimer(Time expiry, Duration interval, Priority priority,
-                          const EventHandlerPtr& handler)
-        = 0;
-    virtual Timer doTimer(Time expiry, Priority priority, const EventHandlerPtr& handler) = 0;
+    virtual Timer doTimer(Time expiry, Duration interval, Priority priority, TimerSlot slot) = 0;
+    virtual Timer doTimer(Time expiry, Priority priority, TimerSlot slot) = 0;
 
     virtual int doPoll(Time now, Millis timeout) = 0;
 };

@@ -17,16 +17,23 @@
 #ifndef SWIRLYD_HTTPSERV_HPP
 #define SWIRLYD_HTTPSERV_HPP
 
+#include "HttpSess.hpp"
+
 #include <swirly/sys/TcpAcceptor.hpp>
 
 namespace swirly {
 
 class RestServ;
 
-class SWIRLY_API HttpServ : public TcpAcceptor {
+class SWIRLY_API HttpServ : public TcpAcceptor<HttpServ> {
+    using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
+    using MemberHookOption = boost::intrusive::member_hook<HttpSess, decltype(HttpSess::listHook),
+                                                           &HttpSess::listHook>;
+    using List = boost::intrusive::list<HttpSess, ConstantTimeSizeOption, MemberHookOption>;
+
   public:
     HttpServ(Reactor& r, const Endpoint& ep, RestServ& rs);
-    ~HttpServ() override;
+    ~HttpServ();
 
     // Copy.
     HttpServ(const HttpServ&) = delete;
@@ -36,17 +43,12 @@ class SWIRLY_API HttpServ : public TcpAcceptor {
     HttpServ(HttpServ&&) = delete;
     HttpServ& operator=(HttpServ&&) = delete;
 
-    static auto make(Reactor& r, const TcpEndpoint& ep, RestServ& rs)
-    {
-        return makeIntrusive<HttpServ>(r, ep, rs);
-    }
-
-  protected:
-    void doClose() noexcept override;
-    void doAccept(IoSocket&& sock, const Endpoint& ep, Time now) override;
+    void doAccept(IoSocket&& sock, const Endpoint& ep, Time now);
 
   private:
+    Reactor& reactor_;
     RestServ& restServ_;
+    List list_;
 };
 
 } // namespace swirly

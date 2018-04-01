@@ -14,17 +14,4 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "EventHandler.hpp"
-
-#include <csignal>
-
-namespace swirly {
-inline namespace sys {
-
-EventHandler::~EventHandler() = default;
-
-void EventHandler::doReady(int fd, unsigned events, Time now) {}
-void EventHandler::doTimer(Timer& tmr, Time now) {}
-
-} // namespace sys
-} // namespace swirly
+#include "Slot.hpp"

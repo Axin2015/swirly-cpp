@@ -17,21 +17,27 @@
 #ifndef SWIRLY_SYS_TCPACCEPTOR_HPP
 #define SWIRLY_SYS_TCPACCEPTOR_HPP
 
+#include <swirly/sys/Event.hpp>
 #include <swirly/sys/Reactor.hpp>
 #include <swirly/sys/TcpSocket.hpp>
 
 namespace swirly {
 inline namespace sys {
 
-class SWIRLY_API TcpAcceptor : public EventHandler {
-    using IntrusivePtr = boost::intrusive_ptr<TcpAcceptor>;
-
+template <typename DerivedT>
+class TcpAcceptor {
   public:
     using Transport = Tcp;
     using Endpoint = TcpEndpoint;
 
-    TcpAcceptor(Reactor& r, const Endpoint& ep);
-    ~TcpAcceptor() override;
+    TcpAcceptor(Reactor& r, const Endpoint& ep)
+    : serv_{ep.protocol()}
+    {
+        serv_.setSoReuseAddr(true);
+        serv_.bind(ep);
+        serv_.listen(SOMAXCONN);
+        sub_ = r.subscribe(*serv_, EventIn, bind<&TcpAcceptor::onReady>(this));
+    }
 
     // Copy.
     TcpAcceptor(const TcpAcceptor&) = delete;
@@ -41,9 +47,15 @@ class SWIRLY_API TcpAcceptor : public EventHandler {
     TcpAcceptor(TcpAcceptor&&) = delete;
     TcpAcceptor& operator=(TcpAcceptor&&) = delete;
 
+    void onReady(int fd, unsigned events, Time now)
+    {
+        Endpoint ep;
+        IoSocket sock{os::accept(fd, ep), serv_.family()};
+        static_cast<DerivedT*>(this)->doAccept(std::move(sock), ep, now);
+    }
+
   protected:
-    void doReady(int fd, unsigned events, Time now) override;
-    virtual void doAccept(IoSocket&& sock, const Endpoint& ep, Time now) = 0;
+    ~TcpAcceptor() = default;
 
   private:
     TcpSocketServ serv_;

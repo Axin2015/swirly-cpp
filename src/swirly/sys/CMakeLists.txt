@@ -33,7 +33,6 @@ set(lib_SOURCES
   EpollReactor.cpp
   Error.cpp
   Event.cpp
-  EventHandler.cpp
   File.cpp
   Handle.cpp
   IoSocket.cpp
@@ -52,6 +51,7 @@ set(lib_SOURCES
   Reactor.cpp
   RefCount.cpp
   Signal.cpp
+  Slot.cpp
   Socket.cpp
   System.cpp
   TcpAcceptor.cpp
@@ -91,6 +91,7 @@ set(test_SOURCES
   Math.ut.cpp
   MemCtx.ut.cpp
   RefCount.ut.cpp
+  Slot.ut.cpp
   Socket.ut.cpp
   Traits.ut.cpp)
 

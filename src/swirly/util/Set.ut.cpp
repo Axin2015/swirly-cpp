@@ -39,7 +39,7 @@ class Foo : public RefCount<Foo, ThreadUnsafePolicy> {
 
     auto symbol() const noexcept { return symbol_; }
     auto display() const noexcept { return +display_; }
-    boost::intrusive::set_member_hook<> symbolHook_;
+    boost::intrusive::set_member_hook<> symbolHook;
 
   private:
     const Symbol symbol_;
@@ -60,7 +60,7 @@ class Bar : public RefCount<Bar, ThreadUnsafePolicy> {
 
     auto id() const noexcept { return id_; }
     auto display() const noexcept { return +display_; }
-    boost::intrusive::set_member_hook<> idHook_;
+    boost::intrusive::set_member_hook<> idHook;
 
   private:
     const Id64 id_;
