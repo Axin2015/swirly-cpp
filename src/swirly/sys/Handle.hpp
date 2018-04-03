@@ -62,7 +62,7 @@ class BasicHandle {
     }
 
     constexpr bool empty() const noexcept { return id_ == invalid(); }
-    explicit constexpr operator bool() const noexcept { return id_ != invalid(); }
+    constexpr explicit operator bool() const noexcept { return id_ != invalid(); }
 
     constexpr Id get() const noexcept { return id_; }
     constexpr Id operator*() const noexcept { return get(); }

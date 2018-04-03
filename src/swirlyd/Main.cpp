@@ -47,7 +47,6 @@
 #include <boost/filesystem/fstream.hpp>
 #pragma GCC diagnostic pop
 
-#include <csignal>
 #include <iomanip>
 #include <iostream>
 #include <thread>
@@ -133,7 +132,6 @@ void getOpts(int argc, char* argv[], Opts& opts)
 }
 
 MemCtx memCtx;
-volatile sig_atomic_t quit{0};
 
 } // namespace
 
@@ -159,7 +157,6 @@ void dealloc(void* ptr, size_t size) noexcept
 int main(int argc, char* argv[])
 {
     closeAll();
-    signal(SIGINT, [](int) { ++quit; });
 
     int ret = 1;
     try {
