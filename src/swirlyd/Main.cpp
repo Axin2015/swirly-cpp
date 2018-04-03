@@ -41,12 +41,9 @@
 #include <swirly/sys/Signal.hpp>
 #include <swirly/sys/System.hpp>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/fstream.hpp>
-#pragma GCC diagnostic pop
+#include <experimental/filesystem>
 
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <thread>
@@ -55,10 +52,10 @@
 #include <syslog.h>
 #include <unistd.h> // dup2()
 
+namespace fs = std::experimental::filesystem;
+
 using namespace std;
 using namespace swirly;
-
-namespace fs = boost::filesystem;
 
 namespace {
 
@@ -170,7 +167,7 @@ int main(int argc, char* argv[])
 
         Config config;
         if (!opts.confFile.empty()) {
-            fs::ifstream is{opts.confFile};
+            ifstream is{opts.confFile};
             if (!is.is_open()) {
                 throw Exception{errMsg() << "open failed: " << opts.confFile};
             }
