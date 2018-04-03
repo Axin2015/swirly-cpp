@@ -93,7 +93,7 @@ find_program(ENV_EXECUTABLE env)
 find_program(RAGEL_EXECUTABLE ragel)
 
 set(Boost_USE_STATIC_LIBS ON)
-find_package(Boost 1.60 REQUIRED COMPONENTS date_time filesystem system unit_test_framework)
+find_package(Boost 1.60 REQUIRED COMPONENTS date_time unit_test_framework)
 # The sqlite3_errstr() function was added in 3.7.15.
 find_package(SQLite3 3.7.15 REQUIRED)
 

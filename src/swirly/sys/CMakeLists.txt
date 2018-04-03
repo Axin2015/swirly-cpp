@@ -63,13 +63,13 @@ set(lib_SOURCES
 
 add_library(swirly-sys-static STATIC ${lib_SOURCES})
 set_target_properties(swirly-sys-static PROPERTIES OUTPUT_NAME swirly-sys)
-target_link_libraries(swirly-sys-static ${Boost_SYSTEM_LIBRARY} pthread)
+target_link_libraries(swirly-sys-static pthread)
 install(TARGETS swirly-sys-static DESTINATION lib COMPONENT static)
 
 if(ENABLE_SHARED_LIBS)
   add_library(swirly-sys-shared SHARED ${lib_SOURCES})
   set_target_properties(swirly-sys-shared PROPERTIES OUTPUT_NAME swirly-sys)
-  target_link_libraries(swirly-sys-shared ${Boost_SYSTEM_LIBRARY} pthread)
+  target_link_libraries(swirly-sys-shared pthread)
   install(TARGETS swirly-sys-shared DESTINATION lib COMPONENT shared)
 endif()
 
