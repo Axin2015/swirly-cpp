@@ -44,6 +44,7 @@ set(lib_SOURCES
   Model.cpp
   Msg.cpp
   MsgHandler.cpp
+  MsgQueue.cpp
   Order.cpp
   Posn.cpp
   Request.cpp
@@ -82,6 +83,7 @@ set(test_SOURCES
   MarketId.ut.cpp
   Market.ut.cpp
   MsgHandler.ut.cpp
+  MsgQueue.ut.cpp
   Posn.ut.cpp
   Request.ut.cpp
   Transaction.ut.cpp)

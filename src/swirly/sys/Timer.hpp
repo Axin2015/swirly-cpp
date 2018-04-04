@@ -165,8 +165,7 @@ class SWIRLY_API TimerQueue {
     const Timer& front() const { return heap_.front(); }
 
     [[nodiscard]] Timer insert(Time expiry, Duration interval, TimerSlot slot);
-    [[nodiscard]] Timer insert(Time expiry, TimerSlot slot)
-    {
+    [[nodiscard]] Timer insert(Time expiry, TimerSlot slot) {
         return insert(expiry, Duration::zero(), slot);
     }
 

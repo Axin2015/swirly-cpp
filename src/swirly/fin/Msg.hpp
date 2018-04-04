@@ -21,13 +21,19 @@
 
 #include <swirly/util/BasicTypes.hpp>
 #include <swirly/util/Date.hpp>
-#include <swirly/util/Pipe.hpp>
 #include <swirly/util/Symbol.hpp>
+
+#include <swirly/sys/MemQueue.hpp>
 
 namespace swirly {
 inline namespace fin {
 
-enum class MsgType : int { Reset, CreateMarket, UpdateMarket, CreateExec, ArchiveTrade };
+enum class MsgType : int { Interrupt, CreateMarket, UpdateMarket, CreateExec, ArchiveTrade };
+
+struct SWIRLY_PACKED Interrupt {
+    Id32 num;
+};
+static_assert(std::is_pod_v<Interrupt>);
 
 struct SWIRLY_PACKED CreateMarket {
     Id64 id;
@@ -66,24 +72,22 @@ struct SWIRLY_PACKED CreateExec {
     char cpty[MaxSymbol];
     // std::chrono::time_point is not pod.
     int64_t created;
-    More more;
 };
 static_assert(std::is_pod_v<CreateExec>);
 
-constexpr std::size_t MaxIds{(sizeof(CreateExec) - MaxSymbol - sizeof(int64_t) - sizeof(More))
-                             / sizeof(Id64)};
+constexpr std::size_t MaxIds{(sizeof(CreateExec) - sizeof(Id64) - sizeof(int64_t)) / sizeof(Id64)};
 struct SWIRLY_PACKED ArchiveTrade {
     Id64 marketId;
     Id64 ids[MaxIds];
     // std::chrono::time_point is not pod.
     int64_t modified;
-    More more;
 };
 static_assert(std::is_pod_v<ArchiveTrade>);
 
 struct SWIRLY_PACKED Msg {
     MsgType type;
     union SWIRLY_PACKED {
+        Interrupt interrupt;
         CreateMarket createMarket;
         UpdateMarket updateMarket;
         CreateExec createExec;
@@ -91,9 +95,7 @@ struct SWIRLY_PACKED Msg {
     };
 };
 static_assert(std::is_pod_v<Msg>);
-static_assert(sizeof(Msg) == 240, "must be specific size");
-
-using MsgPipe = Pipe<Msg>;
+static_assert(sizeof(Msg) == 236, "must be specific size");
 
 } // namespace fin
 } // namespace swirly

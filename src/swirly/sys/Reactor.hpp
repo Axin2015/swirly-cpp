@@ -17,6 +17,7 @@
 #ifndef SWIRLY_SYS_REACTOR_HPP
 #define SWIRLY_SYS_REACTOR_HPP
 
+#include <swirly/sys/Interruptible.hpp>
 #include <swirly/sys/Timer.hpp>
 
 namespace swirly {
@@ -26,7 +27,7 @@ enum class Priority { High = 0, Low = 1 };
 
 using IoSlot = BasicSlot<int, unsigned, Time>;
 
-class SWIRLY_API Reactor {
+class SWIRLY_API Reactor : public Interruptible {
   public:
     class Handle {
       public:
@@ -36,7 +37,7 @@ class SWIRLY_API Reactor {
         {
         }
         Handle() = default;
-        ~Handle() noexcept { reset(); }
+        ~Handle() { reset(); }
 
         // Copy.
         Handle(const Handle&) = delete;
@@ -83,7 +84,7 @@ class SWIRLY_API Reactor {
     };
 
     Reactor() noexcept = default;
-    virtual ~Reactor();
+    ~Reactor() override;
 
     // Copy.
     Reactor(const Reactor&) noexcept = delete;
@@ -93,12 +94,7 @@ class SWIRLY_API Reactor {
     Reactor(Reactor&&) noexcept = delete;
     Reactor& operator=(Reactor&&) noexcept = delete;
 
-    bool closed() const noexcept { return doClosed(); }
-
-    /**
-     * Thread-safe.
-     */
-    void close() noexcept { doClose(); }
+    // clang-format off
     [[nodiscard]] Handle subscribe(int fd, unsigned events, IoSlot slot)
     {
         return doSubscribe(fd, events, slot);
@@ -111,23 +107,17 @@ class SWIRLY_API Reactor {
     {
         return doTimer(expiry, priority, slot);
     }
-    int poll(Millis timeout = Millis::max()) { return doPoll(UnixClock::now(), timeout); }
+    // clang-format on
+    int poll(Millis timeout = Millis::max())
+    {
+        return doPoll(UnixClock::now(), timeout);
+    }
 
   protected:
     /**
      * Overload for unit-testing.
      */
     int poll(Time now, Millis timeout) { return doPoll(now, timeout); }
-
-    /**
-     * Thread-safe.
-     */
-    virtual bool doClosed() const noexcept = 0;
-
-    /**
-     * Thread-safe.
-     */
-    virtual void doClose() noexcept = 0;
 
     virtual Handle doSubscribe(int fd, unsigned events, IoSlot slot) = 0;
     virtual void doUnsubscribe(int fd) noexcept = 0;

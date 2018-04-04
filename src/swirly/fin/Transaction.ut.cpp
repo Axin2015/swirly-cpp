@@ -24,7 +24,7 @@ using namespace swirly;
 
 namespace {
 
-struct Foo : Transactional {
+struct Foo {
 
     int beginCalls{0};
     int commitCalls{0};
@@ -32,17 +32,17 @@ struct Foo : Transactional {
 
     void clear() noexcept
     {
-        reset();
         beginCalls = 0;
         commitCalls = 0;
         rollbackCalls = 0;
     }
 
-  protected:
-    void doBegin() override { ++beginCalls; }
-    void doCommit() override { ++commitCalls; }
-    void doRollback() override { ++rollbackCalls; }
+    void begin() { ++beginCalls; }
+    void commit() { ++commitCalls; }
+    void rollback() noexcept { ++rollbackCalls; }
 };
+
+using Transaction = BasicTransaction<Foo>;
 
 } // namespace
 
@@ -53,7 +53,6 @@ BOOST_AUTO_TEST_CASE(TransScopedCommitCase)
     Foo foo;
     {
         Transaction trans{foo};
-        BOOST_TEST(!foo.failed());
         trans.commit();
     }
     BOOST_TEST(foo.beginCalls == 1);
@@ -61,7 +60,6 @@ BOOST_AUTO_TEST_CASE(TransScopedCommitCase)
     BOOST_TEST(foo.rollbackCalls == 0);
     {
         Transaction trans{foo};
-        BOOST_TEST(!foo.failed());
         trans.commit();
     }
     BOOST_TEST(foo.beginCalls == 2);
@@ -74,225 +72,16 @@ BOOST_AUTO_TEST_CASE(TransScopedRollbackCase)
     Foo foo;
     {
         Transaction trans{foo};
-        BOOST_TEST(!foo.failed());
     }
     BOOST_TEST(foo.beginCalls == 1);
     BOOST_TEST(foo.commitCalls == 0);
     BOOST_TEST(foo.rollbackCalls == 1);
     {
         Transaction trans{foo};
-        BOOST_TEST(!foo.failed());
     }
     BOOST_TEST(foo.beginCalls == 2);
     BOOST_TEST(foo.commitCalls == 0);
     BOOST_TEST(foo.rollbackCalls == 2);
-}
-
-BOOST_AUTO_TEST_CASE(TransSingleCommitCase)
-{
-    Foo foo;
-    {
-        Transaction trans{foo, More::No};
-        BOOST_TEST(!foo.failed());
-        trans.commit();
-    }
-    BOOST_TEST(foo.beginCalls == 0);
-    BOOST_TEST(foo.commitCalls == 0);
-    BOOST_TEST(foo.rollbackCalls == 0);
-
-    BOOST_TEST(!foo.failed());
-
-    // Next.
-    {
-        Transaction trans{foo};
-        BOOST_TEST(!foo.failed());
-        trans.commit();
-    }
-    BOOST_TEST(foo.beginCalls == 1);
-    BOOST_TEST(foo.commitCalls == 1);
-    BOOST_TEST(foo.rollbackCalls == 0);
-}
-
-BOOST_AUTO_TEST_CASE(TransSingleRollbackCase)
-{
-    Foo foo;
-    {
-        Transaction trans{foo, More::No};
-        BOOST_TEST(!foo.failed());
-    }
-    BOOST_TEST(foo.beginCalls == 0);
-    BOOST_TEST(foo.commitCalls == 0);
-    BOOST_TEST(foo.rollbackCalls == 0);
-
-    BOOST_TEST(!foo.failed());
-
-    // Next.
-    {
-        Transaction trans{foo};
-        BOOST_TEST(!foo.failed());
-        trans.commit();
-    }
-    BOOST_TEST(foo.beginCalls == 1);
-    BOOST_TEST(foo.commitCalls == 1);
-    BOOST_TEST(foo.rollbackCalls == 0);
-}
-
-BOOST_AUTO_TEST_CASE(TransMultiCommitCase)
-{
-    Foo foo;
-    {
-        Transaction trans{foo, More::Yes};
-        BOOST_TEST(!foo.failed());
-        trans.commit();
-    }
-    BOOST_TEST(foo.beginCalls == 1);
-    BOOST_TEST(foo.commitCalls == 0);
-    BOOST_TEST(foo.rollbackCalls == 0);
-    {
-        Transaction trans{foo, More::Yes};
-        BOOST_TEST(!foo.failed());
-        trans.commit();
-    }
-    BOOST_TEST(foo.beginCalls == 1);
-    BOOST_TEST(foo.commitCalls == 0);
-    BOOST_TEST(foo.rollbackCalls == 0);
-    {
-        Transaction trans{foo, More::No};
-        BOOST_TEST(!foo.failed());
-        trans.commit();
-    }
-    BOOST_TEST(foo.beginCalls == 1);
-    BOOST_TEST(foo.commitCalls == 1);
-    BOOST_TEST(foo.rollbackCalls == 0);
-
-    BOOST_TEST(!foo.failed());
-
-    // Next.
-    {
-        Transaction trans{foo};
-        BOOST_TEST(!foo.failed());
-        trans.commit();
-    }
-    BOOST_TEST(foo.beginCalls == 2);
-    BOOST_TEST(foo.commitCalls == 2);
-    BOOST_TEST(foo.rollbackCalls == 0);
-}
-
-BOOST_AUTO_TEST_CASE(TransMultiRollbackFirstCase)
-{
-    Foo foo;
-    {
-        Transaction trans{foo, More::Yes};
-        BOOST_TEST(!foo.failed());
-    }
-    BOOST_TEST(foo.beginCalls == 1);
-    BOOST_TEST(foo.commitCalls == 0);
-    BOOST_TEST(foo.rollbackCalls == 1);
-    {
-        Transaction trans{foo, More::Yes};
-        BOOST_TEST(foo.failed());
-        trans.commit();
-    }
-    BOOST_TEST(foo.beginCalls == 1);
-    BOOST_TEST(foo.commitCalls == 0);
-    BOOST_TEST(foo.rollbackCalls == 1);
-    {
-        Transaction trans{foo, More::No};
-        BOOST_TEST(foo.failed());
-        trans.commit();
-    }
-    BOOST_TEST(foo.beginCalls == 1);
-    BOOST_TEST(foo.commitCalls == 0);
-    BOOST_TEST(foo.rollbackCalls == 1);
-
-    BOOST_TEST(!foo.failed());
-
-    // Next.
-    {
-        Transaction trans{foo};
-        BOOST_TEST(!foo.failed());
-        trans.commit();
-    }
-    BOOST_TEST(foo.beginCalls == 2);
-    BOOST_TEST(foo.commitCalls == 1);
-    BOOST_TEST(foo.rollbackCalls == 1);
-}
-
-BOOST_AUTO_TEST_CASE(TransMultiRollbackSecondCase)
-{
-    Foo foo;
-    {
-        Transaction trans{foo, More::Yes};
-        BOOST_TEST(!foo.failed());
-        trans.commit();
-    }
-    BOOST_TEST(foo.beginCalls == 1);
-    BOOST_TEST(foo.commitCalls == 0);
-    BOOST_TEST(foo.rollbackCalls == 0);
-    {
-        Transaction trans{foo, More::Yes};
-        BOOST_TEST(!foo.failed());
-    }
-    BOOST_TEST(foo.beginCalls == 1);
-    BOOST_TEST(foo.commitCalls == 0);
-    BOOST_TEST(foo.rollbackCalls == 1);
-    {
-        Transaction trans{foo, More::No};
-        BOOST_TEST(foo.failed());
-    }
-    BOOST_TEST(foo.beginCalls == 1);
-    BOOST_TEST(foo.commitCalls == 0);
-    BOOST_TEST(foo.rollbackCalls == 1);
-
-    BOOST_TEST(!foo.failed());
-
-    // Next.
-    {
-        Transaction trans{foo};
-        BOOST_TEST(!foo.failed());
-        trans.commit();
-    }
-    BOOST_TEST(foo.beginCalls == 2);
-    BOOST_TEST(foo.commitCalls == 1);
-    BOOST_TEST(foo.rollbackCalls == 1);
-}
-
-BOOST_AUTO_TEST_CASE(TransMultiRollbackAllCase)
-{
-    Foo foo;
-    {
-        Transaction trans{foo, More::Yes};
-        BOOST_TEST(!foo.failed());
-    }
-    BOOST_TEST(foo.beginCalls == 1);
-    BOOST_TEST(foo.commitCalls == 0);
-    BOOST_TEST(foo.rollbackCalls == 1);
-    {
-        Transaction trans{foo, More::Yes};
-        BOOST_TEST(foo.failed());
-    }
-    BOOST_TEST(foo.beginCalls == 1);
-    BOOST_TEST(foo.commitCalls == 0);
-    BOOST_TEST(foo.rollbackCalls == 1);
-    {
-        Transaction trans{foo, More::No};
-        BOOST_TEST(foo.failed());
-    }
-    BOOST_TEST(foo.beginCalls == 1);
-    BOOST_TEST(foo.commitCalls == 0);
-    BOOST_TEST(foo.rollbackCalls == 1);
-
-    BOOST_TEST(!foo.failed());
-
-    // Next.
-    {
-        Transaction trans{foo};
-        BOOST_TEST(!foo.failed());
-        trans.commit();
-    }
-    BOOST_TEST(foo.beginCalls == 2);
-    BOOST_TEST(foo.commitCalls == 1);
-    BOOST_TEST(foo.rollbackCalls == 1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

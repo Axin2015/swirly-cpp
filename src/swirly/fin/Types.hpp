@@ -71,8 +71,6 @@ class Posn;
 using PosnPtr = boost::intrusive_ptr<Posn>;
 using ConstPosnPtr = boost::intrusive_ptr<const Posn>;
 
-enum class More : int { No, Yes };
-
 } // namespace fin
 } // namespace swirly
 

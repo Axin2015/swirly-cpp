@@ -26,6 +26,7 @@
 
 #include <swirly/fin/Journ.hpp>
 #include <swirly/fin/Model.hpp>
+#include <swirly/fin/MsgQueue.hpp>
 
 #include <swirly/util/Config.hpp>
 #include <swirly/util/Exception.hpp>
@@ -33,6 +34,7 @@
 #include <swirly/util/Finally.hpp>
 #include <swirly/util/Log.hpp>
 
+#include <swirly/sys/Cpu.hpp>
 #include <swirly/sys/Daemon.hpp>
 #include <swirly/sys/EpollReactor.hpp>
 #include <swirly/sys/File.hpp>
@@ -126,6 +128,43 @@ void getOpts(int argc, char* argv[], Opts& opts)
         printUsage(cerr);
         exit(1);
     }
+}
+
+void runJourn(MsgQueue& mq, Journ& j)
+{
+    sigBlockAll();
+    SWIRLY_NOTICE("started journal thread"sv);
+    try {
+        CpuBackoff backoff;
+        for (;;) {
+            Msg msg;
+            while (mq.pop(msg)) {
+                j.write(msg);
+                backoff.reset();
+            }
+            if (j.interrupted()) {
+                break;
+            }
+            backoff();
+        }
+    } catch (const exception& e) {
+        SWIRLY_ERROR(logMsg() << "exception: " << e.what());
+    }
+    SWIRLY_NOTICE("stopping journal thread"sv);
+}
+
+void runReactor(Reactor& r)
+{
+    sigBlockAll();
+    SWIRLY_NOTICE("started reactor thread"sv);
+    try {
+        while (!r.interrupted()) {
+            r.poll();
+        }
+    } catch (const exception& e) {
+        SWIRLY_ERROR(logMsg() << "exception: " << e.what());
+    }
+    SWIRLY_NOTICE("stopping reactor thread"sv);
 }
 
 MemCtx memCtx;
@@ -226,7 +265,7 @@ int main(int argc, char* argv[])
         writePidFile(pf);
         if (logFile.empty()) {
 
-        // If a log file is not specified, then use syslog().
+            // If a log file is not specified, then use syslog().
 
 #if SWIRLY_ENABLE_DEBUG
             setlogmask(LOG_UPTO(LOG_DEBUG));
@@ -255,7 +294,6 @@ int main(int argc, char* argv[])
         }
 
         const char* const httpPort{config.get("http_port", "8080")};
-        const auto pipeCapacity = config.get<size_t>("pipe_capacity", 1 << 10);
         const auto maxExecs = config.get<size_t>("max_execs", 1 << 4);
 
         SWIRLY_NOTICE("initialising daemon");
@@ -271,45 +309,34 @@ int main(int argc, char* argv[])
         SWIRLY_INFO(logMsg() << "log_file:      " << logFile);
         SWIRLY_INFO(logMsg() << "log_level:     " << getLogLevel());
         SWIRLY_INFO(logMsg() << "http_port:     " << httpPort);
-        SWIRLY_INFO(logMsg() << "pipe_capacity: " << pipeCapacity);
         SWIRLY_INFO(logMsg() << "max_execs:     " << maxExecs);
 
-        unique_ptr<Journ> journ;
-        if (!opts.test) {
-            journ = make_unique<SqlJourn>(config);
-        } else {
-            journ = make_unique<TestJourn>();
-        }
-        Rest rest{*journ, pipeCapacity, maxExecs};
+        MsgQueue mq{1 << 10};
+        Rest rest{mq, maxExecs};
         {
             SqlModel model{config};
             rest.load(model, opts.startTime);
         }
-
         RestServ restServ{rest};
-        EpollReactor reactor{1024};
+        SqlJourn journ{config};
 
+        EpollReactor reactor{1024};
         const TcpEndpoint ep{Tcp::v4(), stou16(httpPort)};
         HttpServ httpServ{reactor, ep, restServ};
 
-        const auto fn = [](Reactor& r) {
-            sigBlockAll();
-            SWIRLY_NOTICE("started reactor thread"sv);
-            try {
-                while (!r.closed()) {
-                    r.poll();
-                }
-            } catch (const exception& e) {
-                SWIRLY_ERROR(logMsg() << "exception: " << e.what());
-            }
-            SWIRLY_NOTICE("stopped reactor thread"sv);
-        };
-        auto worker = thread{fn, ref(reactor)};
-        auto finally = makeFinally([&]() noexcept {
-            reactor.close();
-            worker.join();
-            SWIRLY_NOTICE("stopped http server"sv);
+        auto reactorThread = thread{runReactor, ref(reactor)};
+        const auto reactorFinally = makeFinally([&]() noexcept {
+            reactor.interrupt(1);
+            reactorThread.join();
         });
+        auto journThread = thread{runJourn, ref(mq), ref(journ)};
+        const auto journFinally = makeFinally([&]() noexcept {
+            if (!mq.interrupt(1_id32)) {
+                SWIRLY_ERROR("interrupt timeout"sv);
+            }
+            journThread.join();
+        });
+        // clang-format on
         SWIRLY_NOTICE(logMsg() << "started http server on port " << httpPort);
 
         // Wait for termination.
@@ -336,7 +363,6 @@ int main(int argc, char* argv[])
             break;
         }
         ret = 0;
-
     } catch (const exception& e) {
         SWIRLY_ERROR(logMsg() << "exception: " << e.what());
     }

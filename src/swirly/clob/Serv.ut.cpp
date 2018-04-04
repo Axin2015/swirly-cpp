@@ -21,6 +21,7 @@
 #include <swirly/clob/Test.hpp>
 
 #include <swirly/fin/Exception.hpp>
+#include <swirly/fin/MsgQueue.hpp>
 
 #include <swirly/util/Date.hpp>
 
@@ -48,13 +49,9 @@ class SWIRLY_API TestModel : public swirly::TestModel {
 };
 
 struct ServFixture {
-    ServFixture()
-    : serv{journ, 1 << 10, 1 << 4}
-    {
-        serv.load(TestModel{}, Now);
-    }
-    TestJourn journ;
-    Serv serv;
+    ServFixture() { serv.load(TestModel{}, Now); }
+    MsgQueue mq{1 << 10};
+    Serv serv{mq, 1 << 4};
 };
 
 } // namespace

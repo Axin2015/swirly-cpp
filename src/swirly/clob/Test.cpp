@@ -124,16 +124,5 @@ void TestModel::doReadTrade(const ModelCallback<ExecPtr>& cb) const {}
 
 void TestModel::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const {}
 
-TestJourn::TestJourn() noexcept = default;
-TestJourn::~TestJourn() = default;
-
-constexpr TestJourn::TestJourn(const TestJourn&) noexcept = default;
-TestJourn& TestJourn::operator=(const TestJourn&) noexcept = default;
-
-constexpr TestJourn::TestJourn(TestJourn&&) noexcept = default;
-TestJourn& TestJourn::operator=(TestJourn&&) noexcept = default;
-
-void TestJourn::doUpdate(const Msg& msg) {}
-
 } // namespace clob
 } // namespace swirly

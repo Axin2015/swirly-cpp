@@ -14,126 +14,50 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_FIN_TRANSACTIONAL_HPP
-#define SWIRLY_FIN_TRANSACTIONAL_HPP
+#ifndef SWIRLY_FIN_TRANSACTION_HPP
+#define SWIRLY_FIN_TRANSACTION_HPP
 
-#include <swirly/fin/Types.hpp>
+#include <swirly/util/Log.hpp>
 
 namespace swirly {
 inline namespace fin {
 
-class SWIRLY_API Transactional {
+template <typename TypeT>
+class BasicTransaction {
   public:
-    Transactional() noexcept = default;
-    virtual ~Transactional();
+    explicit BasicTransaction(TypeT& target)
+    : target_(target)
+    {
+        target_.begin();
+    }
+    ~BasicTransaction()
+    {
+        static_assert(std::is_nothrow_invocable_v<decltype(&TypeT::rollback), TypeT>);
+        if (!done_) {
+            target_.rollback();
+        }
+    }
 
     // Copy.
-    constexpr Transactional(const Transactional&) noexcept = default;
-    Transactional& operator=(const Transactional&) noexcept = default;
+    BasicTransaction(const BasicTransaction&) = delete;
+    BasicTransaction& operator=(const BasicTransaction&) = delete;
 
     // Move.
-    constexpr Transactional(Transactional&&) noexcept = default;
-    Transactional& operator=(Transactional&&) noexcept = default;
-
-    auto failed() const noexcept { return state_ == Failed; }
-
-    /**
-     * Begin transaction.
-     */
-    void tryBegin()
-    {
-        if (state_ == None) {
-            state_ = Active;
-            doBegin();
-        }
-    }
-
-    /**
-     * Commit transaction.
-     */
-    void tryCommit()
-    {
-        if (state_ == Active) {
-            state_ = None;
-            doCommit();
-        }
-    }
-
-    /**
-     * Rollback transaction.
-     */
-    void tryRollback()
-    {
-        if (state_ == Active) {
-            state_ = Failed;
-            doRollback();
-        }
-    }
-
-    /**
-     * Reset transaction.
-     */
-    void reset()
-    {
-        auto prev = state_;
-        state_ = None;
-        if (prev == Active) {
-            doRollback();
-        }
-    }
-
-  protected:
-    virtual void doBegin() = 0;
-
-    virtual void doCommit() = 0;
-
-    virtual void doRollback() = 0;
-
-  private:
-    enum { None, Active, Failed } state_{None};
-};
-
-class SWIRLY_API Transaction {
-  public:
-    Transaction(Transactional& target, More more)
-    : target_(target)
-    , more_{more}
-    {
-        if (more == More::Yes) {
-            target_.tryBegin();
-        }
-    }
-    explicit Transaction(Transactional& target)
-    : target_(target)
-    , more_{More::No}
-    {
-        target_.tryBegin();
-    }
-    ~Transaction();
-
-    // Copy.
-    Transaction(const Transaction&) = delete;
-    Transaction& operator=(const Transaction&) = delete;
-
-    // Move.
-    Transaction(Transaction&&) = delete;
-    Transaction& operator=(Transaction&&) = delete;
+    BasicTransaction(BasicTransaction&&) = delete;
+    BasicTransaction& operator=(BasicTransaction&&) = delete;
 
     void commit()
     {
-        if (more_ == More::No) {
-            target_.tryCommit();
-        }
+        target_.commit();
         done_ = true;
     }
 
   private:
-    Transactional& target_;
-    More more_;
+    TypeT& target_;
     bool done_{false};
 };
 
 } // namespace fin
 } // namespace swirly
 
-#endif // SWIRLY_FIN_TRANSACTIONAL_HPP
+#endif // SWIRLY_FIN_TRANSACTION_HPP

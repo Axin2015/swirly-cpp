@@ -14,36 +14,44 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SYS_MEMORY_HPP
-#define SWIRLY_SYS_MEMORY_HPP
+#ifndef SWIRLY_SYS_INTERRUPTIBLE_HPP
+#define SWIRLY_SYS_INTERRUPTIBLE_HPP
 
-#include <swirly/sys/Math.hpp>
+#include <swirly/Config.h>
+
+#include <cassert>
 
 namespace swirly {
 inline namespace sys {
 
-// Assumptions:
-// sysconf(_SC_LEVEL1_DCACHE_LINESIZE) == 64
-// sysconf(_SC_PAGESIZE) == 4096
+class SWIRLY_API Interruptible {
+  public:
+    Interruptible() noexcept = default;
+    virtual ~Interruptible();
 
-enum : std::size_t {
-    CacheLineBits = 6,
-    CacheLineSize = 1 << CacheLineBits,
-    PageBits = 12,
-    PageSize = 1 << PageBits
+    // Copy.
+    Interruptible(const Interruptible&) noexcept = default;
+    Interruptible& operator=(const Interruptible&) noexcept = default;
+
+    // Move.
+    Interruptible(Interruptible&&) noexcept = default;
+    Interruptible& operator=(Interruptible&&) noexcept = default;
+
+    int interrupted() const noexcept { return doInterrupted(); }
+
+    void interrupt(int num) noexcept
+    {
+        assert(num > 0);
+        doInterrupt(num);
+    }
+
+  protected:
+    virtual int doInterrupted() const noexcept = 0;
+
+    virtual void doInterrupt(int num) noexcept = 0;
 };
-
-constexpr std::size_t ceilCacheLine(std::size_t size) noexcept
-{
-    return ceilPow2<CacheLineBits>(size);
-}
-
-constexpr std::size_t ceilPage(std::size_t size) noexcept
-{
-    return ceilPow2<PageBits>(size);
-}
 
 } // namespace sys
 } // namespace swirly
 
-#endif // SWIRLY_SYS_MEMORY_HPP
+#endif // SWIRLY_SYS_INTERRUPTIBLE_HPP

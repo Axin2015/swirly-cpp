@@ -26,13 +26,13 @@ namespace {
 
 struct MsgHandler : BasicMsgHandler<MsgHandler> {
 
-    int resetCalls{0};
+    int interruptCalls{0};
     int createMarketCalls{0};
     int updateMarketCalls{0};
     int createExecCalls{0};
     int archiveTradeCalls{0};
 
-    void onReset() { ++resetCalls; }
+    void onInterrupt(const Interrupt& body) { ++interruptCalls; }
     void onCreateMarket(const CreateMarket& body) { ++createMarketCalls; }
     void onUpdateMarket(const UpdateMarket& body) { ++updateMarketCalls; }
     void onCreateExec(const CreateExec& body) { ++createExecCalls; }
@@ -49,14 +49,10 @@ BOOST_AUTO_TEST_CASE(BasicMsgHandlerCase)
     Msg m;
     memset(&m, 0, sizeof(m));
 
-    BOOST_TEST(h.resetCalls == 0);
+    m.type = MsgType::Interrupt;
+    BOOST_TEST(h.interruptCalls == 0);
     h.dispatch(m);
-    BOOST_TEST(h.resetCalls == 1);
-
-    m.type = MsgType::Reset;
-    BOOST_TEST(h.resetCalls == 1);
-    h.dispatch(m);
-    BOOST_TEST(h.resetCalls == 2);
+    BOOST_TEST(h.interruptCalls == 1);
 
     m.type = MsgType::CreateMarket;
     BOOST_TEST(h.createMarketCalls == 0);

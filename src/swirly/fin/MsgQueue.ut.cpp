@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "AsyncJourn.hpp"
+#include "MsgQueue.hpp"
 
 #include <swirly/fin/Exec.hpp>
 #include <swirly/fin/Journ.hpp>
@@ -32,26 +32,12 @@
 #include <queue>
 
 namespace swirly {
-inline namespace clob {
-inline namespace clob {
-std::ostream& operator<<(std::ostream& os, More more)
-{
-    switch (more) {
-    case More::Yes:
-        os << "Yes";
-        break;
-    case More::No:
-        os << "No";
-        break;
-    }
-    return os;
-}
-
+inline namespace fin {
 std::ostream& operator<<(std::ostream& os, MsgType type)
 {
     switch (type) {
-    case MsgType::Reset:
-        os << "Reset";
+    case MsgType::Interrupt:
+        os << "Interrupt";
         break;
     case MsgType::CreateMarket:
         os << "CreateMarket";
@@ -68,8 +54,7 @@ std::ostream& operator<<(std::ostream& os, MsgType type)
     }
     return os;
 }
-} // namespace clob
-} // namespace clob
+} // namespace fin
 } // namespace swirly
 
 using namespace std;
@@ -92,126 +77,105 @@ struct JournState {
     int total{0};
 };
 
-struct TestJourn : Journ {
-    bool pop(Msg& msg)
-    {
-        unique_lock<mutex> lock{mutex_};
-        auto now = chrono::system_clock::now();
-        auto pred = [this]() { return !this->msgs_.empty(); };
-        if (!notEmpty_.wait_until(lock, now + chrono::seconds(2), pred)) {
-            // Timeout.
-            return false;
-        }
-        msg = msgs_.front();
-        msgs_.pop();
-        return true;
-    }
-
-  protected:
-    void doUpdate(const Msg& msg) override
-    {
-        {
-            lock_guard<mutex> lock{mutex_};
-            msgs_.push(msg);
-        }
-        notEmpty_.notify_one();
-    }
-
-  private:
-    mutex mutex_;
-    condition_variable notEmpty_;
-    queue<Msg> msgs_;
-};
-
-struct AsyncJournFixture {
-    AsyncJournFixture()
-    : asyncJourn{journ, 1 << 10}
-    {
-    }
-    TestJourn journ;
-    AsyncJourn asyncJourn;
+struct MsgQueueFixture {
+    MsgQueue mq{1 << 10};
 };
 
 } // namespace
 
-BOOST_AUTO_TEST_SUITE(AsyncJournSuite)
+BOOST_AUTO_TEST_SUITE(MsgQueueSuite)
 
-BOOST_AUTO_TEST_CASE(AsyncWindowCase)
+BOOST_AUTO_TEST_CASE(RangeCase)
 {
+    BOOST_TEST(fin::detail::Range<8>{}.steps() == 0);
     {
-        detail::AsyncWindow<1> aw{3};
+        fin::detail::Range<1> c{3};
+        BOOST_TEST(c.steps() == 3);
         // 1.
-        BOOST_TEST(aw.index() == 0U);
-        BOOST_TEST(aw.size() == 1U);
-        BOOST_TEST(aw.more() == More::Yes);
-        BOOST_TEST(aw.next());
-        BOOST_TEST(!aw.done());
+        BOOST_TEST(c.stepOffset() == 0U);
+        BOOST_TEST(c.stepSize() == 1U);
+        BOOST_TEST(c.next());
+        BOOST_TEST(!c.done());
         // 2.
-        BOOST_TEST(aw.index() == 1U);
-        BOOST_TEST(aw.size() == 1U);
-        BOOST_TEST(aw.more() == More::Yes);
-        BOOST_TEST(aw.next());
-        BOOST_TEST(!aw.done());
+        BOOST_TEST(c.stepOffset() == 1U);
+        BOOST_TEST(c.stepSize() == 1U);
+        BOOST_TEST(c.next());
+        BOOST_TEST(!c.done());
         // 3.
-        BOOST_TEST(aw.index() == 2U);
-        BOOST_TEST(aw.size() == 1U);
-        BOOST_TEST(aw.more() == More::No);
-        BOOST_TEST(!aw.next());
-        BOOST_TEST(aw.done());
+        BOOST_TEST(c.stepOffset() == 2U);
+        BOOST_TEST(c.stepSize() == 1U);
+        BOOST_TEST(!c.next());
+        BOOST_TEST(c.done());
     }
     {
-        detail::AsyncWindow<8> aw{4};
+        fin::detail::Range<1> c{3};
+        BOOST_TEST(c.steps() == 3);
+        // 1.
+        BOOST_TEST(c.stepOffset() == 0U);
+        BOOST_TEST(c.stepSize() == 1U);
+        BOOST_TEST(c.next());
+        BOOST_TEST(!c.done());
+        // 2.
+        BOOST_TEST(c.stepOffset() == 1U);
+        BOOST_TEST(c.stepSize() == 1U);
+        BOOST_TEST(c.next());
+        BOOST_TEST(!c.done());
+        // 3.
+        BOOST_TEST(c.stepOffset() == 2U);
+        BOOST_TEST(c.stepSize() == 1U);
+        BOOST_TEST(!c.next());
+        BOOST_TEST(c.done());
+    }
+    {
+        fin::detail::Range<8> c{4};
+        BOOST_TEST(c.steps() == 1);
         // 0-3.
-        BOOST_TEST(aw.index() == 0U);
-        BOOST_TEST(aw.size() == 4U);
-        BOOST_TEST(aw.more() == More::No);
-        BOOST_TEST(!aw.next());
-        BOOST_TEST(aw.done());
+        BOOST_TEST(c.stepOffset() == 0U);
+        BOOST_TEST(c.stepSize() == 4U);
+        BOOST_TEST(!c.next());
+        BOOST_TEST(c.done());
     }
     {
-        detail::AsyncWindow<8> aw{16};
+        fin::detail::Range<8> c{16};
+        BOOST_TEST(c.steps() == 2);
         // 0-7.
-        BOOST_TEST(aw.index() == 0U);
-        BOOST_TEST(aw.size() == 8U);
-        BOOST_TEST(aw.more() == More::Yes);
-        BOOST_TEST(aw.next());
-        BOOST_TEST(!aw.done());
+        BOOST_TEST(c.stepOffset() == 0U);
+        BOOST_TEST(c.stepSize() == 8U);
+        BOOST_TEST(c.next());
+        BOOST_TEST(!c.done());
         // 8-15
-        BOOST_TEST(aw.index() == 8U);
-        BOOST_TEST(aw.size() == 8U);
-        BOOST_TEST(aw.more() == More::No);
-        BOOST_TEST(!aw.next());
-        BOOST_TEST(aw.done());
+        BOOST_TEST(c.stepOffset() == 8U);
+        BOOST_TEST(c.stepSize() == 8U);
+        BOOST_TEST(!c.next());
+        BOOST_TEST(c.done());
     }
     {
-        detail::AsyncWindow<8> aw{20};
+        fin::detail::Range<8> c{20};
+        BOOST_TEST(c.steps() == 3);
         // 0-7.
-        BOOST_TEST(aw.index() == 0U);
-        BOOST_TEST(aw.size() == 8U);
-        BOOST_TEST(aw.more() == More::Yes);
-        BOOST_TEST(aw.next());
-        BOOST_TEST(!aw.done());
+        BOOST_TEST(c.stepOffset() == 0U);
+        BOOST_TEST(c.stepSize() == 8U);
+        BOOST_TEST(c.next());
+        BOOST_TEST(!c.done());
         // 8-15
-        BOOST_TEST(aw.index() == 8U);
-        BOOST_TEST(aw.size() == 8U);
-        BOOST_TEST(aw.more() == More::Yes);
-        BOOST_TEST(aw.next());
-        BOOST_TEST(!aw.done());
+        BOOST_TEST(c.stepOffset() == 8U);
+        BOOST_TEST(c.stepSize() == 8U);
+        BOOST_TEST(c.next());
+        BOOST_TEST(!c.done());
         // 16-19.
-        BOOST_TEST(aw.index() == 16U);
-        BOOST_TEST(aw.size() == 4U);
-        BOOST_TEST(aw.more() == More::No);
-        BOOST_TEST(!aw.next());
-        BOOST_TEST(aw.done());
+        BOOST_TEST(c.stepOffset() == 16U);
+        BOOST_TEST(c.stepSize() == 4U);
+        BOOST_TEST(!c.next());
+        BOOST_TEST(c.done());
     }
 }
 
-BOOST_FIXTURE_TEST_CASE(AsyncJournCreateMarket, AsyncJournFixture)
+BOOST_FIXTURE_TEST_CASE(MsgQueueCreateMarket, MsgQueueFixture)
 {
-    asyncJourn.createMarket(MarketId, "EURUSD"sv, SettlDay, 0x1);
+    mq.createMarket(MarketId, "EURUSD"sv, SettlDay, 0x1);
 
     Msg msg;
-    BOOST_TEST(journ.pop(msg));
+    BOOST_TEST(mq.pop(msg));
     BOOST_CHECK_EQUAL(msg.type, MsgType::CreateMarket);
     const auto& body = msg.createMarket;
 
@@ -221,12 +185,12 @@ BOOST_FIXTURE_TEST_CASE(AsyncJournCreateMarket, AsyncJournFixture)
     BOOST_CHECK_EQUAL(body.state, 0x1U);
 }
 
-BOOST_FIXTURE_TEST_CASE(AsyncJournUpdateMarket, AsyncJournFixture)
+BOOST_FIXTURE_TEST_CASE(MsgQueueUpdateMarket, MsgQueueFixture)
 {
-    asyncJourn.updateMarket(MarketId, 0x1);
+    mq.updateMarket(MarketId, 0x1);
 
     Msg msg;
-    BOOST_TEST(journ.pop(msg));
+    BOOST_TEST(mq.pop(msg));
     BOOST_CHECK_EQUAL(msg.type, MsgType::UpdateMarket);
     const auto& body = msg.updateMarket;
 
@@ -234,7 +198,7 @@ BOOST_FIXTURE_TEST_CASE(AsyncJournUpdateMarket, AsyncJournFixture)
     BOOST_CHECK_EQUAL(body.state, 0x1U);
 }
 
-BOOST_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
+BOOST_FIXTURE_TEST_CASE(MsgQueueCreateExec, MsgQueueFixture)
 {
     ConstExecPtr execs[2];
     execs[0] = makeIntrusive<Exec>("MARAYL"sv, MarketId, "EURUSD"sv, SettlDay, 1_id64, 2_id64,
@@ -244,10 +208,10 @@ BOOST_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
                                    "REF"sv, State::Trade, Side::Buy, 10_lts, 12345_tks, 5_lts,
                                    5_lts, 61725_cst, 5_lts, 12345_tks, 1_lts, 4_id64, LiqInd::Maker,
                                    "GOSAYL"sv, Now + 1ms);
-    asyncJourn.createExec(execs);
+    mq.createExec(execs);
     {
         Msg msg;
-        BOOST_TEST(journ.pop(msg));
+        BOOST_TEST(mq.pop(msg));
         BOOST_CHECK_EQUAL(msg.type, MsgType::CreateExec);
         const auto& body = msg.createExec;
 
@@ -275,7 +239,7 @@ BOOST_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
     }
     {
         Msg msg;
-        BOOST_TEST(journ.pop(msg));
+        BOOST_TEST(mq.pop(msg));
         BOOST_CHECK_EQUAL(msg.type, MsgType::CreateExec);
         const auto& body = msg.createExec;
 
@@ -303,19 +267,19 @@ BOOST_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
     }
 }
 
-BOOST_FIXTURE_TEST_CASE(AsyncJournArchiveTrade, AsyncJournFixture)
+BOOST_FIXTURE_TEST_CASE(MsgQueueArchiveTrade, MsgQueueFixture)
 {
     vector<Id64> ids;
     ids.reserve(101);
 
     Id64 id{};
     generate_n(back_insert_iterator<decltype(ids)>(ids), ids.capacity(), [&id]() { return ++id; });
-    asyncJourn.archiveTrade(MarketId, ids, Now);
+    mq.archiveTrade(MarketId, ids, Now);
 
     auto it = ids.begin();
     while (it != ids.end()) {
         Msg msg;
-        BOOST_TEST(journ.pop(msg));
+        BOOST_TEST(mq.pop(msg));
         BOOST_CHECK_EQUAL(msg.type, MsgType::ArchiveTrade);
         const auto& body = msg.archiveTrade;
         BOOST_CHECK_EQUAL(body.marketId, MarketId);

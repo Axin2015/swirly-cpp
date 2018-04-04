@@ -27,8 +27,8 @@ inline namespace web {
 
 class SWIRLY_API Rest {
   public:
-    Rest(Journ& journ, std::size_t pipeCapacity, std::size_t maxExecs)
-    : serv_{journ, pipeCapacity, maxExecs}
+    Rest(MsgQueue& mq, std::size_t maxExecs)
+    : serv_{mq, maxExecs}
     {
     }
     ~Rest();

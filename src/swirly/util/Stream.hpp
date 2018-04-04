@@ -133,7 +133,7 @@ class SWIRLY_API OStreamJoiner {
     }
     OStreamJoiner& operator*() noexcept { return *this; }
     OStreamJoiner& operator++() noexcept { return *this; }
-    OStreamJoiner& operator++(int)noexcept { return *this; }
+    OStreamJoiner& operator++(int) noexcept { return *this; }
 
   private:
     std::ostream* os_;

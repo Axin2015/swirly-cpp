@@ -17,19 +17,13 @@
 #ifndef SWIRLY_FIN_JOURN_HPP
 #define SWIRLY_FIN_JOURN_HPP
 
-#include <swirly/Config.h>
-
-#include <memory>
+#include <swirly/sys/Interruptible.hpp>
 
 namespace swirly {
-inline namespace util {
-class Config;
-} // namespace util
-
 inline namespace fin {
 struct Msg;
 
-class SWIRLY_API Journ {
+class SWIRLY_API Journ : public Interruptible {
   public:
     Journ() noexcept = default;
     virtual ~Journ();
@@ -42,18 +36,11 @@ class SWIRLY_API Journ {
     constexpr Journ(Journ&&) noexcept = default;
     Journ& operator=(Journ&&) noexcept = default;
 
-    void update(const Msg& msg) { doUpdate(msg); }
+    void write(const Msg& msg) { doWrite(msg); }
 
   protected:
-    virtual void doUpdate(const Msg& msg) = 0;
+    virtual void doWrite(const Msg& msg) = 0;
 };
-
-/**
- * Make Journal. Forward declaration for Journal backend.
- *
- * @param config Configuration.
- */
-SWIRLY_API std::unique_ptr<Journ> makeJourn(const Config& config);
 
 } // namespace fin
 } // namespace swirly

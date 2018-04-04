@@ -14,36 +14,33 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SYS_MEMORY_HPP
-#define SWIRLY_SYS_MEMORY_HPP
+#ifndef SWIRLY_SYS_CPU_HPP
+#define SWIRLY_SYS_CPU_HPP
 
-#include <swirly/sys/Math.hpp>
+#include <swirly/Config.h>
 
 namespace swirly {
 inline namespace sys {
 
-// Assumptions:
-// sysconf(_SC_LEVEL1_DCACHE_LINESIZE) == 64
-// sysconf(_SC_PAGESIZE) == 4096
+class SWIRLY_API CpuBackoff {
+  public:
+    void reset() noexcept { i_ = 0; }
+    void operator()() noexcept;
 
-enum : std::size_t {
-    CacheLineBits = 6,
-    CacheLineSize = 1 << CacheLineBits,
-    PageBits = 12,
-    PageSize = 1 << PageBits
+  private:
+    int i_{0};
 };
 
-constexpr std::size_t ceilCacheLine(std::size_t size) noexcept
+inline void cpuRelax() noexcept
 {
-    return ceilPow2<CacheLineBits>(size);
-}
-
-constexpr std::size_t ceilPage(std::size_t size) noexcept
-{
-    return ceilPow2<PageBits>(size);
+#if defined(__x86_64__) || defined(__i386__)
+    asm volatile("pause" ::: "memory");
+#elif defined(__arm__) || defined(__arm64__)
+    asm volatile("yield" ::: "memory");
+#endif
 }
 
 } // namespace sys
 } // namespace swirly
 
-#endif // SWIRLY_SYS_MEMORY_HPP
+#endif // SWIRLY_SYS_CPU_HPP

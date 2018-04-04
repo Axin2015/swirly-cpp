@@ -17,13 +17,13 @@
 #include "Serv.hpp"
 
 #include <swirly/clob/Accnt.hpp>
-#include <swirly/clob/AsyncJourn.hpp>
 #include <swirly/clob/Response.hpp>
 
 #include <swirly/fin/Date.hpp>
 #include <swirly/fin/Exception.hpp>
 #include <swirly/fin/Journ.hpp>
 #include <swirly/fin/Model.hpp>
+#include <swirly/fin/MsgQueue.hpp>
 
 #include <swirly/util/Date.hpp>
 #include <swirly/util/Finally.hpp>
@@ -58,8 +58,8 @@ inline auto& constCast(const ValueT& ref)
 
 struct Serv::Impl {
 
-    Impl(Journ& journ, size_t pipeCapacity, size_t maxExecs) noexcept
-    : journ_{journ, pipeCapacity}
+    Impl(MsgQueue& mq, size_t maxExecs)
+    : mq_(mq)
     , maxExecs_{maxExecs}
     {
         matches_.reserve(8);
@@ -76,7 +76,7 @@ struct Serv::Impl {
             auto& accnt = this->accnt(ptr->accnt());
             accnt.insertOrder(ptr);
             bool success{false};
-            auto finally = makeFinally([&]() noexcept {
+            const auto finally = makeFinally([&]() noexcept {
                 if (!success) {
                     accnt.removeOrder(*ptr);
                 }
@@ -168,7 +168,7 @@ struct Serv::Impl {
         }
         {
             auto market = Market::make(id, instr.symbol(), settlDay, state);
-            journ_.createMarket(id, instr.symbol(), settlDay, state);
+            mq_.createMarket(id, instr.symbol(), settlDay, state);
             it = markets_.insertHint(it, market);
         }
         return *it;
@@ -176,7 +176,7 @@ struct Serv::Impl {
 
     void updateMarket(Market& market, MarketState state, Time now)
     {
-        journ_.updateMarket(market.id(), state);
+        mq_.updateMarket(market.id(), state);
         market.setState(state);
     }
 
@@ -207,7 +207,7 @@ struct Serv::Impl {
         resp.insertExec(exec);
 
         // Ensure that matches are cleared when scope exits.
-        auto finally = makeFinally([this]() noexcept {
+        const auto finally = makeFinally([this]() noexcept {
             this->matches_.clear();
             this->execs_.clear();
         });
@@ -236,7 +236,7 @@ struct Serv::Impl {
             // unfilled quantity.
             bool success{false};
             // clang-format off
-            auto finally = makeFinally([&market, &order, &success]() noexcept {
+            const auto finally = makeFinally([&market, &order, &success]() noexcept {
                 if (!success && !order->done()) {
                     // Undo market insertion.
                     market.removeOrder(*order);
@@ -244,7 +244,7 @@ struct Serv::Impl {
             });
             // clang-format on
 
-            journ_.createExec(execs_);
+            mq_.createExec(execs_);
             success = true;
         }
 
@@ -318,7 +318,7 @@ struct Serv::Impl {
             resp.insertExec(exec);
         }
 
-        journ_.createExec(resp.execs());
+        mq_.createExec(resp.execs());
 
         // Commit phase.
 
@@ -372,7 +372,7 @@ struct Serv::Impl {
             resp.insertExec(exec);
         }
 
-        journ_.createExec(resp.execs());
+        mq_.createExec(resp.execs());
 
         // Commit phase.
 
@@ -411,7 +411,7 @@ struct Serv::Impl {
             cptyTrade = trade->opposite(market.allocId());
 
             ConstExecPtr trades[] = {trade, cptyTrade};
-            journ_.createExec(trades);
+            mq_.createExec(trades);
 
             // Commit phase.
 
@@ -421,7 +421,7 @@ struct Serv::Impl {
 
         } else {
 
-            journ_.createExec(*trade);
+            mq_.createExec(*trade);
 
             // Commit phase.
         }
@@ -448,11 +448,12 @@ struct Serv::Impl {
 
     void archiveTrade(Accnt& accnt, Id64 marketId, ArrayView<Id64> ids, Time now)
     {
+        // Validate.
         for (const auto id : ids) {
             accnt.trade(marketId, id);
         }
 
-        journ_.archiveTrade(marketId, ids, now);
+        mq_.archiveTrade(marketId, ids, now);
 
         // Commit phase.
 
@@ -653,7 +654,7 @@ struct Serv::Impl {
         resp.insertOrder(&order);
         resp.insertExec(exec);
 
-        journ_.createExec(*exec);
+        mq_.createExec(*exec);
 
         // Commit phase.
 
@@ -669,7 +670,7 @@ struct Serv::Impl {
         resp.insertOrder(&order);
         resp.insertExec(exec);
 
-        journ_.createExec(*exec);
+        mq_.createExec(*exec);
 
         // Commit phase.
 
@@ -680,14 +681,14 @@ struct Serv::Impl {
 
     void doArchiveTrade(Accnt& accnt, const Exec& trade, Time now)
     {
-        journ_.archiveTrade(trade.marketId(), trade.id(), now);
+        mq_.archiveTrade(trade.marketId(), trade.id(), now);
 
         // Commit phase.
 
         accnt.removeTrade(trade);
     }
 
-    AsyncJourn journ_;
+    MsgQueue& mq_;
     const BusinessDay busDay_{MarketZone};
     const size_t maxExecs_;
     AssetSet assets_;
@@ -698,8 +699,8 @@ struct Serv::Impl {
     vector<ConstExecPtr> execs_;
 };
 
-Serv::Serv(Journ& journ, size_t pipeCapacity, size_t maxExecs)
-: impl_{make_unique<Impl>(journ, pipeCapacity, maxExecs)}
+Serv::Serv(MsgQueue& mq, size_t maxExecs)
+: impl_{make_unique<Impl>(mq, maxExecs)}
 {
 }
 

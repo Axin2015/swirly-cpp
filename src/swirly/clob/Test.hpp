@@ -17,7 +17,6 @@
 #ifndef SWIRLY_CLOB_TEST_HPP
 #define SWIRLY_CLOB_TEST_HPP
 
-#include <swirly/fin/Journ.hpp>
 #include <swirly/fin/Model.hpp>
 
 namespace swirly {
@@ -50,23 +49,6 @@ class SWIRLY_API TestModel : public Model {
     void doReadTrade(const ModelCallback<ExecPtr>& cb) const override;
 
     void doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const override;
-};
-
-class SWIRLY_API TestJourn : public Journ {
-  public:
-    TestJourn() noexcept;
-    ~TestJourn() override;
-
-    // Copy.
-    constexpr TestJourn(const TestJourn&) noexcept;
-    TestJourn& operator=(const TestJourn&) noexcept;
-
-    // Move.
-    constexpr TestJourn(TestJourn&&) noexcept;
-    TestJourn& operator=(TestJourn&&) noexcept;
-
-  protected:
-    void doUpdate(const Msg& msg) override;
 };
 
 } // namespace clob

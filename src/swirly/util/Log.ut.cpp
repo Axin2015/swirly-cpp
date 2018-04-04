@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(LogMacroCase)
     auto prevLevel = setLogLevel(LogInfo);
     auto prevLogger = setLogger(testLogger);
     // clang-format off
-    auto finally = makeFinally([prevLevel, prevLogger]() noexcept {
+    const auto finally = makeFinally([prevLevel, prevLogger]() noexcept {
         setLogLevel(prevLevel);
         setLogger(prevLogger);
     });
