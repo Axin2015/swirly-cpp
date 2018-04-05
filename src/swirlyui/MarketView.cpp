@@ -84,6 +84,7 @@ void MarketView::slotClicked(const QModelIndex& index)
             model_.toggleCheckState(index.row());
         // Fall-through.
         case Column::Id:
+        case Column::Broker:
         case Column::Instr:
         case Column::SettlDate:
         case Column::State:

@@ -39,7 +39,7 @@ using TradePair = std::pair<ConstExecPtr, ConstExecPtr>;
 
 class SWIRLY_API Serv {
   public:
-    Serv(Journ& journ, std::size_t pipeCapacity, std::size_t maxExecs);
+    Serv(Symbol broker, Journ& journ, std::size_t pipeCapacity, std::size_t maxExecs);
 
     ~Serv();
 

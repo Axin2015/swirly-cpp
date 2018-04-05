@@ -83,9 +83,9 @@ class SWIRLY_API AsyncJourn {
     /**
      * Create Market.
      */
-    void createMarket(Id64 id, Symbol instr, JDay settlDay, MarketState state)
+    void createMarket(Id64 id, Symbol broker, Symbol instr, JDay settlDay, MarketState state)
     {
-        doCreateMarket(id, instr, settlDay, state);
+        doCreateMarket(id, broker, instr, settlDay, state);
     }
     /**
      * Update Market.
@@ -114,7 +114,7 @@ class SWIRLY_API AsyncJourn {
   private:
     void doReset();
 
-    void doCreateMarket(Id64 id, Symbol instr, JDay settlDay, MarketState state);
+    void doCreateMarket(Id64 id, Symbol broker, Symbol instr, JDay settlDay, MarketState state);
 
     void doUpdateMarket(Id64 id, MarketState state);
 

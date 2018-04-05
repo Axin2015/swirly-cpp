@@ -27,6 +27,7 @@ namespace market {
 enum class Column : int { //
     CheckState,           //
     Id,                   //
+    Broker,               //
     Instr,                //
     SettlDate,            //
     State,                //
@@ -48,9 +49,10 @@ class Market {
   public:
     using Levels = std::array<Level, MaxLevels>;
 
-    Market(Id64 id, const Instr& instr, QDate settlDate, MarketState state, Lots lastLots,
-           Ticks lastTicks, const QDateTime& lastTime)
+    Market(Id64 id, const QString& broker, const Instr& instr, QDate settlDate, MarketState state,
+           Lots lastLots, Ticks lastTicks, const QDateTime& lastTime)
     : id_{id}
+    , broker_{broker}
     , instr_{instr}
     , settlDate_{settlDate}
     , state_{state}
@@ -65,6 +67,7 @@ class Market {
     static Market fromJson(const Instr& instr, const QJsonObject& obj);
 
     Id64 id() const noexcept { return id_; }
+    const QString& broker() const noexcept { return broker_; }
     const Instr& instr() const noexcept { return instr_; }
     QDate settlDate() const noexcept { return settlDate_; }
     MarketState state() const noexcept { return state_; }
@@ -78,6 +81,7 @@ class Market {
 
   private:
     Id64 id_{};
+    QString broker_{};
     Instr instr_{};
     QDate settlDate_{};
     MarketState state_{};
