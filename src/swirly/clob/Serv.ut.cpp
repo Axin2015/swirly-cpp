@@ -43,13 +43,13 @@ class SWIRLY_API TestModel : public swirly::TestModel {
   protected:
     void doReadMarket(const ModelCallback<MarketPtr>& cb) const override
     {
-        cb(Market::make(MarketId, "SWIRLY"sv, "EURUSD"sv, SettlDay, 0x1U));
+        cb(Market::make(MarketId, "EURUSD"sv, SettlDay, 0x1U));
     }
 };
 
 struct ServFixture {
     ServFixture()
-    : serv{"SWIRLY"sv, journ, 1 << 10, 1 << 4}
+    : serv{journ, 1 << 10, 1 << 4}
     {
         serv.load(TestModel{}, Now);
     }
@@ -108,7 +108,6 @@ BOOST_FIXTURE_TEST_CASE(ServMarkets, ServFixture)
     BOOST_TEST(it != serv.markets().end());
     BOOST_TEST(it->id() == MarketId);
 
-    BOOST_TEST(it->broker() == "SWIRLY"sv);
     BOOST_TEST(it->instr() == "EURUSD"sv);
     BOOST_TEST(it->settlDay() == SettlDay);
     BOOST_TEST(it->state() == 0x1U);
@@ -122,7 +121,6 @@ BOOST_FIXTURE_TEST_CASE(ServMarket, ServFixture)
     auto& market = serv.market(MarketId);
     BOOST_TEST(market.id() == MarketId);
 
-    BOOST_TEST(market.broker() == "SWIRLY"sv);
     BOOST_TEST(market.instr() == "EURUSD"sv);
     BOOST_TEST(market.settlDay() == SettlDay);
     BOOST_TEST(market.state() == 0x1U);
@@ -140,7 +138,6 @@ BOOST_FIXTURE_TEST_CASE(ServCreateMarket, ServFixture)
 
     BOOST_TEST(market.id() == marketId);
 
-    BOOST_TEST(market.broker() == "SWIRLY"sv);
     BOOST_TEST(market.instr() == "USDJPY"sv);
     BOOST_TEST(market.settlDay() == SettlDay);
     BOOST_TEST(market.state() == 0x1U);
@@ -164,7 +161,6 @@ BOOST_FIXTURE_TEST_CASE(ServUpdateMarket, ServFixture)
 
     BOOST_TEST(market.id() == marketId);
 
-    BOOST_TEST(market.broker() == "SWIRLY"sv);
     BOOST_TEST(market.instr() == "USDJPY"sv);
     BOOST_TEST(market.settlDay() == SettlDay);
     BOOST_TEST(market.state() == 0x2U);

@@ -38,9 +38,6 @@ log_level = 4
 # Http port. Defaults to 8080.
 http_port = 8080
 
-# Clearing broker.
-broker = SWIRLY
-
 # Journal pipe capacity.
 pipe_capacity = 1024
 

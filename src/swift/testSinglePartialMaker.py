@@ -59,7 +59,6 @@ class TestCase(RestTestCase):
         u'bidCount': [1, None, None],
         u'bidLots': [2, None, None],
         u'bidTicks': [12345, None, None],
-        u'broker': u'SWIRLY',
         u'instr': u'EURUSD',
         u'id': 82255,
         u'lastLots': 3,

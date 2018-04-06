@@ -255,8 +255,6 @@ int main(int argc, char* argv[])
         }
 
         const char* const httpPort{config.get("http_port", "8080")};
-        const auto broker = config.get("broker", "SWIRLY"sv);
-
         const auto pipeCapacity = config.get<size_t>("pipe_capacity", 1 << 10);
         const auto maxExecs = config.get<size_t>("max_execs", 1 << 4);
 
@@ -273,7 +271,6 @@ int main(int argc, char* argv[])
         SWIRLY_INFO(logMsg() << "log_file:      " << logFile);
         SWIRLY_INFO(logMsg() << "log_level:     " << getLogLevel());
         SWIRLY_INFO(logMsg() << "http_port:     " << httpPort);
-        SWIRLY_INFO(logMsg() << "broker:        " << broker);
         SWIRLY_INFO(logMsg() << "pipe_capacity: " << pipeCapacity);
         SWIRLY_INFO(logMsg() << "max_execs:     " << maxExecs);
 
@@ -283,7 +280,7 @@ int main(int argc, char* argv[])
         } else {
             journ = make_unique<TestJourn>();
         }
-        Rest rest{broker, *journ, pipeCapacity, maxExecs};
+        Rest rest{*journ, pipeCapacity, maxExecs};
         {
             SqlModel model{config};
             rest.load(model, opts.startTime);

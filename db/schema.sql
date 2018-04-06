@@ -126,20 +126,8 @@ CREATE TABLE accnt_t (
 
 CREATE INDEX accnt_modified_idx ON accnt_t (modified);
 
-CREATE TABLE broker_t (
-  id INT NOT NULL PRIMARY KEY,
-  symbol CHAR(16) NOT NULL UNIQUE,
-  display VARCHAR(64) NOT NULL UNIQUE
-)
-;
-
-INSERT INTO broker_t (id, symbol, display) VALUES (1, 'SWIRLY', 'Swirly Cloud')
-;
-
 CREATE TABLE market_t (
   id BIGINT NOT NULL PRIMARY KEY,
-  -- Clearing broker.
-  broker CHAR(16) NOT NULL,
   instr CHAR(16) NOT NULL,
   settl_day INT NULL DEFAULT NULL,
   state INT NOT NULL DEFAULT 0,
@@ -359,7 +347,6 @@ CREATE VIEW instr_v AS
 CREATE VIEW market_v AS
   SELECT
     m.id,
-    m.broker,
     m.instr,
     m.settl_day,
     m.state,

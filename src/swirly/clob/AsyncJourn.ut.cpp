@@ -208,7 +208,7 @@ BOOST_AUTO_TEST_CASE(AsyncWindowCase)
 
 BOOST_FIXTURE_TEST_CASE(AsyncJournCreateMarket, AsyncJournFixture)
 {
-    asyncJourn.createMarket(MarketId, "SWIRLY"sv, "EURUSD"sv, SettlDay, 0x1);
+    asyncJourn.createMarket(MarketId, "EURUSD"sv, SettlDay, 0x1);
 
     Msg msg;
     BOOST_TEST(journ.pop(msg));
@@ -216,7 +216,6 @@ BOOST_FIXTURE_TEST_CASE(AsyncJournCreateMarket, AsyncJournFixture)
     const auto& body = msg.createMarket;
 
     BOOST_CHECK_EQUAL(body.id, MarketId);
-    BOOST_CHECK_EQUAL(strncmp(body.broker, "SWIRLY", sizeof(body.instr)), 0);
     BOOST_CHECK_EQUAL(strncmp(body.instr, "EURUSD", sizeof(body.instr)), 0);
     BOOST_CHECK_EQUAL(body.settlDay, SettlDay);
     BOOST_CHECK_EQUAL(body.state, 0x1U);

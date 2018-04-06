@@ -120,14 +120,12 @@ void AsyncJourn::doReset()
     pipe_.post([](Msg& msg) { msg.type = MsgType::Reset; });
 }
 
-void AsyncJourn::doCreateMarket(Id64 id, Symbol broker, Symbol instr, JDay settlDay,
-                                MarketState state)
+void AsyncJourn::doCreateMarket(Id64 id, Symbol instr, JDay settlDay, MarketState state)
 {
-    pipe_.post([id, &broker, &instr, settlDay, state](Msg& msg) {
+    pipe_.post([id, &instr, settlDay, state](Msg& msg) {
         msg.type = MsgType::CreateMarket;
         auto& body = msg.createMarket;
         body.id = id;
-        setCString(body.broker, broker);
         setCString(body.instr, instr);
         body.settlDay = settlDay;
         body.state = state;

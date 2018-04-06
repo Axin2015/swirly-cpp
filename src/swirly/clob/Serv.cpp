@@ -58,9 +58,8 @@ inline auto& constCast(const ValueT& ref)
 
 struct Serv::Impl {
 
-    Impl(Symbol broker, Journ& journ, size_t pipeCapacity, size_t maxExecs) noexcept
-    : broker_{broker}
-    , journ_{journ, pipeCapacity}
+    Impl(Journ& journ, size_t pipeCapacity, size_t maxExecs) noexcept
+    : journ_{journ, pipeCapacity}
     , maxExecs_{maxExecs}
     {
         matches_.reserve(8);
@@ -168,8 +167,8 @@ struct Serv::Impl {
                                                   << jdToIso(settlDay) << " already exists"};
         }
         {
-            auto market = Market::make(id, broker_, instr.symbol(), settlDay, state);
-            journ_.createMarket(id, broker_, instr.symbol(), settlDay, state);
+            auto market = Market::make(id, instr.symbol(), settlDay, state);
+            journ_.createMarket(id, instr.symbol(), settlDay, state);
             it = markets_.insertHint(it, market);
         }
         return *it;
@@ -184,9 +183,9 @@ struct Serv::Impl {
     void createOrder(Accnt& accnt, Market& market, string_view ref, Side side, Lots lots,
                      Ticks ticks, Lots minLots, Time now, Response& resp)
     {
-        // N.B. we only check for duplicates in the refIdx; no unique constraint exists in the
-        // database, and order-refs can be reused so long as only one order is live in the system at
-        // any given time.
+        // N.B. we only check for duplicates in the refIdx; no unique constraint exists in the database,
+        // and order-refs can be reused so long as only one order is live in the system at any given
+        // time.
         if (!ref.empty() && accnt.exists(ref)) {
             throw RefAlreadyExistsException{errMsg() << "order '" << ref << "' already exists"};
         }
@@ -233,8 +232,8 @@ struct Serv::Impl {
             market.insertOrder(order);
         }
         {
-            // TODO: IOC orders would need an additional revision for the unsolicited cancellation
-            // of any unfilled quantity.
+            // TODO: IOC orders would need an additional revision for the unsolicited cancellation of any
+            // unfilled quantity.
             bool success{false};
             // clang-format off
             auto finally = makeFinally([&market, &order, &success]() noexcept {
@@ -601,8 +600,8 @@ struct Serv::Impl {
         matchOrders(takerAccnt, market, takerOrder, *marketSide, direct, now, resp);
     }
 
-    // Assumes that maker lots have not been reduced since matching took place. N.B. this function
-    // is responsible for committing a transaction, so it is particularly important that it does not
+    // Assumes that maker lots have not been reduced since matching took place. N.B. this function is
+    // responsible for committing a transaction, so it is particularly important that it does not
     // throw.
     void commitMatches(Accnt& takerAccnt, Market& market, Time now) noexcept
     {
@@ -688,7 +687,6 @@ struct Serv::Impl {
         accnt.removeTrade(trade);
     }
 
-    const Symbol broker_;
     AsyncJourn journ_;
     const BusinessDay busDay_{MarketZone};
     const size_t maxExecs_;
@@ -700,8 +698,8 @@ struct Serv::Impl {
     vector<ConstExecPtr> execs_;
 };
 
-Serv::Serv(Symbol broker, Journ& journ, size_t pipeCapacity, size_t maxExecs)
-: impl_{make_unique<Impl>(broker, journ, pipeCapacity, maxExecs)}
+Serv::Serv(Journ& journ, size_t pipeCapacity, size_t maxExecs)
+: impl_{make_unique<Impl>(journ, pipeCapacity, maxExecs)}
 {
 }
 
