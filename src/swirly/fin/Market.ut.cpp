@@ -27,10 +27,11 @@ BOOST_AUTO_TEST_SUITE(MarketSuite)
 
 BOOST_AUTO_TEST_CASE(MarketToStringCase)
 {
-    Market market{1_id64, "EURUSD"sv, ymdToJd(2014, 3, 14), 0x01};
+    Market market{1_id64, "SWIRLY"sv, "EURUSD"sv, ymdToJd(2014, 3, 14), 0x01};
 
     BOOST_TEST(toString(market) == //
                "{\"id\":1"
+               ",\"broker\":\"SWIRLY\""
                ",\"instr\":\"EURUSD\""
                ",\"settlDate\":20140314"
                ",\"state\":1"
@@ -48,10 +49,11 @@ BOOST_AUTO_TEST_CASE(MarketToStringCase)
 
 BOOST_AUTO_TEST_CASE(MarketToStringNullCase)
 {
-    Market market{1_id64, "EURUSD"sv, 0_jd, 0x01};
+    Market market{1_id64, "SWIRLY"sv, "EURUSD"sv, 0_jd, 0x01};
 
     BOOST_TEST(toString(market) == //
                "{\"id\":1"
+               ",\"broker\":\"SWIRLY\""
                ",\"instr\":\"EURUSD\""
                ",\"settlDate\":null"
                ",\"state\":1"

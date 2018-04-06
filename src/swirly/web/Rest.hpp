@@ -27,8 +27,8 @@ inline namespace web {
 
 class SWIRLY_API Rest {
   public:
-    Rest(Journ& journ, std::size_t pipeCapacity, std::size_t maxExecs)
-    : serv_{journ, pipeCapacity, maxExecs}
+    Rest(Symbol broker, Journ& journ, std::size_t pipeCapacity, std::size_t maxExecs)
+    : serv_{broker, journ, pipeCapacity, maxExecs}
     {
     }
     ~Rest();

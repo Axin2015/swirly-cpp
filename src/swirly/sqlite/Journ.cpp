@@ -31,9 +31,9 @@ constexpr auto BeginSql = "BEGIN TRANSACTION"sv;
 constexpr auto CommitSql = "COMMIT TRANSACTION"sv;
 constexpr auto RollbackSql = "ROLLBACK TRANSACTION"sv;
 
-constexpr auto InsertMarketSql =                         //
-    "INSERT INTO market_t (id, instr, settl_day, state)" //
-    " VALUES (?, ?, ?, ?)"sv;
+constexpr auto InsertMarketSql =                                 //
+    "INSERT INTO market_t (id, broker, instr, settl_day, state)" //
+    " VALUES (?, ?, ?, ?, ?)"sv;
 
 constexpr auto UpdateMarketSql =     //
     "UPDATE Market_t SET state = ?2" //
@@ -100,6 +100,7 @@ void SqlJourn::onCreateMarket(const CreateMarket& body)
 
     ScopedBind bind{stmt};
     bind(body.id);
+    bind(toStringView(body.broker));
     bind(toStringView(body.instr));
     bind(body.settlDay, MaybeNull);
     bind(body.state);

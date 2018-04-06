@@ -74,8 +74,9 @@ void Market::toDsv(ostream& os, char sep) const
 
 void Market::toJson(ostream& os) const
 {
-    os << "{\"id\":" << id_         //
-       << ",\"instr\":\"" << instr_ //
+    os << "{\"id\":" << id_           //
+       << ",\"broker\":\"" << broker_ //
+       << "\",\"instr\":\"" << instr_ //
        << "\",\"settlDate\":";
     if (settlDay_ != 0_jd) {
         os << jdToIso(settlDay_);
