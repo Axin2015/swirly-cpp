@@ -23,12 +23,13 @@ namespace ui {
 using namespace std;
 
 Instr::Impl::Impl(const QString& symbol, const QString& display, const QString& baseAsset,
-                  const QString& termCcy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
-                  int pipDp, Lots minLots, Lots maxLots)
+                  const QString& termCcy, const QString& broker, int lotNumer, int lotDenom,
+                  int tickNumer, int tickDenom, int pipDp, Lots minLots, Lots maxLots)
 : symbol{symbol}
 , display{display}
 , baseAsset{baseAsset}
 , termCcy{termCcy}
+, broker{broker}
 , lotNumer{lotNumer}
 , lotDenom{lotDenom}
 , qtyInc{fractToReal(lotNumer, lotDenom)}
@@ -48,10 +49,10 @@ Instr Instr::fromJson(const QJsonObject& obj)
     using swirly::ui::fromJson;
     return Instr(fromJson<QString>(obj["symbol"]), fromJson<QString>(obj["display"]),
                  fromJson<QString>(obj["baseAsset"]), fromJson<QString>(obj["termCcy"]),
-                 fromJson<int>(obj["lotNumer"]), fromJson<int>(obj["lotDenom"]),
-                 fromJson<int>(obj["tickNumer"]), fromJson<int>(obj["tickDenom"]),
-                 fromJson<int>(obj["pipDp"]), fromJson<Lots>(obj["minLots"]),
-                 fromJson<Lots>(obj["maxLots"]));
+                 fromJson<QString>(obj["broker"]), fromJson<int>(obj["lotNumer"]),
+                 fromJson<int>(obj["lotDenom"]), fromJson<int>(obj["tickNumer"]),
+                 fromJson<int>(obj["tickDenom"]), fromJson<int>(obj["pipDp"]),
+                 fromJson<Lots>(obj["minLots"]), fromJson<Lots>(obj["maxLots"]));
 }
 
 shared_ptr<const Instr::Impl> Instr::empty()
@@ -66,6 +67,7 @@ QDebug operator<<(QDebug debug, const Instr& instr)
                     << ",display=" << instr.display()     //
                     << ",baseAsset=" << instr.baseAsset() //
                     << ",termCcy=" << instr.termCcy()     //
+                    << ",broker=" << instr.broker()       //
                     << ",lotNumer=" << instr.lotNumer()   //
                     << ",lotDenom=" << instr.lotDenom()   //
                     << ",tickNumer=" << instr.tickNumer() //

@@ -97,12 +97,23 @@ CREATE TABLE asset_t (
 )
 ;
 
+CREATE TABLE broker_t (
+  id INT NOT NULL PRIMARY KEY,
+  symbol CHAR(16) NOT NULL UNIQUE,
+  display VARCHAR(64) NOT NULL UNIQUE
+)
+;
+
+INSERT INTO broker_t (id, symbol, display) VALUES (1, 'SWIRLY', 'Swirly Cloud')
+;
+
 CREATE TABLE instr_t (
   id INT NOT NULL PRIMARY KEY,
   symbol CHAR(16) NOT NULL UNIQUE,
   display VARCHAR(64) NOT NULL UNIQUE,
   base_asset CHAR(16) NOT NULL,
   term_ccy CHAR(16) NOT NULL,
+  broker CHAR(16) NOT NULL,
   lot_numer INT NOT NULL,
   lot_denom INT NOT NULL,
   tick_numer INT NOT NULL,
@@ -112,7 +123,8 @@ CREATE TABLE instr_t (
   max_lots BIGINT NOT NULL,
 
   FOREIGN KEY (base_asset) REFERENCES asset_t (symbol),
-  FOREIGN KEY (term_ccy) REFERENCES asset_t (symbol)
+  FOREIGN KEY (term_ccy) REFERENCES asset_t (symbol),
+  FOREIGN KEY (broker) REFERENCES broker_t (symbol)
 )
 ;
 
@@ -126,20 +138,8 @@ CREATE TABLE accnt_t (
 
 CREATE INDEX accnt_modified_idx ON accnt_t (modified);
 
-CREATE TABLE broker_t (
-  id INT NOT NULL PRIMARY KEY,
-  symbol CHAR(16) NOT NULL UNIQUE,
-  display VARCHAR(64) NOT NULL UNIQUE
-)
-;
-
-INSERT INTO broker_t (id, symbol, display) VALUES (1, 'SWIRLY', 'Swirly Cloud')
-;
-
 CREATE TABLE market_t (
   id BIGINT NOT NULL PRIMARY KEY,
-  -- Clearing broker.
-  broker CHAR(16) NOT NULL,
   instr CHAR(16) NOT NULL,
   settl_day INT NULL DEFAULT NULL,
   state INT NOT NULL DEFAULT 0,
@@ -344,6 +344,7 @@ CREATE VIEW instr_v AS
     a.type,
     i.base_asset,
     i.term_ccy,
+    i.broker,
     i.lot_numer,
     i.lot_denom,
     i.tick_numer,
@@ -359,7 +360,6 @@ CREATE VIEW instr_v AS
 CREATE VIEW market_v AS
   SELECT
     m.id,
-    m.broker,
     m.instr,
     m.settl_day,
     m.state,

@@ -31,7 +31,6 @@ enum class MsgType : int { Reset, CreateMarket, UpdateMarket, CreateExec, Archiv
 
 struct SWIRLY_PACKED CreateMarket {
     Id64 id;
-    char broker[MaxSymbol];
     char instr[MaxSymbol];
     JDay settlDay;
     MarketState state;

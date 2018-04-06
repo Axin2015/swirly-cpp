@@ -29,6 +29,7 @@ InstrModel::InstrModel(QObject* parent)
     header_[unbox(Column::Display)] = tr("Display");
     header_[unbox(Column::BaseAsset)] = tr("Base Asset");
     header_[unbox(Column::TermCcy)] = tr("Term Ccy");
+    header_[unbox(Column::Broker)] = tr("Broker");
     header_[unbox(Column::LotNumer)] = tr("Lot Numer");
     header_[unbox(Column::LotDenom)] = tr("Lot Denom");
     header_[unbox(Column::TickNumer)] = tr("Tick Numer");
@@ -71,6 +72,9 @@ QVariant InstrModel::data(const QModelIndex& index, int role) const
         case Column::TermCcy:
             var = instr.termCcy();
             break;
+        case Column::Broker:
+            var = instr.broker();
+            break;
         case Column::LotNumer:
             var = instr.lotNumer();
             break;
@@ -101,6 +105,7 @@ QVariant InstrModel::data(const QModelIndex& index, int role) const
         case Column::Display:
         case Column::BaseAsset:
         case Column::TermCcy:
+        case Column::Broker:
             var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
             break;
         case Column::LotNumer:

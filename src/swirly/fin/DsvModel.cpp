@@ -70,6 +70,7 @@ void DsvModel::doReadInstr(const ModelCallback<InstrPtr>& cb) const
         Display,   //
         BaseAsset, //
         TermCcy,   //
+        Broker,    //
         TickNumer, //
         TickDenom, //
         LotNumer,  //
@@ -95,6 +96,7 @@ void DsvModel::doReadInstr(const ModelCallback<InstrPtr>& cb) const
         const auto display = fromString<string_view>(row[Display]);
         const auto baseAsset = fromString<swirly::Symbol>(row[BaseAsset]);
         const auto termCcy = fromString<swirly::Symbol>(row[TermCcy]);
+        const auto broker = fromString<swirly::Symbol>(row[Broker]);
         const auto lotNumer = fromString<int>(row[LotNumer]);
         const auto lotDenom = fromString<int>(row[LotDenom]);
         const auto tickNumer = fromString<int>(row[TickNumer]);
@@ -102,8 +104,8 @@ void DsvModel::doReadInstr(const ModelCallback<InstrPtr>& cb) const
         const auto pipDp = fromString<int>(row[PipDp]);
         const auto minLots = fromString<Lots>(row[MinLots]);
         const auto maxLots = fromString<Lots>(row[MaxLots]);
-        cb(Instr::make(id, symbol, display, baseAsset, termCcy, lotNumer, lotDenom, tickNumer,
-                       tickDenom, pipDp, minLots, maxLots));
+        cb(Instr::make(id, symbol, display, baseAsset, termCcy, broker, lotNumer, lotDenom,
+                       tickNumer, tickDenom, pipDp, minLots, maxLots));
     }
 }
 
@@ -111,7 +113,6 @@ void DsvModel::doReadMarket(const ModelCallback<MarketPtr>& cb) const
 {
     enum {         //
         Id,        //
-        Broker,    //
         Instr,     //
         SettlDay,  //
         State,     //
@@ -133,7 +134,6 @@ void DsvModel::doReadMarket(const ModelCallback<MarketPtr>& cb) const
         Row<MaxId + 1> row;
         split(line, "\t"sv, row);
         const auto id = fromString<Id64>(row[Id]);
-        const auto broker = fromString<swirly::Symbol>(row[Broker]);
         const auto instr = fromString<swirly::Symbol>(row[Instr]);
         const auto settlDay = fromString<JDay>(row[SettlDay]);
         const auto state = fromString<MarketState>(row[State]);
@@ -141,7 +141,7 @@ void DsvModel::doReadMarket(const ModelCallback<MarketPtr>& cb) const
         const auto lastTicks = fromString<Ticks>(row[LastTicks]);
         const auto lastTime = fromString<Time>(row[LastTime]);
         const auto maxId = fromString<Id64>(row[MaxId]);
-        cb(Market::make(id, broker, instr, settlDay, state, lastLots, lastTicks, lastTime, maxId));
+        cb(Market::make(id, instr, settlDay, state, lastLots, lastTicks, lastTime, maxId));
     }
 }
 

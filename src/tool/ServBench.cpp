@@ -117,7 +117,7 @@ int main(int argc, char* argv[])
         const BusinessDay busDay{MarketZone};
         const auto now = UnixClock::now();
 
-        Serv serv{"SWIRLY"sv, *journ, 1 << 10, 1 << 4};
+        Serv serv{*journ, 1 << 10, 1 << 4};
         serv.load(*model, now);
         model = nullptr;
 

@@ -26,7 +26,6 @@ MarketModel::MarketModel(QObject* parent)
 {
     header_[unbox(Column::CheckState)] = tr("");
     header_[unbox(Column::Id)] = tr("Id");
-    header_[unbox(Column::Broker)] = tr("Broker");
     header_[unbox(Column::Instr)] = tr("Instr");
     header_[unbox(Column::SettlDate)] = tr("Settl Date");
     header_[unbox(Column::State)] = tr("State");
@@ -64,9 +63,6 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
             break;
         case Column::Id:
             var = toVariant(market.id());
-            break;
-        case Column::Broker:
-            var = market.broker();
             break;
         case Column::Instr:
             var = market.instr().symbol();
@@ -115,7 +111,6 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
         switch (box<Column>(index.column())) {
         case Column::CheckState:
             break;
-        case Column::Broker:
         case Column::Instr:
         case Column::State:
             var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};

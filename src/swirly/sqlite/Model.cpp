@@ -36,12 +36,12 @@ namespace {
 constexpr auto SelectAssetSql = //
     "SELECT id, symbol, display, type_id FROM asset_t"sv;
 
-constexpr auto SelectInstrSql =                                               //
-    "SELECT id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom," //
+constexpr auto SelectInstrSql =                                                       //
+    "SELECT id, symbol, display, base_asset, term_ccy, broker, lot_numer, lot_denom," //
     " tick_numer, tick_denom, pip_dp, min_lots, max_lots FROM instr_v"sv;
 
-constexpr auto SelectMarketSql =                                                           //
-    "SELECT id, broker, instr, settl_day, state, last_lots, last_ticks, last_time, max_id" //
+constexpr auto SelectMarketSql =                                                   //
+    "SELECT id, instr, settl_day, state, last_lots, last_ticks, last_time, max_id" //
     " FROM market_v"sv;
 
 constexpr auto SelectOrderSql =                                                            //
@@ -103,6 +103,7 @@ void SqlModel::doReadInstr(const ModelCallback<InstrPtr>& cb) const
         Display,   //
         BaseAsset, //
         TermCcy,   //
+        Broker,    //
         LotNumer,  //
         LotDenom,  //
         TickNumer, //
@@ -119,6 +120,7 @@ void SqlModel::doReadInstr(const ModelCallback<InstrPtr>& cb) const
                        column<string_view>(*stmt, Display),   //
                        column<string_view>(*stmt, BaseAsset), //
                        column<string_view>(*stmt, TermCcy),   //
+                       column<string_view>(*stmt, Broker),    //
                        column<int>(*stmt, LotNumer),          //
                        column<int>(*stmt, LotDenom),          //
                        column<int>(*stmt, TickNumer),         //
@@ -133,7 +135,6 @@ void SqlModel::doReadMarket(const ModelCallback<MarketPtr>& cb) const
 {
     enum {         //
         Id,        //
-        Broker,    //
         Instr,     //
         SettlDay,  //
         State,     //
@@ -145,14 +146,13 @@ void SqlModel::doReadMarket(const ModelCallback<MarketPtr>& cb) const
 
     StmtPtr stmt{prepare(*db_, SelectMarketSql)};
     while (step(*stmt)) {
-        cb(Market::make(column<Id64>(*stmt, Id),            //
-                        column<string_view>(*stmt, Broker), //
-                        column<string_view>(*stmt, Instr),  //
-                        column<JDay>(*stmt, SettlDay),      //
-                        column<MarketState>(*stmt, State),  //
-                        column<Lots>(*stmt, LastLots),      //
-                        column<Ticks>(*stmt, LastTicks),    //
-                        column<Time>(*stmt, LastTime),      //
+        cb(Market::make(column<Id64>(*stmt, Id),           //
+                        column<string_view>(*stmt, Instr), //
+                        column<JDay>(*stmt, SettlDay),     //
+                        column<MarketState>(*stmt, State), //
+                        column<Lots>(*stmt, LastLots),     //
+                        column<Ticks>(*stmt, LastTicks),   //
+                        column<Time>(*stmt, LastTime),     //
                         column<Id64>(*stmt, MaxId)));
     }
 }
