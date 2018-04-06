@@ -36,6 +36,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'baseAsset': u'CAP',
+      u'broker': u'SWIRLY',
       u'termCcy': u'USD',
       u'display': u'Central Appalachia Coal',
       u'lotDenom': 1,
@@ -48,6 +49,7 @@ class TestCase(RestTestCase):
       u'tickNumer': 1
     }, {
       u'baseAsset': u'CSCO',
+      u'broker': u'SWIRLY',
       u'termCcy': u'USD',
       u'display': u'Cisco Systems Inc',
       u'lotDenom': 1,
@@ -60,6 +62,7 @@ class TestCase(RestTestCase):
       u'tickNumer': 1
     }, {
       u'baseAsset': u'DIS',
+      u'broker': u'SWIRLY',
       u'termCcy': u'USD',
       u'display': u'Walt Disney',
       u'lotDenom': 1,
@@ -72,6 +75,7 @@ class TestCase(RestTestCase):
       u'tickNumer': 1
     }, {
       u'baseAsset': u'EUR',
+      u'broker': u'SWIRLY',
       u'termCcy': u'USD',
       u'display': u'EURUSD',
       u'lotDenom': 1,
@@ -84,6 +88,7 @@ class TestCase(RestTestCase):
       u'tickNumer': 1
     }, {
       u'baseAsset': u'GBP',
+      u'broker': u'SWIRLY',
       u'termCcy': u'USD',
       u'display': u'GBPUSD',
       u'lotDenom': 1,
@@ -96,6 +101,7 @@ class TestCase(RestTestCase):
       u'tickNumer': 1
     }, {
       u'baseAsset': u'IBM',
+      u'broker': u'SWIRLY',
       u'termCcy': u'USD',
       u'display': u'Ibm Corp',
       u'lotDenom': 1,
@@ -108,6 +114,7 @@ class TestCase(RestTestCase):
       u'tickNumer': 1
     }, {
       u'baseAsset': u'ILB',
+      u'broker': u'SWIRLY',
       u'termCcy': u'USD',
       u'display': u'Illinois Basin Coal',
       u'lotDenom': 1,
@@ -120,6 +127,7 @@ class TestCase(RestTestCase):
       u'tickNumer': 1
     }, {
       u'baseAsset': u'INTC',
+      u'broker': u'SWIRLY',
       u'termCcy': u'USD',
       u'display': u'Intel Corp',
       u'lotDenom': 1,
@@ -132,6 +140,7 @@ class TestCase(RestTestCase):
       u'tickNumer': 1
     }, {
       u'baseAsset': u'MSFT',
+      u'broker': u'SWIRLY',
       u'termCcy': u'USD',
       u'display': u'Microsoft Corp',
       u'lotDenom': 1,
@@ -144,6 +153,7 @@ class TestCase(RestTestCase):
       u'tickNumer': 1
     }, {
       u'baseAsset': u'NAP',
+      u'broker': u'SWIRLY',
       u'termCcy': u'USD',
       u'display': u'Northern Appalachia Coal',
       u'lotDenom': 1,
@@ -156,6 +166,7 @@ class TestCase(RestTestCase):
       u'tickNumer': 1
     }, {
       u'baseAsset': u'PRB',
+      u'broker': u'SWIRLY',
       u'termCcy': u'USD',
       u'display': u'Powder River Basin Coal',
       u'lotDenom': 1,
@@ -168,6 +179,7 @@ class TestCase(RestTestCase):
       u'tickNumer': 1
     }, {
       u'baseAsset': u'UIB',
+      u'broker': u'SWIRLY',
       u'termCcy': u'USD',
       u'display': u'Uinta Basin Coal',
       u'lotDenom': 1,
@@ -180,6 +192,7 @@ class TestCase(RestTestCase):
       u'tickNumer': 1
     }, {
       u'baseAsset': u'USD',
+      u'broker': u'SWIRLY',
       u'termCcy': u'CHF',
       u'display': u'USDCHF',
       u'lotDenom': 1,
@@ -192,6 +205,7 @@ class TestCase(RestTestCase):
       u'tickNumer': 1
     }, {
       u'baseAsset': u'USD',
+      u'broker': u'SWIRLY',
       u'termCcy': u'JPY',
       u'display': u'USDJPY',
       u'lotDenom': 1,
@@ -204,6 +218,7 @@ class TestCase(RestTestCase):
       u'tickNumer': 1
     }, {
       u'baseAsset': u'VIA',
+      u'broker': u'SWIRLY',
       u'termCcy': u'USD',
       u'display': u'Viacom Inc',
       u'lotDenom': 1,
@@ -216,6 +231,7 @@ class TestCase(RestTestCase):
       u'tickNumer': 1
     }, {
       u'baseAsset': u'VOD',
+      u'broker': u'SWIRLY',
       u'termCcy': u'USD',
       u'display': u'Vodafone Group Plc',
       u'lotDenom': 1,
@@ -228,6 +244,7 @@ class TestCase(RestTestCase):
       u'tickNumer': 1
     }, {
       u'baseAsset': u'VZ',
+      u'broker': u'SWIRLY',
       u'termCcy': u'USD',
       u'display': u'Verizon Com',
       u'lotDenom': 1,
@@ -240,6 +257,7 @@ class TestCase(RestTestCase):
       u'tickNumer': 1
     }, {
       u'baseAsset': u'WGAA',
+      u'broker': u'SWIRLY',
       u'termCcy': u'ETB',
       u'display': u'Gelena Abaya A',
       u'lotDenom': 1,
@@ -252,6 +270,7 @@ class TestCase(RestTestCase):
       u'tickNumer': 1
     }, {
       u'baseAsset': u'WKCA',
+      u'broker': u'SWIRLY',
       u'termCcy': u'ETB',
       u'display': u'Kochere A',
       u'lotDenom': 1,
@@ -264,6 +283,7 @@ class TestCase(RestTestCase):
       u'tickNumer': 1
     }, {
       u'baseAsset': u'WWNA',
+      u'broker': u'SWIRLY',
       u'termCcy': u'ETB',
       u'display': u'Wenago A',
       u'lotDenom': 1,
@@ -276,6 +296,7 @@ class TestCase(RestTestCase):
       u'tickNumer': 1
     }, {
       u'baseAsset': u'WYCA',
+      u'broker': u'SWIRLY',
       u'termCcy': u'ETB',
       u'display': u'Yirgachefe A',
       u'lotDenom': 1,
@@ -296,6 +317,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'baseAsset': u'EUR',
+      u'broker': u'SWIRLY',
       u'termCcy': u'USD',
       u'display': u'EURUSD',
       u'lotDenom': 1,

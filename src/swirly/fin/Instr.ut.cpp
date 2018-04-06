@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_SUITE(InstrSuite)
 
 BOOST_AUTO_TEST_CASE(InstrToStringCase)
 {
-    Instr instr{1_id32, "EURUSD"sv, "EURUSD"sv, "EUR"sv, "USD"sv, 1000000,
+    Instr instr{1_id32, "EURUSD"sv, "EURUSD"sv, "EUR"sv, "USD"sv, "SWIRLY"sv, 1000000,
                 1,      1,          10000,      4,       1_lts,   10_lts};
 
     BOOST_TEST(toString(instr) == //
@@ -34,6 +34,7 @@ BOOST_AUTO_TEST_CASE(InstrToStringCase)
                ",\"display\":\"EURUSD\""
                ",\"baseAsset\":\"EUR\""
                ",\"termCcy\":\"USD\""
+               ",\"broker\":\"SWIRLY\""
                ",\"lotNumer\":1000000"
                ",\"lotDenom\":1"
                ",\"tickNumer\":1"
