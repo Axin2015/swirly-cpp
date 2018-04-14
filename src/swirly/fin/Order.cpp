@@ -29,9 +29,9 @@ Order::~Order() = default;
 
 Order::Order(Order&&) = default;
 
-void Order::toDsv(ostream& os, char sep) const
+void Order::toDsv(ostream& os, char delim) const
 {
-    OStreamJoiner osj{os, sep};
+    OStreamJoiner osj{os, delim};
     osj << accnt_    //
         << marketId_ //
         << instr_;

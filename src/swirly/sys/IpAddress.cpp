@@ -20,9 +20,9 @@ namespace swirly {
 inline namespace sys {
 namespace {
 
-std::pair<std::string, int> splitPair(const std::string& s, char sep)
+std::pair<std::string, int> splitPair(const std::string& s, char delim)
 {
-    const auto pos = s.find_last_of(sep);
+    const auto pos = s.find_last_of(delim);
     std::string addr, num;
     if (pos == std::string::npos) {
         addr = s;

@@ -55,9 +55,9 @@ Instr::Instr(const Instr&) = default;
 
 Instr::Instr(Instr&&) = default;
 
-void Instr::toDsv(ostream& os, char sep) const
+void Instr::toDsv(ostream& os, char delim) const
 {
-    OStreamJoiner osj{os, sep};
+    OStreamJoiner osj{os, delim};
     osj << id_        //
         << symbol_    //
         << display_   //

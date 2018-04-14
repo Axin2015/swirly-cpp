@@ -53,7 +53,7 @@ class SWIRLY_API Asset : public Comparable<Asset> {
         return std::make_unique<Asset>(std::forward<ArgsT>(args)...);
     }
 
-    void toDsv(std::ostream& os, char sep = ',') const;
+    void toDsv(std::ostream& os, char delim = ',') const;
     void toJson(std::ostream& os) const;
 
     int compare(const Asset& rhs) const noexcept { return symbol_.compare(rhs.symbol_); }
