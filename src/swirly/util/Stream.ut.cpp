@@ -27,9 +27,9 @@ using namespace swirly;
 
 BOOST_AUTO_TEST_SUITE(StreamSuite)
 
-BOOST_AUTO_TEST_CASE(StringStreamCase)
+BOOST_AUTO_TEST_CASE(StaticStreamCase)
 {
-    StringStream<7> ss;
+    StaticStream<7> ss;
     BOOST_TEST(ss.empty());
     ss << "foo";
     BOOST_TEST(ss.size() == 3U);

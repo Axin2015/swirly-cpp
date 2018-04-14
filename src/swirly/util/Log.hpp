@@ -28,11 +28,11 @@ inline namespace util {
 /**
  * Logger callback function.
  */
-using LogMsg = StringStream<MaxLogMsg>;
+using LogMsg = StaticStream<MaxLogMsg>;
 
 /**
- * Thread-local log message. This thread-local instance of StringStream can be used to format log
- * messages before writing to the log. Note that the StringStream is reset each time this function
+ * Thread-local log message. This thread-local instance of StaticStream can be used to format log
+ * messages before writing to the log. Note that the StaticStream is reset each time this function
  * is called.
  */
 SWIRLY_API LogMsg& logMsg() noexcept;

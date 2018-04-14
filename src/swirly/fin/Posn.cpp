@@ -30,9 +30,9 @@ Posn::~Posn() = default;
 
 Posn::Posn(Posn&&) = default;
 
-void Posn::toDsv(ostream& os, char sep) const
+void Posn::toDsv(ostream& os, char delim) const
 {
-    OStreamJoiner osj{os, sep};
+    OStreamJoiner osj{os, delim};
     osj << accnt_    //
         << marketId_ //
         << instr_;

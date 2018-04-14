@@ -143,9 +143,9 @@ inline std::string trimCopy(std::string s) noexcept
 }
 
 SWIRLY_API std::pair<std::string_view, std::string_view> splitPair(std::string_view s,
-                                                                   char sep) noexcept;
+                                                                   char delim) noexcept;
 
-SWIRLY_API std::pair<std::string, std::string> splitPair(const std::string& s, char sep);
+SWIRLY_API std::pair<std::string, std::string> splitPair(const std::string& s, char delim);
 
 } // namespace util
 } // namespace swirly

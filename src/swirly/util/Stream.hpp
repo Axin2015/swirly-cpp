@@ -19,6 +19,8 @@
 
 #include <swirly/Config.h>
 
+#include <experimental/iterator>
+
 #include <ostream>
 #include <string_view>
 
@@ -28,18 +30,18 @@ inline namespace util {
 SWIRLY_API void reset(std::ostream& os) noexcept;
 
 template <std::size_t MaxN>
-class StringStreamBuf : public std::streambuf {
+class StaticStreamBuf : public std::streambuf {
   public:
-    StringStreamBuf() noexcept { reset(); }
-    ~StringStreamBuf() override = default;
+    StaticStreamBuf() noexcept { reset(); }
+    ~StaticStreamBuf() override = default;
 
     // Copy.
-    StringStreamBuf(const StringStreamBuf& rhs) = delete;
-    StringStreamBuf& operator=(const StringStreamBuf& rhs) = delete;
+    StaticStreamBuf(const StaticStreamBuf& rhs) = delete;
+    StaticStreamBuf& operator=(const StaticStreamBuf& rhs) = delete;
 
     // Move.
-    StringStreamBuf(StringStreamBuf&&) = delete;
-    StringStreamBuf& operator=(StringStreamBuf&&) = delete;
+    StaticStreamBuf(StaticStreamBuf&&) = delete;
+    StaticStreamBuf& operator=(StaticStreamBuf&&) = delete;
 
     const char* data() const noexcept { return pbase(); }
     bool empty() const noexcept { return pbase() == pptr(); }
@@ -52,22 +54,22 @@ class StringStreamBuf : public std::streambuf {
 };
 
 template <std::size_t MaxN>
-class StringStream : public std::ostream {
+class StaticStream : public std::ostream {
   public:
-    StringStream()
+    StaticStream()
     : std::ostream{nullptr}
     {
         rdbuf(&buf_);
     }
-    ~StringStream() override = default;
+    ~StaticStream() override = default;
 
     // Copy.
-    StringStream(const StringStream& rhs) = delete;
-    StringStream& operator=(const StringStream& rhs) = delete;
+    StaticStream(const StaticStream& rhs) = delete;
+    StaticStream& operator=(const StaticStream& rhs) = delete;
 
     // Move.
-    StringStream(StringStream&&) = delete;
-    StringStream& operator=(StringStream&&) = delete;
+    StaticStream(StaticStream&&) = delete;
+    StaticStream& operator=(StaticStream&&) = delete;
 
     const char* data() const noexcept { return buf_.data(); }
     bool empty() const noexcept { return buf_.empty(); }
@@ -81,74 +83,28 @@ class StringStream : public std::ostream {
     };
 
   private:
-    StringStreamBuf<MaxN> buf_;
+    StaticStreamBuf<MaxN> buf_;
 };
 
 template <std::size_t MaxN, typename ValueT>
-auto& operator<<(StringStream<MaxN>& ss, ValueT&& val)
+auto& operator<<(StaticStream<MaxN>& ss, ValueT&& val)
 {
     static_cast<std::ostream&>(ss) << std::forward<ValueT>(val);
     return ss;
 }
 
-/**
- * Stream joiner. This is a simplified version of std::experimental::ostream_joiner, intended as a
- * placeholder until TS v2 is more widely available.
- */
-class SWIRLY_API OStreamJoiner {
-  public:
-    using char_type = char;
-    using traits_type = std::char_traits<char_type>;
-    using ostream_type = std::ostream;
-    using value_type = void;
-    using difference_type = void;
-    using pointer = void;
-    using reference = void;
-    using iterator_category = std::output_iterator_tag;
+using OStreamJoiner = std::experimental::ostream_joiner<char>;
 
-    OStreamJoiner(std::ostream& os, char sep) noexcept
-    : os_{&os}
-    , sep_{sep}
-    {
-    }
-    ~OStreamJoiner();
+} // namespace util
+} // namespace swirly
 
-    // Copy.
-    OStreamJoiner(const OStreamJoiner&) = default;
-    OStreamJoiner& operator=(const OStreamJoiner&) = default;
-
-    // Move.
-    OStreamJoiner(OStreamJoiner&&) = default;
-    OStreamJoiner& operator=(OStreamJoiner&&) = default;
-
-    template <typename ValueT>
-    OStreamJoiner& operator=(const ValueT& value)
-    {
-        if (!first_) {
-            *os_ << sep_;
-        }
-        first_ = false;
-        *os_ << value;
-        return *this;
-    }
-    OStreamJoiner& operator*() noexcept { return *this; }
-    OStreamJoiner& operator++() noexcept { return *this; }
-    OStreamJoiner& operator++(int) noexcept { return *this; }
-
-  private:
-    std::ostream* os_;
-    char sep_;
-    bool first_{true};
-};
-
+namespace std::experimental {
 template <typename ValueT>
-OStreamJoiner& operator<<(OStreamJoiner& osj, const ValueT& value)
+ostream_joiner<char>& operator<<(ostream_joiner<char>& osj, const ValueT& value)
 {
     osj = value;
     return osj;
 }
-
-} // namespace util
-} // namespace swirly
+} // namespace std::experimental
 
 #endif // SWIRLY_UTIL_STREAM_HPP
