@@ -19,7 +19,7 @@
 
 #include <swirly/Config.h>
 
-#include <signal.h>
+#include <csignal>
 
 namespace swirly {
 inline namespace sys {

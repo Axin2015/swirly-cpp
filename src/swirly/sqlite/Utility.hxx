@@ -149,7 +149,7 @@ bool step(sqlite3_stmt& stmt);
 
 inline bool stepOnce(sqlite3_stmt& stmt)
 {
-    auto finally = makeFinally([&stmt]() noexcept { sqlite3_reset(&stmt); });
+    const auto finally = makeFinally([&stmt]() noexcept { sqlite3_reset(&stmt); });
     return step(stmt);
 }
 

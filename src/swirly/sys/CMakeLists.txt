@@ -28,6 +28,7 @@ endif()
 
 set(lib_SOURCES
   Buffer.cpp
+  Cpu.cpp
   Daemon.cpp
   Epoll.cpp
   EpollReactor.cpp
@@ -35,6 +36,7 @@ set(lib_SOURCES
   Event.cpp
   File.cpp
   Handle.cpp
+  Interruptible.cpp
   IoSocket.cpp
   IpAddress.cpp
   LocalAddress.cpp

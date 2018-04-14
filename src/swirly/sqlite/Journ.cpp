@@ -69,29 +69,38 @@ SqlJourn::SqlJourn(SqlJourn&&) = default;
 
 SqlJourn& SqlJourn::operator=(SqlJourn&&) = default;
 
-void SqlJourn::doBegin()
+int SqlJourn::doInterrupted() const noexcept
 {
-    stepOnce(*beginStmt_);
+    return interrupt_;
 }
 
-void SqlJourn::doCommit()
+void SqlJourn::doInterrupt(int num) noexcept
 {
-    stepOnce(*commitStmt_);
+    interrupt_ = num;
 }
 
-void SqlJourn::doRollback()
-{
-    stepOnce(*rollbackStmt_);
-}
-
-void SqlJourn::doUpdate(const Msg& msg)
+void SqlJourn::doWrite(const Msg& msg)
 {
     dispatch(msg);
 }
 
-void SqlJourn::onReset()
+void SqlJourn::begin()
 {
-    Transactional::reset();
+    stepOnce(*beginStmt_);
+}
+
+void SqlJourn::commit()
+{
+    stepOnce(*commitStmt_);
+}
+
+void SqlJourn::rollback() noexcept
+{
+    try {
+        stepOnce(*rollbackStmt_);
+    } catch (const std::exception& e) {
+        SWIRLY_ERROR(logMsg() << "failed to rollback transaction: " << e.what());
+    }
 }
 
 void SqlJourn::onCreateMarket(const CreateMarket& body)
@@ -120,10 +129,7 @@ void SqlJourn::onUpdateMarket(const UpdateMarket& body)
 
 void SqlJourn::onCreateExec(const CreateExec& body)
 {
-    Transaction trans{*this, body.more};
-    if (failed()) {
-        return;
-    }
+    Transaction trans{*this};
     auto& stmt = *insertExecStmt_;
 
     ScopedBind bind{stmt};
@@ -160,10 +166,7 @@ void SqlJourn::onCreateExec(const CreateExec& body)
 
 void SqlJourn::onArchiveTrade(const ArchiveTrade& body)
 {
-    Transaction trans{*this, body.more};
-    if (failed()) {
-        return;
-    }
+    Transaction trans{*this};
     auto& stmt = *updateExecStmt_;
 
     for (size_t i{0}; i < MaxIds; ++i) {

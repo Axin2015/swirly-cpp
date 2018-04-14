@@ -14,72 +14,83 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_CLOB_ASYNCJOURN_HPP
-#define SWIRLY_CLOB_ASYNCJOURN_HPP
+#ifndef SWIRLY_FIN_MSGQUEUE_HPP
+#define SWIRLY_FIN_MSGQUEUE_HPP
 
 #include <swirly/fin/Msg.hpp>
 
 #include <swirly/util/Array.hpp>
 
+#include <swirly/sys/MemQueue.hpp>
+
+#include <cassert>
+
 namespace swirly {
 inline namespace fin {
 class Journ;
-} // namespace fin
-inline namespace clob {
 namespace detail {
-
 template <std::size_t StepN>
-class AsyncWindow {
+class Range {
   public:
-    explicit AsyncWindow(std::size_t total) noexcept
-    : total_{total}
+    constexpr explicit Range(std::size_t size) noexcept
+    : size_{size}
     {
     }
-    ~AsyncWindow() = default;
+    constexpr Range() noexcept = default;
+    ~Range() = default;
 
     // Copy.
-    AsyncWindow(const AsyncWindow&) = delete;
-    AsyncWindow& operator=(const AsyncWindow&) = delete;
+    Range(const Range&) = delete;
+    Range& operator=(const Range&) = delete;
 
     // Move.
-    AsyncWindow(AsyncWindow&&) = delete;
-    AsyncWindow& operator=(AsyncWindow&&) = delete;
+    Range(Range&&) = delete;
+    Range& operator=(Range&&) = delete;
 
-    std::size_t index() const noexcept { return index_; }
-    std::size_t size() const noexcept { return std::min(total_ - index_, StepN); }
-    More more() const noexcept { return total_ - index_ > StepN ? More::Yes : More::No; }
-    bool done() const noexcept { return index_ >= total_; }
+    constexpr std::size_t stepOffset() const noexcept { return offset_; }
+    constexpr std::size_t stepSize() const noexcept { return std::min(size_ - offset_, StepN); }
+    constexpr std::size_t steps() const noexcept { return (size_ + StepN - 1) / StepN; }
+    constexpr bool done() const noexcept { return offset_ >= size_; }
     bool next() noexcept
     {
-        index_ += StepN;
+        offset_ += StepN;
         return !done();
     }
 
   private:
-    const std::size_t total_;
-    std::size_t index_{0};
+    const std::size_t size_{0};
+    std::size_t offset_{0};
 };
-
 } // namespace detail
 
-class SWIRLY_API AsyncJourn {
+class SWIRLY_API MsgQueue {
   public:
-    AsyncJourn(Journ& journ, std::size_t pipeCapacity);
-    ~AsyncJourn();
+    explicit MsgQueue(std::size_t capacity)
+    : mq_{capacity}
+    {
+    }
+    explicit MsgQueue(const char* path)
+    : mq_{path}
+    {
+    }
+    ~MsgQueue();
 
     // Copy.
-    AsyncJourn(const AsyncJourn&) = delete;
-    AsyncJourn& operator=(const AsyncJourn&) = delete;
+    MsgQueue(const MsgQueue&) = delete;
+    MsgQueue& operator=(const MsgQueue&) = delete;
 
     // Move.
-    AsyncJourn(AsyncJourn&&) = delete;
-    AsyncJourn& operator=(AsyncJourn&&) = delete;
+    MsgQueue(MsgQueue&&) = delete;
+    MsgQueue& operator=(MsgQueue&&) = delete;
 
     /**
-     * Reset multi-part sequence.
+     * Send interrupt.
      */
-    void reset() { doReset(); }
-
+    bool interrupt(Id32 num, Millis timeout = 5000ms) noexcept
+    {
+        assert(num > 0_id32);
+        return doInterrupt(num, timeout);
+    }
     /**
      * Create Market.
      */
@@ -94,7 +105,7 @@ class SWIRLY_API AsyncJourn {
     /**
      * Create Execution.
      */
-    void createExec(const Exec& exec) { doCreateExec(exec, More::No); }
+    void createExec(const Exec& exec) { doCreateExec(exec); }
     /**
      * Create Executions.
      */
@@ -104,29 +115,32 @@ class SWIRLY_API AsyncJourn {
      */
     void archiveTrade(Id64 marketId, Id64 id, Time modified)
     {
-        doArchiveTrade(marketId, {&id, 1}, modified, More::No);
+        doArchiveTrade(marketId, {&id, 1}, modified);
     }
     /**
      * Archive Trades.
      */
     void archiveTrade(Id64 marketId, ArrayView<Id64> ids, Time modified);
+    /**
+     * Returns false if queue is empty.
+     */
+    bool pop(Msg& msg) noexcept { return mq_.pop(msg); }
 
   private:
-    void doReset();
+    bool doInterrupt(Id32 num, Millis timeout);
 
     void doCreateMarket(Id64 id, Symbol instr, JDay settlDay, MarketState state);
 
     void doUpdateMarket(Id64 id, MarketState state);
 
-    void doCreateExec(const Exec& exec, More more);
+    void doCreateExec(const Exec& exec);
 
-    void doArchiveTrade(Id64 marketId, ArrayView<Id64> ids, Time modified, More more);
+    void doArchiveTrade(Id64 marketId, ArrayView<Id64> ids, Time modified);
 
-    MsgPipe pipe_;
-    std::thread thread_;
+    MemQueue<Msg> mq_;
 };
 
-} // namespace clob
+} // namespace fin
 } // namespace swirly
 
-#endif // SWIRLY_CLOB_ASYNCJOURN_HPP
+#endif // SWIRLY_FIN_MSGQUEUE_HPP

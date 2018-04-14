@@ -182,12 +182,12 @@ struct SWIRLY_PACKED IntWrapper : IntBase {
     /**
      * Post-increment.
      */
-    IntWrapper operator++(int)noexcept { return IntWrapper{value_++}; }
+    IntWrapper operator++(int) noexcept { return IntWrapper{value_++}; }
 
     /**
      * Post-decrement.
      */
-    IntWrapper operator--(int)noexcept { return IntWrapper{value_--}; }
+    IntWrapper operator--(int) noexcept { return IntWrapper{value_--}; }
 
     // Arithmetic.
 

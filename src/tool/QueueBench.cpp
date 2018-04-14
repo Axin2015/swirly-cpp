@@ -17,6 +17,7 @@
 #include <swirly/util/Log.hpp>
 #include <swirly/util/Profile.hpp>
 
+#include <swirly/sys/Cpu.hpp>
 #include <swirly/sys/MemQueue.hpp>
 
 #include <iostream>
@@ -68,7 +69,7 @@ int main(int argc, char* argv[])
                 const auto usec = diff.count();
                 p.record(usec);
             } else {
-                cpuPause();
+                cpuRelax();
             }
         }
 

@@ -24,14 +24,18 @@
 #include <swirly/fin/Transaction.hpp>
 
 namespace swirly {
+inline namespace util {
+class Config;
+} // namespace util
 inline namespace sqlite {
 
 class SWIRLY_API SqlJourn
-: public Transactional
-, public Journ
+: public Journ
 , BasicMsgHandler<SqlJourn> {
+    using Transaction = BasicTransaction<SqlJourn>;
     // Crtp.
     friend struct BasicMsgHandler<SqlJourn>;
+    friend class BasicTransaction<SqlJourn>;
 
   public:
     explicit SqlJourn(const Config& config);
@@ -46,16 +50,20 @@ class SWIRLY_API SqlJourn
     SqlJourn& operator=(SqlJourn&&);
 
   protected:
-    void doBegin() override;
+    int doInterrupted() const noexcept override;
 
-    void doCommit() override;
+    void doInterrupt(int num) noexcept override;
 
-    void doRollback() override;
-
-    void doUpdate(const Msg& msg) override;
+    void doWrite(const Msg& msg) override;
 
   private:
-    void onReset();
+    void begin();
+
+    void commit();
+
+    void rollback() noexcept;
+
+    void onInterrupt(const Interrupt& body) noexcept { interrupt(body.num.count()); }
 
     void onCreateMarket(const CreateMarket& body);
 
@@ -73,6 +81,7 @@ class SWIRLY_API SqlJourn
     sqlite::StmtPtr updateMarketStmt_;
     sqlite::StmtPtr insertExecStmt_;
     sqlite::StmtPtr updateExecStmt_;
+    int interrupt_{0};
 };
 
 } // namespace sqlite

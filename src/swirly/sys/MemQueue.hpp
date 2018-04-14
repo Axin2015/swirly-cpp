@@ -106,6 +106,10 @@ class MemQueue {
         return rpos == wpos;
     }
     /**
+     * Returns the number of unused elements.
+     */
+    std::size_t reserve() const noexcept { return capacity_ - size(); }
+    /**
      * Returns true if the number of elements in the queue.
      */
     std::size_t size() const noexcept

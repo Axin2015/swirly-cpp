@@ -24,10 +24,17 @@
 #include <swirly/util/Array.hpp>
 
 namespace swirly {
+
+inline namespace sys {
+template <typename ValueT>
+class MemQueue;
+} // namespace sys
+
 inline namespace fin {
 class Journ;
 class Market;
 class Model;
+class MsgQueue;
 } // namespace fin
 
 inline namespace clob {
@@ -39,7 +46,7 @@ using TradePair = std::pair<ConstExecPtr, ConstExecPtr>;
 
 class SWIRLY_API Serv {
   public:
-    Serv(Journ& journ, std::size_t pipeCapacity, std::size_t maxExecs);
+    Serv(MsgQueue& mq, std::size_t maxExecs);
 
     ~Serv();
 

@@ -21,8 +21,6 @@
 
 #include <swirly/sys/Muxer.hpp>
 
-#include <atomic>
-
 namespace swirly {
 inline namespace sys {
 
@@ -42,15 +40,12 @@ class SWIRLY_API EpollReactor : public Reactor {
     EpollReactor& operator=(EpollReactor&&) = delete;
 
   protected:
-    /**
-     * Thread-safe.
-     */
-    bool doClosed() const noexcept override;
+    int doInterrupted() const noexcept override;
 
     /**
      * Thread-safe.
      */
-    void doClose() noexcept override;
+    void doInterrupt(int num) noexcept override;
 
     Handle doSubscribe(int fd, unsigned events, IoSlot slot) override;
     void doUnsubscribe(int fd) noexcept override;
@@ -76,7 +71,7 @@ class SWIRLY_API EpollReactor : public Reactor {
     static_assert(static_cast<int>(Priority::High) == 0);
     static_assert(static_cast<int>(Priority::Low) == 1);
     std::array<TimerQueue, 2> tqs_;
-    std::atomic<bool> closed_{false};
+    int interrupt_{0};
 };
 
 } // namespace sys

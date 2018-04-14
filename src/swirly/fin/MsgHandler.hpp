@@ -39,8 +39,8 @@ struct BasicMsgHandler {
     {
         auto* const derived = static_cast<DerivedT*>(this);
         switch (msg.type) {
-        case MsgType::Reset:
-            derived->onReset();
+        case MsgType::Interrupt:
+            derived->onInterrupt(msg.interrupt);
             break;
         case MsgType::CreateMarket:
             derived->onCreateMarket(msg.createMarket);

@@ -15,31 +15,3 @@
  * 02110-1301, USA.
  */
 #include "Transaction.hpp"
-
-#include <swirly/util/Log.hpp>
-
-namespace swirly {
-inline namespace fin {
-using namespace std;
-
-Transactional::~Transactional() = default;
-
-Transaction::~Transaction()
-{
-    if (more_ == More::No) {
-        try {
-            target_.reset();
-        } catch (const exception& e) {
-            SWIRLY_ERROR(logMsg() << "failed to reset transaction: " << e.what());
-        }
-    } else if (!done_) {
-        try {
-            target_.tryRollback();
-        } catch (const exception& e) {
-            SWIRLY_ERROR(logMsg() << "failed to rollback transaction: " << e.what());
-        }
-    }
-}
-
-} // namespace fin
-} // namespace swirly

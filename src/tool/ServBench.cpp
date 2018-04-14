@@ -23,14 +23,20 @@
 #include <swirly/clob/Test.hpp>
 
 #include <swirly/fin/Date.hpp>
+#include <swirly/fin/MsgQueue.hpp>
 
 #include <swirly/util/Config.hpp>
+#include <swirly/util/Finally.hpp>
 #include <swirly/util/Log.hpp>
 #include <swirly/util/Profile.hpp>
 
+#include <swirly/sys/Cpu.hpp>
+#include <swirly/sys/Signal.hpp>
 #include <swirly/sys/Time.hpp>
 
 #include <swirly/sys/MemCtx.hpp>
+
+#include <thread>
 
 using namespace std;
 using namespace swirly;
@@ -71,6 +77,53 @@ class Archiver {
     vector<Id64> ids_;
 };
 
+class NullJourn : public Journ {
+  public:
+    NullJourn() noexcept = default;
+    ~NullJourn() = default;
+
+  protected:
+    int doInterrupted() const noexcept override { return interrupt_; }
+    void doInterrupt(int num) noexcept override
+    {
+        SWIRLY_INFO(logMsg() << "interrupt");
+        interrupt_ = num;
+    }
+    void doWrite(const Msg& msg) override
+    {
+        if (msg.type == MsgType::Interrupt) {
+            interrupt(msg.interrupt.num.count());
+        }
+    }
+
+  private:
+    int interrupt_{0};
+};
+
+void runJourn(MsgQueue& mq)
+{
+    sigBlockAll();
+    SWIRLY_NOTICE("started journal thread"sv);
+    try {
+        CpuBackoff backoff;
+        NullJourn journ;
+        for (;;) {
+            Msg msg;
+            while (mq.pop(msg)) {
+                journ.write(msg);
+                backoff.reset();
+            }
+            if (journ.interrupted()) {
+                break;
+            }
+            backoff();
+        }
+    } catch (const exception& e) {
+        SWIRLY_ERROR(logMsg() << "exception: " << e.what());
+    }
+    SWIRLY_NOTICE("stopping journal thread"sv);
+}
+
 MemCtx memCtx;
 
 } // namespace
@@ -101,25 +154,30 @@ int main(int argc, char* argv[])
 
         memCtx = MemCtx{1 << 20};
 
-        unique_ptr<Journ> journ;
         unique_ptr<Model> model;
         if (argc > 1) {
             Config config;
-            config.set("sqlite_journ", argv[1]);
             config.set("sqlite_model", argv[1]);
-            journ = make_unique<SqlJourn>(config);
             model = make_unique<SqlModel>(config);
         } else {
-            journ = make_unique<TestJourn>();
             model = make_unique<TestModel>();
         }
 
         const BusinessDay busDay{MarketZone};
         const auto now = UnixClock::now();
 
-        Serv serv{*journ, 1 << 10, 1 << 4};
+        MsgQueue mq{1 << 10};
+        Serv serv{mq, 1 << 4};
         serv.load(*model, now);
         model = nullptr;
+
+        auto journThread = thread{runJourn, ref(mq)};
+        const auto journFinally = makeFinally([&]() noexcept {
+            if (!mq.interrupt(1_id32)) {
+                SWIRLY_ERROR("interrupt timeout"sv);
+            }
+            journThread.join();
+        });
 
         auto& market = createMarket(serv, "EURUSD"sv, busDay(now), 0, now);
 

@@ -28,7 +28,6 @@ endif()
 
 set(lib_SOURCES
   Accnt.cpp
-  AsyncJourn.cpp
   Match.cpp
   Response.cpp
   Serv.cpp
@@ -57,7 +56,6 @@ foreach(file ${lib_SOURCES})
 endforeach()
 
 set(test_SOURCES
-  AsyncJourn.ut.cpp
   Response.ut.cpp
   Serv.ut.cpp)
 
