@@ -115,22 +115,23 @@ void RestServ::handleRequest(const HttpRequest& req, HttpResponse& resp) noexcep
         }
         restRequest(req, now, resp);
         if (!matchPath_) {
-            throw NotFoundException{errMsg() << "resource '" << req.path() << "' does not exist"};
+            throw NotFoundException{errMsg()
+                                    << "resource '"sv << req.path() << "' does not exist"sv};
         }
         if (!matchMethod_) {
-            throw MethodNotAllowedException{errMsg()
-                                            << "method '" << req.method() << "' is not allowed"};
+            throw MethodNotAllowedException{errMsg() << "method '"sv << req.method()
+                                                     << "' is not allowed"sv};
         }
     } catch (const ServException& e) {
-        SWIRLY_ERROR(logMsg() << "exception: status=" << e.httpStatus()
-                              << ", reason=" << e.httpReason() << ", detail=" << e.what());
+        SWIRLY_ERROR << "exception: status="sv << e.httpStatus() << ", reason="sv << e.httpReason()
+                     << ", detail="sv << e.what();
         resp.reset(e.httpStatus(), e.httpReason());
         resp << e;
     } catch (const exception& e) {
         const int status{500};
         const char* const reason{"Internal Server Error"};
-        SWIRLY_ERROR(logMsg() << "exception: status=" << status << ", reason=" << reason
-                              << ", detail=" << e.what());
+        SWIRLY_ERROR << "exception: status="sv << status << ", reason="sv << reason << ", detail="sv
+                     << e.what();
         resp.reset(status, reason);
         ServException::toJson(status, reason, e.what(), resp);
     }

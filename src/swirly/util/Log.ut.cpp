@@ -75,32 +75,32 @@ BOOST_AUTO_TEST_CASE(LogMacroCase)
     });
     // clang-format on
 
-    SWIRLY_LOG(LogInfo, logMsg() << "test1: " << Foo<int, int>{10, 20});
+    SWIRLY_LOG(LogInfo) << "test1: "sv << Foo<int, int>{10, 20};
     BOOST_TEST(lastLevel == LogInfo);
     BOOST_TEST(lastMsg == "test1: (10,20)");
 
-    SWIRLY_CRIT(logMsg() << "test2: " << Foo<int, int>{10, 20});
+    SWIRLY_CRIT << "test2: "sv << Foo<int, int>{10, 20};
     BOOST_TEST(lastLevel == LogCrit);
     BOOST_TEST(lastMsg == "test2: (10,20)");
 
-    SWIRLY_ERROR(logMsg() << "test3: " << Foo<int, int>{10, 20});
+    SWIRLY_ERROR << "test3: "sv << Foo<int, int>{10, 20};
     BOOST_TEST(lastLevel == LogError);
     BOOST_TEST(lastMsg == "test3: (10,20)");
 
-    SWIRLY_WARNING(logMsg() << "test4: " << Foo<int, int>{10, 20});
+    SWIRLY_WARNING << "test4: "sv << Foo<int, int>{10, 20};
     BOOST_TEST(lastLevel == LogWarning);
     BOOST_TEST(lastMsg == "test4: (10,20)");
 
-    SWIRLY_NOTICE(logMsg() << "test5: " << Foo<int, int>{10, 20});
+    SWIRLY_NOTICE << "test5: "sv << Foo<int, int>{10, 20};
     BOOST_TEST(lastLevel == LogNotice);
     BOOST_TEST(lastMsg == "test5: (10,20)");
 
-    SWIRLY_INFO(logMsg() << "test6: " << Foo<int, int>{10, 20});
+    SWIRLY_INFO << "test6: "sv << Foo<int, int>{10, 20};
     BOOST_TEST(lastLevel == LogInfo);
     BOOST_TEST(lastMsg == "test6: (10,20)");
 
     // This should not be logged.
-    SWIRLY_DEBUG(logMsg() << "test7: " << Foo<int, int>{10, 20});
+    SWIRLY_DEBUG << "test7: "sv << Foo<int, int>{10, 20};
     BOOST_TEST(lastLevel == LogInfo);
     BOOST_TEST(lastMsg == "test6: (10,20)");
 }

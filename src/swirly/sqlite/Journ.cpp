@@ -99,7 +99,7 @@ void SqlJourn::rollback() noexcept
     try {
         stepOnce(*rollbackStmt_);
     } catch (const std::exception& e) {
-        SWIRLY_ERROR(logMsg() << "failed to rollback transaction: " << e.what());
+        SWIRLY_ERROR << "failed to rollback transaction: "sv << e.what();
     }
 }
 

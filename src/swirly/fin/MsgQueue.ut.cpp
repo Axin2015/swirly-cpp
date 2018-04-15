@@ -37,19 +37,19 @@ std::ostream& operator<<(std::ostream& os, MsgType type)
 {
     switch (type) {
     case MsgType::Interrupt:
-        os << "Interrupt";
+        os << "Interrupt"sv;
         break;
     case MsgType::CreateMarket:
-        os << "CreateMarket";
+        os << "CreateMarket"sv;
         break;
     case MsgType::UpdateMarket:
-        os << "UpdateMarket";
+        os << "UpdateMarket"sv;
         break;
     case MsgType::CreateExec:
-        os << "CreateExec";
+        os << "CreateExec"sv;
         break;
     case MsgType::ArchiveTrade:
-        os << "ArchiveTrade";
+        os << "ArchiveTrade"sv;
         break;
     }
     return os;

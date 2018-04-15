@@ -31,16 +31,16 @@ void Profile::report() const noexcept
 {
     const auto sd = stdev(var_);
     if (!std::isnan(sd)) {
-        SWIRLY_INFO(logMsg() << '<' << name_                                    //
-                             << "> {\"size\":" << var_.size()                   //
-                             << ",\"mean\":" << var_.mean()                     //
-                             << ",\"stdevp\":" << sd                            //
-                             << ",\"pctile95\":" << pctile95(var_.mean(), sd)   //
-                             << ",\"pctile99\":" << pctile99(var_.mean(), sd)   //
-                             << ",\"pctile999\":" << pctile999(var_.mean(), sd) //
-                             << ",\"min\":" << var_.min()                       //
-                             << ",\"max\":" << var_.max()                       //
-                             << '}');
+        SWIRLY_INFO << '<' << name_                                      //
+                    << "> {\"size\":"sv << var_.size()                   //
+                    << ",\"mean\":"sv << var_.mean()                     //
+                    << ",\"stdevp\":"sv << sd                            //
+                    << ",\"pctile95\":"sv << pctile95(var_.mean(), sd)   //
+                    << ",\"pctile99\":"sv << pctile99(var_.mean(), sd)   //
+                    << ",\"pctile999\":"sv << pctile999(var_.mean(), sd) //
+                    << ",\"min\":"sv << var_.min()                       //
+                    << ",\"max\":"sv << var_.max()                       //
+                    << '}';
     }
 }
 
@@ -52,8 +52,7 @@ void Profile::record(double val) noexcept
         const auto z = zscore(var_.mean(), sd, val);
         // NORMSINV(0.999) = 3.0902323
         if (z > 3.0902323) {
-            SWIRLY_WARNING(logMsg()
-                           << '<' << name_ << "> outlier " << val << " with z-score " << z);
+            SWIRLY_WARNING << '<' << name_ << "> outlier "sv << val << " with z-score "sv << z;
         }
     }
 }

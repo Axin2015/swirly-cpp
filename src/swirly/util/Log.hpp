@@ -111,27 +111,6 @@ SWIRLY_API void stdLogger(int level, std::string_view msg) noexcept;
  */
 SWIRLY_API void sysLogger(int level, std::string_view msg) noexcept;
 
-// N.B. varargs help ensure that expressions such as the following work correctly:
-// SWIRLY_LOG(LogInfo, logMsg() << "test: " << Foo<int, int>{10, 20});
-
-#define SWIRLY_LOG(level, ...)                                                                     \
-    do {                                                                                           \
-        if (swirly::isLogLevel(level))                                                             \
-            swirly::writeLog(level, __VA_ARGS__);                                                  \
-    } while (false)
-
-#define SWIRLY_CRIT(...) SWIRLY_LOG(swirly::LogCrit, __VA_ARGS__)
-#define SWIRLY_ERROR(...) SWIRLY_LOG(swirly::LogError, __VA_ARGS__)
-#define SWIRLY_WARNING(...) SWIRLY_LOG(swirly::LogWarning, __VA_ARGS__)
-#define SWIRLY_NOTICE(...) SWIRLY_LOG(swirly::LogNotice, __VA_ARGS__)
-#define SWIRLY_INFO(...) SWIRLY_LOG(swirly::LogInfo, __VA_ARGS__)
-
-#if SWIRLY_ENABLE_DEBUG
-#define SWIRLY_DEBUG(...) SWIRLY_LOG(swirly::LogDebug, __VA_ARGS__)
-#else
-#define SWIRLY_DEBUG(...)
-#endif
-
 /**
  * Logger callback function.
  */
@@ -144,7 +123,67 @@ using LogMsg = StaticStream<MaxLogMsg>;
  */
 SWIRLY_API LogMsg& logMsg() noexcept;
 
+// Inspired by techniques developed by Rodrigo Fernandes.
+class Log {
+    template <typename ValueT>
+    friend Log& operator<<(Log& log, const ValueT& val);
+
+    template <typename ValueT>
+    friend Log& operator<<(Log&& log, const ValueT& val);
+
+  public:
+    explicit Log(int level) noexcept
+    : level_{level}
+    , msg_(logMsg())
+    {
+    }
+    ~Log() { writeLog(level_, msg_); }
+
+    // Copy.
+    Log(const Log&) = delete;
+    Log& operator=(const Log&) = delete;
+
+    // Move.
+    Log(Log&&) = delete;
+    Log& operator=(Log&&) = delete;
+
+    constexpr explicit operator bool() const { return true; }
+
+  private:
+    const int level_;
+    LogMsg& msg_;
+};
+
+template <typename ValueT>
+Log& operator<<(Log& log, const ValueT& val)
+{
+    log.msg_ << val;
+    return log;
+}
+
+template <typename ValueT>
+Log& operator<<(Log&& log, const ValueT& val)
+{
+    return log << val;
+}
+
 } // namespace util
 } // namespace swirly
+
+// clang-format off
+#define SWIRLY_LOG(level) swirly::isLogLevel(level) && swirly::Log{level}
+
+#define SWIRLY_CRIT SWIRLY_LOG(swirly::LogCrit)
+#define SWIRLY_ERROR SWIRLY_LOG(swirly::LogError)
+#define SWIRLY_WARNING SWIRLY_LOG(swirly::LogWarning)
+#define SWIRLY_NOTICE SWIRLY_LOG(swirly::LogNotice)
+#define SWIRLY_INFO SWIRLY_LOG(swirly::LogInfo)
+
+#if SWIRLY_ENABLE_DEBUG
+#define SWIRLY_DEBUG SWIRLY_LOG(swirly::LogDebug)
+#else
+#define SWIRLY_DEBUG false && swirly::Log{swirly::LogDebug}
+#endif
+// clang-format on
 
 #endif // SWIRLY_UTIL_LOG_HPP

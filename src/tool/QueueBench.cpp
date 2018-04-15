@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
         ret = 0;
 
     } catch (const exception& e) {
-        SWIRLY_ERROR(logMsg() << "exception: " << e.what());
+        SWIRLY_ERROR << "exception: "sv << e.what();
     }
     return ret;
 }
