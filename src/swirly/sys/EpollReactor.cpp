@@ -16,7 +16,7 @@
  */
 #include "EpollReactor.hpp"
 
-#include "Log.hpp"
+#include <swirly/util/Log.hpp>
 
 namespace swirly {
 inline namespace sys {

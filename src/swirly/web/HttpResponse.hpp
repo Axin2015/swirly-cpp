@@ -17,9 +17,9 @@
 #ifndef SWIRLY_WEB_HTTPRESPONSE_HPP
 #define SWIRLY_WEB_HTTPRESPONSE_HPP
 
-#include <swirly/util/Stream.hpp>
-
 #include <swirly/sys/Buffer.hpp>
+
+#include <swirly/util/Stream.hpp>
 
 namespace swirly {
 inline namespace web {

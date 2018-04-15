@@ -19,11 +19,11 @@
 
 #include <swirly/fin/Types.hpp>
 
+#include <swirly/sys/MemQueue.hpp>
+
 #include <swirly/util/BasicTypes.hpp>
 #include <swirly/util/Date.hpp>
 #include <swirly/util/Symbol.hpp>
-
-#include <swirly/sys/MemQueue.hpp>
 
 namespace swirly {
 inline namespace fin {

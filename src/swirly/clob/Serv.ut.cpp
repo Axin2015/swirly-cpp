@@ -24,8 +24,7 @@
 #include <swirly/fin/MsgQueue.hpp>
 
 #include <swirly/util/Date.hpp>
-
-#include <swirly/sys/Time.hpp>
+#include <swirly/util/Time.hpp>
 
 #define BOOST_TEST_NO_MAIN
 #include <boost/test/unit_test.hpp>

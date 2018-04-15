@@ -16,7 +16,7 @@
  */
 #include "Timer.hpp"
 
-#include "Log.hpp"
+#include <swirly/util/Log.hpp>
 
 #include <algorithm>
 #include <string>

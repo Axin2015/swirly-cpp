@@ -34,21 +34,24 @@ set(lib_SOURCES
   Date.cpp
   Enum.cpp
   Exception.cpp
-  File.cpp
   Finally.cpp
   IntWrapper.cpp
   Limits.cpp
   Log.cpp
   Math.cpp
   Profile.cpp
+  RefCount.cpp
   RingBuffer.cpp
   Set.cpp
+  Slot.cpp
   Stream.cpp
   String.cpp
   StringBuf.cpp
   Struct.cpp
   Symbol.cpp
+  Time.cpp
   Tokeniser.cpp
+  Traits.cpp
   TypeTraits.cpp
   Types.cpp
   Utility.cpp
@@ -56,13 +59,13 @@ set(lib_SOURCES
 
 add_library(swirly-util-static STATIC ${lib_SOURCES})
 set_target_properties(swirly-util-static PROPERTIES OUTPUT_NAME swirly-util)
-target_link_libraries(swirly-util-static swirly-sys-static pthread)
+target_link_libraries(swirly-util-static pthread)
 install(TARGETS swirly-util-static DESTINATION lib COMPONENT static)
 
 if(ENABLE_SHARED_LIBS)
   add_library(swirly-util-shared SHARED ${lib_SOURCES})
   set_target_properties(swirly-util-shared PROPERTIES OUTPUT_NAME swirly-util)
-  target_link_libraries(swirly-util-shared swirly-sys-shared pthread)
+  target_link_libraries(swirly-util-shared pthread)
   install(TARGETS swirly-util-shared DESTINATION lib COMPONENT shared)
 endif()
 
@@ -86,14 +89,17 @@ set(test_SOURCES
   IntWrapper.ut.cpp
   Log.ut.cpp
   Math.ut.cpp
+  RefCount.ut.cpp
   RingBuffer.ut.cpp
   Set.ut.cpp
+  Slot.ut.cpp
   Stream.ut.cpp
   String.ut.cpp
   StringBuf.ut.cpp
   Struct.ut.cpp
   Symbol.ut.cpp
   Tokeniser.ut.cpp
+  Traits.ut.cpp
   Utility.ut.cpp
   VarSub.ut.cpp)
 

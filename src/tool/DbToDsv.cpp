@@ -28,7 +28,7 @@
 #include <swirly/util/Config.hpp>
 #include <swirly/util/Stream.hpp>
 
-#include <swirly/sys/Time.hpp>
+#include <swirly/util/Time.hpp>
 
 #include <fstream>
 

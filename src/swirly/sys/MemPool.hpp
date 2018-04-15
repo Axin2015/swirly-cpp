@@ -23,6 +23,7 @@
 
 #include <cassert>
 #include <cstddef>
+#include <cstdint>
 #include <new>
 #include <type_traits>
 

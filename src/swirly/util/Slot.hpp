@@ -14,17 +14,14 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SYS_SLOT_HPP
-#define SWIRLY_SYS_SLOT_HPP
+#ifndef SWIRLY_UTIL_SLOT_HPP
+#define SWIRLY_UTIL_SLOT_HPP
 
-#include <swirly/sys/Traits.hpp>
+#include <swirly/util/Traits.hpp>
 
 namespace swirly {
-inline namespace sys {
+inline namespace util {
 
-/**
- *
- */
 template <typename... ArgsT>
 class BasicSlot {
   public:
@@ -111,7 +108,7 @@ constexpr auto bind(ClassT* obj) noexcept
     return Slot{}.template bind<MemFnT>(obj);
 }
 
-} // namespace sys
+} // namespace util
 } // namespace swirly
 
-#endif // SWIRLY_SYS_SLOT_HPP
+#endif // SWIRLY_UTIL_SLOT_HPP

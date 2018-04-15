@@ -23,7 +23,7 @@
 #include <swirly/util/Finally.hpp>
 #include <swirly/util/IntWrapper.hpp>
 
-#include <swirly/sys/Time.hpp>
+#include <swirly/util/Time.hpp>
 
 #include <string_view>
 

@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SYS_REFCOUNT_HPP
-#define SWIRLY_SYS_REFCOUNT_HPP
+#ifndef SWIRLY_UTIL_REFCOUNT_HPP
+#define SWIRLY_UTIL_REFCOUNT_HPP
 
 #include <swirly/Config.h>
 
@@ -24,7 +24,7 @@
 #include <atomic>
 
 namespace swirly {
-inline namespace sys {
+inline namespace util {
 
 struct ThreadSafePolicy {
     using Type = std::atomic<int>;
@@ -100,7 +100,7 @@ boost::intrusive_ptr<ValueT> makeIntrusive(ArgsT&&... args)
     return {new (std::align_val_t(alignof(ValueT))) ValueT{std::forward<ArgsT>(args)...}, false};
 }
 
-} // namespace sys
+} // namespace util
 } // namespace swirly
 
-#endif // SWIRLY_SYS_REFCOUNT_HPP
+#endif // SWIRLY_UTIL_REFCOUNT_HPP

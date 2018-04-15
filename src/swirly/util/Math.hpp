@@ -25,6 +25,39 @@
 namespace swirly {
 inline namespace util {
 
+/**
+ * @return true if size is a power of two.
+ */
+constexpr bool isPow2(std::size_t n) noexcept
+{
+    return n > 0 && (n & (n - 1)) == 0;
+}
+
+/**
+ * @return the next power of two.
+ */
+inline unsigned nextPow2(unsigned n) noexcept
+{
+    // The result of __builtin_clz is undefined for zero values.
+    return n <= 1 ? 1 : 1 << (sizeof(n) * 8 - __builtin_clz(n - 1));
+}
+
+/**
+ * @return the next power of two.
+ */
+inline unsigned long nextPow2(unsigned long n) noexcept
+{
+    // The result of __builtin_clzl is undefined for zero values.
+    return n <= 1 ? 1 : 1 << (sizeof(n) * 8 - __builtin_clzl(n - 1));
+}
+
+template <int BitsN>
+constexpr std::size_t ceilPow2(std::size_t size) noexcept
+{
+    enum { Max = (1 << BitsN) - 1 };
+    return ((size + Max) >> BitsN) << BitsN;
+}
+
 class SWIRLY_API VarAccum {
   public:
     constexpr VarAccum() noexcept {};

@@ -25,16 +25,15 @@
 #include <swirly/fin/Date.hpp>
 #include <swirly/fin/MsgQueue.hpp>
 
+#include <swirly/sys/Cpu.hpp>
+#include <swirly/sys/MemCtx.hpp>
+#include <swirly/sys/Signal.hpp>
+
 #include <swirly/util/Config.hpp>
 #include <swirly/util/Finally.hpp>
 #include <swirly/util/Log.hpp>
 #include <swirly/util/Profile.hpp>
-
-#include <swirly/sys/Cpu.hpp>
-#include <swirly/sys/Signal.hpp>
-#include <swirly/sys/Time.hpp>
-
-#include <swirly/sys/MemCtx.hpp>
+#include <swirly/util/Time.hpp>
 
 #include <thread>
 

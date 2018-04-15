@@ -17,7 +17,7 @@
 #ifndef SWIRLY_SYS_MEMORY_HPP
 #define SWIRLY_SYS_MEMORY_HPP
 
-#include <swirly/sys/Math.hpp>
+#include <swirly/util/Math.hpp>
 
 namespace swirly {
 inline namespace sys {
