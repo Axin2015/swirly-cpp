@@ -134,7 +134,7 @@ int EpollReactor::dispatch(Event* buf, int size, Time now)
         auto& ev = buf[i];
         const auto fd = mux_.fd(ev);
         if (fd == efd_.fd()) {
-            SWIRLY_INFO("reactor interrupted"sv);
+            SWIRLY_INFO << "reactor interrupted"sv;
             interrupt_ = efd_.read();
             continue;
         }
@@ -157,7 +157,7 @@ int EpollReactor::dispatch(Event* buf, int size, Time now)
             ref.slot(fd, events, now);
         } catch (const std::exception& e) {
             using namespace string_literals;
-            SWIRLY_ERROR("error handling io event: "s + e.what());
+            SWIRLY_ERROR << "error handling io event: "sv << e.what();
         }
         ++n;
     }

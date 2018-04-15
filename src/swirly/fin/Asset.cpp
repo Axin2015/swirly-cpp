@@ -41,10 +41,10 @@ void Asset::toDsv(ostream& os, char delim) const
 
 void Asset::toJson(ostream& os) const
 {
-    os << "{\"symbol\":\"" << symbol_     //
-       << "\",\"display\":\"" << display_ //
-       << "\",\"type\":\"" << type_       //
-       << "\"}";
+    os << "{\"symbol\":\""sv << symbol_     //
+       << "\",\"display\":\""sv << display_ //
+       << "\",\"type\":\""sv << type_       //
+       << "\"}"sv;
 }
 
 } // namespace fin

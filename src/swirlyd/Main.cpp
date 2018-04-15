@@ -111,19 +111,19 @@ void getOpts(int argc, char* argv[], Opts& opts)
             opts.test = true;
             break;
         case ':':
-            cerr << "Option '" << static_cast<char>(optopt) << "' requires an argument\n";
+            cerr << "Option '"sv << static_cast<char>(optopt) << "' requires an argument\n"sv;
             printUsage(cerr);
             exit(1);
         case '?':
         default:
-            cerr << "Unknown option '" << static_cast<char>(optopt) << "'\n";
+            cerr << "Unknown option '"sv << static_cast<char>(optopt) << "'\n"sv;
             printUsage(cerr);
             exit(1);
         }
     }
 
     if (optind < argc) {
-        cerr << "Unknown argument '" << argv[optind] << "'\n";
+        cerr << "Unknown argument '"sv << argv[optind] << "'\n"sv;
         printUsage(cerr);
         exit(1);
     }
@@ -132,7 +132,7 @@ void getOpts(int argc, char* argv[], Opts& opts)
 void runJourn(MsgQueue& mq, Journ& j)
 {
     sigBlockAll();
-    SWIRLY_NOTICE("started journal thread"sv);
+    SWIRLY_NOTICE << "started journal thread"sv;
     try {
         CpuBackoff backoff;
         for (;;) {
@@ -147,23 +147,23 @@ void runJourn(MsgQueue& mq, Journ& j)
             backoff();
         }
     } catch (const exception& e) {
-        SWIRLY_ERROR(logMsg() << "exception: " << e.what());
+        SWIRLY_ERROR << "exception: "sv << e.what();
     }
-    SWIRLY_NOTICE("stopping journal thread"sv);
+    SWIRLY_NOTICE << "stopping journal thread"sv;
 }
 
 void runReactor(Reactor& r)
 {
     sigBlockAll();
-    SWIRLY_NOTICE("started reactor thread"sv);
+    SWIRLY_NOTICE << "started reactor thread"sv;
     try {
         while (!r.interrupted()) {
             r.poll();
         }
     } catch (const exception& e) {
-        SWIRLY_ERROR(logMsg() << "exception: " << e.what());
+        SWIRLY_ERROR << "exception: "sv << e.what();
     }
-    SWIRLY_NOTICE("stopping reactor thread"sv);
+    SWIRLY_NOTICE << "stopping reactor thread"sv;
 }
 
 MemCtx memCtx;
@@ -207,7 +207,7 @@ int main(int argc, char* argv[])
         if (!opts.confFile.empty()) {
             ifstream is{opts.confFile};
             if (!is.is_open()) {
-                throw Exception{errMsg() << "open failed: " << opts.confFile};
+                throw Exception{errMsg() << "open failed: "sv << opts.confFile};
             }
             config.read(is);
         }
@@ -288,27 +288,26 @@ int main(int argc, char* argv[])
             }
             fs::create_directory(logFile.parent_path());
 
-            SWIRLY_NOTICE(logMsg() << "opening log file: " << logFile);
+            SWIRLY_NOTICE << "opening log file: "sv << logFile;
             openLogFile(logFile.c_str());
         }
 
         const char* const httpPort{config.get("http_port", "8080")};
         const auto maxExecs = config.get<size_t>("max_execs", 1 << 4);
 
-        SWIRLY_NOTICE("initialising daemon");
-        SWIRLY_INFO(logMsg() << "conf_file:     " << opts.confFile);
-        SWIRLY_INFO(logMsg() << "daemon:        " << (opts.daemon ? "yes" : "no"));
-        SWIRLY_INFO(logMsg() << "start_time:    " << opts.startTime);
-        SWIRLY_INFO(logMsg() << "test_mode:     " << (opts.test ? "yes" : "no"));
+        SWIRLY_NOTICE << "initialising daemon"sv;
+        SWIRLY_INFO << "conf_file:     "sv << opts.confFile;
+        SWIRLY_INFO << "daemon:        "sv << (opts.daemon ? "yes"sv : "no"sv);
+        SWIRLY_INFO << "start_time:    "sv << opts.startTime;
+        SWIRLY_INFO << "test_mode:     "sv << (opts.test ? "yes"sv : "no"sv);
 
-        SWIRLY_INFO(logMsg() << "mem_size:      " << (memCtx.maxSize() >> 20) << "MiB");
-        SWIRLY_INFO(logMsg() << "file_mode:     " << setfill('0') << setw(3) << oct
-                             << swirly::fileMode());
-        SWIRLY_INFO(logMsg() << "run_dir:       " << runDir);
-        SWIRLY_INFO(logMsg() << "log_file:      " << logFile);
-        SWIRLY_INFO(logMsg() << "log_level:     " << getLogLevel());
-        SWIRLY_INFO(logMsg() << "http_port:     " << httpPort);
-        SWIRLY_INFO(logMsg() << "max_execs:     " << maxExecs);
+        SWIRLY_INFO << "mem_size:      "sv << (memCtx.maxSize() >> 20) << "MiB"sv;
+        SWIRLY_INFO << "file_mode:     "sv << setfill('0') << setw(3) << oct << swirly::fileMode();
+        SWIRLY_INFO << "run_dir:       "sv << runDir;
+        SWIRLY_INFO << "log_file:      "sv << logFile;
+        SWIRLY_INFO << "log_level:     "sv << getLogLevel();
+        SWIRLY_INFO << "http_port:     "sv << httpPort;
+        SWIRLY_INFO << "max_execs:     "sv << maxExecs;
 
         MsgQueue mq{1 << 10};
         Rest rest{mq, maxExecs};
@@ -331,39 +330,39 @@ int main(int argc, char* argv[])
         auto journThread = thread{runJourn, ref(mq), ref(journ)};
         const auto journFinally = makeFinally([&]() noexcept {
             if (!mq.interrupt(1_id32)) {
-                SWIRLY_ERROR("interrupt timeout"sv);
+                SWIRLY_ERROR << "interrupt timeout"sv;
             }
             journThread.join();
         });
         // clang-format on
-        SWIRLY_NOTICE(logMsg() << "started http server on port " << httpPort);
+        SWIRLY_NOTICE << "started http server on port "sv << httpPort;
 
         // Wait for termination.
         SigWait sigWait;
         while (const auto sig = sigWait()) {
             switch (sig) {
             case SIGHUP:
-                SWIRLY_INFO("received SIGHUP"sv);
+                SWIRLY_INFO << "received SIGHUP"sv;
                 if (!logFile.empty()) {
-                    SWIRLY_NOTICE(logMsg() << "reopening log file: " << logFile);
+                    SWIRLY_NOTICE << "reopening log file: "sv << logFile;
                     openLogFile(logFile.c_str());
                 }
                 continue;
             case SIGINT:
-                SWIRLY_INFO("received SIGINT"sv);
+                SWIRLY_INFO << "received SIGINT"sv;
                 break;
             case SIGTERM:
-                SWIRLY_INFO("received SIGTERM"sv);
+                SWIRLY_INFO << "received SIGTERM"sv;
                 break;
             default:
-                SWIRLY_INFO(logMsg() << "received signal: " << sig);
+                SWIRLY_INFO << "received signal: "sv << sig;
                 continue;
             }
             break;
         }
         ret = 0;
     } catch (const exception& e) {
-        SWIRLY_ERROR(logMsg() << "exception: " << e.what());
+        SWIRLY_ERROR << "exception: "sv << e.what();
     }
     return ret;
 }

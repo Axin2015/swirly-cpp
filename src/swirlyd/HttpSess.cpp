@@ -35,7 +35,7 @@ HttpSess::HttpSess(Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, RestServ&
 , ep_{ep}
 , restServ_(rs)
 {
-    SWIRLY_INFO(logMsg() << "accept session");
+    SWIRLY_INFO << "accept session"sv;
 
     sub_ = r.subscribe(*sock_, EventIn, bind<&HttpSess::onReady>(this));
     tmr_ = r.timer(now + IdleTimeout, Priority::Low, bind<&HttpSess::onTimer>(this));
@@ -43,12 +43,12 @@ HttpSess::HttpSess(Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, RestServ&
 
 HttpSess::~HttpSess()
 {
-    SWIRLY_INFO(logMsg() << "~HttpSess()");
+    SWIRLY_INFO << "~HttpSess()"sv;
 }
 
 void HttpSess::close() noexcept
 {
-    SWIRLY_INFO(logMsg() << "close session");
+    SWIRLY_INFO << "close session"sv;
     pause();
     tmr_.cancel();
     sub_.reset();
@@ -78,14 +78,14 @@ void HttpSess::onReady(int fd, unsigned events, Time now)
             }
         }
     } catch (const std::exception& e) {
-        SWIRLY_ERROR(logMsg() << "exception handling url: " << e.what());
+        SWIRLY_ERROR << "exception handling url: "sv << e.what();
         close();
     }
 }
 
 void HttpSess::onTimer(Timer& tmr, Time now)
 {
-    SWIRLY_INFO(logMsg() << "timeout");
+    SWIRLY_INFO << "timeout"sv;
     close();
 }
 
@@ -96,7 +96,7 @@ bool HttpSess::doUrl(string_view sv) noexcept
         req_.appendUrl(sv);
         ret = true;
     } catch (const std::exception& e) {
-        SWIRLY_ERROR(logMsg() << "exception handling url: " << e.what());
+        SWIRLY_ERROR << "exception handling url: "sv << e.what();
         close();
     }
     return ret;
@@ -109,7 +109,7 @@ bool HttpSess::doHeaderField(string_view sv, bool first) noexcept
         req_.appendHeaderField(sv, first);
         ret = true;
     } catch (const std::exception& e) {
-        SWIRLY_ERROR(logMsg() << "exception handling header field: " << e.what());
+        SWIRLY_ERROR << "exception handling header field: "sv << e.what();
         close();
     }
     return ret;
@@ -122,7 +122,7 @@ bool HttpSess::doHeaderValue(string_view sv, bool first) noexcept
         req_.appendHeaderValue(sv, first);
         ret = true;
     } catch (const std::exception& e) {
-        SWIRLY_ERROR(logMsg() << "exception handling header value: " << e.what());
+        SWIRLY_ERROR << "exception handling header value: "sv << e.what();
         close();
     }
     return ret;
@@ -141,7 +141,7 @@ bool HttpSess::doBody(string_view sv) noexcept
         req_.appendBody(sv);
         ret = true;
     } catch (const std::exception& e) {
-        SWIRLY_ERROR(logMsg() << "exception handling body: " << e.what());
+        SWIRLY_ERROR << "exception handling body: "sv << e.what();
         close();
     }
     return ret;
@@ -162,7 +162,7 @@ bool HttpSess::doMessageEnd() noexcept
         }
         ret = true;
     } catch (const std::exception& e) {
-        SWIRLY_ERROR(logMsg() << "exception handling message: " << e.what());
+        SWIRLY_ERROR << "exception handling message: "sv << e.what();
         close();
     }
     req_.clear();

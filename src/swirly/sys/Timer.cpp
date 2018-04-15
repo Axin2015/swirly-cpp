@@ -130,7 +130,7 @@ void TimerQueue::expire(Time now)
         tmr.slot().invoke(tmr, now);
     } catch (const std::exception& e) {
         using namespace string_literals;
-        SWIRLY_ERROR("error handling timer event: "s + e.what());
+        SWIRLY_ERROR << "error handling timer event: "sv << e.what();
     }
 
     if (!tmr.pending()) {

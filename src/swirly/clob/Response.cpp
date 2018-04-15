@@ -43,23 +43,23 @@ Response& Response::operator=(Response&&) noexcept = default;
 
 void Response::toJson(ostream& os) const
 {
-    os << "{\"market\":";
+    os << "{\"market\":"sv;
     if (market_) {
         market_->toJson(os);
     } else {
-        os << "null";
+        os << "null"sv;
     }
-    os << ",\"orders\":[";
+    os << ",\"orders\":["sv;
     transform(orders_.begin(), orders_.end(),
               OStreamJoiner{os, ','}, [](const auto& ptr) -> const auto& { return *ptr; });
-    os << "],\"execs\":[";
+    os << "],\"execs\":["sv;
     transform(execs_.rbegin(), execs_.rend(),
               OStreamJoiner{os, ','}, [](const auto& ptr) -> const auto& { return *ptr; });
-    os << "],\"posn\":";
+    os << "],\"posn\":"sv;
     if (posn_) {
         os << *posn_;
     } else {
-        os << "null";
+        os << "null"sv;
     }
     os << '}';
 }

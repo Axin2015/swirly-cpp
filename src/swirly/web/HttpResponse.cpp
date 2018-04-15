@@ -79,9 +79,9 @@ void HttpResponse::reset(int status, const char* reason, bool cache)
     buf_.reset();
     swirly::reset(*this);
 
-    *this << "HTTP/1.1 " << status << ' ' << reason;
+    *this << "HTTP/1.1 "sv << status << ' ' << reason;
     if (!cache) {
-        *this << "\r\nCache-Control: no-cache";
+        *this << "\r\nCache-Control: no-cache"sv;
     }
     if (withBody(status)) {
         // Status-Line = HTTP-Version SP Status-Code SP Reason-Phrase CRLF. Use 10 space
@@ -94,7 +94,7 @@ void HttpResponse::reset(int status, const char* reason, bool cache)
     } else {
         cloff_ = 0;
     }
-    *this << "\r\n\r\n";
+    *this << "\r\n\r\n"sv;
     hcount_ = pcount();
 }
 

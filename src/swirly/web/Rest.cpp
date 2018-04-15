@@ -91,7 +91,7 @@ void Rest::getRefData(EntitySet es, Time now, ostream& out) const
     out << '{';
     // FIXME: validate entities.
     if (es.asset()) {
-        out << "\"assets\":";
+        out << "\"assets\":"sv;
         getAsset(now, out);
         ++i;
     }
@@ -99,7 +99,7 @@ void Rest::getRefData(EntitySet es, Time now, ostream& out) const
         if (i > 0) {
             out << ',';
         }
-        out << "\"instrs\":";
+        out << "\"instrs\":"sv;
         getInstr(now, out);
         ++i;
     }
@@ -107,7 +107,7 @@ void Rest::getRefData(EntitySet es, Time now, ostream& out) const
         if (i > 0) {
             out << ',';
         }
-        out << "\"markets\":";
+        out << "\"markets\":"sv;
         getMarket(now, out);
         ++i;
     }
@@ -127,7 +127,7 @@ void Rest::getAsset(Symbol symbol, Time now, ostream& out) const
     const auto& assets = serv_.assets();
     auto it = assets.find(symbol);
     if (it == assets.end()) {
-        throw NotFoundException{errMsg() << "asset '" << symbol << "' does not exist"};
+        throw NotFoundException{errMsg() << "asset '"sv << symbol << "' does not exist"sv};
     }
     out << *it;
 }
@@ -145,7 +145,7 @@ void Rest::getInstr(Symbol symbol, Time now, ostream& out) const
     const auto& instrs = serv_.instrs();
     auto it = instrs.find(symbol);
     if (it == instrs.end()) {
-        throw NotFoundException{errMsg() << "instr '" << symbol << "' does not exist"};
+        throw NotFoundException{errMsg() << "instr '"sv << symbol << "' does not exist"sv};
     }
     out << *it;
 }
@@ -156,7 +156,7 @@ void Rest::getAccnt(Symbol symbol, EntitySet es, Page page, Time now, ostream& o
     int i{0};
     out << '{';
     if (es.market()) {
-        out << "\"markets\":";
+        out << "\"markets\":"sv;
         getMarket(now, out);
         ++i;
     }
@@ -164,7 +164,7 @@ void Rest::getAccnt(Symbol symbol, EntitySet es, Page page, Time now, ostream& o
         if (i > 0) {
             out << ',';
         }
-        out << "\"orders\":";
+        out << "\"orders\":"sv;
         detail::getOrder(accnt, out);
         ++i;
     }
@@ -172,7 +172,7 @@ void Rest::getAccnt(Symbol symbol, EntitySet es, Page page, Time now, ostream& o
         if (i > 0) {
             out << ',';
         }
-        out << "\"execs\":";
+        out << "\"execs\":"sv;
         detail::getExec(accnt, page, out);
         ++i;
     }
@@ -180,7 +180,7 @@ void Rest::getAccnt(Symbol symbol, EntitySet es, Page page, Time now, ostream& o
         if (i > 0) {
             out << ',';
         }
-        out << "\"trades\":";
+        out << "\"trades\":"sv;
         detail::getTrade(accnt, out);
         ++i;
     }
@@ -188,7 +188,7 @@ void Rest::getAccnt(Symbol symbol, EntitySet es, Page page, Time now, ostream& o
         if (i > 0) {
             out << ',';
         }
-        out << "\"posns\":";
+        out << "\"posns\":"sv;
         detail::getPosn(accnt, out);
         ++i;
     }
@@ -255,7 +255,7 @@ void Rest::getOrder(Symbol accntSymbol, Symbol instrSymbol, IsoDate settlDate, I
     const auto& orders = accnt.orders();
     auto it = orders.find(marketId, id);
     if (it == orders.end()) {
-        throw OrderNotFoundException{errMsg() << "order '" << id << "' does not exist"};
+        throw OrderNotFoundException{errMsg() << "order '"sv << id << "' does not exist"sv};
     }
     out << *it;
 }
@@ -302,7 +302,7 @@ void Rest::getTrade(Symbol accntSymbol, Symbol instrSymbol, IsoDate settlDate, I
     const auto& trades = accnt.trades();
     auto it = trades.find(marketId, id);
     if (it == trades.end()) {
-        throw NotFoundException{errMsg() << "trade '" << id << "' does not exist"};
+        throw NotFoundException{errMsg() << "trade '"sv << id << "' does not exist"sv};
     }
     out << *it;
 }
@@ -331,8 +331,8 @@ void Rest::getPosn(Symbol accntSymbol, Symbol instrSymbol, IsoDate settlDate, Ti
     const auto& posns = accnt.posns();
     auto it = posns.find(marketId);
     if (it == posns.end()) {
-        throw NotFoundException{errMsg() << "posn for '" << instrSymbol << "' on " << settlDate
-                                         << " does not exist"};
+        throw NotFoundException{errMsg() << "posn for '"sv << instrSymbol << "' on "sv << settlDate
+                                         << " does not exist"sv};
     }
     out << *it;
 }

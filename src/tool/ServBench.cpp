@@ -85,7 +85,7 @@ class NullJourn : public Journ {
     int doInterrupted() const noexcept override { return interrupt_; }
     void doInterrupt(int num) noexcept override
     {
-        SWIRLY_INFO(logMsg() << "interrupt");
+        SWIRLY_INFO << "interrupt"sv;
         interrupt_ = num;
     }
     void doWrite(const Msg& msg) override
@@ -102,7 +102,7 @@ class NullJourn : public Journ {
 void runJourn(MsgQueue& mq)
 {
     sigBlockAll();
-    SWIRLY_NOTICE("started journal thread"sv);
+    SWIRLY_NOTICE << "started journal thread"sv;
     try {
         CpuBackoff backoff;
         NullJourn journ;
@@ -118,9 +118,9 @@ void runJourn(MsgQueue& mq)
             backoff();
         }
     } catch (const exception& e) {
-        SWIRLY_ERROR(logMsg() << "exception: " << e.what());
+        SWIRLY_ERROR << "exception: "sv << e.what();
     }
-    SWIRLY_NOTICE("stopping journal thread"sv);
+    SWIRLY_NOTICE << "stopping journal thread"sv;
 }
 
 MemCtx memCtx;
@@ -173,7 +173,7 @@ int main(int argc, char* argv[])
         auto journThread = thread{runJourn, ref(mq)};
         const auto journFinally = makeFinally([&]() noexcept {
             if (!mq.interrupt(1_id32)) {
-                SWIRLY_ERROR("interrupt timeout"sv);
+                SWIRLY_ERROR << "interrupt timeout"sv;
             }
             journThread.join();
         });
@@ -286,7 +286,7 @@ int main(int argc, char* argv[])
 
         ret = 0;
     } catch (const exception& e) {
-        SWIRLY_ERROR(logMsg() << "exception: " << e.what());
+        SWIRLY_ERROR << "exception: "sv << e.what();
     }
     return ret;
 }

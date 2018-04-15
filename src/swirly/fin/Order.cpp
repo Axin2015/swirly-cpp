@@ -38,13 +38,13 @@ void Order::toDsv(ostream& os, char delim) const
     if (settlDay_ != 0_jd) {
         osj << jdToIso(settlDay_);
     } else {
-        osj << "";
+        osj << ""sv;
     }
     osj << id_;
     if (!ref_.empty()) {
         osj << ref_;
     } else {
-        osj << "";
+        osj << ""sv;
     }
     osj << state_    //
         << side_     //
@@ -57,13 +57,13 @@ void Order::toDsv(ostream& os, char delim) const
         osj << lastLots_ //
             << lastTicks_;
     } else {
-        osj << ""
-            << "";
+        osj << ""sv
+            << ""sv;
     }
     if (minLots_ != 0_lts) {
         osj << minLots_;
     } else {
-        osj << "";
+        osj << ""sv;
     }
     osj << created_ //
         << modified_;
@@ -71,43 +71,43 @@ void Order::toDsv(ostream& os, char delim) const
 
 void Order::toJson(ostream& os) const
 {
-    os << "{\"accnt\":\"" << accnt_       //
-       << "\",\"marketId\":" << marketId_ //
-       << ",\"instr\":\"" << instr_       //
-       << "\",\"settlDate\":";
+    os << "{\"accnt\":\""sv << accnt_       //
+       << "\",\"marketId\":"sv << marketId_ //
+       << ",\"instr\":\""sv << instr_       //
+       << "\",\"settlDate\":"sv;
     if (settlDay_ != 0_jd) {
         os << jdToIso(settlDay_);
     } else {
-        os << "null";
+        os << "null"sv;
     }
-    os << ",\"id\":" << id_ //
-       << ",\"ref\":";
+    os << ",\"id\":"sv << id_ //
+       << ",\"ref\":"sv;
     if (!ref_.empty()) {
         os << '"' << ref_ << '"';
     } else {
-        os << "null";
+        os << "null"sv;
     }
-    os << ",\"state\":\"" << state_     //
-       << "\",\"side\":\"" << side_     //
-       << "\",\"lots\":" << lots_       //
-       << ",\"ticks\":" << ticks_       //
-       << ",\"resdLots\":" << resdLots_ //
-       << ",\"execLots\":" << execLots_ //
-       << ",\"execCost\":" << execCost_;
+    os << ",\"state\":\""sv << state_     //
+       << "\",\"side\":\""sv << side_     //
+       << "\",\"lots\":"sv << lots_       //
+       << ",\"ticks\":"sv << ticks_       //
+       << ",\"resdLots\":"sv << resdLots_ //
+       << ",\"execLots\":"sv << execLots_ //
+       << ",\"execCost\":"sv << execCost_;
     if (lastLots_ != 0_lts) {
-        os << ",\"lastLots\":" << lastLots_ //
-           << ",\"lastTicks\":" << lastTicks_;
+        os << ",\"lastLots\":"sv << lastLots_ //
+           << ",\"lastTicks\":"sv << lastTicks_;
     } else {
-        os << ",\"lastLots\":null,\"lastTicks\":null";
+        os << ",\"lastLots\":null,\"lastTicks\":null"sv;
     }
-    os << ",\"minLots\":";
+    os << ",\"minLots\":"sv;
     if (minLots_ != 0_lts) {
         os << minLots_;
     } else {
-        os << "null";
+        os << "null"sv;
     }
-    os << ",\"created\":" << created_   //
-       << ",\"modified\":" << modified_ //
+    os << ",\"created\":"sv << created_   //
+       << ",\"modified\":"sv << modified_ //
        << '}';
 }
 

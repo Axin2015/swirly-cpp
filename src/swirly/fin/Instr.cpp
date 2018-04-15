@@ -75,19 +75,19 @@ void Instr::toDsv(ostream& os, char delim) const
 
 void Instr::toJson(ostream& os) const
 {
-    os << "{\"symbol\":\"" << symbol_         //
-       << "\",\"display\":\"" << display_     //
-       << "\",\"baseAsset\":\"" << baseAsset_ //
-       << "\",\"termCcy\":\"" << termCcy_     //
-       << "\",\"broker\":\"" << broker_       //
-       << "\",\"lotNumer\":" << lotNumer_     //
-       << ",\"lotDenom\":" << lotDenom_       //
-       << ",\"tickNumer\":" << tickNumer_     //
-       << ",\"tickDenom\":" << tickDenom_     //
-       << ",\"pipDp\":" << pipDp_             //
-       << ",\"minLots\":" << minLots_         //
-       << ",\"maxLots\":" << maxLots_         //
-       << "}";
+    os << "{\"symbol\":\""sv << symbol_         //
+       << "\",\"display\":\""sv << display_     //
+       << "\",\"baseAsset\":\""sv << baseAsset_ //
+       << "\",\"termCcy\":\""sv << termCcy_     //
+       << "\",\"broker\":\""sv << broker_       //
+       << "\",\"lotNumer\":"sv << lotNumer_     //
+       << ",\"lotDenom\":"sv << lotDenom_       //
+       << ",\"tickNumer\":"sv << tickNumer_     //
+       << ",\"tickDenom\":"sv << tickDenom_     //
+       << ",\"pipDp\":"sv << pipDp_             //
+       << ",\"minLots\":"sv << minLots_         //
+       << ",\"maxLots\":"sv << maxLots_         //
+       << "}"sv;
 }
 
 } // namespace fin

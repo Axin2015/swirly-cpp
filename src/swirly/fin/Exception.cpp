@@ -26,10 +26,10 @@ ServException::~ServException() = default;
 
 void ServException::toJson(int status, const char* reason, const char* detail, ostream& os)
 {
-    os << "{\"status\":" << status     //
-       << ",\"reason\":\"" << reason   //
-       << "\",\"detail\":\"" << detail //
-       << "\"}";
+    os << "{\"status\":"sv << status     //
+       << ",\"reason\":\""sv << reason   //
+       << "\",\"detail\":\""sv << detail //
+       << "\"}"sv;
 }
 
 BadRequestException::~BadRequestException() = default;
