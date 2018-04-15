@@ -30,18 +30,18 @@ inline namespace util {
 SWIRLY_API void reset(std::ostream& os) noexcept;
 
 template <std::size_t MaxN>
-class StaticStreamBuf : public std::streambuf {
+class StaticBuf : public std::streambuf {
   public:
-    StaticStreamBuf() noexcept { reset(); }
-    ~StaticStreamBuf() override = default;
+    StaticBuf() noexcept { reset(); }
+    ~StaticBuf() override = default;
 
     // Copy.
-    StaticStreamBuf(const StaticStreamBuf& rhs) = delete;
-    StaticStreamBuf& operator=(const StaticStreamBuf& rhs) = delete;
+    StaticBuf(const StaticBuf& rhs) = delete;
+    StaticBuf& operator=(const StaticBuf& rhs) = delete;
 
     // Move.
-    StaticStreamBuf(StaticStreamBuf&&) = delete;
-    StaticStreamBuf& operator=(StaticStreamBuf&&) = delete;
+    StaticBuf(StaticBuf&&) = delete;
+    StaticBuf& operator=(StaticBuf&&) = delete;
 
     const char* data() const noexcept { return pbase(); }
     bool empty() const noexcept { return pbase() == pptr(); }
@@ -83,7 +83,7 @@ class StaticStream : public std::ostream {
     };
 
   private:
-    StaticStreamBuf<MaxN> buf_;
+    StaticBuf<MaxN> buf_;
 };
 
 template <std::size_t MaxN, typename ValueT>
