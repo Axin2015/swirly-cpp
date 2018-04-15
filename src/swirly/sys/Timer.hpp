@@ -17,8 +17,8 @@
 #ifndef SWIRLY_SYS_TIMER_HPP
 #define SWIRLY_SYS_TIMER_HPP
 
-#include <swirly/sys/Slot.hpp>
-#include <swirly/sys/Time.hpp>
+#include <swirly/util/Slot.hpp>
+#include <swirly/util/Time.hpp>
 
 #include <swirly/Config.h>
 
@@ -164,10 +164,13 @@ class SWIRLY_API TimerQueue {
     bool empty() const noexcept { return size() == 0; }
     const Timer& front() const { return heap_.front(); }
 
+    // clang-format off
     [[nodiscard]] Timer insert(Time expiry, Duration interval, TimerSlot slot);
-    [[nodiscard]] Timer insert(Time expiry, TimerSlot slot) {
+    [[nodiscard]] Timer insert(Time expiry, TimerSlot slot)
+    {
         return insert(expiry, Duration::zero(), slot);
     }
+    // clang-format on
 
     int dispatch(Time now);
 

@@ -304,6 +304,26 @@ inline int fcntl(int fd, int cmd, ArgT arg)
 
 } // namespace os
 
+/**
+ * Get file size.
+ */
+inline std::size_t fileSize(int fd)
+{
+    struct stat st;
+    os::fstat(fd, st);
+    return st.st_size;
+}
+
+/**
+ * Get current file mode.
+ */
+inline mode_t fileMode() noexcept
+{
+    mode_t mode{umask(0)};
+    umask(mode);
+    return mode;
+}
+
 inline void setNonBlock(int fd, std::error_code& ec) noexcept
 {
     fcntl(fd, F_SETFL, O_NONBLOCK, ec);

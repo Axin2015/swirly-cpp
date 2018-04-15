@@ -14,10 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/util/Log.hpp>
-
 #include <swirly/sys/EpollReactor.hpp>
-#include <swirly/sys/RefCount.hpp>
+
+#include <swirly/util/Log.hpp>
+#include <swirly/util/RefCount.hpp>
 
 #include <iostream>
 #include <queue>

@@ -45,5 +45,5 @@ target_link_libraries(swirly-serv-bench ${swirly_clob_LIBRARY} ${swirly_sqlite_L
 install(TARGETS swirly-serv-bench DESTINATION bin COMPONENT program)
 
 add_executable(swirly-timer-bench TimerBench.cpp)
-target_link_libraries(swirly-timer-bench ${swirly_util_LIBRARY})
+target_link_libraries(swirly-timer-bench ${swirly_sys_LIBRARY})
 install(TARGETS swirly-timer-bench DESTINATION bin COMPONENT program)

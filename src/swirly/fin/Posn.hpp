@@ -22,9 +22,8 @@
 
 #include <swirly/util/BasicTypes.hpp>
 #include <swirly/util/Date.hpp>
+#include <swirly/util/RefCount.hpp>
 #include <swirly/util/Symbol.hpp>
-
-#include <swirly/sys/RefCount.hpp>
 
 #include <boost/intrusive/set.hpp>
 

@@ -18,8 +18,7 @@
 #define SWIRLY_UTIL_TYPETRAITS_HPP
 
 #include <swirly/util/String.hpp>
-
-#include <swirly/sys/Time.hpp>
+#include <swirly/util/Time.hpp>
 
 namespace swirly {
 inline namespace util {

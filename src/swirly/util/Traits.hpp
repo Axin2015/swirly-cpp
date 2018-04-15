@@ -14,13 +14,13 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SYS_TRAITS_HPP
-#define SWIRLY_SYS_TRAITS_HPP
+#ifndef SWIRLY_UTIL_TRAITS_HPP
+#define SWIRLY_UTIL_TRAITS_HPP
 
 #include <tuple>
 
 namespace swirly {
-inline namespace sys {
+inline namespace util {
 
 /**
  * Default case for functors and lambdas.
@@ -67,7 +67,7 @@ struct FunctionTraits<ReturnT (ClassT::*)(ArgsT...) const> : FunctionTraits<Retu
     using ClassType = ClassT;
 };
 
-} // namespace sys
+} // namespace util
 } // namespace swirly
 
-#endif // SWIRLY_SYS_TRAITS_HPP
+#endif // SWIRLY_UTIL_TRAITS_HPP

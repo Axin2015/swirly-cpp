@@ -28,12 +28,6 @@
 #include <swirly/fin/Model.hpp>
 #include <swirly/fin/MsgQueue.hpp>
 
-#include <swirly/util/Config.hpp>
-#include <swirly/util/Exception.hpp>
-#include <swirly/util/File.hpp>
-#include <swirly/util/Finally.hpp>
-#include <swirly/util/Log.hpp>
-
 #include <swirly/sys/Cpu.hpp>
 #include <swirly/sys/Daemon.hpp>
 #include <swirly/sys/EpollReactor.hpp>
@@ -42,6 +36,11 @@
 #include <swirly/sys/PidFile.hpp>
 #include <swirly/sys/Signal.hpp>
 #include <swirly/sys/System.hpp>
+
+#include <swirly/util/Config.hpp>
+#include <swirly/util/Exception.hpp>
+#include <swirly/util/Finally.hpp>
+#include <swirly/util/Log.hpp>
 
 #include <experimental/filesystem>
 

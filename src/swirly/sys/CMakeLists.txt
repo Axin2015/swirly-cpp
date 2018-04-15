@@ -40,9 +40,7 @@ set(lib_SOURCES
   IoSocket.cpp
   IpAddress.cpp
   LocalAddress.cpp
-  Log.cpp
   MMap.cpp
-  Math.cpp
   MemAlloc.cpp
   MemCtx.cpp
   MemPool.cpp
@@ -51,27 +49,23 @@ set(lib_SOURCES
   Muxer.cpp
   PidFile.cpp
   Reactor.cpp
-  RefCount.cpp
   Signal.cpp
-  Slot.cpp
   Socket.cpp
   System.cpp
   TcpAcceptor.cpp
   TcpSocket.cpp
-  Time.cpp
   Timer.cpp
-  Traits.cpp
   UdpSocket.cpp)
 
 add_library(swirly-sys-static STATIC ${lib_SOURCES})
 set_target_properties(swirly-sys-static PROPERTIES OUTPUT_NAME swirly-sys)
-target_link_libraries(swirly-sys-static pthread)
+target_link_libraries(swirly-sys-static swirly-util-static pthread)
 install(TARGETS swirly-sys-static DESTINATION lib COMPONENT static)
 
 if(ENABLE_SHARED_LIBS)
   add_library(swirly-sys-shared SHARED ${lib_SOURCES})
   set_target_properties(swirly-sys-shared PROPERTIES OUTPUT_NAME swirly-sys)
-  target_link_libraries(swirly-sys-shared pthread)
+  target_link_libraries(swirly-sys-shared swirly-util-shared pthread)
   install(TARGETS swirly-sys-shared DESTINATION lib COMPONENT shared)
 endif()
 
@@ -90,12 +84,8 @@ set(test_SOURCES
   EpollReactor.ut.cpp
   Handle.ut.cpp
   IpAddress.ut.cpp
-  Math.ut.cpp
   MemCtx.ut.cpp
-  RefCount.ut.cpp
-  Slot.ut.cpp
-  Socket.ut.cpp
-  Traits.ut.cpp)
+  Socket.ut.cpp)
 
 add_executable(swirly-sys-test
   ${test_SOURCES}

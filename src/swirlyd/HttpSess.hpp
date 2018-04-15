@@ -21,10 +21,10 @@
 #include <swirly/web/HttpRequest.hpp>
 #include <swirly/web/HttpResponse.hpp>
 
-#include <swirly/util/Log.hpp>
-
 #include <swirly/sys/MemAlloc.hpp>
 #include <swirly/sys/TcpAcceptor.hpp>
+
+#include <swirly/util/Log.hpp>
 
 #include <boost/intrusive/list.hpp>
 

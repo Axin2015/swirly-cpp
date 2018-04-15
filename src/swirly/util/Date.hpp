@@ -18,8 +18,7 @@
 #define SWIRLY_UTIL_DATE_HPP
 
 #include <swirly/util/IntWrapper.hpp>
-
-#include <swirly/sys/Time.hpp>
+#include <swirly/util/Time.hpp>
 
 #include <cassert>
 

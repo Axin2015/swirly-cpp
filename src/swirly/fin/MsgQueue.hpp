@@ -19,9 +19,9 @@
 
 #include <swirly/fin/Msg.hpp>
 
-#include <swirly/util/Array.hpp>
-
 #include <swirly/sys/MemQueue.hpp>
+
+#include <swirly/util/Array.hpp>
 
 #include <cassert>
 

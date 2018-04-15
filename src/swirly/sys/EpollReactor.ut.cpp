@@ -17,7 +17,8 @@
 #include "EpollReactor.hpp"
 #include "IoSocket.hpp"
 #include "LocalAddress.hpp"
-#include "RefCount.hpp"
+
+#include <swirly/util/RefCount.hpp>
 
 #define BOOST_TEST_NO_MAIN
 #include <boost/test/unit_test.hpp>

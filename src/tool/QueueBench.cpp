@@ -14,11 +14,11 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/util/Log.hpp>
-#include <swirly/util/Profile.hpp>
-
 #include <swirly/sys/Cpu.hpp>
 #include <swirly/sys/MemQueue.hpp>
+
+#include <swirly/util/Log.hpp>
+#include <swirly/util/Profile.hpp>
 
 #include <iostream>
 #include <thread>

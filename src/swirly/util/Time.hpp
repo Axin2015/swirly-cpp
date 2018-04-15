@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SYS_TIME_HPP
-#define SWIRLY_SYS_TIME_HPP
+#ifndef SWIRLY_UTIL_TIME_HPP
+#define SWIRLY_UTIL_TIME_HPP
 
 #include <swirly/Config.h>
 
@@ -25,7 +25,7 @@
 #include <sys/time.h>
 
 namespace swirly {
-inline namespace sys {
+inline namespace util {
 using namespace std::literals::chrono_literals;
 
 struct SWIRLY_API UnixClock {
@@ -193,7 +193,7 @@ inline timespec operator-(timespec lhs, timespec rhs) noexcept
     return ts;
 }
 
-} // namespace sys
+} // namespace util
 } // namespace swirly
 
-#endif // SWIRLY_SYS_TIME_HPP
+#endif // SWIRLY_UTIL_TIME_HPP
