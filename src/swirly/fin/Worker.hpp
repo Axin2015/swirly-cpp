@@ -14,12 +14,30 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/util/Log.hpp>
+#ifndef SWIRLY_FIN_WORKER_HPP
+#define SWIRLY_FIN_WORKER_HPP
 
-using namespace swirly;
+#include <swirly/Config.h>
 
-int main(int argc, char* argv[])
-{
-    SWIRLY_INFO << "Hello, World!"sv;
-    return 0;
-}
+#include <thread>
+
+namespace swirly {
+inline namespace fin {
+
+class Journ;
+class MsgQueue;
+
+class SWIRLY_API JournWorker {
+  public:
+    JournWorker(MsgQueue& mq, Journ& journ);
+    ~JournWorker();
+
+  private:
+    MsgQueue& mq_;
+    std::thread thread_;
+};
+
+} // namespace fin
+} // namespace swirly
+
+#endif // SWIRLY_FIN_WORKER_HPP

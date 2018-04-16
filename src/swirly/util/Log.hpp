@@ -28,33 +28,6 @@ inline namespace util {
  */
 using Logger = void (*)(int, std::string_view);
 
-enum : int {
-    /**
-     * Critical.
-     */
-    LogCrit,
-    /**
-     * Error.
-     */
-    LogError,
-    /**
-     * Warning.
-     */
-    LogWarning,
-    /**
-     * Notice.
-     */
-    LogNotice,
-    /**
-     * Information.
-     */
-    LogInfo,
-    /**
-     * Debug.
-     */
-    LogDebug
-};
-
 /**
  * Return log label for given log level.
  */
@@ -132,6 +105,33 @@ class Log {
     friend Log& operator<<(Log&& log, const ValueT& val);
 
   public:
+    enum : int {
+        /**
+     * Critical.
+     */
+        Crit,
+        /**
+     * Error.
+     */
+        Error,
+        /**
+     * Warning.
+     */
+        Warning,
+        /**
+     * Notice.
+     */
+        Notice,
+        /**
+     * Information.
+     */
+        Info,
+        /**
+     * Debug.
+     */
+        Debug
+    };
+
     explicit Log(int level) noexcept
     : level_{level}
     , msg_(logMsg())
@@ -173,16 +173,16 @@ Log& operator<<(Log&& log, const ValueT& val)
 // clang-format off
 #define SWIRLY_LOG(level) swirly::isLogLevel(level) && swirly::Log{level}
 
-#define SWIRLY_CRIT SWIRLY_LOG(swirly::LogCrit)
-#define SWIRLY_ERROR SWIRLY_LOG(swirly::LogError)
-#define SWIRLY_WARNING SWIRLY_LOG(swirly::LogWarning)
-#define SWIRLY_NOTICE SWIRLY_LOG(swirly::LogNotice)
-#define SWIRLY_INFO SWIRLY_LOG(swirly::LogInfo)
+#define SWIRLY_CRIT SWIRLY_LOG(swirly::Log::Crit)
+#define SWIRLY_ERROR SWIRLY_LOG(swirly::Log::Error)
+#define SWIRLY_WARNING SWIRLY_LOG(swirly::Log::Warning)
+#define SWIRLY_NOTICE SWIRLY_LOG(swirly::Log::Notice)
+#define SWIRLY_INFO SWIRLY_LOG(swirly::Log::Info)
 
 #if SWIRLY_ENABLE_DEBUG
-#define SWIRLY_DEBUG SWIRLY_LOG(swirly::LogDebug)
+#define SWIRLY_DEBUG SWIRLY_LOG(swirly::Log::Debug)
 #else
-#define SWIRLY_DEBUG false && swirly::Log{swirly::LogDebug}
+#define SWIRLY_DEBUG false && swirly::Log{swirly::Log::Debug}
 #endif
 // clang-format on
 

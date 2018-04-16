@@ -14,12 +14,29 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/util/Log.hpp>
+#ifndef SWIRLY_SYS_WORKER_HPP
+#define SWIRLY_SYS_WORKER_HPP
 
-using namespace swirly;
+#include <swirly/Config.h>
 
-int main(int argc, char* argv[])
-{
-    SWIRLY_INFO << "Hello, World!"sv;
-    return 0;
-}
+#include <thread>
+
+namespace swirly {
+inline namespace sys {
+
+class Reactor;
+
+class SWIRLY_API ReactorWorker {
+  public:
+    explicit ReactorWorker(Reactor& r);
+    ~ReactorWorker();
+
+  private:
+    Reactor& reactor_;
+    std::thread thread_;
+};
+
+} // namespace sys
+} // namespace swirly
+
+#endif // SWIRLY_SYS_WORKER_HPP

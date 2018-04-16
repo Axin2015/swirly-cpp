@@ -29,7 +29,7 @@ using namespace swirly;
 namespace {
 
 struct TestHandler : RefCount<TestHandler, ThreadUnsafePolicy> {
-    void onReady(int fd, unsigned events, Time now)
+    void onInput(int fd, unsigned events, Time now)
     {
         char buf[4];
         os::recv(fd, buf, 4, 0);
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(EpollReactorLevelCase)
     auto h = makeIntrusive<TestHandler>();
 
     auto socks = socketpair(LocalStream{});
-    const auto sub = r.subscribe(*socks.second, EventIn, bind<&TestHandler::onReady>(h.get()));
+    const auto sub = r.subscribe(*socks.second, EventIn, bind<&TestHandler::onInput>(h.get()));
 
     BOOST_TEST(r.poll(0ms) == 0);
     BOOST_TEST(h->matches == 0);
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(EpollReactorEdgeCase)
     auto h = makeIntrusive<TestHandler>();
 
     auto socks = socketpair(LocalStream{});
-    auto sub = r.subscribe(*socks.second, EventIn | EventEt, bind<&TestHandler::onReady>(h.get()));
+    auto sub = r.subscribe(*socks.second, EventIn | EventEt, bind<&TestHandler::onInput>(h.get()));
 
     BOOST_TEST(r.poll(0ms) == 0);
     BOOST_TEST(h->matches == 0);
