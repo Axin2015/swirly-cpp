@@ -49,7 +49,8 @@ set(lib_SOURCES
   Posn.cpp
   Request.cpp
   Transaction.cpp
-  Types.cpp)
+  Types.cpp
+  Worker.cpp)
 
 add_library(swirly-fin-static STATIC ${lib_SOURCES})
 set_target_properties(swirly-fin-static PROPERTIES OUTPUT_NAME swirly-fin)

@@ -27,6 +27,7 @@
 #include <swirly/fin/Journ.hpp>
 #include <swirly/fin/Model.hpp>
 #include <swirly/fin/MsgQueue.hpp>
+#include <swirly/fin/Worker.hpp>
 
 #include <swirly/sys/Cpu.hpp>
 #include <swirly/sys/Daemon.hpp>
@@ -36,6 +37,7 @@
 #include <swirly/sys/PidFile.hpp>
 #include <swirly/sys/Signal.hpp>
 #include <swirly/sys/System.hpp>
+#include <swirly/sys/Worker.hpp>
 
 #include <swirly/util/Config.hpp>
 #include <swirly/util/Exception.hpp>
@@ -47,7 +49,6 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <thread>
 
 #include <fcntl.h> // open()
 #include <syslog.h>
@@ -127,43 +128,6 @@ void getOpts(int argc, char* argv[], Opts& opts)
         printUsage(cerr);
         exit(1);
     }
-}
-
-void runJourn(MsgQueue& mq, Journ& j)
-{
-    sigBlockAll();
-    SWIRLY_NOTICE << "started journal thread"sv;
-    try {
-        CpuBackoff backoff;
-        for (;;) {
-            Msg msg;
-            while (mq.pop(msg)) {
-                j.write(msg);
-                backoff.reset();
-            }
-            if (j.interrupted()) {
-                break;
-            }
-            backoff();
-        }
-    } catch (const exception& e) {
-        SWIRLY_ERROR << "exception: "sv << e.what();
-    }
-    SWIRLY_NOTICE << "stopping journal thread"sv;
-}
-
-void runReactor(Reactor& r)
-{
-    sigBlockAll();
-    SWIRLY_NOTICE << "started reactor thread"sv;
-    try {
-        while (!r.interrupted()) {
-            r.poll();
-        }
-    } catch (const exception& e) {
-        SWIRLY_ERROR << "exception: "sv << e.what();
-    }
-    SWIRLY_NOTICE << "stopping reactor thread"sv;
 }
 
 MemCtx memCtx;
@@ -322,19 +286,9 @@ int main(int argc, char* argv[])
         const TcpEndpoint ep{Tcp::v4(), stou16(httpPort)};
         HttpServ httpServ{reactor, ep, restServ};
 
-        auto reactorThread = thread{runReactor, ref(reactor)};
-        const auto reactorFinally = makeFinally([&]() noexcept {
-            reactor.interrupt(1);
-            reactorThread.join();
-        });
-        auto journThread = thread{runJourn, ref(mq), ref(journ)};
-        const auto journFinally = makeFinally([&]() noexcept {
-            if (!mq.interrupt(1_id32)) {
-                SWIRLY_ERROR << "interrupt timeout"sv;
-            }
-            journThread.join();
-        });
-        // clang-format on
+        ReactorWorker reactorWorker{reactor};
+        JournWorker journWorker{mq, journ};
+
         SWIRLY_NOTICE << "started http server on port "sv << httpPort;
 
         // Wait for termination.

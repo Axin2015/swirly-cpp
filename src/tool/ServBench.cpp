@@ -24,6 +24,7 @@
 
 #include <swirly/fin/Date.hpp>
 #include <swirly/fin/MsgQueue.hpp>
+#include <swirly/fin/Worker.hpp>
 
 #include <swirly/sys/Cpu.hpp>
 #include <swirly/sys/MemCtx.hpp>
@@ -99,30 +100,6 @@ class NullJourn : public Journ {
     int interrupt_{0};
 };
 
-void runJourn(MsgQueue& mq)
-{
-    sigBlockAll();
-    SWIRLY_NOTICE << "started journal thread"sv;
-    try {
-        CpuBackoff backoff;
-        NullJourn journ;
-        for (;;) {
-            Msg msg;
-            while (mq.pop(msg)) {
-                journ.write(msg);
-                backoff.reset();
-            }
-            if (journ.interrupted()) {
-                break;
-            }
-            backoff();
-        }
-    } catch (const exception& e) {
-        SWIRLY_ERROR << "exception: "sv << e.what();
-    }
-    SWIRLY_NOTICE << "stopping journal thread"sv;
-}
-
 MemCtx memCtx;
 
 } // namespace
@@ -170,13 +147,8 @@ int main(int argc, char* argv[])
         serv.load(*model, now);
         model = nullptr;
 
-        auto journThread = thread{runJourn, ref(mq)};
-        const auto journFinally = makeFinally([&]() noexcept {
-            if (!mq.interrupt(1_id32)) {
-                SWIRLY_ERROR << "interrupt timeout"sv;
-            }
-            journThread.join();
-        });
+        NullJourn journ;
+        JournWorker journWorker{mq, journ};
 
         auto& market = createMarket(serv, "EURUSD"sv, busDay(now), 0, now);
 

@@ -55,7 +55,8 @@ set(lib_SOURCES
   TcpAcceptor.cpp
   TcpSocket.cpp
   Timer.cpp
-  UdpSocket.cpp)
+  UdpSocket.cpp
+  Worker.cpp)
 
 add_library(swirly-sys-static STATIC ${lib_SOURCES})
 set_target_properties(swirly-sys-static PROPERTIES OUTPUT_NAME swirly-sys)
