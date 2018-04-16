@@ -39,7 +39,7 @@ namespace {
 const char* labels_[] = {"CRIT", "ERROR", "WARNING", "NOTICE", "INFO", "DEBUG"};
 
 // Global log level and logger function.
-atomic<int> level_{LogInfo};
+atomic<int> level_{Log::Info};
 atomic<Logger> logger_{stdLogger};
 mutex mutex_;
 
@@ -72,7 +72,7 @@ inline pid_t gettid()
 
 const char* logLabel(int level) noexcept
 {
-    return labels_[min<int>(max<int>(level, LogCrit), LogDebug)];
+    return labels_[min<int>(max<int>(level, Log::Crit), Log::Debug)];
 }
 
 int getLogLevel() noexcept
@@ -128,7 +128,7 @@ void stdLogger(int level, string_view msg) noexcept
         {&tail, 1}                                   //
     };
 
-    int fd{level > LogWarning ? STDOUT_FILENO : STDERR_FILENO};
+    int fd{level > Log::Warning ? STDOUT_FILENO : STDERR_FILENO};
     // The following lock was required to avoid interleaving.
     lock_guard<mutex> lock{mutex_};
     // Best effort given that this is the logger.
@@ -142,19 +142,19 @@ void sysLogger(int level, string_view msg) noexcept
 {
     int prio;
     switch (level) {
-    case LogCrit:
+    case Log::Crit:
         prio = LOG_CRIT;
         break;
-    case LogError:
+    case Log::Error:
         prio = LOG_ERR;
         break;
-    case LogWarning:
+    case Log::Warning:
         prio = LOG_WARNING;
         break;
-    case LogNotice:
+    case Log::Notice:
         prio = LOG_NOTICE;
         break;
-    case LogInfo:
+    case Log::Info:
         prio = LOG_INFO;
         break;
     default:
