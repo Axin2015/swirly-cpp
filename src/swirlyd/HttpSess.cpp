@@ -37,7 +37,7 @@ HttpSess::HttpSess(Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, RestServ&
 {
     SWIRLY_INFO << "accept session"sv;
 
-    sub_ = r.subscribe(*sock_, EventIn, bind<&HttpSess::onReady>(this));
+    sub_ = r.subscribe(*sock_, EventIn, bind<&HttpSess::onInput>(this));
     tmr_ = r.timer(now + IdleTimeout, Priority::Low, bind<&HttpSess::onTimer>(this));
 }
 
@@ -55,7 +55,7 @@ void HttpSess::close() noexcept
     delete this;
 }
 
-void HttpSess::onReady(int fd, unsigned events, Time now)
+void HttpSess::onInput(int fd, unsigned events, Time now)
 {
     try {
         if (events & EventOut) {

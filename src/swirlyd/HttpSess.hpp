@@ -51,7 +51,7 @@ class SWIRLY_API HttpSess
     HttpSess& operator=(HttpSess&&) = delete;
 
     void close() noexcept;
-    void onReady(int fd, unsigned events, Time now);
+    void onInput(int fd, unsigned events, Time now);
     void onTimer(Timer& tmr, Time now);
 
     boost::intrusive::list_member_hook<AutoUnlinkOption> listHook;

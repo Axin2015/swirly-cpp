@@ -36,7 +36,7 @@ class TcpAcceptor {
         serv_.setSoReuseAddr(true);
         serv_.bind(ep);
         serv_.listen(SOMAXCONN);
-        sub_ = r.subscribe(*serv_, EventIn, bind<&TcpAcceptor::onReady>(this));
+        sub_ = r.subscribe(*serv_, EventIn, bind<&TcpAcceptor::onInput>(this));
     }
 
     // Copy.
@@ -47,7 +47,7 @@ class TcpAcceptor {
     TcpAcceptor(TcpAcceptor&&) = delete;
     TcpAcceptor& operator=(TcpAcceptor&&) = delete;
 
-    void onReady(int fd, unsigned events, Time now)
+    void onInput(int fd, unsigned events, Time now)
     {
         Endpoint ep;
         IoSocket sock{os::accept(fd, ep), serv_.family()};
