@@ -20,8 +20,6 @@
 #include <swirly/sqlite/Journ.hpp>
 #include <swirly/sqlite/Model.hpp>
 
-#include <swirly/clob/Test.hpp>
-
 #include <swirly/web/Rest.hpp>
 
 #include <swirly/fin/Journ.hpp>
@@ -71,7 +69,6 @@ void openLogFile(const char* path)
 struct Opts {
     fs::path confFile;
     bool daemon{false};
-    bool test{false};
     Time startTime{};
 };
 
@@ -84,7 +81,6 @@ Options:
   -d           Run in the background as a daemon process.
   -f path      Path to configuration file.
   -s time      Initial time of day in millis since epoch.
-  -t           Test mode.
 
 Report bugs to: support@swirlycloud.com
 )==";
@@ -107,9 +103,6 @@ void getOpts(int argc, char* argv[], Opts& opts)
             exit(0);
         case 's':
             opts.startTime = toTime(Millis{stou64(optarg)});
-            break;
-        case 't':
-            opts.test = true;
             break;
         case ':':
             cerr << "Option '"sv << static_cast<char>(optopt) << "' requires an argument\n"sv;
@@ -256,6 +249,7 @@ int main(int argc, char* argv[])
             openLogFile(logFile.c_str());
         }
 
+        const fs::path mqFile{config.get("mq_file", "")};
         const char* const httpPort{config.get("http_port", "8080")};
         const auto maxExecs = config.get<size_t>("max_execs", 1 << 4);
 
@@ -263,17 +257,23 @@ int main(int argc, char* argv[])
         SWIRLY_INFO << "conf_file:     "sv << opts.confFile;
         SWIRLY_INFO << "daemon:        "sv << (opts.daemon ? "yes"sv : "no"sv);
         SWIRLY_INFO << "start_time:    "sv << opts.startTime;
-        SWIRLY_INFO << "test_mode:     "sv << (opts.test ? "yes"sv : "no"sv);
 
-        SWIRLY_INFO << "mem_size:      "sv << (memCtx.maxSize() >> 20) << "MiB"sv;
         SWIRLY_INFO << "file_mode:     "sv << setfill('0') << setw(3) << oct << swirly::fileMode();
-        SWIRLY_INFO << "run_dir:       "sv << runDir;
+        SWIRLY_INFO << "http_port:     "sv << httpPort;
         SWIRLY_INFO << "log_file:      "sv << logFile;
         SWIRLY_INFO << "log_level:     "sv << getLogLevel();
-        SWIRLY_INFO << "http_port:     "sv << httpPort;
         SWIRLY_INFO << "max_execs:     "sv << maxExecs;
+        SWIRLY_INFO << "mem_size:      "sv << (memCtx.maxSize() >> 20) << "MiB"sv;
+        SWIRLY_INFO << "mq_file:       "sv << mqFile;
+        SWIRLY_INFO << "pid_file:      "sv << pidFile;
+        SWIRLY_INFO << "run_dir:       "sv << runDir;
 
-        MsgQueue mq{1 << 10};
+        MsgQueue mq;
+        if (!mqFile.empty()) {
+            mq = MsgQueue{mqFile.c_str()};
+        } else {
+            mq = MsgQueue{1 << 10};
+        }
         Rest rest{mq, maxExecs};
         {
             SqlModel model{config};

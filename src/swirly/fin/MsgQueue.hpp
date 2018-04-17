@@ -65,6 +65,7 @@ class Range {
 
 class SWIRLY_API MsgQueue {
   public:
+    MsgQueue(std::nullptr_t = nullptr) noexcept {}
     explicit MsgQueue(std::size_t capacity)
     : mq_{capacity}
     {
@@ -80,8 +81,8 @@ class SWIRLY_API MsgQueue {
     MsgQueue& operator=(const MsgQueue&) = delete;
 
     // Move.
-    MsgQueue(MsgQueue&&) = delete;
-    MsgQueue& operator=(MsgQueue&&) = delete;
+    MsgQueue(MsgQueue&&) = default;
+    MsgQueue& operator=(MsgQueue&&) = default;
 
     /**
      * Send interrupt.
@@ -137,7 +138,7 @@ class SWIRLY_API MsgQueue {
 
     void doArchiveTrade(Id64 marketId, ArrayView<Id64> ids, Time modified);
 
-    MemQueue<Msg> mq_;
+    MemQueue<Msg> mq_{nullptr};
 };
 
 } // namespace fin
