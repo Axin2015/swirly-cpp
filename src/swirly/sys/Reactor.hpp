@@ -36,7 +36,7 @@ class SWIRLY_API Reactor : public Interruptible {
         , fd_{fd}
         {
         }
-        Handle() = default;
+        constexpr Handle(std::nullptr_t = nullptr) noexcept {}
         ~Handle() { reset(); }
 
         // Copy.
@@ -61,7 +61,7 @@ class SWIRLY_API Reactor : public Interruptible {
         explicit operator bool() const noexcept { return reactor_ != nullptr; }
         auto fd() const noexcept { return fd_; }
 
-        void reset() noexcept
+        void reset(std::nullptr_t = nullptr) noexcept
         {
             if (reactor_) {
                 reactor_->doUnsubscribe(fd_);

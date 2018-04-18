@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE(TraitsFreeFunCase)
     BOOST_TEST((is_same_v<Traits::ArgType<0>, short>));
     BOOST_TEST((is_same_v<Traits::ArgType<1>, int>));
     BOOST_TEST((is_same_v<Traits::ArgType<2>, long>));
-    BOOST_TEST(tuple_size_v<Tuple> == 3);
+    BOOST_TEST(tuple_size_v<Tuple> == 3U);
 }
 
 BOOST_AUTO_TEST_CASE(TraitsFunctorCase)
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(TraitsFunctorCase)
     BOOST_TEST((is_same_v<Traits::ArgType<0>, short>));
     BOOST_TEST((is_same_v<Traits::ArgType<1>, int>));
     BOOST_TEST((is_same_v<Traits::ArgType<2>, long>));
-    BOOST_TEST(tuple_size_v<Tuple> == 3);
+    BOOST_TEST(tuple_size_v<Tuple> == 3U);
 }
 
 BOOST_AUTO_TEST_CASE(TraitsConstFunctorCase)
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(TraitsConstFunctorCase)
     BOOST_TEST((is_same_v<Traits::ArgType<0>, short>));
     BOOST_TEST((is_same_v<Traits::ArgType<1>, int>));
     BOOST_TEST((is_same_v<Traits::ArgType<2>, long>));
-    BOOST_TEST(tuple_size_v<Tuple> == 3);
+    BOOST_TEST(tuple_size_v<Tuple> == 3U);
 }
 
 BOOST_AUTO_TEST_CASE(TraitsLambdaCase)
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(TraitsLambdaCase)
     BOOST_TEST((is_same_v<Traits::ArgType<0>, short>));
     BOOST_TEST((is_same_v<Traits::ArgType<1>, int>));
     BOOST_TEST((is_same_v<Traits::ArgType<2>, long>));
-    BOOST_TEST(tuple_size_v<Tuple> == 3);
+    BOOST_TEST(tuple_size_v<Tuple> == 3U);
 }
 
 BOOST_AUTO_TEST_CASE(TraitsConstLambdaCase)
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE(TraitsConstLambdaCase)
     BOOST_TEST((is_same_v<Traits::ArgType<0>, short>));
     BOOST_TEST((is_same_v<Traits::ArgType<1>, int>));
     BOOST_TEST((is_same_v<Traits::ArgType<2>, long>));
-    BOOST_TEST(tuple_size_v<Tuple> == 3);
+    BOOST_TEST(tuple_size_v<Tuple> == 3U);
 }
 
 BOOST_AUTO_TEST_CASE(TraitsMemFunCase)
@@ -133,7 +133,7 @@ BOOST_AUTO_TEST_CASE(TraitsMemFunCase)
     BOOST_TEST((is_same_v<FooTraits::ClassType, Test>));
     BOOST_TEST(FooTraits::Arity == 1);
     BOOST_TEST((is_same_v<FooTraits::ArgType<0>, int>));
-    BOOST_TEST(tuple_size_v<FooTuple> == 1);
+    BOOST_TEST(tuple_size_v<FooTuple> == 1U);
 
     using BarTraits = FunctionTraits<decltype(&Test::bar)>;
     using BarTuple = BarTraits::Pack<tuple>;
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE(TraitsMemFunCase)
     BOOST_TEST(BarTraits::Arity == 2);
     BOOST_TEST((is_same_v<BarTraits::ArgType<0>, double>));
     BOOST_TEST((is_same_v<BarTraits::ArgType<1>, double>));
-    BOOST_TEST(tuple_size_v<BarTuple> == 2);
+    BOOST_TEST(tuple_size_v<BarTuple> == 2U);
 }
 
 BOOST_AUTO_TEST_CASE(TraitsConstMemFunCase)
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE(TraitsConstMemFunCase)
     BOOST_TEST((is_same_v<FooTraits::ClassType, Test>));
     BOOST_TEST(FooTraits::Arity == 1);
     BOOST_TEST((is_same_v<FooTraits::ArgType<0>, int>));
-    BOOST_TEST(tuple_size_v<FooTuple> == 1);
+    BOOST_TEST(tuple_size_v<FooTuple> == 1U);
 
     using BarTraits = FunctionTraits<decltype(&Test::bar)>;
     using BarTuple = BarTraits::Pack<tuple>;
@@ -170,7 +170,7 @@ BOOST_AUTO_TEST_CASE(TraitsConstMemFunCase)
     BOOST_TEST(BarTraits::Arity == 2);
     BOOST_TEST((is_same_v<BarTraits::ArgType<0>, double>));
     BOOST_TEST((is_same_v<BarTraits::ArgType<1>, double>));
-    BOOST_TEST(tuple_size_v<BarTuple> == 2);
+    BOOST_TEST(tuple_size_v<BarTuple> == 2U);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

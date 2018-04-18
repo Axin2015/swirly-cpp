@@ -87,10 +87,10 @@ BOOST_AUTO_TEST_SUITE(MsgQueueSuite)
 
 BOOST_AUTO_TEST_CASE(RangeCase)
 {
-    BOOST_TEST(fin::detail::Range<8>{}.steps() == 0);
+    BOOST_TEST(fin::detail::Range<8>{}.steps() == 0U);
     {
         fin::detail::Range<1> c{3};
-        BOOST_TEST(c.steps() == 3);
+        BOOST_TEST(c.steps() == 3U);
         // 1.
         BOOST_TEST(c.stepOffset() == 0U);
         BOOST_TEST(c.stepSize() == 1U);
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(RangeCase)
     }
     {
         fin::detail::Range<1> c{3};
-        BOOST_TEST(c.steps() == 3);
+        BOOST_TEST(c.steps() == 3U);
         // 1.
         BOOST_TEST(c.stepOffset() == 0U);
         BOOST_TEST(c.stepSize() == 1U);
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(RangeCase)
     }
     {
         fin::detail::Range<8> c{4};
-        BOOST_TEST(c.steps() == 1);
+        BOOST_TEST(c.steps() == 1U);
         // 0-3.
         BOOST_TEST(c.stepOffset() == 0U);
         BOOST_TEST(c.stepSize() == 4U);
@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE(RangeCase)
     }
     {
         fin::detail::Range<8> c{16};
-        BOOST_TEST(c.steps() == 2);
+        BOOST_TEST(c.steps() == 2U);
         // 0-7.
         BOOST_TEST(c.stepOffset() == 0U);
         BOOST_TEST(c.stepSize() == 8U);
@@ -151,7 +151,7 @@ BOOST_AUTO_TEST_CASE(RangeCase)
     }
     {
         fin::detail::Range<8> c{20};
-        BOOST_TEST(c.steps() == 3);
+        BOOST_TEST(c.steps() == 3U);
         // 0-7.
         BOOST_TEST(c.stepOffset() == 0U);
         BOOST_TEST(c.stepSize() == 8U);

@@ -135,14 +135,14 @@ class MemQueue {
         const auto wpos = __atomic_load_n(&impl_->wpos, __ATOMIC_RELAXED);
         return wpos - rpos;
     }
-    void reset() noexcept
+    void reset(std::nullptr_t = nullptr) noexcept
     {
         // Reverse order.
         impl_ = nullptr;
-        memMap_.reset();
+        memMap_.reset(nullptr);
         mask_ = 0;
         capacity_ = 0;
-        fh_.reset();
+        fh_.reset(nullptr);
     }
     void swap(MemQueue& rhs) noexcept
     {

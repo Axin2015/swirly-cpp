@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(StructEmptyCase)
 {
     const auto s = Struct;
     BOOST_TEST(empty(s));
-    BOOST_TEST(size(s) == 0);
+    BOOST_TEST(size(s) == 0U);
     BOOST_TEST(!has<tag::Foo>(s));
     BOOST_TEST(!has<tag::Bar>(s));
 }
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(StructFooCase)
 
     const auto s = Struct.extend<tag::Foo>(Test{101});
     BOOST_TEST(!empty(s));
-    BOOST_TEST(size(s) == 1);
+    BOOST_TEST(size(s) == 1U);
     BOOST_TEST(has<tag::Foo>(s));
     BOOST_TEST(!has<tag::Bar>(s));
     BOOST_TEST(get<tag::Foo>(s).x == 101);
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(StructFooBarCase)
 
     const auto s = Struct.extend<tag::Foo>(Test{101}).extend<tag::Bar>(Test{202});
     BOOST_TEST(!empty(s));
-    BOOST_TEST(size(s) == 2);
+    BOOST_TEST(size(s) == 2U);
     BOOST_TEST(has<tag::Foo>(s));
     BOOST_TEST(has<tag::Bar>(s));
     BOOST_TEST(get<tag::Foo>(s).x == 101);
