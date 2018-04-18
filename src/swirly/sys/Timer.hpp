@@ -58,7 +58,7 @@ class SWIRLY_API Timer {
     }
 
   public:
-    Timer() = default;
+    Timer(std::nullptr_t = nullptr) noexcept {}
     ~Timer() { reset(); }
 
     // Copy.
@@ -83,7 +83,7 @@ class SWIRLY_API Timer {
         using namespace std::chrono;
         impl_->interval = duration_cast<Duration>(interval);
     }
-    void reset() noexcept;
+    void reset(std::nullptr_t = nullptr) noexcept;
     void swap(Timer& rhs) noexcept { impl_.swap(rhs.impl_); }
     void cancel() noexcept;
 
@@ -204,7 +204,7 @@ inline void intrusive_ptr_release(Timer::Impl* impl) noexcept
     }
 }
 
-inline void Timer::reset() noexcept
+inline void Timer::reset(std::nullptr_t) noexcept
 {
     if (impl_) {
         // If pending, and if only two references to the timer remain (this one and the one in the

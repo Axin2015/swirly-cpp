@@ -56,8 +56,8 @@ class BasicHandle {
     }
     BasicHandle& operator=(BasicHandle&& rhs)
     {
-        close();
-        std::swap(id_, rhs.id_);
+        reset();
+        swap(rhs);
         return *this;
     }
 
@@ -73,25 +73,17 @@ class BasicHandle {
         id_ = invalid();
         return id;
     }
-
-    void reset(Id id = invalid()) noexcept
+    void reset(std::nullptr_t p = nullptr) noexcept { reset(invalid()); }
+    void reset(Id id) noexcept
     {
         std::swap(id_, id);
         if (id != invalid()) {
             PolicyT::close(id);
         }
     }
-
     void swap(BasicHandle& rhs) noexcept { std::swap(id_, rhs.id_); }
 
   private:
-    void close() noexcept
-    {
-        if (id_ != invalid()) {
-            PolicyT::close(id_);
-            id_ = invalid();
-        }
-    }
     Id id_{invalid()};
 };
 

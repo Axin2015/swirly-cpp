@@ -33,7 +33,7 @@ class BasicSlot {
     {
         return !(lhs == rhs);
     }
-    constexpr BasicSlot() noexcept = default;
+    constexpr BasicSlot(std::nullptr_t = nullptr) noexcept {}
     ~BasicSlot() = default;
 
     // Copy.
@@ -73,7 +73,7 @@ class BasicSlot {
         fn_ = [](void* obj, ArgsT... args) { (static_cast<ClassT*>(obj)->*MemFnT)(args...); };
         return *this;
     }
-    void reset() noexcept
+    void reset(std::nullptr_t = nullptr) noexcept
     {
         obj_ = nullptr;
         fn_ = nullptr;
