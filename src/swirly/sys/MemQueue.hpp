@@ -59,19 +59,20 @@ class MemQueue {
     static_assert(offsetof(Impl, wpos) == 1 * CacheLineSize);
     static_assert(offsetof(Impl, elems) == 2 * CacheLineSize);
 
+    constexpr MemQueue(std::nullptr_t = nullptr) noexcept {}
     explicit MemQueue(std::size_t capacity)
     : capacity_{nextPow2(capacity)}
     , mask_{capacity_ - 1}
     , memMap_{os::mmap(nullptr, size(capacity_), PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1,
                        0)}
-    , impl_{*static_cast<Impl*>(memMap_.get().data())}
+    , impl_{static_cast<Impl*>(memMap_.get().data())}
     {
         assert(capacity >= 2);
 
-        memset(&impl_, 0, size(capacity_));
+        memset(impl_, 0, size(capacity_));
         // Initialise sequence numbers.
         for (std::int64_t i{0}; i < static_cast<std::int64_t>(capacity); ++i) {
-            __atomic_store_n(&impl_.elems[i].seq, i, __ATOMIC_RELAXED);
+            __atomic_store_n(&impl_->elems[i].seq, i, __ATOMIC_RELAXED);
         }
     }
     explicit MemQueue(const char* path)
@@ -79,7 +80,7 @@ class MemQueue {
     , capacity_{capacity(detail::fileSize(fh_.get()))}
     , mask_{capacity_ - 1}
     , memMap_{os::mmap(nullptr, size(capacity_), PROT_READ | PROT_WRITE, MAP_SHARED, fh_.get(), 0)}
-    , impl_{*static_cast<Impl*>(memMap_.get().data())}
+    , impl_{static_cast<Impl*>(memMap_.get().data())}
     {
         if (!isPow2(capacity_)) {
             throw std::runtime_error{"capacity not a power of two"};
@@ -92,8 +93,23 @@ class MemQueue {
     MemQueue& operator=(const MemQueue& rhs) = delete;
 
     // Move.
-    MemQueue(MemQueue&&) = delete;
-    MemQueue& operator=(MemQueue&&) = delete;
+    MemQueue(MemQueue&& rhs) noexcept
+    : fh_{rhs.fh}
+    , capacity_{rhs.capacity_}
+    , mask_{rhs.mask_}
+    , memMap_{std::move(rhs.memMap_)}
+    , impl_{rhs.impl_}
+    {
+        capacity_ = 0;
+        mask_ = 0;
+        impl_ = nullptr;
+    }
+    MemQueue& operator=(MemQueue&& rhs) noexcept
+    {
+        reset();
+        swap(rhs);
+        return *this;
+    }
 
     /**
      * Returns true if the queue is empty.
@@ -101,8 +117,8 @@ class MemQueue {
     bool empty() const noexcept
     {
         // Acquire prevents reordering of these loads.
-        const auto rpos = __atomic_load_n(&impl_.rpos, __ATOMIC_ACQUIRE);
-        const auto wpos = __atomic_load_n(&impl_.wpos, __ATOMIC_RELAXED);
+        const auto rpos = __atomic_load_n(&impl_->rpos, __ATOMIC_ACQUIRE);
+        const auto wpos = __atomic_load_n(&impl_->wpos, __ATOMIC_RELAXED);
         return rpos == wpos;
     }
     /**
@@ -115,9 +131,26 @@ class MemQueue {
     std::size_t size() const noexcept
     {
         // Acquire prevents reordering of these loads.
-        const auto rpos = __atomic_load_n(&impl_.rpos, __ATOMIC_ACQUIRE);
-        const auto wpos = __atomic_load_n(&impl_.wpos, __ATOMIC_RELAXED);
+        const auto rpos = __atomic_load_n(&impl_->rpos, __ATOMIC_ACQUIRE);
+        const auto wpos = __atomic_load_n(&impl_->wpos, __ATOMIC_RELAXED);
         return wpos - rpos;
+    }
+    void reset() noexcept
+    {
+        // Reverse order.
+        impl_ = nullptr;
+        memMap_.reset();
+        mask_ = 0;
+        capacity_ = 0;
+        fh_.reset();
+    }
+    void swap(MemQueue& rhs) noexcept
+    {
+        fh_.swap(rhs.fh_);
+        std::swap(capacity_, rhs.capacity_);
+        std::swap(mask_, rhs.mask_);
+        memMap_.swap(rhs.memMap_);
+        std::swap(impl_, rhs.impl_);
     }
     /**
      * Returns false if queue is empty.
@@ -126,14 +159,14 @@ class MemQueue {
     bool fetch(FnT fn) noexcept
     {
         static_assert(std::is_nothrow_invocable_v<FnT, ValueT&&>);
-        auto rpos = __atomic_load_n(&impl_.rpos, __ATOMIC_RELAXED);
+        auto rpos = __atomic_load_n(&impl_->rpos, __ATOMIC_RELAXED);
         for (;;) {
-            auto& elem = impl_.elems[rpos & mask_];
+            auto& elem = impl_->elems[rpos & mask_];
             const auto seq = __atomic_load_n(&elem.seq, __ATOMIC_ACQUIRE);
             const auto diff = seq - (rpos + 1);
             if (diff == 0) {
                 // The compare_exchange_weak function re-reads wpos on failure.
-                if (__atomic_compare_exchange_n(&impl_.rpos, &rpos, rpos + 1, true,
+                if (__atomic_compare_exchange_n(&impl_->rpos, &rpos, rpos + 1, true,
                                                 __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {
                     fn(std::move(elem.val));
                     // Commit.
@@ -143,7 +176,7 @@ class MemQueue {
             } else if (diff < 0) {
                 return false;
             } else {
-                rpos = __atomic_load_n(&impl_.rpos, __ATOMIC_RELAXED);
+                rpos = __atomic_load_n(&impl_->rpos, __ATOMIC_RELAXED);
             }
         }
         return true;
@@ -155,14 +188,14 @@ class MemQueue {
     bool post(FnT fn) noexcept
     {
         static_assert(std::is_nothrow_invocable_v<FnT, ValueT&>);
-        auto wpos = __atomic_load_n(&impl_.wpos, __ATOMIC_RELAXED);
+        auto wpos = __atomic_load_n(&impl_->wpos, __ATOMIC_RELAXED);
         for (;;) {
-            auto& elem = impl_.elems[wpos & mask_];
+            auto& elem = impl_->elems[wpos & mask_];
             const auto seq = __atomic_load_n(&elem.seq, __ATOMIC_ACQUIRE);
             const auto diff = seq - wpos;
             if (diff == 0) {
                 // The compare_exchange_weak function re-reads wpos on failure.
-                if (__atomic_compare_exchange_n(&impl_.wpos, &wpos, wpos + 1, true,
+                if (__atomic_compare_exchange_n(&impl_->wpos, &wpos, wpos + 1, true,
                                                 __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {
                     fn(elem.val);
                     // Commit.
@@ -172,7 +205,7 @@ class MemQueue {
             } else if (diff < 0) {
                 return false;
             } else {
-                wpos = __atomic_load_n(&impl_.wpos, __ATOMIC_RELAXED);
+                wpos = __atomic_load_n(&impl_->wpos, __ATOMIC_RELAXED);
             }
         }
         return true;
@@ -212,10 +245,10 @@ class MemQueue {
         return sizeof(Impl) + capacity * sizeof(Elem);
     }
 
-    FileHandle fh_;
-    std::uint64_t capacity_, mask_;
-    MMap memMap_;
-    Impl& impl_;
+    FileHandle fh_{nullptr};
+    std::uint64_t capacity_{}, mask_{};
+    MMap memMap_{nullptr};
+    Impl* impl_{nullptr};
 };
 
 /**
@@ -235,12 +268,12 @@ void createMemQueue(const char* path, std::size_t capacity, mode_t mode)
     FileHandle fh{os::open(path, O_RDWR | O_CREAT | O_EXCL, mode)};
     os::ftruncate(fh.get(), size);
     MMap memMap{os::mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fh.get(), 0)};
-    auto& impl = *static_cast<Impl*>(memMap.get().data());
+    auto* const impl = static_cast<Impl*>(memMap.get().data());
 
-    memset(&impl, 0, size);
+    memset(impl, 0, size);
     // Initialise sequence numbers.
     for (std::int64_t i{0}; i < static_cast<std::int64_t>(capacity); ++i) {
-        __atomic_store_n(&impl.elems[i].seq, i, __ATOMIC_RELAXED);
+        __atomic_store_n(impl->elems[i].seq, i, __ATOMIC_RELAXED);
     }
 }
 

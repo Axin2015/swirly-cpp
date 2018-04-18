@@ -28,6 +28,9 @@ run_dir = ${CMAKE_INSTALL_PREFIX}
 # ('-') is specified. The syslog facility is used by default if no log-file is specified.
 log_file = ${CMAKE_INSTALL_PREFIX}/log/swirlyd.log
 
+# Message-queue location.
+mq_file=${CMAKE_INSTALL_PREFIX}/var/mq.dat
+
 # Pid-file location.
 pid_file = ${CMAKE_INSTALL_PREFIX}/var/swirlyd.pid
 
