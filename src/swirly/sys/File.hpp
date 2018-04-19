@@ -199,7 +199,7 @@ inline std::size_t read(int fd, void* buf, std::size_t len)
 /**
  * Read from a file descriptor.
  */
-inline ssize_t read(int fd, const MutableBuffer& buf, std::error_code& ec) noexcept
+inline ssize_t read(int fd, MutableBuffer buf, std::error_code& ec) noexcept
 {
     return read(fd, buffer_cast<void*>(buf), buffer_size(buf), ec);
 }
@@ -207,7 +207,7 @@ inline ssize_t read(int fd, const MutableBuffer& buf, std::error_code& ec) noexc
 /**
  * Read from a file descriptor.
  */
-inline std::size_t read(int fd, const MutableBuffer& buf) noexcept
+inline std::size_t read(int fd, MutableBuffer buf) noexcept
 {
     return read(fd, buffer_cast<void*>(buf), buffer_size(buf));
 }
@@ -239,7 +239,7 @@ inline std::size_t write(int fd, const void* buf, std::size_t len)
 /**
  * Write to a file descriptor.
  */
-inline ssize_t write(int fd, const ConstBuffer& buf, std::error_code& ec) noexcept
+inline ssize_t write(int fd, ConstBuffer buf, std::error_code& ec) noexcept
 {
     return write(fd, buffer_cast<const void*>(buf), buffer_size(buf), ec);
 }
@@ -247,7 +247,7 @@ inline ssize_t write(int fd, const ConstBuffer& buf, std::error_code& ec) noexce
 /**
  * Write to a file descriptor.
  */
-inline std::size_t write(int fd, const ConstBuffer& buf)
+inline std::size_t write(int fd, ConstBuffer buf)
 {
     return write(fd, buffer_cast<const void*>(buf), buffer_size(buf));
 }

@@ -50,27 +50,28 @@ class SWIRLY_API HttpSess
     HttpSess(HttpSess&&) = delete;
     HttpSess& operator=(HttpSess&&) = delete;
 
-    void close() noexcept;
-    void onInput(int fd, unsigned events, Time now);
-    void onTimer(Timer& tmr, Time now);
-
     boost::intrusive::list_member_hook<AutoUnlinkOption> listHook;
 
-  protected:
-    bool doMessageBegin() noexcept { return true; }
-    bool doUrl(std::string_view sv) noexcept;
-    bool doStatus(std::string_view sv) noexcept
+  private:
+    void close() noexcept;
+
+    bool onMessageBegin() noexcept { return true; }
+    bool onUrl(std::string_view sv) noexcept;
+    bool onStatus(std::string_view sv) noexcept
     {
         // Only supported for HTTP responses.
         return false;
     }
-    bool doHeaderField(std::string_view sv, bool first) noexcept;
-    bool doHeaderValue(std::string_view sv, bool first) noexcept;
-    bool doHeadersEnd() noexcept;
-    bool doBody(std::string_view sv) noexcept;
-    bool doMessageEnd() noexcept;
-    bool doChunkHeader(size_t len) noexcept { return true; }
-    bool doChunkEnd() noexcept { return true; }
+    bool onHeaderField(std::string_view sv, bool first) noexcept;
+    bool onHeaderValue(std::string_view sv, bool first) noexcept;
+    bool onHeadersEnd() noexcept;
+    bool onBody(std::string_view sv) noexcept;
+    bool onMessageEnd() noexcept;
+    bool onChunkHeader(size_t len) noexcept { return true; }
+    bool onChunkEnd() noexcept { return true; }
+
+    void onInput(int fd, unsigned events, Time now);
+    void onTimer(Timer& tmr, Time now);
 
     LogMsg& logMsg() const noexcept
     {
@@ -79,7 +80,6 @@ class SWIRLY_API HttpSess
         return ref;
     }
 
-  private:
     Reactor& reactor_;
     IoSocket sock_;
     TcpEndpoint ep_;

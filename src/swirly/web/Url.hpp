@@ -91,6 +91,50 @@ class BasicUrl {
     http_parser_url parser_{};
 };
 
+class Url : public BasicUrl<Url> {
+  public:
+    explicit Url(const std::string& url)
+    : url_{url}
+    {
+        parse();
+    }
+
+    // Copy.
+    Url(const Url&) = default;
+    Url& operator=(const Url&) = default;
+
+    // Move.
+    Url(Url&&) = default;
+    Url& operator=(Url&&) = default;
+
+    const auto& url() const noexcept { return url_; }
+
+  private:
+    std::string url_;
+};
+
+class UrlView : public BasicUrl<UrlView> {
+  public:
+    explicit UrlView(const std::string_view& url)
+    : url_{url}
+    {
+        parse();
+    }
+
+    // Copy.
+    UrlView(const UrlView&) noexcept = default;
+    UrlView& operator=(const UrlView&) noexcept = default;
+
+    // Move.
+    UrlView(UrlView&&) noexcept = default;
+    UrlView& operator=(UrlView&&) noexcept = default;
+
+    const auto& url() const noexcept { return url_; }
+
+  private:
+    std::string_view url_;
+};
+
 } // namespace web
 } // namespace swirly
 

@@ -363,7 +363,7 @@ inline std::size_t recv(int sockfd, void* buf, std::size_t len, int flags)
 /**
  * Receive a message from a socket.
  */
-inline ssize_t recv(int sockfd, const MutableBuffer& buf, int flags, std::error_code& ec) noexcept
+inline ssize_t recv(int sockfd, MutableBuffer buf, int flags, std::error_code& ec) noexcept
 {
     return recv(sockfd, buffer_cast<void*>(buf), buffer_size(buf), flags, ec);
 }
@@ -371,7 +371,7 @@ inline ssize_t recv(int sockfd, const MutableBuffer& buf, int flags, std::error_
 /**
  * Receive a message from a socket.
  */
-inline std::size_t recv(int sockfd, const MutableBuffer& buf, int flags)
+inline std::size_t recv(int sockfd, MutableBuffer buf, int flags)
 {
     return recv(sockfd, buffer_cast<void*>(buf), buffer_size(buf), flags);
 }
@@ -438,8 +438,8 @@ inline std::size_t recvfrom(int sockfd, void* buf, std::size_t len, int flags,
  * Receive a message from a socket.
  */
 template <typename TransportT>
-inline ssize_t recvfrom(int sockfd, const MutableBuffer& buf, int flags,
-                        BasicEndpoint<TransportT>& ep, std::error_code& ec) noexcept
+inline ssize_t recvfrom(int sockfd, MutableBuffer buf, int flags, BasicEndpoint<TransportT>& ep,
+                        std::error_code& ec) noexcept
 {
     return recvfrom(sockfd, buffer_cast<void*>(buf), buffer_size(buf), flags, ep, ec);
 }
@@ -448,8 +448,7 @@ inline ssize_t recvfrom(int sockfd, const MutableBuffer& buf, int flags,
  * Receive a message from a socket.
  */
 template <typename TransportT>
-inline std::size_t recvfrom(int sockfd, const MutableBuffer& buf, int flags,
-                            BasicEndpoint<TransportT>& ep)
+inline std::size_t recvfrom(int sockfd, MutableBuffer buf, int flags, BasicEndpoint<TransportT>& ep)
 {
     return recvfrom(sockfd, buffer_cast<void*>(buf), buffer_size(buf), flags, ep);
 }
@@ -482,7 +481,7 @@ inline std::size_t send(int sockfd, const void* buf, std::size_t len, int flags)
 /**
  * Send a message on a socket.
  */
-inline ssize_t send(int sockfd, const ConstBuffer& buf, int flags, std::error_code& ec) noexcept
+inline ssize_t send(int sockfd, ConstBuffer buf, int flags, std::error_code& ec) noexcept
 {
     return send(sockfd, buffer_cast<const void*>(buf), buffer_size(buf), flags, ec);
 }
@@ -490,7 +489,7 @@ inline ssize_t send(int sockfd, const ConstBuffer& buf, int flags, std::error_co
 /**
  * Send a message on a socket.
  */
-inline std::size_t send(int sockfd, const ConstBuffer& buf, int flags)
+inline std::size_t send(int sockfd, ConstBuffer buf, int flags)
 {
     return send(sockfd, buffer_cast<const void*>(buf), buffer_size(buf), flags);
 }
@@ -545,8 +544,8 @@ inline std::size_t sendto(int sockfd, const void* buf, std::size_t len, int flag
  * Send a message on a socket.
  */
 template <typename TransportT>
-inline ssize_t sendto(int sockfd, const ConstBuffer& buf, int flags,
-                      const BasicEndpoint<TransportT>& ep, std::error_code& ec) noexcept
+inline ssize_t sendto(int sockfd, ConstBuffer buf, int flags, const BasicEndpoint<TransportT>& ep,
+                      std::error_code& ec) noexcept
 {
     return sendto(sockfd, buffer_cast<const void*>(buf), buffer_size(buf), flags, *ep.data(),
                   ep.size(), ec);
@@ -556,7 +555,7 @@ inline ssize_t sendto(int sockfd, const ConstBuffer& buf, int flags,
  * Send a message on a socket.
  */
 template <typename TransportT>
-inline std::size_t sendto(int sockfd, const ConstBuffer& buf, int flags,
+inline std::size_t sendto(int sockfd, ConstBuffer buf, int flags,
                           const BasicEndpoint<TransportT>& ep)
 {
     return sendto(sockfd, buffer_cast<const void*>(buf), buffer_size(buf), flags, *ep.data(),

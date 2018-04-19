@@ -19,6 +19,8 @@
 
 #include <swirly/web/Exception.hpp>
 
+#include <swirly/sys/Buffer.hpp>
+
 #include <swirly/contrib/http_parser.h>
 
 #include <string_view>
@@ -59,7 +61,8 @@ enum class HttpMethod : int {
     Purge = HTTP_PURGE,
     MkCalendar = HTTP_MKCALENDAR,
     Link = HTTP_LINK,
-    Unlink = HTTP_UNLINK
+    Unlink = HTTP_UNLINK,
+    Source = HTTP_SOURCE
 };
 
 inline const char* enumString(HttpMethod method)
@@ -113,10 +116,11 @@ class BasicHttpParser {
         http_parser_init(&parser_, static_cast<http_parser_type>(type_));
         lastHeaderElem_ = None;
     }
-    size_t parse(std::string_view buf)
+    std::size_t parse(ConstBuffer buf)
     {
         static http_parser_settings settings{makeSettings()};
-        const auto rc = http_parser_execute(&parser_, &settings, buf.data(), buf.size());
+        const auto rc = http_parser_execute(&parser_, &settings, buffer_cast<const char*>(buf),
+                                            buffer_size(buf));
         const auto err = static_cast<http_errno>(parser_.http_errno);
         if (err != HPE_OK) {
             if (err == HPE_PAUSED) {
@@ -148,17 +152,17 @@ class BasicHttpParser {
     }
     static int onMessageBegin(http_parser* parser) noexcept
     {
-        return static_cast<DerivedT*>(parser->data)->doMessageBegin() ? 0 : -1;
+        return static_cast<DerivedT*>(parser->data)->onMessageBegin() ? 0 : -1;
     }
-    static int onUrl(http_parser* parser, const char* at, size_t length) noexcept
+    static int onUrl(http_parser* parser, const char* at, std::size_t length) noexcept
     {
-        return static_cast<DerivedT*>(parser->data)->doUrl({at, length}) ? 0 : -1;
+        return static_cast<DerivedT*>(parser->data)->onUrl({at, length}) ? 0 : -1;
     }
-    static int onStatus(http_parser* parser, const char* at, size_t length) noexcept
+    static int onStatus(http_parser* parser, const char* at, std::size_t length) noexcept
     {
-        return static_cast<DerivedT*>(parser->data)->doStatus({at, length}) ? 0 : -1;
+        return static_cast<DerivedT*>(parser->data)->onStatus({at, length}) ? 0 : -1;
     }
-    static int onHeaderField(http_parser* parser, const char* at, size_t length) noexcept
+    static int onHeaderField(http_parser* parser, const char* at, std::size_t length) noexcept
     {
         auto* const obj = static_cast<DerivedT*>(parser->data);
         bool first;
@@ -168,9 +172,9 @@ class BasicHttpParser {
         } else {
             first = false;
         }
-        return obj->doHeaderField({at, length}, first) ? 0 : -1;
+        return obj->onHeaderField({at, length}, first) ? 0 : -1;
     }
-    static int onHeaderValue(http_parser* parser, const char* at, size_t length) noexcept
+    static int onHeaderValue(http_parser* parser, const char* at, std::size_t length) noexcept
     {
         auto* const obj = static_cast<DerivedT*>(parser->data);
         bool first;
@@ -180,28 +184,28 @@ class BasicHttpParser {
         } else {
             first = false;
         }
-        return obj->doHeaderValue({at, length}, first) ? 0 : -1;
+        return obj->onHeaderValue({at, length}, first) ? 0 : -1;
     }
     static int onHeadersEnd(http_parser* parser) noexcept
     {
-        return static_cast<DerivedT*>(parser->data)->doHeadersEnd() ? 0 : -1;
+        return static_cast<DerivedT*>(parser->data)->onHeadersEnd() ? 0 : -1;
     }
-    static int onBody(http_parser* parser, const char* at, size_t length) noexcept
+    static int onBody(http_parser* parser, const char* at, std::size_t length) noexcept
     {
-        return static_cast<DerivedT*>(parser->data)->doBody({at, length}) ? 0 : -1;
+        return static_cast<DerivedT*>(parser->data)->onBody({at, length}) ? 0 : -1;
     }
     static int onMessageEnd(http_parser* parser) noexcept
     {
-        return static_cast<DerivedT*>(parser->data)->doMessageEnd() ? 0 : -1;
+        return static_cast<DerivedT*>(parser->data)->onMessageEnd() ? 0 : -1;
     }
     static int onChunkHeader(http_parser* parser) noexcept
     {
         // When on_chunk_header is called, the current chunk length is stored in parser->content_length.
-        return static_cast<DerivedT*>(parser->data)->doChunkHeader(parser->content_length) ? 0 : -1;
+        return static_cast<DerivedT*>(parser->data)->onChunkHeader(parser->content_length) ? 0 : -1;
     }
     static int onChunkEnd(http_parser* parser) noexcept
     {
-        return static_cast<DerivedT*>(parser->data)->doChunkEnd() ? 0 : -1;
+        return static_cast<DerivedT*>(parser->data)->onChunkEnd() ? 0 : -1;
     }
     HttpType type_;
     http_parser parser_;

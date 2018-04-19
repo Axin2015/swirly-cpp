@@ -49,10 +49,84 @@ HttpSess::~HttpSess()
 void HttpSess::close() noexcept
 {
     SWIRLY_INFO << "close session"sv;
-    pause();
     tmr_.cancel();
     sub_.reset();
     delete this;
+}
+
+bool HttpSess::onUrl(string_view sv) noexcept
+{
+    bool ret{false};
+    try {
+        req_.appendUrl(sv);
+        ret = true;
+    } catch (const std::exception& e) {
+        SWIRLY_ERROR << "exception handling url: "sv << e.what();
+    }
+    return ret;
+}
+
+bool HttpSess::onHeaderField(string_view sv, bool first) noexcept
+{
+    bool ret{false};
+    try {
+        req_.appendHeaderField(sv, first);
+        ret = true;
+    } catch (const std::exception& e) {
+        SWIRLY_ERROR << "exception handling header field: "sv << e.what();
+    }
+    return ret;
+}
+
+bool HttpSess::onHeaderValue(string_view sv, bool first) noexcept
+{
+    bool ret{false};
+    try {
+        req_.appendHeaderValue(sv, first);
+        ret = true;
+    } catch (const std::exception& e) {
+        SWIRLY_ERROR << "exception handling header value: "sv << e.what();
+    }
+    return ret;
+}
+
+bool HttpSess::onHeadersEnd() noexcept
+{
+    req_.setMethod(method());
+    return true;
+}
+
+bool HttpSess::onBody(string_view sv) noexcept
+{
+    bool ret{false};
+    try {
+        req_.appendBody(sv);
+        ret = true;
+    } catch (const std::exception& e) {
+        SWIRLY_ERROR << "exception handling body: "sv << e.what();
+    }
+    return ret;
+}
+
+bool HttpSess::onMessageEnd() noexcept
+{
+    bool ret{false};
+    try {
+        req_.flush(); // May throw.
+
+        const auto wasEmpty = outbuf_.empty();
+        restServ_.handleRequest(req_, rsp_);
+
+        if (wasEmpty) {
+            // May throw.
+            sub_.setEvents(EventIn | EventOut);
+        }
+        ret = true;
+    } catch (const std::exception& e) {
+        SWIRLY_ERROR << "exception handling message: "sv << e.what();
+    }
+    req_.clear();
+    return ret;
 }
 
 void HttpSess::onInput(int fd, unsigned events, Time now)
@@ -87,86 +161,6 @@ void HttpSess::onTimer(Timer& tmr, Time now)
 {
     SWIRLY_INFO << "timeout"sv;
     close();
-}
-
-bool HttpSess::doUrl(string_view sv) noexcept
-{
-    bool ret{false};
-    try {
-        req_.appendUrl(sv);
-        ret = true;
-    } catch (const std::exception& e) {
-        SWIRLY_ERROR << "exception handling url: "sv << e.what();
-        close();
-    }
-    return ret;
-}
-
-bool HttpSess::doHeaderField(string_view sv, bool first) noexcept
-{
-    bool ret{false};
-    try {
-        req_.appendHeaderField(sv, first);
-        ret = true;
-    } catch (const std::exception& e) {
-        SWIRLY_ERROR << "exception handling header field: "sv << e.what();
-        close();
-    }
-    return ret;
-}
-
-bool HttpSess::doHeaderValue(string_view sv, bool first) noexcept
-{
-    bool ret{false};
-    try {
-        req_.appendHeaderValue(sv, first);
-        ret = true;
-    } catch (const std::exception& e) {
-        SWIRLY_ERROR << "exception handling header value: "sv << e.what();
-        close();
-    }
-    return ret;
-}
-
-bool HttpSess::doHeadersEnd() noexcept
-{
-    req_.setMethod(method());
-    return true;
-}
-
-bool HttpSess::doBody(string_view sv) noexcept
-{
-    bool ret{false};
-    try {
-        req_.appendBody(sv);
-        ret = true;
-    } catch (const std::exception& e) {
-        SWIRLY_ERROR << "exception handling body: "sv << e.what();
-        close();
-    }
-    return ret;
-}
-
-bool HttpSess::doMessageEnd() noexcept
-{
-    bool ret{false};
-    try {
-        req_.flush(); // May throw.
-
-        const auto wasEmpty = outbuf_.empty();
-        restServ_.handleRequest(req_, rsp_);
-
-        if (wasEmpty) {
-            // May throw.
-            sub_.setEvents(EventIn | EventOut);
-        }
-        ret = true;
-    } catch (const std::exception& e) {
-        SWIRLY_ERROR << "exception handling message: "sv << e.what();
-        close();
-    }
-    req_.clear();
-    return ret;
 }
 
 } // namespace swirly

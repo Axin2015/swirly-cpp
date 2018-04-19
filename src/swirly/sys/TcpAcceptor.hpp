@@ -47,6 +47,10 @@ class TcpAcceptor {
     TcpAcceptor(TcpAcceptor&&) = delete;
     TcpAcceptor& operator=(TcpAcceptor&&) = delete;
 
+  protected:
+    ~TcpAcceptor() = default;
+
+  private:
     void onInput(int fd, unsigned events, Time now)
     {
         Endpoint ep;
@@ -54,10 +58,6 @@ class TcpAcceptor {
         static_cast<DerivedT*>(this)->doAccept(std::move(sock), ep, now);
     }
 
-  protected:
-    ~TcpAcceptor() = default;
-
-  private:
     TcpSocketServ serv_;
     Reactor::Handle sub_;
 };

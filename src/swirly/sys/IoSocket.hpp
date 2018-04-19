@@ -42,11 +42,11 @@ struct IoSocket : Socket {
         return os::recv(*sock_, buf, len, flags);
     }
 
-    ssize_t recv(const MutableBuffer& buf, int flags, std::error_code& ec) noexcept
+    ssize_t recv(MutableBuffer buf, int flags, std::error_code& ec) noexcept
     {
         return os::recv(*sock_, buf, flags, ec);
     }
-    std::size_t recv(const MutableBuffer& buf, int flags) { return os::recv(*sock_, buf, flags); }
+    std::size_t recv(MutableBuffer buf, int flags) { return os::recv(*sock_, buf, flags); }
 
     ssize_t send(const void* buf, std::size_t len, int flags, std::error_code& ec) noexcept
     {
@@ -57,11 +57,11 @@ struct IoSocket : Socket {
         return os::send(*sock_, buf, len, flags);
     }
 
-    ssize_t send(const ConstBuffer& buf, int flags, std::error_code& ec) noexcept
+    ssize_t send(ConstBuffer buf, int flags, std::error_code& ec) noexcept
     {
         return os::send(*sock_, buf, flags, ec);
     }
-    std::size_t send(const ConstBuffer& buf, int flags) { return os::send(*sock_, buf, flags); }
+    std::size_t send(ConstBuffer buf, int flags) { return os::send(*sock_, buf, flags); }
 };
 
 template <typename TransportT>
