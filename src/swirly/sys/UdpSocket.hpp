@@ -286,12 +286,11 @@ struct UdpSocket : IoSocket {
         return os::recvfrom(*sock_, buf, len, flags, ep);
     }
 
-    ssize_t recvfrom(const MutableBuffer& buf, int flags, Endpoint& ep,
-                     std::error_code& ec) noexcept
+    ssize_t recvfrom(MutableBuffer buf, int flags, Endpoint& ep, std::error_code& ec) noexcept
     {
         return os::recvfrom(*sock_, buf, flags, ep, ec);
     }
-    std::size_t recvfrom(const MutableBuffer& buf, int flags, Endpoint& ep)
+    std::size_t recvfrom(MutableBuffer buf, int flags, Endpoint& ep)
     {
         return os::recvfrom(*sock_, buf, flags, ep);
     }
@@ -306,12 +305,11 @@ struct UdpSocket : IoSocket {
         return os::sendto(*sock_, buf, len, flags, ep);
     }
 
-    ssize_t sendto(const ConstBuffer& buf, int flags, const Endpoint& ep,
-                   std::error_code& ec) noexcept
+    ssize_t sendto(ConstBuffer buf, int flags, const Endpoint& ep, std::error_code& ec) noexcept
     {
         return os::sendto(*sock_, buf, flags, ep, ec);
     }
-    std::size_t sendto(const ConstBuffer& buf, int flags, const Endpoint& ep)
+    std::size_t sendto(ConstBuffer buf, int flags, const Endpoint& ep)
     {
         return os::sendto(*sock_, buf, flags, ep);
     }

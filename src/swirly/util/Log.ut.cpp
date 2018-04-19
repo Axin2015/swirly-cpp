@@ -18,7 +18,6 @@
 
 #include <swirly/util/Finally.hpp>
 
-#define BOOST_TEST_NO_MAIN
 #include <boost/test/unit_test.hpp>
 
 #include <cstring>

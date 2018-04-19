@@ -25,7 +25,6 @@
 
 #include <swirly/util/Time.hpp>
 
-#define BOOST_TEST_NO_MAIN
 #include <boost/test/unit_test.hpp>
 
 #include <algorithm>
