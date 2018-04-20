@@ -17,8 +17,8 @@
 #ifndef SWIRLY_WEB_HTTPREQUEST_HPP
 #define SWIRLY_WEB_HTTPREQUEST_HPP
 
-#include <swirly/web/HttpParser.hpp>
 #include <swirly/web/RestBody.hpp>
+#include <swirly/web/Types.hpp>
 #include <swirly/web/Url.hpp>
 
 namespace swirly {

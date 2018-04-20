@@ -44,6 +44,7 @@ set(lib_SOURCES
   Page.cpp
   RestBody.cpp
   Rest.cpp
+  Types.cpp
   Url.cpp
   "${PROJECT_SOURCE_DIR}/src/swirly/contrib/http_parser.c")
 
