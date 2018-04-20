@@ -18,64 +18,14 @@
 #define SWIRLY_WEB_HTTPPARSER_HPP
 
 #include <swirly/web/Exception.hpp>
+#include <swirly/web/Types.hpp>
 
 #include <swirly/sys/Buffer.hpp>
-
-#include <swirly/contrib/http_parser.h>
 
 #include <string_view>
 
 namespace swirly {
 inline namespace web {
-
-enum class HttpMethod : int {
-    Delete = HTTP_DELETE,
-    Get = HTTP_GET,
-    Head = HTTP_HEAD,
-    Post = HTTP_POST,
-    Put = HTTP_PUT,
-    Connect = HTTP_CONNECT,
-    Options = HTTP_OPTIONS,
-    Trace = HTTP_TRACE,
-    Copy = HTTP_COPY,
-    Lock = HTTP_LOCK,
-    MkCol = HTTP_MKCOL,
-    Move = HTTP_MOVE,
-    PropFind = HTTP_PROPFIND,
-    PropPatch = HTTP_PROPPATCH,
-    Search = HTTP_SEARCH,
-    Unlock = HTTP_UNLOCK,
-    Bind = HTTP_BIND,
-    Rebind = HTTP_REBIND,
-    Unbind = HTTP_UNBIND,
-    Acl = HTTP_ACL,
-    Report = HTTP_REPORT,
-    MkActivity = HTTP_MKACTIVITY,
-    Checkout = HTTP_CHECKOUT,
-    Merge = HTTP_MERGE,
-    MSearch = HTTP_MSEARCH,
-    Notify = HTTP_NOTIFY,
-    Subscribe = HTTP_SUBSCRIBE,
-    Unsubscribe = HTTP_UNSUBSCRIBE,
-    Patch = HTTP_PATCH,
-    Purge = HTTP_PURGE,
-    MkCalendar = HTTP_MKCALENDAR,
-    Link = HTTP_LINK,
-    Unlink = HTTP_UNLINK,
-    Source = HTTP_SOURCE
-};
-
-inline const char* enumString(HttpMethod method)
-{
-    return http_method_str(static_cast<http_method>(method));
-}
-
-inline std::ostream& operator<<(std::ostream& os, HttpMethod method)
-{
-    return os << enumString(method);
-}
-
-enum class HttpType : int { Request = HTTP_REQUEST, Response = HTTP_RESPONSE };
 
 template <typename DerivedT>
 class BasicHttpParser {
