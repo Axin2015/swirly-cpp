@@ -48,9 +48,10 @@ class SWIRLY_API EpollReactor : public Reactor {
     void doInterrupt(int num) noexcept override;
 
     Handle doSubscribe(int fd, unsigned events, IoSlot slot) override;
-    void doUnsubscribe(int fd) noexcept override;
+    void doUnsubscribe(int fd, int sid) noexcept override;
 
-    void doSetEvents(int fd, unsigned events) override;
+    void doSetEvents(int fd, int sid, unsigned events, IoSlot slot) override;
+    void doSetEvents(int fd, int sid, unsigned events) override;
 
     Timer doTimer(Time expiry, Duration interval, Priority priority, TimerSlot slot) override;
     Timer doTimer(Time expiry, Priority priority, TimerSlot slot) override;
