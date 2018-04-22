@@ -66,23 +66,35 @@ Reactor::Handle EpollReactor::doSubscribe(int fd, unsigned events, IoSlot slot)
     mux_.subscribe(fd, ++ref.sid, events);
     ref.events = events;
     ref.slot = slot;
-    return {*this, fd};
+    return {*this, fd, ref.sid};
 }
 
-void EpollReactor::doUnsubscribe(int fd) noexcept
+void EpollReactor::doUnsubscribe(int fd, int sid) noexcept
 {
-    mux_.unsubscribe(fd);
     auto& ref = data_[fd];
-    ref.events = 0;
-    ref.slot.reset();
+    if (ref.sid == sid) {
+        mux_.unsubscribe(fd);
+        ref.events = 0;
+        ref.slot.reset();
+    }
 }
 
-void EpollReactor::doSetEvents(int fd, unsigned events)
+void EpollReactor::doSetEvents(int fd, int sid, unsigned events, IoSlot slot)
 {
     auto& ref = data_[fd];
-    if (ref.events != events) {
-        mux_.setEvents(fd, ref.sid, events);
-        data_[fd].events = events;
+    if (ref.sid == sid && ref.events != events) {
+        mux_.setEvents(fd, sid, events);
+        ref.events = events;
+        ref.slot = slot;
+    }
+}
+
+void EpollReactor::doSetEvents(int fd, int sid, unsigned events)
+{
+    auto& ref = data_[fd];
+    if (ref.sid == sid && ref.events != events) {
+        mux_.setEvents(fd, sid, events);
+        ref.events = events;
     }
 }
 

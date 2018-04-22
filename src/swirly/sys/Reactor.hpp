@@ -31,9 +31,10 @@ class SWIRLY_API Reactor : public Interruptible {
   public:
     class Handle {
       public:
-        Handle(Reactor& reactor, int fd)
+        Handle(Reactor& reactor, int fd, int sid)
         : reactor_{&reactor}
         , fd_{fd}
+        , sid_{sid}
         {
         }
         constexpr Handle(std::nullptr_t = nullptr) noexcept {}
@@ -47,9 +48,11 @@ class SWIRLY_API Reactor : public Interruptible {
         Handle(Handle&& rhs) noexcept
         : reactor_{rhs.reactor_}
         , fd_{rhs.fd_}
+        , sid_{rhs.sid_}
         {
             rhs.reactor_ = nullptr;
             rhs.fd_ = -1;
+            rhs.sid_ = 0;
         }
         Handle& operator=(Handle&& rhs) noexcept
         {
@@ -60,27 +63,34 @@ class SWIRLY_API Reactor : public Interruptible {
         bool empty() const noexcept { return reactor_ == nullptr; }
         explicit operator bool() const noexcept { return reactor_ != nullptr; }
         auto fd() const noexcept { return fd_; }
+        auto sid() const noexcept { return sid_; }
 
         void reset(std::nullptr_t = nullptr) noexcept
         {
             if (reactor_) {
-                reactor_->doUnsubscribe(fd_);
+                reactor_->doUnsubscribe(fd_, sid_);
                 reactor_ = nullptr;
                 fd_ = -1;
+                sid_ = 0;
             }
         }
         void swap(Handle& rhs) noexcept
         {
             std::swap(reactor_, rhs.reactor_);
             std::swap(fd_, rhs.fd_);
+            std::swap(sid_, rhs.sid_);
         }
 
         // Modify IO event subscription.
-        void setEvents(unsigned events) { reactor_->doSetEvents(fd_, events); }
+        void setEvents(unsigned events, IoSlot slot)
+        {
+            reactor_->doSetEvents(fd_, sid_, events, slot);
+        }
+        void setEvents(unsigned events) { reactor_->doSetEvents(fd_, sid_, events); }
 
       private:
         Reactor* reactor_{nullptr};
-        int fd_{-1};
+        int fd_{-1}, sid_{0};
     };
 
     Reactor() noexcept = default;
@@ -120,9 +130,10 @@ class SWIRLY_API Reactor : public Interruptible {
     int poll(Time now, Millis timeout) { return doPoll(now, timeout); }
 
     virtual Handle doSubscribe(int fd, unsigned events, IoSlot slot) = 0;
-    virtual void doUnsubscribe(int fd) noexcept = 0;
+    virtual void doUnsubscribe(int fd, int sid) noexcept = 0;
 
-    virtual void doSetEvents(int fd, unsigned events) = 0;
+    virtual void doSetEvents(int fd, int sid, unsigned events, IoSlot slot) = 0;
+    virtual void doSetEvents(int fd, int sid, unsigned events) = 0;
 
     virtual Timer doTimer(Time expiry, Duration interval, Priority priority, TimerSlot slot) = 0;
     virtual Timer doTimer(Time expiry, Priority priority, TimerSlot slot) = 0;
