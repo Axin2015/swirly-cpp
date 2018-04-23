@@ -29,7 +29,7 @@
 namespace swirly {
 inline namespace web {
 class HttpRequest;
-class HttpResponse;
+class HttpStream;
 class Rest;
 } // namespace web
 
@@ -50,24 +50,24 @@ class RestServ {
     RestServ(RestServ&&) = delete;
     RestServ& operator=(RestServ&&) = delete;
 
-    void handleRequest(const HttpRequest& req, HttpResponse& resp) noexcept;
+    void handleRequest(const HttpRequest& req, HttpStream& os) noexcept;
 
   private:
     bool reset(const HttpRequest& req) noexcept;
 
-    void restRequest(const HttpRequest& req, Time now, HttpResponse& resp);
+    void restRequest(const HttpRequest& req, Time now, HttpStream& os);
 
-    void refDataRequest(const HttpRequest& req, Time now, HttpResponse& resp);
-    void assetRequest(const HttpRequest& req, Time now, HttpResponse& resp);
-    void instrRequest(const HttpRequest& req, Time now, HttpResponse& resp);
+    void refDataRequest(const HttpRequest& req, Time now, HttpStream& os);
+    void assetRequest(const HttpRequest& req, Time now, HttpStream& os);
+    void instrRequest(const HttpRequest& req, Time now, HttpStream& os);
 
-    void accntRequest(const HttpRequest& req, Time now, HttpResponse& resp);
-    void marketRequest(const HttpRequest& req, Time now, HttpResponse& resp);
+    void accntRequest(const HttpRequest& req, Time now, HttpStream& os);
+    void marketRequest(const HttpRequest& req, Time now, HttpStream& os);
 
-    void orderRequest(const HttpRequest& req, Time now, HttpResponse& resp);
-    void execRequest(const HttpRequest& req, Time now, HttpResponse& resp);
-    void tradeRequest(const HttpRequest& req, Time now, HttpResponse& resp);
-    void posnRequest(const HttpRequest& req, Time now, HttpResponse& resp);
+    void orderRequest(const HttpRequest& req, Time now, HttpStream& os);
+    void execRequest(const HttpRequest& req, Time now, HttpStream& os);
+    void tradeRequest(const HttpRequest& req, Time now, HttpStream& os);
+    void posnRequest(const HttpRequest& req, Time now, HttpStream& os);
 
     Rest& rest_;
     bool matchMethod_{false};

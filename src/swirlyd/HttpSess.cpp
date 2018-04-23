@@ -114,8 +114,8 @@ bool HttpSess::onMessageEnd() noexcept
     try {
         req_.flush(); // May throw.
 
-        const auto wasEmpty = outbuf_.empty();
-        restServ_.handleRequest(req_, rsp_);
+        const auto wasEmpty = buf_.empty();
+        restServ_.handleRequest(req_, os_);
 
         if (wasEmpty) {
             // May throw.
@@ -133,8 +133,8 @@ void HttpSess::onInput(int fd, unsigned events, Time now)
 {
     try {
         if (events & EventOut) {
-            outbuf_.consume(os::write(fd, outbuf_.data()));
-            if (outbuf_.empty()) {
+            buf_.consume(os::write(fd, buf_.data()));
+            if (buf_.empty()) {
                 // May throw.
                 sub_.setEvents(EventIn);
             }
