@@ -82,9 +82,11 @@ void EpollReactor::doUnsubscribe(int fd, int sid) noexcept
 void EpollReactor::doSetEvents(int fd, int sid, unsigned events, IoSlot slot)
 {
     auto& ref = data_[fd];
-    if (ref.sid == sid && ref.events != events) {
-        mux_.setEvents(fd, sid, events);
-        ref.events = events;
+    if (ref.sid == sid) {
+        if (ref.events != events) {
+            mux_.setEvents(fd, sid, events);
+            ref.events = events;
+        }
         ref.slot = slot;
     }
 }
