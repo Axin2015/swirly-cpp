@@ -17,9 +17,9 @@
 #ifndef SWIRLYD_HTTPSESS_HPP
 #define SWIRLYD_HTTPSESS_HPP
 
-#include <swirly/web/HttpParser.hpp>
-#include <swirly/web/HttpRequest.hpp>
-#include <swirly/web/HttpResponse.hpp>
+#include <swirly/web/Parser.hpp>
+#include <swirly/web/Request.hpp>
+#include <swirly/web/Stream.hpp>
 
 #include <swirly/sys/MemAlloc.hpp>
 #include <swirly/sys/TcpAcceptor.hpp>
@@ -87,8 +87,8 @@ class SWIRLY_API HttpSess
     Reactor::Handle sub_;
     Timer tmr_;
     HttpRequest req_;
-    Buffer outbuf_;
-    HttpResponse rsp_{outbuf_};
+    Buffer buf_;
+    HttpStream os_{buf_};
 };
 
 } // namespace swirly

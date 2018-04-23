@@ -14,4 +14,12 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "HttpParser.hpp"
+#include "Request.hpp"
+
+namespace swirly {
+inline namespace web {
+
+HttpRequest::~HttpRequest() = default;
+
+} // namespace web
+} // namespace swirly

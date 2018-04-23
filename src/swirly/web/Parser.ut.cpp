@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "HttpParser.hpp"
+#include "Parser.hpp"
 
 #include <swirly/web/Url.hpp>
 
@@ -115,7 +115,7 @@ class HttpParser
 
 } // namespace
 
-BOOST_AUTO_TEST_SUITE(HttpParserSuite)
+BOOST_AUTO_TEST_SUITE(ParserSuite)
 
 BOOST_AUTO_TEST_CASE(HttpInitialRequestLineCase)
 {

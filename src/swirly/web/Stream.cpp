@@ -14,10 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "HttpResponse.hpp"
-
-#include <swirly/util/Stream.hpp>
-#include <swirly/util/String.hpp>
+#include "Stream.hpp"
 
 namespace swirly {
 inline namespace web {
@@ -33,7 +30,7 @@ constexpr bool withBody(int status) noexcept
 
 } // namespace
 
-void HttpResponseBuf::setContentLength(std::streamsize pos, std::streamsize len) noexcept
+void HttpBuf::setContentLength(std::streamsize pos, std::streamsize len) noexcept
 {
     auto it = pbase_ + pos;
     do {
@@ -43,9 +40,9 @@ void HttpResponseBuf::setContentLength(std::streamsize pos, std::streamsize len)
     } while (len > 0);
 }
 
-HttpResponseBuf::~HttpResponseBuf() = default;
+HttpBuf::~HttpBuf() = default;
 
-HttpResponseBuf::int_type HttpResponseBuf::overflow(int_type c) noexcept
+HttpBuf::int_type HttpBuf::overflow(int_type c) noexcept
 {
     if (c != traits_type::eof()) {
         auto buf = buf_.prepare(pcount_ + 1);
@@ -55,7 +52,7 @@ HttpResponseBuf::int_type HttpResponseBuf::overflow(int_type c) noexcept
     return c;
 }
 
-streamsize HttpResponseBuf::xsputn(const char_type* s, streamsize count) noexcept
+streamsize HttpBuf::xsputn(const char_type* s, streamsize count) noexcept
 {
     auto buf = buf_.prepare(pcount_ + count);
     pbase_ = buffer_cast<char*>(buf);
@@ -64,9 +61,9 @@ streamsize HttpResponseBuf::xsputn(const char_type* s, streamsize count) noexcep
     return count;
 }
 
-HttpResponse::~HttpResponse() = default;
+HttpStream::~HttpStream() = default;
 
-void HttpResponse::commit() noexcept
+void HttpStream::commit() noexcept
 {
     if (cloff_ > 0) {
         buf_.setContentLength(cloff_, pcount() - hcount_);
@@ -74,7 +71,7 @@ void HttpResponse::commit() noexcept
     buf_.commit();
 }
 
-void HttpResponse::reset(int status, const char* reason, bool cache)
+void HttpStream::reset(int status, const char* reason, bool cache)
 {
     buf_.reset();
     swirly::reset(*this);

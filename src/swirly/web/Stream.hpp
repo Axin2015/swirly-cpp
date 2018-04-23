@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_WEB_HTTPRESPONSE_HPP
-#define SWIRLY_WEB_HTTPRESPONSE_HPP
+#ifndef SWIRLY_WEB_STREAM_HPP
+#define SWIRLY_WEB_STREAM_HPP
 
 #include <swirly/sys/Buffer.hpp>
 
@@ -24,21 +24,21 @@
 namespace swirly {
 inline namespace web {
 
-class SWIRLY_API HttpResponseBuf : public std::streambuf {
+class SWIRLY_API HttpBuf : public std::streambuf {
   public:
-    explicit HttpResponseBuf(Buffer& buf) noexcept
+    explicit HttpBuf(Buffer& buf) noexcept
     : buf_(buf)
     {
     }
-    ~HttpResponseBuf() override;
+    ~HttpBuf() override;
 
     // Copy.
-    HttpResponseBuf(const HttpResponseBuf& rhs) = delete;
-    HttpResponseBuf& operator=(const HttpResponseBuf& rhs) = delete;
+    HttpBuf(const HttpBuf& rhs) = delete;
+    HttpBuf& operator=(const HttpBuf& rhs) = delete;
 
     // Move.
-    HttpResponseBuf(HttpResponseBuf&&) = delete;
-    HttpResponseBuf& operator=(HttpResponseBuf&&) = delete;
+    HttpBuf(HttpBuf&&) = delete;
+    HttpBuf& operator=(HttpBuf&&) = delete;
 
     std::streamsize pcount() const noexcept { return pcount_; }
     void commit() noexcept { buf_.commit(pcount_); }
@@ -60,23 +60,23 @@ class SWIRLY_API HttpResponseBuf : public std::streambuf {
     std::streamsize pcount_{0};
 };
 
-class SWIRLY_API HttpResponse : public std::ostream {
+class SWIRLY_API HttpStream : public std::ostream {
   public:
-    explicit HttpResponse(Buffer& buf) noexcept
+    explicit HttpStream(Buffer& buf) noexcept
     : std::ostream{nullptr}
     , buf_{buf}
     {
         rdbuf(&buf_);
     }
-    ~HttpResponse() override;
+    ~HttpStream() override;
 
     // Copy.
-    HttpResponse(const HttpResponse& rhs) = delete;
-    HttpResponse& operator=(const HttpResponse& rhs) = delete;
+    HttpStream(const HttpStream& rhs) = delete;
+    HttpStream& operator=(const HttpStream& rhs) = delete;
 
     // Move.
-    HttpResponse(HttpResponse&&) = delete;
-    HttpResponse& operator=(HttpResponse&&) = delete;
+    HttpStream(HttpStream&&) = delete;
+    HttpStream& operator=(HttpStream&&) = delete;
 
     std::streamsize pcount() const noexcept { return buf_.pcount(); }
     void commit() noexcept;
@@ -89,7 +89,7 @@ class SWIRLY_API HttpResponse : public std::ostream {
     void reset(int status, const char* reason, bool cache = false);
 
   private:
-    HttpResponseBuf buf_;
+    HttpBuf buf_;
     /**
      * Content-Length offset.
      */
@@ -103,4 +103,4 @@ class SWIRLY_API HttpResponse : public std::ostream {
 } // namespace web
 } // namespace swirly
 
-#endif // SWIRLY_WEB_HTTPRESPONSE_HPP
+#endif // SWIRLY_WEB_STREAM_HPP

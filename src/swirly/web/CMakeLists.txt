@@ -38,12 +38,12 @@ endif(RAGEL_EXECUTABLE)
 set(lib_SOURCES
   EntitySet.cpp
   Exception.cpp
-  HttpParser.cpp
-  HttpRequest.cpp
-  HttpResponse.cpp
   Page.cpp
-  RestBody.cpp
+  Parser.cpp
+  Request.cpp
   Rest.cpp
+  RestBody.cpp
+  Stream.cpp
   Types.cpp
   Url.cpp
   "${PROJECT_SOURCE_DIR}/src/swirly/contrib/http_parser.c")
@@ -72,8 +72,8 @@ endforeach()
 
 set(test_SOURCES
   EntitySet.ut.cpp
-  HttpParser.ut.cpp
   Page.ut.cpp
+  Parser.ut.cpp
   RestBody.ut.cpp
   Url.ut.cpp)
 

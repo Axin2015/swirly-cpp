@@ -16,9 +16,9 @@
  */
 #include "RestServ.hpp"
 
-#include <swirly/web/HttpRequest.hpp>
-#include <swirly/web/HttpResponse.hpp>
+#include <swirly/web/Request.hpp>
 #include <swirly/web/Rest.hpp>
+#include <swirly/web/Stream.hpp>
 
 #include <swirly/fin/Exception.hpp>
 
@@ -92,7 +92,7 @@ string_view getTrader(const HttpRequest& req)
 
 RestServ::~RestServ() = default;
 
-void RestServ::handleRequest(const HttpRequest& req, HttpResponse& resp) noexcept
+void RestServ::handleRequest(const HttpRequest& req, HttpStream& os) noexcept
 {
     TimeRecorder tr{profile_};
     const auto finally = makeFinally([this]() noexcept {
@@ -104,16 +104,16 @@ void RestServ::handleRequest(const HttpRequest& req, HttpResponse& resp) noexcep
     const auto now = getTime(req); // noexcept
 
     if (req.method() != HttpMethod::Delete) {
-        resp.reset(200, "OK", cache); // noexcept
+        os.reset(200, "OK", cache); // noexcept
     } else {
-        resp.reset(204, "No Content"); // noexcept
+        os.reset(204, "No Content"); // noexcept
     }
     try {
         const auto& body = req.body();
         if (req.partial()) {
             throw BadRequestException{"request body is incomplete"sv};
         }
-        restRequest(req, now, resp);
+        restRequest(req, now, os);
         if (!matchPath_) {
             throw NotFoundException{errMsg()
                                     << "resource '"sv << req.path() << "' does not exist"sv};
@@ -125,17 +125,17 @@ void RestServ::handleRequest(const HttpRequest& req, HttpResponse& resp) noexcep
     } catch (const ServException& e) {
         SWIRLY_ERROR << "exception: status="sv << e.httpStatus() << ", reason="sv << e.httpReason()
                      << ", detail="sv << e.what();
-        resp.reset(e.httpStatus(), e.httpReason());
-        resp << e;
+        os.reset(e.httpStatus(), e.httpReason());
+        os << e;
     } catch (const exception& e) {
         const int status{500};
         const char* const reason{"Internal Server Error"};
         SWIRLY_ERROR << "exception: status="sv << status << ", reason="sv << reason << ", detail="sv
                      << e.what();
-        resp.reset(status, reason);
-        ServException::toJson(status, reason, e.what(), resp);
+        os.reset(status, reason);
+        ServException::toJson(status, reason, e.what(), os);
     }
-    resp.commit(); // noexcept
+    os.commit(); // noexcept
 }
 
 bool RestServ::reset(const HttpRequest& req) noexcept
@@ -158,7 +158,7 @@ bool RestServ::reset(const HttpRequest& req) noexcept
     return !path.empty() && path_.top() == "refdata"sv;
 }
 
-void RestServ::restRequest(const HttpRequest& req, Time now, HttpResponse& resp)
+void RestServ::restRequest(const HttpRequest& req, Time now, HttpStream& os)
 {
     if (path_.empty()) {
         return;
@@ -169,10 +169,10 @@ void RestServ::restRequest(const HttpRequest& req, Time now, HttpResponse& resp)
 
     if (tok == "refdata"sv) {
         // /refdata
-        refDataRequest(req, now, resp);
+        refDataRequest(req, now, os);
     } else if (tok == "accnt"sv) {
         // /accnt
-        accntRequest(req, now, resp);
+        accntRequest(req, now, os);
     } else {
         // Support both plural and singular forms.
         if (!tok.empty() && tok.back() == 's') {
@@ -180,12 +180,12 @@ void RestServ::restRequest(const HttpRequest& req, Time now, HttpResponse& resp)
         }
         if (tok == "market"sv) {
             // /markets
-            marketRequest(req, now, resp);
+            marketRequest(req, now, os);
         }
     }
 }
 
-void RestServ::refDataRequest(const HttpRequest& req, Time now, HttpResponse& resp)
+void RestServ::refDataRequest(const HttpRequest& req, Time now, HttpStream& os)
 {
     if (path_.empty()) {
 
@@ -196,7 +196,7 @@ void RestServ::refDataRequest(const HttpRequest& req, Time now, HttpResponse& re
             // GET /refdata
             matchMethod_ = true;
             const int bs{EntitySet::Asset | EntitySet::Instr};
-            rest_.getRefData(bs, now, resp);
+            rest_.getRefData(bs, now, os);
         }
         return;
     }
@@ -215,7 +215,7 @@ void RestServ::refDataRequest(const HttpRequest& req, Time now, HttpResponse& re
             if (req.method() == HttpMethod::Get) {
                 // GET /refdata/entity,entity...
                 matchMethod_ = true;
-                rest_.getRefData(es, now, resp);
+                rest_.getRefData(es, now, os);
             }
         }
         return;
@@ -223,15 +223,15 @@ void RestServ::refDataRequest(const HttpRequest& req, Time now, HttpResponse& re
 
     switch (es.get()) {
     case EntitySet::Asset:
-        assetRequest(req, now, resp);
+        assetRequest(req, now, os);
         break;
     case EntitySet::Instr:
-        instrRequest(req, now, resp);
+        instrRequest(req, now, os);
         break;
     }
 }
 
-void RestServ::assetRequest(const HttpRequest& req, Time now, HttpResponse& resp)
+void RestServ::assetRequest(const HttpRequest& req, Time now, HttpStream& os)
 {
     if (path_.empty()) {
 
@@ -241,7 +241,7 @@ void RestServ::assetRequest(const HttpRequest& req, Time now, HttpResponse& resp
         if (req.method() == HttpMethod::Get) {
             // GET /refdata/asset
             matchMethod_ = true;
-            rest_.getAsset(now, resp);
+            rest_.getAsset(now, os);
         }
         return;
     }
@@ -257,13 +257,13 @@ void RestServ::assetRequest(const HttpRequest& req, Time now, HttpResponse& resp
         if (req.method() == HttpMethod::Get) {
             // GET /refdata/asset/SYMBOL
             matchMethod_ = true;
-            rest_.getAsset(symbol, now, resp);
+            rest_.getAsset(symbol, now, os);
         }
         return;
     }
 }
 
-void RestServ::instrRequest(const HttpRequest& req, Time now, HttpResponse& resp)
+void RestServ::instrRequest(const HttpRequest& req, Time now, HttpStream& os)
 {
     if (path_.empty()) {
 
@@ -273,7 +273,7 @@ void RestServ::instrRequest(const HttpRequest& req, Time now, HttpResponse& resp
         if (req.method() == HttpMethod::Get) {
             // GET /refdata/instrs
             matchMethod_ = true;
-            rest_.getInstr(now, resp);
+            rest_.getInstr(now, os);
         }
         return;
     }
@@ -289,13 +289,13 @@ void RestServ::instrRequest(const HttpRequest& req, Time now, HttpResponse& resp
         if (req.method() == HttpMethod::Get) {
             // GET /refdata/instrs/SYMBOL
             matchMethod_ = true;
-            rest_.getInstr(symbol, now, resp);
+            rest_.getInstr(symbol, now, os);
         }
         return;
     }
 }
 
-void RestServ::accntRequest(const HttpRequest& req, Time now, HttpResponse& resp)
+void RestServ::accntRequest(const HttpRequest& req, Time now, HttpStream& os)
 {
     if (path_.empty()) {
 
@@ -307,7 +307,7 @@ void RestServ::accntRequest(const HttpRequest& req, Time now, HttpResponse& resp
             matchMethod_ = true;
             const auto es = EntitySet::Market | EntitySet::Order | EntitySet::Exec
                 | EntitySet::Trade | EntitySet::Posn;
-            rest_.getAccnt(getTrader(req), es, parseQuery(req.query()), now, resp);
+            rest_.getAccnt(getTrader(req), es, parseQuery(req.query()), now, os);
         }
         return;
     }
@@ -326,7 +326,7 @@ void RestServ::accntRequest(const HttpRequest& req, Time now, HttpResponse& resp
             if (req.method() == HttpMethod::Get) {
                 // GET /accnt/entity,entity...
                 matchMethod_ = true;
-                rest_.getAccnt(getTrader(req), es, parseQuery(req.query()), now, resp);
+                rest_.getAccnt(getTrader(req), es, parseQuery(req.query()), now, os);
             }
         }
         return;
@@ -334,24 +334,24 @@ void RestServ::accntRequest(const HttpRequest& req, Time now, HttpResponse& resp
 
     switch (es.get()) {
     case EntitySet::Market:
-        marketRequest(req, now, resp);
+        marketRequest(req, now, os);
         break;
     case EntitySet::Order:
-        orderRequest(req, now, resp);
+        orderRequest(req, now, os);
         break;
     case EntitySet::Exec:
-        execRequest(req, now, resp);
+        execRequest(req, now, os);
         break;
     case EntitySet::Trade:
-        tradeRequest(req, now, resp);
+        tradeRequest(req, now, os);
         break;
     case EntitySet::Posn:
-        posnRequest(req, now, resp);
+        posnRequest(req, now, os);
         break;
     }
 }
 
-void RestServ::marketRequest(const HttpRequest& req, Time now, HttpResponse& resp)
+void RestServ::marketRequest(const HttpRequest& req, Time now, HttpStream& os)
 {
     if (path_.empty()) {
 
@@ -362,7 +362,7 @@ void RestServ::marketRequest(const HttpRequest& req, Time now, HttpResponse& res
         case HttpMethod::Get:
             // GET /markets
             matchMethod_ = true;
-            rest_.getMarket(now, resp);
+            rest_.getMarket(now, os);
             break;
         case HttpMethod::Post:
             // POST /markets
@@ -375,7 +375,7 @@ void RestServ::marketRequest(const HttpRequest& req, Time now, HttpResponse& res
                     throw InvalidException{"request fields are invalid"sv};
                 }
                 rest_.postMarket(req.body().instr(), req.body().settlDate(), req.body().state(),
-                                 now, resp);
+                                 now, os);
             }
             break;
         default:
@@ -396,7 +396,7 @@ void RestServ::marketRequest(const HttpRequest& req, Time now, HttpResponse& res
         case HttpMethod::Get:
             // GET /market/INSTR
             matchMethod_ = true;
-            rest_.getMarket(instr, now, resp);
+            rest_.getMarket(instr, now, os);
             break;
         case HttpMethod::Post:
             // POST /market/INSTR
@@ -408,7 +408,7 @@ void RestServ::marketRequest(const HttpRequest& req, Time now, HttpResponse& res
                 if (!req.body().valid(ReqFields, OptFields)) {
                     throw InvalidException{"request fields are invalid"sv};
                 }
-                rest_.postMarket(instr, req.body().settlDate(), req.body().state(), now, resp);
+                rest_.postMarket(instr, req.body().settlDate(), req.body().state(), now, os);
             }
             break;
         default:
@@ -429,7 +429,7 @@ void RestServ::marketRequest(const HttpRequest& req, Time now, HttpResponse& res
         case HttpMethod::Get:
             // GET /market/INSTR/SETTL_DATE
             matchMethod_ = true;
-            rest_.getMarket(instr, settlDate, now, resp);
+            rest_.getMarket(instr, settlDate, now, os);
             break;
         case HttpMethod::Post:
             // POST /market/INSTR/SETTL_DATE
@@ -441,7 +441,7 @@ void RestServ::marketRequest(const HttpRequest& req, Time now, HttpResponse& res
                 if (!req.body().valid(ReqFields, OptFields)) {
                     throw InvalidException{"request fields are invalid"sv};
                 }
-                rest_.postMarket(instr, settlDate, req.body().state(), now, resp);
+                rest_.postMarket(instr, settlDate, req.body().state(), now, os);
             }
             break;
         case HttpMethod::Put:
@@ -453,7 +453,7 @@ void RestServ::marketRequest(const HttpRequest& req, Time now, HttpResponse& res
                 if (!req.body().valid(ReqFields)) {
                     throw InvalidException{"request fields are invalid"sv};
                 }
-                rest_.putMarket(instr, settlDate, req.body().state(), now, resp);
+                rest_.putMarket(instr, settlDate, req.body().state(), now, os);
             }
             break;
         default:
@@ -463,7 +463,7 @@ void RestServ::marketRequest(const HttpRequest& req, Time now, HttpResponse& res
     }
 }
 
-void RestServ::orderRequest(const HttpRequest& req, Time now, HttpResponse& resp)
+void RestServ::orderRequest(const HttpRequest& req, Time now, HttpStream& os)
 {
     if (path_.empty()) {
 
@@ -474,7 +474,7 @@ void RestServ::orderRequest(const HttpRequest& req, Time now, HttpResponse& resp
         case HttpMethod::Get:
             // GET /accnt/orders
             matchMethod_ = true;
-            rest_.getOrder(getTrader(req), now, resp);
+            rest_.getOrder(getTrader(req), now, os);
             break;
         case HttpMethod::Post:
             // POST /accnt/orders
@@ -490,7 +490,7 @@ void RestServ::orderRequest(const HttpRequest& req, Time now, HttpResponse& resp
                 }
                 rest_.postOrder(accnt, req.body().instr(), req.body().settlDate(), req.body().ref(),
                                 req.body().side(), req.body().lots(), req.body().ticks(),
-                                req.body().minLots(), now, resp);
+                                req.body().minLots(), now, os);
             }
             break;
         default:
@@ -511,7 +511,7 @@ void RestServ::orderRequest(const HttpRequest& req, Time now, HttpResponse& resp
         case HttpMethod::Get:
             // GET /accnt/orders/INSTR
             matchMethod_ = true;
-            rest_.getOrder(getTrader(req), instr, now, resp);
+            rest_.getOrder(getTrader(req), instr, now, os);
             break;
         case HttpMethod::Post:
             // POST /accnt/orders/INSTR
@@ -527,7 +527,7 @@ void RestServ::orderRequest(const HttpRequest& req, Time now, HttpResponse& resp
                 }
                 rest_.postOrder(accnt, instr, req.body().settlDate(), req.body().ref(),
                                 req.body().side(), req.body().lots(), req.body().ticks(),
-                                req.body().minLots(), now, resp);
+                                req.body().minLots(), now, os);
             }
             break;
         default:
@@ -548,7 +548,7 @@ void RestServ::orderRequest(const HttpRequest& req, Time now, HttpResponse& resp
         case HttpMethod::Get:
             // GET /accnt/orders/INSTR/SETTL_DATE
             matchMethod_ = true;
-            rest_.getOrder(getTrader(req), instr, settlDate, now, resp);
+            rest_.getOrder(getTrader(req), instr, settlDate, now, os);
             break;
         case HttpMethod::Post:
             // POST /accnt/orders/INSTR/SETTL_DATE
@@ -563,7 +563,7 @@ void RestServ::orderRequest(const HttpRequest& req, Time now, HttpResponse& resp
                 }
                 rest_.postOrder(accnt, instr, settlDate, req.body().ref(), req.body().side(),
                                 req.body().lots(), req.body().ticks(), req.body().minLots(), now,
-                                resp);
+                                os);
             }
             break;
         default:
@@ -584,7 +584,7 @@ void RestServ::orderRequest(const HttpRequest& req, Time now, HttpResponse& resp
         case HttpMethod::Get:
             // GET /accnt/orders/INSTR/SETTL_DATE/ID
             matchMethod_ = true;
-            rest_.getOrder(getTrader(req), instr, settlDate, ids_[0], now, resp);
+            rest_.getOrder(getTrader(req), instr, settlDate, ids_[0], now, os);
             break;
         case HttpMethod::Put:
             // PUT /accnt/orders/INSTR/SETTL_DATE/ID,ID...
@@ -596,7 +596,7 @@ void RestServ::orderRequest(const HttpRequest& req, Time now, HttpResponse& resp
                 if (req.body().fields() != ReqFields) {
                     throw InvalidException{"request fields are invalid"sv};
                 }
-                rest_.putOrder(accnt, instr, settlDate, ids_, req.body().lots(), now, resp);
+                rest_.putOrder(accnt, instr, settlDate, ids_, req.body().lots(), now, os);
             }
             break;
         default:
@@ -606,7 +606,7 @@ void RestServ::orderRequest(const HttpRequest& req, Time now, HttpResponse& resp
     }
 }
 
-void RestServ::execRequest(const HttpRequest& req, Time now, HttpResponse& resp)
+void RestServ::execRequest(const HttpRequest& req, Time now, HttpStream& os)
 {
     if (path_.empty()) {
 
@@ -616,13 +616,13 @@ void RestServ::execRequest(const HttpRequest& req, Time now, HttpResponse& resp)
         if (req.method() == HttpMethod::Get) {
             // GET /accnt/execs
             matchMethod_ = true;
-            rest_.getExec(getTrader(req), parseQuery(req.query()), now, resp);
+            rest_.getExec(getTrader(req), parseQuery(req.query()), now, os);
         }
         return;
     }
 }
 
-void RestServ::tradeRequest(const HttpRequest& req, Time now, HttpResponse& resp)
+void RestServ::tradeRequest(const HttpRequest& req, Time now, HttpStream& os)
 {
     if (path_.empty()) {
 
@@ -633,7 +633,7 @@ void RestServ::tradeRequest(const HttpRequest& req, Time now, HttpResponse& resp
         case HttpMethod::Get:
             // GET /accnt/trades
             matchMethod_ = true;
-            rest_.getTrade(getTrader(req), now, resp);
+            rest_.getTrade(getTrader(req), now, os);
             break;
         case HttpMethod::Post:
             // POST /accnt/trades
@@ -650,7 +650,7 @@ void RestServ::tradeRequest(const HttpRequest& req, Time now, HttpResponse& resp
                 rest_.postTrade(req.body().accnt(), req.body().instr(), req.body().settlDate(),
                                 req.body().ref(), req.body().side(), req.body().lots(),
                                 req.body().ticks(), req.body().liqInd(), req.body().cpty(), now,
-                                resp);
+                                os);
             }
             break;
         default:
@@ -671,7 +671,7 @@ void RestServ::tradeRequest(const HttpRequest& req, Time now, HttpResponse& resp
         case HttpMethod::Get:
             // GET /accnt/trades/INSTR
             matchMethod_ = true;
-            rest_.getTrade(getTrader(req), instr, now, resp);
+            rest_.getTrade(getTrader(req), instr, now, os);
             break;
         case HttpMethod::Post:
             // POST /accnt/trades/INSTR
@@ -687,7 +687,7 @@ void RestServ::tradeRequest(const HttpRequest& req, Time now, HttpResponse& resp
                 }
                 rest_.postTrade(req.body().accnt(), instr, req.body().settlDate(), req.body().ref(),
                                 req.body().side(), req.body().lots(), req.body().ticks(),
-                                req.body().liqInd(), req.body().cpty(), now, resp);
+                                req.body().liqInd(), req.body().cpty(), now, os);
             }
             break;
         default:
@@ -708,7 +708,7 @@ void RestServ::tradeRequest(const HttpRequest& req, Time now, HttpResponse& resp
         case HttpMethod::Get:
             // GET /accnt/trades/INSTR/SETTL_DATE
             matchMethod_ = true;
-            rest_.getTrade(getTrader(req), instr, settlDate, now, resp);
+            rest_.getTrade(getTrader(req), instr, settlDate, now, os);
             break;
         case HttpMethod::Post:
             // POST /accnt/trades/INSTR/SETTL_DATE
@@ -723,7 +723,7 @@ void RestServ::tradeRequest(const HttpRequest& req, Time now, HttpResponse& resp
                 }
                 rest_.postTrade(req.body().accnt(), instr, settlDate, req.body().ref(),
                                 req.body().side(), req.body().lots(), req.body().ticks(),
-                                req.body().liqInd(), req.body().cpty(), now, resp);
+                                req.body().liqInd(), req.body().cpty(), now, os);
             }
             break;
         default:
@@ -744,7 +744,7 @@ void RestServ::tradeRequest(const HttpRequest& req, Time now, HttpResponse& resp
         case HttpMethod::Get:
             // GET /accnt/trades/INSTR/SETTL_DATE/ID
             matchMethod_ = true;
-            rest_.getTrade(getTrader(req), instr, settlDate, ids_[0], now, resp);
+            rest_.getTrade(getTrader(req), instr, settlDate, ids_[0], now, os);
             break;
         case HttpMethod::Delete:
             // DELETE /accnt/trades/INSTR/SETTL_DATE/ID,ID...
@@ -758,7 +758,7 @@ void RestServ::tradeRequest(const HttpRequest& req, Time now, HttpResponse& resp
     }
 }
 
-void RestServ::posnRequest(const HttpRequest& req, Time now, HttpResponse& resp)
+void RestServ::posnRequest(const HttpRequest& req, Time now, HttpStream& os)
 {
     if (path_.empty()) {
 
@@ -768,7 +768,7 @@ void RestServ::posnRequest(const HttpRequest& req, Time now, HttpResponse& resp)
         if (req.method() == HttpMethod::Get) {
             // GET /accnt/posns
             matchMethod_ = true;
-            rest_.getPosn(getTrader(req), now, resp);
+            rest_.getPosn(getTrader(req), now, os);
         }
         return;
     }
@@ -784,7 +784,7 @@ void RestServ::posnRequest(const HttpRequest& req, Time now, HttpResponse& resp)
         if (req.method() == HttpMethod::Get) {
             // GET /accnt/posns/INSTR
             matchMethod_ = true;
-            rest_.getPosn(getTrader(req), instr, now, resp);
+            rest_.getPosn(getTrader(req), instr, now, os);
         }
         return;
     }
@@ -800,7 +800,7 @@ void RestServ::posnRequest(const HttpRequest& req, Time now, HttpResponse& resp)
         if (req.method() == HttpMethod::Get) {
             // GET /accnt/posns/INSTR/SETTL_DATE
             matchMethod_ = true;
-            rest_.getPosn(getTrader(req), instr, settlDate, now, resp);
+            rest_.getPosn(getTrader(req), instr, settlDate, now, os);
         }
         return;
     }
