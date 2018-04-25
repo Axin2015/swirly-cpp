@@ -263,6 +263,7 @@ struct UdpSocket : IoSocket {
     using Endpoint = UdpEndpoint;
 
     using IoSocket::IoSocket;
+
     UdpSocket(Transport trans, std::error_code& ec) noexcept
     : IoSocket{os::socket(trans, ec), trans.family()}
     {
@@ -273,8 +274,19 @@ struct UdpSocket : IoSocket {
     }
     UdpSocket() noexcept = default;
 
+    // Logically const.
+    void getSockName(Endpoint& ep, std::error_code& ec) noexcept
+    {
+        os::getsockname(*sock_, ep, ec);
+    }
+    void getSockName(Endpoint& ep) { os::getsockname(*sock_, ep); }
     void bind(const Endpoint& ep, std::error_code& ec) noexcept { os::bind(*sock_, ep, ec); }
     void bind(const Endpoint& ep) { os::bind(*sock_, ep); }
+    void connect(const Endpoint& ep, std::error_code& ec) noexcept
+    {
+        return os::connect(*sock_, ep, ec);
+    }
+    void connect(const Endpoint& ep) { return os::connect(*sock_, ep); }
 
     ssize_t recvfrom(void* buf, std::size_t len, int flags, Endpoint& ep,
                      std::error_code& ec) noexcept

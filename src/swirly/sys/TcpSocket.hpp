@@ -39,9 +39,14 @@ struct TcpSocketServ : Socket {
     : Socket{os::socket(trans), trans.family()}
     {
     }
-
     TcpSocketServ() noexcept = default;
 
+    // Logically const.
+    void getSockName(Endpoint& ep, std::error_code& ec) noexcept
+    {
+        os::getsockname(*sock_, ep, ec);
+    }
+    void getSockName(Endpoint& ep) { os::getsockname(*sock_, ep); }
     void bind(const Endpoint& ep, std::error_code& ec) noexcept { os::bind(*sock_, ep, ec); }
     void bind(const Endpoint& ep) { os::bind(*sock_, ep); }
 
@@ -72,9 +77,14 @@ struct TcpSocketClnt : IoSocket {
     : IoSocket{os::socket(trans), trans.family()}
     {
     }
-
     TcpSocketClnt() noexcept = default;
 
+    // Logically const.
+    void getSockName(Endpoint& ep, std::error_code& ec) noexcept
+    {
+        os::getsockname(*sock_, ep, ec);
+    }
+    void getSockName(Endpoint& ep) { os::getsockname(*sock_, ep); }
     void connect(const Endpoint& ep, std::error_code& ec) noexcept
     {
         return os::connect(*sock_, ep, ec);

@@ -201,7 +201,7 @@ inline FileHandle accept(int sockfd, BasicEndpoint<TransportT>& ep, std::error_c
 {
     socklen_t addrlen = ep.capacity();
     FileHandle fh{accept(sockfd, *ep.data(), addrlen, ec)};
-    if (fh) {
+    if (!ec) {
         ep.resize(std::min<std::size_t>(addrlen, ep.capacity()));
     }
     return fh;
@@ -563,6 +563,55 @@ inline std::size_t sendto(int sockfd, ConstBuffer buf, int flags,
 }
 
 /**
+ * Get the socket name.
+ */
+inline void getsockname(int sockfd, sockaddr& addr, socklen_t& addrlen,
+                        std::error_code& ec) noexcept
+{
+    // The addrlen argument is updated to contain the actual size of the source address.
+    // The returned address is truncated if the buffer provided is too small.
+    if (::getsockname(sockfd, &addr, &addrlen) < 0) {
+        ec = makeError(errno);
+    }
+}
+
+/**
+ * Get the socket name.
+ */
+inline void getsockname(int sockfd, sockaddr& addr, socklen_t& addrlen)
+{
+    // The addrlen argument is updated to contain the actual size of the source address.
+    // The returned address is truncated if the buffer provided is too small.
+    if (::getsockname(sockfd, &addr, &addrlen) < 0) {
+        throw std::system_error{makeError(errno), "getsockname"};
+    }
+}
+
+/**
+ * Get the socket name.
+ */
+template <typename TransportT>
+inline void getsockname(int sockfd, BasicEndpoint<TransportT>& ep, std::error_code& ec) noexcept
+{
+    socklen_t addrlen = ep.capacity();
+    getsockname(sockfd, *ep.data(), addrlen, ec);
+    if (!ec) {
+        ep.resize(std::min<std::size_t>(addrlen, ep.capacity()));
+    }
+}
+
+/**
+ * Get the socket name.
+ */
+template <typename TransportT>
+inline void getsockname(int sockfd, BasicEndpoint<TransportT>& ep)
+{
+    socklen_t addrlen = ep.capacity();
+    getsockname(sockfd, *ep.data(), addrlen);
+    ep.resize(std::min<std::size_t>(addrlen, ep.capacity()));
+}
+
+/**
  * Get socket option.
  */
 inline void getsockopt(int sockfd, int level, int optname, void* optval, socklen_t& optlen,
@@ -606,20 +655,32 @@ inline void setsockopt(int sockfd, int level, int optname, const void* optval, s
 
 } // namespace os
 
-inline int getSoError(int sockfd, std::error_code& ec) noexcept
+template <typename TransportT>
+inline void getSockName(int sockfd, BasicEndpoint<TransportT>& ep, std::error_code& ec) noexcept
 {
-    int optval{};
-    socklen_t optlen{sizeof(optval)};
-    os::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &optval, optlen);
-    return optval;
+    os::getsockname(sockfd, ep, ec);
 }
 
-inline int getSoError(int sockfd)
+template <typename TransportT>
+inline void getSockName(int sockfd, BasicEndpoint<TransportT>& ep)
+{
+    os::getsockname(sockfd, ep);
+}
+
+inline std::error_code getSoError(int sockfd, std::error_code& ec) noexcept
 {
     int optval{};
     socklen_t optlen{sizeof(optval)};
     os::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &optval, optlen);
-    return optval;
+    return os::makeError(optval);
+}
+
+inline std::error_code getSoError(int sockfd)
+{
+    int optval{};
+    socklen_t optlen{sizeof(optval)};
+    os::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &optval, optlen);
+    return os::makeError(optval);
 }
 
 inline void setSoReuseAddr(int sockfd, bool enabled, std::error_code& ec) noexcept
@@ -680,7 +741,8 @@ struct Socket {
     int family() const noexcept { return family_; }
 
     // Logically const.
-    int getSoError() const { return swirly::getSoError(*sock_); }
+    std::error_code getSoError(std::error_code& ec) const { return swirly::getSoError(*sock_, ec); }
+    std::error_code getSoError() const { return swirly::getSoError(*sock_); }
 
     void close() { sock_.reset(); }
 
