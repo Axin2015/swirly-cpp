@@ -14,40 +14,43 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_WEB_STREAM_HPP
-#define SWIRLY_WEB_STREAM_HPP
+#ifndef SWIRLY_FIX_STREAM_HPP
+#define SWIRLY_FIX_STREAM_HPP
+
+#include "Types.hpp"
 
 #include <swirly/sys/Buffer.hpp>
 
 #include <swirly/util/Stream.hpp>
 
 namespace swirly {
-inline namespace web {
+inline namespace fix {
 
-class SWIRLY_API HttpBuf : public std::streambuf {
+class SWIRLY_API FixBuf : public std::streambuf {
   public:
-    explicit HttpBuf(Buffer& buf) noexcept
+    explicit FixBuf(Buffer& buf) noexcept
     : buf_(buf)
     {
     }
-    ~HttpBuf() override;
+    ~FixBuf() override;
 
     // Copy.
-    HttpBuf(const HttpBuf& rhs) = delete;
-    HttpBuf& operator=(const HttpBuf& rhs) = delete;
+    FixBuf(const FixBuf& rhs) = delete;
+    FixBuf& operator=(const FixBuf& rhs) = delete;
 
     // Move.
-    HttpBuf(HttpBuf&&) = delete;
-    HttpBuf& operator=(HttpBuf&&) = delete;
+    FixBuf(FixBuf&&) = delete;
+    FixBuf& operator=(FixBuf&&) = delete;
 
     std::streamsize pcount() const noexcept { return pcount_; }
-    void commit() noexcept { buf_.commit(pcount_); }
+    void commit() noexcept;
     void reset() noexcept
     {
         pbase_ = nullptr;
         pcount_ = 0;
+        sum_ = 0;
     }
-    void setContentLength(std::streamsize pos, std::streamsize len) noexcept;
+    void setBodyLength(std::streamsize pos, std::streamsize len) noexcept;
 
   protected:
     int_type overflow(int_type c) noexcept override;
@@ -57,25 +60,26 @@ class SWIRLY_API HttpBuf : public std::streambuf {
     Buffer& buf_;
     char* pbase_{nullptr};
     std::streamsize pcount_{0};
+    std::uint64_t sum_{0};
 };
 
-class SWIRLY_API HttpStream : public std::ostream {
+class SWIRLY_API FixStream : public std::ostream {
   public:
-    explicit HttpStream(Buffer& buf) noexcept
+    explicit FixStream(Buffer& buf) noexcept
     : std::ostream{nullptr}
     , buf_{buf}
     {
         rdbuf(&buf_);
     }
-    ~HttpStream() override;
+    ~FixStream() override;
 
     // Copy.
-    HttpStream(const HttpStream& rhs) = delete;
-    HttpStream& operator=(const HttpStream& rhs) = delete;
+    FixStream(const FixStream& rhs) = delete;
+    FixStream& operator=(const FixStream& rhs) = delete;
 
     // Move.
-    HttpStream(HttpStream&&) = delete;
-    HttpStream& operator=(HttpStream&&) = delete;
+    FixStream(FixStream&&) = delete;
+    FixStream& operator=(FixStream&&) = delete;
 
     std::streamsize pcount() const noexcept { return buf_.pcount(); }
     void commit() noexcept;
@@ -83,23 +87,19 @@ class SWIRLY_API HttpStream : public std::ostream {
     {
         buf_.reset();
         swirly::reset(*this);
-        cloff_ = hcount_ = 0;
+        bloff_ = 0;
     }
-    void reset(int status, const char* reason, bool cache = false);
+    void reset(FixVersion ver);
 
   private:
-    HttpBuf buf_;
+    FixBuf buf_;
     /**
-     * Content-Length offset.
+     * BodyLength offset.
      */
-    std::streamsize cloff_{0};
-    /**
-     * Header size.
-     */
-    std::streamsize hcount_{0};
+    std::streamsize bloff_{0};
 };
 
-} // namespace web
+} // namespace fix
 } // namespace swirly
 
-#endif // SWIRLY_WEB_STREAM_HPP
+#endif // SWIRLY_FIX_STREAM_HPP

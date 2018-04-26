@@ -23,6 +23,9 @@ void Buffer::consume(std::size_t count) noexcept
 {
     enum { ShrinkThreshold = 1024 };
 
+    if (count == 0) {
+        return;
+    }
     rpos_ += count;
 
     // Shrink if the block of unused bytes at the front of the buffer satisfies the following
@@ -51,6 +54,14 @@ MutableBuffer Buffer::prepare(std::size_t size)
         buf_.resize(buf_.size() + d);
     }
     return {wptr(), size};
+}
+
+ConstBuffer advance(ConstBuffer buf, std::size_t n) noexcept
+{
+    const auto* data = buffer_cast<const char*>(buf);
+    const std::size_t size = buffer_size(buf);
+    const auto offset = std::min(n, size);
+    return {data + offset, size - offset};
 }
 
 } // namespace sys

@@ -37,7 +37,7 @@ HttpSess::HttpSess(Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, RestServ&
 {
     SWIRLY_INFO << "accept session"sv;
 
-    sub_ = r.subscribe(*sock_, EventIn, bind<&HttpSess::onInput>(this));
+    sub_ = r.subscribe(*sock_, EventIn, bind<&HttpSess::onIoEvent>(this));
     tmr_ = r.timer(now + IdleTimeout, Priority::Low, bind<&HttpSess::onTimer>(this));
 }
 
@@ -129,7 +129,7 @@ bool HttpSess::onMessageEnd() noexcept
     return ret;
 }
 
-void HttpSess::onInput(int fd, unsigned events, Time now)
+void HttpSess::onIoEvent(int fd, unsigned events, Time now)
 {
     try {
         if (events & EventOut) {
@@ -142,13 +142,13 @@ void HttpSess::onInput(int fd, unsigned events, Time now)
         if (events & EventIn) {
             char in[MaxData];
             const auto size = os::read(fd, in, sizeof(in));
-            if (size == 0) {
-                close();
-            } else {
+            if (size > 0) {
                 parse({in, size});
                 tmr_.cancel();
                 tmr_ = reactor_.timer(now + IdleTimeout, Priority::Low,
                                       bind<&HttpSess::onTimer>(this));
+            } else {
+                close();
             }
         }
     } catch (const std::exception& e) {

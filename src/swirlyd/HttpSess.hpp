@@ -70,7 +70,7 @@ class SWIRLY_API HttpSess
     bool onChunkHeader(size_t len) noexcept { return true; }
     bool onChunkEnd() noexcept { return true; }
 
-    void onInput(int fd, unsigned events, Time now);
+    void onIoEvent(int fd, unsigned events, Time now);
     void onTimer(Timer& tmr, Time now);
 
     LogMsg& logMsg() const noexcept

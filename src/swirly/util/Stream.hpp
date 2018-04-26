@@ -95,6 +95,13 @@ auto& operator<<(StaticStream<MaxN>& ss, ValueT&& val)
 
 using OStreamJoiner = std::experimental::ostream_joiner<char>;
 
+template <auto DelimT, typename ArgT, typename... ArgsT>
+void join(std::ostream& os, const ArgT& arg, const ArgsT&... args)
+{
+    os << arg;
+    (..., [&os](const auto& arg) { os << DelimT << arg; }(args));
+}
+
 } // namespace util
 } // namespace swirly
 

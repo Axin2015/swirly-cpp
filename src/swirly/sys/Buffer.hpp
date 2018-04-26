@@ -101,6 +101,8 @@ class SWIRLY_API Buffer {
     std::vector<char> buf_;
 };
 
+SWIRLY_API ConstBuffer advance(ConstBuffer buf, std::size_t n) noexcept;
+
 } // namespace sys
 } // namespace swirly
 
