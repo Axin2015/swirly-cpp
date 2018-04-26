@@ -16,6 +16,7 @@
 add_custom_target(swirly-tool DEPENDS
   swirly-db-to-dsv
   swirly-db-to-json
+  swirly-echo-serv
   swirly-queue-bench
   swirly-scratch
   swirly-serv-bench
@@ -31,6 +32,10 @@ install(TARGETS swirly-db-to-dsv DESTINATION bin COMPONENT program)
 add_executable(swirly-db-to-json DbToJson.cpp)
 target_link_libraries(swirly-db-to-json ${swirly_sqlite_LIBRARY})
 install(TARGETS swirly-db-to-json DESTINATION bin COMPONENT program)
+
+add_executable(swirly-echo-serv EchoServ.cpp)
+target_link_libraries(swirly-echo-serv ${swirly_fix_LIBRARY})
+install(TARGETS swirly-echo-serv DESTINATION bin COMPONENT program)
 
 add_executable(swirly-queue-bench QueueBench.cpp)
 target_link_libraries(swirly-queue-bench ${swirly_util_LIBRARY})

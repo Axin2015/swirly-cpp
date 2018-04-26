@@ -14,27 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Time.hpp"
+#include "Exception.hpp"
 
 namespace swirly {
-inline namespace util {
-using namespace std;
-
-SWIRLY_WEAK Time getTime() noexcept;
-
-Time getTime() noexcept
-{
-    using chrono::nanoseconds;
-    timespec ts;
-    clock_gettime(CLOCK_REALTIME, &ts);
-    return Time{nanoseconds{ts.tv_sec * 1'000'000'000L + ts.tv_nsec}};
-}
-
-ostream& operator<<(ostream& os, Time time)
-{
-    // TODO: change to a higher resolution.
-    return os << msSinceEpoch(time);
-}
-
-} // namespace util
+inline namespace fix {
+FixException::~FixException() = default;
+} // namespace fix
 } // namespace swirly

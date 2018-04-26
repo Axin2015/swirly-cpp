@@ -20,9 +20,14 @@
 #include <swirly/Config.h>
 
 #include <cstdint>
+#include <type_traits>
 
 namespace swirly {
 inline namespace util {
+
+template <typename>
+struct DependentFalse : std::false_type {
+};
 
 SWIRLY_API int hexDigits(int64_t i) noexcept;
 

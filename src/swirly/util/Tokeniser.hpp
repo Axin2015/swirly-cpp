@@ -27,7 +27,7 @@ inline namespace util {
 
 class Tokeniser {
   public:
-    Tokeniser(std::string_view buf, std::string_view seps) noexcept { reset(buf, seps); }
+    Tokeniser(std::string_view buf, std::string_view delims) noexcept { reset(buf, delims); }
     Tokeniser() noexcept { reset(""sv, ""sv); }
     ~Tokeniser() = default;
 
@@ -39,20 +39,26 @@ class Tokeniser {
     Tokeniser(Tokeniser&&) noexcept = default;
     Tokeniser& operator=(Tokeniser&&) noexcept = default;
 
-    std::string_view top() const noexcept { return buf_.substr(i_ - buf_.cbegin(), j_ - i_); }
-    bool empty() const noexcept { return i_ == buf_.cend(); }
-    void reset(std::string_view buf, std::string_view toks) noexcept
+    void reset(std::string_view buf, std::string_view delims) noexcept
     {
         buf_ = buf;
-        seps_ = toks;
+        delims_ = delims;
         i_ = buf_.cbegin();
-        j_ = std::find_first_of(i_, buf_.cend(), seps_.cbegin(), seps_.cend());
+        j_ = std::find_first_of(i_, buf_.cend(), delims_.cbegin(), delims_.cend());
+    }
+    bool empty() const noexcept { return i_ == buf_.cend(); }
+    std::string_view top() const noexcept { return buf_.substr(i_ - buf_.cbegin(), j_ - i_); }
+    std::string_view next() noexcept
+    {
+        const auto tok = top();
+        pop();
+        return tok;
     }
     void pop() noexcept
     {
         if (j_ != buf_.cend()) {
             i_ = j_ + 1;
-            j_ = std::find_first_of(i_, buf_.cend(), seps_.cbegin(), seps_.cend());
+            j_ = std::find_first_of(i_, buf_.cend(), delims_.cbegin(), delims_.cend());
         } else {
             i_ = j_;
         }
@@ -60,7 +66,7 @@ class Tokeniser {
 
   private:
     std::string_view buf_;
-    std::string_view seps_;
+    std::string_view delims_;
     std::string_view::const_iterator i_, j_;
 };
 
@@ -68,9 +74,9 @@ template <std::size_t N>
 using Row = std::array<std::string_view, N>;
 
 template <std::size_t N>
-void split(std::string_view line, std::string_view seps, Row<N>& row) noexcept
+void split(std::string_view line, std::string_view delims, Row<N>& row) noexcept
 {
-    Tokeniser toks{line, seps};
+    Tokeniser toks{line, delims};
     for (auto& col : row) {
         if (toks.empty()) {
             break;

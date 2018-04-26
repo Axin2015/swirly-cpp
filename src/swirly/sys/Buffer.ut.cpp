@@ -34,7 +34,7 @@ void write(Buffer& buf, const char* data)
 string read(Buffer& buf)
 {
     const auto in = buf.data();
-    string s{buffer_cast<const char*>(in), buffer_size(in)};
+    const string s{buffer_cast<const char*>(in), buffer_size(in)};
     buf.consume(buffer_size(in));
     return s;
 }
@@ -42,7 +42,7 @@ string read(Buffer& buf)
 string read(Buffer& buf, std::size_t limit)
 {
     const auto in = buf.data(limit);
-    string s{buffer_cast<const char*>(in), buffer_size(in)};
+    const string s{buffer_cast<const char*>(in), buffer_size(in)};
     buf.consume(buffer_size(in));
     return s;
 }

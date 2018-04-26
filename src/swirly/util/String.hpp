@@ -24,9 +24,8 @@
 #include <string_view>
 
 namespace swirly {
-inline namespace util {
-
 using namespace std::literals::string_view_literals;
+inline namespace util {
 
 template <typename ValueT, typename std::enable_if_t<std::is_arithmetic_v<ValueT>>* = nullptr>
 std::string toString(ValueT val)

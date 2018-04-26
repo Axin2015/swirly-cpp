@@ -17,9 +17,10 @@
 #ifndef SWIRLY_UTIL_TIME_HPP
 #define SWIRLY_UTIL_TIME_HPP
 
-#include <swirly/Config.h>
+#include <swirly/util/Utility.hpp>
 
 #include <chrono>
+#include <iomanip>
 #include <iosfwd>
 
 #include <sys/time.h>
@@ -54,11 +55,13 @@ struct SWIRLY_API UnixClock {
 
 using Duration = UnixClock::duration;
 using Time = UnixClock::time_point;
+using Seconds = std::chrono::seconds;
 using Millis = std::chrono::milliseconds;
 using Micros = std::chrono::microseconds;
 using Nanos = std::chrono::nanoseconds;
 
 SWIRLY_API Time getTime() noexcept;
+SWIRLY_API std::ostream& operator<<(std::ostream& os, Time time);
 
 inline UnixClock::time_point UnixClock::now() noexcept
 {
@@ -116,14 +119,40 @@ constexpr std::int64_t nsSinceEpoch(Time time) noexcept
     return ns.count();
 }
 
-/**
- * Format time with microsecond precision.
- */
-SWIRLY_API void printTime(Time time, std::ostream& os);
+template <typename DurationT>
+struct PutTime {
+    Time time;
+    const char* fmt;
+};
 
-SWIRLY_API std::string printTime(Time time);
+template <typename DurationT = Seconds>
+auto putTime(Time time, const char* fmt)
+{
+    return PutTime<DurationT>{time, fmt};
+}
 
-SWIRLY_API std::ostream& operator<<(std::ostream& os, Time time);
+template <typename DurationT>
+std::ostream& operator<<(std::ostream& os, PutTime<DurationT> pt)
+{
+    const auto t = UnixClock::to_time_t(pt.time);
+    struct tm gmt;
+    os << std::put_time(gmtime_r(&t, &gmt), pt.fmt);
+
+    if constexpr (std::is_same_v<DurationT, Nanos>) {
+        const auto ns = nsSinceEpoch(pt.time);
+        os << '.' << std::setfill('0') << std::setw(9) << (ns % 1'000'000'000L);
+    } else if constexpr (std::is_same_v<DurationT, Micros>) {
+        const auto us = usSinceEpoch(pt.time);
+        os << '.' << std::setfill('0') << std::setw(6) << (us % 1'000'000L);
+    } else if constexpr (std::is_same_v<DurationT, Millis>) {
+        const auto ms = msSinceEpoch(pt.time);
+        os << '.' << std::setfill('0') << std::setw(3) << (ms % 1'000L);
+    } else if constexpr (std::is_same_v<DurationT, Seconds>) {
+    } else {
+        static_assert(DependentFalse<DurationT>::value);
+    }
+    return os;
+}
 
 constexpr bool isZero(timeval tv) noexcept
 {
