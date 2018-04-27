@@ -59,23 +59,23 @@ class SWIRLY_API Timer {
 
   public:
     Timer(std::nullptr_t = nullptr) noexcept {}
-    ~Timer() { reset(); }
+    ~Timer() = default;
 
     // Copy.
     Timer(const Timer&) = default;
     Timer& operator=(const Timer&) = default;
 
     // Move.
-    Timer(Timer&&) = default;
-    Timer& operator=(Timer&&) = default;
+    Timer(Timer&&) noexcept = default;
+    Timer& operator=(Timer&&) noexcept = default;
 
     bool empty() const noexcept { return !impl_; }
     explicit operator bool() const noexcept { return impl_ != nullptr; }
-    long id() const noexcept { return impl_->id; }
-    Time expiry() const noexcept { return impl_->expiry; }
-
-    Duration interval() const noexcept { return impl_->interval; }
+    long id() const noexcept { return impl_ ? impl_->id : 0; }
     bool pending() const noexcept { return impl_ != nullptr && bool{impl_->slot}; }
+
+    Time expiry() const noexcept { return impl_->expiry; }
+    Duration interval() const noexcept { return impl_->interval; }
     // Setting the interval will not reschedule any pending timer.
     template <typename RepT, typename PeriodT>
     void setInterval(std::chrono::duration<RepT, PeriodT> interval) noexcept
@@ -83,7 +83,7 @@ class SWIRLY_API Timer {
         using namespace std::chrono;
         impl_->interval = duration_cast<Duration>(interval);
     }
-    void reset(std::nullptr_t = nullptr) noexcept;
+    void reset(std::nullptr_t = nullptr) noexcept { impl_.reset(); }
     void swap(Timer& rhs) noexcept { impl_.swap(rhs.impl_); }
     void cancel() noexcept;
 
@@ -195,27 +195,7 @@ inline void intrusive_ptr_add_ref(Timer::Impl* impl) noexcept
     ++impl->refCount;
 }
 
-inline void intrusive_ptr_release(Timer::Impl* impl) noexcept
-{
-    if (--impl->refCount == 0) {
-        auto& tq = *impl->tq;
-        impl->next = tq.free_;
-        tq.free_ = impl;
-    }
-}
-
-inline void Timer::reset(std::nullptr_t) noexcept
-{
-    if (impl_) {
-        // If pending, and if only two references to the timer remain (this one and the one in the
-        // queue), then reset the slot and inform the queue that the timer has been cancelled.
-        if (impl_->slot && impl_->refCount == 2) {
-            impl_->slot.reset();
-            impl_->tq->cancel();
-        }
-        impl_.reset();
-    }
-}
+SWIRLY_API void intrusive_ptr_release(Timer::Impl* impl) noexcept;
 
 inline void Timer::cancel() noexcept
 {

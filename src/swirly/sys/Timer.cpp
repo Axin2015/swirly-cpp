@@ -171,5 +171,24 @@ Timer TimerQueue::pop() noexcept
     return tmr;
 }
 
+void intrusive_ptr_release(Timer::Impl* impl) noexcept
+{
+    --impl->refCount;
+    if (impl->refCount == 1) {
+        // Cancel pending if only one reference remains. If only one reference remains after
+        // decrementing the counter, and the timer is still pending, then the final reference must
+        // be held within the internal timer queue, which means that no more references exist
+        // outside of the timer queue.
+        if (impl->slot) {
+            impl->slot.reset();
+            impl->tq->cancel();
+        }
+    } else if (impl->refCount == 0) {
+        auto& tq = *impl->tq;
+        impl->next = tq.free_;
+        tq.free_ = impl;
+    }
+}
+
 } // namespace sys
 } // namespace swirly

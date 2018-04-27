@@ -79,12 +79,24 @@ BOOST_AUTO_TEST_CASE(SlotConstFunctorCase)
     BOOST_TEST(x == 8);
 }
 
-BOOST_AUTO_TEST_CASE(SlotLambdaCase)
+BOOST_AUTO_TEST_CASE(SlotLambdaNullaryCase)
 {
     int x{2};
     auto fn = [&x]() { x <<= 1; };
 
-    auto cb = bind(fn);
+    auto cb = bind(&fn);
+    cb();
+    BOOST_TEST(x == 4);
+    cb();
+    BOOST_TEST(x == 8);
+}
+
+BOOST_AUTO_TEST_CASE(SlotLambdaUnaryCase)
+{
+    int x{2};
+    auto fn = [](int& x) { x <<= 1; };
+
+    auto cb = bind(&fn);
     cb(x);
     BOOST_TEST(x == 4);
     cb(x);
