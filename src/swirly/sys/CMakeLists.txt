@@ -86,7 +86,8 @@ set(test_SOURCES
   Handle.ut.cpp
   IpAddress.ut.cpp
   MemCtx.ut.cpp
-  Socket.ut.cpp)
+  Socket.ut.cpp
+  Timer.ut.cpp)
 
 add_executable(swirly-sys-test
   ${test_SOURCES}
