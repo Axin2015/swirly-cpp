@@ -17,16 +17,16 @@
 #ifndef SWIRLY_FIX_TOKENISER_HPP
 #define SWIRLY_FIX_TOKENISER_HPP
 
-#include <swirly/fix/Exception.hpp>
 #include <swirly/fix/Types.hpp>
 
-#include <cassert>
-#include <cctype>
+#include <swirly/Config.h>
 
 namespace swirly {
 inline namespace fix {
 
-class FixTokeniser {
+SWIRLY_API std::pair<std::string_view, bool> findTag(std::string_view msg, int tag) noexcept;
+
+class SWIRLY_API FixTokeniser {
   public:
     explicit FixTokeniser(std::string_view msg)
     : msg_{msg}
@@ -42,44 +42,14 @@ class FixTokeniser {
     FixTokeniser& operator=(FixTokeniser&&) = delete;
 
     bool empty() const noexcept { return it_ == msg_.cend(); }
+    std::pair<std::string_view, bool> find(int tag) const noexcept { return findTag(msg_, tag); }
     FixPair next() { return {tag(), value()}; }
 
   private:
-    int tag()
-    {
-        int tag{0};
-        assert(it_ != msg_.cend());
-        if (std::isdigit(*it_)) {
-            tag += *it_++ - '0';
-            for (;;) {
-                if (it_ == msg_.cend()) {
-                    throw FixException{"partial FIX tag"};
-                }
-                if (!std::isdigit(*it_)) {
-                    break;
-                }
-                tag *= 10;
-                tag += *it_++ - '0';
-            }
-        }
-        // Verify that first non-digit charactor was '=' delimiter.
-        if (*it_ != '=') {
-            throw FixException{"invalid FIX tag"};
-        }
-        // Skip delimiter.
-        ++it_;
-        return tag;
-    }
-    std::string_view value()
-    {
-        const auto begin = it_;
-        for (; it_ != msg_.cend(); ++it_) {
-            if (*it_ == '\1') {
-                return msg_.substr(begin - msg_.cbegin(), it_++ - begin);
-            }
-        }
-        throw FixException{"partial FIX value"};
-    }
+    int tag(std::string_view::const_iterator& it) const;
+    std::string_view value(std::string_view::const_iterator& it) const noexcept;
+    int tag() { return tag(it_); }
+    std::string_view value() noexcept { return value(it_); }
     std::string_view msg_{};
     std::string_view::const_iterator it_{};
 };

@@ -19,6 +19,8 @@
 
 #include <swirly/util/Utility.hpp>
 
+#include <boost/io/ios_state.hpp>
+
 #include <chrono>
 #include <iomanip>
 #include <iosfwd>
@@ -140,12 +142,18 @@ std::ostream& operator<<(std::ostream& os, PutTime<DurationT> pt)
 
     if constexpr (std::is_same_v<DurationT, Nanos>) {
         const auto ns = nsSinceEpoch(pt.time);
+        boost::io::ios_fill_saver ifs{os};
+        boost::io::ios_width_saver iws{os};
         os << '.' << std::setfill('0') << std::setw(9) << (ns % 1'000'000'000L);
     } else if constexpr (std::is_same_v<DurationT, Micros>) {
         const auto us = usSinceEpoch(pt.time);
+        boost::io::ios_fill_saver ifs{os};
+        boost::io::ios_width_saver iws{os};
         os << '.' << std::setfill('0') << std::setw(6) << (us % 1'000'000L);
     } else if constexpr (std::is_same_v<DurationT, Millis>) {
         const auto ms = msSinceEpoch(pt.time);
+        boost::io::ios_fill_saver ifs{os};
+        boost::io::ios_width_saver iws{os};
         os << '.' << std::setfill('0') << std::setw(3) << (ms % 1'000L);
     } else if constexpr (std::is_same_v<DurationT, Seconds>) {
     } else {

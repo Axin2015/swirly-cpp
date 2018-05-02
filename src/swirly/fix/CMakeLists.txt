@@ -57,7 +57,8 @@ foreach(file ${lib_SOURCES})
 endforeach()
 
 set(test_SOURCES
-  Stream.ut.cpp)
+  Stream.ut.cpp
+  Tokeniser.ut.cpp)
 
 add_executable(swirly-fix-test
   ${test_SOURCES}

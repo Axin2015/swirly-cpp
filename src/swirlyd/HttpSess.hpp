@@ -33,8 +33,8 @@ namespace swirly {
 class RestServ;
 
 class SWIRLY_API HttpSess
-: public BasicHttpParser<HttpSess>
-, public MemAlloc {
+: public MemAlloc
+, BasicHttpParser<HttpSess> {
     friend class BasicHttpParser<HttpSess>;
     using AutoUnlinkOption = boost::intrusive::link_mode<boost::intrusive::auto_unlink>;
 

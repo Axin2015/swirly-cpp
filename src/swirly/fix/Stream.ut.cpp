@@ -76,9 +76,15 @@ BOOST_AUTO_TEST_CASE(StreamNoBodyCase)
         FixStream os{buf};
         os.reset({4, 3});
         os.commit();
-        BOOST_TEST(buf == "8=FIX.4.39=000010=087"sv);
+        BOOST_TEST(buf
+                   == "8=FIX.4.3\1"
+                      "9=0000\1"
+                      "10=087\1"sv);
     }
-    BOOST_TEST(buf == "8=FIX.4.39=000010=087"sv);
+    BOOST_TEST(buf
+               == "8=FIX.4.3\1"
+                  "9=0000\1"
+                  "10=087\1"sv);
 }
 
 BOOST_AUTO_TEST_CASE(StreamMsgTypeCase)
@@ -89,9 +95,17 @@ BOOST_AUTO_TEST_CASE(StreamMsgTypeCase)
         os.reset({4, 3});
         os << "35=D\1";
         os.commit();
-        BOOST_TEST(buf == "8=FIX.4.39=000535=D10=070"sv);
+        BOOST_TEST(buf
+                   == "8=FIX.4.3\1"
+                      "9=0005\1"
+                      "35=D\1"
+                      "10=070\1"sv);
     }
-    BOOST_TEST(buf == "8=FIX.4.39=000535=D10=070"sv);
+    BOOST_TEST(buf
+               == "8=FIX.4.3\1"
+                  "9=0005\1"
+                  "35=D\1"
+                  "10=070\1"sv);
 }
 
 BOOST_AUTO_TEST_CASE(StreamNoCommitCase)
@@ -114,17 +128,41 @@ BOOST_AUTO_TEST_CASE(StreamMultiCase)
         os.reset({4, 2});
         os << "35=A\1";
         os.commit();
-        BOOST_TEST(buf == "8=FIX.4.29=000535=A10=066"sv);
+        BOOST_TEST(buf
+                   == "8=FIX.4.2\1"
+                      "9=0005\1"
+                      "35=A\1"
+                      "10=066\1"sv);
     }
-    BOOST_TEST(buf == "8=FIX.4.29=000535=A10=066"sv);
+    BOOST_TEST(buf
+               == "8=FIX.4.2\1"
+                  "9=0005\1"
+                  "35=A\1"
+                  "10=066\1"sv);
     {
         FixStream os{buf};
         os.reset({4, 3});
         os << "35=D\1";
         os.commit();
-        BOOST_TEST(buf == "8=FIX.4.29=000535=A10=0668=FIX.4.39=000535=D10=070"sv);
+        BOOST_TEST(buf
+                   == "8=FIX.4.2\1"
+                      "9=0005\1"
+                      "35=A\1"
+                      "10=066\1"
+                      "8=FIX.4.3\1"
+                      "9=0005\1"
+                      "35=D\1"
+                      "10=070\1"sv);
     }
-    BOOST_TEST(buf == "8=FIX.4.29=000535=A10=0668=FIX.4.39=000535=D10=070"sv);
+    BOOST_TEST(buf
+               == "8=FIX.4.2\1"
+                  "9=0005\1"
+                  "35=A\1"
+                  "10=066\1"
+                  "8=FIX.4.3\1"
+                  "9=0005\1"
+                  "35=D\1"
+                  "10=070\1"sv);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

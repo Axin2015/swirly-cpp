@@ -66,7 +66,7 @@ class FixField<TagN, ValueT, std::enable_if_t<!std::is_arithmetic_v<ValueT>>> {
     constexpr const ValueT& value() const noexcept { return value_; }
 
   private:
-    ValueT value_;
+    ValueT value_{};
 };
 
 template <int TagN, typename ValueT>
@@ -98,7 +98,7 @@ class FixField<TagN, ValueT, std::enable_if_t<std::is_arithmetic_v<ValueT>>> {
     constexpr ValueT value() const noexcept { return value_; }
 
   private:
-    ValueT value_;
+    ValueT value_{};
 };
 
 static_assert(FixField<9, int>{101}.value() == FixField<9, int>{101}.value());
@@ -141,11 +141,13 @@ using TimeFixField = FixField<TagN, Time>;
 
 using BeginString = StringFixField<8, 7>;
 using BodyLength = IntFixField<9>;
+using MsgSeqNum = IntFixField<34>;
 using MsgType = StringFixField<35, 2>;
 using SenderCompId = StringFixField<49, 32>;
-using TargetCompId = StringFixField<56, 32>;
-using MsgSeqNum = IntFixField<34>;
 using SendingTime = TimeFixField<52>;
+using TargetCompId = StringFixField<56, 32>;
+using EncryptMethod = IntFixField<98>;
+using HeartBtInt = IntFixField<108>;
 
 } // namespace fix
 } // namespace swirly
