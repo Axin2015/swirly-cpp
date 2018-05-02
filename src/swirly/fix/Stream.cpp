@@ -52,10 +52,9 @@ void FixBuf::setBodyLength(std::streamsize pos, std::streamsize len) noexcept
 {
     auto it = pbase_ + pos;
     do {
-        --it;
         const auto d = len % 10;
         sum_ += d;
-        *it = '0' + d;
+        *--it = '0' + d;
         len /= 10;
     } while (len > 0);
 }

@@ -15,3 +15,94 @@
  * 02110-1301, USA.
  */
 #include "Tokeniser.hpp"
+
+#include <swirly/fix/Exception.hpp>
+
+#include <cassert>
+#include <cctype>
+
+namespace swirly {
+inline namespace fix {
+using namespace std;
+pair<string_view, bool> findTag(string_view msg, int tag) noexcept
+{
+    assert(tag >= 0);
+
+    auto pos = msg.find('=');
+    if (pos == string_view::npos) {
+        return {{}, false};
+    }
+    ++pos;
+
+    // \10123456789=
+    char arr[12];
+    auto* end = &arr[sizeof(arr) - 1];
+
+    // Format tag plus equals sign.
+    auto* it = end - 1;
+    *it = '=';
+    do {
+        const auto d = tag % 10;
+        *--it = '0' + d;
+        tag /= 10;
+    } while (tag > 0);
+
+    // Compare first field.
+    size_t len = end - it;
+    if (len != pos || msg.compare(0, pos, it, len) != 0) {
+
+        // Otherwise, search remaining fields.
+        *--it = '\1';
+        ++len;
+        pos = msg.find({it, len}, pos);
+        if (pos == string_view::npos) {
+            return {{}, false};
+        }
+        pos += len;
+    }
+    if ((len = msg.find('\1', pos)) != string_view::npos) {
+        len -= pos;
+    }
+    return {msg.substr(pos, len), true};
+}
+
+int FixTokeniser::tag(string_view::const_iterator& it) const
+{
+    int tag{0};
+    assert(it != msg_.cend());
+    if (isdigit(*it)) {
+        tag += *it++ - '0';
+        for (;;) {
+            if (it == msg_.cend()) {
+                throw FixException{"partial FIX tag"};
+            }
+            if (!isdigit(*it)) {
+                break;
+            }
+            tag *= 10;
+            tag += *it++ - '0';
+        }
+    }
+    // Verify that first non-digit charactor was '=' delimiter.
+    if (*it != '=') {
+        throw FixException{"invalid FIX tag"};
+    }
+    // Skip delimiter.
+    ++it;
+    return tag;
+}
+
+string_view FixTokeniser::value(string_view::const_iterator& it) const noexcept
+{
+    const auto begin = it;
+    auto pos = string_view::npos;
+    for (; it != msg_.cend(); ++it) {
+        if (*it == '\1') {
+            pos = it++ - begin;
+            break;
+        }
+    }
+    return msg_.substr(begin - msg_.cbegin(), pos);
+}
+} // namespace fix
+} // namespace swirly
