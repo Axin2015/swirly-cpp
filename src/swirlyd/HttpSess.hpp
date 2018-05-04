@@ -55,7 +55,11 @@ class SWIRLY_API HttpSess
   private:
     void close() noexcept;
 
-    bool onMessageBegin() noexcept { return true; }
+    bool onMessageBegin() noexcept
+    {
+        ++pending_;
+        return true;
+    }
     bool onUrl(std::string_view sv) noexcept;
     bool onStatus(std::string_view sv) noexcept
     {
@@ -86,6 +90,7 @@ class SWIRLY_API HttpSess
     RestServ& restServ_;
     Reactor::Handle sub_;
     Timer tmr_;
+    int pending_{0};
     HttpRequest req_;
     Buffer buf_;
     HttpStream os_{buf_};

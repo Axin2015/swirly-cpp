@@ -112,6 +112,7 @@ bool HttpSess::onMessageEnd() noexcept
 {
     bool ret{false};
     try {
+        --pending_;
         req_.flush(); // May throw.
 
         const auto wasEmpty = buf_.empty();
@@ -135,8 +136,12 @@ void HttpSess::onIoEvent(int fd, unsigned events, Time now)
         if (events & EventOut) {
             buf_.consume(os::write(fd, buf_.data()));
             if (buf_.empty()) {
-                // May throw.
-                sub_.setEvents(EventIn);
+                if (shouldKeepAlive()) {
+                    // May throw.
+                    sub_.setEvents(EventIn);
+                } else {
+                    close();
+                }
             }
         }
         if (events & EventIn) {
