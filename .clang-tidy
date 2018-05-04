@@ -1,6 +1,7 @@
 # -*- yaml -*-
 ---
-Checks: '-*,modernize-use-nullptr,modernize-use-override,readability-braces-around-statements,readability-identifier-naming'
+Checks:
+  '-*,bugprone-use-after-move,modernize-use-nullptr,modernize-use-equals-default,modernize-use-equals-delete,modernize-use-override,readability-braces-around-statements,readability-deleted-default,readability-identifier-naming'
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false
