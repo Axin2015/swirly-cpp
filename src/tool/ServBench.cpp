@@ -80,7 +80,7 @@ class Archiver {
 class NullJourn : public Journ {
   public:
     NullJourn() noexcept = default;
-    ~NullJourn() = default;
+    ~NullJourn() override = default;
 
   protected:
     int doInterrupted() const noexcept override { return interrupt_; }
