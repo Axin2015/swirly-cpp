@@ -60,13 +60,13 @@ set(lib_SOURCES
 add_library(swirly-util-static STATIC ${lib_SOURCES})
 set_target_properties(swirly-util-static PROPERTIES OUTPUT_NAME swirly-util)
 target_link_libraries(swirly-util-static pthread)
-install(TARGETS swirly-util-static DESTINATION lib COMPONENT static)
+install(TARGETS swirly-util-static DESTINATION lib64 COMPONENT static)
 
 if(ENABLE_SHARED_LIBS)
   add_library(swirly-util-shared SHARED ${lib_SOURCES})
   set_target_properties(swirly-util-shared PROPERTIES OUTPUT_NAME swirly-util)
   target_link_libraries(swirly-util-shared pthread)
-  install(TARGETS swirly-util-shared DESTINATION lib COMPONENT shared)
+  install(TARGETS swirly-util-shared DESTINATION lib64 COMPONENT shared)
 endif()
 
 foreach(file ${lib_SOURCES})
