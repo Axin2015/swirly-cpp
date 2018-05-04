@@ -56,8 +56,8 @@ OrderView::OrderView(OrderModel& model, QWidget* parent, Qt::WindowFlags f)
     connect(table.get(), &QTableView::clicked, this, &OrderView::slotClicked);
 
     auto layout = make_unique<QVBoxLayout>();
-    layout->addWidget(form.release(), 0, 0);
-    layout->addWidget(table.release(), 0, 0);
+    layout->addWidget(form.release(), 0, nullptr);
+    layout->addWidget(table.release(), 0, nullptr);
     setLayout(layout.release());
 }
 

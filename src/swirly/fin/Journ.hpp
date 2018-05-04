@@ -26,7 +26,7 @@ struct Msg;
 class SWIRLY_API Journ : public Interruptible {
   public:
     Journ() noexcept = default;
-    virtual ~Journ();
+    ~Journ() override;
 
     // Copy.
     constexpr Journ(const Journ&) noexcept = default;
