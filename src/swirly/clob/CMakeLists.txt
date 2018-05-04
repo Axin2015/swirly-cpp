@@ -36,13 +36,13 @@ set(lib_SOURCES
 add_library(swirly-clob-static STATIC ${lib_SOURCES})
 set_target_properties(swirly-clob-static PROPERTIES OUTPUT_NAME swirly-clob)
 target_link_libraries(swirly-clob-static swirly-fin-static)
-install(TARGETS swirly-clob-static DESTINATION lib COMPONENT static)
+install(TARGETS swirly-clob-static DESTINATION lib64 COMPONENT static)
 
 if(ENABLE_SHARED_LIBS)
   add_library(swirly-clob-shared SHARED ${lib_SOURCES})
   set_target_properties(swirly-clob-shared PROPERTIES OUTPUT_NAME swirly-clob)
   target_link_libraries(swirly-clob-shared swirly-fin-shared)
-  install(TARGETS swirly-clob-shared DESTINATION lib COMPONENT shared)
+  install(TARGETS swirly-clob-shared DESTINATION lib64 COMPONENT shared)
 endif()
 
 foreach(file ${lib_SOURCES})
