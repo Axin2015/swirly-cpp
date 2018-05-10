@@ -60,6 +60,7 @@ int TimerQueue::dispatch(Time now)
         if (!heap_.front().pending()) {
             pop();
             --cancelled_;
+            assert(cancelled_ >= 0);
         } else if (heap_.front().expiry() <= now) {
             expire(now);
             ++n;
@@ -67,11 +68,7 @@ int TimerQueue::dispatch(Time now)
             break;
         }
     }
-
-    // Garbage collect if more than half of the timers have been cancelled.
-    if (cancelled_ > static_cast<int>(heap_.size() >> 2)) {
-        gc();
-    }
+    gc();
     return n;
 }
 
@@ -117,7 +114,9 @@ void TimerQueue::cancel() noexcept
     while (!heap_.empty() && !heap_.front().pending()) {
         pop();
         --cancelled_;
+        assert(cancelled_ >= 0);
     }
+    gc();
 }
 
 void TimerQueue::expire(Time now)
@@ -137,6 +136,7 @@ void TimerQueue::expire(Time now)
 
         // The timer was cancelled during the callback.
         --cancelled_;
+        assert(cancelled_ >= 0);
 
     } else if (tmr.interval().count() > 0) {
 
@@ -156,11 +156,14 @@ void TimerQueue::expire(Time now)
 
 void TimerQueue::gc() noexcept
 {
-    const auto it
-        = remove_if(heap_.begin(), heap_.end(), [](const auto& tmr) { return !tmr.pending(); });
-    heap_.erase(it, heap_.end());
-    make_heap(heap_.begin(), heap_.end(), isAfter);
-    cancelled_ = 0;
+    // Garbage collect if more than half of the timers have been cancelled.
+    if (cancelled_ >= static_cast<int>(heap_.size() >> 1)) {
+        const auto it
+            = remove_if(heap_.begin(), heap_.end(), [](const auto& tmr) { return !tmr.pending(); });
+        heap_.erase(it, heap_.end());
+        make_heap(heap_.begin(), heap_.end(), isAfter);
+        cancelled_ = 0;
+    }
 }
 
 Timer TimerQueue::pop() noexcept
