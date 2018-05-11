@@ -132,32 +132,31 @@ void TimerQueue::expire(Time now)
         SWIRLY_ERROR << "error handling timer event: "sv << e.what();
     }
 
-    if (!tmr.pending()) {
+    // If timer was not cancelled during the callback.
+    if (tmr.pending()) {
 
-        // The timer was cancelled during the callback.
-        --cancelled_;
-        assert(cancelled_ >= 0);
+        // If periodic timer.
+        if (tmr.interval().count() > 0) {
 
-    } else if (tmr.interval().count() > 0) {
+            // Add interval to expiry, while ensuring that next expiry is always in the future.
+            tmr.setExpiry(max(tmr.expiry() + tmr.interval(), now + 1ns));
 
-        // Add interval to expiry, while ensuring that next expiry is always in the future.
-        tmr.setExpiry(max(tmr.expiry() + tmr.interval(), now + 1ns));
+            // Reschedule popped timer.
+            heap_.push_back(tmr);
+            push_heap(heap_.begin(), heap_.end(), isAfter);
 
-        // Reschedule popped timer.
-        heap_.push_back(tmr);
-        push_heap(heap_.begin(), heap_.end(), isAfter);
+        } else {
 
-    } else {
-
-        // Free handler for non-repeating timer.
-        tmr.slot().reset();
+            // Free handler for non-repeating timer.
+            tmr.slot().reset();
+        }
     }
 }
 
 void TimerQueue::gc() noexcept
 {
     // Garbage collect if more than half of the timers have been cancelled.
-    if (cancelled_ >= static_cast<int>(heap_.size() >> 1)) {
+    if (cancelled_ > static_cast<int>(heap_.size() >> 1)) {
         const auto it
             = remove_if(heap_.begin(), heap_.end(), [](const auto& tmr) { return !tmr.pending(); });
         heap_.erase(it, heap_.end());

@@ -20,7 +20,6 @@
 #include <swirly/util/RefCount.hpp>
 
 #include <iostream>
-#include <queue>
 #include <random>
 
 using namespace std;
@@ -44,23 +43,19 @@ int main(int argc, char* argv[])
         uniform_int_distribution<> dis;
 
         EpollReactor r{1024};
-        priority_queue<pair<int, Timer>> pq;
+        Timer ts[128];
 
         auto h = makeIntrusive<TimerHandler>();
-        for (int i{0}; i < 1000000; ++i) {
+        for (int i{0}; i < 5000000; ++i) {
             const auto now = UnixClock::now();
-            if (pq.empty() || dis(gen) % 2 == 0) {
-                pq.emplace(i,
-                           r.timer(now + Micros{dis(gen) % 100}, Priority::High,
-                                   bind<&TimerHandler::onTimer>(h.get())));
+            auto& t = ts[dis(gen) % 128];
+            if (t && dis(gen) % 2 == 0) {
+                t = {};
             } else {
-                auto tmr = pq.top().second;
-                pq.pop();
-                tmr.reset();
+                t = r.timer(now + Micros{dis(gen) % 100}, Priority::High,
+                            bind<&TimerHandler::onTimer>(h.get()));
             }
-            if (!pq.empty()) {
-                r.poll(0ms);
-            }
+            r.poll(0ms);
         }
         ret = 0;
     } catch (const exception& e) {
