@@ -14,30 +14,36 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Match.hxx"
+#ifndef SWIRLY_LOB_MATCH_HXX
+#define SWIRLY_LOB_MATCH_HXX
 
-#include <swirly/fin/Exec.hpp>
-#include <swirly/fin/Order.hpp>
-#include <swirly/fin/Posn.hpp>
+#include <swirly/fin/Types.hpp>
 
 namespace swirly {
-inline namespace clob {
+inline namespace lob {
 
-Match::Match(Lots lots, const OrderPtr& makerOrder, const ExecPtr& makerTrade,
-             const PosnPtr& makerPosn, const ExecPtr& takerTrade) noexcept
-: lots{lots}
-, makerOrder{makerOrder}
-, makerTrade{makerTrade}
-, makerPosn{makerPosn}
-, takerTrade{takerTrade}
-{
-}
+struct Match {
+    Match(Lots lots, const OrderPtr& makerOrder, const ExecPtr& makerTrade,
+          const PosnPtr& makerPosn, const ExecPtr& takerTrade) noexcept;
 
-Match::~Match() = default;
+    ~Match();
 
-Match::Match(const Match&) = default;
+    // Copy.
+    Match(const Match&);
+    Match& operator=(const Match&) = delete;
 
-Match::Match(Match&&) = default;
+    // Move.
+    Match(Match&&);
+    Match& operator=(Match&&) = delete;
 
-} // namespace clob
+    const Lots lots;
+    const OrderPtr makerOrder;
+    const ExecPtr makerTrade;
+    const PosnPtr makerPosn;
+    const ExecPtr takerTrade;
+};
+
+} // namespace lob
 } // namespace swirly
+
+#endif // SWIRLY_LOB_MATCH_HXX

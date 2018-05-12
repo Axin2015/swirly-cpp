@@ -26,7 +26,7 @@
 #include <algorithm> // transform()
 
 namespace swirly {
-inline namespace clob {
+inline namespace lob {
 using namespace std;
 
 Response::Response() noexcept = default;
@@ -113,5 +113,5 @@ void Response::setPosn(const ConstPosnPtr& posn) noexcept
     posn_ = posn;
 }
 
-} // namespace clob
+} // namespace lob
 } // namespace swirly

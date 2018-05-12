@@ -16,8 +16,8 @@
  */
 #include "Serv.hpp"
 
-#include <swirly/clob/Accnt.hpp>
-#include <swirly/clob/Response.hpp>
+#include <swirly/lob/Accnt.hpp>
+#include <swirly/lob/Response.hpp>
 
 #include <swirly/fin/Date.hpp>
 #include <swirly/fin/Exception.hpp>
@@ -33,7 +33,7 @@
 #include <regex>
 
 namespace swirly {
-inline namespace clob {
+inline namespace lob {
 using namespace std;
 namespace {
 
@@ -851,5 +851,5 @@ void Serv::settlEndOfDay(Time now)
     impl_->settlEndOfDay(now);
 }
 
-} // namespace clob
+} // namespace lob
 } // namespace swirly

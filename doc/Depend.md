@@ -13,9 +13,9 @@ Fin Library
 -----------
 ![Fin Depends](@ref swirly_fin.png)
 
-Clob Library
+Lob Library
 -----------
-![Clob Depends](@ref swirly_clob.png)
+![Lob Depends](@ref swirly_lob.png)
 
 Web Library
 -----------

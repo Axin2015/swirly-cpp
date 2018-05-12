@@ -18,7 +18,7 @@ add_subdirectory(util)
 add_subdirectory(sys)
 add_subdirectory(fix)
 add_subdirectory(fin)
-add_subdirectory(clob)
+add_subdirectory(lob)
 add_subdirectory(web)
 
 # FIXME: the following libraries should be modules.

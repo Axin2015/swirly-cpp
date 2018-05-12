@@ -14,13 +14,13 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_CLOB_TEST_HPP
-#define SWIRLY_CLOB_TEST_HPP
+#ifndef SWIRLY_LOB_TEST_HPP
+#define SWIRLY_LOB_TEST_HPP
 
 #include <swirly/fin/Model.hpp>
 
 namespace swirly {
-inline namespace clob {
+inline namespace lob {
 
 class SWIRLY_API TestModel : public Model {
   public:
@@ -51,7 +51,7 @@ class SWIRLY_API TestModel : public Model {
     void doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const override;
 };
 
-} // namespace clob
+} // namespace lob
 } // namespace swirly
 
-#endif // SWIRLY_CLOB_TEST_HPP
+#endif // SWIRLY_LOB_TEST_HPP

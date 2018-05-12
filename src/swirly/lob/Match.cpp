@@ -14,28 +14,30 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Accnt.hpp"
+#include "Match.hxx"
+
+#include <swirly/fin/Exec.hpp>
+#include <swirly/fin/Order.hpp>
+#include <swirly/fin/Posn.hpp>
 
 namespace swirly {
-inline namespace clob {
-using namespace std;
+inline namespace lob {
 
-static_assert(sizeof(Accnt) <= 6 * 64, "no greater than specified cache-lines");
-
-Accnt::~Accnt() = default;
-
-Accnt::Accnt(Accnt&&) = default;
-
-PosnPtr Accnt::posn(Id64 marketId, Symbol instr, JDay settlDay)
+Match::Match(Lots lots, const OrderPtr& makerOrder, const ExecPtr& makerTrade,
+             const PosnPtr& makerPosn, const ExecPtr& takerTrade) noexcept
+: lots{lots}
+, makerOrder{makerOrder}
+, makerTrade{makerTrade}
+, makerPosn{makerPosn}
+, takerTrade{takerTrade}
 {
-    PosnSet::Iterator it;
-    bool found;
-    tie(it, found) = posns_.findHint(marketId);
-    if (!found) {
-        it = posns_.insertHint(it, Posn::make(symbol_, marketId, instr, settlDay));
-    }
-    return &*it;
 }
 
-} // namespace clob
+Match::~Match() = default;
+
+Match::Match(const Match&) = default;
+
+Match::Match(Match&&) = default;
+
+} // namespace lob
 } // namespace swirly

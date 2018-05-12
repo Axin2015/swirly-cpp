@@ -17,10 +17,10 @@
 #include <swirly/sqlite/Journ.hpp>
 #include <swirly/sqlite/Model.hpp>
 
-#include <swirly/clob/Accnt.hpp>
-#include <swirly/clob/Response.hpp>
-#include <swirly/clob/Serv.hpp>
-#include <swirly/clob/Test.hpp>
+#include <swirly/lob/Accnt.hpp>
+#include <swirly/lob/Response.hpp>
+#include <swirly/lob/Serv.hpp>
+#include <swirly/lob/Test.hpp>
 
 #include <swirly/fin/Date.hpp>
 #include <swirly/fin/MsgQueue.hpp>

@@ -59,7 +59,6 @@
 * *API*: Application Programming Interface
 * *BBO*: Best Bid and Offer
 * *BPS*: Basis Point
-* *CLOB*: Central Limit Order-Book
 * *CLS*: Continuous Linked Settlement
 * *CPU*: Central Processing Unit
 * *DOS*: Denial Of Service
@@ -75,6 +74,7 @@
 * *IOC*: Immediate Or Cancel
 * *IP*: Intellectual Property
 * *JSON*: Java-Script Object Notation
+* *LOB*: Limit Order-Book
 * *LP*: Liquidity Provider
 * *MIS*: Market Information Services
 * *MQL*: Minimum Quote Lifetime

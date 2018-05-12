@@ -14,15 +14,15 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_CLOB_RESPONSE_HPP
-#define SWIRLY_CLOB_RESPONSE_HPP
+#ifndef SWIRLY_LOB_RESPONSE_HPP
+#define SWIRLY_LOB_RESPONSE_HPP
 
 #include <swirly/fin/Types.hpp>
 
 #include <vector>
 
 namespace swirly {
-inline namespace clob {
+inline namespace lob {
 
 class SWIRLY_API Response {
   public:
@@ -72,7 +72,7 @@ inline std::ostream& operator<<(std::ostream& os, const Response& resp)
     return os;
 }
 
-} // namespace clob
+} // namespace lob
 } // namespace swirly
 
-#endif // SWIRLY_CLOB_RESPONSE_HPP
+#endif // SWIRLY_LOB_RESPONSE_HPP
