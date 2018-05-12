@@ -20,7 +20,7 @@
 #include <swirly/fin/Conv.hpp>
 #include <swirly/fin/Request.hpp>
 
-#include <swirly/sys/MemAlloc.hpp>
+#include <swirly/app/MemAlloc.hpp>
 
 #include <boost/intrusive/list.hpp>
 

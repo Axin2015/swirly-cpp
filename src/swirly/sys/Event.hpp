@@ -96,6 +96,16 @@ class EventFd {
         os::read(*fh_, u.buf, sizeof(u.buf));
         return u.val;
     }
+    void write(std::int64_t val, std::error_code& ec) noexcept
+    {
+        // Adds the 8-byte integer value supplied in its buffer to the counter.
+        union {
+            char buf[sizeof(std::int64_t)];
+            std::int64_t val;
+        } u;
+        u.val = val;
+        os::write(*fh_, u.buf, sizeof(u.buf), ec);
+    }
     void write(std::int64_t val)
     {
         // Adds the 8-byte integer value supplied in its buffer to the counter.

@@ -25,17 +25,16 @@
 #include <swirly/fin/Journ.hpp>
 #include <swirly/fin/Model.hpp>
 #include <swirly/fin/MsgQueue.hpp>
-#include <swirly/fin/Worker.hpp>
 
-#include <swirly/sys/Cpu.hpp>
+#include <swirly/app/MemCtx.hpp>
+#include <swirly/app/Thread.hpp>
+
 #include <swirly/sys/Daemon.hpp>
 #include <swirly/sys/EpollReactor.hpp>
 #include <swirly/sys/File.hpp>
-#include <swirly/sys/MemCtx.hpp>
 #include <swirly/sys/PidFile.hpp>
 #include <swirly/sys/Signal.hpp>
 #include <swirly/sys/System.hpp>
-#include <swirly/sys/Worker.hpp>
 
 #include <swirly/util/Config.hpp>
 #include <swirly/util/Exception.hpp>
@@ -286,8 +285,17 @@ int main(int argc, char* argv[])
         const TcpEndpoint ep{Tcp::v4(), stou16(httpPort)};
         HttpServ httpServ{reactor, ep, restServ};
 
-        ReactorWorker reactorWorker{reactor};
-        JournWorker journWorker{mq, journ};
+        ReactorThread reactorThread{reactor, ThreadConfig{"reactor"s}};
+        auto journAgent = [&mq, &journ]() {
+            int n{0};
+            Msg msg;
+            while (mq.pop(msg)) {
+                journ.write(msg);
+                ++n;
+            }
+            return n;
+        };
+        AgentThread journThread{journAgent, ThreadConfig{"journ"s}};
 
         SWIRLY_NOTICE << "started http server on port "sv << httpPort;
 

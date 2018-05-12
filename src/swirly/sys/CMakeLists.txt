@@ -28,7 +28,6 @@ endif()
 
 set(lib_SOURCES
   Buffer.cpp
-  Cpu.cpp
   Daemon.cpp
   Epoll.cpp
   EpollReactor.cpp
@@ -36,15 +35,10 @@ set(lib_SOURCES
   Event.cpp
   File.cpp
   Handle.cpp
-  Interruptible.cpp
   IoSocket.cpp
   IpAddress.cpp
   LocalAddress.cpp
   MMap.cpp
-  MemAlloc.cpp
-  MemCtx.cpp
-  MemPool.cpp
-  MemQueue.cpp
   Memory.cpp
   Muxer.cpp
   PidFile.cpp
@@ -55,8 +49,7 @@ set(lib_SOURCES
   TcpAcceptor.cpp
   TcpSocket.cpp
   Timer.cpp
-  UdpSocket.cpp
-  Worker.cpp)
+  UdpSocket.cpp)
 
 add_library(swirly-sys-static STATIC ${lib_SOURCES})
 set_target_properties(swirly-sys-static PROPERTIES OUTPUT_NAME swirly-sys)
@@ -85,7 +78,6 @@ set(test_SOURCES
   EpollReactor.ut.cpp
   Handle.ut.cpp
   IpAddress.ut.cpp
-  MemCtx.ut.cpp
   Socket.ut.cpp
   Timer.ut.cpp)
 

@@ -14,44 +14,43 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Worker.hpp"
+#ifndef SWIRLY_APP_BACKOFF_HPP
+#define SWIRLY_APP_BACKOFF_HPP
 
-#include "Reactor.hpp"
-#include "Signal.hpp"
-
-#include <swirly/util/Log.hpp>
+#include <swirly/Config.h>
 
 namespace swirly {
-inline namespace sys {
-using namespace std;
-namespace {
-void runReactor(Reactor& r)
-{
-    sigBlockAll();
-    SWIRLY_NOTICE << "started reactor thread"sv;
-    try {
-        while (!r.interrupted()) {
-            r.poll();
-        }
-    } catch (const exception& e) {
-        SWIRLY_ERROR << "exception: "sv << e.what();
-        kill(0, SIGTERM);
-    }
-    SWIRLY_NOTICE << "stopping reactor thread"sv;
-}
-} // namespace
+inline namespace app {
 
-ReactorWorker::ReactorWorker(Reactor& r)
-: reactor_(r)
-, thread_{runReactor, ref(r)}
+struct NoBackoff {
+    void idle() noexcept {}
+    void reset() noexcept {}
+};
+
+class SWIRLY_API PhasedBackoff {
+  public:
+    void idle() noexcept;
+    void reset() noexcept { i_ = 0; }
+
+  private:
+    int i_{0};
+};
+
+struct SWIRLY_API YieldBackoff {
+    void idle() noexcept;
+    void reset() noexcept {}
+};
+
+inline void cpuRelax() noexcept
 {
+#if defined(__x86_64__) || defined(__i386__)
+    asm volatile("pause" ::: "memory");
+#elif defined(__arm__) || defined(__arm64__)
+    asm volatile("yield" ::: "memory");
+#endif
 }
 
-ReactorWorker::~ReactorWorker()
-{
-    reactor_.interrupt(1);
-    thread_.join();
-}
-
-} // namespace sys
+} // namespace app
 } // namespace swirly
+
+#endif // SWIRLY_APP_BACKOFF_HPP

@@ -16,6 +16,7 @@
 add_subdirectory(contrib)
 add_subdirectory(util)
 add_subdirectory(sys)
+add_subdirectory(app)
 add_subdirectory(fix)
 add_subdirectory(fin)
 add_subdirectory(lob)

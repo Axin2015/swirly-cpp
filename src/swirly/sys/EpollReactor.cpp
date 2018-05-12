@@ -45,14 +45,11 @@ EpollReactor::~EpollReactor()
     mux_.unsubscribe(efd_.fd());
 }
 
-int EpollReactor::doInterrupted() const noexcept
+void EpollReactor::doInterrupt() noexcept
 {
-    return interrupt_;
-}
-
-void EpollReactor::doInterrupt(int num) noexcept
-{
-    efd_.write(num);
+    // Best effort.
+    std::error_code ec;
+    efd_.write(1, ec);
 }
 
 Reactor::Handle EpollReactor::doSubscribe(int fd, unsigned events, IoSlot slot)
@@ -115,7 +112,6 @@ int EpollReactor::doPoll(Time now, Millis timeout)
     enum { High = 0, Low = 1 };
     using namespace chrono;
 
-    interrupt_ = 0;
     for (const auto& tq : tqs_) {
         if (!tq.empty()) {
             // Millis until next expiry.
@@ -149,7 +145,7 @@ int EpollReactor::dispatch(Event* buf, int size, Time now)
         const auto fd = mux_.fd(ev);
         if (fd == efd_.fd()) {
             SWIRLY_INFO << "reactor interrupted"sv;
-            interrupt_ = efd_.read();
+            efd_.read();
             continue;
         }
         const auto& ref = data_[fd];

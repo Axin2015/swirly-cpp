@@ -17,7 +17,6 @@
 #ifndef SWIRLY_SYS_REACTOR_HPP
 #define SWIRLY_SYS_REACTOR_HPP
 
-#include <swirly/sys/Interruptible.hpp>
 #include <swirly/sys/Timer.hpp>
 
 namespace swirly {
@@ -27,7 +26,7 @@ enum class Priority { High = 0, Low = 1 };
 
 using IoSlot = BasicSlot<int, unsigned, Time>;
 
-class SWIRLY_API Reactor : public Interruptible {
+class SWIRLY_API Reactor {
   public:
     class Handle {
       public:
@@ -94,7 +93,7 @@ class SWIRLY_API Reactor : public Interruptible {
     };
 
     Reactor() noexcept = default;
-    ~Reactor() override;
+    virtual ~Reactor();
 
     // Copy.
     Reactor(const Reactor&) noexcept = delete;
@@ -104,6 +103,7 @@ class SWIRLY_API Reactor : public Interruptible {
     Reactor(Reactor&&) noexcept = delete;
     Reactor& operator=(Reactor&&) noexcept = delete;
 
+    void interrupt() noexcept { doInterrupt(); }
     // clang-format off
     [[nodiscard]] Handle subscribe(int fd, unsigned events, IoSlot slot)
     {
@@ -128,6 +128,8 @@ class SWIRLY_API Reactor : public Interruptible {
      * Overload for unit-testing.
      */
     int poll(Time now, Millis timeout) { return doPoll(now, timeout); }
+
+    virtual void doInterrupt() noexcept = 0;
 
     virtual Handle doSubscribe(int fd, unsigned events, IoSlot slot) = 0;
     virtual void doUnsubscribe(int fd, int sid) noexcept = 0;

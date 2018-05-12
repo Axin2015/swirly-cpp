@@ -34,11 +34,11 @@ target_link_libraries(swirly-db-to-json ${swirly_sqlite_LIBRARY})
 install(TARGETS swirly-db-to-json DESTINATION bin COMPONENT program)
 
 add_executable(swirly-echo-serv EchoServ.cpp)
-target_link_libraries(swirly-echo-serv ${swirly_fix_LIBRARY})
+target_link_libraries(swirly-echo-serv ${swirly_app_LIBRARY} ${swirly_fix_LIBRARY})
 install(TARGETS swirly-echo-serv DESTINATION bin COMPONENT program)
 
 add_executable(swirly-queue-bench QueueBench.cpp)
-target_link_libraries(swirly-queue-bench ${swirly_util_LIBRARY})
+target_link_libraries(swirly-queue-bench ${swirly_app_LIBRARY})
 install(TARGETS swirly-queue-bench DESTINATION bin COMPONENT program)
 
 # Reserved as an ad-hoc scratch pad.

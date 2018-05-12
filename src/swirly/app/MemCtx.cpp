@@ -16,14 +16,15 @@
  */
 #include "MemCtx.hpp"
 
-#include "File.hpp"
-#include "MMap.hpp"
 #include "MemPool.hpp"
+
+#include <swirly/sys/File.hpp>
+#include <swirly/sys/MMap.hpp>
 
 #include <fcntl.h>
 
 namespace swirly {
-inline namespace sys {
+inline namespace app {
 using namespace std;
 namespace {
 
@@ -167,5 +168,5 @@ void MemCtx::dealloc(void* addr, size_t size) noexcept
     impl_->dealloc(addr, size);
 }
 
-} // namespace sys
+} // namespace app
 } // namespace swirly

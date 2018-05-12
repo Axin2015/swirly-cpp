@@ -25,10 +25,10 @@
 
 namespace swirly {
 
-inline namespace sys {
+inline namespace app {
 template <typename ValueT>
 class MemQueue;
-} // namespace sys
+} // namespace app
 
 inline namespace fin {
 class Journ;

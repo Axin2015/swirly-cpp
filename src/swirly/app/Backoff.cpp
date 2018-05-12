@@ -14,12 +14,34 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Interruptible.hpp"
+#include "Backoff.hpp"
+
+#include <chrono>
+#include <thread>
 
 namespace swirly {
-inline namespace sys {
+inline namespace app {
 
-Interruptible::~Interruptible() = default;
+void PhasedBackoff::idle() noexcept
+{
+    using namespace std::literals::chrono_literals;
+    if (i_ < 1000) {
+        cpuRelax();
+    } else if (i_ < 2000) {
+        sched_yield();
+    } else if (i_ < 4000) {
+        std::this_thread::sleep_for(1ms);
+    } else {
+        // Deep sleep.
+        std::this_thread::sleep_for(250ms);
+    }
+    ++i_;
+}
 
-} // namespace sys
+void YieldBackoff::idle() noexcept
+{
+    sched_yield();
+}
+
+} // namespace app
 } // namespace swirly

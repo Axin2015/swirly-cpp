@@ -21,9 +21,11 @@ if(DOT_EXECUTABLE)
   message(STATUS "Dot found: ${DOT_EXECUTABLE}")
 
   set(names
-    sys
     util
+    sys
+    app
     fin
+    fix
     lob
     web
   )

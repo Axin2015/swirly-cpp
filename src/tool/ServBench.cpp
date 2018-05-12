@@ -24,10 +24,10 @@
 
 #include <swirly/fin/Date.hpp>
 #include <swirly/fin/MsgQueue.hpp>
-#include <swirly/fin/Worker.hpp>
 
-#include <swirly/sys/Cpu.hpp>
-#include <swirly/sys/MemCtx.hpp>
+#include <swirly/app/MemCtx.hpp>
+#include <swirly/app/Thread.hpp>
+
 #include <swirly/sys/Signal.hpp>
 
 #include <swirly/util/Config.hpp>
@@ -83,21 +83,7 @@ class NullJourn : public Journ {
     ~NullJourn() override = default;
 
   protected:
-    int doInterrupted() const noexcept override { return interrupt_; }
-    void doInterrupt(int num) noexcept override
-    {
-        SWIRLY_INFO << "interrupt"sv;
-        interrupt_ = num;
-    }
-    void doWrite(const Msg& msg) override
-    {
-        if (msg.type == MsgType::Interrupt) {
-            interrupt(msg.interrupt.num.count());
-        }
-    }
-
-  private:
-    int interrupt_{0};
+    void doWrite(const Msg& msg) override {}
 };
 
 MemCtx memCtx;
@@ -148,7 +134,16 @@ int main(int argc, char* argv[])
         model = nullptr;
 
         NullJourn journ;
-        JournWorker journWorker{mq, journ};
+        auto journAgent = [&mq, &journ]() {
+            int n{0};
+            Msg msg;
+            while (mq.pop(msg)) {
+                journ.write(msg);
+                ++n;
+            }
+            return n;
+        };
+        AgentThread journThread{journAgent, ThreadConfig{"journ"s}};
 
         auto& market = createMarket(serv, "EURUSD"sv, busDay(now), 0, now);
 

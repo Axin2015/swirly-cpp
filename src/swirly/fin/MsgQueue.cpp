@@ -40,26 +40,6 @@ void MsgQueue::archiveTrade(Id64 marketId, ArrayView<Id64> ids, Time modified)
     } while (r.next());
 }
 
-bool MsgQueue::doInterrupt(Id32 num, Millis timeout)
-{
-    const auto fn = [&num](Msg & msg) noexcept
-    {
-        msg.type = MsgType::Interrupt;
-        auto& body = msg.interrupt;
-        body.num = num;
-    };
-    // Best effort to post stop message within timeout period.
-    const auto expiry = UnixClock::now() + timeout;
-    while (!mq_.post(fn)) {
-        const auto diff = chrono::duration_cast<Millis>(expiry - UnixClock::now());
-        if (diff <= 0ms) {
-            return false;
-        }
-        this_thread::sleep_for(min(diff, 1000ms));
-    }
-    return true;
-}
-
 void MsgQueue::doCreateMarket(Id64 id, Symbol instr, JDay settlDay, MarketState state)
 {
     const auto fn = [ id, &instr, settlDay, state ](Msg & msg) noexcept

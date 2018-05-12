@@ -35,9 +35,6 @@ inline namespace fin {
 std::ostream& operator<<(std::ostream& os, MsgType type)
 {
     switch (type) {
-    case MsgType::Interrupt:
-        os << "Interrupt"sv;
-        break;
     case MsgType::CreateMarket:
         os << "CreateMarket"sv;
         break;

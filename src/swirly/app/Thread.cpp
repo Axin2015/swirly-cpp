@@ -14,58 +14,43 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Worker.hpp"
+#include "Thread.hpp"
 
-#include "Journ.hpp"
-#include "MsgQueue.hpp"
-
-#include <swirly/sys/Cpu.hpp>
-#include <swirly/sys/Signal.hpp>
-
-#include <swirly/util/Log.hpp>
+#include <swirly/sys/Reactor.hpp>
 
 namespace swirly {
-inline namespace fin {
+inline namespace app {
 using namespace std;
 namespace {
-void runJourn(MsgQueue& mq, Journ& journ)
+void runReactor(Reactor& r, ThreadConfig config, const std::atomic<bool>& stop)
 {
     sigBlockAll();
-    SWIRLY_NOTICE << "started journal thread"sv;
+    pthread_setname_np(pthread_self(), config.name.c_str());
+    SWIRLY_NOTICE << "started "sv << config.name << " thread"sv;
     try {
-        CpuBackoff backoff;
-        for (;;) {
-            Msg msg;
-            while (mq.pop(msg)) {
-                journ.write(msg);
-                backoff.reset();
-            }
-            if (journ.interrupted()) {
-                break;
-            }
-            backoff();
+        while (!stop.load(std::memory_order_acquire)) {
+            r.poll();
         }
-    } catch (const exception& e) {
+    } catch (const std::exception& e) {
         SWIRLY_ERROR << "exception: "sv << e.what();
-        kill(0, SIGTERM);
+        kill(getpid(), SIGTERM);
     }
-    SWIRLY_NOTICE << "stopping journal thread"sv;
+    SWIRLY_NOTICE << "stopping "sv << config.name << " thread"sv;
 }
 } // namespace
 
-JournWorker::JournWorker(MsgQueue& mq, Journ& journ)
-: mq_(mq)
-, thread_{runJourn, ref(mq), ref(journ)}
+ReactorThread::ReactorThread(Reactor& r, ThreadConfig config)
+: reactor_(r)
+, thread_{runReactor, std::ref(r), config, std::cref(stop_)}
 {
 }
 
-JournWorker::~JournWorker()
+ReactorThread::~ReactorThread()
 {
-    if (!mq_.interrupt(1_id32)) {
-        SWIRLY_ERROR << "interrupt timeout"sv;
-    }
+    stop_.store(true, std::memory_order_release);
+    reactor_.interrupt();
     thread_.join();
 }
 
-} // namespace fin
+} // namespace app
 } // namespace swirly

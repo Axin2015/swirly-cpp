@@ -49,18 +49,17 @@ set(lib_SOURCES
   Posn.cpp
   Request.cpp
   Transaction.cpp
-  Types.cpp
-  Worker.cpp)
+  Types.cpp)
 
 add_library(swirly-fin-static STATIC ${lib_SOURCES})
 set_target_properties(swirly-fin-static PROPERTIES OUTPUT_NAME swirly-fin)
-target_link_libraries(swirly-fin-static swirly-sys-static)
+target_link_libraries(swirly-fin-static swirly-app-static)
 install(TARGETS swirly-fin-static DESTINATION lib64 COMPONENT static)
 
 if(ENABLE_SHARED_LIBS)
   add_library(swirly-fin-shared SHARED ${lib_SOURCES})
   set_target_properties(swirly-fin-shared PROPERTIES OUTPUT_NAME swirly-fin)
-  target_link_libraries(swirly-fin-shared swirly-sys-shared)
+  target_link_libraries(swirly-fin-shared swirly-app-shared)
   install(TARGETS swirly-fin-shared DESTINATION lib64 COMPONENT shared)
 endif()
 
