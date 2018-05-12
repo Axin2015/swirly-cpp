@@ -18,7 +18,6 @@
 
 namespace swirly {
 inline namespace fin {
-using namespace std;
 
 Journ::~Journ() = default;
 

@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SYS_MEMQUEUE_HPP
-#define SWIRLY_SYS_MEMQUEUE_HPP
+#ifndef SWIRLY_APP_MEMQUEUE_HPP
+#define SWIRLY_APP_MEMQUEUE_HPP
 
 #include <swirly/sys/File.hpp>
 #include <swirly/sys/MMap.hpp>
@@ -26,7 +26,7 @@
 #include <memory>
 
 namespace swirly {
-inline namespace sys {
+inline namespace app {
 namespace detail {
 inline std::size_t fileSize(int fd)
 {
@@ -277,7 +277,7 @@ void createMemQueue(const char* path, std::size_t capacity, mode_t mode)
     }
 }
 
-} // namespace sys
+} // namespace app
 } // namespace swirly
 
-#endif // SWIRLY_SYS_MEMQUEUE_HPP
+#endif // SWIRLY_APP_MEMQUEUE_HPP

@@ -14,30 +14,5 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SYS_MEMALLOC_HPP
-#define SWIRLY_SYS_MEMALLOC_HPP
-
-#include <swirly/Config.h>
-
-#include <new>
-
-namespace swirly {
-inline namespace sys {
-
-SWIRLY_API void* alloc(std::size_t size);
-SWIRLY_API void* alloc(std::size_t size, std::align_val_t al);
-SWIRLY_API void dealloc(void* ptr, std::size_t size) noexcept;
-
-struct MemAlloc {
-    static void* operator new(std::size_t size) { return alloc(size); }
-    static void* operator new(std::size_t size, std::align_val_t al) { return alloc(size, al); }
-    static void operator delete(void* ptr, std::size_t size) noexcept { return dealloc(ptr, size); }
-
-  protected:
-    ~MemAlloc() = default;
-};
-
-} // namespace sys
-} // namespace swirly
-
-#endif // SWIRLY_SYS_MEMALLOC_HPP
+#define BOOST_TEST_MAIN
+#include <boost/test/unit_test.hpp>

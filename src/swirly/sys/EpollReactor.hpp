@@ -40,12 +40,10 @@ class SWIRLY_API EpollReactor : public Reactor {
     EpollReactor& operator=(EpollReactor&&) = delete;
 
   protected:
-    int doInterrupted() const noexcept override;
-
     /**
      * Thread-safe.
      */
-    void doInterrupt(int num) noexcept override;
+    void doInterrupt() noexcept override;
 
     Handle doSubscribe(int fd, unsigned events, IoSlot slot) override;
     void doUnsubscribe(int fd, int sid) noexcept override;
@@ -72,7 +70,6 @@ class SWIRLY_API EpollReactor : public Reactor {
     static_assert(static_cast<int>(Priority::High) == 0);
     static_assert(static_cast<int>(Priority::Low) == 1);
     std::array<TimerQueue, 2> tqs_;
-    int interrupt_{0};
 };
 
 } // namespace sys

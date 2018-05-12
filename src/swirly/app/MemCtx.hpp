@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SYS_MEMCTX_HPP
-#define SWIRLY_SYS_MEMCTX_HPP
+#ifndef SWIRLY_APP_MEMCTX_HPP
+#define SWIRLY_APP_MEMCTX_HPP
 
 #include <swirly/Config.h>
 
@@ -23,7 +23,7 @@
 #include <memory>
 
 namespace swirly {
-inline namespace sys {
+inline namespace app {
 
 class SWIRLY_API MemCtx {
   public:
@@ -61,7 +61,7 @@ class SWIRLY_API MemCtx {
     std::unique_ptr<Impl> impl_;
 };
 
-} // namespace sys
+} // namespace app
 } // namespace swirly
 
-#endif // SWIRLY_SYS_MEMCTX_HPP
+#endif // SWIRLY_APP_MEMCTX_HPP

@@ -50,10 +50,6 @@ class SWIRLY_API SqlJourn
     SqlJourn& operator=(SqlJourn&&);
 
   protected:
-    int doInterrupted() const noexcept override;
-
-    void doInterrupt(int num) noexcept override;
-
     void doWrite(const Msg& msg) override;
 
   private:
@@ -62,8 +58,6 @@ class SWIRLY_API SqlJourn
     void commit();
 
     void rollback() noexcept;
-
-    void onInterrupt(const Interrupt& body) noexcept { interrupt(body.num.count()); }
 
     void onCreateMarket(const CreateMarket& body);
 
@@ -81,7 +75,6 @@ class SWIRLY_API SqlJourn
     sqlite::StmtPtr updateMarketStmt_;
     sqlite::StmtPtr insertExecStmt_;
     sqlite::StmtPtr updateExecStmt_;
-    int interrupt_{0};
 };
 
 } // namespace sqlite

@@ -60,7 +60,7 @@ constexpr std::size_t ceilPow2(std::size_t size) noexcept
 
 class SWIRLY_API VarAccum {
   public:
-    constexpr VarAccum() noexcept = default;;
+    constexpr VarAccum() noexcept = default;
     ~VarAccum() = default;
 
     // Copy.

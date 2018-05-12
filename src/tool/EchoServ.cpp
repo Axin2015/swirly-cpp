@@ -14,10 +14,11 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
+#include <swirly/app/Thread.hpp>
+
 #include <swirly/sys/EpollReactor.hpp>
 #include <swirly/sys/Signal.hpp>
 #include <swirly/sys/TcpAcceptor.hpp>
-#include <swirly/sys/Worker.hpp>
 
 #include <swirly/util/Log.hpp>
 
@@ -134,8 +135,8 @@ int main(int argc, char* argv[])
         const TcpEndpoint ep{Tcp::v4(), 7777};
         EchoServ echoServ{reactor, ep};
 
-        // Start service/worker threads.
-        ReactorWorker reactorWorker{reactor};
+        // Start service threads.
+        ReactorThread reactorThread{reactor, ThreadConfig{"reactor"s}};
 
         // Wait for termination.
         SigWait sigWait;

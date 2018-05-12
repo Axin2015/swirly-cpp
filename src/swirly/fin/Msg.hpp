@@ -19,7 +19,7 @@
 
 #include <swirly/fin/Types.hpp>
 
-#include <swirly/sys/MemQueue.hpp>
+#include <swirly/app/MemQueue.hpp>
 
 #include <swirly/util/BasicTypes.hpp>
 #include <swirly/util/Date.hpp>
@@ -28,12 +28,7 @@
 namespace swirly {
 inline namespace fin {
 
-enum class MsgType : int { Interrupt, CreateMarket, UpdateMarket, CreateExec, ArchiveTrade };
-
-struct SWIRLY_PACKED Interrupt {
-    Id32 num;
-};
-static_assert(std::is_pod_v<Interrupt>);
+enum class MsgType : int { CreateMarket, UpdateMarket, CreateExec, ArchiveTrade };
 
 struct SWIRLY_PACKED CreateMarket {
     Id64 id;
@@ -87,7 +82,6 @@ static_assert(std::is_pod_v<ArchiveTrade>);
 struct SWIRLY_PACKED Msg {
     MsgType type;
     union SWIRLY_PACKED {
-        Interrupt interrupt;
         CreateMarket createMarket;
         UpdateMarket updateMarket;
         CreateExec createExec;

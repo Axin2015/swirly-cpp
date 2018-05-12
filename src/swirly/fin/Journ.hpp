@@ -17,16 +17,16 @@
 #ifndef SWIRLY_FIN_JOURN_HPP
 #define SWIRLY_FIN_JOURN_HPP
 
-#include <swirly/sys/Interruptible.hpp>
+#include <swirly/Config.h>
 
 namespace swirly {
 inline namespace fin {
 struct Msg;
 
-class SWIRLY_API Journ : public Interruptible {
+class SWIRLY_API Journ {
   public:
     Journ() noexcept = default;
-    ~Journ() override;
+    virtual ~Journ();
 
     // Copy.
     constexpr Journ(const Journ&) noexcept = default;

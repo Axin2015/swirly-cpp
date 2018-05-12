@@ -14,44 +14,30 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SYS_INTERRUPTIBLE_HPP
-#define SWIRLY_SYS_INTERRUPTIBLE_HPP
+#ifndef SWIRLY_APP_MEMALLOC_HPP
+#define SWIRLY_APP_MEMALLOC_HPP
 
 #include <swirly/Config.h>
 
-#include <cassert>
+#include <new>
 
 namespace swirly {
-inline namespace sys {
+inline namespace app {
 
-class SWIRLY_API Interruptible {
-  public:
-    Interruptible() noexcept = default;
-    virtual ~Interruptible();
+SWIRLY_API void* alloc(std::size_t size);
+SWIRLY_API void* alloc(std::size_t size, std::align_val_t al);
+SWIRLY_API void dealloc(void* ptr, std::size_t size) noexcept;
 
-    // Copy.
-    Interruptible(const Interruptible&) noexcept = default;
-    Interruptible& operator=(const Interruptible&) noexcept = default;
-
-    // Move.
-    Interruptible(Interruptible&&) noexcept = default;
-    Interruptible& operator=(Interruptible&&) noexcept = default;
-
-    int interrupted() const noexcept { return doInterrupted(); }
-
-    void interrupt(int num) noexcept
-    {
-        assert(num > 0);
-        doInterrupt(num);
-    }
+struct MemAlloc {
+    static void* operator new(std::size_t size) { return alloc(size); }
+    static void* operator new(std::size_t size, std::align_val_t al) { return alloc(size, al); }
+    static void operator delete(void* ptr, std::size_t size) noexcept { return dealloc(ptr, size); }
 
   protected:
-    virtual int doInterrupted() const noexcept = 0;
-
-    virtual void doInterrupt(int num) noexcept = 0;
+    ~MemAlloc() = default;
 };
 
-} // namespace sys
+} // namespace app
 } // namespace swirly
 
-#endif // SWIRLY_SYS_INTERRUPTIBLE_HPP
+#endif // SWIRLY_APP_MEMALLOC_HPP

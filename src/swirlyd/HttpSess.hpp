@@ -21,7 +21,8 @@
 #include <swirly/web/Request.hpp>
 #include <swirly/web/Stream.hpp>
 
-#include <swirly/sys/MemAlloc.hpp>
+#include <swirly/app/MemAlloc.hpp>
+
 #include <swirly/sys/TcpAcceptor.hpp>
 
 #include <swirly/util/Log.hpp>

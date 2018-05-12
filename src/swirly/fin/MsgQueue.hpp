@@ -19,7 +19,7 @@
 
 #include <swirly/fin/Msg.hpp>
 
-#include <swirly/sys/MemQueue.hpp>
+#include <swirly/app/MemQueue.hpp>
 
 #include <swirly/util/Array.hpp>
 
@@ -85,14 +85,6 @@ class SWIRLY_API MsgQueue {
     MsgQueue& operator=(MsgQueue&&) = default;
 
     /**
-     * Send interrupt.
-     */
-    bool interrupt(Id32 num, Millis timeout = 5000ms) noexcept
-    {
-        assert(num > 0_id32);
-        return doInterrupt(num, timeout);
-    }
-    /**
      * Create Market.
      */
     void createMarket(Id64 id, Symbol instr, JDay settlDay, MarketState state)
@@ -128,8 +120,6 @@ class SWIRLY_API MsgQueue {
     bool pop(Msg& msg) noexcept { return mq_.pop(msg); }
 
   private:
-    bool doInterrupt(Id32 num, Millis timeout);
-
     void doCreateMarket(Id64 id, Symbol instr, JDay settlDay, MarketState state);
 
     void doUpdateMarket(Id64 id, MarketState state);

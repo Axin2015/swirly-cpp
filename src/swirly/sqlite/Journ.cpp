@@ -69,16 +69,6 @@ SqlJourn::SqlJourn(SqlJourn&&) = default;
 
 SqlJourn& SqlJourn::operator=(SqlJourn&&) = default;
 
-int SqlJourn::doInterrupted() const noexcept
-{
-    return interrupt_;
-}
-
-void SqlJourn::doInterrupt(int num) noexcept
-{
-    interrupt_ = num;
-}
-
 void SqlJourn::doWrite(const Msg& msg)
 {
     dispatch(msg);

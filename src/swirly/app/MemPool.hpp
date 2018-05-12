@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SYS_MEMPOOL_HPP
-#define SWIRLY_SYS_MEMPOOL_HPP
+#ifndef SWIRLY_APP_MEMPOOL_HPP
+#define SWIRLY_APP_MEMPOOL_HPP
 
 #include <swirly/sys/Memory.hpp>
 
@@ -28,7 +28,7 @@
 #include <type_traits>
 
 namespace swirly {
-inline namespace sys {
+inline namespace app {
 
 /**
  * Size type used for 32bit index or offset into shared memory segment.
@@ -190,7 +190,7 @@ inline void deallocBlock(MemPool& pool, MemStack<SizeN>& stack, void* addr)
     push(pool, stack, static_cast<MemNode<SizeN>*>(addr));
 }
 
-} // namespace sys
+} // namespace app
 } // namespace swirly
 
-#endif // SWIRLY_SYS_MEMPOOL_HPP
+#endif // SWIRLY_APP_MEMPOOL_HPP
