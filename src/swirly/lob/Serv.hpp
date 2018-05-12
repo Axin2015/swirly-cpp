@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_CLOB_SERV_HPP
-#define SWIRLY_CLOB_SERV_HPP
+#ifndef SWIRLY_LOB_SERV_HPP
+#define SWIRLY_LOB_SERV_HPP
 
 #include <swirly/fin/Asset.hpp>
 #include <swirly/fin/Instr.hpp>
@@ -37,7 +37,7 @@ class Model;
 class MsgQueue;
 } // namespace fin
 
-inline namespace clob {
+inline namespace lob {
 
 class Accnt;
 class Response;
@@ -138,7 +138,7 @@ class SWIRLY_API Serv {
     std::unique_ptr<Impl> impl_;
 };
 
-} // namespace clob
+} // namespace lob
 } // namespace swirly
 
-#endif // SWIRLY_CLOB_SERV_HPP
+#endif // SWIRLY_LOB_SERV_HPP

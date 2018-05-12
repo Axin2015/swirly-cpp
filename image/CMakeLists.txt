@@ -24,7 +24,7 @@ if(DOT_EXECUTABLE)
     sys
     util
     fin
-    clob
+    lob
     web
   )
 

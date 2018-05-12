@@ -14,15 +14,15 @@
 # 02110-1301, USA.
 
 if(ENABLE_SHARED_LIBS)
-  add_custom_target(swirly-clob DEPENDS
-    swirly-clob-static
-    swirly-clob-shared
-    swirly-clob-test
+  add_custom_target(swirly-lob DEPENDS
+    swirly-lob-static
+    swirly-lob-shared
+    swirly-lob-test
   )
 else()
-  add_custom_target(swirly-clob DEPENDS
-    swirly-clob-static
-    swirly-clob-test
+  add_custom_target(swirly-lob DEPENDS
+    swirly-lob-static
+    swirly-lob-test
   )
 endif()
 
@@ -33,23 +33,23 @@ set(lib_SOURCES
   Serv.cpp
   Test.cpp)
 
-add_library(swirly-clob-static STATIC ${lib_SOURCES})
-set_target_properties(swirly-clob-static PROPERTIES OUTPUT_NAME swirly-clob)
-target_link_libraries(swirly-clob-static swirly-fin-static)
-install(TARGETS swirly-clob-static DESTINATION lib64 COMPONENT static)
+add_library(swirly-lob-static STATIC ${lib_SOURCES})
+set_target_properties(swirly-lob-static PROPERTIES OUTPUT_NAME swirly-lob)
+target_link_libraries(swirly-lob-static swirly-fin-static)
+install(TARGETS swirly-lob-static DESTINATION lib64 COMPONENT static)
 
 if(ENABLE_SHARED_LIBS)
-  add_library(swirly-clob-shared SHARED ${lib_SOURCES})
-  set_target_properties(swirly-clob-shared PROPERTIES OUTPUT_NAME swirly-clob)
-  target_link_libraries(swirly-clob-shared swirly-fin-shared)
-  install(TARGETS swirly-clob-shared DESTINATION lib64 COMPONENT shared)
+  add_library(swirly-lob-shared SHARED ${lib_SOURCES})
+  set_target_properties(swirly-lob-shared PROPERTIES OUTPUT_NAME swirly-lob)
+  target_link_libraries(swirly-lob-shared swirly-fin-shared)
+  install(TARGETS swirly-lob-shared DESTINATION lib64 COMPONENT shared)
 endif()
 
 foreach(file ${lib_SOURCES})
   get_filename_component (name "${file}" NAME_WE)
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${name}.hpp")
     install(FILES "${name}.hpp"
-      DESTINATION include/swirly/clob
+      DESTINATION include/swirly/lob
       COMPONENT header
     )
   endif()
@@ -59,12 +59,12 @@ set(test_SOURCES
   Response.ut.cpp
   Serv.ut.cpp)
 
-add_executable(swirly-clob-test
+add_executable(swirly-lob-test
   ${test_SOURCES}
   Main.ut.cpp)
-target_link_libraries(swirly-clob-test ${swirly_clob_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+target_link_libraries(swirly-lob-test ${swirly_lob_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
 foreach(file ${test_SOURCES})
   get_filename_component (name "${file}" NAME_WE)
-  add_test(NAME clob::${name}Suite COMMAND swirly-clob-test -l error -t ${name}Suite)
+  add_test(NAME lob::${name}Suite COMMAND swirly-lob-test -l error -t ${name}Suite)
 endforeach()

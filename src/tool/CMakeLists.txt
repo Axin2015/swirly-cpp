@@ -46,7 +46,7 @@ add_executable(swirly-scratch Scratch.cpp)
 target_link_libraries(swirly-scratch ${swirly_fin_LIBRARY})
 
 add_executable(swirly-serv-bench ServBench.cpp)
-target_link_libraries(swirly-serv-bench ${swirly_clob_LIBRARY} ${swirly_sqlite_LIBRARY})
+target_link_libraries(swirly-serv-bench ${swirly_lob_LIBRARY} ${swirly_sqlite_LIBRARY})
 install(TARGETS swirly-serv-bench DESTINATION bin COMPONENT program)
 
 add_executable(swirly-timer-bench TimerBench.cpp)

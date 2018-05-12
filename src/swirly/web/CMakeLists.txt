@@ -50,13 +50,13 @@ set(lib_SOURCES
 
 add_library(swirly-web-static STATIC ${lib_SOURCES})
 set_target_properties(swirly-web-static PROPERTIES OUTPUT_NAME swirly-web)
-target_link_libraries(swirly-web-static swirly-clob-static)
+target_link_libraries(swirly-web-static swirly-lob-static)
 install(TARGETS swirly-web-static DESTINATION lib64 COMPONENT static)
 
 if(ENABLE_SHARED_LIBS)
   add_library(swirly-web-shared SHARED ${lib_SOURCES})
   set_target_properties(swirly-web-shared PROPERTIES OUTPUT_NAME swirly-web)
-  target_link_libraries(swirly-web-shared swirly-clob-shared)
+  target_link_libraries(swirly-web-shared swirly-lob-shared)
   install(TARGETS swirly-web-shared DESTINATION lib64 COMPONENT shared)
 endif()
 

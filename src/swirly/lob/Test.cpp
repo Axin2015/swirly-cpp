@@ -20,7 +20,7 @@
 #include <swirly/fin/Instr.hpp>
 
 namespace swirly {
-inline namespace clob {
+inline namespace lob {
 using namespace std;
 
 TestModel::TestModel() noexcept = default;
@@ -124,5 +124,5 @@ void TestModel::doReadTrade(const ModelCallback<ExecPtr>& cb) const {}
 
 void TestModel::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const {}
 
-} // namespace clob
+} // namespace lob
 } // namespace swirly

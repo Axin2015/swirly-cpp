@@ -16,9 +16,9 @@
  */
 #include "Serv.hpp"
 
-#include <swirly/clob/Accnt.hpp>
-#include <swirly/clob/Response.hpp>
-#include <swirly/clob/Test.hpp>
+#include <swirly/lob/Accnt.hpp>
+#include <swirly/lob/Response.hpp>
+#include <swirly/lob/Test.hpp>
 
 #include <swirly/fin/Exception.hpp>
 #include <swirly/fin/MsgQueue.hpp>
