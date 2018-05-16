@@ -235,11 +235,11 @@ void RestServ::assetRequest(const HttpRequest& req, Time now, HttpStream& os)
 {
     if (path_.empty()) {
 
-        // /refdata/asset
+        // /refdata/assets
         matchPath_ = true;
 
         if (req.method() == HttpMethod::Get) {
-            // GET /refdata/asset
+            // GET /refdata/assets
             matchMethod_ = true;
             rest_.getAsset(now, os);
         }
@@ -251,11 +251,11 @@ void RestServ::assetRequest(const HttpRequest& req, Time now, HttpStream& os)
 
     if (path_.empty()) {
 
-        // /refdata/asset/SYMBOL
+        // /refdata/assets/SYMBOL
         matchPath_ = true;
 
         if (req.method() == HttpMethod::Get) {
-            // GET /refdata/asset/SYMBOL
+            // GET /refdata/assets/SYMBOL
             matchMethod_ = true;
             rest_.getAsset(symbol, now, os);
         }
@@ -389,17 +389,17 @@ void RestServ::marketRequest(const HttpRequest& req, Time now, HttpStream& os)
 
     if (path_.empty()) {
 
-        // /market/INSTR
+        // /markets/INSTR
         matchPath_ = true;
 
         switch (req.method()) {
         case HttpMethod::Get:
-            // GET /market/INSTR
+            // GET /markets/INSTR
             matchMethod_ = true;
             rest_.getMarket(instr, now, os);
             break;
         case HttpMethod::Post:
-            // POST /market/INSTR
+            // POST /markets/INSTR
             matchMethod_ = true;
             getAdmin(req);
             {
@@ -422,17 +422,17 @@ void RestServ::marketRequest(const HttpRequest& req, Time now, HttpStream& os)
 
     if (path_.empty()) {
 
-        // /market/INSTR/SETTL_DATE
+        // /markets/INSTR/SETTL_DATE
         matchPath_ = true;
 
         switch (req.method()) {
         case HttpMethod::Get:
-            // GET /market/INSTR/SETTL_DATE
+            // GET /markets/INSTR/SETTL_DATE
             matchMethod_ = true;
             rest_.getMarket(instr, settlDate, now, os);
             break;
         case HttpMethod::Post:
-            // POST /market/INSTR/SETTL_DATE
+            // POST /markets/INSTR/SETTL_DATE
             matchMethod_ = true;
             getAdmin(req);
             {
@@ -445,7 +445,7 @@ void RestServ::marketRequest(const HttpRequest& req, Time now, HttpStream& os)
             }
             break;
         case HttpMethod::Put:
-            // PUT /market/INSTR/SETTL_DATE
+            // PUT /markets/INSTR/SETTL_DATE
             matchMethod_ = true;
             getAdmin(req);
             {
@@ -467,17 +467,17 @@ void RestServ::orderRequest(const HttpRequest& req, Time now, HttpStream& os)
 {
     if (path_.empty()) {
 
-        // /accnt/orders
+        // /accnts/orders
         matchPath_ = true;
 
         switch (req.method()) {
         case HttpMethod::Get:
-            // GET /accnt/orders
+            // GET /accnts/orders
             matchMethod_ = true;
             rest_.getOrder(getTrader(req), now, os);
             break;
         case HttpMethod::Post:
-            // POST /accnt/orders
+            // POST /accnts/orders
             matchMethod_ = true;
             {
                 // Validate account before request.
