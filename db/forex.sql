@@ -87,125 +87,101 @@ INSERT INTO asset_t (id, symbol, display, type_id)
        VALUES (22, 'ZAR', 'South Africa, Rand', 3)
 ;
 
-INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, broker, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
-       VALUES (1, 'AUDUSD', 'AUDUSD', 'AUD', 'USD', 'SWIRLY',
-       1000000, 1, 1, 10000, 4, 1, 10)
+       VALUES (1, 'AUDUSD', 'AUDUSD', 'AUD', 'USD', 1000000, 1, 1, 10000, 4, 1, 10)
 ;
-INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, broker, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
-       VALUES (2, 'EURCHF', 'EURCHF', 'EUR', 'CHF', 'SWIRLY',
-       1000000, 1, 1, 10000, 4, 1, 10)
+       VALUES (2, 'EURCHF', 'EURCHF', 'EUR', 'CHF', 1000000, 1, 1, 10000, 4, 1, 10)
 ;
-INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, broker, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
-       VALUES (3, 'EURCZK', 'EURCZK', 'EUR', 'CZK', 'SWIRLY',
-       1000000, 1, 1, 100, 2, 1, 10)
+       VALUES (3, 'EURCZK', 'EURCZK', 'EUR', 'CZK', 1000000, 1, 1, 100, 2, 1, 10)
 ;
-INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, broker, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
-       VALUES (4, 'EURDKK', 'EURDKK', 'EUR', 'DKK', 'SWIRLY',
-       1000000, 1, 1, 1000, 3, 1, 10)
+       VALUES (4, 'EURDKK', 'EURDKK', 'EUR', 'DKK', 1000000, 1, 1, 1000, 3, 1, 10)
 ;
-INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, broker, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
-       VALUES (5, 'EURGBP', 'EURGBP', 'EUR', 'GBP', 'SWIRLY',
-       1000000, 1, 1, 10000, 4, 1, 10)
+       VALUES (5, 'EURGBP', 'EURGBP', 'EUR', 'GBP', 1000000, 1, 1, 10000, 4, 1, 10)
 ;
-INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, broker, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
-       VALUES (6, 'EURHUF', 'EURHUF', 'EUR', 'HUF', 'SWIRLY',
-       1000000, 1, 1, 100, 2, 1, 10)
+       VALUES (6, 'EURHUF', 'EURHUF', 'EUR', 'HUF', 1000000, 1, 1, 100, 2, 1, 10)
 ;
-INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, broker, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
-       VALUES (7, 'EURJPY', 'EURJPY', 'EUR', 'JPY', 'SWIRLY',
-       1000000, 1, 1, 100, 2, 1, 10)
+       VALUES (7, 'EURJPY', 'EURJPY', 'EUR', 'JPY', 1000000, 1, 1, 100, 2, 1, 10)
 ;
-INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, broker, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
-       VALUES (8, 'EURNOK', 'EURNOK', 'EUR', 'NOK', 'SWIRLY',
-       1000000, 1, 1, 1000, 3, 1, 10)
+       VALUES (8, 'EURNOK', 'EURNOK', 'EUR', 'NOK', 1000000, 1, 1, 1000, 3, 1, 10)
 ;
-INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, broker, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
-       VALUES (9, 'EURPLN', 'EURPLN', 'EUR', 'PLN', 'SWIRLY',
-       1000000, 1, 1, 1000, 3, 1, 10)
+       VALUES (9, 'EURPLN', 'EURPLN', 'EUR', 'PLN', 1000000, 1, 1, 1000, 3, 1, 10)
 ;
-INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, broker, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
-       VALUES (10, 'EURRON', 'EURRON', 'EUR', 'RON', 'SWIRLY',
-       1000000, 1, 1, 1000, 3, 1, 10)
+       VALUES (10, 'EURRON', 'EURRON', 'EUR', 'RON', 1000000, 1, 1, 1000, 3, 1, 10)
 ;
-INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, broker, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
-       VALUES (11, 'EURSEK', 'EURSEK', 'EUR', 'SEK', 'SWIRLY',
-       1000000, 1, 1, 1000, 3, 1, 10)
+       VALUES (11, 'EURSEK', 'EURSEK', 'EUR', 'SEK', 1000000, 1, 1, 1000, 3, 1, 10)
 ;
-INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, broker, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
-       VALUES (12, 'EURUSD', 'EURUSD', 'EUR', 'USD', 'SWIRLY',
-       1000000, 1, 1, 10000, 4, 1, 10)
+       VALUES (12, 'EURUSD', 'EURUSD', 'EUR', 'USD', 1000000, 1, 1, 10000, 4, 1, 10)
 ;
-INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, broker, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
-       VALUES (13, 'GBPUSD', 'GBPUSD', 'GBP', 'USD', 'SWIRLY',
-       1000000, 1, 1, 10000, 4, 1, 10)
+       VALUES (13, 'GBPUSD', 'GBPUSD', 'GBP', 'USD', 1000000, 1, 1, 10000, 4, 1, 10)
 ;
-INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, broker, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
-       VALUES (14, 'NZDUSD', 'NZDUSD', 'NZD', 'USD', 'SWIRLY',
-       1000000, 1, 1, 10000, 4, 1, 10)
+       VALUES (14, 'NZDUSD', 'NZDUSD', 'NZD', 'USD', 1000000, 1, 1, 10000, 4, 1, 10)
 ;
-INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, broker, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
-       VALUES (15, 'USDCAD', 'USDCAD', 'USD', 'CAD', 'SWIRLY',
-       1000000, 1, 1, 10000, 4, 1, 10)
+       VALUES (15, 'USDCAD', 'USDCAD', 'USD', 'CAD', 1000000, 1, 1, 10000, 4, 1, 10)
 ;
-INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, broker, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
-       VALUES (16, 'USDCHF', 'USDCHF', 'USD', 'CHF', 'SWIRLY',
-       1000000, 1, 1, 10000, 4, 1, 10)
+       VALUES (16, 'USDCHF', 'USDCHF', 'USD', 'CHF', 1000000, 1, 1, 10000, 4, 1, 10)
 ;
-INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, broker, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
-       VALUES (17, 'USDHKD', 'USDHKD', 'USD', 'HKD', 'SWIRLY',
-       1000000, 1, 1, 1000, 3, 1, 10)
+       VALUES (17, 'USDHKD', 'USDHKD', 'USD', 'HKD', 1000000, 1, 1, 1000, 3, 1, 10)
 ;
-INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, broker, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
-       VALUES (18, 'USDILS', 'USDILS', 'USD', 'ILS', 'SWIRLY',
-       1000000, 1, 1, 1000, 3, 1, 10)
+       VALUES (18, 'USDILS', 'USDILS', 'USD', 'ILS', 1000000, 1, 1, 1000, 3, 1, 10)
 ;
-INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, broker, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
-       VALUES (19, 'USDJPY', 'USDJPY', 'USD', 'JPY', 'SWIRLY',
-       1000000, 1, 1, 100, 2, 1, 10)
+       VALUES (19, 'USDJPY', 'USDJPY', 'USD', 'JPY', 1000000, 1, 1, 100, 2, 1, 10)
 ;
-INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, broker, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
-       VALUES (20, 'USDMXN', 'USDMXN', 'USD', 'MXN', 'SWIRLY',
-       1000000, 1, 1, 1000, 3, 1, 10)
+       VALUES (20, 'USDMXN', 'USDMXN', 'USD', 'MXN', 1000000, 1, 1, 1000, 3, 1, 10)
 ;
-INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, broker, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
-       VALUES (21, 'USDSGD', 'USDSGD', 'USD', 'SGD', 'SWIRLY',
-       1000000, 1, 1, 10000, 4, 1, 10)
+       VALUES (21, 'USDSGD', 'USDSGD', 'USD', 'SGD', 1000000, 1, 1, 10000, 4, 1, 10)
 ;
-INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, broker, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
-       VALUES (22, 'USDTHB', 'USDTHB', 'USD', 'THB', 'SWIRLY',
-       1000000, 1, 1, 100, 2, 1, 10)
+       VALUES (22, 'USDTHB', 'USDTHB', 'USD', 'THB', 1000000, 1, 1, 100, 2, 1, 10)
 ;
-INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, broker, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
-       VALUES (23, 'USDTRY', 'USDTRY', 'USD', 'TRY', 'SWIRLY',
-       1000000, 1, 1, 1000, 4, 1, 10)
+       VALUES (23, 'USDTRY', 'USDTRY', 'USD', 'TRY', 1000000, 1, 1, 1000, 4, 1, 10)
 ;
-INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, broker, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
-       VALUES (24, 'USDZAR', 'USDZAR', 'USD', 'ZAR', 'SWIRLY',
-       1000000, 1, 1, 1000, 3, 1, 10)
+       VALUES (24, 'USDZAR', 'USDZAR', 'USD', 'ZAR', 1000000, 1, 1, 1000, 3, 1, 10)
 ;
 
 COMMIT

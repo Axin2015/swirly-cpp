@@ -27,14 +27,13 @@ using namespace std;
 static_assert(sizeof(Instr) <= 4 * 64, "no greater than specified cache-lines");
 
 Instr::Instr(Id32 id, Symbol symbol, string_view display, Symbol baseAsset, Symbol termCcy,
-             Symbol broker, int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp,
-             Lots minLots, Lots maxLots) noexcept
+             int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
+             Lots maxLots) noexcept
 : id_{id}
 , symbol_{symbol}
 , display_{display}
 , baseAsset_{baseAsset}
 , termCcy_{termCcy}
-, broker_{broker}
 , lotNumer_{lotNumer}
 , lotDenom_{lotDenom}
 , qtyInc_{fractToReal(lotNumer, lotDenom)}
@@ -63,7 +62,6 @@ void Instr::toDsv(ostream& os, char delim) const
         << display_   //
         << baseAsset_ //
         << termCcy_   //
-        << broker_    //
         << lotNumer_  //
         << lotDenom_  //
         << tickNumer_ //
@@ -79,7 +77,6 @@ void Instr::toJson(ostream& os) const
        << "\",\"display\":\""sv << display_     //
        << "\",\"baseAsset\":\""sv << baseAsset_ //
        << "\",\"termCcy\":\""sv << termCcy_     //
-       << "\",\"broker\":\""sv << broker_       //
        << "\",\"lotNumer\":"sv << lotNumer_     //
        << ",\"lotDenom\":"sv << lotDenom_       //
        << ",\"tickNumer\":"sv << tickNumer_     //

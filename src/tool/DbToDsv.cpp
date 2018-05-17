@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
         }
         {
             ofstream os{"instr.txt"};
-            os << "id\tsymbol\tdisplay\tbaseAsset\ttermCcy\tbroker\tlotNumer\tlotDenom\ttickNumer\t"
+            os << "id\tsymbol\tdisplay\tbaseAsset\ttermCcy\tlotNumer\tlotDenom\ttickNumer\t"
                   "tickDenom\tpipDp\tminLots\tmaxLots\n";
             model.readInstr([&os](auto ptr) {
                 ptr->toDsv(os, '\t');
