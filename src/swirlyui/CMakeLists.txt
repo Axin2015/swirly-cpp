@@ -60,4 +60,3 @@ set(prog_SOURCES
 
 add_executable(swirlyui ${prog_RESOURCES} ${prog_SOURCES})
 target_link_libraries(swirlyui Qt5::Widgets Qt5::Network)
-install(TARGETS swirlyui DESTINATION bin COMPONENT program)

@@ -36,8 +36,8 @@ namespace {
 constexpr auto SelectAssetSql = //
     "SELECT id, symbol, display, type_id FROM asset_t"sv;
 
-constexpr auto SelectInstrSql =                                                       //
-    "SELECT id, symbol, display, base_asset, term_ccy, broker, lot_numer, lot_denom," //
+constexpr auto SelectInstrSql =                                               //
+    "SELECT id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom," //
     " tick_numer, tick_denom, pip_dp, min_lots, max_lots FROM instr_v"sv;
 
 constexpr auto SelectMarketSql =                                                   //
@@ -103,7 +103,6 @@ void SqlModel::doReadInstr(const ModelCallback<InstrPtr>& cb) const
         Display,   //
         BaseAsset, //
         TermCcy,   //
-        Broker,    //
         LotNumer,  //
         LotDenom,  //
         TickNumer, //
@@ -120,7 +119,6 @@ void SqlModel::doReadInstr(const ModelCallback<InstrPtr>& cb) const
                        column<string_view>(*stmt, Display),   //
                        column<string_view>(*stmt, BaseAsset), //
                        column<string_view>(*stmt, TermCcy),   //
-                       column<string_view>(*stmt, Broker),    //
                        column<int>(*stmt, LotNumer),          //
                        column<int>(*stmt, LotDenom),          //
                        column<int>(*stmt, TickNumer),         //

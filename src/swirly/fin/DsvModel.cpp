@@ -70,7 +70,6 @@ void DsvModel::doReadInstr(const ModelCallback<InstrPtr>& cb) const
         Display,   //
         BaseAsset, //
         TermCcy,   //
-        Broker,    //
         TickNumer, //
         TickDenom, //
         LotNumer,  //
@@ -96,7 +95,6 @@ void DsvModel::doReadInstr(const ModelCallback<InstrPtr>& cb) const
         const auto display = fromString<string_view>(row[Display]);
         const auto baseAsset = fromString<swirly::Symbol>(row[BaseAsset]);
         const auto termCcy = fromString<swirly::Symbol>(row[TermCcy]);
-        const auto broker = fromString<swirly::Symbol>(row[Broker]);
         const auto lotNumer = fromString<int>(row[LotNumer]);
         const auto lotDenom = fromString<int>(row[LotDenom]);
         const auto tickNumer = fromString<int>(row[TickNumer]);
@@ -104,8 +102,8 @@ void DsvModel::doReadInstr(const ModelCallback<InstrPtr>& cb) const
         const auto pipDp = fromString<int>(row[PipDp]);
         const auto minLots = fromString<Lots>(row[MinLots]);
         const auto maxLots = fromString<Lots>(row[MaxLots]);
-        cb(Instr::make(id, symbol, display, baseAsset, termCcy, broker, lotNumer, lotDenom,
-                       tickNumer, tickDenom, pipDp, minLots, maxLots));
+        cb(Instr::make(id, symbol, display, baseAsset, termCcy, lotNumer, lotDenom, tickNumer,
+                       tickDenom, pipDp, minLots, maxLots));
     }
 }
 

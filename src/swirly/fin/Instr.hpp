@@ -30,8 +30,8 @@ inline namespace fin {
 class SWIRLY_API Instr : public Comparable<Instr> {
   public:
     Instr(Id32 id, Symbol symbol, std::string_view display, Symbol baseAsset, Symbol termCcy,
-          Symbol broker, int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp,
-          Lots minLots, Lots maxLots) noexcept;
+          int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
+          Lots maxLots) noexcept;
 
     ~Instr();
 
@@ -58,7 +58,6 @@ class SWIRLY_API Instr : public Comparable<Instr> {
     auto display() const noexcept { return +display_; }
     auto baseAsset() const noexcept { return baseAsset_; }
     auto termCcy() const noexcept { return termCcy_; }
-    auto broker() const noexcept { return broker_; }
     auto lotNumer() const noexcept { return lotNumer_; }
     auto lotDenom() const noexcept { return lotDenom_; }
     auto qtyInc() const noexcept { return qtyInc_; }
@@ -78,7 +77,6 @@ class SWIRLY_API Instr : public Comparable<Instr> {
     const Display display_;
     const Symbol baseAsset_;
     const Symbol termCcy_;
-    const Symbol broker_;
     const int lotNumer_;
     const int lotDenom_;
     // Transient.
