@@ -33,12 +33,12 @@ int main(int argc, char* argv[])
     int ret = 1;
     try {
         Profile p{"MemQueue"sv};
-        MemQueue<Clock::time_point> q{1 << 14};
+        MemQueue<Clock::duration> q{1 << 14};
 
         enum { Iters = 50000000 };
         auto t1 = thread([&q]() {
             for (int i{}; i < Iters;) {
-                if (q.push(Clock::now())) {
+                if (q.push(Clock::now().time_since_epoch())) {
                     ++i;
                 } else {
                     sched_yield();
@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
 
         auto t2 = thread([&q]() {
             for (int i{}; i < Iters;) {
-                if (q.push(Clock::now())) {
+                if (q.push(Clock::now().time_since_epoch())) {
                     ++i;
                 } else {
                     sched_yield();
@@ -58,13 +58,13 @@ int main(int argc, char* argv[])
 
         for (int i{}; i < Iters * 2;) {
 
-            Clock::time_point start;
+            Clock::duration start;
             if (q.pop(start)) {
                 if (++i <= 1000) {
                     // Warmup.
                     continue;
                 }
-                const auto end = Clock::now();
+                const auto end = Clock::now().time_since_epoch();
                 const chrono::duration<double, micro> diff{end - start};
                 const auto usec = diff.count();
                 p.record(usec);
