@@ -1,0 +1,65 @@
+// The Restful Matching-Engine.
+// Copyright (C) 2013, 2018 Swirly Cloud Limited.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU General Public License as published by the Free Software Foundation; either version 2 of the
+// License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+// even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+// General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with this program; if
+// not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+// 02110-1301, USA.
+
+namespace swirly.fbs;
+
+enum AssetType:int {
+  None = 0,
+  // Commodity.
+  Cmdty = 1,
+  // Corporate Bond.
+  Corp,
+  // Currency.
+  Ccy,
+  // Equity.
+  Eqty,
+  // Government Bond.
+  Govt,
+  // Index.
+  Index
+}
+
+enum Direct:int {
+  // Aggressor sold. Taker hit the bid resulting in a market dow
+  Given = -1,
+  // Aggressor bought. Taker lifted the offer resulting in a market uptick.
+  Paid = 1
+}
+
+enum LiqInd:int {
+  // No liqInd.
+  None = 0,
+  // Passive buyer or seller that receives the spread.
+  Maker,
+  // Aggressive buyer or seller that crosses the market and pays the spread.
+  Taker
+}
+
+enum Side:int {
+  Sell = -1,
+  Buy = 1
+}
+
+enum State:int {
+  None = 0,
+  // Initial state of a resting order placed in the order-book.
+  New,
+  // State of a resting order that has been revised.
+  Revise,
+  // State of a resting order that has been cancelled.
+  Cancel,
+  // State of an order that has been partially or fully filled.
+  Trade
+}

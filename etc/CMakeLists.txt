@@ -13,9 +13,6 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-install(FILES FindSQLite3.cmake DESTINATION etc COMPONENT config)
-install(FILES FindSwirly.cmake DESTINATION etc COMPONENT config)
-
 configure_file(swirlyd.conf.in "${PROJECT_BINARY_DIR}/etc/swirlyd.conf")
 configure_file(swirlyd.service.in "${PROJECT_BINARY_DIR}/etc/swirlyd.service")
 configure_file(swirlyd.service.conf.in "${PROJECT_BINARY_DIR}/etc/swirlyd.service.conf")

@@ -13,21 +13,24 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-configure_file(Config.h.in "${PROJECT_BINARY_DIR}/include/swirly/Config.h")
-install(FILES "${PROJECT_BINARY_DIR}/include/swirly/Config.h"
-  DESTINATION include/swirly
+set(fbs_SOURCES
+  Asset.fbs
+  Instr.fbs
+  Types.fbs)
+
+build_flatbuffers(
+  "${fbs_SOURCES}"
+  "${CMAKE_CURRENT_SOURCE_DIR}"
+  swirly-fbs
+  ""
+  "${PROJECT_BINARY_DIR}/include/swirly/fbs"
+  ""
+  "")
+
+install(FILES
+  "${PROJECT_BINARY_DIR}/include/swirly/fbs/Asset_generated.h"
+  "${PROJECT_BINARY_DIR}/include/swirly/fbs/Instr_generated.h"
+  "${PROJECT_BINARY_DIR}/include/swirly/fbs/Types_generated.h"
+  DESTINATION include/swirly/fbs
   COMPONENT header
 )
-
-add_subdirectory(contrib)
-add_subdirectory(util)
-add_subdirectory(sys)
-add_subdirectory(app)
-add_subdirectory(fbs)
-add_subdirectory(fix)
-add_subdirectory(fin)
-add_subdirectory(lob)
-add_subdirectory(web)
-
-# FIXME: the following libraries should be modules.
-add_subdirectory(sqlite)
