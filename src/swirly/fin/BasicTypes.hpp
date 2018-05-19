@@ -19,6 +19,8 @@
 
 #include <swirly/util/IntWrapper.hpp>
 
+#include <swirly/fbs/Types_generated.h>
+
 #include <ostream>
 
 namespace swirly {
@@ -65,37 +67,13 @@ constexpr Cost operator""_cst(unsigned long long val) noexcept
  * Bitfield representing the state of a Market.
  */
 using MarketState = unsigned;
-
-enum class AssetType : int {
-    /**
-     * Commodity.
-     */
-    Cmdty = 1,
-    /**
-     * Corporate Bond.
-     */
-    Corp,
-    /**
-     * Currency.
-     */
-    Ccy,
-    /**
-     * Equity.
-     */
-    Eqty,
-    /**
-     * Government Bond.
-     */
-    Govt,
-    /**
-     * Index.
-     */
-    Index
-};
+using AssetType = fbs::AssetType;
 
 inline const char* enumString(AssetType type) noexcept
 {
     switch (type) {
+    case AssetType::None:
+        return "NONE";
     case AssetType::Cmdty:
         return "CMDTY";
     case AssetType::Corp:
@@ -112,21 +90,7 @@ inline const char* enumString(AssetType type) noexcept
     std::terminate();
 }
 
-inline std::ostream& operator<<(std::ostream& os, AssetType type)
-{
-    return os << enumString(type);
-}
-
-enum class Direct : int {
-    /**
-     * Aggressor bought. Taker lifted the offer resulting in a market uptick.
-     */
-    Paid = 1,
-    /**
-     * Aggressor sold. Taker hit the bid resulting in a market dow
-     */
-    Given = -1
-};
+using Direct = fbs::Direct;
 
 inline const char* enumString(Direct direct) noexcept
 {
@@ -139,25 +103,7 @@ inline const char* enumString(Direct direct) noexcept
     std::terminate();
 }
 
-inline std::ostream& operator<<(std::ostream& os, Direct direct)
-{
-    return os << enumString(direct);
-}
-
-enum class LiqInd : int {
-    /**
-     * No liqInd.
-     */
-    None = 0,
-    /**
-     * Passive buyer or seller that receives the spread.
-     */
-    Maker,
-    /**
-     * Aggressive buyer or seller that crosses the market and pays the spread.
-     */
-    Taker
-};
+using LiqInd = fbs::LiqInd;
 
 inline const char* enumString(LiqInd liqInd) noexcept
 {
@@ -187,12 +133,7 @@ constexpr LiqInd opposite(LiqInd liqInd) noexcept
     return liqInd;
 }
 
-inline std::ostream& operator<<(std::ostream& os, LiqInd liqInd)
-{
-    return os << enumString(liqInd);
-}
-
-enum class Side : int { Buy = 1, Sell = -1 };
+using Side = fbs::Side;
 
 inline const char* enumString(Side side) noexcept
 {
@@ -218,34 +159,11 @@ constexpr Side opposite(Side side) noexcept
     return side;
 }
 
-inline std::ostream& operator<<(std::ostream& os, Side side)
-{
-    return os << enumString(side);
-}
-
 /**
  * Order states.
  * @image html OrderState.png
  */
-enum class State : int {
-    None = 0,
-    /**
-     * Initial state of a resting order placed in the order-book.
-     */
-    New,
-    /**
-     * State of a resting order that has been revised.
-     */
-    Revise,
-    /**
-     * State of a resting order that has been cancelled.
-     */
-    Cancel,
-    /**
-     * State of an order that has been partially or fully filled.
-     */
-    Trade
-};
+using State = fbs::State;
 
 inline const char* enumString(State state) noexcept
 {
@@ -281,12 +199,36 @@ inline const char* enumString(State state, Lots resd) noexcept
     std::terminate();
 }
 
+} // namespace fin
+
+namespace fbs {
+
+inline std::ostream& operator<<(std::ostream& os, AssetType type)
+{
+    return os << enumString(type);
+}
+
+inline std::ostream& operator<<(std::ostream& os, Direct direct)
+{
+    return os << enumString(direct);
+}
+
+inline std::ostream& operator<<(std::ostream& os, LiqInd liqInd)
+{
+    return os << enumString(liqInd);
+}
+
+inline std::ostream& operator<<(std::ostream& os, Side side)
+{
+    return os << enumString(side);
+}
+
 inline std::ostream& operator<<(std::ostream& os, State state)
 {
     return os << enumString(state);
 }
 
-} // namespace fin
+} // namespace fbs
 } // namespace swirly
 
 #endif // SWIRLY_FIN_BASICTYPES_HPP

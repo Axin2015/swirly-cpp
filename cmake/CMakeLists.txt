@@ -13,21 +13,5 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-configure_file(Config.h.in "${PROJECT_BINARY_DIR}/include/swirly/Config.h")
-install(FILES "${PROJECT_BINARY_DIR}/include/swirly/Config.h"
-  DESTINATION include/swirly
-  COMPONENT header
-)
-
-add_subdirectory(contrib)
-add_subdirectory(util)
-add_subdirectory(sys)
-add_subdirectory(app)
-add_subdirectory(fbs)
-add_subdirectory(fix)
-add_subdirectory(fin)
-add_subdirectory(lob)
-add_subdirectory(web)
-
-# FIXME: the following libraries should be modules.
-add_subdirectory(sqlite)
+install(FILES FindSQLite3.cmake DESTINATION cmake COMPONENT config)
+install(FILES FindSwirly.cmake DESTINATION cmake COMPONENT config)
