@@ -28,7 +28,7 @@ if (NOT "${SWIRLY_TOOLSET}" STREQUAL "")
   message(STATUS "SWIRLY_TOOLSET: ${SWIRLY_TOOLSET}")
 endif()
 
-set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${PROJECT_SOURCE_DIR}/cmake")
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${PROJECT_SOURCE_DIR}/etc/cmake")
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Intended for use with Linux Perf:
@@ -148,10 +148,9 @@ endif()
 enable_testing()
 
 set(FLATBUFFERS_FLATC_SCHEMA_EXTRA_ARGS --no-prefix --scoped-enums)
-add_subdirectory(cmake)
-add_subdirectory(db)
-add_subdirectory(etc)
 add_subdirectory(flatbuffers)
+
+add_subdirectory(etc)
 add_subdirectory(image)
 add_subdirectory(src)
 

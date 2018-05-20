@@ -13,5 +13,25 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-install(FILES FindSQLite3.cmake DESTINATION cmake COMPONENT config)
-install(FILES FindSwirly.cmake DESTINATION cmake COMPONENT config)
+set(fbs_SOURCES
+  Asset.fbs
+  Instr.fbs
+  Types.fbs)
+
+build_flatbuffers(
+  "${fbs_SOURCES}"
+  "${CMAKE_CURRENT_SOURCE_DIR}"
+  swirly-fbs
+  ""
+  "${PROJECT_BINARY_DIR}/include/swirly/fbs"
+  ""
+  "")
+
+install(FILES ${fbs_SOURCES} DESTINATION etc/fbs COMPONENT config)
+install(FILES
+  "${PROJECT_BINARY_DIR}/include/swirly/fbs/Asset_generated.h"
+  "${PROJECT_BINARY_DIR}/include/swirly/fbs/Instr_generated.h"
+  "${PROJECT_BINARY_DIR}/include/swirly/fbs/Types_generated.h"
+  DESTINATION include/swirly/fbs
+  COMPONENT header
+)

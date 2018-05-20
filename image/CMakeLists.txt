@@ -37,9 +37,9 @@ if(DOT_EXECUTABLE)
     add_custom_command(
       OUTPUT "${outfile}"
       WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
-      COMMAND CXX="${CMAKE_CXX_COMPILER}" "${PERL}" etc/dotdepend.pl ${name}
+      COMMAND CXX="${CMAKE_CXX_COMPILER}" "${PERL}" script/dotdepend.pl ${name}
               | "${DOT_EXECUTABLE}" -Tpng >"${outfile}"
-      DEPENDS "${PROJECT_SOURCE_DIR}/etc/dotdepend.pl" "swirly-${name}-static")
+      DEPENDS "${PROJECT_SOURCE_DIR}/script/dotdepend.pl" "swirly-${name}-static")
 
     set(outfiles ${outfiles} "${outfile}")
     install(FILES "${outfile}" DESTINATION image COMPONENT doc)
