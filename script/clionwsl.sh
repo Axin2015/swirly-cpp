@@ -42,7 +42,7 @@ echo "%sudo ALL=(ALL) NOPASSWD: /usr/sbin/service ssh --full-restart" | sudo tee
 cat << 'EOF' >> ~/.bashrc
 sshd_status=$(service ssh status)
 if [[ $sshd_status = *"is not running"* ]]; then
-   sudo service ssh --full-restart
+    sudo service ssh --full-restart
 fi
 EOF
 

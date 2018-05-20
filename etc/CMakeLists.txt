@@ -16,6 +16,7 @@
 configure_file(swirlyd.conf.in "${PROJECT_BINARY_DIR}/etc/swirlyd.conf")
 configure_file(swirlyd.service.in "${PROJECT_BINARY_DIR}/etc/swirlyd.service")
 configure_file(swirlyd.service.conf.in "${PROJECT_BINARY_DIR}/etc/swirlyd.service.conf")
+
 install(FILES
   "${PROJECT_BINARY_DIR}/etc/swirlyd.conf"
   "${PROJECT_BINARY_DIR}/etc/swirlyd.service"
@@ -23,3 +24,7 @@ install(FILES
   DESTINATION etc
   COMPONENT config
 )
+
+add_subdirectory(cmake)
+add_subdirectory(fbs)
+add_subdirectory(sql)

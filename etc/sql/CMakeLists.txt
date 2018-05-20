@@ -27,6 +27,7 @@ if(SQLITE3_EXECUTABLE)
     forex
   )
 
+  file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/db")
   foreach(name ${names})
 
     set(dbfile "${PROJECT_BINARY_DIR}/db/${name}.db")
@@ -44,15 +45,14 @@ if(SQLITE3_EXECUTABLE)
 
 endif()
 
-add_custom_target(db ALL DEPENDS ${dbfiles})
+add_custom_target(swirly-db ALL DEPENDS ${dbfiles})
+install(FILES ${dbfiles} DESTINATION var COMPONENT config)
 
-set(sqlfiles
+set(sql_SOURCES
   coal.sql
   coffee.sql
   corp.sql
   forex.sql
   schema.sql
   test.sql)
-
-install(FILES ${sqlfiles} DESTINATION db COMPONENT config)
-install(FILES ${dbfiles} DESTINATION var COMPONENT config)
+install(FILES ${sql_SOURCES} DESTINATION etc/sql COMPONENT config)
