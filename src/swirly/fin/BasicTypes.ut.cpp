@@ -26,33 +26,33 @@ BOOST_AUTO_TEST_SUITE(BasicTypesSuite)
 
 BOOST_AUTO_TEST_CASE(AssetTypeCase)
 {
-    BOOST_TEST(strcmp(enumString(AssetType::Cmdty), "CMDTY") == 0);
+    BOOST_TEST(strcmp(enumString(AssetType::Cmdty), "Cmdty") == 0);
 }
 
 BOOST_AUTO_TEST_CASE(DirectCase)
 {
-    BOOST_TEST(strcmp(enumString(Direct::Paid), "PAID") == 0);
+    BOOST_TEST(strcmp(enumString(Direct::Paid), "Paid") == 0);
 }
 
 BOOST_AUTO_TEST_CASE(LiqIndCase)
 {
-    BOOST_TEST(strcmp(enumString(LiqInd::Maker), "MAKER") == 0);
+    BOOST_TEST(strcmp(enumString(LiqInd::Maker), "Maker") == 0);
 }
 
 BOOST_AUTO_TEST_CASE(SideCase)
 {
-    BOOST_TEST(strcmp(enumString(Side::Buy), "BUY") == 0);
+    BOOST_TEST(strcmp(enumString(Side::Buy), "Buy") == 0);
 }
 
 BOOST_AUTO_TEST_CASE(StateCase)
 {
-    BOOST_TEST(strcmp(enumString(State::New), "NEW") == 0);
+    BOOST_TEST(strcmp(enumString(State::New), "New") == 0);
 }
 
 BOOST_AUTO_TEST_CASE(StateResdCase)
 {
-    BOOST_TEST(strcmp(enumString(State::Trade, 0_lts), "COMPLETE") == 0);
-    BOOST_TEST(strcmp(enumString(State::Trade, 1_lts), "PARTIAL") == 0);
+    BOOST_TEST(strcmp(enumString(State::Trade, 0_lts), "Complete") == 0);
+    BOOST_TEST(strcmp(enumString(State::Trade, 1_lts), "Partial") == 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

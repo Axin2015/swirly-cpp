@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(AssetToStringCase)
     BOOST_TEST(toString(asset) == //
                "{\"symbol\":\"GBP\""
                ",\"display\":\"United Kingdom, Pounds\""
-               ",\"type\":\"CCY\""
+               ",\"type\":\"Ccy\""
                "}");
 }
 

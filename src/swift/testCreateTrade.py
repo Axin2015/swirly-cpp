@@ -74,10 +74,10 @@ class TestCase(RestTestCase):
                        instr = 'EURUSD',
                        settlDate = 20140302,
                        ref = 'test1',
-                       side = 'BUY',
+                       side = 'Buy',
                        lots = 10,
                        ticks = 12345,
-                       liqInd = 'MAKER',
+                       liqInd = 'Maker',
                        cpty = 'GOSAYL')
 
     self.assertEqual(200, resp.status)
@@ -99,10 +99,10 @@ class TestCase(RestTestCase):
       u'orderId': 0,
       u'ref': u'test1',
       u'resdLots': 0,
-      u'liqInd': u'MAKER',
+      u'liqInd': u'Maker',
       u'settlDate': 20140302,
-      u'side': u'BUY',
-      u'state': u'TRADE',
+      u'side': u'Buy',
+      u'state': u'Trade',
       u'ticks': 12345
     }, {
       u'accnt': u'GOSAYL',
@@ -121,10 +121,10 @@ class TestCase(RestTestCase):
       u'orderId': 0,
       u'ref': u'test1',
       u'resdLots': 0,
-      u'liqInd': u'TAKER',
+      u'liqInd': u'Taker',
       u'settlDate': 20140302,
-      u'side': u'SELL',
-      u'state': u'TRADE',
+      u'side': u'Sell',
+      u'state': u'Trade',
       u'ticks': 12345
     }], resp.content)
 
@@ -135,10 +135,10 @@ class TestCase(RestTestCase):
                        instr = 'EURUSD',
                        settlDate = 20140302,
                        ref = 'test2',
-                       side = 'SELL',
+                       side = 'Sell',
                        lots = 15,
                        ticks = 12345,
-                       liqInd = 'TAKER',
+                       liqInd = 'Taker',
                        cpty = 'GOSAYL')
 
     self.assertEqual(200, resp.status)
@@ -160,10 +160,10 @@ class TestCase(RestTestCase):
       u'orderId': 0,
       u'ref': u'test2',
       u'resdLots': 0,
-      u'liqInd': u'TAKER',
+      u'liqInd': u'Taker',
       u'settlDate': 20140302,
-      u'side': u'SELL',
-      u'state': u'TRADE',
+      u'side': u'Sell',
+      u'state': u'Trade',
       u'ticks': 12345
     }, {
       u'accnt': u'GOSAYL',
@@ -182,10 +182,10 @@ class TestCase(RestTestCase):
       u'orderId': 0,
       u'ref': u'test2',
       u'resdLots': 0,
-      u'liqInd': u'MAKER',
+      u'liqInd': u'Maker',
       u'settlDate': 20140302,
-      u'side': u'BUY',
-      u'state': u'TRADE',
+      u'side': u'Buy',
+      u'state': u'Trade',
       u'ticks': 12345
     }], resp.content)
 
@@ -195,10 +195,10 @@ class TestCase(RestTestCase):
                        accnt = 'MARAYL',
                        settlDate = 20140302,
                        ref = 'test1',
-                       side = 'BUY',
+                       side = 'Buy',
                        lots = 10,
                        ticks = 12345,
-                       liqInd = 'MAKER',
+                       liqInd = 'Maker',
                        cpty = 'GOSAYL')
 
     self.assertEqual(200, resp.status)
@@ -220,10 +220,10 @@ class TestCase(RestTestCase):
       u'orderId': 0,
       u'ref': u'test1',
       u'resdLots': 0,
-      u'liqInd': u'MAKER',
+      u'liqInd': u'Maker',
       u'settlDate': 20140302,
-      u'side': u'BUY',
-      u'state': u'TRADE',
+      u'side': u'Buy',
+      u'state': u'Trade',
       u'ticks': 12345
     }, {
       u'accnt': u'GOSAYL',
@@ -242,10 +242,10 @@ class TestCase(RestTestCase):
       u'orderId': 0,
       u'ref': u'test1',
       u'resdLots': 0,
-      u'liqInd': u'TAKER',
+      u'liqInd': u'Taker',
       u'settlDate': 20140302,
-      u'side': u'SELL',
-      u'state': u'TRADE',
+      u'side': u'Sell',
+      u'state': u'Trade',
       u'ticks': 12345
     }], resp.content)
 
@@ -255,10 +255,10 @@ class TestCase(RestTestCase):
                        accnt = 'MARAYL',
                        settlDate = 20140302,
                        ref = 'test2',
-                       side = 'SELL',
+                       side = 'Sell',
                        lots = 15,
                        ticks = 12345,
-                       liqInd = 'TAKER',
+                       liqInd = 'Taker',
                        cpty = 'GOSAYL')
 
     self.assertEqual(200, resp.status)
@@ -280,10 +280,10 @@ class TestCase(RestTestCase):
       u'orderId': 0,
       u'ref': u'test2',
       u'resdLots': 0,
-      u'liqInd': u'TAKER',
+      u'liqInd': u'Taker',
       u'settlDate': 20140302,
-      u'side': u'SELL',
-      u'state': u'TRADE',
+      u'side': u'Sell',
+      u'state': u'Trade',
       u'ticks': 12345
     }, {
       u'accnt': u'GOSAYL',
@@ -302,10 +302,10 @@ class TestCase(RestTestCase):
       u'orderId': 0,
       u'ref': u'test2',
       u'resdLots': 0,
-      u'liqInd': u'MAKER',
+      u'liqInd': u'Maker',
       u'settlDate': 20140302,
-      u'side': u'BUY',
-      u'state': u'TRADE',
+      u'side': u'Buy',
+      u'state': u'Trade',
       u'ticks': 12345
     }], resp.content)
 
@@ -314,10 +314,10 @@ class TestCase(RestTestCase):
     resp = client.send('POST', '/accnt/trades/EURUSD/20140302',
                        accnt = 'MARAYL',
                        ref = 'test1',
-                       side = 'BUY',
+                       side = 'Buy',
                        lots = 10,
                        ticks = 12345,
-                       liqInd = 'MAKER',
+                       liqInd = 'Maker',
                        cpty = 'GOSAYL')
 
     self.assertEqual(200, resp.status)
@@ -339,10 +339,10 @@ class TestCase(RestTestCase):
       u'orderId': 0,
       u'ref': u'test1',
       u'resdLots': 0,
-      u'liqInd': u'MAKER',
+      u'liqInd': u'Maker',
       u'settlDate': 20140302,
-      u'side': u'BUY',
-      u'state': u'TRADE',
+      u'side': u'Buy',
+      u'state': u'Trade',
       u'ticks': 12345
     }, {
       u'accnt': u'GOSAYL',
@@ -361,10 +361,10 @@ class TestCase(RestTestCase):
       u'orderId': 0,
       u'ref': u'test1',
       u'resdLots': 0,
-      u'liqInd': u'TAKER',
+      u'liqInd': u'Taker',
       u'settlDate': 20140302,
-      u'side': u'SELL',
-      u'state': u'TRADE',
+      u'side': u'Sell',
+      u'state': u'Trade',
       u'ticks': 12345
     }], resp.content)
 
@@ -373,10 +373,10 @@ class TestCase(RestTestCase):
     resp = client.send('POST', '/accnt/trades/EURUSD/20140302',
                        accnt = 'MARAYL',
                        ref = 'test2',
-                       side = 'SELL',
+                       side = 'Sell',
                        lots = 15,
                        ticks = 12345,
-                       liqInd = 'TAKER',
+                       liqInd = 'Taker',
                        cpty = 'GOSAYL')
 
     self.assertEqual(200, resp.status)
@@ -398,10 +398,10 @@ class TestCase(RestTestCase):
       u'orderId': 0,
       u'ref': u'test2',
       u'resdLots': 0,
-      u'liqInd': u'TAKER',
+      u'liqInd': u'Taker',
       u'settlDate': 20140302,
-      u'side': u'SELL',
-      u'state': u'TRADE',
+      u'side': u'Sell',
+      u'state': u'Trade',
       u'ticks': 12345
     }, {
       u'accnt': u'GOSAYL',
@@ -420,9 +420,9 @@ class TestCase(RestTestCase):
       u'orderId': 0,
       u'ref': u'test2',
       u'resdLots': 0,
-      u'liqInd': u'MAKER',
+      u'liqInd': u'Maker',
       u'settlDate': 20140302,
-      u'side': u'BUY',
-      u'state': u'TRADE',
+      u'side': u'Buy',
+      u'state': u'Trade',
       u'ticks': 12345
     }], resp.content)

@@ -23,17 +23,17 @@ using namespace std;
 AssetType TypeTraits<AssetType>::fromString(const QString& value)
 {
     AssetType type;
-    if (value == "CMDTY") {
+    if (value == "Cmdty") {
         type = AssetType::Cmdty;
-    } else if (value == "CORP") {
+    } else if (value == "Corp") {
         type = AssetType::Corp;
-    } else if (value == "CCY") {
+    } else if (value == "Ccy") {
         type = AssetType::Ccy;
-    } else if (value == "EQTY") {
+    } else if (value == "Eqty") {
         type = AssetType::Eqty;
-    } else if (value == "GOVT") {
+    } else if (value == "Govt") {
         type = AssetType::Govt;
-    } else if (value == "INDEX") {
+    } else if (value == "Index") {
         type = AssetType::Index;
     } else {
         throw domain_error{"invalid asset-type"};
@@ -44,9 +44,9 @@ AssetType TypeTraits<AssetType>::fromString(const QString& value)
 Direct TypeTraits<Direct>::fromString(const QString& value)
 {
     Direct direct;
-    if (value == "PAID") {
+    if (value == "Paid") {
         direct = Direct::Paid;
-    } else if (value == "GIVEN") {
+    } else if (value == "Given") {
         direct = Direct::Given;
     } else {
         throw domain_error{"invalid direction"};
@@ -60,9 +60,9 @@ LiqInd TypeTraits<LiqInd>::fromString(const QString& value)
     if (value.isNull()) {
         liqInd = LiqInd::None;
     } else {
-        if (value == "MAKER") {
+        if (value == "Maker") {
             liqInd = LiqInd::Maker;
-        } else if (value == "TAKER") {
+        } else if (value == "Taker") {
             liqInd = LiqInd::Taker;
         } else {
             throw domain_error{"invalid liquidity-indicator"};
@@ -74,9 +74,9 @@ LiqInd TypeTraits<LiqInd>::fromString(const QString& value)
 Side TypeTraits<Side>::fromString(const QString& value)
 {
     Side side;
-    if (value == "BUY") {
+    if (value == "Buy") {
         side = Side::Buy;
-    } else if (value == "SELL") {
+    } else if (value == "Sell") {
         side = Side::Sell;
     } else {
         throw domain_error{"invalid side"};
@@ -87,15 +87,15 @@ Side TypeTraits<Side>::fromString(const QString& value)
 State TypeTraits<State>::fromString(const QString& value)
 {
     State state;
-    if (value == "NONE") {
+    if (value == "None") {
         state = State::None;
-    } else if (value == "NEW") {
+    } else if (value == "New") {
         state = State::New;
-    } else if (value == "REVISE") {
+    } else if (value == "Revise") {
         state = State::Revise;
-    } else if (value == "CANCEL") {
+    } else if (value == "Cancel") {
         state = State::Cancel;
-    } else if (value == "TRADE") {
+    } else if (value == "Trade") {
         state = State::Trade;
     } else {
         throw domain_error{"invalid state"};

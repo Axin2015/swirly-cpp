@@ -50,7 +50,7 @@ class TestCase(RestTestCase):
     resp = client.send('POST', '/accnt/trades/EURUSD/20140302',
                        accnt = 'MARAYL',
                        ref = 'test1',
-                       side = 'BUY',
+                       side = 'Buy',
                        lots = 10)
 
     self.assertEqual(200, resp.status)
@@ -74,8 +74,8 @@ class TestCase(RestTestCase):
       u'resdLots': 0,
       u'liqInd': None,
       u'settlDate': 20140302,
-      u'side': u'BUY',
-      u'state': u'TRADE',
+      u'side': u'Buy',
+      u'state': u'Trade',
       u'ticks': 0
     }], resp.content)
 
@@ -84,7 +84,7 @@ class TestCase(RestTestCase):
     resp = client.send('POST', '/accnt/trades/EURUSD/20140302',
                        accnt = 'MARAYL',
                        ref = 'test1',
-                       side = 'SELL',
+                       side = 'Sell',
                        lots = 10)
 
     self.assertEqual(200, resp.status)
@@ -108,7 +108,7 @@ class TestCase(RestTestCase):
       u'resdLots': 0,
       u'liqInd': None,
       u'settlDate': 20140302,
-      u'side': u'SELL',
-      u'state': u'TRADE',
+      u'side': u'Sell',
+      u'state': u'Trade',
       u'ticks': 0
     }], resp.content)

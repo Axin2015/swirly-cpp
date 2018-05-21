@@ -29,14 +29,14 @@ class TestCase(RestTestCase):
           self.createMarket(client, 'EURUSD', 20140402)
           self.createMarket(client, 'GBPUSD', 20140302)
 
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'SELL', 3, 12346)
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'BUY', 3, 12346)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Sell', 3, 12346)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 3, 12346)
 
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140402, 'SELL', 5, 12347)
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140402, 'BUY', 5, 12347)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140402, 'Sell', 5, 12347)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140402, 'Buy', 5, 12347)
 
-          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'SELL', 3, 15346)
-          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'BUY', 3, 15346)
+          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'Sell', 3, 15346)
+          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'Buy', 3, 15346)
 
           self.checkAuth(client)
 
@@ -99,7 +99,7 @@ class TestCase(RestTestCase):
       u'id': 3,
       u'lastLots': 3,
       u'lastTicks': 12346,
-      u'liqInd': u'MAKER',
+      u'liqInd': u'Maker',
       u'lots': 3,
       u'marketId': 82255,
       u'matchId': 4,
@@ -108,8 +108,8 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 0,
       u'settlDate': 20140302,
-      u'side': u'SELL',
-      u'state': u'TRADE',
+      u'side': u'Sell',
+      u'state': u'Trade',
       u'ticks': 12346
     }, {
       u'accnt': u'MARAYL',
@@ -121,7 +121,7 @@ class TestCase(RestTestCase):
       u'id': 4,
       u'lastLots': 3,
       u'lastTicks': 12346,
-      u'liqInd': u'TAKER',
+      u'liqInd': u'Taker',
       u'lots': 3,
       u'marketId': 82255,
       u'matchId': 3,
@@ -130,8 +130,8 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 0,
       u'settlDate': 20140302,
-      u'side': u'BUY',
-      u'state': u'TRADE',
+      u'side': u'Buy',
+      u'state': u'Trade',
       u'ticks': 12346
     }, {
       u'accnt': u'MARAYL',
@@ -143,7 +143,7 @@ class TestCase(RestTestCase):
       u'id': 3,
       u'lastLots': 5,
       u'lastTicks': 12347,
-      u'liqInd': u'MAKER',
+      u'liqInd': u'Maker',
       u'lots': 5,
       u'marketId': 82286,
       u'matchId': 4,
@@ -152,8 +152,8 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 0,
       u'settlDate': 20140402,
-      u'side': u'SELL',
-      u'state': u'TRADE',
+      u'side': u'Sell',
+      u'state': u'Trade',
       u'ticks': 12347
     }, {
       u'accnt': u'MARAYL',
@@ -165,7 +165,7 @@ class TestCase(RestTestCase):
       u'id': 4,
       u'lastLots': 5,
       u'lastTicks': 12347,
-      u'liqInd': u'TAKER',
+      u'liqInd': u'Taker',
       u'lots': 5,
       u'marketId': 82286,
       u'matchId': 3,
@@ -174,8 +174,8 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 0,
       u'settlDate': 20140402,
-      u'side': u'BUY',
-      u'state': u'TRADE',
+      u'side': u'Buy',
+      u'state': u'Trade',
       u'ticks': 12347
     }, {
       u'accnt': u'MARAYL',
@@ -187,7 +187,7 @@ class TestCase(RestTestCase):
       u'id': 3,
       u'lastLots': 3,
       u'lastTicks': 15346,
-      u'liqInd': u'MAKER',
+      u'liqInd': u'Maker',
       u'lots': 3,
       u'marketId': 147791,
       u'matchId': 4,
@@ -196,8 +196,8 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 0,
       u'settlDate': 20140302,
-      u'side': u'SELL',
-      u'state': u'TRADE',
+      u'side': u'Sell',
+      u'state': u'Trade',
       u'ticks': 15346
     }, {
       u'accnt': u'MARAYL',
@@ -209,7 +209,7 @@ class TestCase(RestTestCase):
       u'id': 4,
       u'lastLots': 3,
       u'lastTicks': 15346,
-      u'liqInd': u'TAKER',
+      u'liqInd': u'Taker',
       u'lots': 3,
       u'marketId': 147791,
       u'matchId': 3,
@@ -218,8 +218,8 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 0,
       u'settlDate': 20140302,
-      u'side': u'BUY',
-      u'state': u'TRADE',
+      u'side': u'Buy',
+      u'state': u'Trade',
       u'ticks': 15346
     }], resp.content)
 
@@ -239,7 +239,7 @@ class TestCase(RestTestCase):
       u'id': 3,
       u'lastLots': 3,
       u'lastTicks': 12346,
-      u'liqInd': u'MAKER',
+      u'liqInd': u'Maker',
       u'lots': 3,
       u'marketId': 82255,
       u'matchId': 4,
@@ -248,8 +248,8 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 0,
       u'settlDate': 20140302,
-      u'side': u'SELL',
-      u'state': u'TRADE',
+      u'side': u'Sell',
+      u'state': u'Trade',
       u'ticks': 12346
     }, {
       u'accnt': u'MARAYL',
@@ -261,7 +261,7 @@ class TestCase(RestTestCase):
       u'id': 4,
       u'lastLots': 3,
       u'lastTicks': 12346,
-      u'liqInd': u'TAKER',
+      u'liqInd': u'Taker',
       u'lots': 3,
       u'marketId': 82255,
       u'matchId': 3,
@@ -270,8 +270,8 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 0,
       u'settlDate': 20140302,
-      u'side': u'BUY',
-      u'state': u'TRADE',
+      u'side': u'Buy',
+      u'state': u'Trade',
       u'ticks': 12346
     }, {
       u'accnt': u'MARAYL',
@@ -283,7 +283,7 @@ class TestCase(RestTestCase):
       u'id': 3,
       u'lastLots': 5,
       u'lastTicks': 12347,
-      u'liqInd': u'MAKER',
+      u'liqInd': u'Maker',
       u'lots': 5,
       u'marketId': 82286,
       u'matchId': 4,
@@ -292,8 +292,8 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 0,
       u'settlDate': 20140402,
-      u'side': u'SELL',
-      u'state': u'TRADE',
+      u'side': u'Sell',
+      u'state': u'Trade',
       u'ticks': 12347
     }, {
       u'accnt': u'MARAYL',
@@ -305,7 +305,7 @@ class TestCase(RestTestCase):
       u'id': 4,
       u'lastLots': 5,
       u'lastTicks': 12347,
-      u'liqInd': u'TAKER',
+      u'liqInd': u'Taker',
       u'lots': 5,
       u'marketId': 82286,
       u'matchId': 3,
@@ -314,8 +314,8 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 0,
       u'settlDate': 20140402,
-      u'side': u'BUY',
-      u'state': u'TRADE',
+      u'side': u'Buy',
+      u'state': u'Trade',
       u'ticks': 12347
     }], resp.content)
 
@@ -335,7 +335,7 @@ class TestCase(RestTestCase):
       u'id': 3,
       u'lastLots': 3,
       u'lastTicks': 15346,
-      u'liqInd': u'MAKER',
+      u'liqInd': u'Maker',
       u'lots': 3,
       u'marketId': 147791,
       u'matchId': 4,
@@ -344,8 +344,8 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 0,
       u'settlDate': 20140302,
-      u'side': u'SELL',
-      u'state': u'TRADE',
+      u'side': u'Sell',
+      u'state': u'Trade',
       u'ticks': 15346
     }, {
       u'accnt': u'MARAYL',
@@ -357,7 +357,7 @@ class TestCase(RestTestCase):
       u'id': 4,
       u'lastLots': 3,
       u'lastTicks': 15346,
-      u'liqInd': u'TAKER',
+      u'liqInd': u'Taker',
       u'lots': 3,
       u'marketId': 147791,
       u'matchId': 3,
@@ -366,8 +366,8 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 0,
       u'settlDate': 20140302,
-      u'side': u'BUY',
-      u'state': u'TRADE',
+      u'side': u'Buy',
+      u'state': u'Trade',
       u'ticks': 15346
     }], resp.content)
 
@@ -387,7 +387,7 @@ class TestCase(RestTestCase):
       u'id': 3,
       u'lastLots': 3,
       u'lastTicks': 15346,
-      u'liqInd': u'MAKER',
+      u'liqInd': u'Maker',
       u'lots': 3,
       u'marketId': 147791,
       u'matchId': 4,
@@ -396,7 +396,7 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 0,
       u'settlDate': 20140302,
-      u'side': u'SELL',
-      u'state': u'TRADE',
+      u'side': u'Sell',
+      u'state': u'Trade',
       u'ticks': 15346
     }, resp.content)

@@ -38,13 +38,13 @@ const char* enumString(Test t)
 {
     switch (t) {
     case Test::Foo:
-        return "FOO";
+        return "Foo";
     case Test::Bar:
-        return "BAR";
+        return "Bar";
     case Test::Baz:
-        return "BAZ";
+        return "Baz";
     case Test::Qux:
-        return "QUX";
+        return "Qux";
     }
     terminate();
 }
@@ -61,10 +61,10 @@ BOOST_AUTO_TEST_SUITE(EnumSuite)
 
 BOOST_AUTO_TEST_CASE(EnumStringCase)
 {
-    BOOST_TEST(lexical_cast<string>(Test::Foo) == "FOO");
-    BOOST_TEST(lexical_cast<string>(Test::Bar) == "BAR");
-    BOOST_TEST(lexical_cast<string>(Test::Baz) == "BAZ");
-    BOOST_TEST(lexical_cast<string>(Test::Qux) == "QUX");
+    BOOST_TEST(lexical_cast<string>(Test::Foo) == "Foo");
+    BOOST_TEST(lexical_cast<string>(Test::Bar) == "Bar");
+    BOOST_TEST(lexical_cast<string>(Test::Baz) == "Baz");
+    BOOST_TEST(lexical_cast<string>(Test::Qux) == "Qux");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

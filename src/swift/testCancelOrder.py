@@ -27,10 +27,10 @@ class TestCase(RestTestCase):
 
           self.createMarket(client, 'EURUSD', 20140302)
 
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'BUY', 3, 12345)
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'BUY', 5, 12345)
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'BUY', 7, 12345)
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'BUY', 11, 12345)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 3, 12345)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 5, 12345)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 7, 12345)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 11, 12345)
 
           self.checkAuth(client)
 
@@ -91,8 +91,8 @@ class TestCase(RestTestCase):
         u'ref': None,
         u'resdLots': 0,
         u'settlDate': 20140302,
-        u'side': u'BUY',
-        u'state': u'CANCEL',
+        u'side': u'Buy',
+        u'state': u'Cancel',
         u'ticks': 12345
       }],
       u'orders': [{
@@ -111,8 +111,8 @@ class TestCase(RestTestCase):
         u'ref': None,
         u'resdLots': 0,
         u'settlDate': 20140302,
-        u'side': u'BUY',
-        u'state': u'CANCEL',
+        u'side': u'Buy',
+        u'state': u'Cancel',
         u'ticks': 12345
       }],
       u'posn': None
@@ -159,8 +159,8 @@ class TestCase(RestTestCase):
         u'resdLots': 0,
         u'liqInd': None,
         u'settlDate': 20140302,
-        u'side': u'BUY',
-        u'state': u'CANCEL',
+        u'side': u'Buy',
+        u'state': u'Cancel',
         u'ticks': 12345
       }, {
         u'accnt': u'MARAYL',
@@ -181,8 +181,8 @@ class TestCase(RestTestCase):
         u'resdLots': 0,
         u'liqInd': None,
         u'settlDate': 20140302,
-        u'side': u'BUY',
-        u'state': u'CANCEL',
+        u'side': u'Buy',
+        u'state': u'Cancel',
         u'ticks': 12345
       }],
       u'orders': [{
@@ -201,8 +201,8 @@ class TestCase(RestTestCase):
         u'ref': None,
         u'resdLots': 0,
         u'settlDate': 20140302,
-        u'side': u'BUY',
-        u'state': u'CANCEL',
+        u'side': u'Buy',
+        u'state': u'Cancel',
         u'ticks': 12345
       }, {
         u'accnt': u'MARAYL',
@@ -220,8 +220,8 @@ class TestCase(RestTestCase):
         u'ref': None,
         u'resdLots': 0,
         u'settlDate': 20140302,
-        u'side': u'BUY',
-        u'state': u'CANCEL',
+        u'side': u'Buy',
+        u'state': u'Cancel',
         u'ticks': 12345
       }],
       u'posn': None
