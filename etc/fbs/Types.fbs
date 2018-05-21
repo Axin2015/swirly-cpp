@@ -34,6 +34,7 @@ enum AssetType:int {
 enum Direct:int {
   // Aggressor sold. Taker hit the bid resulting in a market dow
   Given = -1,
+  None = 0,
   // Aggressor bought. Taker lifted the offer resulting in a market uptick.
   Paid = 1
 }
@@ -49,6 +50,7 @@ enum LiqInd:int {
 
 enum Side:int {
   Sell = -1,
+  None = 0,
   Buy = 1
 }
 

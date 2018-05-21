@@ -95,6 +95,8 @@ using Direct = fbs::Direct;
 inline const char* enumString(Direct direct) noexcept
 {
     switch (direct) {
+    case Direct::None:
+        return "NONE";
     case Direct::Paid:
         return "PAID";
     case Direct::Given:
@@ -138,6 +140,8 @@ using Side = fbs::Side;
 inline const char* enumString(Side side) noexcept
 {
     switch (side) {
+    case Side::None:
+        return "NONE";
     case Side::Buy:
         return "BUY";
     case Side::Sell:
@@ -149,6 +153,8 @@ inline const char* enumString(Side side) noexcept
 constexpr Side opposite(Side side) noexcept
 {
     switch (side) {
+    case Side::None:
+        break;
     case Side::Buy:
         side = Side::Sell;
         break;

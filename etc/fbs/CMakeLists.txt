@@ -15,7 +15,11 @@
 
 set(fbs_SOURCES
   Asset.fbs
+  Exec.fbs
   Instr.fbs
+  Market.fbs
+  Order.fbs
+  Posn.fbs
   Types.fbs)
 
 build_flatbuffers(
@@ -30,7 +34,11 @@ build_flatbuffers(
 install(FILES ${fbs_SOURCES} DESTINATION etc/fbs COMPONENT config)
 install(FILES
   "${PROJECT_BINARY_DIR}/include/swirly/fbs/Asset_generated.h"
+  "${PROJECT_BINARY_DIR}/include/swirly/fbs/Exec_generated.h"
   "${PROJECT_BINARY_DIR}/include/swirly/fbs/Instr_generated.h"
+  "${PROJECT_BINARY_DIR}/include/swirly/fbs/Market_generated.h"
+  "${PROJECT_BINARY_DIR}/include/swirly/fbs/Order_generated.h"
+  "${PROJECT_BINARY_DIR}/include/swirly/fbs/Posn_generated.h"
   "${PROJECT_BINARY_DIR}/include/swirly/fbs/Types_generated.h"
   DESTINATION include/swirly/fbs
   COMPONENT header
