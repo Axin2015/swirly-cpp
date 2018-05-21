@@ -71,7 +71,7 @@ class TestCase(RestTestCase):
     resp = client.send('POST', '/accnt/orders',
                        instr = 'EURUSD',
                        settlDate = 20140302,
-                       side = 'BUY',
+                       side = 'Buy',
                        lots = 3,
                        ticks = 12344)
 
@@ -112,8 +112,8 @@ class TestCase(RestTestCase):
         u'resdLots': 3,
         u'liqInd': None,
         u'settlDate': 20140302,
-        u'side': u'BUY',
-        u'state': u'NEW',
+        u'side': u'Buy',
+        u'state': u'New',
         u'ticks': 12344
       }],
       u'orders': [{
@@ -132,8 +132,8 @@ class TestCase(RestTestCase):
         u'ref': None,
         u'resdLots': 3,
         u'settlDate': 20140302,
-        u'side': u'BUY',
-        u'state': u'NEW',
+        u'side': u'Buy',
+        u'state': u'New',
         u'ticks': 12344
       }],
       u'posn': None
@@ -144,7 +144,7 @@ class TestCase(RestTestCase):
     resp = client.send('POST', '/accnt/orders',
                        instr = 'EURUSD',
                        settlDate = 20140302,
-                       side = 'BUY',
+                       side = 'Buy',
                        lots = 5,
                        ticks = 12343)
 
@@ -185,8 +185,8 @@ class TestCase(RestTestCase):
         u'resdLots': 5,
         u'liqInd': None,
         u'settlDate': 20140302,
-        u'side': u'BUY',
-        u'state': u'NEW',
+        u'side': u'Buy',
+        u'state': u'New',
         u'ticks': 12343
       }],
       u'orders': [{
@@ -205,8 +205,8 @@ class TestCase(RestTestCase):
         u'ref': None,
         u'resdLots': 5,
         u'settlDate': 20140302,
-        u'side': u'BUY',
-        u'state': u'NEW',
+        u'side': u'Buy',
+        u'state': u'New',
         u'ticks': 12343
       }],
       u'posn': None
@@ -215,7 +215,7 @@ class TestCase(RestTestCase):
   def createBidByMarket(self, client):
     client.setTrader('EDIAYL')
     resp = client.send('POST', '/accnt/orders/EURUSD/20140302',
-                       side = 'BUY',
+                       side = 'Buy',
                        lots = 7,
                        ticks = 12342)
 
@@ -256,8 +256,8 @@ class TestCase(RestTestCase):
         u'resdLots': 7,
         u'liqInd': None,
         u'settlDate': 20140302,
-        u'side': u'BUY',
-        u'state': u'NEW',
+        u'side': u'Buy',
+        u'state': u'New',
         u'ticks': 12342
       }],
       u'orders': [{
@@ -276,8 +276,8 @@ class TestCase(RestTestCase):
         u'ref': None,
         u'resdLots': 7,
         u'settlDate': 20140302,
-        u'side': u'BUY',
-        u'state': u'NEW',
+        u'side': u'Buy',
+        u'state': u'New',
         u'ticks': 12342
       }],
       u'posn': None
@@ -288,7 +288,7 @@ class TestCase(RestTestCase):
     resp = client.send('POST', '/accnt/orders',
                        instr = 'EURUSD',
                        settlDate = 20140302,
-                       side = 'SELL',
+                       side = 'Sell',
                        lots = 3,
                        ticks = 12346)
 
@@ -329,8 +329,8 @@ class TestCase(RestTestCase):
         u'resdLots': 3,
         u'liqInd': None,
         u'settlDate': 20140302,
-        u'side': u'SELL',
-        u'state': u'NEW',
+        u'side': u'Sell',
+        u'state': u'New',
         u'ticks': 12346
       }],
       u'orders': [{
@@ -349,8 +349,8 @@ class TestCase(RestTestCase):
         u'ref': None,
         u'resdLots': 3,
         u'settlDate': 20140302,
-        u'side': u'SELL',
-        u'state': u'NEW',
+        u'side': u'Sell',
+        u'state': u'New',
         u'ticks': 12346
       }],
       u'posn': None
@@ -361,7 +361,7 @@ class TestCase(RestTestCase):
     resp = client.send('POST', '/accnt/orders',
                        instr = 'EURUSD',
                        settlDate = 20140302,
-                       side = 'SELL',
+                       side = 'Sell',
                        lots = 5,
                        ticks = 12347)
 
@@ -402,8 +402,8 @@ class TestCase(RestTestCase):
         u'resdLots': 5,
         u'liqInd': None,
         u'settlDate': 20140302,
-        u'side': u'SELL',
-        u'state': u'NEW',
+        u'side': u'Sell',
+        u'state': u'New',
         u'ticks': 12347
       }],
       u'orders': [{
@@ -422,8 +422,8 @@ class TestCase(RestTestCase):
         u'ref': None,
         u'resdLots': 5,
         u'settlDate': 20140302,
-        u'side': u'SELL',
-        u'state': u'NEW',
+        u'side': u'Sell',
+        u'state': u'New',
         u'ticks': 12347
       }],
       u'posn': None
@@ -432,7 +432,7 @@ class TestCase(RestTestCase):
   def createOfferByMarket(self, client):
     client.setTrader('EDIAYL')
     resp = client.send('POST', '/accnt/orders/EURUSD/20140302',
-                       side = 'SELL',
+                       side = 'Sell',
                        lots = 7,
                        ticks = 12348)
 
@@ -473,8 +473,8 @@ class TestCase(RestTestCase):
         u'resdLots': 7,
         u'liqInd': None,
         u'settlDate': 20140302,
-        u'side': u'SELL',
-        u'state': u'NEW',
+        u'side': u'Sell',
+        u'state': u'New',
         u'ticks': 12348
       }],
       u'orders': [{
@@ -493,8 +493,8 @@ class TestCase(RestTestCase):
         u'ref': None,
         u'resdLots': 7,
         u'settlDate': 20140302,
-        u'side': u'SELL',
-        u'state': u'NEW',
+        u'side': u'Sell',
+        u'state': u'New',
         u'ticks': 12348
       }],
       u'posn': None

@@ -71,51 +71,21 @@ using AssetType = fbs::AssetType;
 
 inline const char* enumString(AssetType type) noexcept
 {
-    switch (type) {
-    case AssetType::None:
-        return "NONE";
-    case AssetType::Cmdty:
-        return "CMDTY";
-    case AssetType::Corp:
-        return "CORP";
-    case AssetType::Ccy:
-        return "CCY";
-    case AssetType::Eqty:
-        return "EQTY";
-    case AssetType::Govt:
-        return "GOVT";
-    case AssetType::Index:
-        return "INDEX";
-    }
-    std::terminate();
+    return fbs::EnumNameAssetType(type);
 }
 
 using Direct = fbs::Direct;
 
 inline const char* enumString(Direct direct) noexcept
 {
-    switch (direct) {
-    case Direct::Paid:
-        return "PAID";
-    case Direct::Given:
-        return "GIVEN";
-    }
-    std::terminate();
+    return fbs::EnumNameDirect(direct);
 }
 
 using LiqInd = fbs::LiqInd;
 
 inline const char* enumString(LiqInd liqInd) noexcept
 {
-    switch (liqInd) {
-    case LiqInd::None:
-        return "NONE";
-    case LiqInd::Maker:
-        return "MAKER";
-    case LiqInd::Taker:
-        return "TAKER";
-    }
-    std::terminate();
+    return fbs::EnumNameLiqInd(liqInd);
 }
 
 constexpr LiqInd opposite(LiqInd liqInd) noexcept
@@ -137,18 +107,14 @@ using Side = fbs::Side;
 
 inline const char* enumString(Side side) noexcept
 {
-    switch (side) {
-    case Side::Buy:
-        return "BUY";
-    case Side::Sell:
-        return "SELL";
-    }
-    std::terminate();
+    return fbs::EnumNameSide(side);
 }
 
 constexpr Side opposite(Side side) noexcept
 {
     switch (side) {
+    case Side::None:
+        break;
     case Side::Buy:
         side = Side::Sell;
         break;
@@ -167,36 +133,18 @@ using State = fbs::State;
 
 inline const char* enumString(State state) noexcept
 {
-    switch (state) {
-    case State::None:
-        return "NONE";
-    case State::New:
-        return "NEW";
-    case State::Revise:
-        return "REVISE";
-    case State::Cancel:
-        return "CANCEL";
-    case State::Trade:
-        return "TRADE";
-    }
-    std::terminate();
+    return fbs::EnumNameState(state);
 }
 
+/**
+ * This overload is used for presentation purposes only. There is no inverse operation.
+ */
 inline const char* enumString(State state, Lots resd) noexcept
 {
-    switch (state) {
-    case State::None:
-        return "NONE";
-    case State::New:
-        return "NEW";
-    case State::Revise:
-        return "REVISE";
-    case State::Cancel:
-        return "CANCEL";
-    case State::Trade:
-        return resd == 0_lts ? "COMPLETE" : "PARTIAL";
+    if (state == State::Trade) {
+        return resd == 0_lts ? "Complete" : "Partial";
     }
-    std::terminate();
+    return fbs::EnumNameState(state);
 }
 
 } // namespace fin

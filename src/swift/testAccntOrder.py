@@ -29,14 +29,14 @@ class TestCase(RestTestCase):
           self.createMarket(client, 'EURUSD', 20140402)
           self.createMarket(client, 'GBPUSD', 20140302)
 
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'SELL', 3, 12346)
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'BUY', 3, 12344)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Sell', 3, 12346)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 3, 12344)
 
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140402, 'SELL', 5, 12347)
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140402, 'BUY', 5, 12343)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140402, 'Sell', 5, 12347)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140402, 'Buy', 5, 12343)
 
-          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'SELL', 3, 15346)
-          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'BUY', 3, 15344)
+          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'Sell', 3, 15346)
+          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'Buy', 3, 15344)
 
           self.checkAuth(client)
 
@@ -105,8 +105,8 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 3,
       u'settlDate': 20140302,
-      u'side': u'SELL',
-      u'state': u'NEW',
+      u'side': u'Sell',
+      u'state': u'New',
       u'ticks': 12346
     }, {
       u'accnt': u'MARAYL',
@@ -124,8 +124,8 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 3,
       u'settlDate': 20140302,
-      u'side': u'BUY',
-      u'state': u'NEW',
+      u'side': u'Buy',
+      u'state': u'New',
       u'ticks': 12344
     }, {
       u'accnt': u'MARAYL',
@@ -143,8 +143,8 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 5,
       u'settlDate': 20140402,
-      u'side': u'SELL',
-      u'state': u'NEW',
+      u'side': u'Sell',
+      u'state': u'New',
       u'ticks': 12347
     }, {
       u'accnt': u'MARAYL',
@@ -162,8 +162,8 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 5,
       u'settlDate': 20140402,
-      u'side': u'BUY',
-      u'state': u'NEW',
+      u'side': u'Buy',
+      u'state': u'New',
       u'ticks': 12343
     }, {
       u'accnt': u'MARAYL',
@@ -181,8 +181,8 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 3,
       u'settlDate': 20140302,
-      u'side': u'SELL',
-      u'state': u'NEW',
+      u'side': u'Sell',
+      u'state': u'New',
       u'ticks': 15346
     }, {
       u'accnt': u'MARAYL',
@@ -200,8 +200,8 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 3,
       u'settlDate': 20140302,
-      u'side': u'BUY',
-      u'state': u'NEW',
+      u'side': u'Buy',
+      u'state': u'New',
       u'ticks': 15344
     }], resp.content)
 
@@ -227,8 +227,8 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 3,
       u'settlDate': 20140302,
-      u'side': u'SELL',
-      u'state': u'NEW',
+      u'side': u'Sell',
+      u'state': u'New',
       u'ticks': 12346
     }, {
       u'accnt': u'MARAYL',
@@ -246,8 +246,8 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 3,
       u'settlDate': 20140302,
-      u'side': u'BUY',
-      u'state': u'NEW',
+      u'side': u'Buy',
+      u'state': u'New',
       u'ticks': 12344
     }, {
       u'accnt': u'MARAYL',
@@ -265,8 +265,8 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 5,
       u'settlDate': 20140402,
-      u'side': u'SELL',
-      u'state': u'NEW',
+      u'side': u'Sell',
+      u'state': u'New',
       u'ticks': 12347
     }, {
       u'accnt': u'MARAYL',
@@ -284,8 +284,8 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 5,
       u'settlDate': 20140402,
-      u'side': u'BUY',
-      u'state': u'NEW',
+      u'side': u'Buy',
+      u'state': u'New',
       u'ticks': 12343
     }], resp.content)
 
@@ -311,8 +311,8 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 3,
       u'settlDate': 20140302,
-      u'side': u'SELL',
-      u'state': u'NEW',
+      u'side': u'Sell',
+      u'state': u'New',
       u'ticks': 12346
     }, {
       u'accnt': u'MARAYL',
@@ -330,8 +330,8 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 3,
       u'settlDate': 20140302,
-      u'side': u'BUY',
-      u'state': u'NEW',
+      u'side': u'Buy',
+      u'state': u'New',
       u'ticks': 12344
     }], resp.content)
 
@@ -357,7 +357,7 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 3,
       u'settlDate': 20140302,
-      u'side': u'SELL',
-      u'state': u'NEW',
+      u'side': u'Sell',
+      u'state': u'New',
       u'ticks': 15346
     }, resp.content)

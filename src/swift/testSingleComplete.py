@@ -27,7 +27,7 @@ class TestCase(RestTestCase):
 
           self.createMarket(client, 'EURUSD', 20140302)
 
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'BUY', 5, 12345)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 5, 12345)
 
           self.takeOrder(client)
 
@@ -48,7 +48,7 @@ class TestCase(RestTestCase):
   def takeOrder(self, client):
     client.setTrader('GOSAYL')
     resp = client.send('POST', '/accnt/orders/EURUSD/20140302',
-                       side = 'SELL',
+                       side = 'Sell',
                        lots = 5,
                        ticks = 12345)
 
@@ -87,10 +87,10 @@ class TestCase(RestTestCase):
         u'orderId': 2,
         u'ref': None,
         u'resdLots': 0,
-        u'liqInd': u'TAKER',
+        u'liqInd': u'Taker',
         u'settlDate': 20140302,
-        u'side': u'SELL',
-        u'state': u'TRADE',
+        u'side': u'Sell',
+        u'state': u'Trade',
         u'ticks': 12345
       }, {
         u'accnt': u'GOSAYL',
@@ -111,8 +111,8 @@ class TestCase(RestTestCase):
         u'resdLots': 5,
         u'liqInd': None,
         u'settlDate': 20140302,
-        u'side': u'SELL',
-        u'state': u'NEW',
+        u'side': u'Sell',
+        u'state': u'New',
         u'ticks': 12345
       }],
       u'orders': [{
@@ -131,8 +131,8 @@ class TestCase(RestTestCase):
         u'ref': None,
         u'resdLots': 0,
         u'settlDate': 20140302,
-        u'side': u'SELL',
-        u'state': u'TRADE',
+        u'side': u'Sell',
+        u'state': u'Trade',
         u'ticks': 12345
       }],
       u'posn': {
@@ -171,7 +171,7 @@ class TestCase(RestTestCase):
       u'id': 3,
       u'lastLots': 5,
       u'lastTicks': 12345,
-      u'liqInd': u'MAKER',
+      u'liqInd': u'Maker',
       u'lots': 5,
       u'marketId': 82255,
       u'matchId': 4,
@@ -180,8 +180,8 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 0,
       u'settlDate': 20140302,
-      u'side': u'BUY',
-      u'state': u'TRADE',
+      u'side': u'Buy',
+      u'state': u'Trade',
       u'ticks': 12345
     }, {
       u'accnt': u'MARAYL',
@@ -202,8 +202,8 @@ class TestCase(RestTestCase):
       u'ref': None,
       u'resdLots': 5,
       u'settlDate': 20140302,
-      u'side': u'BUY',
-      u'state': u'NEW',
+      u'side': u'Buy',
+      u'state': u'New',
       u'ticks': 12345
     }], resp.content)
 
@@ -230,10 +230,10 @@ class TestCase(RestTestCase):
       u'orderId': 1,
       u'ref': None,
       u'resdLots': 0,
-      u'liqInd': u'MAKER',
+      u'liqInd': u'Maker',
       u'settlDate': 20140302,
-      u'side': u'BUY',
-      u'state': u'TRADE',
+      u'side': u'Buy',
+      u'state': u'Trade',
       u'ticks': 12345
     }], resp.content)
 

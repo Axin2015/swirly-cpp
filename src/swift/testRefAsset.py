@@ -35,30 +35,30 @@ class TestCase(RestTestCase):
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([
-      {u'display': u'Central Appalachia Coal', u'symbol': u'CAP',  u'type': u'CMDTY'},
-      {u'display': u'Switzerland, Francs', u'symbol': u'CHF', u'type': u'CCY'},
-      {u'display': u'Cisco Systems Inc', u'symbol': u'CSCO', u'type': u'CORP'},
-      {u'display': u'Walt Disney', u'symbol': u'DIS', u'type': u'CORP'},
-      {u'display': u'Ethiopia, Birr', u'symbol': u'ETB', u'type': u'CCY'},
-      {u'display': u'Euro Member Countries, Euro', u'symbol': u'EUR', u'type': u'CCY'},
-      {u'display': u'United Kingdom, Pounds', u'symbol': u'GBP',  u'type': u'CCY'},
-      {u'display': u'Ibm Corp', u'symbol': u'IBM', u'type': u'CORP'},
-      {u'display': u'Illinois Basin Coal', u'symbol': u'ILB', u'type': u'CMDTY'},
-      {u'display': u'Intel Corp', u'symbol': u'INTC', u'type': u'CORP'},
-      {u'display': u'Japan, Yen', u'symbol': u'JPY', u'type': u'CCY'},
-      {u'display': u'Microsoft Corp', u'symbol': u'MSFT', u'type': u'CORP'},
-      {u'display': u'Northern Appalachia Coal', u'symbol': u'NAP', u'type': u'CMDTY'},
-      {u'display': u'Powder River Basin Coal', u'symbol': u'PRB', u'type': u'CMDTY'},
-      {u'display': u'Uinta Basin Coal', u'symbol': u'UIB', u'type': u'CMDTY'},
-      {u'display': u'United States of America, Dollars', u'symbol': u'USD', u'type': u'CCY'},
-      {u'display': u'Viacom Inc', u'symbol': u'VIA', u'type': u'CORP'},
-      {u'display': u'Vodafone Group Plc', u'symbol': u'VOD', u'type': u'CORP'},
-      {u'display': u'Verizon Com', u'symbol': u'VZ', u'type': u'CORP'},
-      {u'display': u'Gelena Abaya A', u'symbol': u'WGAA', u'type': u'CMDTY'},
-      {u'display': u'Kochere A', u'symbol': u'WKCA', u'type': u'CMDTY'},
-      {u'display': u'Wenago A', u'symbol': u'WWNA', u'type': u'CMDTY'},
-      {u'display': u'Yirgachefe A', u'symbol': u'WYCA', u'type': u'CMDTY'},
-      {u'display': u'South Africa, Rand', u'symbol': u'ZAR', u'type': u'CCY'}
+      {u'display': u'Central Appalachia Coal', u'symbol': u'CAP',  u'type': u'Cmdty'},
+      {u'display': u'Switzerland, Francs', u'symbol': u'CHF', u'type': u'Ccy'},
+      {u'display': u'Cisco Systems Inc', u'symbol': u'CSCO', u'type': u'Corp'},
+      {u'display': u'Walt Disney', u'symbol': u'DIS', u'type': u'Corp'},
+      {u'display': u'Ethiopia, Birr', u'symbol': u'ETB', u'type': u'Ccy'},
+      {u'display': u'Euro Member Countries, Euro', u'symbol': u'EUR', u'type': u'Ccy'},
+      {u'display': u'United Kingdom, Pounds', u'symbol': u'GBP',  u'type': u'Ccy'},
+      {u'display': u'Ibm Corp', u'symbol': u'IBM', u'type': u'Corp'},
+      {u'display': u'Illinois Basin Coal', u'symbol': u'ILB', u'type': u'Cmdty'},
+      {u'display': u'Intel Corp', u'symbol': u'INTC', u'type': u'Corp'},
+      {u'display': u'Japan, Yen', u'symbol': u'JPY', u'type': u'Ccy'},
+      {u'display': u'Microsoft Corp', u'symbol': u'MSFT', u'type': u'Corp'},
+      {u'display': u'Northern Appalachia Coal', u'symbol': u'NAP', u'type': u'Cmdty'},
+      {u'display': u'Powder River Basin Coal', u'symbol': u'PRB', u'type': u'Cmdty'},
+      {u'display': u'Uinta Basin Coal', u'symbol': u'UIB', u'type': u'Cmdty'},
+      {u'display': u'United States of America, Dollars', u'symbol': u'USD', u'type': u'Ccy'},
+      {u'display': u'Viacom Inc', u'symbol': u'VIA', u'type': u'Corp'},
+      {u'display': u'Vodafone Group Plc', u'symbol': u'VOD', u'type': u'Corp'},
+      {u'display': u'Verizon Com', u'symbol': u'VZ', u'type': u'Corp'},
+      {u'display': u'Gelena Abaya A', u'symbol': u'WGAA', u'type': u'Cmdty'},
+      {u'display': u'Kochere A', u'symbol': u'WKCA', u'type': u'Cmdty'},
+      {u'display': u'Wenago A', u'symbol': u'WWNA', u'type': u'Cmdty'},
+      {u'display': u'Yirgachefe A', u'symbol': u'WYCA', u'type': u'Cmdty'},
+      {u'display': u'South Africa, Rand', u'symbol': u'ZAR', u'type': u'Ccy'}
     ], resp.content)
 
   def getBySymbol(self, client):
@@ -70,5 +70,5 @@ class TestCase(RestTestCase):
     self.assertDictEqual({
       u'display': u'Euro Member Countries, Euro',
       u'symbol': u'EUR',
-      u'type': u'CCY'
+      u'type': u'Ccy'
     }, resp.content)

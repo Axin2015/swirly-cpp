@@ -29,14 +29,14 @@ class TestCase(RestTestCase):
           self.createMarket(client, 'EURUSD', 20140402)
           self.createMarket(client, 'GBPUSD', 20140302)
 
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'SELL', 3, 12346)
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'BUY', 3, 12346)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Sell', 3, 12346)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 3, 12346)
 
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140402, 'SELL', 5, 12346)
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140402, 'BUY', 5, 12346)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140402, 'Sell', 5, 12346)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140402, 'Buy', 5, 12346)
 
-          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'SELL', 7, 15346)
-          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'BUY', 7, 15346)
+          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'Sell', 7, 15346)
+          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'Buy', 7, 15346)
 
           self.checkAuth(client)
 
