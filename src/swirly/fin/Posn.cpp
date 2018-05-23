@@ -81,6 +81,62 @@ void Posn::toJson(ostream& os) const
     os << '}';
 }
 
+void Posn::addBuy(Lots lots, Ticks ticks) noexcept
+{
+    //   -2  -1   0   1
+    //    +-------+---+
+    //    |-->    |   |     netLots < 0
+    //    |------>|   |     netLots == 0
+    //    |---------->|     netLots > 0 && netLots < lots
+    //    |       |   |-->  netLots >= lots
+
+    const auto cost = swirly::cost(lots, ticks);
+    const auto netLots = this->netLots() + lots;
+    buyLots_ += lots;
+    buyCost_ += cost;
+    if (netLots < 0_lts || netLots >= lots) {
+        // Either short position was partially closed.
+        // Or long position was extended.
+        netCost_ += cost;
+    } else if (netLots > 0_lts) {
+        assert(netLots < lots);
+        // Short position was fully closed and long position opened.
+        netCost_ = swirly::cost(netLots, ticks);
+    } else {
+        assert(netLots == 0_lts);
+        // Short position was fully closed.
+        netCost_ = 0_cst;
+    }
+}
+
+void Posn::addSell(Lots lots, Ticks ticks) noexcept
+{
+    //   -1   0   1   2
+    //    +-------+---+
+    //    |   |    <--|     netLots > 0
+    //    |   |<------|     netLots == 0
+    //    |<----------|     netLots < 0 && netLots > -lots
+    // <--|   |       |     netLots <= -lots
+
+    const auto cost = swirly::cost(lots, ticks);
+    const auto netLots = this->netLots() - lots;
+    sellLots_ += lots;
+    sellCost_ += cost;
+    if (netLots > 0_lts || netLots <= -lots) {
+        // Either long position was partially closed.
+        // Or short position was extended.
+        netCost_ -= cost;
+    } else if (netLots < 0_lts) {
+        assert(netLots > -lots);
+        // Long position was fully closed and short position opened.
+        netCost_ = swirly::cost(netLots, ticks);
+    } else {
+        assert(netLots == 0_lts);
+        // Long position was fully closed.
+        netCost_ = 0_cst;
+    }
+}
+
 PosnSet::~PosnSet()
 {
     set_.clear_and_dispose([](const Posn* ptr) { ptr->release(); });

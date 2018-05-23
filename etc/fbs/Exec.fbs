@@ -36,6 +36,8 @@ table Exec {
   last_ticks:long;
   min_lots:long = 1;
   match_id:long;
+  posn_lots:long;
+  posn_ticks:long;
   liqind:LiqInd;
   cpty:string;
   created:long;

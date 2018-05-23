@@ -94,6 +94,8 @@ void MsgQueue::doCreateExec(const Exec& exec)
         body.lastTicks = exec.lastTicks();
         body.minLots = exec.minLots();
         body.matchId = exec.matchId();
+        body.posnLots = exec.posnLots();
+        body.posnCost = exec.posnCost();
         body.liqInd = exec.liqInd();
         pstrcpy<'\0'>(body.cpty, exec.cpty());
         body.created = msSinceEpoch(exec.created());

@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
             ofstream os{"exec.txt"};
             os << "accnt\tmarket_id\tinstr\tsettl_date\tid\torder_id\tref\tstate\tside\tlots\t"
                   "ticks\tresd_lots\texec_lots\texec_cost\tlast_lots\tlast_ticks\tmin_lots\t"
-                  "match_id\tliq_ind\tcpty\tcreated\n";
+                  "match_id\tposn_lots\tposn_cost\tliq_ind\tcpty\tcreated\n";
             // One week ago.
             model.readExec(now - 604800000ms, [&os](auto ptr) {
                 ptr->toDsv(os, '\t');
@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
             ofstream os{"trade.txt"};
             os << "accnt\tmarket_id\tinstr\tsettl_date\tid\torder_id\tref\tstate\tside\tlots\t"
                   "ticks\tresd_lots\texec_lots\texec_cost\tlast_lots\tlast_ticks\tmin_lots\t"
-                  "match_id\tliq_ind\tcpty\tcreated\n";
+                  "match_id\tposn_lots\tposn_cost\tliq_ind\tcpty\tcreated\n";
             model.readTrade([&os](auto ptr) {
                 ptr->toDsv(os, '\t');
                 os << '\n';

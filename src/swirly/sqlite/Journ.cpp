@@ -42,8 +42,9 @@ constexpr auto UpdateMarketSql =     //
 constexpr auto InsertExecSql =                                                     //
     "INSERT INTO exec_t (market_id, instr, settl_day, id, order_id, accnt, ref,"   //
     " state_id, side_id, lots, ticks, resd_lots, exec_lots, exec_cost, last_lots," //
-    " last_ticks, min_lots, match_id, liq_ind_id, cpty, created)"                  //
-    " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"sv;
+    " last_ticks, min_lots, match_id, posn_lots, posn_cost, liq_ind_id, cpty,"     //
+    " created)"                                                                    //
+    " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"sv;
 
 constexpr auto UpdateExecSql =       //
     "UPDATE exec_t SET archive = ?3" //
@@ -146,6 +147,8 @@ void SqlJourn::onCreateExec(const CreateExec& body)
     }
     bind(body.minLots);
     bind(body.matchId, MaybeNull);
+    bind(body.posnLots);
+    bind(body.posnCost);
     bind(body.liqInd, MaybeNull);
     bind(toStringView(body.cpty), MaybeNull);
     bind(body.created); // Created.

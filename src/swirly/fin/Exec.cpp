@@ -71,17 +71,19 @@ void Exec::toDsv(ostream& os, char delim) const
     } else {
         osj << ""sv;
     }
+    if (state_ == State::Trade) {
+        osj << posnLots_ << posnCost_;
+    } else {
+        osj << ""sv
+            << ""sv;
+    }
     if (liqInd_ != LiqInd::None) {
         osj << liqInd_;
     } else {
         osj << ""sv;
     }
-    if (!cpty_.empty()) {
-        osj << cpty_;
-    } else {
-        osj << ""sv;
-    }
-    osj << created_;
+    osj << cpty_ //
+        << created_;
 }
 
 void Exec::toJson(ostream& os) const
@@ -128,6 +130,12 @@ void Exec::toJson(ostream& os) const
     } else {
         os << "null"sv;
     }
+    if (state_ == State::Trade) {
+        os << ",\"posn_lots\":"sv << posnLots_ //
+           << ",\"posn_cost\":"sv << posnCost_;
+    } else {
+        os << ",\"posn_lots\":null,\"posn_cost\":null"sv;
+    }
     os << ",\"liq_ind\":"sv;
     if (liqInd_ != LiqInd::None) {
         os << '"' << liqInd_ << '"';
@@ -149,7 +157,8 @@ ExecPtr Exec::opposite(Id64 id) const
     assert(!cpty_.empty());
     return make(cpty_, marketId_, instr_, settlDay_, id, orderId_, +ref_, state_,
                 swirly::opposite(side_), lots_, ticks_, resdLots_, execLots_, execCost_, lastLots_,
-                lastTicks_, minLots_, matchId_, swirly::opposite(liqInd_), accnt_, created_);
+                lastTicks_, minLots_, matchId_, posnLots_, posnCost_, swirly::opposite(liqInd_),
+                accnt_, created_);
 }
 
 void Exec::trade(Lots sumLots, Cost sumCost, Lots lastLots, Ticks lastTicks, Id64 matchId,

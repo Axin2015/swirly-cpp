@@ -232,8 +232,8 @@ struct Serv::Impl {
             market.insertOrder(order);
         }
         {
-            // TODO: IOC orders would need an additional revision for the unsolicited cancellation of any
-            // unfilled quantity.
+            // TODO: IOC orders would need an additional revision for the unsolicited cancellation
+            // of any unfilled quantity.
             bool success{false};
             // clang-format off
             const auto finally = makeFinally([&market, &order, &success]() noexcept {
@@ -258,8 +258,7 @@ struct Serv::Impl {
         // Commit matches.
         if (!matches_.empty()) {
             assert(posn);
-            commitMatches(accnt, market, now);
-            posn->addTrade(order->side(), order->execLots(), order->execCost());
+            commitMatches(accnt, market, *posn, now);
         }
     }
 
@@ -399,8 +398,8 @@ struct Serv::Impl {
                           Ticks ticks, LiqInd liqInd, Symbol cpty, Time created)
     {
         auto posn = accnt.posn(market.id(), market.instr(), market.settlDay());
-        auto trade
-            = newManual(accnt.symbol(), market, ref, side, lots, ticks, liqInd, cpty, created);
+        auto trade = newManual(accnt.symbol(), market, ref, side, lots, ticks, posn->netLots(),
+                               posn->netCost(), liqInd, cpty, created);
         decltype(trade) cptyTrade;
 
         if (!cpty.empty()) {
@@ -481,16 +480,16 @@ struct Serv::Impl {
         return Exec::make(order.accnt(), order.marketId(), order.instr(), order.settlDay(), id,
                           order.id(), order.ref(), order.state(), order.side(), order.lots(),
                           order.ticks(), order.resdLots(), order.execLots(), order.execCost(),
-                          order.lastLots(), order.lastTicks(), order.minLots(), 0_id64,
-                          LiqInd::None, Symbol{}, created);
+                          order.lastLots(), order.lastTicks(), order.minLots(), 0_id64, 0_lts,
+                          0_cst, LiqInd::None, Symbol{}, created);
     }
 
     /**
      * Special factory method for manual trades.
      */
     ExecPtr newManual(Id64 marketId, Symbol instr, JDay settlDay, Id64 id, Symbol accnt,
-                      string_view ref, Side side, Lots lots, Ticks ticks, LiqInd liqInd,
-                      Symbol cpty, Time created) const
+                      string_view ref, Side side, Lots lots, Ticks ticks, Lots posnLots,
+                      Cost posnCost, LiqInd liqInd, Symbol cpty, Time created) const
     {
         const auto orderId = 0_id64;
         const auto state = State::Trade;
@@ -502,15 +501,16 @@ struct Serv::Impl {
         const auto minLots = 1_lts;
         const auto matchId = 0_id64;
         return Exec::make(accnt, marketId, instr, settlDay, id, orderId, ref, state, side, lots,
-                          ticks, resd, exec, cost, lastLots, lastTicks, minLots, matchId, liqInd,
-                          cpty, created);
+                          ticks, resd, exec, cost, lastLots, lastTicks, minLots, matchId, posnLots,
+                          posnCost, liqInd, cpty, created);
     }
 
     ExecPtr newManual(Symbol accnt, Market& market, string_view ref, Side side, Lots lots,
-                      Ticks ticks, LiqInd liqInd, Symbol cpty, Time created) const
+                      Ticks ticks, Lots posnLots, Cost posnCost, LiqInd liqInd, Symbol cpty,
+                      Time created) const
     {
         return newManual(market.id(), market.instr(), market.settlDay(), market.allocId(), accnt,
-                         ref, side, lots, ticks, liqInd, cpty, created);
+                         ref, side, lots, ticks, posnLots, posnCost, liqInd, cpty, created);
     }
 
     Match newMatch(Market& market, const Order& takerOrder, const OrderPtr& makerOrder, Lots lots,
@@ -604,31 +604,44 @@ struct Serv::Impl {
     // Assumes that maker lots have not been reduced since matching took place. N.B. this function is
     // responsible for committing a transaction, so it is particularly important that it does not
     // throw.
-    void commitMatches(Accnt& takerAccnt, Market& market, Time now) noexcept
+    void commitMatches(Accnt& takerAccnt, Market& market, Posn& takerPosn, Time now) noexcept
     {
         for (const auto& match : matches_) {
+
             const auto makerOrder = match.makerOrder;
             assert(makerOrder);
+
             // Reduce maker.
             market.takeOrder(*makerOrder, match.lots, now);
+
             // Must succeed because maker order exists.
             auto it = accnts_.find(makerOrder->accnt());
             assert(it != accnts_.end());
             auto& makerAccnt = *it;
+
             // Maker updated first because this is consistent with last-look semantics.
-            // Update maker.
+
+            // Update maker position.
             const auto makerTrade = match.makerTrade;
             assert(makerTrade);
+            makerTrade->posn(match.makerPosn->netLots(), match.makerPosn->netCost());
+            match.makerPosn->addTrade(makerTrade->side(), makerTrade->lastLots(),
+                                      makerTrade->lastTicks());
+
+            // Update maker account.
+            makerAccnt.pushExecFront(makerTrade);
+            makerAccnt.insertTrade(makerTrade);
             if (makerOrder->done()) {
                 makerAccnt.removeOrder(*makerOrder);
             }
-            makerAccnt.pushExecFront(makerTrade);
-            makerAccnt.insertTrade(makerTrade);
-            match.makerPosn->addTrade(makerTrade->side(), makerTrade->lastLots(),
-                                      makerTrade->lastTicks());
-            // Update taker.
+
+            // Update taker position.
             const auto takerTrade = match.takerTrade;
             assert(takerTrade);
+            takerTrade->posn(takerPosn.netLots(), takerPosn.netCost());
+            takerPosn.addTrade(takerTrade->side(), takerTrade->lastLots(), takerTrade->lastTicks());
+
+            // Update taker account.
             takerAccnt.pushExecFront(takerTrade);
             takerAccnt.insertTrade(takerTrade);
         }

@@ -38,7 +38,7 @@ class SWIRLY_API Exec
     Exec(Symbol accnt, Id64 marketId, Symbol instr, JDay settlDay, Id64 id, Id64 orderId,
          std::string_view ref, State state, Side side, Lots lots, Ticks ticks, Lots resdLots,
          Lots execLots, Cost execCost, Lots lastLots, Ticks lastTicks, Lots minLots, Id64 matchId,
-         LiqInd liqInd, Symbol cpty, Time created) noexcept
+         Lots posnLots, Cost posnCost, LiqInd liqInd, Symbol cpty, Time created) noexcept
     : Request{accnt, marketId, instr, settlDay, id, ref, side, lots, created}
     , orderId_{orderId}
     , state_{state}
@@ -50,6 +50,8 @@ class SWIRLY_API Exec
     , lastTicks_{lastTicks}
     , minLots_{minLots}
     , matchId_{matchId}
+    , posnLots_{posnLots}
+    , posnCost_{posnCost}
     , liqInd_{liqInd}
     , cpty_{cpty}
     {
@@ -84,6 +86,8 @@ class SWIRLY_API Exec
     auto lastTicks() const noexcept { return lastTicks_; }
     auto minLots() const noexcept { return minLots_; }
     auto matchId() const noexcept { return matchId_; }
+    auto posnLots() const noexcept { return posnLots_; }
+    auto posnCost() const noexcept { return posnCost_; }
     auto liqInd() const noexcept { return liqInd_; }
     auto cpty() const noexcept { return cpty_; }
 
@@ -99,6 +103,11 @@ class SWIRLY_API Exec
     {
         state_ = State::Cancel;
         resdLots_ = 0_lts;
+    }
+    void posn(Lots posnLots, Cost posnCost) noexcept
+    {
+        posnLots_ = posnLots;
+        posnCost_ = posnCost;
     }
     void trade(Lots sumLots, Cost sumCost, Lots lastLots, Ticks lastTicks, Id64 matchId,
                LiqInd liqInd, Symbol cpty) noexcept;
@@ -131,6 +140,8 @@ class SWIRLY_API Exec
      */
     const Lots minLots_;
     Id64 matchId_;
+    Lots posnLots_;
+    Cost posnCost_;
     LiqInd liqInd_;
     Symbol cpty_;
 };
