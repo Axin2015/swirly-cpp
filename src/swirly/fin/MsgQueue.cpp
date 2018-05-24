@@ -47,7 +47,7 @@ void MsgQueue::doCreateMarket(Id64 id, Symbol instr, JDay settlDay, MarketState 
         msg.type = MsgType::CreateMarket;
         auto& body = msg.createMarket;
         body.id = id;
-        setCString(body.instr, instr);
+        pstrcpy<'\0'>(body.instr, instr);
         body.settlDay = settlDay;
         body.state = state;
     };
@@ -76,13 +76,13 @@ void MsgQueue::doCreateExec(const Exec& exec)
     {
         msg.type = MsgType::CreateExec;
         auto& body = msg.createExec;
-        setCString(body.accnt, exec.accnt());
+        pstrcpy<'\0'>(body.accnt, exec.accnt());
         body.marketId = exec.marketId();
-        setCString(body.instr, exec.instr());
+        pstrcpy<'\0'>(body.instr, exec.instr());
         body.settlDay = exec.settlDay();
         body.id = exec.id();
         body.orderId = exec.orderId();
-        setCString(body.ref, exec.ref());
+        pstrcpy<'\0'>(body.ref, exec.ref());
         body.state = exec.state();
         body.side = exec.side();
         body.lots = exec.lots();
@@ -95,7 +95,7 @@ void MsgQueue::doCreateExec(const Exec& exec)
         body.minLots = exec.minLots();
         body.matchId = exec.matchId();
         body.liqInd = exec.liqInd();
-        setCString(body.cpty, exec.cpty());
+        pstrcpy<'\0'>(body.cpty, exec.cpty());
         body.created = msSinceEpoch(exec.created());
     };
     if (!mq_.post(fn)) {
