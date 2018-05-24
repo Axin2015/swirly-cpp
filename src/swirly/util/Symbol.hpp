@@ -240,17 +240,19 @@ inline std::ostream& operator<<(std::ostream& os, Symbol rhs)
     return std::operator<<(os, std::string_view{rhs.data(), rhs.size()});
 }
 
-template <std::size_t SizeN>
-void setCString(char (&lhs)[SizeN], Symbol rhs) noexcept
+template <char PadC, std::size_t SizeN>
+inline std::size_t pstrcpy(char (&dst)[SizeN], Symbol src) noexcept
 {
     constexpr std::size_t len{std::min(SizeN, MaxSymbol)};
+
     std::size_t i{0};
     for (; i < len; ++i) {
-        lhs[i] = rhs[i];
+        dst[i] = src[i];
     }
-    for (; i < SizeN; ++i) {
-        lhs[i] = '\0';
+    for (std::size_t j{i}; j < SizeN; ++j) {
+        dst[j] = PadC;
     }
+    return i;
 }
 
 template <>

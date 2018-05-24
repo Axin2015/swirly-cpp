@@ -201,4 +201,119 @@ BOOST_AUTO_TEST_CASE(SplitPairCase)
     BOOST_TEST(splitPair(" a = b "s, '=') == make_pair(" a "s, " b "s));
 }
 
+BOOST_AUTO_TEST_CASE(PstrlenCase)
+{
+    constexpr char ZeroPad[] = "foo";
+    BOOST_TEST(pstrlen<'\0'>(ZeroPad, ~0) == 3);
+    BOOST_TEST(pstrlen<'\0'>(ZeroPad, 2) == 2);
+    BOOST_TEST(pstrlen<'\0'>(ZeroPad) == 3);
+
+    constexpr char SpacePad[] = "foo ";
+    BOOST_TEST(pstrlen<' '>(SpacePad, ~0) == 3);
+    BOOST_TEST(pstrlen<' '>(SpacePad, 2) == 2);
+    BOOST_TEST(pstrlen<' '>(SpacePad) == 3);
+}
+
+BOOST_AUTO_TEST_CASE(PstrcpyCase)
+{
+    struct SWIRLY_PACKED {
+        char data[8];
+        char canary;
+    } buf;
+
+    auto clear = [&]() { memset(buf.data, '#', sizeof(buf.data) + 1); };
+
+    clear();
+    BOOST_TEST(memcmp(buf.data, "########", sizeof(buf.data)) == 0);
+    BOOST_TEST(buf.canary == '#');
+
+    // Zero / C-String / Explicit Length.
+    clear();
+    BOOST_TEST(pstrcpy<'\0'>(buf.data, "foobar", sizeof(buf.data)) == 6);
+    BOOST_TEST(memcmp(buf.data, "foobar\0\0", sizeof(buf.data)) == 0);
+    BOOST_TEST(buf.canary == '#');
+
+    clear();
+    BOOST_TEST(pstrcpy<'\0'>(buf.data, "foobarbaz", sizeof(buf.data)) == 8);
+    BOOST_TEST(memcmp(buf.data, "foobarba", sizeof(buf.data)) == 0);
+    BOOST_TEST(buf.canary == '#');
+
+    // Zero / C-String / Implied Length.
+    clear();
+    BOOST_TEST(pstrcpy<'\0'>(buf.data, "foobar") == 6);
+    BOOST_TEST(memcmp(buf.data, "foobar\0\0", sizeof(buf.data)) == 0);
+    BOOST_TEST(buf.canary == '#');
+
+    clear();
+    BOOST_TEST(pstrcpy<'\0'>(buf.data, "foobarbaz") == 8);
+    BOOST_TEST(memcmp(buf.data, "foobarba", sizeof(buf.data)) == 0);
+    BOOST_TEST(buf.canary == '#');
+
+    // Zero / String View / Explicit Length.
+    clear();
+    BOOST_TEST(pstrcpy<'\0'>(buf.data, "foobar"sv, sizeof(buf.data)) == 6);
+    BOOST_TEST(memcmp(buf.data, "foobar\0\0", sizeof(buf.data)) == 0);
+    BOOST_TEST(buf.canary == '#');
+
+    clear();
+    BOOST_TEST(pstrcpy<'\0'>(buf.data, "foobarbaz"sv, sizeof(buf.data)) == 8);
+    BOOST_TEST(memcmp(buf.data, "foobarba", sizeof(buf.data)) == 0);
+    BOOST_TEST(buf.canary == '#');
+
+    // Zero / String View / Implied Length.
+    clear();
+    BOOST_TEST(pstrcpy<'\0'>(buf.data, "foobar"sv) == 6);
+    BOOST_TEST(memcmp(buf.data, "foobar\0\0", sizeof(buf.data)) == 0);
+    BOOST_TEST(buf.canary == '#');
+
+    clear();
+    BOOST_TEST(pstrcpy<'\0'>(buf.data, "foobarbaz"sv) == 8);
+    BOOST_TEST(memcmp(buf.data, "foobarba", sizeof(buf.data)) == 0);
+    BOOST_TEST(buf.canary == '#');
+
+    // Space / C-String / Explicit Length.
+    clear();
+    BOOST_TEST(pstrcpy<' '>(buf.data, "foobar", sizeof(buf.data)) == 6);
+    BOOST_TEST(memcmp(buf.data, "foobar  ", sizeof(buf.data)) == 0);
+    BOOST_TEST(buf.canary == '#');
+
+    clear();
+    BOOST_TEST(pstrcpy<' '>(buf.data, "foobarbaz", sizeof(buf.data)) == 8);
+    BOOST_TEST(memcmp(buf.data, "foobarba", sizeof(buf.data)) == 0);
+    BOOST_TEST(buf.canary == '#');
+
+    // Space / C-String / Implied Length.
+    clear();
+    BOOST_TEST(pstrcpy<' '>(buf.data, "foobar") == 6);
+    BOOST_TEST(memcmp(buf.data, "foobar  ", sizeof(buf.data)) == 0);
+    BOOST_TEST(buf.canary == '#');
+
+    clear();
+    BOOST_TEST(pstrcpy<' '>(buf.data, "foobarbaz") == 8);
+    BOOST_TEST(memcmp(buf.data, "foobarba", sizeof(buf.data)) == 0);
+    BOOST_TEST(buf.canary == '#');
+
+    // Space / String View / Explicit Length.
+    clear();
+    BOOST_TEST(pstrcpy<' '>(buf.data, "foobar"sv, sizeof(buf.data)) == 6);
+    BOOST_TEST(memcmp(buf.data, "foobar  ", sizeof(buf.data)) == 0);
+    BOOST_TEST(buf.canary == '#');
+
+    clear();
+    BOOST_TEST(pstrcpy<' '>(buf.data, "foobarbaz"sv, sizeof(buf.data)) == 8);
+    BOOST_TEST(memcmp(buf.data, "foobarba", sizeof(buf.data)) == 0);
+    BOOST_TEST(buf.canary == '#');
+
+    // Space / String View / Implied Length.
+    clear();
+    BOOST_TEST(pstrcpy<' '>(buf.data, "foobar"sv) == 6);
+    BOOST_TEST(memcmp(buf.data, "foobar  ", sizeof(buf.data)) == 0);
+    BOOST_TEST(buf.canary == '#');
+
+    clear();
+    BOOST_TEST(pstrcpy<' '>(buf.data, "foobarbaz"sv) == 8);
+    BOOST_TEST(memcmp(buf.data, "foobarba", sizeof(buf.data)) == 0);
+    BOOST_TEST(buf.canary == '#');
+}
+
 BOOST_AUTO_TEST_SUITE_END()

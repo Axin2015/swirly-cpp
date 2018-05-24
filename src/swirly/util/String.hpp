@@ -47,30 +47,6 @@ std::string_view toStringView(const char (&val)[SizeN]) noexcept
     return {val, strnlen(val, SizeN)};
 }
 
-template <std::size_t SizeN>
-void setCString(char (&lhs)[SizeN], const char* rhs) noexcept
-{
-    strncpy(lhs, rhs, SizeN);
-}
-
-template <std::size_t SizeN>
-void setCString(char (&lhs)[SizeN], const char* rdata, std::size_t rlen) noexcept
-{
-    const std::size_t len{std::min(SizeN, rlen)};
-    if (len > 0) {
-        std::memcpy(lhs, rdata, len);
-    }
-    if (len < SizeN) {
-        std::memset(lhs + len, 0, SizeN - len);
-    }
-}
-
-template <std::size_t SizeN>
-void setCString(char (&lhs)[SizeN], std::string_view rhs) noexcept
-{
-    setCString(lhs, rhs.data(), rhs.size());
-}
-
 SWIRLY_API int16_t stoi16(std::string_view sv) noexcept;
 
 SWIRLY_API int32_t stoi32(std::string_view sv) noexcept;
@@ -145,6 +121,70 @@ SWIRLY_API std::pair<std::string_view, std::string_view> splitPair(std::string_v
                                                                    char delim) noexcept;
 
 SWIRLY_API std::pair<std::string, std::string> splitPair(const std::string& s, char delim);
+
+template <char PadC>
+inline std::size_t pstrlen(const char* src, std::size_t n) noexcept
+{
+    if constexpr (PadC == '\0') {
+        // Optimised case.
+        return strnlen(src, n);
+    } else {
+        std::size_t i{0};
+        while (i < n && src[i] != PadC) {
+            ++i;
+        }
+        return i;
+    }
+}
+
+template <char PadC, std::size_t SizeN>
+inline std::size_t pstrlen(const char (&src)[SizeN]) noexcept
+{
+    return pstrlen<PadC>(src, SizeN);
+}
+
+template <char PadC>
+inline std::size_t pstrcpy(char* dst, const char* src, std::size_t n) noexcept
+{
+    if constexpr (PadC == '\0') {
+        // Optimised case.
+        return stpncpy(dst, src, n) - dst;
+    } else {
+        std::size_t i{0};
+        for (; i < n && src[i] != '\0'; ++i) {
+            dst[i] = src[i];
+        }
+        for (std::size_t j{i}; j < n; ++j) {
+            dst[j] = PadC;
+        }
+        return i;
+    }
+}
+
+template <char PadC, std::size_t SizeN>
+inline std::size_t pstrcpy(char (&dst)[SizeN], const char* src) noexcept
+{
+    return pstrcpy<PadC>(dst, src, SizeN);
+}
+
+template <char PadC>
+inline std::size_t pstrcpy(char* dst, std::string_view src, std::size_t n) noexcept
+{
+    const std::size_t len{std::min(n, src.size())};
+    if (len > 0) {
+        std::memcpy(dst, src.data(), len);
+    }
+    if (len < n) {
+        std::memset(dst + len, PadC, n - len);
+    }
+    return len;
+}
+
+template <char PadC, std::size_t SizeN>
+inline std::size_t pstrcpy(char (&dst)[SizeN], std::string_view src) noexcept
+{
+    return pstrcpy<PadC>(dst, src, SizeN);
+}
 
 } // namespace util
 } // namespace swirly
