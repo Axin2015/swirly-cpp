@@ -76,7 +76,7 @@ void Market::toJson(ostream& os) const
 {
     os << "{\"id\":"sv << id_         //
        << ",\"instr\":\""sv << instr_ //
-       << "\",\"settlDate\":"sv;
+       << "\",\"settl_date\":"sv;
     if (settlDay_ != 0_jd) {
         os << jdToIso(settlDay_);
     } else {
@@ -84,32 +84,32 @@ void Market::toJson(ostream& os) const
     }
     os << ",\"state\":"sv << state_;
     if (lastLots_ != 0_lts) {
-        os << ",\"lastLots\":"sv << lastLots_   //
-           << ",\"lastTicks\":"sv << lastTicks_ //
-           << ",\"lastTime\":"sv << lastTime_;
+        os << ",\"last_lots\":"sv << lastLots_   //
+           << ",\"last_ticks\":"sv << lastTicks_ //
+           << ",\"last_time\":"sv << lastTime_;
     } else {
-        os << ",\"lastLots\":null,\"lastTicks\":null,\"lastTime\":null"sv;
+        os << ",\"last_lots\":null,\"last_ticks\":null,\"last_time\":null"sv;
     }
 
     const auto& bidLevels = bidSide_.levels();
-    os << ",\"bidTicks\":["sv;
+    os << ",\"bid_ticks\":["sv;
     toJsonLevels(bidLevels.begin(), bidLevels.end(), os,
                  [](const auto& level) { return level.ticks(); });
-    os << "],\"bidLots\":["sv;
+    os << "],\"bid_lots\":["sv;
     toJsonLevels(bidLevels.begin(), bidLevels.end(), os,
                  [](const auto& level) { return level.lots(); });
-    os << "],\"bidCount\":["sv;
+    os << "],\"bid_count\":["sv;
     toJsonLevels(bidLevels.begin(), bidLevels.end(), os,
                  [](const auto& level) { return level.count(); });
 
     const auto& offerLevels = offerSide_.levels();
-    os << "],\"offerTicks\":["sv;
+    os << "],\"offer_ticks\":["sv;
     toJsonLevels(offerLevels.begin(), offerLevels.end(), os,
                  [](const auto& level) { return level.ticks(); });
-    os << "],\"offerLots\":["sv;
+    os << "],\"offer_lots\":["sv;
     toJsonLevels(offerLevels.begin(), offerLevels.end(), os,
                  [](const auto& level) { return level.lots(); });
-    os << "],\"offerCount\":["sv;
+    os << "],\"offer_count\":["sv;
     toJsonLevels(offerLevels.begin(), offerLevels.end(), os,
                  [](const auto& level) { return level.count(); });
     os << "]}"sv;

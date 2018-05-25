@@ -42,7 +42,7 @@ constexpr auto UpdateMarketSql =     //
 constexpr auto InsertExecSql =                                                     //
     "INSERT INTO exec_t (market_id, instr, settl_day, id, order_id, accnt, ref,"   //
     " state_id, side_id, lots, ticks, resd_lots, exec_lots, exec_cost, last_lots," //
-    " last_ticks, min_lots, match_id, liqInd_id, cpty, created)"                   //
+    " last_ticks, min_lots, match_id, liq_ind_id, cpty, created)"                  //
     " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"sv;
 
 constexpr auto UpdateExecSql =       //

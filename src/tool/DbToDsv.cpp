@@ -58,8 +58,8 @@ int main(int argc, char* argv[])
         }
         {
             ofstream os{"instr.txt"};
-            os << "id\tsymbol\tdisplay\tbaseAsset\ttermCcy\tlotNumer\tlotDenom\ttickNumer\t"
-                  "tickDenom\tpipDp\tminLots\tmaxLots\n";
+            os << "id\tsymbol\tdisplay\tbase_asset\tterm_ccy\tlot_numer\tlot_denom\ttick_numer\t"
+                  "tick_denom\tpip_dp\tmin_lots\tmax_lots\n";
             model.readInstr([&os](auto ptr) {
                 ptr->toDsv(os, '\t');
                 os << '\n';
@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
         }
         {
             ofstream os{"market.txt"};
-            os << "id\tinstr\tsettlDay\tstate\tlastLots\tlastTicks\tlastTime\tmaxId\n";
+            os << "id\tinstr\tsettl_day\tstate\tlast_lots\tlast_ticks\tlast_time\tmax_id\n";
             model.readMarket([&os](auto ptr) {
                 ptr->toDsv(os, '\t');
                 os << '\n';
@@ -75,8 +75,8 @@ int main(int argc, char* argv[])
         }
         {
             ofstream os{"order.txt"};
-            os << "accnt\tmarketId\tinstr\tsettlDate\tid\tref\tstate\tside\tlots\tticks\t"
-                  "resdLots\texecLots\texecCost\tlastLots\tlastTicks\tminLots\tcreated\t"
+            os << "accnt\tmarket_id\tinstr\tsettl_date\tid\tref\tstate\tside\tlots\tticks\t"
+                  "resd_lots\texec_lots\texec_cost\tlast_lots\tlast_ticks\tmin_lots\tcreated\t"
                   "modified\n";
             model.readOrder([&os](auto ptr) {
                 ptr->toDsv(os, '\t');
@@ -85,9 +85,9 @@ int main(int argc, char* argv[])
         }
         {
             ofstream os{"exec.txt"};
-            os << "accnt\tmarketId\tinstr\tsettlDate\tid\torderId\tref\tstate\tside\tlots\t"
-                  "ticks\tresdLots\texecLots\texecCost\tlastLots\tlastTicks\tminLots\tmatchId\t"
-                  "liqInd\tcpty\tcreated\n";
+            os << "accnt\tmarket_id\tinstr\tsettl_date\tid\torder_id\tref\tstate\tside\tlots\t"
+                  "ticks\tresd_lots\texec_lots\texec_cost\tlast_lots\tlast_ticks\tmin_lots\t"
+                  "match_id\tliq_ind\tcpty\tcreated\n";
             // One week ago.
             model.readExec(now - 604800000ms, [&os](auto ptr) {
                 ptr->toDsv(os, '\t');
@@ -96,9 +96,9 @@ int main(int argc, char* argv[])
         }
         {
             ofstream os{"trade.txt"};
-            os << "accnt\tmarketId\tinstr\tsettlDate\tid\torderId\tref\tstate\tside\tlots\t"
-                  "ticks\tresdLots\texecLots\texecCost\tlastLots\tlastTicks\tminLots\tmatchId\t"
-                  "liqInd\tcpty\tcreated\n";
+            os << "accnt\tmarket_id\tinstr\tsettl_date\tid\torder_id\tref\tstate\tside\tlots\t"
+                  "ticks\tresd_lots\texec_lots\texec_cost\tlast_lots\tlast_ticks\tmin_lots\t"
+                  "match_id\tliq_ind\tcpty\tcreated\n";
             model.readTrade([&os](auto ptr) {
                 ptr->toDsv(os, '\t');
                 os << '\n';
@@ -106,7 +106,7 @@ int main(int argc, char* argv[])
         }
         {
             ofstream os{"posn.txt"};
-            os << "accnt\tmarketId\tinstr\tsettlDate\tbuyLots\tbuyCost\tsellLots\tsellCost\n";
+            os << "accnt\tmarket_id\tinstr\tsettl_date\tbuy_lots\tbuy_cost\tsell_lots\tsell_cost\n";
             model.readPosn(busDay(now), [&os](auto ptr) {
                 ptr->toDsv(os, '\t');
                 os << '\n';

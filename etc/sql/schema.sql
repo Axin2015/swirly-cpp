@@ -57,15 +57,15 @@ INSERT INTO direct_t (id, symbol) VALUES (1, 'PAID')
 INSERT INTO direct_t (id, symbol) VALUES (-1, 'GIVEN')
 ;
 
-CREATE TABLE liqind_t (
+CREATE TABLE liq_ind_t (
   id INT NOT NULL PRIMARY KEY,
   symbol CHAR(16) NOT NULL UNIQUE
 )
 ;
 
-INSERT INTO liqind_t (id, symbol) VALUES (1, 'MAKER')
+INSERT INTO liq_ind_t (id, symbol) VALUES (1, 'MAKER')
 ;
-INSERT INTO liqind_t (id, symbol) VALUES (2, 'TAKER')
+INSERT INTO liq_ind_t (id, symbol) VALUES (2, 'TAKER')
 ;
 
 CREATE TABLE asset_type_t (
@@ -190,7 +190,7 @@ CREATE TABLE exec_t (
   last_ticks BIGINT NULL DEFAULT NULL,
   min_lots BIGINT NOT NULL DEFAULT 1,
   match_id BIGINT NULL DEFAULT NULL,
-  liqind_id INT NULL DEFAULT NULL,
+  liq_ind_id INT NULL DEFAULT NULL,
   cpty CHAR(16) NULL DEFAULT NULL,
   created BIGINT NOT NULL,
   archive BIGINT NULL DEFAULT NULL,
@@ -202,7 +202,7 @@ CREATE TABLE exec_t (
   FOREIGN KEY (instr) REFERENCES instr_t (symbol),
   FOREIGN KEY (state_id) REFERENCES state_t (id),
   FOREIGN KEY (side_id) REFERENCES side_t (id),
-  FOREIGN KEY (liqind_id) REFERENCES liqind_t (id)
+  FOREIGN KEY (liq_ind_id) REFERENCES liq_ind_t (id)
 )
 ;
 
@@ -408,7 +408,7 @@ CREATE VIEW exec_v AS
     e.last_ticks,
     e.min_lots,
     e.match_id,
-    r.symbol liqind,
+    r.symbol liq_ind,
     e.cpty,
     e.created,
     e.archive
@@ -417,8 +417,8 @@ CREATE VIEW exec_v AS
   ON e.state_id = s.id
   LEFT OUTER JOIN side_t a
   ON e.side_id = a.id
-  LEFT OUTER JOIN liqind_t r
-  ON e.liqind_id = r.id
+  LEFT OUTER JOIN liq_ind_t r
+  ON e.liq_ind_id = r.id
 ;
 
 CREATE VIEW posn_v AS

@@ -74,7 +74,7 @@ void HttpClient::createMarket(const Instr& instr, QDate settlDate)
 
     QJsonObject obj;
     obj["instr"] = instr.symbol();
-    obj["settlDate"] = toJson(settlDate);
+    obj["settl_date"] = toJson(settlDate);
     obj["state"] = 0;
 
     QJsonDocument doc(obj);
@@ -93,7 +93,7 @@ void HttpClient::createOrder(const Instr& instr, QDate settlDate, const QString&
 
     QJsonObject obj;
     obj["instr"] = instr.symbol();
-    obj["settlDate"] = toJson(settlDate);
+    obj["settl_date"] = toJson(settlDate);
     obj["ref"] = ref;
     obj["side"] = toJson(side);
     obj["lots"] = toJson(lots);

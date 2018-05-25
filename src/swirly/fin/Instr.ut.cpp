@@ -31,15 +31,15 @@ BOOST_AUTO_TEST_CASE(InstrToStringCase)
     BOOST_TEST(toString(instr) == //
                "{\"symbol\":\"EURUSD\""
                ",\"display\":\"EURUSD\""
-               ",\"baseAsset\":\"EUR\""
-               ",\"termCcy\":\"USD\""
-               ",\"lotNumer\":1000000"
-               ",\"lotDenom\":1"
-               ",\"tickNumer\":1"
-               ",\"tickDenom\":10000"
-               ",\"pipDp\":4"
-               ",\"minLots\":1"
-               ",\"maxLots\":10"
+               ",\"base_asset\":\"EUR\""
+               ",\"term_ccy\":\"USD\""
+               ",\"lot_numer\":1000000"
+               ",\"lot_denom\":1"
+               ",\"tick_numer\":1"
+               ",\"tick_denom\":10000"
+               ",\"pip_dp\":4"
+               ",\"min_lots\":1"
+               ",\"max_lots\":10"
                "}");
 }
 

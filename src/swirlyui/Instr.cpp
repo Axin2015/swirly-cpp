@@ -47,11 +47,11 @@ Instr Instr::fromJson(const QJsonObject& obj)
 {
     using swirly::ui::fromJson;
     return Instr(fromJson<QString>(obj["symbol"]), fromJson<QString>(obj["display"]),
-                 fromJson<QString>(obj["baseAsset"]), fromJson<QString>(obj["termCcy"]),
-                 fromJson<int>(obj["lotNumer"]), fromJson<int>(obj["lotDenom"]),
-                 fromJson<int>(obj["tickNumer"]), fromJson<int>(obj["tickDenom"]),
-                 fromJson<int>(obj["pipDp"]), fromJson<Lots>(obj["minLots"]),
-                 fromJson<Lots>(obj["maxLots"]));
+                 fromJson<QString>(obj["base_asset"]), fromJson<QString>(obj["term_ccy"]),
+                 fromJson<int>(obj["lot_numer"]), fromJson<int>(obj["lot_denom"]),
+                 fromJson<int>(obj["tick_numer"]), fromJson<int>(obj["tick_denom"]),
+                 fromJson<int>(obj["pip_dp"]), fromJson<Lots>(obj["min_lots"]),
+                 fromJson<Lots>(obj["max_lots"]));
 }
 
 shared_ptr<const Instr::Impl> Instr::empty()

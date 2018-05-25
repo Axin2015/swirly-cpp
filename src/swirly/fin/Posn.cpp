@@ -57,26 +57,26 @@ void Posn::toDsv(ostream& os, char delim) const
 
 void Posn::toJson(ostream& os) const
 {
-    os << "{\"accnt\":\""sv << accnt_       //
-       << "\",\"marketId\":"sv << marketId_ //
-       << ",\"instr\":\""sv << instr_       //
-       << "\",\"settlDate\":"sv;
+    os << "{\"accnt\":\""sv << accnt_        //
+       << "\",\"market_id\":"sv << marketId_ //
+       << ",\"instr\":\""sv << instr_        //
+       << "\",\"settl_date\":"sv;
     if (settlDay_ != 0_jd) {
         os << jdToIso(settlDay_);
     } else {
         os << "null"sv;
     }
     if (buyLots_ != 0_lts) {
-        os << ",\"buyLots\":"sv << buyLots_ //
-           << ",\"buyCost\":"sv << buyCost_;
+        os << ",\"buy_lots\":"sv << buyLots_ //
+           << ",\"buy_cost\":"sv << buyCost_;
     } else {
-        os << ",\"buyLots\":0,\"buyCost\":0"sv;
+        os << ",\"buy_lots\":0,\"buy_cost\":0"sv;
     }
     if (sellLots_ != 0_lts) {
-        os << ",\"sellLots\":"sv << sellLots_ //
-           << ",\"sellCost\":"sv << sellCost_;
+        os << ",\"sell_lots\":"sv << sellLots_ //
+           << ",\"sell_cost\":"sv << sellCost_;
     } else {
-        os << ",\"sellLots\":0,\"sellCost\":0"sv;
+        os << ",\"sell_lots\":0,\"sell_cost\":0"sv;
     }
     os << '}';
 }
