@@ -52,13 +52,13 @@ constexpr auto SelectOrderSql =                                                 
 constexpr auto SelectExecSql =                                                               //
     "SELECT accnt, market_id, instr, settl_day, id, order_id, ref, state_id, side_id, lots," //
     " ticks, resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots, match_id,"    //
-    " liqInd_id, cpty, created"                                                              //
+    " liq_ind_id, cpty, created"                                                             //
     " FROM exec_t WHERE created > ? ORDER BY seq_id DESC;"sv;
 
-constexpr auto SelectTradeSql =                                                               //
-    "SELECT accnt, market_id, instr, settl_day, id, order_id, ref, side_id, lots, ticks,"     //
-    " resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots, match_id, liqInd_id," //
-    " cpty, created"                                                                          //
+constexpr auto SelectTradeSql =                                                           //
+    "SELECT accnt, market_id, instr, settl_day, id, order_id, ref, side_id, lots, ticks," //
+    " resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots, match_id,"        //
+    "liq_ind_id, cpty, created"                                                           //
     " FROM exec_t WHERE state_id = 4 AND archive IS NULL;"sv;
 
 constexpr auto SelectPosnSql = //

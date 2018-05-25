@@ -181,8 +181,8 @@ namespace {
     fields_ |= Side;
     side_ = swirly::Side::Sell;
   }
-  side = '"BUY"'i %buySide
-    | '"SELL"'i %sellSide;
+  side = '"Buy"'i %buySide
+    | '"Sell"'i %sellSide;
 
   action nullLots {
     fields_ &= ~Lots;
@@ -219,8 +219,8 @@ namespace {
     liqInd_ = swirly::LiqInd::Taker;
   }
   liqInd = 'null' %nullLiqInd
-    | '"MAKER"'i %makerLiqInd
-    | '"TAKER"'i %takerLiqInd;
+    | '"Maker"'i %makerLiqInd
+    | '"Taker"'i %takerLiqInd;
 
   action nullCpty {
     fields_ &= ~Cpty;
@@ -243,14 +243,14 @@ namespace {
   pair = '"symbol"'i colon symbol
     | '"accnt"'i colon accnt
     | '"instr"'i colon instr
-    | '"settlDate"'i colon settlDate
+    | '"settl_date"'i colon settlDate
     | '"ref"'i colon ref
     | '"state"'i colon state
     | '"side"'i colon side
     | '"lots"'i colon lots
     | '"ticks"'i colon ticks
-    | '"minLots"'i colon minLots
-    | '"liqInd"'i colon liqInd
+    | '"min_lots"'i colon minLots
+    | '"liq_ind"'i colon liqInd
     | '"cpty"'i colon cpty;
 
   members = pair (comma pair)*;

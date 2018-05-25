@@ -38,19 +38,22 @@ Market Market::fromJson(const Instr& instr, const QJsonObject& obj)
 {
     using swirly::ui::fromJson;
 
-    Market market{fromJson<Id64>(obj["id"]),           instr,
-                  fromJson<QDate>(obj["settlDate"]),   fromJson<MarketState>(obj["state"]),
-                  fromJson<Lots>(obj["lastLots"]),     fromJson<Ticks>(obj["lastTicks"]),
-                  fromJson<QDateTime>(obj["lastTime"])};
+    Market market{fromJson<Id64>(obj["id"]),
+                  instr,
+                  fromJson<QDate>(obj["settl_date"]),
+                  fromJson<MarketState>(obj["state"]),
+                  fromJson<Lots>(obj["last_lots"]),
+                  fromJson<Ticks>(obj["last_ticks"]),
+                  fromJson<QDateTime>(obj["last_time"])};
 
-    const auto bidTicks = obj["bidTicks"].toArray();
-    const auto bidLots = obj["bidLots"].toArray();
-    const auto bidCount = obj["bidCount"].toArray();
+    const auto bidTicks = obj["bid_ticks"].toArray();
+    const auto bidLots = obj["bid_lots"].toArray();
+    const auto bidCount = obj["bid_count"].toArray();
     toLevels(bidTicks, bidLots, bidCount, market.bids_);
 
-    const auto offerTicks = obj["offerTicks"].toArray();
-    const auto offerLots = obj["offerLots"].toArray();
-    const auto offerCount = obj["offerCount"].toArray();
+    const auto offerTicks = obj["offer_ticks"].toArray();
+    const auto offerLots = obj["offer_lots"].toArray();
+    const auto offerCount = obj["offer_count"].toArray();
     toLevels(offerTicks, offerLots, offerCount, market.offers_);
 
     return market;

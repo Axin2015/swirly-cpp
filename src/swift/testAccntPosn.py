@@ -89,31 +89,31 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'buyCost': 37038,
-      u'buyLots': 3,
+      u'buy_cost': 37038,
+      u'buy_lots': 3,
       u'instr': u'EURUSD',
-      u'marketId': 82255,
-      u'sellCost': 37038,
-      u'sellLots': 3,
-      u'settlDate': 20140302
+      u'market_id': 82255,
+      u'sell_cost': 37038,
+      u'sell_lots': 3,
+      u'settl_date': 20140302
     }, {
       u'accnt': u'MARAYL',
-      u'buyCost': 61730,
-      u'buyLots': 5,
+      u'buy_cost': 61730,
+      u'buy_lots': 5,
       u'instr': u'EURUSD',
-      u'marketId': 82286,
-      u'sellCost': 61730,
-      u'sellLots': 5,
-      u'settlDate': 20140402
+      u'market_id': 82286,
+      u'sell_cost': 61730,
+      u'sell_lots': 5,
+      u'settl_date': 20140402
     }, {
       u'accnt': u'MARAYL',
-      u'buyCost': 107422,
-      u'buyLots': 7,
+      u'buy_cost': 107422,
+      u'buy_lots': 7,
       u'instr': u'GBPUSD',
-      u'marketId': 147791,
-      u'sellCost': 107422,
-      u'sellLots': 7,
-      u'settlDate': 20140302
+      u'market_id': 147791,
+      u'sell_cost': 107422,
+      u'sell_lots': 7,
+      u'settl_date': 20140302
     }], resp.content)
 
   def getByInstr(self, client):
@@ -124,22 +124,22 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'buyCost': 37038,
-      u'buyLots': 3,
+      u'buy_cost': 37038,
+      u'buy_lots': 3,
       u'instr': u'EURUSD',
-      u'marketId': 82255,
-      u'sellCost': 37038,
-      u'sellLots': 3,
-      u'settlDate': 20140302
+      u'market_id': 82255,
+      u'sell_cost': 37038,
+      u'sell_lots': 3,
+      u'settl_date': 20140302
     }, {
       u'accnt': u'MARAYL',
-      u'buyCost': 61730,
-      u'buyLots': 5,
+      u'buy_cost': 61730,
+      u'buy_lots': 5,
       u'instr': u'EURUSD',
-      u'marketId': 82286,
-      u'sellCost': 61730,
-      u'sellLots': 5,
-      u'settlDate': 20140402
+      u'market_id': 82286,
+      u'sell_cost': 61730,
+      u'sell_lots': 5,
+      u'settl_date': 20140402
     }], resp.content)
 
   def getBySettlDate(self, client):
@@ -150,11 +150,11 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'accnt': u'MARAYL',
-      u'buyCost': 37038,
-      u'buyLots': 3,
+      u'buy_cost': 37038,
+      u'buy_lots': 3,
       u'instr': u'EURUSD',
-      u'marketId': 82255,
-      u'sellCost': 37038,
-      u'sellLots': 3,
-      u'settlDate': 20140302
+      u'market_id': 82255,
+      u'sell_cost': 37038,
+      u'sell_lots': 3,
+      u'settl_date': 20140302
     }, resp.content)

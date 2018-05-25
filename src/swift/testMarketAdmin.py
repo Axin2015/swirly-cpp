@@ -73,48 +73,48 @@ class TestCase(RestTestCase):
     client.setAdmin()
     resp = client.send('POST', '/markets',
                        instr = 'EURUSD',
-                       settlDate = 20140302,
+                       settl_date = 20140302,
                        state = 1)
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
-      u'bidCount': [None, None, None],
-      u'bidLots': [None, None, None],
-      u'bidTicks': [None, None, None],
+      u'bid_count': [None, None, None],
+      u'bid_lots': [None, None, None],
+      u'bid_ticks': [None, None, None],
       u'instr': u'EURUSD',
       u'id': 82255,
-      u'lastLots': None,
-      u'lastTicks': None,
-      u'lastTime': None,
-      u'offerCount': [None, None, None],
-      u'offerLots': [None, None, None],
-      u'offerTicks': [None, None, None],
-      u'settlDate': 20140302,
+      u'last_lots': None,
+      u'last_ticks': None,
+      u'last_time': None,
+      u'offer_count': [None, None, None],
+      u'offer_lots': [None, None, None],
+      u'offer_ticks': [None, None, None],
+      u'settl_date': 20140302,
       u'state': 1
     }, resp.content)
 
   def createMarketByInstr(self, client):
     client.setAdmin()
     resp = client.send('POST', '/markets/GBPUSD',
-                       settlDate = 20140302,
+                       settl_date = 20140302,
                        state = 1)
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
-      u'bidCount': [None, None, None],
-      u'bidLots': [None, None, None],
-      u'bidTicks': [None, None, None],
+      u'bid_count': [None, None, None],
+      u'bid_lots': [None, None, None],
+      u'bid_ticks': [None, None, None],
       u'instr': u'GBPUSD',
       u'id': 147791,
-      u'lastLots': None,
-      u'lastTicks': None,
-      u'lastTime': None,
-      u'offerCount': [None, None, None],
-      u'offerLots': [None, None, None],
-      u'offerTicks': [None, None, None],
-      u'settlDate': 20140302,
+      u'last_lots': None,
+      u'last_ticks': None,
+      u'last_time': None,
+      u'offer_count': [None, None, None],
+      u'offer_lots': [None, None, None],
+      u'offer_ticks': [None, None, None],
+      u'settl_date': 20140302,
       u'state': 1
     }, resp.content)
 
@@ -126,18 +126,18 @@ class TestCase(RestTestCase):
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
-      u'bidCount': [None, None, None],
-      u'bidLots': [None, None, None],
-      u'bidTicks': [None, None, None],
+      u'bid_count': [None, None, None],
+      u'bid_lots': [None, None, None],
+      u'bid_ticks': [None, None, None],
       u'instr': u'USDJPY',
       u'id': 278863,
-      u'lastLots': None,
-      u'lastTicks': None,
-      u'lastTime': None,
-      u'offerCount': [None, None, None],
-      u'offerLots': [None, None, None],
-      u'offerTicks': [None, None, None],
-      u'settlDate': 20140302,
+      u'last_lots': None,
+      u'last_ticks': None,
+      u'last_time': None,
+      u'offer_count': [None, None, None],
+      u'offer_lots': [None, None, None],
+      u'offer_ticks': [None, None, None],
+      u'settl_date': 20140302,
       u'state': 1
     }, resp.content)
 
@@ -148,17 +148,17 @@ class TestCase(RestTestCase):
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
-      u'bidCount': [None, None, None],
-      u'bidLots': [None, None, None],
-      u'bidTicks': [None, None, None],
+      u'bid_count': [None, None, None],
+      u'bid_lots': [None, None, None],
+      u'bid_ticks': [None, None, None],
       u'instr': u'USDJPY',
       u'id': 278863,
-      u'lastLots': None,
-      u'lastTicks': None,
-      u'lastTime': None,
-      u'offerCount': [None, None, None],
-      u'offerLots': [None, None, None],
-      u'offerTicks': [None, None, None],
-      u'settlDate': 20140302,
+      u'last_lots': None,
+      u'last_ticks': None,
+      u'last_time': None,
+      u'offer_count': [None, None, None],
+      u'offer_lots': [None, None, None],
+      u'offer_ticks': [None, None, None],
+      u'settl_date': 20140302,
       u'state': 2
     }, resp.content)

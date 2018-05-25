@@ -71,12 +71,12 @@ BOOST_AUTO_TEST_CASE(RestBodySettlDateCase)
 {
     RestBody rb;
 
-    BOOST_TEST(rb.parse(R"({"settlDate":20140314})"sv));
+    BOOST_TEST(rb.parse(R"({"settl_date":20140314})"sv));
     BOOST_TEST(rb.fields() == RestBody::SettlDate);
     BOOST_TEST(rb.settlDate() == 20140314_ymd);
 
     rb.reset(false);
-    BOOST_TEST(rb.parse(R"({"settlDate":null})"sv));
+    BOOST_TEST(rb.parse(R"({"settl_date":null})"sv));
     BOOST_TEST(rb.fields() == 0U);
     BOOST_TEST(rb.settlDate() == 0_ymd);
 }
@@ -155,12 +155,12 @@ BOOST_AUTO_TEST_CASE(RestBodyMinLotsCase)
 {
     RestBody rb;
 
-    BOOST_TEST(rb.parse(R"({"minLots":101})"sv));
+    BOOST_TEST(rb.parse(R"({"min_lots":101})"sv));
     BOOST_TEST(rb.fields() == RestBody::MinLots);
     BOOST_TEST(rb.minLots() == 101_lts);
 
     rb.reset(false);
-    BOOST_TEST(rb.parse(R"({"minLots":null})"sv));
+    BOOST_TEST(rb.parse(R"({"min_lots":null})"sv));
     BOOST_TEST(rb.fields() == 0U);
     BOOST_TEST(rb.minLots() == 0_lts);
 }
@@ -169,17 +169,17 @@ BOOST_AUTO_TEST_CASE(RestBodyLiqIndCase)
 {
     RestBody rb;
 
-    BOOST_TEST(rb.parse(R"({"liqInd":"Maker"})"sv));
+    BOOST_TEST(rb.parse(R"({"liq_ind":"Maker"})"sv));
     BOOST_TEST(rb.fields() == RestBody::LiqInd);
     BOOST_TEST(rb.liqInd() == LiqInd::Maker);
 
     rb.reset(false);
-    BOOST_TEST(rb.parse(R"({"liqInd":"Taker"})"sv));
+    BOOST_TEST(rb.parse(R"({"liq_ind":"Taker"})"sv));
     BOOST_TEST(rb.fields() == RestBody::LiqInd);
     BOOST_TEST(rb.liqInd() == LiqInd::Taker);
 
     rb.reset(false);
-    BOOST_TEST(rb.parse(R"({"liqInd":null})"sv));
+    BOOST_TEST(rb.parse(R"({"liq_ind":null})"sv));
     BOOST_TEST(rb.fields() == 0U);
     BOOST_TEST(rb.liqInd() == LiqInd::None);
 }
@@ -202,7 +202,7 @@ BOOST_AUTO_TEST_CASE(RestBodyMultiCase)
 {
     RestBody rb;
 
-    BOOST_TEST(rb.parse(R"({"instr":"EURUSD","settlDate":20140314})"sv));
+    BOOST_TEST(rb.parse(R"({"instr":"EURUSD","settl_date":20140314})"sv));
     BOOST_TEST(rb.fields() == (RestBody::Instr | RestBody::SettlDate));
     BOOST_TEST(rb.instr() == "EURUSD"sv);
     BOOST_TEST(rb.settlDate() == 20140314_ymd);
@@ -262,7 +262,7 @@ BOOST_AUTO_TEST_CASE(RestBodyAllCase)
     RestBody rb;
 
     BOOST_TEST(rb.parse(
-        R"({"accnt":"MARAYL","symbol":"EURUSD","instr":"EURUSD","settlDate":20140315,"ref":"EURUSD","state":3,"side":"Buy","lots":101,"ticks":12345,"minLots":101,"liqInd":"Maker","cpty":"MARAYL"})"sv));
+        R"({"accnt":"MARAYL","symbol":"EURUSD","instr":"EURUSD","settl_date":20140315,"ref":"EURUSD","state":3,"side":"Buy","lots":101,"ticks":12345,"min_lots":101,"liq_ind":"Maker","cpty":"MARAYL"})"sv));
     BOOST_TEST(rb.fields() == ((RestBody::Cpty - 1) | RestBody::Cpty));
     BOOST_TEST(rb.symbol() == "EURUSD"sv);
     BOOST_TEST(rb.accnt() == "MARAYL"sv);

@@ -25,13 +25,13 @@ Posn Posn::fromJson(const Instr& instr, const QJsonObject& obj)
 {
     using swirly::ui::fromJson;
     return Posn{fromJson<QString>(obj["accnt"]),
-                fromJson<Id64>(obj["marketId"]),
+                fromJson<Id64>(obj["market_id"]),
                 instr,
-                fromJson<QDate>(obj["settlDate"]),
-                fromJson<Lots>(obj["buyLots"]),
-                fromJson<Cost>(obj["buyCost"]),
-                fromJson<Lots>(obj["sellLots"]),
-                fromJson<Cost>(obj["sellCost"])};
+                fromJson<QDate>(obj["settl_date"]),
+                fromJson<Lots>(obj["buy_lots"]),
+                fromJson<Cost>(obj["buy_cost"]),
+                fromJson<Lots>(obj["sell_lots"]),
+                fromJson<Cost>(obj["sell_cost"])};
 }
 
 QDebug operator<<(QDebug debug, const Posn& posn)

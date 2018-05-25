@@ -282,7 +282,7 @@ class RestTestCase(unittest.TestCase):
     client.setAdmin()
     resp = client.send('POST', '/markets',
                        instr = instr,
-                       settlDate = settlDate,
+                       settl_date = settlDate,
                        state = 0)
 
     self.assertEqual(200, resp.status)

@@ -71,10 +71,10 @@ void Order::toDsv(ostream& os, char delim) const
 
 void Order::toJson(ostream& os) const
 {
-    os << "{\"accnt\":\""sv << accnt_       //
-       << "\",\"marketId\":"sv << marketId_ //
-       << ",\"instr\":\""sv << instr_       //
-       << "\",\"settlDate\":"sv;
+    os << "{\"accnt\":\""sv << accnt_        //
+       << "\",\"market_id\":"sv << marketId_ //
+       << ",\"instr\":\""sv << instr_        //
+       << "\",\"settl_date\":"sv;
     if (settlDay_ != 0_jd) {
         os << jdToIso(settlDay_);
     } else {
@@ -87,20 +87,20 @@ void Order::toJson(ostream& os) const
     } else {
         os << "null"sv;
     }
-    os << ",\"state\":\""sv << state_     //
-       << "\",\"side\":\""sv << side_     //
-       << "\",\"lots\":"sv << lots_       //
-       << ",\"ticks\":"sv << ticks_       //
-       << ",\"resdLots\":"sv << resdLots_ //
-       << ",\"execLots\":"sv << execLots_ //
-       << ",\"execCost\":"sv << execCost_;
+    os << ",\"state\":\""sv << state_      //
+       << "\",\"side\":\""sv << side_      //
+       << "\",\"lots\":"sv << lots_        //
+       << ",\"ticks\":"sv << ticks_        //
+       << ",\"resd_lots\":"sv << resdLots_ //
+       << ",\"exec_lots\":"sv << execLots_ //
+       << ",\"exec_cost\":"sv << execCost_;
     if (lastLots_ != 0_lts) {
-        os << ",\"lastLots\":"sv << lastLots_ //
-           << ",\"lastTicks\":"sv << lastTicks_;
+        os << ",\"last_lots\":"sv << lastLots_ //
+           << ",\"last_ticks\":"sv << lastTicks_;
     } else {
-        os << ",\"lastLots\":null,\"lastTicks\":null"sv;
+        os << ",\"last_lots\":null,\"last_ticks\":null"sv;
     }
-    os << ",\"minLots\":"sv;
+    os << ",\"min_lots\":"sv;
     if (minLots_ != 0_lts) {
         os << minLots_;
     } else {
