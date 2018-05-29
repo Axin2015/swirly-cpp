@@ -38,7 +38,7 @@ target_link_libraries(swirly-echo-serv ${swirly_app_LIBRARY} ${swirly_fix_LIBRAR
 install(TARGETS swirly-echo-serv DESTINATION bin COMPONENT program)
 
 add_executable(swirly-queue-bench QueueBench.cpp)
-target_link_libraries(swirly-queue-bench ${swirly_app_LIBRARY})
+target_link_libraries(swirly-queue-bench ${swirly_prof_LIBRARY} ${swirly_app_LIBRARY})
 install(TARGETS swirly-queue-bench DESTINATION bin COMPONENT program)
 
 # Reserved as an ad-hoc scratch pad.
@@ -46,7 +46,8 @@ add_executable(swirly-scratch Scratch.cpp)
 target_link_libraries(swirly-scratch ${swirly_fin_LIBRARY})
 
 add_executable(swirly-serv-bench ServBench.cpp)
-target_link_libraries(swirly-serv-bench ${swirly_lob_LIBRARY} ${swirly_sqlite_LIBRARY})
+target_link_libraries(swirly-serv-bench ${swirly_prof_LIBRARY} ${swirly_lob_LIBRARY}
+  ${swirly_sqlite_LIBRARY})
 install(TARGETS swirly-serv-bench DESTINATION bin COMPONENT program)
 
 add_executable(swirly-timer-bench TimerBench.cpp)

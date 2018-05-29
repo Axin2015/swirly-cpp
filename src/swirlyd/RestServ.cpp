@@ -94,12 +94,6 @@ RestServ::~RestServ() = default;
 
 void RestServ::handleRequest(const HttpRequest& req, HttpStream& os) noexcept
 {
-    TimeRecorder tr{profile_};
-    const auto finally = makeFinally([this]() noexcept {
-        if (this->profile_.size() % 10 == 0) {
-            this->profile_.report();
-        }
-    });
     const auto cache = reset(req); // noexcept
     const auto now = getTime(req); // noexcept
 

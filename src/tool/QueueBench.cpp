@@ -14,11 +14,12 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
+#include <swirly/prof/HdrHistogram.hpp>
+
 #include <swirly/app/Backoff.hpp>
 #include <swirly/app/MemQueue.hpp>
 
 #include <swirly/util/Log.hpp>
-#include <swirly/util/Profile.hpp>
 
 #include <iostream>
 #include <thread>
@@ -32,7 +33,7 @@ int main(int argc, char* argv[])
 
     int ret = 1;
     try {
-        Profile p{"MemQueue"sv};
+        HdrHistogram hist{1, 1'000'000, 5};
         MemQueue<Clock::duration> q{1 << 14};
 
         enum { Iters = 50000000 };
@@ -67,7 +68,7 @@ int main(int argc, char* argv[])
                 const auto end = Clock::now().time_since_epoch();
                 const chrono::duration<double, micro> diff{end - start};
                 const auto usec = diff.count();
-                p.record(usec);
+                hist.record(usec);
             } else {
                 cpuRelax();
             }
@@ -75,7 +76,11 @@ int main(int argc, char* argv[])
 
         t1.join();
         t2.join();
-        p.report();
+
+        SWIRLY_NOTICE << "Percentile report"sv;
+        hist.print(stdout, 1, 1000);
+
+        fflush(stdout);
         ret = 0;
 
     } catch (const exception& e) {

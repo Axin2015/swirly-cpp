@@ -18,7 +18,6 @@
 #define SWIRLYD_RESTSERV_HPP
 
 #include <swirly/util/BasicTypes.hpp>
-#include <swirly/util/Profile.hpp>
 #include <swirly/util/Symbol.hpp>
 #include <swirly/util/Tokeniser.hpp>
 
@@ -37,7 +36,6 @@ class RestServ {
   public:
     explicit RestServ(Rest& rest) noexcept
     : rest_(rest)
-    , profile_{"profile"sv}
     {
     }
     ~RestServ();
@@ -75,7 +73,6 @@ class RestServ {
     Tokeniser path_;
     std::vector<Id64> ids_;
     std::vector<Symbol> symbols_;
-    Profile profile_;
 };
 
 } // namespace swirly

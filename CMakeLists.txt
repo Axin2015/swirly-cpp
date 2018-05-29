@@ -23,6 +23,13 @@ set(SWIRLY_BUILD_SHARED ON CACHE BOOL "Enable shared libs.")
 set(SWIRLY_MAX_LEVELS 3 CACHE STRING "Maximum price levels.")
 set(SWIRLY_TOOLSET "" CACHE PATH "Toolchain prefix.")
 
+# Flatbuffer options.
+set(FLATBUFFERS_BUILD_TESTS OFF CACHE BOOL "Enable the build of tests and samples.")
+set(FLATBUFFERS_FLATC_SCHEMA_EXTRA_ARGS --no-prefix --scoped-enums)
+
+# Hdr histogram options.
+set(HDR_HISTOGRAM_BUILD_PROGRAMS OFF CACHE BOOL "Build tests and examples.")
+
 if (NOT "${SWIRLY_TOOLSET}" STREQUAL "")
   get_filename_component(SWIRLY_TOOLSET "${SWIRLY_TOOLSET}" REALPATH)
   set(CMAKE_PREFIX_PATH "${SWIRLY_TOOLSET}")
@@ -130,12 +137,14 @@ endif()
 
 include_directories("${Boost_INCLUDE_DIRS}")
 include_directories(
-  "${PROJECT_SOURCE_DIR}/src"
+  "${PROJECT_SOURCE_DIR}/HdrHistogram_c/src"
   "${PROJECT_SOURCE_DIR}/flatbuffers/include"
+  "${PROJECT_SOURCE_DIR}/src"
   "${PROJECT_BINARY_DIR}/include")
 
 if(SWIRLY_BUILD_SHARED)
   set(swirly_util_LIBRARY swirly-util-shared)
+  set(swirly_prof_LIBRARY swirly-prof-shared)
   set(swirly_sys_LIBRARY swirly-sys-shared)
   set(swirly_app_LIBRARY swirly-app-shared)
   set(swirly_fix_LIBRARY swirly-fix-shared)
@@ -145,6 +154,7 @@ if(SWIRLY_BUILD_SHARED)
   set(swirly_sqlite_LIBRARY swirly-sqlite-shared)
 else()
   set(swirly_util_LIBRARY swirly-util-static)
+  set(swirly_prof_LIBRARY swirly-prof-static)
   set(swirly_sys_LIBRARY swirly-sys-static)
   set(swirly_app_LIBRARY swirly-app-static)
   set(swirly_fix_LIBRARY swirly-fix-static)
@@ -156,9 +166,8 @@ endif()
 
 enable_testing()
 
-set(FLATBUFFERS_FLATC_SCHEMA_EXTRA_ARGS --no-prefix --scoped-enums)
 add_subdirectory(flatbuffers)
-
+add_subdirectory(HdrHistogram_c)
 add_subdirectory(etc)
 add_subdirectory(image)
 add_subdirectory(src)

@@ -39,7 +39,6 @@ set(lib_SOURCES
   Limits.cpp
   Log.cpp
   Math.cpp
-  Profile.cpp
   RefCount.cpp
   RingBuffer.cpp
   Set.cpp
