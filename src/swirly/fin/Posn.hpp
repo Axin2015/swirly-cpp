@@ -42,6 +42,7 @@ class SWIRLY_API Posn : public RefCount<Posn, ThreadUnsafePolicy> {
     , buyCost_{buyCost}
     , sellLots_{sellLots}
     , sellCost_{sellCost}
+    , netCost_{buyCost - sellCost}
     {
     }
     Posn(Symbol accnt, Id64 marketId, Symbol instr, JDay settlDay) noexcept
@@ -75,39 +76,37 @@ class SWIRLY_API Posn : public RefCount<Posn, ThreadUnsafePolicy> {
     auto buyCost() const noexcept { return buyCost_; }
     auto sellLots() const noexcept { return sellLots_; }
     auto sellCost() const noexcept { return sellCost_; }
+    auto netLots() const noexcept { return buyLots_ - sellLots_; }
+    auto netCost() const noexcept { return netCost_; }
 
-    void add(const Posn& rhs) noexcept
-    {
-        addBuy(rhs.buyLots_, rhs.buyCost_);
-        addSell(rhs.sellLots_, rhs.sellCost_);
-    }
     void addBuy(Lots lots, Cost cost) noexcept
     {
         buyLots_ += lots;
         buyCost_ += cost;
+        netCost_ = buyCost_ - sellCost_;
     }
     void addSell(Lots lots, Cost cost) noexcept
     {
         sellLots_ += lots;
         sellCost_ += cost;
+        netCost_ = buyCost_ - sellCost_;
     }
-    void addTrade(Side side, Lots lots, Cost cost) noexcept
+    void addBuy(Lots lots, Ticks ticks) noexcept;
+    void addSell(Lots lots, Ticks ticks) noexcept;
+    void addPosn(const Posn& rhs) noexcept
     {
-        if (side == Side::Buy) {
-            addBuy(lots, cost);
-        } else {
-            assert(side == Side::Sell);
-            addSell(lots, cost);
-        }
+        addBuy(rhs.buyLots_, rhs.buyCost_);
+        addSell(rhs.sellLots_, rhs.sellCost_);
     }
     void addTrade(Side side, Lots lots, Ticks ticks) noexcept
     {
-        addTrade(side, lots, swirly::cost(lots, ticks));
+        if (side == Side::Buy) {
+            addBuy(lots, ticks);
+        } else {
+            assert(side == Side::Sell);
+            addSell(lots, ticks);
+        }
     }
-    void setBuyLots(Lots buyLots) noexcept { buyLots_ = buyLots; }
-    void setBuyCost(Cost buyCost) noexcept { buyCost_ = buyCost; }
-    void setSellLots(Lots sellLots) noexcept { sellLots_ = sellLots; }
-    void setSellCost(Cost sellCost) noexcept { sellCost_ = sellCost; }
 
     boost::intrusive::set_member_hook<> idHook;
 
@@ -120,6 +119,7 @@ class SWIRLY_API Posn : public RefCount<Posn, ThreadUnsafePolicy> {
     Cost buyCost_;
     Lots sellLots_;
     Cost sellCost_;
+    Cost netCost_;
 };
 
 inline std::ostream& operator<<(std::ostream& os, const Posn& posn)

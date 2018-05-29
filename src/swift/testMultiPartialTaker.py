@@ -38,15 +38,6 @@ class TestCase(RestTestCase):
           self.makerTrade(client)
           self.makerPosn(client)
 
-      with Server(dbFile, self.now) as server:
-        with Client() as client:
-          client.setTime(self.now)
-
-          self.makerOrder(client)
-          self.makerExec(client)
-          self.makerTrade(client)
-          self.makerPosn(client)
-
   def takeOrder(self, client):
     client.setTrader('GOSAYL')
     resp = client.send('POST', '/accnt/orders/EURUSD/20140302',
@@ -88,6 +79,8 @@ class TestCase(RestTestCase):
         u'match_id': 9,
         u'min_lots': None,
         u'order_id': 4,
+        u'posn_cost': -98755,
+        u'posn_lots': -8,
         u'ref': None,
         u'resd_lots': 2,
         u'settl_date': 20140302,
@@ -110,6 +103,8 @@ class TestCase(RestTestCase):
         u'match_id': 7,
         u'min_lots': None,
         u'order_id': 4,
+        u'posn_cost': -37035,
+        u'posn_lots': -3,
         u'ref': None,
         u'resd_lots': 9,
         u'settl_date': 20140302,
@@ -132,6 +127,8 @@ class TestCase(RestTestCase):
         u'match_id': 5,
         u'min_lots': None,
         u'order_id': 4,
+        u'posn_cost': 0,
+        u'posn_lots': 0,
         u'ref': None,
         u'resd_lots': 14,
         u'settl_date': 20140302,
@@ -154,6 +151,8 @@ class TestCase(RestTestCase):
         u'match_id': None,
         u'min_lots': None,
         u'order_id': 4,
+        u'posn_cost': None,
+        u'posn_lots': None,
         u'ref': None,
         u'resd_lots': 17,
         u'settl_date': 20140302,
@@ -223,6 +222,8 @@ class TestCase(RestTestCase):
       u'match_id': 10,
       u'min_lots': None,
       u'order_id': 3,
+      u'posn_cost': 98755,
+      u'posn_lots': 8,
       u'ref': None,
       u'resd_lots': 0,
       u'settl_date': 20140302,
@@ -245,6 +246,8 @@ class TestCase(RestTestCase):
       u'match_id': 8,
       u'min_lots': None,
       u'order_id': 2,
+      u'posn_cost': 37035,
+      u'posn_lots': 3,
       u'ref': None,
       u'resd_lots': 0,
       u'settl_date': 20140302,
@@ -267,6 +270,8 @@ class TestCase(RestTestCase):
       u'match_id': 6,
       u'min_lots': None,
       u'order_id': 1,
+      u'posn_cost': 0,
+      u'posn_lots': 0,
       u'ref': None,
       u'resd_lots': 0,
       u'settl_date': 20140302,
@@ -289,6 +294,8 @@ class TestCase(RestTestCase):
       u'match_id': None,
       u'min_lots': None,
       u'order_id': 3,
+      u'posn_cost': None,
+      u'posn_lots': None,
       u'ref': None,
       u'resd_lots': 7,
       u'settl_date': 20140302,
@@ -311,6 +318,8 @@ class TestCase(RestTestCase):
       u'match_id': None,
       u'min_lots': None,
       u'order_id': 2,
+      u'posn_cost': None,
+      u'posn_lots': None,
       u'ref': None,
       u'resd_lots': 5,
       u'settl_date': 20140302,
@@ -333,6 +342,8 @@ class TestCase(RestTestCase):
       u'match_id': None,
       u'min_lots': None,
       u'order_id': 1,
+      u'posn_cost': None,
+      u'posn_lots': None,
       u'ref': None,
       u'resd_lots': 3,
       u'settl_date': 20140302,
@@ -363,6 +374,8 @@ class TestCase(RestTestCase):
       u'match_id': 6,
       u'min_lots': None,
       u'order_id': 1,
+      u'posn_cost': 0,
+      u'posn_lots': 0,
       u'ref': None,
       u'resd_lots': 0,
       u'settl_date': 20140302,
@@ -385,6 +398,8 @@ class TestCase(RestTestCase):
       u'match_id': 8,
       u'min_lots': None,
       u'order_id': 2,
+      u'posn_cost': 37035,
+      u'posn_lots': 3,
       u'ref': None,
       u'resd_lots': 0,
       u'settl_date': 20140302,
@@ -407,6 +422,8 @@ class TestCase(RestTestCase):
       u'match_id': 10,
       u'min_lots': None,
       u'order_id': 3,
+      u'posn_cost': 98755,
+      u'posn_lots': 8,
       u'ref': None,
       u'resd_lots': 0,
       u'settl_date': 20140302,

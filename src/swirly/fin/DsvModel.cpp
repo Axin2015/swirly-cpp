@@ -222,6 +222,8 @@ void DsvModel::doReadExec(Time since, const ModelCallback<ExecPtr>& cb) const
         LastTicks, //
         MinLots,   //
         MatchId,   //
+        PosnLots,  //
+        PosnCost,  //
         LiqInd,    //
         Cpty,      //
         Created    //
@@ -256,12 +258,14 @@ void DsvModel::doReadExec(Time since, const ModelCallback<ExecPtr>& cb) const
         const auto lastTicks = fromString<swirly::Ticks>(row[LastTicks]);
         const auto minLots = fromString<swirly::Lots>(row[MinLots]);
         const auto matchId = fromString<Id64>(row[MatchId]);
+        const auto posnLots = fromString<swirly::Lots>(row[PosnLots]);
+        const auto posnCost = fromString<Cost>(row[PosnCost]);
         const auto liqInd = fromString<swirly::LiqInd>(row[LiqInd]);
         const auto cpty = fromString<Symbol>(row[Cpty]);
         const auto created = fromString<Time>(row[Created]);
         cb(Exec::make(accnt, marketId, instr, settlDay, id, orderId, ref, state, side, lots, ticks,
-                      resdLots, execLots, execCost, lastLots, lastTicks, minLots, matchId, liqInd,
-                      cpty, created));
+                      resdLots, execLots, execCost, lastLots, lastTicks, minLots, matchId, posnLots,
+                      posnCost, liqInd, cpty, created));
     }
 }
 
@@ -285,6 +289,8 @@ void DsvModel::doReadTrade(const ModelCallback<ExecPtr>& cb) const
         LastTicks, //
         MinLots,   //
         MatchId,   //
+        PosnLots,  //
+        PosnCost,  //
         LiqInd,    //
         Cpty,      //
         Created    //
@@ -318,12 +324,14 @@ void DsvModel::doReadTrade(const ModelCallback<ExecPtr>& cb) const
         const auto lastTicks = fromString<swirly::Ticks>(row[LastTicks]);
         const auto minLots = fromString<swirly::Lots>(row[MinLots]);
         const auto matchId = fromString<Id64>(row[MatchId]);
+        const auto posnLots = fromString<swirly::Lots>(row[PosnLots]);
+        const auto posnCost = fromString<Cost>(row[PosnCost]);
         const auto liqInd = fromString<swirly::LiqInd>(row[LiqInd]);
         const auto cpty = fromString<Symbol>(row[Cpty]);
         const auto created = fromString<Time>(row[Created]);
         cb(Exec::make(accnt, marketId, instr, settlDay, id, orderId, ref, State::Trade, side, lots,
                       ticks, resdLots, execLots, execCost, lastLots, lastTicks, minLots, matchId,
-                      liqInd, cpty, created));
+                      posnLots, posnCost, liqInd, cpty, created));
     }
 }
 

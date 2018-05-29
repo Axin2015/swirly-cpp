@@ -197,13 +197,14 @@ BOOST_FIXTURE_TEST_CASE(MsgQueueUpdateMarket, MsgQueueFixture)
 BOOST_FIXTURE_TEST_CASE(MsgQueueCreateExec, MsgQueueFixture)
 {
     ConstExecPtr execs[2];
-    execs[0] = makeIntrusive<Exec>("MARAYL"sv, MarketId, "EURUSD"sv, SettlDay, 1_id64, 2_id64,
-                                   "REF"sv, State::New, Side::Buy, 10_lts, 12345_tks, 10_lts, 0_lts,
-                                   0_cst, 0_lts, 0_tks, 1_lts, 0_id64, LiqInd::None, Symbol{}, Now);
+    execs[0]
+        = makeIntrusive<Exec>("MARAYL"sv, MarketId, "EURUSD"sv, SettlDay, 1_id64, 2_id64, "REF"sv,
+                              State::New, Side::Buy, 10_lts, 12345_tks, 10_lts, 0_lts, 0_cst, 0_lts,
+                              0_tks, 1_lts, 0_id64, 0_lts, 0_cst, LiqInd::None, Symbol{}, Now);
     execs[1] = makeIntrusive<Exec>("MARAYL"sv, MarketId, "EURUSD"sv, SettlDay, 3_id64, 2_id64,
                                    "REF"sv, State::Trade, Side::Buy, 10_lts, 12345_tks, 5_lts,
-                                   5_lts, 61725_cst, 5_lts, 12345_tks, 1_lts, 4_id64, LiqInd::Maker,
-                                   "GOSAYL"sv, Now + 1ms);
+                                   5_lts, 61725_cst, 5_lts, 12345_tks, 1_lts, 4_id64, 0_lts, 0_cst,
+                                   LiqInd::Maker, "GOSAYL"sv, Now + 1ms);
     mq.createExec(execs);
     {
         Msg msg;
@@ -229,6 +230,8 @@ BOOST_FIXTURE_TEST_CASE(MsgQueueCreateExec, MsgQueueFixture)
         BOOST_CHECK_EQUAL(body.lastTicks, 0_tks);
         BOOST_CHECK_EQUAL(body.minLots, 1_lts);
         BOOST_CHECK_EQUAL(body.matchId, 0_id64);
+        BOOST_CHECK_EQUAL(body.posnLots, 0_lts);
+        BOOST_CHECK_EQUAL(body.posnCost, 0_cst);
         BOOST_CHECK_EQUAL(body.liqInd, LiqInd::None);
         BOOST_CHECK_EQUAL(strncmp(body.cpty, "", sizeof(body.cpty)), 0);
         BOOST_CHECK_EQUAL(body.created, msSinceEpoch(Now));
@@ -257,6 +260,8 @@ BOOST_FIXTURE_TEST_CASE(MsgQueueCreateExec, MsgQueueFixture)
         BOOST_CHECK_EQUAL(body.lastTicks, 12345_tks);
         BOOST_CHECK_EQUAL(body.minLots, 1_lts);
         BOOST_CHECK_EQUAL(body.matchId, 4_id64);
+        BOOST_CHECK_EQUAL(body.posnLots, 0_lts);
+        BOOST_CHECK_EQUAL(body.posnCost, 0_cst);
         BOOST_CHECK_EQUAL(body.liqInd, LiqInd::Maker);
         BOOST_CHECK_EQUAL(strncmp(body.cpty, "GOSAYL", sizeof(body.cpty)), 0);
         BOOST_CHECK_EQUAL(body.created, msSinceEpoch(Now + 1ms));

@@ -45,15 +45,6 @@ class TestCase(RestTestCase):
           self.getByMarket(client)
           self.getById(client)
 
-      with Server(dbFile, self.now) as server:
-        with Client() as client:
-          client.setTime(self.now)
-
-          self.getAll(client)
-          self.getByInstr(client)
-          self.getByMarket(client)
-          self.getById(client)
-
   def checkAuth(self, client):
     client.setAuth(None, 0x2)
 
@@ -105,6 +96,8 @@ class TestCase(RestTestCase):
       u'match_id': 4,
       u'min_lots': None,
       u'order_id': 1,
+      u'posn_cost': 0,
+      u'posn_lots': 0,
       u'ref': None,
       u'resd_lots': 0,
       u'settl_date': 20140302,
@@ -127,6 +120,8 @@ class TestCase(RestTestCase):
       u'match_id': 3,
       u'min_lots': None,
       u'order_id': 2,
+      u'posn_cost': -37038,
+      u'posn_lots': -3,
       u'ref': None,
       u'resd_lots': 0,
       u'settl_date': 20140302,
@@ -149,6 +144,8 @@ class TestCase(RestTestCase):
       u'match_id': 4,
       u'min_lots': None,
       u'order_id': 1,
+      u'posn_cost': 0,
+      u'posn_lots': 0,
       u'ref': None,
       u'resd_lots': 0,
       u'settl_date': 20140402,
@@ -171,6 +168,8 @@ class TestCase(RestTestCase):
       u'match_id': 3,
       u'min_lots': None,
       u'order_id': 2,
+      u'posn_cost': -61735,
+      u'posn_lots': -5,
       u'ref': None,
       u'resd_lots': 0,
       u'settl_date': 20140402,
@@ -193,6 +192,8 @@ class TestCase(RestTestCase):
       u'match_id': 4,
       u'min_lots': None,
       u'order_id': 1,
+      u'posn_cost': 0,
+      u'posn_lots': 0,
       u'ref': None,
       u'resd_lots': 0,
       u'settl_date': 20140302,
@@ -215,6 +216,8 @@ class TestCase(RestTestCase):
       u'match_id': 3,
       u'min_lots': None,
       u'order_id': 2,
+      u'posn_cost': -46038,
+      u'posn_lots': -3,
       u'ref': None,
       u'resd_lots': 0,
       u'settl_date': 20140302,
@@ -245,6 +248,8 @@ class TestCase(RestTestCase):
       u'match_id': 4,
       u'min_lots': None,
       u'order_id': 1,
+      u'posn_cost': 0,
+      u'posn_lots': 0,
       u'ref': None,
       u'resd_lots': 0,
       u'settl_date': 20140302,
@@ -267,6 +272,8 @@ class TestCase(RestTestCase):
       u'match_id': 3,
       u'min_lots': None,
       u'order_id': 2,
+      u'posn_cost': -37038,
+      u'posn_lots': -3,
       u'ref': None,
       u'resd_lots': 0,
       u'settl_date': 20140302,
@@ -289,6 +296,8 @@ class TestCase(RestTestCase):
       u'match_id': 4,
       u'min_lots': None,
       u'order_id': 1,
+      u'posn_cost': 0,
+      u'posn_lots': 0,
       u'ref': None,
       u'resd_lots': 0,
       u'settl_date': 20140402,
@@ -311,6 +320,8 @@ class TestCase(RestTestCase):
       u'match_id': 3,
       u'min_lots': None,
       u'order_id': 2,
+      u'posn_cost': -61735,
+      u'posn_lots': -5,
       u'ref': None,
       u'resd_lots': 0,
       u'settl_date': 20140402,
@@ -341,6 +352,8 @@ class TestCase(RestTestCase):
       u'match_id': 4,
       u'min_lots': None,
       u'order_id': 1,
+      u'posn_cost': 0,
+      u'posn_lots': 0,
       u'ref': None,
       u'resd_lots': 0,
       u'settl_date': 20140302,
@@ -363,6 +376,8 @@ class TestCase(RestTestCase):
       u'match_id': 3,
       u'min_lots': None,
       u'order_id': 2,
+      u'posn_cost': -46038,
+      u'posn_lots': -3,
       u'ref': None,
       u'resd_lots': 0,
       u'settl_date': 20140302,
@@ -393,6 +408,8 @@ class TestCase(RestTestCase):
       u'match_id': 4,
       u'min_lots': None,
       u'order_id': 1,
+      u'posn_cost': 0,
+      u'posn_lots': 0,
       u'ref': None,
       u'resd_lots': 0,
       u'settl_date': 20140302,

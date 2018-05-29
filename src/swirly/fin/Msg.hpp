@@ -63,6 +63,8 @@ struct SWIRLY_PACKED CreateExec {
     Ticks lastTicks;
     Lots minLots;
     Id64 matchId;
+    Lots posnLots;
+    Cost posnCost;
     LiqInd liqInd;
     char cpty[MaxSymbol];
     // std::chrono::time_point is not pod.
@@ -89,7 +91,7 @@ struct SWIRLY_PACKED Msg {
     };
 };
 static_assert(std::is_pod_v<Msg>);
-static_assert(sizeof(Msg) == 236, "must be specific size");
+static_assert(sizeof(Msg) == 252, "must be specific size");
 
 } // namespace fin
 } // namespace swirly
