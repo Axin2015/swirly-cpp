@@ -18,6 +18,7 @@ cmake_minimum_required(VERSION 3.8)
 project(swirly)
 
 # Configuration options:
+set(SWIRLY_BUILD_ARCH "native" CACHE STRING "Target architecture.")
 set(SWIRLY_BUILD_SHARED ON CACHE BOOL "Enable shared libs.")
 set(SWIRLY_MAX_LEVELS 3 CACHE STRING "Maximum price levels.")
 set(SWIRLY_TOOLSET "" CACHE PATH "Toolchain prefix.")
@@ -30,6 +31,14 @@ endif()
 
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${PROJECT_SOURCE_DIR}/etc/cmake")
 set(CMAKE_VERBOSE_MAKEFILE ON)
+
+# Optimise for target architecture.
+SET(CMAKE_C_FLAGS_RELEASE          "${CMAKE_C_FLAGS_RELEASE} -march=${SWIRLY_BUILD_ARCH}")
+SET(CMAKE_CXX_FLAGS_RELEASE        "${CMAKE_CXX_FLAGS_RELEASE} -march=${SWIRLY_BUILD_ARCH}")
+SET(CMAKE_C_FLAGS_RELWITHDEBINFO   "${CMAKE_C_FLAGS_RELWITHDEBINFO} -march=${SWIRLY_BUILD_ARCH}")
+SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -march=${SWIRLY_BUILD_ARCH}")
+SET(CMAKE_C_FLAGS_MINSIZEREL       "${CMAKE_C_FLAGS_MINSIZEREL} -march=${SWIRLY_BUILD_ARCH}")
+SET(CMAKE_CXX_FLAGS_MINSIZEREL     "${CMAKE_CXX_FLAGS_MINSIZEREL} -march=${SWIRLY_BUILD_ARCH}")
 
 # Intended for use with Linux Perf:
 # $ perf record -g swirly_bench
