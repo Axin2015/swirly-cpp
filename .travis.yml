@@ -24,7 +24,7 @@ matrix:
         - CMAKE_BUILD_TYPE=DEBUG
         - CMAKE_C_COMPILER=clang-5.0
         - CMAKE_CXX_COMPILER=clang++-5.0
-        - ENABLE_SHARED_LIBS=ON
+        - SWIRLY_BUILD_SHARED=ON
 
     - os: linux
       compiler: clang
@@ -45,7 +45,7 @@ matrix:
         - CMAKE_BUILD_TYPE=RELEASE
         - CMAKE_C_COMPILER=clang-5.0
         - CMAKE_CXX_COMPILER=clang++-5.0
-        - ENABLE_SHARED_LIBS=ON
+        - SWIRLY_BUILD_SHARED=ON
 
     - os: linux
       compiler: g++
@@ -63,7 +63,7 @@ matrix:
         - CMAKE_BUILD_TYPE=DEBUG
         - CMAKE_C_COMPILER=gcc-7
         - CMAKE_CXX_COMPILER=g++-7
-        - ENABLE_SHARED_LIBS=ON
+        - SWIRLY_BUILD_SHARED=ON
 
     - os: linux
       compiler: g++
@@ -81,7 +81,7 @@ matrix:
         - CMAKE_BUILD_TYPE=RELEASE
         - CMAKE_C_COMPILER=gcc-7
         - CMAKE_CXX_COMPILER=g++-7
-        - ENABLE_SHARED_LIBS=ON
+        - SWIRLY_BUILD_SHARED=ON
 
 before_install:
   - sudo add-apt-repository -y ppa:samuel-bachmann/boost
@@ -95,7 +95,7 @@ before_script:
   - cmake -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
           -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
           -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-          -DENABLE_SHARED_LIBS=${ENABLE_SHARED_LIBS}
+          -DSWIRLY_BUILD_SHARED=${SWIRLY_BUILD_SHARED}
           ..
 
 script:

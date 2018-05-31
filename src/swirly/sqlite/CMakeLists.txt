@@ -13,7 +13,7 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-if(ENABLE_SHARED_LIBS)
+if(SWIRLY_BUILD_SHARED)
   add_custom_target(swirly-sqlite DEPENDS
     swirly-sqlite-static
     swirly-sqlite-shared
@@ -38,7 +38,7 @@ set_target_properties(swirly-sqlite-static PROPERTIES OUTPUT_NAME swirly-sqlite)
 target_link_libraries(swirly-sqlite-static swirly-fin-static ${SQLITE3_LIBRARIES})
 install(TARGETS swirly-sqlite-static DESTINATION lib64 COMPONENT static)
 
-if(ENABLE_SHARED_LIBS)
+if(SWIRLY_BUILD_SHARED)
   add_library(swirly-sqlite-shared SHARED ${lib_SOURCES})
   set_target_properties(swirly-sqlite-shared PROPERTIES OUTPUT_NAME swirly-sqlite)
   target_link_libraries(swirly-sqlite-shared swirly-fin-shared ${SQLITE3_LIBRARIES})
