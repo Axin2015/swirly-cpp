@@ -21,7 +21,7 @@ if [[ $local != $remote ]]; then
     git submodule update --init --recursive
     mkdir -p $SWIRLY_BUILD
     pushd $SWIRLY_BUILD
-    cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_SHARED_LIBS=OFF $SWIRLY_SOURCE
+    cmake -DCMAKE_BUILD_TYPE=Release -DSWIRLY_BUILD_SHARED=OFF $SWIRLY_SOURCE
     result=
     if make -j 2 all test swift; then
         result=pass

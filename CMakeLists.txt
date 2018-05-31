@@ -18,7 +18,7 @@ cmake_minimum_required(VERSION 3.8)
 project(swirly)
 
 # Configuration options:
-set(ENABLE_SHARED_LIBS ON CACHE BOOL "Enable shared libs.")
+set(SWIRLY_BUILD_SHARED ON CACHE BOOL "Enable shared libs.")
 set(SWIRLY_MAX_LEVELS 3 CACHE STRING "Maximum price levels.")
 set(SWIRLY_TOOLSET "" CACHE PATH "Toolchain prefix.")
 
@@ -125,7 +125,7 @@ include_directories(
   "${PROJECT_SOURCE_DIR}/flatbuffers/include"
   "${PROJECT_BINARY_DIR}/include")
 
-if(ENABLE_SHARED_LIBS)
+if(SWIRLY_BUILD_SHARED)
   set(swirly_util_LIBRARY swirly-util-shared)
   set(swirly_sys_LIBRARY swirly-sys-shared)
   set(swirly_app_LIBRARY swirly-app-shared)

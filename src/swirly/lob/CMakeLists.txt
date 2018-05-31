@@ -13,7 +13,7 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-if(ENABLE_SHARED_LIBS)
+if(SWIRLY_BUILD_SHARED)
   add_custom_target(swirly-lob DEPENDS
     swirly-lob-static
     swirly-lob-shared
@@ -38,7 +38,7 @@ set_target_properties(swirly-lob-static PROPERTIES OUTPUT_NAME swirly-lob)
 target_link_libraries(swirly-lob-static swirly-fin-static)
 install(TARGETS swirly-lob-static DESTINATION lib64 COMPONENT static)
 
-if(ENABLE_SHARED_LIBS)
+if(SWIRLY_BUILD_SHARED)
   add_library(swirly-lob-shared SHARED ${lib_SOURCES})
   set_target_properties(swirly-lob-shared PROPERTIES OUTPUT_NAME swirly-lob)
   target_link_libraries(swirly-lob-shared swirly-fin-shared)

@@ -13,7 +13,7 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-if(ENABLE_SHARED_LIBS)
+if(SWIRLY_BUILD_SHARED)
   add_custom_target(swirly-fix DEPENDS
     swirly-fix-static
     swirly-fix-shared
@@ -39,7 +39,7 @@ set_target_properties(swirly-fix-static PROPERTIES OUTPUT_NAME swirly-fix)
 target_link_libraries(swirly-fix-static swirly-sys-static)
 install(TARGETS swirly-fix-static DESTINATION lib64 COMPONENT static)
 
-if(ENABLE_SHARED_LIBS)
+if(SWIRLY_BUILD_SHARED)
   add_library(swirly-fix-shared SHARED ${lib_SOURCES})
   set_target_properties(swirly-fix-shared PROPERTIES OUTPUT_NAME swirly-fix)
   target_link_libraries(swirly-fix-shared swirly-sys-shared)
