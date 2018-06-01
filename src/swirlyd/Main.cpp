@@ -222,7 +222,7 @@ int main(int argc, char* argv[])
 
             // If a log file is not specified, then use syslog().
 
-#if SWIRLY_ENABLE_DEBUG
+#if SWIRLY_BUILD_DEBUG
             setlogmask(LOG_UPTO(LOG_DEBUG));
 #endif
             setLogger(sysLogger);

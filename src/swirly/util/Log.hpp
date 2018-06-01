@@ -179,7 +179,7 @@ Log& operator<<(Log&& log, const ValueT& val)
 #define SWIRLY_NOTICE SWIRLY_LOG(swirly::Log::Notice)
 #define SWIRLY_INFO SWIRLY_LOG(swirly::Log::Info)
 
-#if SWIRLY_ENABLE_DEBUG
+#if SWIRLY_BUILD_DEBUG
 #define SWIRLY_DEBUG SWIRLY_LOG(swirly::Log::Debug)
 #else
 #define SWIRLY_DEBUG false && swirly::Log{swirly::Log::Debug}
