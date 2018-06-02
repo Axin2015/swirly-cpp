@@ -253,13 +253,15 @@ int main(int argc, char* argv[])
             arch(pipayl, market.id(), startTime);
         }
 
-        SWIRLY_NOTICE << "Maker percentile report"sv;
-        maker.print(stdout, 1, 1000);
+        fprintf(stderr, "Maker Percentile Report\n");
+        fprintf(stderr, "-----------------------\n");
+        maker.print(stderr, 5, 1000);
 
-        SWIRLY_NOTICE << "Taker percentile report"sv;
-        taker.print(stdout, 1, 1000);
+        fprintf(stderr, "Taker Percentile Report\n");
+        fprintf(stderr, "-----------------------\n");
+        taker.print(stderr, 5, 1000);
 
-        fflush(stdout);
+        fflush(stderr);
         ret = 0;
     } catch (const exception& e) {
         SWIRLY_ERROR << "exception: "sv << e.what();
