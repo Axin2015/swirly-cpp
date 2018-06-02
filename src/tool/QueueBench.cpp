@@ -77,10 +77,11 @@ int main(int argc, char* argv[])
         t1.join();
         t2.join();
 
-        SWIRLY_NOTICE << "Percentile report"sv;
-        hist.print(stdout, 1, 1000);
+        fprintf(stderr, "Percentile Report\n");
+        fprintf(stderr, "-----------------\n");
+        hist.print(stderr, 5, 1000);
 
-        fflush(stdout);
+        fflush(stderr);
         ret = 0;
 
     } catch (const exception& e) {
