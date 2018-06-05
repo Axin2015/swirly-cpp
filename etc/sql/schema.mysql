@@ -17,13 +17,16 @@
 START TRANSACTION
 ;
 
-DROP DATABASE IF EXISTS swirly
+DROP DATABASE IF EXISTS swirlydb
 ;
 
-CREATE DATABASE swirly
+CREATE DATABASE swirlydb
 ;
 
-USE swirly
+GRANT ALL PRIVILEGES ON swirlydb.* TO 'swirlyuser'@'localhost' IDENTIFIED BY 'swirlypassword'
+;
+
+USE swirlydb
 ;
 
 SET foreign_key_checks = 1
