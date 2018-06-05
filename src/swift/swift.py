@@ -60,7 +60,7 @@ def getProg():
   return os.getenv('SWIRLY_PROGRAM', 'swirlyd')
 
 def getSchema():
-  return os.getenv('SWIRLY_SCHEMA', 'schema.sql')
+  return os.getenv('SWIRLY_SCHEMA', 'schema.sqlite')
 
 def getRefData():
   return os.getenv('SWIRLY_REFDATA', 'test.sql')

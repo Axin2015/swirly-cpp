@@ -36,9 +36,9 @@ if(SQLITE3_EXECUTABLE)
       OUTPUT "${dbfile}"
       WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
       COMMAND ${CMAKE_COMMAND} -E remove "${dbfile}"
-      COMMAND "${SQLITE3_EXECUTABLE}" "${dbfile}" <schema.sql
+      COMMAND "${SQLITE3_EXECUTABLE}" "${dbfile}" <schema.sqlite
       COMMAND "${SQLITE3_EXECUTABLE}" "${dbfile}" <${name}.sql
-      DEPENDS schema.sql ${name}.sql)
+      DEPENDS schema.sqlite ${name}.sql)
 
     set(dbfiles ${dbfiles} "${dbfile}")
   endforeach()
@@ -53,6 +53,7 @@ set(sql_SOURCES
   coffee.sql
   corp.sql
   forex.sql
-  schema.sql
+  schema.mysql
+  schema.sqlite
   test.sql)
 install(FILES ${sql_SOURCES} DESTINATION etc/sql COMPONENT config)

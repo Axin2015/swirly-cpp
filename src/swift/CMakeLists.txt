@@ -18,7 +18,7 @@ if(PYTHONINTERP_FOUND)
   add_custom_target(swift
     COMMAND "${ENV_EXECUTABLE}"
             "SWIRLY_PROGRAM=\"${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/swirlyd\""
-            "SWIRLY_SCHEMA=\"${PROJECT_SOURCE_DIR}/etc/sql/schema.sql\""
+            "SWIRLY_SCHEMA=\"${PROJECT_SOURCE_DIR}/etc/sql/schema.sqlite\""
             "SWIRLY_REFDATA=\"${PROJECT_SOURCE_DIR}/etc/sql/test.sql\""
             "${PYTHON_EXECUTABLE}" -m unittest discover -s "${CMAKE_CURRENT_SOURCE_DIR}" -v
     DEPENDS swirlyd)
