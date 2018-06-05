@@ -3,4 +3,4 @@
 	url = https://github.com/swirlycloud/flatbuffers.git
 [submodule "HdrHistogram_c"]
 	path = HdrHistogram_c
-	url = https://github.com/HdrHistogram/HdrHistogram_c.git
+	url = https://github.com/swirlycloud/HdrHistogram_c.git
