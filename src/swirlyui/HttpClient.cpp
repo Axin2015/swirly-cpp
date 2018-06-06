@@ -241,9 +241,9 @@ void HttpClient::on_ref_data_reply(QNetworkReply& reply)
     for (const auto elem : obj["assets"].toArray()) {
         const auto asset = Asset::from_json(elem.toObject());
         qDebug().nospace() << "asset: " << asset;
-        assetModel().update_row(tag_, asset);
+        asset_model().update_row(tag_, asset);
     }
-    assetModel().sweep(tag_);
+    asset_model().sweep(tag_);
     for (const auto elem : obj["instrs"].toArray()) {
         const auto instr = Instr::from_json(elem.toObject());
         qDebug().nospace() << "instr: " << instr;

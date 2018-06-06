@@ -17,6 +17,8 @@
 #ifndef SWIRLY_FIN_JOURN_HPP
 #define SWIRLY_FIN_JOURN_HPP
 
+#include <swirly/fin/Transaction.hpp>
+
 #include <swirly/Config.h>
 
 namespace swirly {
@@ -25,6 +27,7 @@ struct Msg;
 
 class SWIRLY_API Journ {
   public:
+    using Transaction = BasicTransaction<Journ>;
     Journ() noexcept = default;
     virtual ~Journ();
 
@@ -36,9 +39,21 @@ class SWIRLY_API Journ {
     constexpr Journ(Journ&&) noexcept = default;
     Journ& operator=(Journ&&) noexcept = default;
 
+    void begin() { do_begin(); }
+
+    void commit() { do_commit(); }
+
+    void rollback() noexcept { do_rollback(); }
+
     void write(const Msg& msg) { do_write(msg); }
 
   protected:
+    virtual void do_begin() = 0;
+
+    virtual void do_commit() = 0;
+
+    virtual void do_rollback() noexcept = 0;
+
     virtual void do_write(const Msg& msg) = 0;
 };
 

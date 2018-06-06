@@ -14,9 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Model.hpp"
+#include "SqliteModel.hpp"
 
-#include "Utility.hxx"
+#include "Sql.hxx"
+#include "Sqlite.hxx"
 
 #include <swirly/fin/Asset.hpp>
 #include <swirly/fin/Exec.hpp>
@@ -29,64 +30,30 @@
 #include <swirly/util/Config.hpp>
 
 namespace swirly {
-inline namespace sqlite {
+inline namespace db {
+using namespace sqlite;
 using namespace std;
-namespace {
 
-constexpr auto SelectAssetSql = //
-    "SELECT id, symbol, display, type_id FROM asset_t"sv;
-
-constexpr auto SelectInstrSql =                                               //
-    "SELECT id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom," //
-    " tick_numer, tick_denom, pip_dp, min_lots, max_lots FROM instr_v"sv;
-
-constexpr auto SelectMarketSql =                                                   //
-    "SELECT id, instr, settl_day, state, last_lots, last_ticks, last_time, max_id" //
-    " FROM market_v"sv;
-
-constexpr auto SelectOrderSql =                                                            //
-    "SELECT accnt, market_id, instr, settl_day, id, ref, state_id, side_id, lots, ticks,"  //
-    " resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots, created, modified" //
-    " FROM order_t WHERE resd_lots > 0;"sv;
-
-constexpr auto SelectExecSql =                                                               //
-    "SELECT accnt, market_id, instr, settl_day, id, order_id, ref, state_id, side_id, lots," //
-    " ticks, resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots, match_id,"    //
-    " posn_lots, posn_cost, liq_ind_id, cpty, created"                                       //
-    " FROM exec_t WHERE created > ? ORDER BY seq_id DESC;"sv;
-
-constexpr auto SelectTradeSql =                                                           //
-    "SELECT accnt, market_id, instr, settl_day, id, order_id, ref, side_id, lots, ticks," //
-    " resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots, match_id,"        //
-    " posn_lots, posn_cost, liq_ind_id, cpty, created"                                    //
-    " FROM exec_t WHERE state_id = 4 AND archive IS NULL;"sv;
-
-constexpr auto SelectPosnSql = //
-    "SELECT accnt, market_id, instr, settl_day, side_id, lots, cost FROM posn_v;"sv;
-
-} // namespace
-
-SqlModel::SqlModel(const Config& config)
-: db_{open_db(config.get("sqlite_model", "swirly.db"), SQLITE_OPEN_READONLY, config)}
+SqliteModel::SqliteModel(const DbPtr& db)
+: db_{db}
 {
 }
 
-SqlModel::~SqlModel() = default;
-
-SqlModel::SqlModel(SqlModel&&) = default;
-
-SqlModel& SqlModel::operator=(SqlModel&&) = default;
-
-void SqlModel::do_read_asset(const ModelCallback<AssetPtr>& cb) const
+SqliteModel::SqliteModel(const Config& config)
+: SqliteModel{open_db(config.get("db_name", "swirly.db"), SQLITE_OPEN_READONLY, config)}
 {
-    enum {
-        Id,      //
-        Symbol,  //
-        Display, //
-        TypeId   //
-    };
+}
 
-    StmtPtr stmt{prepare(*db_, SelectAssetSql)};
+SqliteModel::~SqliteModel() = default;
+
+SqliteModel::SqliteModel(SqliteModel&&) = default;
+
+SqliteModel& SqliteModel::operator=(SqliteModel&&) = default;
+
+void SqliteModel::do_read_asset(const ModelCallback<AssetPtr>& cb) const
+{
+    using namespace asset;
+    StmtPtr stmt{prepare(*db_, SelectSql)};
     while (step(*stmt)) {
         cb(Asset::make(column<Id32>(*stmt, Id),             //
                        column<string_view>(*stmt, Symbol),  //
@@ -95,24 +62,10 @@ void SqlModel::do_read_asset(const ModelCallback<AssetPtr>& cb) const
     }
 }
 
-void SqlModel::do_read_instr(const ModelCallback<InstrPtr>& cb) const
+void SqliteModel::do_read_instr(const ModelCallback<InstrPtr>& cb) const
 {
-    enum {
-        Id,        //
-        Symbol,    //
-        Display,   //
-        BaseAsset, //
-        TermCcy,   //
-        LotNumer,  //
-        LotDenom,  //
-        TickNumer, //
-        TickDenom, //
-        PipDp,     //
-        MinLots,   //
-        MaxLots    //
-    };
-
-    StmtPtr stmt{prepare(*db_, SelectInstrSql)};
+    using namespace instr;
+    StmtPtr stmt{prepare(*db_, SelectSql)};
     while (step(*stmt)) {
         cb(Instr::make(column<Id32>(*stmt, Id),               //
                        column<string_view>(*stmt, Symbol),    //
@@ -129,20 +82,10 @@ void SqlModel::do_read_instr(const ModelCallback<InstrPtr>& cb) const
     }
 }
 
-void SqlModel::do_read_market(const ModelCallback<MarketPtr>& cb) const
+void SqliteModel::do_read_market(const ModelCallback<MarketPtr>& cb) const
 {
-    enum {         //
-        Id,        //
-        Instr,     //
-        SettlDay,  //
-        State,     //
-        LastLots,  //
-        LastTicks, //
-        LastTime,  //
-        MaxId      //
-    };
-
-    StmtPtr stmt{prepare(*db_, SelectMarketSql)};
+    using namespace market;
+    StmtPtr stmt{prepare(*db_, SelectSql)};
     while (step(*stmt)) {
         cb(Market::make(column<Id64>(*stmt, Id),           //
                         column<string_view>(*stmt, Instr), //
@@ -155,30 +98,10 @@ void SqlModel::do_read_market(const ModelCallback<MarketPtr>& cb) const
     }
 }
 
-void SqlModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
+void SqliteModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
 {
-    enum {         //
-        Accnt,     //
-        MarketId,  //
-        Instr,     //
-        SettlDay,  //
-        Id,        //
-        Ref,       //
-        State,     //
-        Side,      //
-        Lots,      //
-        Ticks,     //
-        ResdLots,  //
-        ExecLots,  //
-        ExecCost,  //
-        LastLots,  //
-        LastTicks, //
-        MinLots,   //
-        Created,   //
-        Modified   //
-    };
-
-    StmtPtr stmt{prepare(*db_, SelectOrderSql)};
+    using namespace order;
+    StmtPtr stmt{prepare(*db_, SelectSql)};
     while (step(*stmt)) {
         cb(Order::make(column<string_view>(*stmt, Accnt),       //
                        column<Id64>(*stmt, MarketId),           //
@@ -201,35 +124,10 @@ void SqlModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
     }
 }
 
-void SqlModel::do_read_exec(Time since, const ModelCallback<ExecPtr>& cb) const
+void SqliteModel::do_read_exec(Time since, const ModelCallback<ExecPtr>& cb) const
 {
-    enum {         //
-        Accnt,     //
-        MarketId,  //
-        Instr,     //
-        SettlDay,  //
-        Id,        //
-        OrderId,   //
-        Ref,       //
-        State,     //
-        Side,      //
-        Lots,      //
-        Ticks,     //
-        ResdLots,  //
-        ExecLots,  //
-        ExecCost,  //
-        LastLots,  //
-        LastTicks, //
-        MinLots,   //
-        MatchId,   //
-        PosnLots,  //
-        PosnCost,  //
-        LiqInd,    //
-        Cpty,      //
-        Created    //
-    };
-
-    StmtPtr stmt{prepare(*db_, SelectExecSql)};
+    using namespace exec;
+    StmtPtr stmt{prepare(*db_, SelectSql)};
     ScopedBind bind{*stmt};
     bind(since);
     while (step(*stmt)) {
@@ -259,34 +157,10 @@ void SqlModel::do_read_exec(Time since, const ModelCallback<ExecPtr>& cb) const
     }
 }
 
-void SqlModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
+void SqliteModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
 {
-    enum {         //
-        Accnt,     //
-        MarketId,  //
-        Instr,     //
-        SettlDay,  //
-        Id,        //
-        OrderId,   //
-        Ref,       //
-        Side,      //
-        Lots,      //
-        Ticks,     //
-        ResdLots,  //
-        ExecLots,  //
-        ExecCost,  //
-        LastLots,  //
-        LastTicks, //
-        MinLots,   //
-        MatchId,   //
-        PosnLots,  //
-        PosnCost,  //
-        LiqInd,    //
-        Cpty,      //
-        Created    //
-    };
-
-    StmtPtr stmt{prepare(*db_, SelectTradeSql)};
+    using namespace trade;
+    StmtPtr stmt{prepare(*db_, SelectSql)};
     while (step(*stmt)) {
         cb(Exec::make(column<string_view>(*stmt, Accnt),       //
                       column<Id64>(*stmt, MarketId),           //
@@ -314,22 +188,14 @@ void SqlModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
     }
 }
 
-void SqlModel::do_read_posn(JDay bus_day, const ModelCallback<PosnPtr>& cb) const
+void SqliteModel::do_read_posn(JDay bus_day, const ModelCallback<PosnPtr>& cb) const
 {
-    enum {        //
-        Accnt,    //
-        MarketId, //
-        Instr,    //
-        SettlDay, //
-        Side,     //
-        Lots,     //
-        Cost      //
-    };
+    using namespace posn;
 
     PosnSet ps;
     PosnSet::Iterator it;
 
-    StmtPtr stmt{prepare(*db_, SelectPosnSql)};
+    StmtPtr stmt{prepare(*db_, SelectSql)};
     while (step(*stmt)) {
         const auto accnt = column<string_view>(*stmt, Accnt);
         auto market_id = column<Id64>(*stmt, MarketId);
@@ -363,5 +229,5 @@ void SqlModel::do_read_posn(JDay bus_day, const ModelCallback<PosnPtr>& cb) cons
     }
 }
 
-} // namespace sqlite
+} // namespace db
 } // namespace swirly

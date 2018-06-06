@@ -37,7 +37,7 @@ class Client : public QObject {
     Client(QObject* parent = nullptr);
     ~Client() override = default;
 
-    const AssetModel& assetModel() const noexcept { return assetModel_; }
+    const AssetModel& asset_model() const noexcept { return asset_model_; }
     const InstrModel& instr_model() const noexcept { return instr_model_; }
     const MarketModel& market_model() const noexcept { return market_model_; }
     const OrderModel& order_model() const noexcept { return order_model_; }
@@ -45,7 +45,7 @@ class Client : public QObject {
     const TradeModel& trade_model() const noexcept { return trade_model_; }
     const PosnModel& posn_model() const noexcept { return posn_model_; }
 
-    AssetModel& assetModel() noexcept { return assetModel_; }
+    AssetModel& asset_model() noexcept { return asset_model_; }
     InstrModel& instr_model() noexcept { return instr_model_; }
     MarketModel& market_model() noexcept { return market_model_; }
     OrderModel& order_model() noexcept { return order_model_; }
@@ -69,7 +69,7 @@ class Client : public QObject {
   private slots:
 
   private:
-    AssetModel assetModel_;
+    AssetModel asset_model_;
     InstrModel instr_model_;
     MarketModel market_model_;
     OrderModel order_model_;

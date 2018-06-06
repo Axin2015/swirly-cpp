@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/sqlite/Model.hpp>
+#include <swirly/db/SqliteModel.hpp>
 
 #include <swirly/fin/Asset.hpp>
 #include <swirly/fin/Date.hpp>
@@ -42,12 +42,13 @@ int main(int argc, char* argv[])
 
         Config config;
         if (argc > 1) {
-            config.set("sqlite_model", argv[1]);
+            config.set("db_type", "sqlite");
+            config.set("db_name", argv[1]);
         }
         const BusinessDay bus_day{MarketZone};
 
         const auto now = UnixClock::now();
-        SqlModel model{config};
+        SqliteModel model{config};
         {
             ofstream os{"asset.txt"};
             os << "id\tsymbol\tdisplay\ttype\n";

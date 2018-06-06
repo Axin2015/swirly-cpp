@@ -28,6 +28,4 @@ add_subdirectory(fix)
 add_subdirectory(fin)
 add_subdirectory(lob)
 add_subdirectory(web)
-
-# FIXME: the following libraries should be modules.
-add_subdirectory(sqlite)
+add_subdirectory(db)

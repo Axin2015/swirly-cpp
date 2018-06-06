@@ -14,51 +14,46 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SQLITE_JOURN_HPP
-#define SWIRLY_SQLITE_JOURN_HPP
+#ifndef SWIRLY_DB_MYSQLJOURN_HPP
+#define SWIRLY_DB_MYSQLJOURN_HPP
 
-#include <swirly/sqlite/Types.hpp>
+#include <swirly/db/Types.hpp>
 
 #include <swirly/fin/Journ.hpp>
 #include <swirly/fin/MsgHandler.hpp>
-#include <swirly/fin/Transaction.hpp>
 
 namespace swirly {
-inline namespace util {
-class Config;
-} // namespace util
-inline namespace sqlite {
+inline namespace db {
 
-class SWIRLY_API SqlJourn
+class SWIRLY_API MySqlJourn
 : public Journ
-, BasicMsgHandler<SqlJourn> {
-    using Transaction = BasicTransaction<SqlJourn>;
+, BasicMsgHandler<MySqlJourn> {
     // Crtp.
-    friend struct BasicMsgHandler<SqlJourn>;
-    friend class BasicTransaction<SqlJourn>;
+    friend struct BasicMsgHandler<MySqlJourn>;
 
   public:
-    explicit SqlJourn(const Config& config);
-    ~SqlJourn() override;
+    explicit MySqlJourn(const mysql::DbPtr& db);
+    explicit MySqlJourn(const Config& config);
+    ~MySqlJourn() override;
 
     // Copy.
-    SqlJourn(const SqlJourn&) = delete;
-    SqlJourn& operator=(const SqlJourn&) = delete;
+    MySqlJourn(const MySqlJourn&) = delete;
+    MySqlJourn& operator=(const MySqlJourn&) = delete;
 
     // Move.
-    SqlJourn(SqlJourn&&);
-    SqlJourn& operator=(SqlJourn&&);
+    MySqlJourn(MySqlJourn&&);
+    MySqlJourn& operator=(MySqlJourn&&);
 
   protected:
+    void do_begin() override;
+
+    void do_commit() override;
+
+    void do_rollback() noexcept override;
+
     void do_write(const Msg& msg) override;
 
   private:
-    void begin();
-
-    void commit();
-
-    void rollback() noexcept;
-
     void on_create_market(const CreateMarket& body);
 
     void on_update_market(const UpdateMarket& body);
@@ -67,17 +62,14 @@ class SWIRLY_API SqlJourn
 
     void on_archive_trade(const ArchiveTrade& body);
 
-    sqlite::DbPtr db_;
-    sqlite::StmtPtr begin_stmt_;
-    sqlite::StmtPtr commit_stmt_;
-    sqlite::StmtPtr rollback_stmt_;
-    sqlite::StmtPtr insert_market_stmt_;
-    sqlite::StmtPtr update_market_stmt_;
-    sqlite::StmtPtr insert_exec_stmt_;
-    sqlite::StmtPtr update_exec_stmt_;
+    mysql::DbPtr db_;
+    mysql::StmtPtr insert_market_stmt_;
+    mysql::StmtPtr update_market_stmt_;
+    mysql::StmtPtr insert_exec_stmt_;
+    mysql::StmtPtr update_exec_stmt_;
 };
 
-} // namespace sqlite
+} // namespace db
 } // namespace swirly
 
-#endif // SWIRLY_SQLITE_JOURN_HPP
+#endif // SWIRLY_DB_MYSQLJOURN_HPP

@@ -37,4 +37,9 @@
  */
 #define SWIRLY_MAX_LEVELS ${SWIRLY_MAX_LEVELS}
 
+/**
+ * True if MySQL support is enabled.
+ */
+#define SWIRLY_HAVE_MYSQL ${SWIRLY_HAVE_MYSQL}
+
 #endif // SWIRLY_CONFIG_H

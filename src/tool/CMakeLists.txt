@@ -26,11 +26,11 @@ add_custom_target(swirly-tool DEPENDS
 install(PROGRAMS ${bin_FILES} DESTINATION bin COMPONENT program)
 
 add_executable(swirly-db-to-dsv DbToDsv.cpp)
-target_link_libraries(swirly-db-to-dsv ${swirly_sqlite_LIBRARY})
+target_link_libraries(swirly-db-to-dsv ${swirly_db_LIBRARY})
 install(TARGETS swirly-db-to-dsv DESTINATION bin COMPONENT program)
 
 add_executable(swirly-db-to-json DbToJson.cpp)
-target_link_libraries(swirly-db-to-json ${swirly_sqlite_LIBRARY})
+target_link_libraries(swirly-db-to-json ${swirly_db_LIBRARY})
 install(TARGETS swirly-db-to-json DESTINATION bin COMPONENT program)
 
 add_executable(swirly-echo-serv EchoServ.cpp)
@@ -43,11 +43,11 @@ install(TARGETS swirly-queue-bench DESTINATION bin COMPONENT program)
 
 # Reserved as an ad-hoc scratch pad.
 add_executable(swirly-scratch Scratch.cpp)
-target_link_libraries(swirly-scratch ${swirly_fin_LIBRARY})
+target_link_libraries(swirly-scratch ${swirly_db_LIBRARY})
 
 add_executable(swirly-serv-bench ServBench.cpp)
 target_link_libraries(swirly-serv-bench ${swirly_prof_LIBRARY} ${swirly_lob_LIBRARY}
-  ${swirly_sqlite_LIBRARY})
+  ${swirly_db_LIBRARY})
 install(TARGETS swirly-serv-bench DESTINATION bin COMPONENT program)
 
 add_executable(swirly-timer-bench TimerBench.cpp)

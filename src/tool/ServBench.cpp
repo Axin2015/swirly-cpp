@@ -17,8 +17,8 @@
 #include <swirly/prof/HdrHistogram.hpp>
 #include <swirly/prof/HdrRecorder.hpp>
 
-#include <swirly/sqlite/Journ.hpp>
-#include <swirly/sqlite/Model.hpp>
+#include <swirly/db/SqliteJourn.hpp>
+#include <swirly/db/SqliteModel.hpp>
 
 #include <swirly/lob/Accnt.hpp>
 #include <swirly/lob/Response.hpp>
@@ -85,6 +85,9 @@ class NullJourn : public Journ {
     ~NullJourn() override = default;
 
   protected:
+    void do_begin() override {}
+    void do_commit() override {}
+    void do_rollback() noexcept override {}
     void do_write(const Msg& msg) override {}
 };
 
@@ -121,8 +124,9 @@ int main(int argc, char* argv[])
         unique_ptr<Model> model;
         if (argc > 1) {
             Config config;
-            config.set("sqlite_model", argv[1]);
-            model = make_unique<SqlModel>(config);
+            config.set("db_type", "sqlite");
+            config.set("db_name", argv[1]);
+            model = make_unique<SqliteModel>(config);
         } else {
             model = make_unique<TestModel>();
         }

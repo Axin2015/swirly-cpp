@@ -14,32 +14,12 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SQLITE_EXCEPTION_HPP
-#define SWIRLY_SQLITE_EXCEPTION_HPP
-
-#include <swirly/util/Exception.hpp>
+#include "Exception.hpp"
 
 namespace swirly {
-inline namespace sqlite {
+inline namespace db {
 
-class SqlException : public Exception {
-  public:
-    explicit SqlException(std::string_view what) noexcept
-    : Exception{what}
-    {
-    }
-    ~SqlException() override;
+DbException::~DbException() = default;
 
-    // Copy.
-    SqlException(const SqlException&) noexcept = default;
-    SqlException& operator=(const SqlException&) noexcept = default;
-
-    // Move.
-    SqlException(SqlException&&) noexcept = default;
-    SqlException& operator=(SqlException&&) noexcept = default;
-};
-
-} // namespace sqlite
+} // namespace db
 } // namespace swirly
-
-#endif // SWIRLY_SQLITE_EXCEPTION_HPP

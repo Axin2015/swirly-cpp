@@ -14,50 +14,49 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_FIN_TRANSACTION_HPP
-#define SWIRLY_FIN_TRANSACTION_HPP
+#ifndef SWIRLY_DB_CTX_HPP
+#define SWIRLY_DB_CTX_HPP
 
-#include <type_traits>
+#include <swirly/Config.h>
+
+#include <memory>
 
 namespace swirly {
 inline namespace fin {
+class Journ;
+class Model;
+} // namespace fin
+inline namespace util {
+class Config;
+} // namespace util
+inline namespace db {
 
-template <typename TypeT>
-class BasicTransaction {
+class SWIRLY_API DbCtx {
   public:
-    explicit BasicTransaction(TypeT& target)
-    : target_(target)
-    {
-        target_.begin();
-    }
-    ~BasicTransaction()
-    {
-        static_assert(std::is_nothrow_invocable_v<decltype(&TypeT::rollback), TypeT>);
-        if (!done_) {
-            target_.rollback();
-        }
-    }
+    struct Impl {
+        virtual ~Impl();
+        virtual Model& do_model() = 0;
+        virtual Journ& do_journ() = 0;
+    };
+    DbCtx(const Config& config);
+    ~DbCtx();
 
     // Copy.
-    BasicTransaction(const BasicTransaction&) = delete;
-    BasicTransaction& operator=(const BasicTransaction&) = delete;
+    DbCtx(const DbCtx&) = delete;
+    DbCtx& operator=(const DbCtx&) = delete;
 
     // Move.
-    BasicTransaction(BasicTransaction&&) = delete;
-    BasicTransaction& operator=(BasicTransaction&&) = delete;
+    DbCtx(DbCtx&&) noexcept = default;
+    DbCtx& operator=(DbCtx&&) noexcept = default;
 
-    void commit()
-    {
-        target_.commit();
-        done_ = true;
-    }
+    Model& model() const { return impl_->do_model(); }
+    Journ& journ() const { return impl_->do_journ(); }
 
   private:
-    TypeT& target_;
-    bool done_{false};
+    std::unique_ptr<Impl> impl_;
 };
 
-} // namespace fin
+} // namespace db
 } // namespace swirly
 
-#endif // SWIRLY_FIN_TRANSACTION_HPP
+#endif // SWIRLY_DB_CTX_HPP
