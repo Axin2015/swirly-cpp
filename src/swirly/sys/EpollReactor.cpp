@@ -27,11 +27,11 @@ constexpr size_t MaxEvents{16};
 
 } // namespace
 
-EpollReactor::EpollReactor(size_t sizeHint)
-: mux_{sizeHint}
+EpollReactor::EpollReactor(size_t size_hint)
+: mux_{size_hint}
 {
     const auto fd = efd_.fd();
-    data_.resize(max<size_t>(fd + 1, sizeHint));
+    data_.resize(max<size_t>(fd + 1, size_hint));
     mux_.subscribe(fd, 0, EventIn);
 
     auto& ref = data_[fd];
@@ -45,14 +45,14 @@ EpollReactor::~EpollReactor()
     mux_.unsubscribe(efd_.fd());
 }
 
-void EpollReactor::doInterrupt() noexcept
+void EpollReactor::do_interrupt() noexcept
 {
     // Best effort.
     std::error_code ec;
     efd_.write(1, ec);
 }
 
-Reactor::Handle EpollReactor::doSubscribe(int fd, unsigned events, IoSlot slot)
+Reactor::Handle EpollReactor::do_subscribe(int fd, unsigned events, IoSlot slot)
 {
     assert(fd >= 0);
     assert(slot);
@@ -66,7 +66,7 @@ Reactor::Handle EpollReactor::doSubscribe(int fd, unsigned events, IoSlot slot)
     return {*this, fd, ref.sid};
 }
 
-void EpollReactor::doUnsubscribe(int fd, int sid) noexcept
+void EpollReactor::do_unsubscribe(int fd, int sid) noexcept
 {
     auto& ref = data_[fd];
     if (ref.sid == sid) {
@@ -76,38 +76,38 @@ void EpollReactor::doUnsubscribe(int fd, int sid) noexcept
     }
 }
 
-void EpollReactor::doSetEvents(int fd, int sid, unsigned events, IoSlot slot)
+void EpollReactor::do_set_events(int fd, int sid, unsigned events, IoSlot slot)
 {
     auto& ref = data_[fd];
     if (ref.sid == sid) {
         if (ref.events != events) {
-            mux_.setEvents(fd, sid, events);
+            mux_.set_events(fd, sid, events);
             ref.events = events;
         }
         ref.slot = slot;
     }
 }
 
-void EpollReactor::doSetEvents(int fd, int sid, unsigned events)
+void EpollReactor::do_set_events(int fd, int sid, unsigned events)
 {
     auto& ref = data_[fd];
     if (ref.sid == sid && ref.events != events) {
-        mux_.setEvents(fd, sid, events);
+        mux_.set_events(fd, sid, events);
         ref.events = events;
     }
 }
 
-Timer EpollReactor::doTimer(Time expiry, Duration interval, Priority priority, TimerSlot slot)
+Timer EpollReactor::do_timer(Time expiry, Duration interval, Priority priority, TimerSlot slot)
 {
     return tqs_[static_cast<size_t>(priority)].insert(expiry, interval, slot);
 }
 
-Timer EpollReactor::doTimer(Time expiry, Priority priority, TimerSlot slot)
+Timer EpollReactor::do_timer(Time expiry, Priority priority, TimerSlot slot)
 {
     return tqs_[static_cast<size_t>(priority)].insert(expiry, slot);
 }
 
-int EpollReactor::doPoll(Time now, Millis timeout)
+int EpollReactor::do_poll(Time now, Millis timeout)
 {
     enum { High = 0, Low = 1 };
     using namespace chrono;

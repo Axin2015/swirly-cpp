@@ -53,14 +53,14 @@ constexpr auto UpdateExecSql =       //
 } // namespace
 
 SqlJourn::SqlJourn(const Config& config)
-: db_{openDb(config.get("sqlite_journ", "swirly.db"), SQLITE_OPEN_READWRITE, config)}
-, beginStmt_{prepare(*db_, BeginSql)}
-, commitStmt_{prepare(*db_, CommitSql)}
-, rollbackStmt_{prepare(*db_, RollbackSql)}
-, insertMarketStmt_{prepare(*db_, InsertMarketSql)}
-, updateMarketStmt_{prepare(*db_, UpdateMarketSql)}
-, insertExecStmt_{prepare(*db_, InsertExecSql)}
-, updateExecStmt_{prepare(*db_, UpdateExecSql)}
+: db_{open_db(config.get("sqlite_journ", "swirly.db"), SQLITE_OPEN_READWRITE, config)}
+, begin_stmt_{prepare(*db_, BeginSql)}
+, commit_stmt_{prepare(*db_, CommitSql)}
+, rollback_stmt_{prepare(*db_, RollbackSql)}
+, insert_market_stmt_{prepare(*db_, InsertMarketSql)}
+, update_market_stmt_{prepare(*db_, UpdateMarketSql)}
+, insert_exec_stmt_{prepare(*db_, InsertExecSql)}
+, update_exec_stmt_{prepare(*db_, UpdateExecSql)}
 {
 }
 
@@ -70,97 +70,97 @@ SqlJourn::SqlJourn(SqlJourn&&) = default;
 
 SqlJourn& SqlJourn::operator=(SqlJourn&&) = default;
 
-void SqlJourn::doWrite(const Msg& msg)
+void SqlJourn::do_write(const Msg& msg)
 {
     dispatch(msg);
 }
 
 void SqlJourn::begin()
 {
-    stepOnce(*beginStmt_);
+    step_once(*begin_stmt_);
 }
 
 void SqlJourn::commit()
 {
-    stepOnce(*commitStmt_);
+    step_once(*commit_stmt_);
 }
 
 void SqlJourn::rollback() noexcept
 {
     try {
-        stepOnce(*rollbackStmt_);
+        step_once(*rollback_stmt_);
     } catch (const std::exception& e) {
         SWIRLY_ERROR << "failed to rollback transaction: "sv << e.what();
     }
 }
 
-void SqlJourn::onCreateMarket(const CreateMarket& body)
+void SqlJourn::on_create_market(const CreateMarket& body)
 {
-    auto& stmt = *insertMarketStmt_;
+    auto& stmt = *insert_market_stmt_;
 
     ScopedBind bind{stmt};
     bind(body.id);
-    bind(toStringView(body.instr));
-    bind(body.settlDay, MaybeNull);
+    bind(to_string_view(body.instr));
+    bind(body.settl_day, MaybeNull);
     bind(body.state);
 
-    stepOnce(stmt);
+    step_once(stmt);
 }
 
-void SqlJourn::onUpdateMarket(const UpdateMarket& body)
+void SqlJourn::on_update_market(const UpdateMarket& body)
 {
-    auto& stmt = *updateMarketStmt_;
+    auto& stmt = *update_market_stmt_;
 
     ScopedBind bind{stmt};
     bind(body.id);
     bind(body.state);
 
-    stepOnce(stmt);
+    step_once(stmt);
 }
 
-void SqlJourn::onCreateExec(const CreateExec& body)
+void SqlJourn::on_create_exec(const CreateExec& body)
 {
     Transaction trans{*this};
-    auto& stmt = *insertExecStmt_;
+    auto& stmt = *insert_exec_stmt_;
 
     ScopedBind bind{stmt};
-    bind(body.marketId);
-    bind(toStringView(body.instr));
-    bind(body.settlDay, MaybeNull);
+    bind(body.market_id);
+    bind(to_string_view(body.instr));
+    bind(body.settl_day, MaybeNull);
     bind(body.id);
-    bind(body.orderId, MaybeNull);
-    bind(toStringView(body.accnt));
-    bind(toStringView(body.ref), MaybeNull);
+    bind(body.order_id, MaybeNull);
+    bind(to_string_view(body.accnt));
+    bind(to_string_view(body.ref), MaybeNull);
     bind(body.state);
     bind(body.side);
     bind(body.lots);
     bind(body.ticks);
-    bind(body.resdLots);
-    bind(body.execLots);
-    bind(body.execCost);
-    if (body.lastLots > 0_lts) {
-        bind(body.lastLots);
-        bind(body.lastTicks);
+    bind(body.resd_lots);
+    bind(body.exec_lots);
+    bind(body.exec_cost);
+    if (body.last_lots > 0_lts) {
+        bind(body.last_lots);
+        bind(body.last_ticks);
     } else {
         bind(nullptr);
         bind(nullptr);
     }
-    bind(body.minLots);
-    bind(body.matchId, MaybeNull);
-    bind(body.posnLots);
-    bind(body.posnCost);
-    bind(body.liqInd, MaybeNull);
-    bind(toStringView(body.cpty), MaybeNull);
+    bind(body.min_lots);
+    bind(body.match_id, MaybeNull);
+    bind(body.posn_lots);
+    bind(body.posn_cost);
+    bind(body.liq_ind, MaybeNull);
+    bind(to_string_view(body.cpty), MaybeNull);
     bind(body.created); // Created.
 
-    stepOnce(stmt);
+    step_once(stmt);
     trans.commit();
 }
 
-void SqlJourn::onArchiveTrade(const ArchiveTrade& body)
+void SqlJourn::on_archive_trade(const ArchiveTrade& body)
 {
     Transaction trans{*this};
-    auto& stmt = *updateExecStmt_;
+    auto& stmt = *update_exec_stmt_;
 
     for (size_t i{0}; i < MaxIds; ++i) {
         const auto id = body.ids[i];
@@ -168,11 +168,11 @@ void SqlJourn::onArchiveTrade(const ArchiveTrade& body)
             break;
         }
         ScopedBind bind{stmt};
-        bind(body.marketId);
+        bind(body.market_id);
         bind(id);
         bind(body.modified);
 
-        stepOnce(stmt);
+        step_once(stmt);
     }
     trans.commit();
 }

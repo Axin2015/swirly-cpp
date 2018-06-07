@@ -56,7 +56,7 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
     if (!index.isValid()) {
         // No-op.
     } else if (role == Qt::CheckStateRole) {
-        const auto& row = rowAt(index.row());
+        const auto& row = row_at(index.row());
         switch (box<Column>(index.column())) {
         case Column::CheckState:
             var = row.checked() ? Qt::Checked : Qt::Unchecked;
@@ -65,7 +65,7 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
             break;
         }
     } else if (role == Qt::DisplayRole) {
-        const auto& trade = valueAt(index.row());
+        const auto& trade = value_at(index.row());
         switch (box<Column>(index.column())) {
         case Column::CheckState:
             break;
@@ -73,62 +73,62 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
             var = trade.accnt();
             break;
         case Column::MarketId:
-            var = toVariant(trade.marketId());
+            var = to_variant(trade.market_id());
             break;
         case Column::Instr:
             var = trade.instr().symbol();
             break;
         case Column::SettlDate:
-            var = trade.settlDate();
+            var = trade.settl_date();
             break;
         case Column::Id:
-            var = toVariant(trade.id());
+            var = to_variant(trade.id());
             break;
         case Column::OrderId:
-            var = toVariant(trade.orderId());
+            var = to_variant(trade.order_id());
             break;
         case Column::Ref:
             var = trade.ref();
             break;
         case Column::State:
-            var = enumString(trade.state(), trade.resdLots());
+            var = enum_string(trade.state(), trade.resd_lots());
             break;
         case Column::Side:
-            var = enumString(trade.side());
+            var = enum_string(trade.side());
             break;
         case Column::Lots:
-            var = toVariant(trade.lots());
+            var = to_variant(trade.lots());
             break;
         case Column::Price:
             if (trade.lots() != 0_lts) {
-                var = ticksToPriceString(trade.ticks(), trade.instr());
+                var = ticks_to_price_string(trade.ticks(), trade.instr());
             }
             break;
         case Column::ResdLots:
-            var = toVariant(trade.resdLots());
+            var = to_variant(trade.resd_lots());
             break;
         case Column::ExecLots:
-            var = toVariant(trade.execLots());
+            var = to_variant(trade.exec_lots());
             break;
         case Column::AvgPrice:
-            var = ticksToAvgPriceString(trade.execLots(), trade.execCost(), trade.instr());
+            var = ticks_to_avg_price_string(trade.exec_lots(), trade.exec_cost(), trade.instr());
             break;
         case Column::LastLots:
-            var = toVariant(trade.lastLots());
+            var = to_variant(trade.last_lots());
             break;
         case Column::LastPrice:
-            if (trade.lastLots() != 0_lts) {
-                var = ticksToPriceString(trade.lastTicks(), trade.instr());
+            if (trade.last_lots() != 0_lts) {
+                var = ticks_to_price_string(trade.last_ticks(), trade.instr());
             }
             break;
         case Column::MinLots:
-            var = toVariant(trade.minLots());
+            var = to_variant(trade.min_lots());
             break;
         case Column::MatchId:
-            var = toVariant(trade.matchId());
+            var = to_variant(trade.match_id());
             break;
         case Column::LiqInd:
-            var = enumString(trade.liqInd());
+            var = enum_string(trade.liq_ind());
             break;
         case Column::Cpty:
             var = trade.cpty();
@@ -168,7 +168,7 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
             break;
         }
     } else if (role == Qt::UserRole) {
-        var = QVariant::fromValue(valueAt(index.row()));
+        var = QVariant::fromValue(value_at(index.row()));
     }
     return var;
 }

@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(ExceptionToStringCase)
 {
     const NotFoundException e{"this is a test"};
 
-    BOOST_TEST(toString(e) == //
+    BOOST_TEST(to_string(e) == //
                "{\"status\":404"
                ",\"reason\":\"Not Found\""
                ",\"detail\":\"this is a test\""

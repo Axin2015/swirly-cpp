@@ -51,7 +51,7 @@ class IdSet {
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
     using CompareOption = boost::intrusive::compare<ValueCompare>;
     using MemberHookOption
-        = boost::intrusive::member_hook<ValueT, decltype(ValueT::idHook), &ValueT::idHook>;
+        = boost::intrusive::member_hook<ValueT, decltype(ValueT::id_hook), &ValueT::id_hook>;
     using Set
         = boost::intrusive::set<ValueT, ConstantTimeSizeOption, CompareOption, MemberHookOption>;
     using ValuePtr = boost::intrusive_ptr<ValueT>;
@@ -87,13 +87,13 @@ class IdSet {
     // Find.
     ConstIterator find(Id id) const noexcept { return set_.find(id, KeyValueCompare()); }
     Iterator find(Id id) noexcept { return set_.find(id, KeyValueCompare()); }
-    std::pair<ConstIterator, bool> findHint(Id id) const noexcept
+    std::pair<ConstIterator, bool> find_hint(Id id) const noexcept
     {
         const auto comp = KeyValueCompare();
         auto it = set_.lower_bound(id, comp);
         return std::make_pair(it, it != set_.end() && !comp(id, *it));
     }
-    std::pair<Iterator, bool> findHint(Id id) noexcept
+    std::pair<Iterator, bool> find_hint(Id id) noexcept
     {
         const auto comp = KeyValueCompare();
         auto it = set_.lower_bound(id, comp);
@@ -106,18 +106,18 @@ class IdSet {
         std::tie(it, inserted) = set_.insert(*value);
         if (inserted) {
             // Take ownership if inserted.
-            value->addRef();
+            value->add_ref();
         }
         return it;
     }
-    Iterator insertHint(ConstIterator hint, const ValuePtr& value) noexcept
+    Iterator insert_hint(ConstIterator hint, const ValuePtr& value) noexcept
     {
         auto it = set_.insert(hint, *value);
         // Take ownership.
-        value->addRef();
+        value->add_ref();
         return it;
     }
-    Iterator insertOrReplace(const ValuePtr& value) noexcept
+    Iterator insert_or_replace(const ValuePtr& value) noexcept
     {
         Iterator it;
         bool inserted;
@@ -129,23 +129,23 @@ class IdSet {
             it = Set::s_iterator_to(*value);
         }
         // Take ownership.
-        value->addRef();
+        value->add_ref();
         return it;
     }
     template <typename... ArgsT>
     Iterator emplace(ArgsT&&... args)
     {
-        return insert(makeIntrusive<ValueT>(std::forward<ArgsT>(args)...));
+        return insert(make_intrusive<ValueT>(std::forward<ArgsT>(args)...));
     }
     template <typename... ArgsT>
-    Iterator emplaceHint(ConstIterator hint, ArgsT&&... args)
+    Iterator emplace_hint(ConstIterator hint, ArgsT&&... args)
     {
-        return insertHint(hint, makeIntrusive<ValueT>(std::forward<ArgsT>(args)...));
+        return insert_hint(hint, make_intrusive<ValueT>(std::forward<ArgsT>(args)...));
     }
     template <typename... ArgsT>
-    Iterator emplaceOrReplace(ArgsT&&... args)
+    Iterator emplace_or_replace(ArgsT&&... args)
     {
-        return insertOrReplace(makeIntrusive<ValueT>(std::forward<ArgsT>(args)...));
+        return insert_or_replace(make_intrusive<ValueT>(std::forward<ArgsT>(args)...));
     }
     ValuePtr remove(const ValueT& ref) noexcept
     {
@@ -175,8 +175,8 @@ class SymbolSet {
     };
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
     using CompareOption = boost::intrusive::compare<ValueCompare>;
-    using MemberHookOption
-        = boost::intrusive::member_hook<ValueT, decltype(ValueT::symbolHook), &ValueT::symbolHook>;
+    using MemberHookOption = boost::intrusive::member_hook<ValueT, decltype(ValueT::symbol_hook),
+                                                           &ValueT::symbol_hook>;
     using Set
         = boost::intrusive::set<ValueT, ConstantTimeSizeOption, CompareOption, MemberHookOption>;
     using ValuePtr = std::unique_ptr<ValueT>;
@@ -215,13 +215,13 @@ class SymbolSet {
         return set_.find(symbol, KeyValueCompare());
     }
     Iterator find(Symbol symbol) noexcept { return set_.find(symbol, KeyValueCompare()); }
-    std::pair<ConstIterator, bool> findHint(Symbol symbol) const noexcept
+    std::pair<ConstIterator, bool> find_hint(Symbol symbol) const noexcept
     {
         const auto comp = KeyValueCompare();
         auto it = set_.lower_bound(symbol, comp);
         return std::make_pair(it, it != set_.end() && !comp(symbol, *it));
     }
-    std::pair<Iterator, bool> findHint(Symbol symbol) noexcept
+    std::pair<Iterator, bool> find_hint(Symbol symbol) noexcept
     {
         const auto comp = KeyValueCompare();
         auto it = set_.lower_bound(symbol, comp);
@@ -238,14 +238,14 @@ class SymbolSet {
         }
         return it;
     }
-    Iterator insertHint(ConstIterator hint, ValuePtr value) noexcept
+    Iterator insert_hint(ConstIterator hint, ValuePtr value) noexcept
     {
         auto it = set_.insert(hint, *value);
         // Take ownership.
         value.release();
         return it;
     }
-    Iterator insertOrReplace(ValuePtr value) noexcept
+    Iterator insert_or_replace(ValuePtr value) noexcept
     {
         Iterator it;
         bool inserted;
@@ -266,14 +266,14 @@ class SymbolSet {
         return insert(std::make_unique<ValueT>(std::forward<ArgsT>(args)...));
     }
     template <typename... ArgsT>
-    Iterator emplaceHint(ConstIterator hint, ArgsT&&... args)
+    Iterator emplace_hint(ConstIterator hint, ArgsT&&... args)
     {
-        return insertHint(hint, std::make_unique<ValueT>(std::forward<ArgsT>(args)...));
+        return insert_hint(hint, std::make_unique<ValueT>(std::forward<ArgsT>(args)...));
     }
     template <typename... ArgsT>
-    Iterator emplaceOrReplace(ArgsT&&... args)
+    Iterator emplace_or_replace(ArgsT&&... args)
     {
-        return insertOrReplace(std::make_unique<ValueT>(std::forward<ArgsT>(args)...));
+        return insert_or_replace(std::make_unique<ValueT>(std::forward<ArgsT>(args)...));
     }
 
   private:

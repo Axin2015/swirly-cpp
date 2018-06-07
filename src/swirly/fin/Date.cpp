@@ -29,8 +29,8 @@ namespace swirly {
 inline namespace fin {
 using namespace std;
 
-BusinessDay::BusinessDay(const char* timeZone)
-: timeZone_{new lt::posix_time_zone{timeZone}}
+BusinessDay::BusinessDay(const char* time_zone)
+: time_zone_{new lt::posix_time_zone{time_zone}}
 {
 }
 
@@ -53,7 +53,7 @@ JDay BusinessDay::operator()(Time time) const
     if (cache_[i].first == t) {
         return cache_[i].second;
     }
-    lt::local_date_time ldt{pt::from_time_t(t), timeZone_};
+    lt::local_date_time ldt{pt::from_time_t(t), time_zone_};
     const auto jd = JDay{ldt.local_time().date().julian_day()};
     // Update cache entry.
     cache_[i] = {t, jd};

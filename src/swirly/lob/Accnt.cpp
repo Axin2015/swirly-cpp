@@ -26,13 +26,13 @@ Accnt::~Accnt() = default;
 
 Accnt::Accnt(Accnt&&) = default;
 
-PosnPtr Accnt::posn(Id64 marketId, Symbol instr, JDay settlDay)
+PosnPtr Accnt::posn(Id64 market_id, Symbol instr, JDay settl_day)
 {
     PosnSet::Iterator it;
     bool found;
-    tie(it, found) = posns_.findHint(marketId);
+    tie(it, found) = posns_.find_hint(market_id);
     if (!found) {
-        it = posns_.insertHint(it, Posn::make(symbol_, marketId, instr, settlDay));
+        it = posns_.insert_hint(it, Posn::make(symbol_, market_id, instr, settl_day));
     }
     return &*it;
 }

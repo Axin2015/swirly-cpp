@@ -24,7 +24,7 @@
 namespace swirly {
 inline namespace fix {
 
-SWIRLY_API std::pair<std::string_view, bool> findTag(std::string_view msg, int tag) noexcept;
+SWIRLY_API std::pair<std::string_view, bool> find_tag(std::string_view msg, int tag) noexcept;
 
 class SWIRLY_API FixTokeniser {
   public:
@@ -42,7 +42,7 @@ class SWIRLY_API FixTokeniser {
     FixTokeniser& operator=(FixTokeniser&&) = delete;
 
     bool empty() const noexcept { return it_ == msg_.cend(); }
-    std::pair<std::string_view, bool> find(int tag) const noexcept { return findTag(msg_, tag); }
+    std::pair<std::string_view, bool> find(int tag) const noexcept { return find_tag(msg_, tag); }
     FixPair next() { return {tag(), value()}; }
 
   private:

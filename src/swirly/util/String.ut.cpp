@@ -33,9 +33,9 @@ BOOST_AUTO_TEST_SUITE(StringSuite)
 
 BOOST_AUTO_TEST_CASE(ToStringCase)
 {
-    BOOST_TEST(toString("foo"sv) == "foo"s);
-    BOOST_TEST(stoi(toString(12345)) == 12345);
-    BOOST_TEST(stod(toString(12345.67)) == 12345.67);
+    BOOST_TEST(to_string("foo"sv) == "foo"s);
+    BOOST_TEST(stoi(to_string(12345)) == 12345);
+    BOOST_TEST(stod(to_string(12345.67)) == 12345.67);
 }
 
 BOOST_AUTO_TEST_CASE(Stoi32NoSignCase)
@@ -143,62 +143,62 @@ BOOST_AUTO_TEST_CASE(StobCase)
 
 BOOST_AUTO_TEST_CASE(LtrimCopyCase)
 {
-    BOOST_TEST(ltrimCopy(""sv) == ""sv);
-    BOOST_TEST(ltrimCopy(" \t\n\v\f\r"sv) == ""sv);
-    BOOST_TEST(ltrimCopy(" \t\n\v\f\rfoo "sv) == "foo "sv);
-    BOOST_TEST(ltrimCopy("foo"sv) == "foo"sv);
+    BOOST_TEST(ltrim_copy(""sv) == ""sv);
+    BOOST_TEST(ltrim_copy(" \t\n\v\f\r"sv) == ""sv);
+    BOOST_TEST(ltrim_copy(" \t\n\v\f\rfoo "sv) == "foo "sv);
+    BOOST_TEST(ltrim_copy("foo"sv) == "foo"sv);
 
-    BOOST_TEST(ltrimCopy(""s) == ""s);
-    BOOST_TEST(ltrimCopy(" \t\n\v\f\r"s) == ""s);
-    BOOST_TEST(ltrimCopy(" \t\n\v\f\rfoo "s) == "foo "s);
-    BOOST_TEST(ltrimCopy("foo"s) == "foo"s);
+    BOOST_TEST(ltrim_copy(""s) == ""s);
+    BOOST_TEST(ltrim_copy(" \t\n\v\f\r"s) == ""s);
+    BOOST_TEST(ltrim_copy(" \t\n\v\f\rfoo "s) == "foo "s);
+    BOOST_TEST(ltrim_copy("foo"s) == "foo"s);
 }
 
 BOOST_AUTO_TEST_CASE(RtrimCopyCase)
 {
-    BOOST_TEST(rtrimCopy(""sv) == ""sv);
-    BOOST_TEST(rtrimCopy(" \t\n\v\f\r"sv) == ""sv);
-    BOOST_TEST(rtrimCopy(" foo \t\n\v\f\r"sv) == " foo"sv);
-    BOOST_TEST(rtrimCopy("foo"sv) == "foo"sv);
+    BOOST_TEST(rtrim_copy(""sv) == ""sv);
+    BOOST_TEST(rtrim_copy(" \t\n\v\f\r"sv) == ""sv);
+    BOOST_TEST(rtrim_copy(" foo \t\n\v\f\r"sv) == " foo"sv);
+    BOOST_TEST(rtrim_copy("foo"sv) == "foo"sv);
 
-    BOOST_TEST(rtrimCopy(""s) == ""s);
-    BOOST_TEST(rtrimCopy(" \t\n\v\f\r"s) == ""s);
-    BOOST_TEST(rtrimCopy(" foo \t\n\v\f\r"s) == " foo"s);
-    BOOST_TEST(rtrimCopy("foo"s) == "foo"s);
+    BOOST_TEST(rtrim_copy(""s) == ""s);
+    BOOST_TEST(rtrim_copy(" \t\n\v\f\r"s) == ""s);
+    BOOST_TEST(rtrim_copy(" foo \t\n\v\f\r"s) == " foo"s);
+    BOOST_TEST(rtrim_copy("foo"s) == "foo"s);
 }
 
 BOOST_AUTO_TEST_CASE(TrimCopyCase)
 {
-    BOOST_TEST(trimCopy(""sv) == ""sv);
-    BOOST_TEST(trimCopy(" \t\n\v\f\r"sv) == ""sv);
-    BOOST_TEST(trimCopy(" \t\n\v\f\rfoo \t\n\v\f\r"sv) == "foo"sv);
-    BOOST_TEST(trimCopy("foo"sv) == "foo"sv);
+    BOOST_TEST(trim_copy(""sv) == ""sv);
+    BOOST_TEST(trim_copy(" \t\n\v\f\r"sv) == ""sv);
+    BOOST_TEST(trim_copy(" \t\n\v\f\rfoo \t\n\v\f\r"sv) == "foo"sv);
+    BOOST_TEST(trim_copy("foo"sv) == "foo"sv);
 
-    BOOST_TEST(trimCopy(""s) == ""s);
-    BOOST_TEST(trimCopy(" \t\n\v\f\r"s) == ""s);
-    BOOST_TEST(trimCopy(" \t\n\v\f\rfoo \t\n\v\f\r"s) == "foo"s);
-    BOOST_TEST(trimCopy("foo"s) == "foo"s);
+    BOOST_TEST(trim_copy(""s) == ""s);
+    BOOST_TEST(trim_copy(" \t\n\v\f\r"s) == ""s);
+    BOOST_TEST(trim_copy(" \t\n\v\f\rfoo \t\n\v\f\r"s) == "foo"s);
+    BOOST_TEST(trim_copy("foo"s) == "foo"s);
 }
 
 BOOST_AUTO_TEST_CASE(SplitPairCase)
 {
-    BOOST_TEST(splitPair(""sv, '=') == make_pair(""sv, ""sv));
-    BOOST_TEST(splitPair("="sv, '=') == make_pair(""sv, ""sv));
-    BOOST_TEST(splitPair("a"sv, '=') == make_pair("a"sv, ""sv));
-    BOOST_TEST(splitPair("a="sv, '=') == make_pair("a"sv, ""sv));
-    BOOST_TEST(splitPair("=b"sv, '=') == make_pair(""sv, "b"sv));
-    BOOST_TEST(splitPair("a=b"sv, '=') == make_pair("a"sv, "b"sv));
-    BOOST_TEST(splitPair("a:b"sv, ':') == make_pair("a"sv, "b"sv));
-    BOOST_TEST(splitPair(" a = b "sv, '=') == make_pair(" a "sv, " b "sv));
+    BOOST_TEST(split_pair(""sv, '=') == make_pair(""sv, ""sv));
+    BOOST_TEST(split_pair("="sv, '=') == make_pair(""sv, ""sv));
+    BOOST_TEST(split_pair("a"sv, '=') == make_pair("a"sv, ""sv));
+    BOOST_TEST(split_pair("a="sv, '=') == make_pair("a"sv, ""sv));
+    BOOST_TEST(split_pair("=b"sv, '=') == make_pair(""sv, "b"sv));
+    BOOST_TEST(split_pair("a=b"sv, '=') == make_pair("a"sv, "b"sv));
+    BOOST_TEST(split_pair("a:b"sv, ':') == make_pair("a"sv, "b"sv));
+    BOOST_TEST(split_pair(" a = b "sv, '=') == make_pair(" a "sv, " b "sv));
 
-    BOOST_TEST(splitPair(""s, '=') == make_pair(""s, ""s));
-    BOOST_TEST(splitPair("="s, '=') == make_pair(""s, ""s));
-    BOOST_TEST(splitPair("a"s, '=') == make_pair("a"s, ""s));
-    BOOST_TEST(splitPair("a="s, '=') == make_pair("a"s, ""s));
-    BOOST_TEST(splitPair("=b"s, '=') == make_pair(""s, "b"s));
-    BOOST_TEST(splitPair("a=b"s, '=') == make_pair("a"s, "b"s));
-    BOOST_TEST(splitPair("a:b"s, ':') == make_pair("a"s, "b"s));
-    BOOST_TEST(splitPair(" a = b "s, '=') == make_pair(" a "s, " b "s));
+    BOOST_TEST(split_pair(""s, '=') == make_pair(""s, ""s));
+    BOOST_TEST(split_pair("="s, '=') == make_pair(""s, ""s));
+    BOOST_TEST(split_pair("a"s, '=') == make_pair("a"s, ""s));
+    BOOST_TEST(split_pair("a="s, '=') == make_pair("a"s, ""s));
+    BOOST_TEST(split_pair("=b"s, '=') == make_pair(""s, "b"s));
+    BOOST_TEST(split_pair("a=b"s, '=') == make_pair("a"s, "b"s));
+    BOOST_TEST(split_pair("a:b"s, ':') == make_pair("a"s, "b"s));
+    BOOST_TEST(split_pair(" a = b "s, '=') == make_pair(" a "s, " b "s));
 }
 
 BOOST_AUTO_TEST_CASE(PstrlenCase)

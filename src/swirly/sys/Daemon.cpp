@@ -23,7 +23,7 @@ namespace swirly {
 inline namespace sys {
 using namespace std;
 
-void closeAll() noexcept
+void close_all() noexcept
 {
     const int fds{getdtablesize()};
     for (int fd{STDERR_FILENO + 1}; fd < fds; ++fd) {

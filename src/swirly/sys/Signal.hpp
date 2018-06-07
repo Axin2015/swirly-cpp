@@ -40,13 +40,13 @@ class SWIRLY_API SigWait {
     int operator()() const;
 
   private:
-    sigset_t newMask_, oldMask_;
+    sigset_t new_mask_, old_mask_;
 };
 
 /**
  * Block all signals.
  */
-SWIRLY_API void sigBlockAll();
+SWIRLY_API void sig_block_all();
 
 } // namespace sys
 } // namespace swirly

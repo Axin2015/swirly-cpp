@@ -38,13 +38,13 @@ ostream& operator<<(ostream& os, const Foo<int, int>& val)
     return os << '(' << val.first << ',' << val.second << ')';
 }
 
-int lastLevel{};
-string lastMsg{};
+int last_level{};
+string last_msg{};
 
-void testLogger(int level, string_view msg)
+void test_logger(int level, string_view msg)
 {
-    lastLevel = level;
-    lastMsg.assign(msg.data(), msg.size());
+    last_level = level;
+    last_msg.assign(msg.data(), msg.size());
 }
 
 } // namespace
@@ -53,55 +53,55 @@ BOOST_AUTO_TEST_SUITE(LogSuite)
 
 BOOST_AUTO_TEST_CASE(LogLabelCase)
 {
-    BOOST_TEST(strcmp(logLabel(-1), "CRIT") == 0);
-    BOOST_TEST(strcmp(logLabel(Log::Crit), "CRIT") == 0);
-    BOOST_TEST(strcmp(logLabel(Log::Error), "ERROR") == 0);
-    BOOST_TEST(strcmp(logLabel(Log::Warning), "WARNING") == 0);
-    BOOST_TEST(strcmp(logLabel(Log::Notice), "NOTICE") == 0);
-    BOOST_TEST(strcmp(logLabel(Log::Info), "INFO") == 0);
-    BOOST_TEST(strcmp(logLabel(Log::Debug), "DEBUG") == 0);
-    BOOST_TEST(strcmp(logLabel(99), "DEBUG") == 0);
+    BOOST_TEST(strcmp(log_label(-1), "CRIT") == 0);
+    BOOST_TEST(strcmp(log_label(Log::Crit), "CRIT") == 0);
+    BOOST_TEST(strcmp(log_label(Log::Error), "ERROR") == 0);
+    BOOST_TEST(strcmp(log_label(Log::Warning), "WARNING") == 0);
+    BOOST_TEST(strcmp(log_label(Log::Notice), "NOTICE") == 0);
+    BOOST_TEST(strcmp(log_label(Log::Info), "INFO") == 0);
+    BOOST_TEST(strcmp(log_label(Log::Debug), "DEBUG") == 0);
+    BOOST_TEST(strcmp(log_label(99), "DEBUG") == 0);
 }
 
 BOOST_AUTO_TEST_CASE(LogMacroCase)
 {
-    auto prevLevel = setLogLevel(Log::Info);
-    auto prevLogger = setLogger(testLogger);
+    auto prev_level = set_log_level(Log::Info);
+    auto prev_logger = set_logger(test_logger);
     // clang-format off
-    const auto finally = makeFinally([prevLevel, prevLogger]() noexcept {
-        setLogLevel(prevLevel);
-        setLogger(prevLogger);
+    const auto finally = make_finally([prev_level, prev_logger]() noexcept {
+        set_log_level(prev_level);
+        set_logger(prev_logger);
     });
     // clang-format on
 
     SWIRLY_LOG(Log::Info) << "test1: "sv << Foo<int, int>{10, 20};
-    BOOST_TEST(lastLevel == Log::Info);
-    BOOST_TEST(lastMsg == "test1: (10,20)");
+    BOOST_TEST(last_level == Log::Info);
+    BOOST_TEST(last_msg == "test1: (10,20)");
 
     SWIRLY_CRIT << "test2: "sv << Foo<int, int>{10, 20};
-    BOOST_TEST(lastLevel == Log::Crit);
-    BOOST_TEST(lastMsg == "test2: (10,20)");
+    BOOST_TEST(last_level == Log::Crit);
+    BOOST_TEST(last_msg == "test2: (10,20)");
 
     SWIRLY_ERROR << "test3: "sv << Foo<int, int>{10, 20};
-    BOOST_TEST(lastLevel == Log::Error);
-    BOOST_TEST(lastMsg == "test3: (10,20)");
+    BOOST_TEST(last_level == Log::Error);
+    BOOST_TEST(last_msg == "test3: (10,20)");
 
     SWIRLY_WARNING << "test4: "sv << Foo<int, int>{10, 20};
-    BOOST_TEST(lastLevel == Log::Warning);
-    BOOST_TEST(lastMsg == "test4: (10,20)");
+    BOOST_TEST(last_level == Log::Warning);
+    BOOST_TEST(last_msg == "test4: (10,20)");
 
     SWIRLY_NOTICE << "test5: "sv << Foo<int, int>{10, 20};
-    BOOST_TEST(lastLevel == Log::Notice);
-    BOOST_TEST(lastMsg == "test5: (10,20)");
+    BOOST_TEST(last_level == Log::Notice);
+    BOOST_TEST(last_msg == "test5: (10,20)");
 
     SWIRLY_INFO << "test6: "sv << Foo<int, int>{10, 20};
-    BOOST_TEST(lastLevel == Log::Info);
-    BOOST_TEST(lastMsg == "test6: (10,20)");
+    BOOST_TEST(last_level == Log::Info);
+    BOOST_TEST(last_msg == "test6: (10,20)");
 
     // This should not be logged.
     SWIRLY_DEBUG << "test7: "sv << Foo<int, int>{10, 20};
-    BOOST_TEST(lastLevel == Log::Info);
-    BOOST_TEST(lastMsg == "test6: (10,20)");
+    BOOST_TEST(last_level == Log::Info);
+    BOOST_TEST(last_msg == "test6: (10,20)");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -29,9 +29,9 @@ inline namespace fin {
  */
 class SWIRLY_API Instr : public Comparable<Instr> {
   public:
-    Instr(Id32 id, Symbol symbol, std::string_view display, Symbol baseAsset, Symbol termCcy,
-          int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
-          Lots maxLots) noexcept;
+    Instr(Id32 id, Symbol symbol, std::string_view display, Symbol base_asset, Symbol term_ccy,
+          int lot_numer, int lot_denom, int tick_numer, int tick_denom, int pip_dp, Lots min_lots,
+          Lots max_lots) noexcept;
 
     ~Instr();
 
@@ -49,54 +49,54 @@ class SWIRLY_API Instr : public Comparable<Instr> {
         return std::make_unique<Instr>(std::forward<ArgsT>(args)...);
     }
 
-    void toDsv(std::ostream& os, char delim = ',') const;
-    void toJson(std::ostream& os) const;
+    void to_dsv(std::ostream& os, char delim = ',') const;
+    void to_json(std::ostream& os) const;
 
     int compare(const Instr& rhs) const noexcept { return symbol_.compare(rhs.symbol_); }
     auto id() const noexcept { return id_; }
     auto symbol() const noexcept { return symbol_; }
     auto display() const noexcept { return +display_; }
-    auto baseAsset() const noexcept { return baseAsset_; }
-    auto termCcy() const noexcept { return termCcy_; }
-    auto lotNumer() const noexcept { return lotNumer_; }
-    auto lotDenom() const noexcept { return lotDenom_; }
-    auto qtyInc() const noexcept { return qtyInc_; }
-    auto tickNumer() const noexcept { return tickNumer_; }
-    auto tickDenom() const noexcept { return tickDenom_; }
-    auto priceInc() const noexcept { return priceInc_; }
-    auto pipDp() const noexcept { return pipDp_; }
-    auto qtyDp() const noexcept { return qtyDp_; }
-    auto priceDp() const noexcept { return priceDp_; }
-    auto minLots() const noexcept { return minLots_; }
-    auto maxLots() const noexcept { return maxLots_; }
-    boost::intrusive::set_member_hook<> symbolHook;
+    auto base_asset() const noexcept { return base_asset_; }
+    auto term_ccy() const noexcept { return term_ccy_; }
+    auto lot_numer() const noexcept { return lot_numer_; }
+    auto lot_denom() const noexcept { return lot_denom_; }
+    auto qty_inc() const noexcept { return qty_inc_; }
+    auto tick_numer() const noexcept { return tick_numer_; }
+    auto tick_denom() const noexcept { return tick_denom_; }
+    auto price_inc() const noexcept { return price_inc_; }
+    auto pip_dp() const noexcept { return pip_dp_; }
+    auto qty_dp() const noexcept { return qty_dp_; }
+    auto price_dp() const noexcept { return price_dp_; }
+    auto min_lots() const noexcept { return min_lots_; }
+    auto max_lots() const noexcept { return max_lots_; }
+    boost::intrusive::set_member_hook<> symbol_hook;
 
   private:
     const Id32 id_;
     const Symbol symbol_;
     const Display display_;
-    const Symbol baseAsset_;
-    const Symbol termCcy_;
-    const int lotNumer_;
-    const int lotDenom_;
+    const Symbol base_asset_;
+    const Symbol term_ccy_;
+    const int lot_numer_;
+    const int lot_denom_;
     // Transient.
-    const double qtyInc_;
-    const int tickNumer_;
-    const int tickDenom_;
+    const double qty_inc_;
+    const int tick_numer_;
+    const int tick_denom_;
     // Transient.
-    const double priceInc_;
-    const int pipDp_;
+    const double price_inc_;
+    const int pip_dp_;
     // Transient.
-    const int qtyDp_;
+    const int qty_dp_;
     // Transient.
-    const int priceDp_;
-    const Lots minLots_;
-    const Lots maxLots_;
+    const int price_dp_;
+    const Lots min_lots_;
+    const Lots max_lots_;
 };
 
 inline std::ostream& operator<<(std::ostream& os, const Instr& instr)
 {
-    instr.toJson(os);
+    instr.to_json(os);
     return os;
 }
 

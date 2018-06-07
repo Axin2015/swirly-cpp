@@ -22,7 +22,7 @@ namespace swirly {
 inline namespace util {
 using namespace std;
 
-string getEnv(const string& name)
+string get_env(const string& name)
 {
     const char* const val{getenv(name.c_str())};
     return val ? string{val} : string{};

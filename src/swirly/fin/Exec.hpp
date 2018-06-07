@@ -35,24 +35,25 @@ class SWIRLY_API Exec
 , public Request
 , public MemAlloc {
   public:
-    Exec(Symbol accnt, Id64 marketId, Symbol instr, JDay settlDay, Id64 id, Id64 orderId,
-         std::string_view ref, State state, Side side, Lots lots, Ticks ticks, Lots resdLots,
-         Lots execLots, Cost execCost, Lots lastLots, Ticks lastTicks, Lots minLots, Id64 matchId,
-         Lots posnLots, Cost posnCost, LiqInd liqInd, Symbol cpty, Time created) noexcept
-    : Request{accnt, marketId, instr, settlDay, id, ref, side, lots, created}
-    , orderId_{orderId}
+    Exec(Symbol accnt, Id64 market_id, Symbol instr, JDay settl_day, Id64 id, Id64 order_id,
+         std::string_view ref, State state, Side side, Lots lots, Ticks ticks, Lots resd_lots,
+         Lots exec_lots, Cost exec_cost, Lots last_lots, Ticks last_ticks, Lots min_lots,
+         Id64 match_id, Lots posn_lots, Cost posn_cost, LiqInd liq_ind, Symbol cpty,
+         Time created) noexcept
+    : Request{accnt, market_id, instr, settl_day, id, ref, side, lots, created}
+    , order_id_{order_id}
     , state_{state}
     , ticks_{ticks}
-    , resdLots_{resdLots}
-    , execLots_{execLots}
-    , execCost_{execCost}
-    , lastLots_{lastLots}
-    , lastTicks_{lastTicks}
-    , minLots_{minLots}
-    , matchId_{matchId}
-    , posnLots_{posnLots}
-    , posnCost_{posnCost}
-    , liqInd_{liqInd}
+    , resd_lots_{resd_lots}
+    , exec_lots_{exec_lots}
+    , exec_cost_{exec_cost}
+    , last_lots_{last_lots}
+    , last_ticks_{last_ticks}
+    , min_lots_{min_lots}
+    , match_id_{match_id}
+    , posn_lots_{posn_lots}
+    , posn_cost_{posn_cost}
+    , liq_ind_{liq_ind}
     , cpty_{cpty}
     {
     }
@@ -69,26 +70,26 @@ class SWIRLY_API Exec
     template <typename... ArgsT>
     static ExecPtr make(ArgsT&&... args)
     {
-        return makeIntrusive<Exec>(std::forward<ArgsT>(args)...);
+        return make_intrusive<Exec>(std::forward<ArgsT>(args)...);
     }
     ExecPtr opposite(Id64 id) const;
 
-    void toDsv(std::ostream& os, char delim = ',') const;
-    void toJson(std::ostream& os) const;
+    void to_dsv(std::ostream& os, char delim = ',') const;
+    void to_json(std::ostream& os) const;
 
-    auto orderId() const noexcept { return orderId_; }
+    auto order_id() const noexcept { return order_id_; }
     auto state() const noexcept { return state_; }
     auto ticks() const noexcept { return ticks_; }
-    auto resdLots() const noexcept { return resdLots_; }
-    auto execLots() const noexcept { return execLots_; }
-    auto execCost() const noexcept { return execCost_; }
-    auto lastLots() const noexcept { return lastLots_; }
-    auto lastTicks() const noexcept { return lastTicks_; }
-    auto minLots() const noexcept { return minLots_; }
-    auto matchId() const noexcept { return matchId_; }
-    auto posnLots() const noexcept { return posnLots_; }
-    auto posnCost() const noexcept { return posnCost_; }
-    auto liqInd() const noexcept { return liqInd_; }
+    auto resd_lots() const noexcept { return resd_lots_; }
+    auto exec_lots() const noexcept { return exec_lots_; }
+    auto exec_cost() const noexcept { return exec_cost_; }
+    auto last_lots() const noexcept { return last_lots_; }
+    auto last_ticks() const noexcept { return last_ticks_; }
+    auto min_lots() const noexcept { return min_lots_; }
+    auto match_id() const noexcept { return match_id_; }
+    auto posn_lots() const noexcept { return posn_lots_; }
+    auto posn_cost() const noexcept { return posn_cost_; }
+    auto liq_ind() const noexcept { return liq_ind_; }
     auto cpty() const noexcept { return cpty_; }
 
     void revise(Lots lots) noexcept
@@ -97,52 +98,53 @@ class SWIRLY_API Exec
         const auto delta = lots_ - lots;
         assert(delta >= 0_lts);
         lots_ = lots;
-        resdLots_ -= delta;
+        resd_lots_ -= delta;
     }
     void cancel() noexcept
     {
         state_ = State::Cancel;
-        resdLots_ = 0_lts;
+        resd_lots_ = 0_lts;
     }
-    void posn(Lots posnLots, Cost posnCost) noexcept
+    void posn(Lots posn_lots, Cost posn_cost) noexcept
     {
-        posnLots_ = posnLots;
-        posnCost_ = posnCost;
+        posn_lots_ = posn_lots;
+        posn_cost_ = posn_cost;
     }
-    void trade(Lots sumLots, Cost sumCost, Lots lastLots, Ticks lastTicks, Id64 matchId,
-               LiqInd liqInd, Symbol cpty) noexcept;
+    void trade(Lots sum_lots, Cost sum_cost, Lots last_lots, Ticks last_ticks, Id64 match_id,
+               LiqInd liq_ind, Symbol cpty) noexcept;
 
-    void trade(Lots lastLots, Ticks lastTicks, Id64 matchId, LiqInd liqInd, Symbol cpty) noexcept
+    void trade(Lots last_lots, Ticks last_ticks, Id64 match_id, LiqInd liq_ind,
+               Symbol cpty) noexcept
     {
-        trade(lastLots, swirly::cost(lastLots, lastTicks), lastLots, lastTicks, matchId, liqInd,
-              cpty);
+        trade(last_lots, swirly::cost(last_lots, last_ticks), last_lots, last_ticks, match_id,
+              liq_ind, cpty);
     }
 
-    boost::intrusive::set_member_hook<> idHook;
+    boost::intrusive::set_member_hook<> id_hook;
 
   private:
-    const Id64 orderId_;
+    const Id64 order_id_;
     State state_;
     const Ticks ticks_;
     /**
      * Must be greater than zero.
      */
-    Lots resdLots_;
+    Lots resd_lots_;
     /**
      * Must not be greater that lots.
      */
-    Lots execLots_;
-    Cost execCost_;
-    Lots lastLots_;
-    Ticks lastTicks_;
+    Lots exec_lots_;
+    Cost exec_cost_;
+    Lots last_lots_;
+    Ticks last_ticks_;
     /**
      * Minimum to be filled by this order.
      */
-    const Lots minLots_;
-    Id64 matchId_;
-    Lots posnLots_;
-    Cost posnCost_;
-    LiqInd liqInd_;
+    const Lots min_lots_;
+    Id64 match_id_;
+    Lots posn_lots_;
+    Cost posn_cost_;
+    LiqInd liq_ind_;
     Symbol cpty_;
 };
 
@@ -150,7 +152,7 @@ static_assert(sizeof(Exec) <= 5 * 64, "no greater than specified cache-lines");
 
 inline std::ostream& operator<<(std::ostream& os, const Exec& exec)
 {
-    exec.toJson(os);
+    exec.to_json(os);
     return os;
 }
 

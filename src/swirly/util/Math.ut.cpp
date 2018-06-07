@@ -27,23 +27,23 @@ BOOST_AUTO_TEST_SUITE(MathSuite)
 
 BOOST_AUTO_TEST_CASE(NextPow2Case)
 {
-    BOOST_TEST(nextPow2(1U) == 1U);
-    BOOST_TEST(nextPow2(2U) == 2U);
-    BOOST_TEST(nextPow2(3U) == 4U);
-    BOOST_TEST(nextPow2(4U) == 4U);
-    BOOST_TEST(nextPow2(5U) == 8U);
-    BOOST_TEST(nextPow2(6U) == 8U);
-    BOOST_TEST(nextPow2(7U) == 8U);
-    BOOST_TEST(nextPow2(8U) == 8U);
+    BOOST_TEST(next_pow2(1U) == 1U);
+    BOOST_TEST(next_pow2(2U) == 2U);
+    BOOST_TEST(next_pow2(3U) == 4U);
+    BOOST_TEST(next_pow2(4U) == 4U);
+    BOOST_TEST(next_pow2(5U) == 8U);
+    BOOST_TEST(next_pow2(6U) == 8U);
+    BOOST_TEST(next_pow2(7U) == 8U);
+    BOOST_TEST(next_pow2(8U) == 8U);
 
-    BOOST_TEST(nextPow2(1UL) == 1UL);
-    BOOST_TEST(nextPow2(2UL) == 2UL);
-    BOOST_TEST(nextPow2(3UL) == 4UL);
-    BOOST_TEST(nextPow2(4UL) == 4UL);
-    BOOST_TEST(nextPow2(5UL) == 8UL);
-    BOOST_TEST(nextPow2(6UL) == 8UL);
-    BOOST_TEST(nextPow2(7UL) == 8UL);
-    BOOST_TEST(nextPow2(8UL) == 8UL);
+    BOOST_TEST(next_pow2(1UL) == 1UL);
+    BOOST_TEST(next_pow2(2UL) == 2UL);
+    BOOST_TEST(next_pow2(3UL) == 4UL);
+    BOOST_TEST(next_pow2(4UL) == 4UL);
+    BOOST_TEST(next_pow2(5UL) == 8UL);
+    BOOST_TEST(next_pow2(6UL) == 8UL);
+    BOOST_TEST(next_pow2(7UL) == 8UL);
+    BOOST_TEST(next_pow2(8UL) == 8UL);
 }
 
 BOOST_AUTO_TEST_CASE(VarAccumCase, *utf::tolerance(0.0000001))

@@ -28,7 +28,7 @@ using namespace swirly;
 namespace {
 
 struct TestHandler : RefCount<TestHandler, ThreadUnsafePolicy> {
-    void onInput(int fd, unsigned events, Time now)
+    void on_input(int fd, unsigned events, Time now)
     {
         char buf[4];
         os::recv(fd, buf, 4, 0);
@@ -48,10 +48,10 @@ BOOST_AUTO_TEST_CASE(EpollReactorLevelCase)
     using namespace literals::chrono_literals;
 
     EpollReactor r{1024};
-    auto h = makeIntrusive<TestHandler>();
+    auto h = make_intrusive<TestHandler>();
 
     auto socks = socketpair(LocalStream{});
-    const auto sub = r.subscribe(*socks.second, EventIn, bind<&TestHandler::onInput>(h.get()));
+    const auto sub = r.subscribe(*socks.second, EventIn, bind<&TestHandler::on_input>(h.get()));
 
     BOOST_TEST(r.poll(0ms) == 0);
     BOOST_TEST(h->matches == 0);
@@ -79,10 +79,10 @@ BOOST_AUTO_TEST_CASE(EpollReactorEdgeCase)
     using namespace literals::chrono_literals;
 
     EpollReactor r{1024};
-    auto h = makeIntrusive<TestHandler>();
+    auto h = make_intrusive<TestHandler>();
 
     auto socks = socketpair(LocalStream{});
-    auto sub = r.subscribe(*socks.second, EventIn | EventEt, bind<&TestHandler::onInput>(h.get()));
+    auto sub = r.subscribe(*socks.second, EventIn | EventEt, bind<&TestHandler::on_input>(h.get()));
 
     BOOST_TEST(r.poll(0ms) == 0);
     BOOST_TEST(h->matches == 0);
@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_CASE(EpollReactorEdgeCase)
     BOOST_TEST(h->matches == 1);
 
     // Revert to level-triggered.
-    sub.setEvents(EventIn);
+    sub.set_events(EventIn);
     BOOST_TEST(r.poll(0ms) == 1);
     BOOST_TEST(h->matches == 2);
 

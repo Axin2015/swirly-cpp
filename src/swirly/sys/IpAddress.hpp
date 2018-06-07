@@ -44,26 +44,26 @@ struct SWIRLY_API TransportTraits;
 
 template <>
 struct SWIRLY_API TransportTraits<Tcp> {
-    static TcpEndpoint parseEndpoint(const std::string& s, boost::system::error_code& ec);
-    static TcpEndpoint parseEndpoint(const std::string& s);
+    static TcpEndpoint parse_endpoint(const std::string& s, boost::system::error_code& ec);
+    static TcpEndpoint parse_endpoint(const std::string& s);
 };
 
 template <>
 struct SWIRLY_API TransportTraits<Udp> {
-    static UdpEndpoint parseEndpoint(const std::string& s, boost::system::error_code& ec);
-    static UdpEndpoint parseEndpoint(const std::string& s);
+    static UdpEndpoint parse_endpoint(const std::string& s, boost::system::error_code& ec);
+    static UdpEndpoint parse_endpoint(const std::string& s);
 };
 
 template <typename TransportT>
-BasicEndpoint<TransportT> parseEndpoint(const std::string& s, boost::system::error_code& ec)
+BasicEndpoint<TransportT> parse_endpoint(const std::string& s, boost::system::error_code& ec)
 {
-    return TransportTraits<TransportT>::parseEndpoint(s, ec);
+    return TransportTraits<TransportT>::parse_endpoint(s, ec);
 }
 
 template <typename TransportT>
-BasicEndpoint<TransportT> parseEndpoint(const std::string& s)
+BasicEndpoint<TransportT> parse_endpoint(const std::string& s)
 {
-    return TransportTraits<TransportT>::parseEndpoint(s);
+    return TransportTraits<TransportT>::parse_endpoint(s);
 }
 
 } // namespace sys

@@ -30,20 +30,20 @@ class OrderForm : public QWidget {
     Q_OBJECT
 
   public:
-    OrderForm(OrderModel& orderModel, QWidget* parent = nullptr,
+    OrderForm(OrderModel& order_model, QWidget* parent = nullptr,
               Qt::WindowFlags f = Qt::WindowFlags{});
     ~OrderForm() override;
 
   signals:
-    void cancelOrders(const OrderKeys& keys);
+    void cancel_orders(const OrderKeys& keys);
 
   private slots:
-    void slotSelectAllClicked();
-    void slotSelectNoneClicked();
-    void slotCancelOrdersClicked();
+    void slot_select_all_clicked();
+    void slot_select_none_clicked();
+    void slot_cancel_orders_clicked();
 
   private:
-    OrderModel& orderModel_;
+    OrderModel& order_model_;
 };
 
 } // namespace ui

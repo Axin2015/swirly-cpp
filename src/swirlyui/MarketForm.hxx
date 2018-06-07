@@ -37,31 +37,31 @@ class MarketForm : public QWidget {
     Q_OBJECT
 
   public:
-    MarketForm(InstrModel& instrModel, QWidget* parent = nullptr,
+    MarketForm(InstrModel& instr_model, QWidget* parent = nullptr,
                Qt::WindowFlags f = Qt::WindowFlags{});
     ~MarketForm() override;
 
-    void setFields(const QString& instrSymbol, QDate settlDate, std::optional<Lots> lots,
-                   std::optional<Ticks> ticks);
+    void set_fields(const QString& instr_symbol, QDate settl_date, std::optional<Lots> lots,
+                    std::optional<Ticks> ticks);
 
   signals:
-    void createMarket(const Instr& instr, QDate settlDate);
-    void createOrder(const Instr& instr, QDate settlDate, const QString& ref, Side side, Lots lots,
-                     Ticks ticks);
+    void create_market(const Instr& instr, QDate settl_date);
+    void create_order(const Instr& instr, QDate settl_date, const QString& ref, Side side,
+                      Lots lots, Ticks ticks);
 
   private slots:
-    void slotInstrChanged(int index);
-    void slotCreateClicked();
-    void slotBuyOrSellClicked(Side side);
+    void slot_instr_changed(int index);
+    void slot_create_clicked();
+    void slot_buy_or_sell_clicked(Side side);
 
   private:
-    InstrModel& instrModel_;
-    QComboBox* instrComboBox_{nullptr};
-    QDateEdit* settlDateEdit_{nullptr};
-    QLineEdit* lotsEdit_{nullptr};
-    QLineEdit* priceEdit_{nullptr};
-    QIntValidator lotsValidator_;
-    QDoubleValidator priceValidator_;
+    InstrModel& instr_model_;
+    QComboBox* instr_combo_box_{nullptr};
+    QDateEdit* settl_date_edit_{nullptr};
+    QLineEdit* lots_edit_{nullptr};
+    QLineEdit* price_edit_{nullptr};
+    QIntValidator lots_validator_;
+    QDoubleValidator price_validator_;
 };
 
 } // namespace ui

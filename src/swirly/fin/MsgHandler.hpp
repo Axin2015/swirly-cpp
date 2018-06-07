@@ -40,16 +40,16 @@ struct BasicMsgHandler {
         auto* const derived = static_cast<DerivedT*>(this);
         switch (msg.type) {
         case MsgType::CreateMarket:
-            derived->onCreateMarket(msg.createMarket);
+            derived->on_create_market(msg.create_market);
             break;
         case MsgType::UpdateMarket:
-            derived->onUpdateMarket(msg.updateMarket);
+            derived->on_update_market(msg.update_market);
             break;
         case MsgType::CreateExec:
-            derived->onCreateExec(msg.createExec);
+            derived->on_create_exec(msg.create_exec);
             break;
         case MsgType::ArchiveTrade:
-            derived->onArchiveTrade(msg.archiveTrade);
+            derived->on_archive_trade(msg.archive_trade);
             break;
         }
     }

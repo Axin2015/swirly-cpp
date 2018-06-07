@@ -39,17 +39,17 @@ namespace {
 
 const regex SymbolPattern{R"(^[0-9A-Za-z-._]{3,16}$)"};
 
-Ticks spread(const Order& takerOrder, const Order& makerOrder, Direct direct) noexcept
+Ticks spread(const Order& taker_order, const Order& maker_order, Direct direct) noexcept
 {
     return direct == Direct::Paid
         // Paid when the taker lifts the offer.
-        ? makerOrder.ticks() - takerOrder.ticks()
+        ? maker_order.ticks() - taker_order.ticks()
         // Given when the taker hits the bid.
-        : takerOrder.ticks() - makerOrder.ticks();
+        : taker_order.ticks() - maker_order.ticks();
 }
 
 template <typename ValueT>
-inline auto& constCast(const ValueT& ref)
+inline auto& remove_const(const ValueT& ref)
 {
     return const_cast<ValueT&>(ref);
 }
@@ -58,9 +58,9 @@ inline auto& constCast(const ValueT& ref)
 
 struct Serv::Impl {
 
-    Impl(MsgQueue& mq, size_t maxExecs)
+    Impl(MsgQueue& mq, size_t max_execs)
     : mq_(mq)
-    , maxExecs_{maxExecs}
+    , max_execs_{max_execs}
     {
         matches_.reserve(8);
         execs_.reserve(1 + 16);
@@ -68,36 +68,36 @@ struct Serv::Impl {
 
     void load(const Model& model, Time now)
     {
-        const auto busDay = busDay_(now);
-        model.readAsset([& assets = assets_](auto ptr) { assets.insert(move(ptr)); });
-        model.readInstr([& instrs = instrs_](auto ptr) { instrs.insert(move(ptr)); });
-        model.readMarket([& markets = markets_](MarketPtr ptr) { markets.insert(ptr); });
-        model.readOrder([this](auto ptr) {
+        const auto bus_day = bus_day_(now);
+        model.read_asset([& assets = assets_](auto ptr) { assets.insert(move(ptr)); });
+        model.read_instr([& instrs = instrs_](auto ptr) { instrs.insert(move(ptr)); });
+        model.read_market([& markets = markets_](MarketPtr ptr) { markets.insert(ptr); });
+        model.read_order([this](auto ptr) {
             auto& accnt = this->accnt(ptr->accnt());
-            accnt.insertOrder(ptr);
+            accnt.insert_order(ptr);
             bool success{false};
-            const auto finally = makeFinally([&]() noexcept {
+            const auto finally = make_finally([&]() noexcept {
                 if (!success) {
-                    accnt.removeOrder(*ptr);
+                    accnt.remove_order(*ptr);
                 }
             });
-            auto it = this->markets_.find(ptr->marketId());
+            auto it = this->markets_.find(ptr->market_id());
             assert(it != this->markets_.end());
-            it->insertOrder(ptr);
+            it->insert_order(ptr);
             success = true;
         });
         // One week ago.
-        model.readExec(now - 604800000ms, [this](auto ptr) {
+        model.read_exec(now - 604800000ms, [this](auto ptr) {
             auto& accnt = this->accnt(ptr->accnt());
-            accnt.pushExecBack(ptr);
+            accnt.push_exec_back(ptr);
         });
-        model.readTrade([this](auto ptr) {
+        model.read_trade([this](auto ptr) {
             auto& accnt = this->accnt(ptr->accnt());
-            accnt.insertTrade(ptr);
+            accnt.insert_trade(ptr);
         });
-        model.readPosn(busDay, [this](auto ptr) {
+        model.read_posn(bus_day, [this](auto ptr) {
             auto& accnt = this->accnt(ptr->accnt());
-            accnt.insertPosn(ptr);
+            accnt.insert_posn(ptr);
         });
     }
 
@@ -107,7 +107,7 @@ struct Serv::Impl {
     {
         auto it = instrs_.find(symbol);
         if (it == instrs_.end()) {
-            throw MarketNotFoundException{errMsg()
+            throw MarketNotFoundException{err_msg()
                                           << "instrument '"sv << symbol << "' does not exist"sv};
         }
         return *it;
@@ -119,9 +119,9 @@ struct Serv::Impl {
     {
         AccntSet::ConstIterator it;
         bool found;
-        tie(it, found) = accnts_.findHint(symbol);
+        tie(it, found) = accnts_.find_hint(symbol);
         if (!found) {
-            it = accnts_.insertHint(it, Accnt::make(symbol, maxExecs_));
+            it = accnts_.insert_hint(it, Accnt::make(symbol, max_execs_));
         }
         return *it;
     }
@@ -130,7 +130,7 @@ struct Serv::Impl {
     {
         auto it = markets_.find(id);
         if (it == markets_.end()) {
-            throw MarketNotFoundException{errMsg() << "market '"sv << id << "' does not exist"sv};
+            throw MarketNotFoundException{err_msg() << "market '"sv << id << "' does not exist"sv};
         }
         return *it;
     }
@@ -141,569 +141,575 @@ struct Serv::Impl {
     {
         AccntSet::Iterator it;
         bool found;
-        tie(it, found) = accnts_.findHint(symbol);
+        tie(it, found) = accnts_.find_hint(symbol);
         if (!found) {
-            it = accnts_.insertHint(it, Accnt::make(symbol, maxExecs_));
+            it = accnts_.insert_hint(it, Accnt::make(symbol, max_execs_));
         }
         return *it;
     }
 
-    const Market& createMarket(const Instr& instr, JDay settlDay, MarketState state, Time now)
+    const Market& create_market(const Instr& instr, JDay settl_day, MarketState state, Time now)
     {
-        if (settlDay != 0_jd) {
-            // busDay <= settlDay.
-            const auto busDay = busDay_(now);
-            if (settlDay < busDay) {
+        if (settl_day != 0_jd) {
+            // bus_day <= settl_day.
+            const auto bus_day = bus_day_(now);
+            if (settl_day < bus_day) {
                 throw InvalidException{"settl-day before bus-day"sv};
             }
         }
-        const auto id = toMarketId(instr.id(), settlDay);
+        const auto id = to_market_id(instr.id(), settl_day);
 
         MarketSet::Iterator it;
         bool found;
-        tie(it, found) = markets_.findHint(id);
+        tie(it, found) = markets_.find_hint(id);
         if (found) {
-            throw AlreadyExistsException{errMsg() << "market for '"sv << instr.symbol() << "' on "sv
-                                                  << jdToIso(settlDay) << " already exists"sv};
+            throw AlreadyExistsException{err_msg()
+                                         << "market for '"sv << instr.symbol() << "' on "sv
+                                         << jd_to_iso(settl_day) << " already exists"sv};
         }
         {
-            auto market = Market::make(id, instr.symbol(), settlDay, state);
-            mq_.createMarket(id, instr.symbol(), settlDay, state);
-            it = markets_.insertHint(it, market);
+            auto market = Market::make(id, instr.symbol(), settl_day, state);
+            mq_.create_market(id, instr.symbol(), settl_day, state);
+            it = markets_.insert_hint(it, market);
         }
         return *it;
     }
 
-    void updateMarket(Market& market, MarketState state, Time now)
+    void update_market(Market& market, MarketState state, Time now)
     {
-        mq_.updateMarket(market.id(), state);
-        market.setState(state);
+        mq_.update_market(market.id(), state);
+        market.set_state(state);
     }
 
-    void createOrder(Accnt& accnt, Market& market, string_view ref, Side side, Lots lots,
-                     Ticks ticks, Lots minLots, Time now, Response& resp)
+    void create_order(Accnt& accnt, Market& market, string_view ref, Side side, Lots lots,
+                      Ticks ticks, Lots min_lots, Time now, Response& resp)
     {
-        // N.B. we only check for duplicates in the refIdx; no unique constraint exists in the database,
+        // N.B. we only check for duplicates in the ref_idx; no unique constraint exists in the database,
         // and order-refs can be reused so long as only one order is live in the system at any given
         // time.
         if (!ref.empty() && accnt.exists(ref)) {
-            throw RefAlreadyExistsException{errMsg() << "order '"sv << ref << "' already exists"sv};
+            throw RefAlreadyExistsException{err_msg()
+                                            << "order '"sv << ref << "' already exists"sv};
         }
 
-        const auto busDay = busDay_(now);
-        if (market.settlDay() != 0_jd && market.settlDay() < busDay) {
-            throw MarketClosedException{errMsg() << "market for '"sv << market.instr() << "' on "sv
-                                                 << jdToIso(market.settlDay()) << " has closed"sv};
+        const auto bus_day = bus_day_(now);
+        if (market.settl_day() != 0_jd && market.settl_day() < bus_day) {
+            throw MarketClosedException{err_msg()
+                                        << "market for '"sv << market.instr() << "' on "sv
+                                        << jd_to_iso(market.settl_day()) << " has closed"sv};
         }
-        if (lots == 0_lts || lots < minLots) {
-            throw InvalidLotsException{errMsg() << "invalid lots '"sv << lots << '\''};
+        if (lots == 0_lts || lots < min_lots) {
+            throw InvalidLotsException{err_msg() << "invalid lots '"sv << lots << '\''};
         }
-        const auto id = market.allocId();
-        auto order = Order::make(accnt.symbol(), market.id(), market.instr(), market.settlDay(), id,
-                                 ref, side, lots, ticks, minLots, now);
-        auto exec = newExec(*order, id, now);
+        const auto id = market.alloc_id();
+        auto order = Order::make(accnt.symbol(), market.id(), market.instr(), market.settl_day(),
+                                 id, ref, side, lots, ticks, min_lots, now);
+        auto exec = new_exec(*order, id, now);
 
-        resp.insertOrder(order);
-        resp.insertExec(exec);
+        resp.insert_order(order);
+        resp.insert_exec(exec);
 
         // Ensure that matches are cleared when scope exits.
-        const auto finally = makeFinally([this]() noexcept {
+        const auto finally = make_finally([this]() noexcept {
             this->matches_.clear();
             this->execs_.clear();
         });
         execs_.push_back(exec);
         // Order fields are updated on match.
-        matchOrders(accnt, market, *order, now, resp);
+        match_orders(accnt, market, *order, now, resp);
 
-        resp.setMarket(&market);
+        resp.set_market(&market);
 
         // Avoid allocating position when there are no matches.
         PosnPtr posn;
         if (!matches_.empty()) {
             // Avoid allocating position when there are no matches.
             // N.B. before commit phase, because this may fail.
-            posn = accnt.posn(market.id(), market.instr(), market.settlDay());
-            resp.setPosn(posn);
+            posn = accnt.posn(market.id(), market.instr(), market.settl_day());
+            resp.set_posn(posn);
         }
 
         // Place incomplete order in market.
         if (!order->done()) {
             // This may fail if level cannot be allocated.
-            market.insertOrder(order);
+            market.insert_order(order);
         }
         {
             // TODO: IOC orders would need an additional revision for the unsolicited cancellation
             // of any unfilled quantity.
             bool success{false};
             // clang-format off
-            const auto finally = makeFinally([&market, &order, &success]() noexcept {
+            const auto finally = make_finally([&market, &order, &success]() noexcept {
                 if (!success && !order->done()) {
                     // Undo market insertion.
-                    market.removeOrder(*order);
+                    market.remove_order(*order);
                 }
             });
             // clang-format on
 
-            mq_.createExec(execs_);
+            mq_.create_exec(execs_);
             success = true;
         }
 
         // Commit phase.
 
         if (!order->done()) {
-            accnt.insertOrder(order);
+            accnt.insert_order(order);
         }
-        accnt.pushExecFront(exec);
+        accnt.push_exec_front(exec);
 
         // Commit matches.
         if (!matches_.empty()) {
             assert(posn);
-            commitMatches(accnt, market, *posn, now);
+            commit_matches(accnt, market, *posn, now);
         }
     }
 
-    void reviseOrder(Accnt& accnt, Market& market, Order& order, Lots lots, Time now,
-                     Response& resp)
+    void revise_order(Accnt& accnt, Market& market, Order& order, Lots lots, Time now,
+                      Response& resp)
     {
         if (order.done()) {
-            throw TooLateException{errMsg() << "order '"sv << order.id() << "' is done"sv};
+            throw TooLateException{err_msg() << "order '"sv << order.id() << "' is done"sv};
         }
-        doReviseOrder(accnt, market, order, lots, now, resp);
+        do_revise_order(accnt, market, order, lots, now, resp);
     }
 
-    void reviseOrder(Accnt& accnt, Market& market, Id64 id, Lots lots, Time now, Response& resp)
+    void revise_order(Accnt& accnt, Market& market, Id64 id, Lots lots, Time now, Response& resp)
     {
         auto& order = accnt.order(market.id(), id);
         if (order.done()) {
-            throw TooLateException{errMsg() << "order '"sv << order.id() << "' is done"sv};
+            throw TooLateException{err_msg() << "order '"sv << order.id() << "' is done"sv};
         }
-        doReviseOrder(accnt, market, order, lots, now, resp);
+        do_revise_order(accnt, market, order, lots, now, resp);
     }
 
-    void reviseOrder(Accnt& accnt, Market& market, string_view ref, Lots lots, Time now,
-                     Response& resp)
+    void revise_order(Accnt& accnt, Market& market, string_view ref, Lots lots, Time now,
+                      Response& resp)
     {
         auto& order = accnt.order(ref);
         if (order.done()) {
-            throw TooLateException{errMsg() << "order '"sv << order.id() << "' is done"sv};
+            throw TooLateException{err_msg() << "order '"sv << order.id() << "' is done"sv};
         }
-        doReviseOrder(accnt, market, order, lots, now, resp);
+        do_revise_order(accnt, market, order, lots, now, resp);
     }
 
-    void reviseOrder(Accnt& accnt, Market& market, ArrayView<Id64> ids, Lots lots, Time now,
-                     Response& resp)
+    void revise_order(Accnt& accnt, Market& market, ArrayView<Id64> ids, Lots lots, Time now,
+                      Response& resp)
     {
-        resp.setMarket(&market);
+        resp.set_market(&market);
         for (const auto id : ids) {
 
             auto& order = accnt.order(market.id(), id);
             if (order.done()) {
-                throw TooLateException{errMsg() << "order '"sv << order.id() << "' is done"sv};
+                throw TooLateException{err_msg() << "order '"sv << order.id() << "' is done"sv};
             }
             // Revised lots must not be:
             // 1. greater than original lots;
             // 2. less than executed lots;
             // 3. less than min lots.
-            if (lots == 0_lts              //
-                || lots > order.lots()     //
-                || lots < order.execLots() //
-                || lots < order.minLots()) {
-                throw new InvalidLotsException{errMsg() << "invalid lots '"sv << lots << '\''};
+            if (lots == 0_lts               //
+                || lots > order.lots()      //
+                || lots < order.exec_lots() //
+                || lots < order.min_lots()) {
+                throw new InvalidLotsException{err_msg() << "invalid lots '"sv << lots << '\''};
             }
-            auto exec = newExec(order, market.allocId(), now);
+            auto exec = new_exec(order, market.alloc_id(), now);
             exec->revise(lots);
 
-            resp.insertOrder(&order);
-            resp.insertExec(exec);
+            resp.insert_order(&order);
+            resp.insert_exec(exec);
         }
 
-        mq_.createExec(resp.execs());
+        mq_.create_exec(resp.execs());
 
         // Commit phase.
 
         for (const auto& exec : resp.execs()) {
-            auto it = accnt.orders().find(market.id(), exec->orderId());
+            auto it = accnt.orders().find(market.id(), exec->order_id());
             assert(it != accnt.orders().end());
-            market.reviseOrder(*it, lots, now);
-            accnt.pushExecFront(exec);
+            market.revise_order(*it, lots, now);
+            accnt.push_exec_front(exec);
         }
     }
 
-    void cancelOrder(Accnt& accnt, Market& market, Order& order, Time now, Response& resp)
+    void cancel_order(Accnt& accnt, Market& market, Order& order, Time now, Response& resp)
     {
         if (order.done()) {
-            throw TooLateException{errMsg() << "order '"sv << order.id() << "' is done"sv};
+            throw TooLateException{err_msg() << "order '"sv << order.id() << "' is done"sv};
         }
-        doCancelOrder(accnt, market, order, now, resp);
+        do_cancel_order(accnt, market, order, now, resp);
     }
 
-    void cancelOrder(Accnt& accnt, Market& market, Id64 id, Time now, Response& resp)
+    void cancel_order(Accnt& accnt, Market& market, Id64 id, Time now, Response& resp)
     {
         auto& order = accnt.order(market.id(), id);
         if (order.done()) {
-            throw TooLateException{errMsg() << "order '"sv << order.id() << "' is done"sv};
+            throw TooLateException{err_msg() << "order '"sv << order.id() << "' is done"sv};
         }
-        doCancelOrder(accnt, market, order, now, resp);
+        do_cancel_order(accnt, market, order, now, resp);
     }
 
-    void cancelOrder(Accnt& accnt, Market& market, string_view ref, Time now, Response& resp)
+    void cancel_order(Accnt& accnt, Market& market, string_view ref, Time now, Response& resp)
     {
         auto& order = accnt.order(ref);
         if (order.done()) {
-            throw TooLateException{errMsg() << "order '"sv << order.id() << "' is done"sv};
+            throw TooLateException{err_msg() << "order '"sv << order.id() << "' is done"sv};
         }
-        doCancelOrder(accnt, market, order, now, resp);
+        do_cancel_order(accnt, market, order, now, resp);
     }
 
-    void cancelOrder(Accnt& accnt, Market& market, ArrayView<Id64> ids, Time now, Response& resp)
+    void cancel_order(Accnt& accnt, Market& market, ArrayView<Id64> ids, Time now, Response& resp)
     {
-        resp.setMarket(&market);
+        resp.set_market(&market);
         for (const auto id : ids) {
 
             auto& order = accnt.order(market.id(), id);
             if (order.done()) {
-                throw TooLateException{errMsg() << "order '"sv << order.id() << "' is done"sv};
+                throw TooLateException{err_msg() << "order '"sv << order.id() << "' is done"sv};
             }
-            auto exec = newExec(order, market.allocId(), now);
+            auto exec = new_exec(order, market.alloc_id(), now);
             exec->cancel();
 
-            resp.insertOrder(&order);
-            resp.insertExec(exec);
+            resp.insert_order(&order);
+            resp.insert_exec(exec);
         }
 
-        mq_.createExec(resp.execs());
+        mq_.create_exec(resp.execs());
 
         // Commit phase.
 
         for (const auto& exec : resp.execs()) {
-            auto it = accnt.orders().find(market.id(), exec->orderId());
+            auto it = accnt.orders().find(market.id(), exec->order_id());
             assert(it != accnt.orders().end());
-            market.cancelOrder(*it, now);
-            accnt.removeOrder(*it);
-            accnt.pushExecFront(exec);
+            market.cancel_order(*it, now);
+            accnt.remove_order(*it);
+            accnt.push_exec_front(exec);
         }
     }
 
-    void cancelOrder(Accnt& accnt, Time now)
+    void cancel_order(Accnt& accnt, Time now)
     {
         // FIXME: Not implemented.
     }
 
-    void cancelOrder(Market& market, Time now)
+    void cancel_order(Market& market, Time now)
     {
         // FIXME: Not implemented.
     }
 
-    TradePair createTrade(Accnt& accnt, Market& market, string_view ref, Side side, Lots lots,
-                          Ticks ticks, LiqInd liqInd, Symbol cpty, Time created)
+    TradePair create_trade(Accnt& accnt, Market& market, string_view ref, Side side, Lots lots,
+                           Ticks ticks, LiqInd liq_ind, Symbol cpty, Time created)
     {
-        auto posn = accnt.posn(market.id(), market.instr(), market.settlDay());
-        auto trade = newManual(accnt.symbol(), market, ref, side, lots, ticks, posn->netLots(),
-                               posn->netCost(), liqInd, cpty, created);
-        decltype(trade) cptyTrade;
+        auto posn = accnt.posn(market.id(), market.instr(), market.settl_day());
+        auto trade = new_manual(accnt.symbol(), market, ref, side, lots, ticks, posn->net_lots(),
+                                posn->net_cost(), liq_ind, cpty, created);
+        decltype(trade) cpty_trade;
 
         if (!cpty.empty()) {
 
             // Create back-to-back trade if counter-party is specified.
-            auto& cptyAccnt = this->accnt(cpty);
-            auto cptyPosn = cptyAccnt.posn(market.id(), market.instr(), market.settlDay());
-            cptyTrade = trade->opposite(market.allocId());
+            auto& cpty_accnt = this->accnt(cpty);
+            auto cpty_posn = cpty_accnt.posn(market.id(), market.instr(), market.settl_day());
+            cpty_trade = trade->opposite(market.alloc_id());
 
-            ConstExecPtr trades[] = {trade, cptyTrade};
-            mq_.createExec(trades);
+            ConstExecPtr trades[] = {trade, cpty_trade};
+            mq_.create_exec(trades);
 
             // Commit phase.
 
-            cptyAccnt.pushExecFront(cptyTrade);
-            cptyAccnt.insertTrade(cptyTrade);
-            cptyPosn->addTrade(cptyTrade->side(), cptyTrade->lastLots(), cptyTrade->lastTicks());
+            cpty_accnt.push_exec_front(cpty_trade);
+            cpty_accnt.insert_trade(cpty_trade);
+            cpty_posn->add_trade(cpty_trade->side(), cpty_trade->last_lots(),
+                                 cpty_trade->last_ticks());
 
         } else {
 
-            mq_.createExec(*trade);
+            mq_.create_exec(*trade);
 
             // Commit phase.
         }
-        accnt.pushExecFront(trade);
-        accnt.insertTrade(trade);
-        posn->addTrade(trade->side(), trade->lastLots(), trade->lastTicks());
+        accnt.push_exec_front(trade);
+        accnt.insert_trade(trade);
+        posn->add_trade(trade->side(), trade->last_lots(), trade->last_ticks());
 
-        return {trade, cptyTrade};
+        return {trade, cpty_trade};
     }
 
-    void archiveTrade(Accnt& accnt, const Exec& trade, Time now)
+    void archive_trade(Accnt& accnt, const Exec& trade, Time now)
     {
         if (trade.state() != State::Trade) {
-            throw InvalidException{errMsg() << "exec '"sv << trade.id() << "' is not a trade"sv};
+            throw InvalidException{err_msg() << "exec '"sv << trade.id() << "' is not a trade"sv};
         }
-        doArchiveTrade(accnt, trade, now);
+        do_archive_trade(accnt, trade, now);
     }
 
-    void archiveTrade(Accnt& accnt, Id64 marketId, Id64 id, Time now)
+    void archive_trade(Accnt& accnt, Id64 market_id, Id64 id, Time now)
     {
-        auto& trade = accnt.trade(marketId, id);
-        doArchiveTrade(accnt, trade, now);
+        auto& trade = accnt.trade(market_id, id);
+        do_archive_trade(accnt, trade, now);
     }
 
-    void archiveTrade(Accnt& accnt, Id64 marketId, ArrayView<Id64> ids, Time now)
+    void archive_trade(Accnt& accnt, Id64 market_id, ArrayView<Id64> ids, Time now)
     {
         // Validate.
         for (const auto id : ids) {
-            accnt.trade(marketId, id);
+            accnt.trade(market_id, id);
         }
 
-        mq_.archiveTrade(marketId, ids, now);
+        mq_.archive_trade(market_id, ids, now);
 
         // Commit phase.
 
         for (const auto id : ids) {
 
-            auto it = accnt.trades().find(marketId, id);
+            auto it = accnt.trades().find(market_id, id);
             assert(it != accnt.trades().end());
-            accnt.removeTrade(*it);
+            accnt.remove_trade(*it);
         }
     }
 
-    void expireEndOfDay(Time now)
+    void expire_end_of_day(Time now)
     {
         // FIXME: Not implemented.
     }
 
-    void settlEndOfDay(Time now)
+    void settl_end_of_day(Time now)
     {
         // FIXME: Not implemented.
     }
 
   private:
-    ExecPtr newExec(const Order& order, Id64 id, Time created) const
+    ExecPtr new_exec(const Order& order, Id64 id, Time created) const
     {
-        return Exec::make(order.accnt(), order.marketId(), order.instr(), order.settlDay(), id,
+        return Exec::make(order.accnt(), order.market_id(), order.instr(), order.settl_day(), id,
                           order.id(), order.ref(), order.state(), order.side(), order.lots(),
-                          order.ticks(), order.resdLots(), order.execLots(), order.execCost(),
-                          order.lastLots(), order.lastTicks(), order.minLots(), 0_id64, 0_lts,
+                          order.ticks(), order.resd_lots(), order.exec_lots(), order.exec_cost(),
+                          order.last_lots(), order.last_ticks(), order.min_lots(), 0_id64, 0_lts,
                           0_cst, LiqInd::None, Symbol{}, created);
     }
 
     /**
      * Special factory method for manual trades.
      */
-    ExecPtr newManual(Id64 marketId, Symbol instr, JDay settlDay, Id64 id, Symbol accnt,
-                      string_view ref, Side side, Lots lots, Ticks ticks, Lots posnLots,
-                      Cost posnCost, LiqInd liqInd, Symbol cpty, Time created) const
+    ExecPtr new_manual(Id64 market_id, Symbol instr, JDay settl_day, Id64 id, Symbol accnt,
+                       string_view ref, Side side, Lots lots, Ticks ticks, Lots posn_lots,
+                       Cost posn_cost, LiqInd liq_ind, Symbol cpty, Time created) const
     {
-        const auto orderId = 0_id64;
+        const auto order_id = 0_id64;
         const auto state = State::Trade;
         const auto resd = 0_lts;
         const auto exec = lots;
         const auto cost = swirly::cost(lots, ticks);
-        const auto lastLots = lots;
-        const auto lastTicks = ticks;
-        const auto minLots = 1_lts;
-        const auto matchId = 0_id64;
-        return Exec::make(accnt, marketId, instr, settlDay, id, orderId, ref, state, side, lots,
-                          ticks, resd, exec, cost, lastLots, lastTicks, minLots, matchId, posnLots,
-                          posnCost, liqInd, cpty, created);
+        const auto last_lots = lots;
+        const auto last_ticks = ticks;
+        const auto min_lots = 1_lts;
+        const auto match_id = 0_id64;
+        return Exec::make(accnt, market_id, instr, settl_day, id, order_id, ref, state, side, lots,
+                          ticks, resd, exec, cost, last_lots, last_ticks, min_lots, match_id,
+                          posn_lots, posn_cost, liq_ind, cpty, created);
     }
 
-    ExecPtr newManual(Symbol accnt, Market& market, string_view ref, Side side, Lots lots,
-                      Ticks ticks, Lots posnLots, Cost posnCost, LiqInd liqInd, Symbol cpty,
-                      Time created) const
+    ExecPtr new_manual(Symbol accnt, Market& market, string_view ref, Side side, Lots lots,
+                       Ticks ticks, Lots posn_lots, Cost posn_cost, LiqInd liq_ind, Symbol cpty,
+                       Time created) const
     {
-        return newManual(market.id(), market.instr(), market.settlDay(), market.allocId(), accnt,
-                         ref, side, lots, ticks, posnLots, posnCost, liqInd, cpty, created);
+        return new_manual(market.id(), market.instr(), market.settl_day(), market.alloc_id(), accnt,
+                          ref, side, lots, ticks, posn_lots, posn_cost, liq_ind, cpty, created);
     }
 
-    Match newMatch(Market& market, const Order& takerOrder, const OrderPtr& makerOrder, Lots lots,
-                   Lots sumLots, Cost sumCost, Time created)
+    Match new_match(Market& market, const Order& taker_order, const OrderPtr& maker_order,
+                    Lots lots, Lots sum_lots, Cost sum_cost, Time created)
     {
-        const auto makerId = market.allocId();
-        const auto takerId = market.allocId();
+        const auto maker_id = market.alloc_id();
+        const auto taker_id = market.alloc_id();
 
-        auto it = accnts_.find(makerOrder->accnt());
+        auto it = accnts_.find(maker_order->accnt());
         assert(it != accnts_.end());
-        auto& makerAccnt = *it;
-        auto makerPosn = makerAccnt.posn(market.id(), market.instr(), market.settlDay());
+        auto& maker_accnt = *it;
+        auto maker_posn = maker_accnt.posn(market.id(), market.instr(), market.settl_day());
 
-        const auto ticks = makerOrder->ticks();
+        const auto ticks = maker_order->ticks();
 
-        auto makerTrade = newExec(*makerOrder, makerId, created);
-        makerTrade->trade(lots, ticks, takerId, LiqInd::Maker, takerOrder.accnt());
+        auto maker_trade = new_exec(*maker_order, maker_id, created);
+        maker_trade->trade(lots, ticks, taker_id, LiqInd::Maker, taker_order.accnt());
 
-        auto takerTrade = newExec(takerOrder, takerId, created);
-        takerTrade->trade(sumLots, sumCost, lots, ticks, makerId, LiqInd::Taker,
-                          makerOrder->accnt());
+        auto taker_trade = new_exec(taker_order, taker_id, created);
+        taker_trade->trade(sum_lots, sum_cost, lots, ticks, maker_id, LiqInd::Taker,
+                           maker_order->accnt());
 
-        return {lots, makerOrder, makerTrade, makerPosn, takerTrade};
+        return {lots, maker_order, maker_trade, maker_posn, taker_trade};
     }
 
-    void matchOrders(const Accnt& takerAccnt, Market& market, Order& takerOrder, MarketSide& side,
-                     Direct direct, Time now, Response& resp)
+    void match_orders(const Accnt& taker_accnt, Market& market, Order& taker_order,
+                      MarketSide& side, Direct direct, Time now, Response& resp)
     {
-        auto sumLots = 0_lts;
-        auto sumCost = 0_cst;
-        auto lastLots = 0_lts;
-        auto lastTicks = 0_tks;
+        auto sum_lots = 0_lts;
+        auto sum_cost = 0_cst;
+        auto last_lots = 0_lts;
+        auto last_ticks = 0_tks;
 
-        for (auto& makerOrder : side.orders()) {
+        for (auto& maker_order : side.orders()) {
             // Break if order is fully filled.
-            if (sumLots == takerOrder.resdLots()) {
+            if (sum_lots == taker_order.resd_lots()) {
                 break;
             }
             // Only consider orders while prices cross.
-            if (spread(takerOrder, makerOrder, direct) > 0_tks) {
+            if (spread(taker_order, maker_order, direct) > 0_tks) {
                 break;
             }
 
-            const auto lots = min(takerOrder.resdLots() - sumLots, makerOrder.resdLots());
-            const auto ticks = makerOrder.ticks();
+            const auto lots = min(taker_order.resd_lots() - sum_lots, maker_order.resd_lots());
+            const auto ticks = maker_order.ticks();
 
-            sumLots += lots;
-            sumCost += cost(lots, ticks);
-            lastLots = lots;
-            lastTicks = ticks;
+            sum_lots += lots;
+            sum_cost += cost(lots, ticks);
+            last_lots = lots;
+            last_ticks = ticks;
 
-            auto match = newMatch(market, takerOrder, &makerOrder, lots, sumLots, sumCost, now);
+            auto match
+                = new_match(market, taker_order, &maker_order, lots, sum_lots, sum_cost, now);
 
             // Insert order if trade crossed with self.
-            if (makerOrder.accnt() == takerAccnt.symbol()) {
+            if (maker_order.accnt() == taker_accnt.symbol()) {
                 // Maker updated first because this is consistent with last-look semantics.
                 // N.B. the reference count is not incremented here.
-                resp.insertOrder(&makerOrder);
-                resp.insertExec(match.makerTrade);
+                resp.insert_order(&maker_order);
+                resp.insert_exec(match.maker_trade);
             }
-            resp.insertExec(match.takerTrade);
+            resp.insert_exec(match.taker_trade);
 
             matches_.push_back(move(match));
-            execs_.push_back(match.makerTrade);
-            execs_.push_back(match.takerTrade);
+            execs_.push_back(match.maker_trade);
+            execs_.push_back(match.taker_trade);
         }
 
         if (!matches_.empty()) {
-            takerOrder.trade(sumLots, sumCost, lastLots, lastTicks, now);
+            taker_order.trade(sum_lots, sum_cost, last_lots, last_ticks, now);
         }
     }
 
-    void matchOrders(const Accnt& takerAccnt, Market& market, Order& takerOrder, Time now,
-                     Response& resp)
+    void match_orders(const Accnt& taker_accnt, Market& market, Order& taker_order, Time now,
+                      Response& resp)
     {
-        MarketSide* marketSide;
+        MarketSide* market_side;
         Direct direct;
-        if (takerOrder.side() == Side::Buy) {
+        if (taker_order.side() == Side::Buy) {
             // Paid when the taker lifts the offer.
-            marketSide = &market.offerSide();
+            market_side = &market.offer_side();
             direct = Direct::Paid;
         } else {
-            assert(takerOrder.side() == Side::Sell);
+            assert(taker_order.side() == Side::Sell);
             // Given when the taker hits the bid.
-            marketSide = &market.bidSide();
+            market_side = &market.bid_side();
             direct = Direct::Given;
         }
-        matchOrders(takerAccnt, market, takerOrder, *marketSide, direct, now, resp);
+        match_orders(taker_accnt, market, taker_order, *market_side, direct, now, resp);
     }
 
     // Assumes that maker lots have not been reduced since matching took place. N.B. this function is
     // responsible for committing a transaction, so it is particularly important that it does not
     // throw.
-    void commitMatches(Accnt& takerAccnt, Market& market, Posn& takerPosn, Time now) noexcept
+    void commit_matches(Accnt& taker_accnt, Market& market, Posn& taker_posn, Time now) noexcept
     {
         for (const auto& match : matches_) {
 
-            const auto makerOrder = match.makerOrder;
-            assert(makerOrder);
+            const auto maker_order = match.maker_order;
+            assert(maker_order);
 
             // Reduce maker.
-            market.takeOrder(*makerOrder, match.lots, now);
+            market.take_order(*maker_order, match.lots, now);
 
             // Must succeed because maker order exists.
-            auto it = accnts_.find(makerOrder->accnt());
+            auto it = accnts_.find(maker_order->accnt());
             assert(it != accnts_.end());
-            auto& makerAccnt = *it;
+            auto& maker_accnt = *it;
 
             // Maker updated first because this is consistent with last-look semantics.
 
             // Update maker position.
-            const auto makerTrade = match.makerTrade;
-            assert(makerTrade);
-            makerTrade->posn(match.makerPosn->netLots(), match.makerPosn->netCost());
-            match.makerPosn->addTrade(makerTrade->side(), makerTrade->lastLots(),
-                                      makerTrade->lastTicks());
+            const auto maker_trade = match.maker_trade;
+            assert(maker_trade);
+            maker_trade->posn(match.maker_posn->net_lots(), match.maker_posn->net_cost());
+            match.maker_posn->add_trade(maker_trade->side(), maker_trade->last_lots(),
+                                        maker_trade->last_ticks());
 
             // Update maker account.
-            makerAccnt.pushExecFront(makerTrade);
-            makerAccnt.insertTrade(makerTrade);
-            if (makerOrder->done()) {
-                makerAccnt.removeOrder(*makerOrder);
+            maker_accnt.push_exec_front(maker_trade);
+            maker_accnt.insert_trade(maker_trade);
+            if (maker_order->done()) {
+                maker_accnt.remove_order(*maker_order);
             }
 
             // Update taker position.
-            const auto takerTrade = match.takerTrade;
-            assert(takerTrade);
-            takerTrade->posn(takerPosn.netLots(), takerPosn.netCost());
-            takerPosn.addTrade(takerTrade->side(), takerTrade->lastLots(), takerTrade->lastTicks());
+            const auto taker_trade = match.taker_trade;
+            assert(taker_trade);
+            taker_trade->posn(taker_posn.net_lots(), taker_posn.net_cost());
+            taker_posn.add_trade(taker_trade->side(), taker_trade->last_lots(),
+                                 taker_trade->last_ticks());
 
             // Update taker account.
-            takerAccnt.pushExecFront(takerTrade);
-            takerAccnt.insertTrade(takerTrade);
+            taker_accnt.push_exec_front(taker_trade);
+            taker_accnt.insert_trade(taker_trade);
         }
     }
 
-    void doReviseOrder(Accnt& accnt, Market& market, Order& order, Lots lots, Time now,
-                       Response& resp)
+    void do_revise_order(Accnt& accnt, Market& market, Order& order, Lots lots, Time now,
+                         Response& resp)
     {
         // Revised lots must not be:
         // 1. greater than original lots;
         // 2. less than executed lots;
         // 3. less than min lots.
-        if (lots == 0_lts              //
-            || lots > order.lots()     //
-            || lots < order.execLots() //
-            || lots < order.minLots()) {
-            throw new InvalidLotsException{errMsg() << "invalid lots '"sv << lots << '\''};
+        if (lots == 0_lts               //
+            || lots > order.lots()      //
+            || lots < order.exec_lots() //
+            || lots < order.min_lots()) {
+            throw new InvalidLotsException{err_msg() << "invalid lots '"sv << lots << '\''};
         }
-        auto exec = newExec(order, market.allocId(), now);
+        auto exec = new_exec(order, market.alloc_id(), now);
         exec->revise(lots);
 
-        resp.setMarket(&market);
-        resp.insertOrder(&order);
-        resp.insertExec(exec);
+        resp.set_market(&market);
+        resp.insert_order(&order);
+        resp.insert_exec(exec);
 
-        mq_.createExec(*exec);
+        mq_.create_exec(*exec);
 
         // Commit phase.
 
-        market.reviseOrder(order, lots, now);
-        accnt.pushExecFront(exec);
+        market.revise_order(order, lots, now);
+        accnt.push_exec_front(exec);
     }
-    void doCancelOrder(Accnt& accnt, Market& market, Order& order, Time now, Response& resp)
+    void do_cancel_order(Accnt& accnt, Market& market, Order& order, Time now, Response& resp)
     {
-        auto exec = newExec(order, market.allocId(), now);
+        auto exec = new_exec(order, market.alloc_id(), now);
         exec->cancel();
 
-        resp.setMarket(&market);
-        resp.insertOrder(&order);
-        resp.insertExec(exec);
+        resp.set_market(&market);
+        resp.insert_order(&order);
+        resp.insert_exec(exec);
 
-        mq_.createExec(*exec);
+        mq_.create_exec(*exec);
 
         // Commit phase.
 
-        market.cancelOrder(order, now);
-        accnt.removeOrder(order);
-        accnt.pushExecFront(exec);
+        market.cancel_order(order, now);
+        accnt.remove_order(order);
+        accnt.push_exec_front(exec);
     }
 
-    void doArchiveTrade(Accnt& accnt, const Exec& trade, Time now)
+    void do_archive_trade(Accnt& accnt, const Exec& trade, Time now)
     {
-        mq_.archiveTrade(trade.marketId(), trade.id(), now);
+        mq_.archive_trade(trade.market_id(), trade.id(), now);
 
         // Commit phase.
 
-        accnt.removeTrade(trade);
+        accnt.remove_trade(trade);
     }
 
     MsgQueue& mq_;
-    const BusinessDay busDay_{MarketZone};
-    const size_t maxExecs_;
+    const BusinessDay bus_day_{MarketZone};
+    const size_t max_execs_;
     AssetSet assets_;
     InstrSet instrs_;
     MarketSet markets_;
@@ -712,8 +718,8 @@ struct Serv::Impl {
     vector<ConstExecPtr> execs_;
 };
 
-Serv::Serv(MsgQueue& mq, size_t maxExecs)
-: impl_{make_unique<Impl>(mq, maxExecs)}
+Serv::Serv(MsgQueue& mq, size_t max_execs)
+: impl_{make_unique<Impl>(mq, max_execs)}
 {
 }
 
@@ -758,110 +764,111 @@ const Accnt& Serv::accnt(Symbol symbol) const
     return impl_->accnt(symbol);
 }
 
-const Market& Serv::createMarket(const Instr& instr, JDay settlDay, MarketState state, Time now)
+const Market& Serv::create_market(const Instr& instr, JDay settl_day, MarketState state, Time now)
 {
-    return impl_->createMarket(instr, settlDay, state, now);
+    return impl_->create_market(instr, settl_day, state, now);
 }
 
-void Serv::updateMarket(const Market& market, MarketState state, Time now)
+void Serv::update_market(const Market& market, MarketState state, Time now)
 {
-    return impl_->updateMarket(constCast(market), state, now);
+    return impl_->update_market(remove_const(market), state, now);
 }
 
-void Serv::createOrder(const Accnt& accnt, const Market& market, string_view ref, Side side,
-                       Lots lots, Ticks ticks, Lots minLots, Time now, Response& resp)
+void Serv::create_order(const Accnt& accnt, const Market& market, string_view ref, Side side,
+                        Lots lots, Ticks ticks, Lots min_lots, Time now, Response& resp)
 {
-    impl_->createOrder(constCast(accnt), constCast(market), ref, side, lots, ticks, minLots, now,
-                       resp);
+    impl_->create_order(remove_const(accnt), remove_const(market), ref, side, lots, ticks, min_lots,
+                        now, resp);
 }
 
-void Serv::reviseOrder(const Accnt& accnt, const Market& market, const Order& order, Lots lots,
-                       Time now, Response& resp)
+void Serv::revise_order(const Accnt& accnt, const Market& market, const Order& order, Lots lots,
+                        Time now, Response& resp)
 {
-    impl_->reviseOrder(constCast(accnt), constCast(market), constCast(order), lots, now, resp);
+    impl_->revise_order(remove_const(accnt), remove_const(market), remove_const(order), lots, now,
+                        resp);
 }
 
-void Serv::reviseOrder(const Accnt& accnt, const Market& market, Id64 id, Lots lots, Time now,
-                       Response& resp)
+void Serv::revise_order(const Accnt& accnt, const Market& market, Id64 id, Lots lots, Time now,
+                        Response& resp)
 {
-    impl_->reviseOrder(constCast(accnt), constCast(market), id, lots, now, resp);
+    impl_->revise_order(remove_const(accnt), remove_const(market), id, lots, now, resp);
 }
 
-void Serv::reviseOrder(const Accnt& accnt, const Market& market, string_view ref, Lots lots,
-                       Time now, Response& resp)
+void Serv::revise_order(const Accnt& accnt, const Market& market, string_view ref, Lots lots,
+                        Time now, Response& resp)
 {
-    impl_->reviseOrder(constCast(accnt), constCast(market), ref, lots, now, resp);
+    impl_->revise_order(remove_const(accnt), remove_const(market), ref, lots, now, resp);
 }
 
-void Serv::reviseOrder(const Accnt& accnt, const Market& market, ArrayView<Id64> ids, Lots lots,
-                       Time now, Response& resp)
+void Serv::revise_order(const Accnt& accnt, const Market& market, ArrayView<Id64> ids, Lots lots,
+                        Time now, Response& resp)
 {
-    impl_->reviseOrder(constCast(accnt), constCast(market), ids, lots, now, resp);
+    impl_->revise_order(remove_const(accnt), remove_const(market), ids, lots, now, resp);
 }
 
-void Serv::cancelOrder(const Accnt& accnt, const Market& market, const Order& order, Time now,
-                       Response& resp)
+void Serv::cancel_order(const Accnt& accnt, const Market& market, const Order& order, Time now,
+                        Response& resp)
 {
-    impl_->cancelOrder(constCast(accnt), constCast(market), constCast(order), now, resp);
+    impl_->cancel_order(remove_const(accnt), remove_const(market), remove_const(order), now, resp);
 }
 
-void Serv::cancelOrder(const Accnt& accnt, const Market& market, Id64 id, Time now, Response& resp)
+void Serv::cancel_order(const Accnt& accnt, const Market& market, Id64 id, Time now, Response& resp)
 {
-    impl_->cancelOrder(constCast(accnt), constCast(market), id, now, resp);
+    impl_->cancel_order(remove_const(accnt), remove_const(market), id, now, resp);
 }
 
-void Serv::cancelOrder(const Accnt& accnt, const Market& market, string_view ref, Time now,
-                       Response& resp)
+void Serv::cancel_order(const Accnt& accnt, const Market& market, string_view ref, Time now,
+                        Response& resp)
 {
-    impl_->cancelOrder(constCast(accnt), constCast(market), ref, now, resp);
+    impl_->cancel_order(remove_const(accnt), remove_const(market), ref, now, resp);
 }
 
-void Serv::cancelOrder(const Accnt& accnt, const Market& market, ArrayView<Id64> ids, Time now,
-                       Response& resp)
+void Serv::cancel_order(const Accnt& accnt, const Market& market, ArrayView<Id64> ids, Time now,
+                        Response& resp)
 {
-    impl_->cancelOrder(constCast(accnt), constCast(market), ids, now, resp);
+    impl_->cancel_order(remove_const(accnt), remove_const(market), ids, now, resp);
 }
 
-void Serv::cancelOrder(const Accnt& accnt, Time now)
+void Serv::cancel_order(const Accnt& accnt, Time now)
 {
-    impl_->cancelOrder(constCast(accnt), now);
+    impl_->cancel_order(remove_const(accnt), now);
 }
 
-void Serv::cancelOrder(const Market& market, Time now)
+void Serv::cancel_order(const Market& market, Time now)
 {
-    impl_->cancelOrder(constCast(market), now);
+    impl_->cancel_order(remove_const(market), now);
 }
 
-TradePair Serv::createTrade(const Accnt& accnt, const Market& market, string_view ref, Side side,
-                            Lots lots, Ticks ticks, LiqInd liqInd, Symbol cpty, Time created)
+TradePair Serv::create_trade(const Accnt& accnt, const Market& market, string_view ref, Side side,
+                             Lots lots, Ticks ticks, LiqInd liq_ind, Symbol cpty, Time created)
 {
-    return impl_->createTrade(constCast(accnt), constCast(market), ref, side, lots, ticks, liqInd,
-                              cpty, created);
+    return impl_->create_trade(remove_const(accnt), remove_const(market), ref, side, lots, ticks,
+                               liq_ind, cpty, created);
 }
 
-void Serv::archiveTrade(const Accnt& accnt, const Exec& trade, Time now)
+void Serv::archive_trade(const Accnt& accnt, const Exec& trade, Time now)
 {
-    impl_->archiveTrade(constCast(accnt), trade, now);
+    impl_->archive_trade(remove_const(accnt), trade, now);
 }
 
-void Serv::archiveTrade(const Accnt& accnt, Id64 marketId, Id64 id, Time now)
+void Serv::archive_trade(const Accnt& accnt, Id64 market_id, Id64 id, Time now)
 {
-    impl_->archiveTrade(constCast(accnt), marketId, id, now);
+    impl_->archive_trade(remove_const(accnt), market_id, id, now);
 }
 
-void Serv::archiveTrade(const Accnt& accnt, Id64 marketId, ArrayView<Id64> ids, Time now)
+void Serv::archive_trade(const Accnt& accnt, Id64 market_id, ArrayView<Id64> ids, Time now)
 {
-    impl_->archiveTrade(constCast(accnt), marketId, ids, now);
+    impl_->archive_trade(remove_const(accnt), market_id, ids, now);
 }
 
-void Serv::expireEndOfDay(Time now)
+void Serv::expire_end_of_day(Time now)
 {
-    impl_->expireEndOfDay(now);
+    impl_->expire_end_of_day(now);
 }
 
-void Serv::settlEndOfDay(Time now)
+void Serv::settl_end_of_day(Time now)
 {
-    impl_->settlEndOfDay(now);
+    impl_->settl_end_of_day(now);
 }
 
 } // namespace lob

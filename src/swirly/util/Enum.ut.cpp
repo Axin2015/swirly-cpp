@@ -34,7 +34,7 @@ constexpr Test operator""_test(unsigned long long val) noexcept
     return box<Test>(val);
 }
 
-const char* enumString(Test t)
+const char* enum_string(Test t)
 {
     switch (t) {
     case Test::Foo:
@@ -51,7 +51,7 @@ const char* enumString(Test t)
 
 inline ostream& operator<<(ostream& os, Test t)
 {
-    return os << enumString(t);
+    return os << enum_string(t);
 }
 
 } // namespace util

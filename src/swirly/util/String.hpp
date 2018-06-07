@@ -28,13 +28,13 @@ using namespace std::literals::string_view_literals;
 inline namespace util {
 
 template <typename ValueT, typename std::enable_if_t<std::is_arithmetic_v<ValueT>>* = nullptr>
-std::string toString(ValueT val)
+std::string to_string(ValueT val)
 {
     return std::to_string(val);
 }
 
 template <typename ValueT, typename std::enable_if_t<!std::is_arithmetic_v<ValueT>>* = nullptr>
-std::string toString(const ValueT& val)
+std::string to_string(const ValueT& val)
 {
     std::stringstream ss;
     ss << val;
@@ -42,7 +42,7 @@ std::string toString(const ValueT& val)
 }
 
 template <std::size_t SizeN>
-std::string_view toStringView(const char (&val)[SizeN]) noexcept
+std::string_view to_string_view(const char (&val)[SizeN]) noexcept
 {
     return {val, strnlen(val, SizeN)};
 }
@@ -81,46 +81,46 @@ inline void trim(std::string& s) noexcept
     rtrim(s);
 }
 
-inline std::string_view ltrimCopy(std::string_view s) noexcept
+inline std::string_view ltrim_copy(std::string_view s) noexcept
 {
     ltrim(s);
     return s;
 }
 
-inline std::string ltrimCopy(std::string s) noexcept
+inline std::string ltrim_copy(std::string s) noexcept
 {
     ltrim(s);
     return s;
 }
 
-inline std::string_view rtrimCopy(std::string_view s) noexcept
+inline std::string_view rtrim_copy(std::string_view s) noexcept
 {
     rtrim(s);
     return s;
 }
 
-inline std::string rtrimCopy(std::string s) noexcept
+inline std::string rtrim_copy(std::string s) noexcept
 {
     rtrim(s);
     return s;
 }
 
-inline std::string_view trimCopy(std::string_view s) noexcept
+inline std::string_view trim_copy(std::string_view s) noexcept
 {
     trim(s);
     return s;
 }
 
-inline std::string trimCopy(std::string s) noexcept
+inline std::string trim_copy(std::string s) noexcept
 {
     trim(s);
     return s;
 }
 
-SWIRLY_API std::pair<std::string_view, std::string_view> splitPair(std::string_view s,
-                                                                   char delim) noexcept;
+SWIRLY_API std::pair<std::string_view, std::string_view> split_pair(std::string_view s,
+                                                                    char delim) noexcept;
 
-SWIRLY_API std::pair<std::string, std::string> splitPair(const std::string& s, char delim);
+SWIRLY_API std::pair<std::string, std::string> split_pair(const std::string& s, char delim);
 
 template <char PadC>
 inline std::size_t pstrlen(const char* src, std::size_t n) noexcept

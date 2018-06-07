@@ -22,36 +22,36 @@ namespace swirly {
 namespace ui {
 using namespace std;
 
-Instr::Impl::Impl(const QString& symbol, const QString& display, const QString& baseAsset,
-                  const QString& termCcy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
-                  int pipDp, Lots minLots, Lots maxLots)
+Instr::Impl::Impl(const QString& symbol, const QString& display, const QString& base_asset,
+                  const QString& term_ccy, int lot_numer, int lot_denom, int tick_numer,
+                  int tick_denom, int pip_dp, Lots min_lots, Lots max_lots)
 : symbol{symbol}
 , display{display}
-, baseAsset{baseAsset}
-, termCcy{termCcy}
-, lotNumer{lotNumer}
-, lotDenom{lotDenom}
-, qtyInc{fractToReal(lotNumer, lotDenom)}
-, tickNumer{tickNumer}
-, tickDenom{tickDenom}
-, priceInc{fractToReal(tickNumer, tickDenom)}
-, pipDp{pipDp}
-, qtyDp{realToDp(qtyInc)}
-, priceDp{realToDp(priceInc)}
-, minLots{minLots}
-, maxLots{maxLots}
+, base_asset{base_asset}
+, term_ccy{term_ccy}
+, lot_numer{lot_numer}
+, lot_denom{lot_denom}
+, qty_inc{fract_to_real(lot_numer, lot_denom)}
+, tick_numer{tick_numer}
+, tick_denom{tick_denom}
+, price_inc{fract_to_real(tick_numer, tick_denom)}
+, pip_dp{pip_dp}
+, qty_dp{real_to_dp(qty_inc)}
+, price_dp{real_to_dp(price_inc)}
+, min_lots{min_lots}
+, max_lots{max_lots}
 {
 }
 
-Instr Instr::fromJson(const QJsonObject& obj)
+Instr Instr::from_json(const QJsonObject& obj)
 {
-    using swirly::ui::fromJson;
-    return Instr(fromJson<QString>(obj["symbol"]), fromJson<QString>(obj["display"]),
-                 fromJson<QString>(obj["base_asset"]), fromJson<QString>(obj["term_ccy"]),
-                 fromJson<int>(obj["lot_numer"]), fromJson<int>(obj["lot_denom"]),
-                 fromJson<int>(obj["tick_numer"]), fromJson<int>(obj["tick_denom"]),
-                 fromJson<int>(obj["pip_dp"]), fromJson<Lots>(obj["min_lots"]),
-                 fromJson<Lots>(obj["max_lots"]));
+    using swirly::ui::from_json;
+    return Instr(from_json<QString>(obj["symbol"]), from_json<QString>(obj["display"]),
+                 from_json<QString>(obj["base_asset"]), from_json<QString>(obj["term_ccy"]),
+                 from_json<int>(obj["lot_numer"]), from_json<int>(obj["lot_denom"]),
+                 from_json<int>(obj["tick_numer"]), from_json<int>(obj["tick_denom"]),
+                 from_json<int>(obj["pip_dp"]), from_json<Lots>(obj["min_lots"]),
+                 from_json<Lots>(obj["max_lots"]));
 }
 
 shared_ptr<const Instr::Impl> Instr::empty()
@@ -62,17 +62,17 @@ shared_ptr<const Instr::Impl> Instr::empty()
 
 QDebug operator<<(QDebug debug, const Instr& instr)
 {
-    debug.nospace() << "Instr{symbol=" << instr.symbol()  //
-                    << ",display=" << instr.display()     //
-                    << ",baseAsset=" << instr.baseAsset() //
-                    << ",termCcy=" << instr.termCcy()     //
-                    << ",lotNumer=" << instr.lotNumer()   //
-                    << ",lotDenom=" << instr.lotDenom()   //
-                    << ",tickNumer=" << instr.tickNumer() //
-                    << ",tickDenom=" << instr.tickDenom() //
-                    << ",pipDp=" << instr.pipDp()         //
-                    << ",minLots=" << instr.minLots()     //
-                    << ",maxLots=" << instr.maxLots()     //
+    debug.nospace() << "Instr{symbol=" << instr.symbol()    //
+                    << ",display=" << instr.display()       //
+                    << ",base_asset=" << instr.base_asset() //
+                    << ",term_ccy=" << instr.term_ccy()     //
+                    << ",lot_numer=" << instr.lot_numer()   //
+                    << ",lot_denom=" << instr.lot_denom()   //
+                    << ",tick_numer=" << instr.tick_numer() //
+                    << ",tick_denom=" << instr.tick_denom() //
+                    << ",pip_dp=" << instr.pip_dp()         //
+                    << ",min_lots=" << instr.min_lots()     //
+                    << ",max_lots=" << instr.max_lots()     //
                     << '}';
     return debug;
 }

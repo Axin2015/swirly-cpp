@@ -28,7 +28,7 @@ class SWIRLY_API EpollReactor : public Reactor {
   public:
     using Event = typename EpollMuxer::Event;
 
-    explicit EpollReactor(std::size_t sizeHint = 1024);
+    explicit EpollReactor(std::size_t size_hint = 1024);
     ~EpollReactor() override;
 
     // Copy.
@@ -43,18 +43,18 @@ class SWIRLY_API EpollReactor : public Reactor {
     /**
      * Thread-safe.
      */
-    void doInterrupt() noexcept override;
+    void do_interrupt() noexcept override;
 
-    Handle doSubscribe(int fd, unsigned events, IoSlot slot) override;
-    void doUnsubscribe(int fd, int sid) noexcept override;
+    Handle do_subscribe(int fd, unsigned events, IoSlot slot) override;
+    void do_unsubscribe(int fd, int sid) noexcept override;
 
-    void doSetEvents(int fd, int sid, unsigned events, IoSlot slot) override;
-    void doSetEvents(int fd, int sid, unsigned events) override;
+    void do_set_events(int fd, int sid, unsigned events, IoSlot slot) override;
+    void do_set_events(int fd, int sid, unsigned events) override;
 
-    Timer doTimer(Time expiry, Duration interval, Priority priority, TimerSlot slot) override;
-    Timer doTimer(Time expiry, Priority priority, TimerSlot slot) override;
+    Timer do_timer(Time expiry, Duration interval, Priority priority, TimerSlot slot) override;
+    Timer do_timer(Time expiry, Priority priority, TimerSlot slot) override;
 
-    int doPoll(Time now, Millis timeout) override;
+    int do_poll(Time now, Millis timeout) override;
 
   private:
     int dispatch(Event* buf, int size, Time now);

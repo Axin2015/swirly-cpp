@@ -36,7 +36,7 @@ ExecView::ExecView(ExecModel& model, QWidget* parent, Qt::WindowFlags f)
 {
     auto table = make_unique<QTableView>();
     {
-        auto del = makeDeleter(table->model());
+        auto del = make_deleter(table->model());
         table->setModel(&model);
     }
     table->resizeColumnToContents(unbox(Column::CheckState));
@@ -50,7 +50,7 @@ ExecView::ExecView(ExecModel& model, QWidget* parent, Qt::WindowFlags f)
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::NoSelection);
 
-    connect(table.get(), &QTableView::clicked, this, &ExecView::slotClicked);
+    connect(table.get(), &QTableView::clicked, this, &ExecView::slot_clicked);
 
     auto layout = make_unique<QGridLayout>();
     layout->addWidget(table.release(), 0, 0);
@@ -59,22 +59,22 @@ ExecView::ExecView(ExecModel& model, QWidget* parent, Qt::WindowFlags f)
 
 ExecView::~ExecView() = default;
 
-void ExecView::slotClicked(const QModelIndex& index)
+void ExecView::slot_clicked(const QModelIndex& index)
 {
     if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
-        model_.toggleCheckState(index.row());
+        model_.toggle_check_state(index.row());
     }
     optional<Lots> lots;
     optional<Ticks> ticks;
-    const auto& exec = model_.valueAt(index.row());
-    if (exec.matchId() != 0_id64) {
-        lots = exec.lastLots();
-        ticks = exec.lastTicks();
+    const auto& exec = model_.value_at(index.row());
+    if (exec.match_id() != 0_id64) {
+        lots = exec.last_lots();
+        ticks = exec.last_ticks();
     } else {
-        lots = exec.resdLots() > 0_lts ? exec.resdLots() : exec.lots();
+        lots = exec.resd_lots() > 0_lts ? exec.resd_lots() : exec.lots();
         ticks = exec.ticks();
     }
-    emit setFields(exec.instr().symbol(), exec.settlDate(), lots, ticks);
+    emit set_fields(exec.instr().symbol(), exec.settl_date(), lots, ticks);
 }
 
 } // namespace ui

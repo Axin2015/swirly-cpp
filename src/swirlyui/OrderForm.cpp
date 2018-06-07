@@ -27,22 +27,25 @@ namespace swirly {
 namespace ui {
 using namespace std;
 
-OrderForm::OrderForm(OrderModel& orderModel, QWidget* parent, Qt::WindowFlags f)
+OrderForm::OrderForm(OrderModel& order_model, QWidget* parent, Qt::WindowFlags f)
 : QWidget{parent, f}
-, orderModel_(orderModel)
+, order_model_(order_model)
 {
-    auto selectAllButton = make_unique<QPushButton>(tr("Select All"));
-    auto selectNoneButton = make_unique<QPushButton>(tr("Select None"));
-    auto cancelButton = make_unique<QPushButton>(tr("Cancel"));
+    auto select_all_button = make_unique<QPushButton>(tr("Select All"));
+    auto select_none_button = make_unique<QPushButton>(tr("Select None"));
+    auto cancel_button = make_unique<QPushButton>(tr("Cancel"));
 
-    connect(selectAllButton.get(), &QPushButton::clicked, this, &OrderForm::slotSelectAllClicked);
-    connect(selectNoneButton.get(), &QPushButton::clicked, this, &OrderForm::slotSelectNoneClicked);
-    connect(cancelButton.get(), &QPushButton::clicked, this, &OrderForm::slotCancelOrdersClicked);
+    connect(select_all_button.get(), &QPushButton::clicked, this,
+            &OrderForm::slot_select_all_clicked);
+    connect(select_none_button.get(), &QPushButton::clicked, this,
+            &OrderForm::slot_select_none_clicked);
+    connect(cancel_button.get(), &QPushButton::clicked, this,
+            &OrderForm::slot_cancel_orders_clicked);
 
     auto layout = make_unique<QHBoxLayout>();
-    layout->addWidget(selectAllButton.release());
-    layout->addWidget(selectNoneButton.release());
-    layout->addWidget(cancelButton.release());
+    layout->addWidget(select_all_button.release());
+    layout->addWidget(select_none_button.release());
+    layout->addWidget(cancel_button.release());
     layout->addStretch(1);
 
     setLayout(layout.release());
@@ -50,19 +53,19 @@ OrderForm::OrderForm(OrderModel& orderModel, QWidget* parent, Qt::WindowFlags f)
 
 OrderForm::~OrderForm() = default;
 
-void OrderForm::slotSelectAllClicked()
+void OrderForm::slot_select_all_clicked()
 {
-    orderModel_.setChecked(true);
+    order_model_.set_checked(true);
 }
 
-void OrderForm::slotSelectNoneClicked()
+void OrderForm::slot_select_none_clicked()
 {
-    orderModel_.setChecked(false);
+    order_model_.set_checked(false);
 }
 
-void OrderForm::slotCancelOrdersClicked()
+void OrderForm::slot_cancel_orders_clicked()
 {
-    emit cancelOrders(orderModel_.checked());
+    emit cancel_orders(order_model_.checked());
 }
 
 } // namespace ui

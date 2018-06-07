@@ -23,14 +23,14 @@ namespace {
 
 // All 1xx (informational), 204 (no content), and 304 (not modified) responses must not include a
 // body.
-constexpr bool withBody(int status) noexcept
+constexpr bool with_body(int status) noexcept
 {
     return !((status >= 100 && status < 200) || status == 204 || status == 304);
 }
 
 } // namespace
 
-void HttpBuf::setContentLength(std::streamsize pos, std::streamsize len) noexcept
+void HttpBuf::set_content_length(std::streamsize pos, std::streamsize len) noexcept
 {
     auto it = pbase_ + pos;
     do {
@@ -66,7 +66,7 @@ HttpStream::~HttpStream() = default;
 void HttpStream::commit() noexcept
 {
     if (cloff_ > 0) {
-        buf_.setContentLength(cloff_, pcount() - hcount_);
+        buf_.set_content_length(cloff_, pcount() - hcount_);
     }
     buf_.commit();
 }
@@ -80,7 +80,7 @@ void HttpStream::reset(int status, const char* reason, bool cache)
     if (!cache) {
         *this << "\r\nCache-Control: no-cache"sv;
     }
-    if (withBody(status)) {
+    if (with_body(status)) {
         // Status-Line = HTTP-Version SP Status-Code SP Reason-Phrase CRLF. Use 10 space
         // place-holder for content length. RFC2616 states that field value MAY be preceded by any
         // amount of LWS, though a single SP is preferred.

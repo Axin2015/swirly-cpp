@@ -53,15 +53,15 @@ class SWIRLY_API Asset : public Comparable<Asset> {
         return std::make_unique<Asset>(std::forward<ArgsT>(args)...);
     }
 
-    void toDsv(std::ostream& os, char delim = ',') const;
-    void toJson(std::ostream& os) const;
+    void to_dsv(std::ostream& os, char delim = ',') const;
+    void to_json(std::ostream& os) const;
 
     int compare(const Asset& rhs) const noexcept { return symbol_.compare(rhs.symbol_); }
     auto id() const noexcept { return id_; }
     auto symbol() const noexcept { return symbol_; }
     auto display() const noexcept { return +display_; }
     auto type() const noexcept { return type_; }
-    boost::intrusive::set_member_hook<> symbolHook;
+    boost::intrusive::set_member_hook<> symbol_hook;
 
   private:
     const Id32 id_;
@@ -72,7 +72,7 @@ class SWIRLY_API Asset : public Comparable<Asset> {
 
 inline std::ostream& operator<<(std::ostream& os, const Asset& asset)
 {
-    asset.toJson(os);
+    asset.to_json(os);
     return os;
 }
 

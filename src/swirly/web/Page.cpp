@@ -24,13 +24,13 @@ namespace swirly {
 inline namespace web {
 using namespace std;
 
-Page parseQuery(string_view query) noexcept
+Page parse_query(string_view query) noexcept
 {
     Page page;
     Tokeniser toks{query, "&;"sv};
     while (!toks.empty()) {
         string_view key, val;
-        tie(key, val) = splitPair(toks.top(), '=');
+        tie(key, val) = split_pair(toks.top(), '=');
         if (key == "offset"sv) {
             page.offset = stou64(val);
         } else if (key == "limit"sv) {

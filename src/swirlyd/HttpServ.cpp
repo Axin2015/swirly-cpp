@@ -24,7 +24,7 @@ using namespace std;
 HttpServ::HttpServ(Reactor& r, const Endpoint& ep, RestServ& rs)
 : TcpAcceptor{r, ep}
 , reactor_(r)
-, restServ_(rs)
+, rest_serv_(rs)
 {
 }
 
@@ -33,9 +33,9 @@ HttpServ::~HttpServ()
     list_.clear_and_dispose([](auto* sess) { delete sess; });
 }
 
-void HttpServ::doAccept(IoSocket&& sock, const Endpoint& ep, Time now)
+void HttpServ::do_accept(IoSocket&& sock, const Endpoint& ep, Time now)
 {
-    auto* const sess = new HttpSess{reactor_, move(sock), ep, restServ_, now};
+    auto* const sess = new HttpSess{reactor_, move(sock), ep, rest_serv_, now};
     list_.push_back(*sess);
 }
 

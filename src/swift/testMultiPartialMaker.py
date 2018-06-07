@@ -18,28 +18,28 @@ from swift import *
 class TestCase(RestTestCase):
 
   def test(self):
-    self.maxDiff = None
+    self.max_diff = None
     self.now = 1388534400000
-    with DbFile() as dbFile:
-      with Server(dbFile, self.now) as server:
+    with DbFile() as db_file:
+      with Server(db_file, self.now) as server:
         with Client() as client:
-          client.setTime(self.now)
+          client.set_time(self.now)
 
-          self.createMarket(client, 'EURUSD', 20140302)
+          self.create_market(client, 'EURUSD', 20140302)
 
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 3, 12345)
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 5, 12344)
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 7, 12344)
+          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 3, 12345)
+          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 5, 12344)
+          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 7, 12344)
 
-          self.takeOrder(client)
+          self.take_order(client)
 
-          self.makerOrder(client)
-          self.makerExec(client)
-          self.makerTrade(client)
-          self.makerPosn(client)
+          self.maker_order(client)
+          self.maker_exec(client)
+          self.maker_trade(client)
+          self.maker_posn(client)
 
-  def takeOrder(self, client):
-    client.setTrader('GOSAYL')
+  def take_order(self, client):
+    client.set_trader('GOSAYL')
     resp = client.send('POST', '/accnt/orders/EURUSD/20140302',
                        side = 'Sell',
                        lots = 11,
@@ -192,8 +192,8 @@ class TestCase(RestTestCase):
       }
     }, resp.content)
 
-  def makerOrder(self, client):
-    client.setTrader('MARAYL')
+  def maker_order(self, client):
+    client.set_trader('MARAYL')
     resp = client.send('GET', '/accnt/orders')
 
     self.assertEqual(200, resp.status)
@@ -219,8 +219,8 @@ class TestCase(RestTestCase):
       u'ticks': 12344
     }], resp.content)
 
-  def makerExec(self, client):
-    client.setTrader('MARAYL')
+  def maker_exec(self, client):
+    client.set_trader('MARAYL')
     resp = client.send('GET', '/accnt/execs')
 
     self.assertEqual(200, resp.status)
@@ -371,8 +371,8 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }], resp.content)
 
-  def makerTrade(self, client):
-    client.setTrader('MARAYL')
+  def maker_trade(self, client):
+    client.set_trader('MARAYL')
     resp = client.send('GET', '/accnt/trades')
 
     self.assertEqual(200, resp.status)
@@ -451,8 +451,8 @@ class TestCase(RestTestCase):
       u'ticks': 12344
     }], resp.content)
 
-  def makerPosn(self, client):
-    client.setTrader('MARAYL')
+  def maker_posn(self, client):
+    client.set_trader('MARAYL')
     resp = client.send('GET', '/accnt/posns')
 
     self.assertEqual(200, resp.status)

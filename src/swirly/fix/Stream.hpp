@@ -50,7 +50,7 @@ class SWIRLY_API FixBuf : public std::streambuf {
         pcount_ = 0;
         sum_ = 0;
     }
-    void setBodyLength(std::streamsize pos, std::streamsize len) noexcept;
+    void set_body_length(std::streamsize pos, std::streamsize len) noexcept;
 
   protected:
     int_type overflow(int_type c) noexcept override;

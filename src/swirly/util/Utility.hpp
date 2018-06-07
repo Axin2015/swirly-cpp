@@ -29,7 +29,7 @@ template <typename>
 struct DependentFalse : std::false_type {
 };
 
-SWIRLY_API int hexDigits(int64_t i) noexcept;
+SWIRLY_API int hex_digits(int64_t i) noexcept;
 
 } // namespace util
 } // namespace swirly

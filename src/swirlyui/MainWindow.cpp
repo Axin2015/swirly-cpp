@@ -34,48 +34,48 @@ using namespace std;
 
 MainWindow::MainWindow()
 {
-    connect(&client_, &HttpClient::refDataComplete, this, &MainWindow::slotRefDataComplete);
-    connect(&client_, &HttpClient::serviceError, this, &MainWindow::slotServiceError);
+    connect(&client_, &HttpClient::ref_data_complete, this, &MainWindow::slot_ref_data_complete);
+    connect(&client_, &HttpClient::service_error, this, &MainWindow::slot_service_error);
 
-    auto marketView = make_unique<MarketView>(client_.instrModel(), client_.marketModel());
-    connect(marketView.get(), &MarketView::createMarket, this, &MainWindow::slotCreateMarket);
-    connect(marketView.get(), &MarketView::createOrder, this, &MainWindow::slotCreateOrder);
+    auto market_view = make_unique<MarketView>(client_.instr_model(), client_.market_model());
+    connect(market_view.get(), &MarketView::create_market, this, &MainWindow::slot_create_market);
+    connect(market_view.get(), &MarketView::create_order, this, &MainWindow::slot_create_order);
 
-    auto orderView = make_unique<OrderView>(client_.orderModel());
-    connect(orderView.get(), &OrderView::cancelOrders, this, &MainWindow::slotCancelOrders);
-    connect(orderView.get(), &OrderView::setFields, marketView.get(), &MarketView::setFields);
+    auto order_view = make_unique<OrderView>(client_.order_model());
+    connect(order_view.get(), &OrderView::cancel_orders, this, &MainWindow::slot_cancel_orders);
+    connect(order_view.get(), &OrderView::set_fields, market_view.get(), &MarketView::set_fields);
 
-    auto execView = make_unique<ExecView>(client_.execModel());
-    connect(execView.get(), &ExecView::setFields, marketView.get(), &MarketView::setFields);
+    auto exec_view = make_unique<ExecView>(client_.exec_model());
+    connect(exec_view.get(), &ExecView::set_fields, market_view.get(), &MarketView::set_fields);
 
-    auto tradeView = make_unique<TradeView>(client_.tradeModel());
-    connect(tradeView.get(), &TradeView::setFields, marketView.get(), &MarketView::setFields);
+    auto trade_view = make_unique<TradeView>(client_.trade_model());
+    connect(trade_view.get(), &TradeView::set_fields, market_view.get(), &MarketView::set_fields);
 
-    auto posnView = make_unique<PosnView>(client_.posnModel());
-    connect(posnView.get(), &PosnView::setFields, marketView.get(), &MarketView::setFields);
+    auto posn_view = make_unique<PosnView>(client_.posn_model());
+    connect(posn_view.get(), &PosnView::set_fields, market_view.get(), &MarketView::set_fields);
 
-    auto topTabs = make_unique<QTabWidget>();
-    topTabs->addTab(assetView_ = new AssetView{client_.assetModel()}, tr("Asset"));
-    topTabs->addTab(instrView_ = new InstrView{client_.instrModel()}, tr("Instr"));
-    topTabs->addTab(marketView_ = marketView.release(), tr("Market"));
-    topTabs->setCurrentIndex(2);
+    auto top_tabs = make_unique<QTabWidget>();
+    top_tabs->addTab(asset_view_ = new AssetView{client_.assetModel()}, tr("Asset"));
+    top_tabs->addTab(instr_view_ = new InstrView{client_.instr_model()}, tr("Instr"));
+    top_tabs->addTab(market_view_ = market_view.release(), tr("Market"));
+    top_tabs->setCurrentIndex(2);
 
-    auto bottomTabs = make_unique<QTabWidget>();
-    bottomTabs->addTab(orderView.release(), tr("Order"));
-    bottomTabs->addTab(execView.release(), tr("Exec"));
-    bottomTabs->addTab(tradeView.release(), tr("Trade"));
-    bottomTabs->addTab(posnView.release(), tr("Posn"));
+    auto bottom_tabs = make_unique<QTabWidget>();
+    bottom_tabs->addTab(order_view.release(), tr("Order"));
+    bottom_tabs->addTab(exec_view.release(), tr("Exec"));
+    bottom_tabs->addTab(trade_view.release(), tr("Trade"));
+    bottom_tabs->addTab(posn_view.release(), tr("Posn"));
 
     auto splitter = make_unique<QSplitter>(Qt::Vertical);
-    splitter->addWidget(topTabs.release());
-    splitter->addWidget(bottomTabs.release());
+    splitter->addWidget(top_tabs.release());
+    splitter->addWidget(bottom_tabs.release());
 
     setCentralWidget(splitter.release());
 
-    createActions();
-    createStatusBar();
+    create_actions();
+    create_status_bar();
 
-    readSettings();
+    read_settings();
 
     setUnifiedTitleAndToolBarOnMac(true);
 }
@@ -85,103 +85,103 @@ MainWindow::~MainWindow() = default;
 void MainWindow::closeEvent(QCloseEvent* event)
 {
     qDebug() << "closeEvent";
-    if (canClose()) {
-        writeSettings();
+    if (can_close()) {
+        write_settings();
         event->accept();
     } else {
         event->ignore();
     }
 }
 
-void MainWindow::slotRefDataComplete()
+void MainWindow::slot_ref_data_complete()
 {
-    qDebug() << "slotRefDataComplete";
-    assetView_->resizeColumnsToContents();
-    instrView_->resizeColumnsToContents();
+    qDebug() << "slot_ref_data_complete";
+    asset_view_->resize_columns_to_contents();
+    instr_view_->resize_columns_to_contents();
 }
 
-void MainWindow::slotServiceError(const QString& error)
+void MainWindow::slot_service_error(const QString& error)
 {
-    qDebug().nospace() << "slotServiceError: " << error;
+    qDebug().nospace() << "slot_service_error: " << error;
 }
 
-void MainWindow::slotCreateMarket(const Instr& instr, QDate settlDate)
+void MainWindow::slot_create_market(const Instr& instr, QDate settl_date)
 {
-    qDebug().nospace() << "slotCreateMarket: instr=" << instr //
-                       << ",settlDate=" << settlDate;
-    client_.createMarket(instr, settlDate);
+    qDebug().nospace() << "slot_create_market: instr=" << instr //
+                       << ",settl_date=" << settl_date;
+    client_.create_market(instr, settl_date);
 }
 
-void MainWindow::slotCreateOrder(const Instr& instr, QDate settlDate, const QString& ref, Side side,
-                                 Lots lots, Ticks ticks)
+void MainWindow::slot_create_order(const Instr& instr, QDate settl_date, const QString& ref,
+                                   Side side, Lots lots, Ticks ticks)
 {
-    qDebug().nospace() << "slotCreateOrder: instr=" << instr //
-                       << ",settlDate=" << settlDate         //
-                       << ",ref=" << ref                     //
-                       << ",side=" << side                   //
-                       << ",lots=" << lots                   //
+    qDebug().nospace() << "slot_create_order: instr=" << instr //
+                       << ",settl_date=" << settl_date         //
+                       << ",ref=" << ref                       //
+                       << ",side=" << side                     //
+                       << ",lots=" << lots                     //
                        << ",ticks=" << ticks;
-    client_.createOrder(instr, settlDate, ref, side, lots, ticks);
+    client_.create_order(instr, settl_date, ref, side, lots, ticks);
 }
 
-void MainWindow::slotCancelOrders(const OrderKeys& keys)
+void MainWindow::slot_cancel_orders(const OrderKeys& keys)
 {
-    qDebug() << "slotCancelOrders";
-    client_.cancelOrders(keys);
+    qDebug() << "slot_cancel_orders";
+    client_.cancel_orders(keys);
 }
 
-void MainWindow::slotAbout()
+void MainWindow::slot_about()
 {
-    qDebug() << "slotAbout";
+    qDebug() << "slot_about";
     QMessageBox::about(this, tr("About Swiry UI"), tr("The Swirly UI."));
 }
 
-void MainWindow::createActions()
+void MainWindow::create_actions()
 {
-    auto* const fileMenu = menuBar()->addMenu(tr("&File"));
+    auto* const file_menu = menuBar()->addMenu(tr("&File"));
 
-    const auto exitIcon = QIcon::fromTheme("application-exit");
+    const auto exit_icon = QIcon::fromTheme("application-exit");
 
-    auto* const exitAct = fileMenu->addAction(exitIcon, tr("E&xit"), this, &QWidget::close);
-    exitAct->setShortcuts(QKeySequence::Quit);
-    exitAct->setStatusTip(tr("Exit the application"));
+    auto* const exit_act = file_menu->addAction(exit_icon, tr("E&xit"), this, &QWidget::close);
+    exit_act->setShortcuts(QKeySequence::Quit);
+    exit_act->setStatusTip(tr("Exit the application"));
 
-    auto* const helpMenu = menuBar()->addMenu(tr("&Help"));
+    auto* const help_menu = menuBar()->addMenu(tr("&Help"));
 
-    auto* const aboutAct = helpMenu->addAction(tr("&About"), this, &MainWindow::slotAbout);
-    aboutAct->setStatusTip(tr("Show the application's About box"));
+    auto* const about_act = help_menu->addAction(tr("&About"), this, &MainWindow::slot_about);
+    about_act->setStatusTip(tr("Show the application's About box"));
 
-    auto* const aboutQtAct = helpMenu->addAction(tr("About &Qt"), qApp, &QApplication::aboutQt);
-    aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
+    auto* const about_qt_act = help_menu->addAction(tr("About &Qt"), qApp, &QApplication::aboutQt);
+    about_qt_act->setStatusTip(tr("Show the Qt library's About box"));
 }
 
-void MainWindow::createStatusBar()
+void MainWindow::create_status_bar()
 {
     statusBar()->showMessage(tr("Ready"));
 }
 
-void MainWindow::readSettings()
+void MainWindow::read_settings()
 {
     const QSettings settings{QCoreApplication::organizationName(),
                              QCoreApplication::applicationName()};
     const auto geometry = settings.value("geometry", QByteArray()).toByteArray();
     if (geometry.isEmpty()) {
-        const auto availableGeometry = QApplication::desktop()->availableGeometry(this);
-        resize(availableGeometry.width() / 3, availableGeometry.height() / 2);
-        move((availableGeometry.width() - width()) / 2,
-             (availableGeometry.height() - height()) / 2);
+        const auto available_geometry = QApplication::desktop()->availableGeometry(this);
+        resize(available_geometry.width() / 3, available_geometry.height() / 2);
+        move((available_geometry.width() - width()) / 2,
+             (available_geometry.height() - height()) / 2);
     } else {
         restoreGeometry(geometry);
     }
 }
 
-void MainWindow::writeSettings()
+void MainWindow::write_settings()
 {
     QSettings settings{QCoreApplication::organizationName(), QCoreApplication::applicationName()};
     settings.setValue("geometry", saveGeometry());
 }
 
-bool MainWindow::canClose()
+bool MainWindow::can_close()
 {
     return true;
 }

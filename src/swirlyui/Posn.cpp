@@ -21,29 +21,29 @@
 namespace swirly {
 namespace ui {
 
-Posn Posn::fromJson(const Instr& instr, const QJsonObject& obj)
+Posn Posn::from_json(const Instr& instr, const QJsonObject& obj)
 {
-    using swirly::ui::fromJson;
-    return Posn{fromJson<QString>(obj["accnt"]),
-                fromJson<Id64>(obj["market_id"]),
+    using swirly::ui::from_json;
+    return Posn{from_json<QString>(obj["accnt"]),
+                from_json<Id64>(obj["market_id"]),
                 instr,
-                fromJson<QDate>(obj["settl_date"]),
-                fromJson<Lots>(obj["buy_lots"]),
-                fromJson<Cost>(obj["buy_cost"]),
-                fromJson<Lots>(obj["sell_lots"]),
-                fromJson<Cost>(obj["sell_cost"])};
+                from_json<QDate>(obj["settl_date"]),
+                from_json<Lots>(obj["buy_lots"]),
+                from_json<Cost>(obj["buy_cost"]),
+                from_json<Lots>(obj["sell_lots"]),
+                from_json<Cost>(obj["sell_cost"])};
 }
 
 QDebug operator<<(QDebug debug, const Posn& posn)
 {
-    debug.nospace() << "Posn{accnt=" << posn.accnt()      //
-                    << ",marketId=" << posn.marketId()    //
-                    << ",instr=" << posn.instr().symbol() //
-                    << ",settlDate=" << posn.settlDate()  //
-                    << ",buyLots=" << posn.buyLots()      //
-                    << ",buyCost=" << posn.buyCost()      //
-                    << ",sellLots=" << posn.sellLots()    //
-                    << ",sellCost=" << posn.sellCost()    //
+    debug.nospace() << "Posn{accnt=" << posn.accnt()       //
+                    << ",market_id=" << posn.market_id()   //
+                    << ",instr=" << posn.instr().symbol()  //
+                    << ",settl_date=" << posn.settl_date() //
+                    << ",buy_lots=" << posn.buy_lots()     //
+                    << ",buy_cost=" << posn.buy_cost()     //
+                    << ",sell_lots=" << posn.sell_lots()   //
+                    << ",sell_cost=" << posn.sell_cost()   //
                     << '}';
     return debug;
 }

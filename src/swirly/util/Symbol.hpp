@@ -257,7 +257,7 @@ inline std::size_t pstrcpy(char (&dst)[SizeN], Symbol src) noexcept
 
 template <>
 struct TypeTraits<Symbol> {
-    static auto fromString(std::string_view sv) noexcept { return Symbol{sv}; }
+    static auto from_string(std::string_view sv) noexcept { return Symbol{sv}; }
 };
 
 } // namespace util

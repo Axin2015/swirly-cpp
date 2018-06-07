@@ -67,7 +67,7 @@ class SWIRLY_API Reactor {
         void reset(std::nullptr_t = nullptr) noexcept
         {
             if (reactor_) {
-                reactor_->doUnsubscribe(fd_, sid_);
+                reactor_->do_unsubscribe(fd_, sid_);
                 reactor_ = nullptr;
                 fd_ = -1;
                 sid_ = 0;
@@ -81,11 +81,11 @@ class SWIRLY_API Reactor {
         }
 
         // Modify IO event subscription.
-        void setEvents(unsigned events, IoSlot slot)
+        void set_events(unsigned events, IoSlot slot)
         {
-            reactor_->doSetEvents(fd_, sid_, events, slot);
+            reactor_->do_set_events(fd_, sid_, events, slot);
         }
-        void setEvents(unsigned events) { reactor_->doSetEvents(fd_, sid_, events); }
+        void set_events(unsigned events) { reactor_->do_set_events(fd_, sid_, events); }
 
       private:
         Reactor* reactor_{nullptr};
@@ -103,44 +103,44 @@ class SWIRLY_API Reactor {
     Reactor(Reactor&&) noexcept = delete;
     Reactor& operator=(Reactor&&) noexcept = delete;
 
-    void interrupt() noexcept { doInterrupt(); }
+    void interrupt() noexcept { do_interrupt(); }
     // clang-format off
     [[nodiscard]] Handle subscribe(int fd, unsigned events, IoSlot slot)
     {
-        return doSubscribe(fd, events, slot);
+        return do_subscribe(fd, events, slot);
     }
     [[nodiscard]] Timer timer(Time expiry, Duration interval, Priority priority, TimerSlot slot)
     {
-        return doTimer(expiry, interval, priority, slot);
+        return do_timer(expiry, interval, priority, slot);
     }
     [[nodiscard]] Timer timer(Time expiry, Priority priority, TimerSlot slot)
     {
-        return doTimer(expiry, priority, slot);
+        return do_timer(expiry, priority, slot);
     }
     // clang-format on
     int poll(Millis timeout = Millis::max())
     {
-        return doPoll(UnixClock::now(), timeout);
+        return do_poll(UnixClock::now(), timeout);
     }
 
   protected:
     /**
      * Overload for unit-testing.
      */
-    int poll(Time now, Millis timeout) { return doPoll(now, timeout); }
+    int poll(Time now, Millis timeout) { return do_poll(now, timeout); }
 
-    virtual void doInterrupt() noexcept = 0;
+    virtual void do_interrupt() noexcept = 0;
 
-    virtual Handle doSubscribe(int fd, unsigned events, IoSlot slot) = 0;
-    virtual void doUnsubscribe(int fd, int sid) noexcept = 0;
+    virtual Handle do_subscribe(int fd, unsigned events, IoSlot slot) = 0;
+    virtual void do_unsubscribe(int fd, int sid) noexcept = 0;
 
-    virtual void doSetEvents(int fd, int sid, unsigned events, IoSlot slot) = 0;
-    virtual void doSetEvents(int fd, int sid, unsigned events) = 0;
+    virtual void do_set_events(int fd, int sid, unsigned events, IoSlot slot) = 0;
+    virtual void do_set_events(int fd, int sid, unsigned events) = 0;
 
-    virtual Timer doTimer(Time expiry, Duration interval, Priority priority, TimerSlot slot) = 0;
-    virtual Timer doTimer(Time expiry, Priority priority, TimerSlot slot) = 0;
+    virtual Timer do_timer(Time expiry, Duration interval, Priority priority, TimerSlot slot) = 0;
+    virtual Timer do_timer(Time expiry, Priority priority, TimerSlot slot) = 0;
 
-    virtual int doPoll(Time now, Millis timeout) = 0;
+    virtual int do_poll(Time now, Millis timeout) = 0;
 };
 
 } // namespace sys

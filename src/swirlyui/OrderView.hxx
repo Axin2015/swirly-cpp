@@ -38,12 +38,12 @@ class OrderView : public QWidget {
     ~OrderView() override;
 
   signals:
-    void cancelOrders(const OrderKeys& keys);
-    void setFields(const QString& instrSymbol, QDate settlDate, std::optional<Lots> lots,
-                   std::optional<Ticks> ticks);
+    void cancel_orders(const OrderKeys& keys);
+    void set_fields(const QString& instr_symbol, QDate settl_date, std::optional<Lots> lots,
+                    std::optional<Ticks> ticks);
 
   private slots:
-    void slotClicked(const QModelIndex& index);
+    void slot_clicked(const QModelIndex& index);
 
   private:
     OrderModel& model_;

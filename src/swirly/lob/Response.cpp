@@ -41,11 +41,11 @@ Response::Response(Response&&) noexcept = default;
 
 Response& Response::operator=(Response&&) noexcept = default;
 
-void Response::toJson(ostream& os) const
+void Response::to_json(ostream& os) const
 {
     os << "{\"market\":"sv;
     if (market_) {
-        market_->toJson(os);
+        market_->to_json(os);
     } else {
         os << "null"sv;
     }
@@ -82,7 +82,7 @@ void Response::clear() noexcept
     posn_ = nullptr;
 }
 
-void Response::clearMatches() noexcept
+void Response::clear_matches() noexcept
 {
     if (!orders_.empty()) {
         orders_.resize(1);
@@ -93,22 +93,22 @@ void Response::clearMatches() noexcept
     posn_ = nullptr;
 }
 
-void Response::setMarket(const ConstMarketPtr& market) noexcept
+void Response::set_market(const ConstMarketPtr& market) noexcept
 {
     market_ = market;
 }
 
-void Response::insertOrder(const ConstOrderPtr& order)
+void Response::insert_order(const ConstOrderPtr& order)
 {
     orders_.push_back(order);
 }
 
-void Response::insertExec(const ConstExecPtr& exec)
+void Response::insert_exec(const ConstExecPtr& exec)
 {
     execs_.push_back(exec);
 }
 
-void Response::setPosn(const ConstPosnPtr& posn) noexcept
+void Response::set_posn(const ConstPosnPtr& posn) noexcept
 {
     posn_ = posn;
 }

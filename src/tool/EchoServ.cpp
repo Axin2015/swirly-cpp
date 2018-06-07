@@ -42,10 +42,10 @@ class EchoSess {
     , sock_{move(sock)}
     , ep_{ep}
     {
-        sock_.setNonBlock();
-        sock_.setTcpNoDelay(true);
-        sub_ = r.subscribe(sock_.get(), EventIn, bind<&EchoSess::onInput>(this));
-        tmr_ = r.timer(now + IdleTimeout, Priority::Low, bind<&EchoSess::onTimer>(this));
+        sock_.set_non_block();
+        sock_.set_tcp_no_delay(true);
+        sub_ = r.subscribe(sock_.get(), EventIn, bind<&EchoSess::on_input>(this));
+        tmr_ = r.timer(now + IdleTimeout, Priority::Low, bind<&EchoSess::on_timer>(this));
     }
     void close() noexcept
     {
@@ -54,7 +54,7 @@ class EchoSess {
         sub_.reset();
         delete this;
     }
-    void onInput(int fd, unsigned events, Time now)
+    void on_input(int fd, unsigned events, Time now)
     {
         try {
             if (events & EventIn) {
@@ -68,7 +68,7 @@ class EchoSess {
                     }
                     tmr_.cancel();
                     tmr_ = reactor_.timer(now + IdleTimeout, Priority::Low,
-                                          bind<&EchoSess::onTimer>(this));
+                                          bind<&EchoSess::on_timer>(this));
                 } else {
                     close();
                 }
@@ -78,12 +78,12 @@ class EchoSess {
             close();
         }
     }
-    void onTimer(Timer& tmr, Time now)
+    void on_timer(Timer& tmr, Time now)
     {
         SWIRLY_INFO << "timeout"sv;
         close();
     }
-    boost::intrusive::list_member_hook<AutoUnlinkOption> listHook;
+    boost::intrusive::list_member_hook<AutoUnlinkOption> list_hook;
 
   private:
     Reactor& reactor_;
@@ -97,8 +97,8 @@ class EchoServ : public TcpAcceptor<EchoServ> {
 
     friend TcpAcceptor<EchoServ>;
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
-    using MemberHookOption = boost::intrusive::member_hook<EchoSess, decltype(EchoSess::listHook),
-                                                           &EchoSess::listHook>;
+    using MemberHookOption = boost::intrusive::member_hook<EchoSess, decltype(EchoSess::list_hook),
+                                                           &EchoSess::list_hook>;
     using SessList = boost::intrusive::list<EchoSess, ConstantTimeSizeOption, MemberHookOption>;
 
   public:
@@ -109,20 +109,20 @@ class EchoServ : public TcpAcceptor<EchoServ> {
     }
     ~EchoServ()
     {
-        sessList_.clear_and_dispose([](auto* sess) { delete sess; });
+        sess_list_.clear_and_dispose([](auto* sess) { delete sess; });
     }
 
   private:
-    void doAccept(IoSocket&& sock, const Endpoint& ep, Time now)
+    void do_accept(IoSocket&& sock, const Endpoint& ep, Time now)
     {
         SWIRLY_INFO << "session opened: "sv << ep;
         // High performance TCP servers could use a custom allocator.
         auto* const sess = new EchoSess{reactor_, move(sock), ep, now};
-        sessList_.push_back(*sess);
+        sess_list_.push_back(*sess);
     }
     Reactor& reactor_;
     // List of active sessions.
-    SessList sessList_;
+    SessList sess_list_;
 };
 } // namespace
 
@@ -133,14 +133,14 @@ int main(int argc, char* argv[])
 
         EpollReactor reactor{1024};
         const TcpEndpoint ep{Tcp::v4(), 7777};
-        EchoServ echoServ{reactor, ep};
+        EchoServ echo_serv{reactor, ep};
 
         // Start service threads.
-        ReactorThread reactorThread{reactor, ThreadConfig{"reactor"s}};
+        ReactorThread reactor_thread{reactor, ThreadConfig{"reactor"s}};
 
         // Wait for termination.
-        SigWait sigWait;
-        while (const auto sig = sigWait()) {
+        SigWait sig_wait;
+        while (const auto sig = sig_wait()) {
             switch (sig) {
             case SIGHUP:
                 SWIRLY_INFO << "received SIGHUP"sv;

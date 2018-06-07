@@ -28,119 +28,119 @@ struct TypeTraits;
 
 template <>
 struct TypeTraits<std::int16_t> {
-    static auto fromString(std::string_view sv) noexcept { return stoi16(sv); }
-    static auto fromString(const std::string& s) noexcept
+    static auto from_string(std::string_view sv) noexcept { return stoi16(sv); }
+    static auto from_string(const std::string& s) noexcept
     {
-        return fromString(std::string_view{s.data(), s.size()});
+        return from_string(std::string_view{s.data(), s.size()});
     }
 };
 
 template <>
 struct TypeTraits<std::int32_t> {
-    static auto fromString(std::string_view sv) noexcept { return stoi32(sv); }
-    static auto fromString(const std::string& s) noexcept
+    static auto from_string(std::string_view sv) noexcept { return stoi32(sv); }
+    static auto from_string(const std::string& s) noexcept
     {
-        return fromString(std::string_view{s.data(), s.size()});
+        return from_string(std::string_view{s.data(), s.size()});
     }
 };
 
 template <>
 struct TypeTraits<std::int64_t> {
-    static auto fromString(std::string_view sv) noexcept { return stoi32(sv); }
-    static auto fromString(const std::string& s) noexcept
+    static auto from_string(std::string_view sv) noexcept { return stoi32(sv); }
+    static auto from_string(const std::string& s) noexcept
     {
-        return fromString(std::string_view{s.data(), s.size()});
+        return from_string(std::string_view{s.data(), s.size()});
     }
 };
 
 template <>
 struct TypeTraits<std::uint16_t> {
-    static auto fromString(std::string_view sv) noexcept { return stou16(sv); }
-    static auto fromString(const std::string& s) noexcept
+    static auto from_string(std::string_view sv) noexcept { return stou16(sv); }
+    static auto from_string(const std::string& s) noexcept
     {
-        return fromString(std::string_view{s.data(), s.size()});
+        return from_string(std::string_view{s.data(), s.size()});
     }
 };
 
 template <>
 struct TypeTraits<std::uint32_t> {
-    static auto fromString(std::string_view sv) noexcept { return stou32(sv); }
-    static auto fromString(const std::string& s) noexcept
+    static auto from_string(std::string_view sv) noexcept { return stou32(sv); }
+    static auto from_string(const std::string& s) noexcept
     {
-        return fromString(std::string_view{s.data(), s.size()});
+        return from_string(std::string_view{s.data(), s.size()});
     }
 };
 
 template <>
 struct TypeTraits<std::uint64_t> {
-    static auto fromString(std::string_view sv) noexcept { return stou32(sv); }
-    static auto fromString(const std::string& s) noexcept
+    static auto from_string(std::string_view sv) noexcept { return stou32(sv); }
+    static auto from_string(const std::string& s) noexcept
     {
-        return fromString(std::string_view{s.data(), s.size()});
+        return from_string(std::string_view{s.data(), s.size()});
     }
 };
 
 template <>
 struct TypeTraits<bool> {
-    static auto fromString(std::string_view sv) noexcept { return stob(sv); }
-    static auto fromString(const std::string& s) noexcept
+    static auto from_string(std::string_view sv) noexcept { return stob(sv); }
+    static auto from_string(const std::string& s) noexcept
     {
-        return fromString(std::string_view{s.data(), s.size()});
+        return from_string(std::string_view{s.data(), s.size()});
     }
 };
 
 template <typename ValueT>
 struct TypeTraits<ValueT, std::enable_if_t<std::is_enum_v<ValueT>>> {
-    static auto fromString(std::string_view sv) noexcept
+    static auto from_string(std::string_view sv) noexcept
     {
         using UnderlyingTraits = TypeTraits<std::underlying_type_t<ValueT>>;
-        return static_cast<ValueT>(UnderlyingTraits::fromString(sv));
+        return static_cast<ValueT>(UnderlyingTraits::from_string(sv));
     }
-    static auto fromString(const std::string& s) noexcept
+    static auto from_string(const std::string& s) noexcept
     {
-        return fromString(std::string_view{s.data(), s.size()});
+        return from_string(std::string_view{s.data(), s.size()});
     }
 };
 
 template <>
 struct TypeTraits<Time> {
-    static auto fromString(std::string_view sv) noexcept { return toTime(Millis{stoi64(sv)}); }
-    static auto fromString(const std::string& s) noexcept
+    static auto from_string(std::string_view sv) noexcept { return to_time(Millis{stoi64(sv)}); }
+    static auto from_string(const std::string& s) noexcept
     {
-        return fromString(std::string_view{s.data(), s.size()});
+        return from_string(std::string_view{s.data(), s.size()});
     }
 };
 
 template <>
 struct TypeTraits<std::string_view> {
-    static auto fromString(std::string_view sv) noexcept { return sv; }
-    static auto fromString(const std::string& s) noexcept
+    static auto from_string(std::string_view sv) noexcept { return sv; }
+    static auto from_string(const std::string& s) noexcept
     {
-        return fromString(std::string_view{s.data(), s.size()});
+        return from_string(std::string_view{s.data(), s.size()});
     }
 };
 
 template <>
 struct TypeTraits<std::string> {
-    static auto fromString(std::string_view sv) noexcept
+    static auto from_string(std::string_view sv) noexcept
     {
         return std::string{sv.data(), sv.size()};
     }
-    static auto fromString(const std::string& s) noexcept { return s; }
+    static auto from_string(const std::string& s) noexcept { return s; }
 };
 
 template <typename ValueT>
-inline ValueT fromString(std::string_view sv) noexcept
+inline ValueT from_string(std::string_view sv) noexcept
 {
     using Traits = TypeTraits<ValueT>;
-    return Traits::fromString(sv);
+    return Traits::from_string(sv);
 }
 
 template <typename ValueT>
-inline ValueT fromString(const std::string& s) noexcept
+inline ValueT from_string(const std::string& s) noexcept
 {
     using Traits = TypeTraits<ValueT>;
-    return Traits::fromString(s);
+    return Traits::from_string(s);
 }
 
 } // namespace util

@@ -44,48 +44,48 @@ struct TypeTraits;
 
 template <>
 struct TypeTraits<int> {
-    static int fromJson(const QJsonValue& value) { return value.toInt(); }
-    static int fromVariant(const QVariant& value) { return value.toInt(); }
-    static QJsonValue toJson(int value) { return value; }
-    static QVariant toVariant(int value) { return value; }
+    static int from_json(const QJsonValue& value) { return value.toInt(); }
+    static int from_variant(const QVariant& value) { return value.toInt(); }
+    static QJsonValue to_json(int value) { return value; }
+    static QVariant to_variant(int value) { return value; }
 };
 
 template <>
 struct TypeTraits<unsigned> {
-    static unsigned fromJson(const QJsonValue& value)
+    static unsigned from_json(const QJsonValue& value)
     {
         return static_cast<unsigned>(value.toInt());
     }
-    static unsigned fromVariant(const QVariant& value) { return value.toUInt(); }
-    static QJsonValue toJson(unsigned value) { return static_cast<int>(value); }
-    static QVariant toVariant(unsigned value) { return value; }
+    static unsigned from_variant(const QVariant& value) { return value.toUInt(); }
+    static QJsonValue to_json(unsigned value) { return static_cast<int>(value); }
+    static QVariant to_variant(unsigned value) { return value; }
 };
 
 template <typename ValueT>
 struct TypeTraits<ValueT,
                   typename std::enable_if_t<                       //
-                      isIntWrapper<ValueT>                         //
+                      is_int_wrapper<ValueT>                       //
                       && (sizeof(typename ValueT::ValueType) <= 4) //
                       >> {
-    static ValueT fromJson(const QJsonValue& value) { return ValueT{value.toInt()}; }
-    static ValueT fromVariant(const QVariant& value) { return ValueT{value.toInt()}; }
-    static QJsonValue toJson(ValueT value) { return static_cast<int>(value.count()); }
-    static QVariant toVariant(ValueT value) { return static_cast<int>(value.count()); }
+    static ValueT from_json(const QJsonValue& value) { return ValueT{value.toInt()}; }
+    static ValueT from_variant(const QVariant& value) { return ValueT{value.toInt()}; }
+    static QJsonValue to_json(ValueT value) { return static_cast<int>(value.count()); }
+    static QVariant to_variant(ValueT value) { return static_cast<int>(value.count()); }
 };
 
 template <typename ValueT>
 struct TypeTraits<ValueT,
                   typename std::enable_if_t<                      //
-                      isIntWrapper<ValueT>                        //
+                      is_int_wrapper<ValueT>                      //
                       && (sizeof(typename ValueT::ValueType) > 4) //
                       >> {
-    static ValueT fromJson(const QJsonValue& value) { return ValueT{value.toDouble()}; }
-    static ValueT fromVariant(const QVariant& value) { return ValueT{value.toLongLong()}; }
-    static QJsonValue toJson(ValueT value) { return static_cast<qint64>(value.count()); }
-    static QVariant toVariant(ValueT value) { return static_cast<qlonglong>(value.count()); }
+    static ValueT from_json(const QJsonValue& value) { return ValueT{value.toDouble()}; }
+    static ValueT from_variant(const QVariant& value) { return ValueT{value.toLongLong()}; }
+    static QJsonValue to_json(ValueT value) { return static_cast<qint64>(value.count()); }
+    static QVariant to_variant(ValueT value) { return static_cast<qlonglong>(value.count()); }
 };
 
-template <typename ValueT, typename std::enable_if_t<isIntWrapper<ValueT>>* = nullptr>
+template <typename ValueT, typename std::enable_if_t<is_int_wrapper<ValueT>>* = nullptr>
 QDebug operator<<(QDebug debug, ValueT val)
 {
     return debug.nospace() << val.count();
@@ -93,20 +93,20 @@ QDebug operator<<(QDebug debug, ValueT val)
 
 template <>
 struct TypeTraits<QString> {
-    static QString fromJson(const QJsonValue& value) { return value.toString(); }
-    static QString fromVariant(const QVariant& value) { return value.toString(); }
-    static QJsonValue toJson(const QString& value) { return value; }
-    static QVariant toVariant(const QString& value) { return value; }
+    static QString from_json(const QJsonValue& value) { return value.toString(); }
+    static QString from_variant(const QVariant& value) { return value.toString(); }
+    static QJsonValue to_json(const QString& value) { return value; }
+    static QVariant to_variant(const QString& value) { return value; }
 };
 
-inline auto dateToIso(const QDate& value) noexcept
+inline auto date_to_iso(const QDate& value) noexcept
 {
     return value.year() * 10000 + value.month() * 100 + value.day();
 }
 
 template <>
 struct TypeTraits<QDate> {
-    static QDate fromJson(const QJsonValue& value)
+    static QDate from_json(const QJsonValue& value)
     {
         const auto n = value.toInt();
         const auto y = n / 10000;
@@ -114,114 +114,114 @@ struct TypeTraits<QDate> {
         const auto d = n % 100;
         return {y, m, d};
     }
-    static QDate fromVariant(const QVariant& value) { return value.toDate(); }
-    static QJsonValue toJson(const QDate& value) { return dateToIso(value); }
-    static QVariant toVariant(const QDate& value) { return value; }
+    static QDate from_variant(const QVariant& value) { return value.toDate(); }
+    static QJsonValue to_json(const QDate& value) { return date_to_iso(value); }
+    static QVariant to_variant(const QDate& value) { return value; }
 };
 
 template <>
 struct TypeTraits<QDateTime> {
-    static QDateTime fromJson(const QJsonValue& value)
+    static QDateTime from_json(const QJsonValue& value)
     {
         return QDateTime::fromMSecsSinceEpoch(value.toDouble());
     }
-    static QDateTime fromVariant(const QVariant& value) { return value.toDateTime(); }
-    static QJsonValue toJson(const QDateTime& value) { return value.toMSecsSinceEpoch(); }
-    static QVariant toVariant(const QDateTime& value) { return value; }
+    static QDateTime from_variant(const QVariant& value) { return value.toDateTime(); }
+    static QJsonValue to_json(const QDateTime& value) { return value.toMSecsSinceEpoch(); }
+    static QVariant to_variant(const QDateTime& value) { return value; }
 };
 
 template <>
 struct TypeTraits<AssetType> {
-    static AssetType fromString(const QString& value);
-    static AssetType fromJson(const QJsonValue& value) { return fromString(value.toString()); }
-    static AssetType fromVariant(const QVariant& value) { return fromString(value.toString()); }
-    static QJsonValue toJson(AssetType value) { return enumString(value); }
-    static QVariant toVariant(AssetType value) { return enumString(value); }
+    static AssetType from_string(const QString& value);
+    static AssetType from_json(const QJsonValue& value) { return from_string(value.toString()); }
+    static AssetType from_variant(const QVariant& value) { return from_string(value.toString()); }
+    static QJsonValue to_json(AssetType value) { return enum_string(value); }
+    static QVariant to_variant(AssetType value) { return enum_string(value); }
 };
 
 inline QDebug operator<<(QDebug debug, AssetType type)
 {
-    return debug.nospace() << enumString(type);
+    return debug.nospace() << enum_string(type);
 }
 
 template <>
 struct TypeTraits<Direct> {
-    static Direct fromString(const QString& value);
-    static Direct fromJson(const QJsonValue& value) { return fromString(value.toString()); }
-    static Direct fromVariant(const QVariant& value) { return fromString(value.toString()); }
-    static QJsonValue toJson(Direct value) { return enumString(value); }
-    static QVariant toVariant(Direct value) { return enumString(value); }
+    static Direct from_string(const QString& value);
+    static Direct from_json(const QJsonValue& value) { return from_string(value.toString()); }
+    static Direct from_variant(const QVariant& value) { return from_string(value.toString()); }
+    static QJsonValue to_json(Direct value) { return enum_string(value); }
+    static QVariant to_variant(Direct value) { return enum_string(value); }
 };
 
 inline QDebug operator<<(QDebug debug, Direct direct)
 {
-    return debug.nospace() << enumString(direct);
+    return debug.nospace() << enum_string(direct);
 }
 
 template <>
 struct TypeTraits<LiqInd> {
-    static LiqInd fromString(const QString& value);
-    static LiqInd fromJson(const QJsonValue& value) { return fromString(value.toString()); }
-    static LiqInd fromVariant(const QVariant& value) { return fromString(value.toString()); }
-    static QJsonValue toJson(LiqInd value) { return enumString(value); }
-    static QVariant toVariant(LiqInd value) { return enumString(value); }
+    static LiqInd from_string(const QString& value);
+    static LiqInd from_json(const QJsonValue& value) { return from_string(value.toString()); }
+    static LiqInd from_variant(const QVariant& value) { return from_string(value.toString()); }
+    static QJsonValue to_json(LiqInd value) { return enum_string(value); }
+    static QVariant to_variant(LiqInd value) { return enum_string(value); }
 };
 
-inline QDebug operator<<(QDebug debug, LiqInd liqInd)
+inline QDebug operator<<(QDebug debug, LiqInd liq_ind)
 {
-    return debug.nospace() << enumString(liqInd);
+    return debug.nospace() << enum_string(liq_ind);
 }
 
 template <>
 struct TypeTraits<Side> {
-    static Side fromString(const QString& value);
-    static Side fromJson(const QJsonValue& value) { return fromString(value.toString()); }
-    static Side fromVariant(const QVariant& value) { return fromString(value.toString()); }
-    static QJsonValue toJson(Side value) { return enumString(value); }
-    static QVariant toVariant(Side value) { return enumString(value); }
+    static Side from_string(const QString& value);
+    static Side from_json(const QJsonValue& value) { return from_string(value.toString()); }
+    static Side from_variant(const QVariant& value) { return from_string(value.toString()); }
+    static QJsonValue to_json(Side value) { return enum_string(value); }
+    static QVariant to_variant(Side value) { return enum_string(value); }
 };
 
 inline QDebug operator<<(QDebug debug, Side side)
 {
-    return debug.nospace() << enumString(side);
+    return debug.nospace() << enum_string(side);
 }
 
 template <>
 struct TypeTraits<State> {
-    static State fromString(const QString& value);
-    static State fromJson(const QJsonValue& value) { return fromString(value.toString()); }
-    static State fromVariant(const QVariant& value) { return fromString(value.toString()); }
-    static QJsonValue toJson(State value) { return enumString(value); }
-    static QVariant toVariant(State value) { return enumString(value); }
+    static State from_string(const QString& value);
+    static State from_json(const QJsonValue& value) { return from_string(value.toString()); }
+    static State from_variant(const QVariant& value) { return from_string(value.toString()); }
+    static QJsonValue to_json(State value) { return enum_string(value); }
+    static QVariant to_variant(State value) { return enum_string(value); }
 };
 
 inline QDebug operator<<(QDebug debug, State state)
 {
-    return debug.nospace() << enumString(state);
+    return debug.nospace() << enum_string(state);
 }
 
 template <typename ValueT>
-ValueT fromJson(const QJsonValue& value)
+ValueT from_json(const QJsonValue& value)
 {
-    return TypeTraits<ValueT>::fromJson(value);
+    return TypeTraits<ValueT>::from_json(value);
 }
 
 template <typename ValueT>
-ValueT fromVariant(const QVariant& value)
+ValueT from_variant(const QVariant& value)
 {
-    return TypeTraits<ValueT>::fromVariant(value);
+    return TypeTraits<ValueT>::from_variant(value);
 }
 
 template <typename ValueT>
-QJsonValue toJson(const ValueT& value)
+QJsonValue to_json(const ValueT& value)
 {
-    return TypeTraits<ValueT>::toJson(value);
+    return TypeTraits<ValueT>::to_json(value);
 }
 
 template <typename ValueT>
-QVariant toVariant(const ValueT& value)
+QVariant to_variant(const ValueT& value)
 {
-    return TypeTraits<ValueT>::toVariant(value);
+    return TypeTraits<ValueT>::to_variant(value);
 }
 
 using ExecKey = std::pair<Id64, Id64>;

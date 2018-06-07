@@ -48,7 +48,7 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
     if (!index.isValid()) {
         // No-op.
     } else if (role == Qt::CheckStateRole) {
-        const auto& row = rowAt(index.row());
+        const auto& row = row_at(index.row());
         switch (box<Column>(index.column())) {
         case Column::CheckState:
             var = row.checked() ? Qt::Checked : Qt::Unchecked;
@@ -57,54 +57,54 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
             break;
         }
     } else if (role == Qt::DisplayRole) {
-        const auto& market = valueAt(index.row());
+        const auto& market = value_at(index.row());
         switch (box<Column>(index.column())) {
         case Column::CheckState:
             break;
         case Column::Id:
-            var = toVariant(market.id());
+            var = to_variant(market.id());
             break;
         case Column::Instr:
             var = market.instr().symbol();
             break;
         case Column::SettlDate:
-            var = market.settlDate();
+            var = market.settl_date();
             break;
         case Column::State:
             var = market.state();
             break;
         case Column::LastLots:
-            var = toVariant(market.lastLots());
+            var = to_variant(market.last_lots());
             break;
         case Column::LastPrice:
-            if (market.lastLots() != 0_lts) {
-                var = ticksToPriceString(market.lastTicks(), market.instr());
+            if (market.last_lots() != 0_lts) {
+                var = ticks_to_price_string(market.last_ticks(), market.instr());
             }
             break;
         case Column::LastTime:
-            var = market.lastTime();
+            var = market.last_time();
             break;
         case Column::BidPrice:
-            if (market.bestBid().lots() != 0_lts) {
-                var = ticksToPriceString(market.bestBid().ticks(), market.instr());
+            if (market.best_bid().lots() != 0_lts) {
+                var = ticks_to_price_string(market.best_bid().ticks(), market.instr());
             }
             break;
         case Column::BidLots:
-            var = toVariant(market.bestBid().lots());
+            var = to_variant(market.best_bid().lots());
             break;
         case Column::BidCount:
-            var = market.bestBid().count();
+            var = market.best_bid().count();
             break;
         case Column::OfferPrice:
-            if (market.bestOffer().lots() != 0_lts) {
-                var = ticksToPriceString(market.bestOffer().ticks(), market.instr());
+            if (market.best_offer().lots() != 0_lts) {
+                var = ticks_to_price_string(market.best_offer().ticks(), market.instr());
             }
             break;
         case Column::OfferLots:
-            var = toVariant(market.bestOffer().lots());
+            var = to_variant(market.best_offer().lots());
             break;
         case Column::OfferCount:
-            var = market.bestOffer().count();
+            var = market.best_offer().count();
             break;
         }
     } else if (role == Qt::TextAlignmentRole) {
@@ -130,7 +130,7 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
             break;
         }
     } else if (role == Qt::UserRole) {
-        var = QVariant::fromValue(valueAt(index.row()));
+        var = QVariant::fromValue(value_at(index.row()));
     }
     return var;
 }
@@ -154,7 +154,7 @@ Market MarketModel::find(Id64 id) const
     return market;
 }
 
-int MarketModel::indexOf(Id64 id) const
+int MarketModel::index_of(Id64 id) const
 {
     int i{-1};
     auto it = rows_.find(id);

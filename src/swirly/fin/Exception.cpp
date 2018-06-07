@@ -24,7 +24,7 @@ using namespace std;
 
 ServException::~ServException() = default;
 
-void ServException::toJson(int status, const char* reason, const char* detail, ostream& os)
+void ServException::to_json(int status, const char* reason, const char* detail, ostream& os)
 {
     os << "{\"status\":"sv << status     //
        << ",\"reason\":\""sv << reason   //
@@ -34,12 +34,12 @@ void ServException::toJson(int status, const char* reason, const char* detail, o
 
 BadRequestException::~BadRequestException() = default;
 
-int BadRequestException::httpStatus() const noexcept
+int BadRequestException::http_status() const noexcept
 {
     return 400;
 }
 
-const char* BadRequestException::httpReason() const noexcept
+const char* BadRequestException::http_reason() const noexcept
 {
     return "Bad Request";
 }
@@ -58,48 +58,48 @@ TooLateException::~TooLateException() = default;
 
 ForbiddenException::~ForbiddenException() = default;
 
-int ForbiddenException::httpStatus() const noexcept
+int ForbiddenException::http_status() const noexcept
 {
     return 403;
 }
 
-const char* ForbiddenException::httpReason() const noexcept
+const char* ForbiddenException::http_reason() const noexcept
 {
     return "Forbidden";
 }
 
 InternalException::~InternalException() = default;
 
-int InternalException::httpStatus() const noexcept
+int InternalException::http_status() const noexcept
 {
     return 500;
 }
 
-const char* InternalException::httpReason() const noexcept
+const char* InternalException::http_reason() const noexcept
 {
     return "Internal Server Error";
 }
 
 MethodNotAllowedException::~MethodNotAllowedException() = default;
 
-int MethodNotAllowedException::httpStatus() const noexcept
+int MethodNotAllowedException::http_status() const noexcept
 {
     return 405;
 }
 
-const char* MethodNotAllowedException::httpReason() const noexcept
+const char* MethodNotAllowedException::http_reason() const noexcept
 {
     return "Method Not Allowed";
 }
 
 NotFoundException::~NotFoundException() = default;
 
-int NotFoundException::httpStatus() const noexcept
+int NotFoundException::http_status() const noexcept
 {
     return 404;
 }
 
-const char* NotFoundException::httpReason() const noexcept
+const char* NotFoundException::http_reason() const noexcept
 {
     return "Not Found";
 }
@@ -112,24 +112,24 @@ OrderNotFoundException::~OrderNotFoundException() = default;
 
 ServiceUnavailableException::~ServiceUnavailableException() = default;
 
-int ServiceUnavailableException::httpStatus() const noexcept
+int ServiceUnavailableException::http_status() const noexcept
 {
     return 503;
 }
 
-const char* ServiceUnavailableException::httpReason() const noexcept
+const char* ServiceUnavailableException::http_reason() const noexcept
 {
     return "Service Unavailable";
 }
 
 UnauthorizedException::~UnauthorizedException() = default;
 
-int UnauthorizedException::httpStatus() const noexcept
+int UnauthorizedException::http_status() const noexcept
 {
     return 401;
 }
 
-const char* UnauthorizedException::httpReason() const noexcept
+const char* UnauthorizedException::http_reason() const noexcept
 {
     return "Unauthorized";
 }

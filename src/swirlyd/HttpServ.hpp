@@ -27,8 +27,8 @@ class RestServ;
 
 class SWIRLY_API HttpServ : public TcpAcceptor<HttpServ> {
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
-    using MemberHookOption = boost::intrusive::member_hook<HttpSess, decltype(HttpSess::listHook),
-                                                           &HttpSess::listHook>;
+    using MemberHookOption = boost::intrusive::member_hook<HttpSess, decltype(HttpSess::list_hook),
+                                                           &HttpSess::list_hook>;
     using List = boost::intrusive::list<HttpSess, ConstantTimeSizeOption, MemberHookOption>;
 
   public:
@@ -43,11 +43,11 @@ class SWIRLY_API HttpServ : public TcpAcceptor<HttpServ> {
     HttpServ(HttpServ&&) = delete;
     HttpServ& operator=(HttpServ&&) = delete;
 
-    void doAccept(IoSocket&& sock, const Endpoint& ep, Time now);
+    void do_accept(IoSocket&& sock, const Endpoint& ep, Time now);
 
   private:
     Reactor& reactor_;
-    RestServ& restServ_;
+    RestServ& rest_serv_;
     List list_;
 };
 

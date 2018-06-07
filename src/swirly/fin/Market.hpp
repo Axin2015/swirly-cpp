@@ -32,16 +32,16 @@ class SWIRLY_API Market
 : public RefCount<Market, ThreadUnsafePolicy>
 , public Comparable<Market> {
   public:
-    Market(Id64 id, Symbol instr, JDay settlDay, MarketState state, Lots lastLots = 0_lts,
-           Ticks lastTicks = 0_tks, Time lastTime = {}, Id64 maxId = 0_id64) noexcept
+    Market(Id64 id, Symbol instr, JDay settl_day, MarketState state, Lots last_lots = 0_lts,
+           Ticks last_ticks = 0_tks, Time last_time = {}, Id64 max_id = 0_id64) noexcept
     : id_{id}
     , instr_{instr}
-    , settlDay_{settlDay}
+    , settl_day_{settl_day}
     , state_{state}
-    , lastLots_{lastLots}
-    , lastTicks_{lastTicks}
-    , lastTime_{lastTime}
-    , maxId_{maxId}
+    , last_lots_{last_lots}
+    , last_ticks_{last_ticks}
+    , last_time_{last_time}
+    , max_id_{max_id}
     {
     }
     ~Market();
@@ -57,80 +57,80 @@ class SWIRLY_API Market
     template <typename... ArgsT>
     static MarketPtr make(ArgsT&&... args)
     {
-        return makeIntrusive<Market>(std::forward<ArgsT>(args)...);
+        return make_intrusive<Market>(std::forward<ArgsT>(args)...);
     }
 
-    void toDsv(std::ostream& os, char delim = ',') const;
-    void toJson(std::ostream& os) const;
+    void to_dsv(std::ostream& os, char delim = ',') const;
+    void to_json(std::ostream& os) const;
 
     int compare(const Market& rhs) const noexcept { return swirly::compare(id_, rhs.id_); }
     auto id() const noexcept { return id_; }
     auto instr() const noexcept { return instr_; }
-    auto settlDay() const noexcept { return settlDay_; }
+    auto settl_day() const noexcept { return settl_day_; }
     auto state() const noexcept { return state_; }
-    Lots lastLots() const noexcept { return lastLots_; }
-    Ticks lastTicks() const noexcept { return lastTicks_; }
-    Time lastTime() const noexcept { return lastTime_; }
-    const MarketSide& bidSide() const noexcept { return bidSide_; }
-    const MarketSide& offerSide() const noexcept { return offerSide_; }
-    Id64 maxId() const noexcept { return maxId_; }
+    Lots last_lots() const noexcept { return last_lots_; }
+    Ticks last_ticks() const noexcept { return last_ticks_; }
+    Time last_time() const noexcept { return last_time_; }
+    const MarketSide& bid_side() const noexcept { return bid_side_; }
+    const MarketSide& offer_side() const noexcept { return offer_side_; }
+    Id64 max_id() const noexcept { return max_id_; }
 
-    void setState(MarketState state) noexcept { state_ = state; }
-    MarketSide& bidSide() noexcept { return bidSide_; }
-    MarketSide& offerSide() noexcept { return offerSide_; }
+    void set_state(MarketState state) noexcept { state_ = state; }
+    MarketSide& bid_side() noexcept { return bid_side_; }
+    MarketSide& offer_side() noexcept { return offer_side_; }
     /**
      * Throws std::bad_alloc.
      */
-    void insertOrder(const OrderPtr& order) { side(order->side()).insertOrder(order); }
-    void removeOrder(const Order& order) noexcept { side(order.side()).removeOrder(order); }
+    void insert_order(const OrderPtr& order) { side(order->side()).insert_order(order); }
+    void remove_order(const Order& order) noexcept { side(order.side()).remove_order(order); }
     /**
      * Throws std::bad_alloc.
      */
-    void createOrder(const OrderPtr& order, Time now)
+    void create_order(const OrderPtr& order, Time now)
     {
-        side(order->side()).createOrder(order, now);
+        side(order->side()).create_order(order, now);
     }
-    void reviseOrder(Order& order, Lots lots, Time now) noexcept
+    void revise_order(Order& order, Lots lots, Time now) noexcept
     {
-        side(order.side()).reviseOrder(order, lots, now);
+        side(order.side()).revise_order(order, lots, now);
     }
-    void cancelOrder(Order& order, Time now) noexcept
+    void cancel_order(Order& order, Time now) noexcept
     {
-        side(order.side()).cancelOrder(order, now);
+        side(order.side()).cancel_order(order, now);
     }
-    void takeOrder(Order& order, Lots lots, Time now) noexcept
+    void take_order(Order& order, Lots lots, Time now) noexcept
     {
-        side(order.side()).takeOrder(order, lots, now);
-        lastLots_ = lots;
-        lastTicks_ = order.ticks();
-        lastTime_ = now;
+        side(order.side()).take_order(order, lots, now);
+        last_lots_ = lots;
+        last_ticks_ = order.ticks();
+        last_time_ = now;
     }
-    Id64 allocId() noexcept { return ++maxId_; }
-    boost::intrusive::set_member_hook<> idHook;
+    Id64 alloc_id() noexcept { return ++max_id_; }
+    boost::intrusive::set_member_hook<> id_hook;
 
   private:
-    MarketSide& side(Side side) noexcept { return side == Side::Buy ? bidSide_ : offerSide_; }
+    MarketSide& side(Side side) noexcept { return side == Side::Buy ? bid_side_ : offer_side_; }
     const MarketSide& side(Side side) const noexcept
     {
-        return side == Side::Buy ? bidSide_ : offerSide_;
+        return side == Side::Buy ? bid_side_ : offer_side_;
     }
 
     const Id64 id_;
     const Symbol instr_;
-    const JDay settlDay_;
+    const JDay settl_day_;
     MarketState state_;
-    Lots lastLots_;
-    Ticks lastTicks_;
-    Time lastTime_;
+    Lots last_lots_;
+    Ticks last_ticks_;
+    Time last_time_;
     // Two sides constitute the market.
-    MarketSide bidSide_;
-    MarketSide offerSide_;
-    Id64 maxId_;
+    MarketSide bid_side_;
+    MarketSide offer_side_;
+    Id64 max_id_;
 };
 
 inline std::ostream& operator<<(std::ostream& os, const Market& market)
 {
-    market.toJson(os);
+    market.to_json(os);
     return os;
 }
 

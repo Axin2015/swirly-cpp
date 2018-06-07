@@ -71,7 +71,7 @@ class AgentThread {
     {
         using namespace std::literals::string_view_literals;
 
-        sigBlockAll();
+        sig_block_all();
         pthread_setname_np(pthread_self(), config.name.c_str());
         SWIRLY_NOTICE << "started "sv << config.name << " thread"sv;
         try {

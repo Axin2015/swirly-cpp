@@ -45,7 +45,7 @@ QVariant PosnModel::data(const QModelIndex& index, int role) const
     if (!index.isValid()) {
         // No-op.
     } else if (role == Qt::CheckStateRole) {
-        const auto& row = rowAt(index.row());
+        const auto& row = row_at(index.row());
         switch (box<Column>(index.column())) {
         case Column::CheckState:
             var = row.checked() ? Qt::Checked : Qt::Unchecked;
@@ -54,7 +54,7 @@ QVariant PosnModel::data(const QModelIndex& index, int role) const
             break;
         }
     } else if (role == Qt::DisplayRole) {
-        const auto& posn = valueAt(index.row());
+        const auto& posn = value_at(index.row());
         switch (box<Column>(index.column())) {
         case Column::CheckState:
             break;
@@ -62,25 +62,25 @@ QVariant PosnModel::data(const QModelIndex& index, int role) const
             var = posn.accnt();
             break;
         case Column::MarketId:
-            var = toVariant(posn.marketId());
+            var = to_variant(posn.market_id());
             break;
         case Column::Instr:
             var = posn.instr().symbol();
             break;
         case Column::SettlDate:
-            var = posn.settlDate();
+            var = posn.settl_date();
             break;
         case Column::BuyLots:
-            var = toVariant(posn.buyLots());
+            var = to_variant(posn.buy_lots());
             break;
         case Column::BuyAvgPrice:
-            var = ticksToAvgPriceString(posn.buyLots(), posn.buyCost(), posn.instr());
+            var = ticks_to_avg_price_string(posn.buy_lots(), posn.buy_cost(), posn.instr());
             break;
         case Column::SellLots:
-            var = toVariant(posn.sellLots());
+            var = to_variant(posn.sell_lots());
             break;
         case Column::SellAvgPrice:
-            var = ticksToAvgPriceString(posn.sellLots(), posn.sellCost(), posn.instr());
+            var = ticks_to_avg_price_string(posn.sell_lots(), posn.sell_cost(), posn.instr());
             break;
         }
     } else if (role == Qt::TextAlignmentRole) {
@@ -101,7 +101,7 @@ QVariant PosnModel::data(const QModelIndex& index, int role) const
             break;
         }
     } else if (role == Qt::UserRole) {
-        var = QVariant::fromValue(valueAt(index.row()));
+        var = QVariant::fromValue(value_at(index.row()));
     }
     return var;
 }

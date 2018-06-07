@@ -51,60 +51,61 @@ constexpr int ColumnCount{unbox(Column::MaxLots) + 1};
 // Cheap copies.
 class Instr {
   public:
-    Instr(const QString& symbol, const QString& display, const QString& baseAsset,
-          const QString& termCcy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
-          int pipDp, Lots minLots, Lots maxLots)
-    : impl_{std::make_shared<const Impl>(symbol, display, baseAsset, termCcy, lotNumer, lotDenom,
-                                         tickNumer, tickDenom, pipDp, minLots, maxLots)}
+    Instr(const QString& symbol, const QString& display, const QString& base_asset,
+          const QString& term_ccy, int lot_numer, int lot_denom, int tick_numer, int tick_denom,
+          int pip_dp, Lots min_lots, Lots max_lots)
+    : impl_{std::make_shared<const Impl>(symbol, display, base_asset, term_ccy, lot_numer,
+                                         lot_denom, tick_numer, tick_denom, pip_dp, min_lots,
+                                         max_lots)}
     {
     }
     Instr() = default;
     ~Instr() = default;
 
-    static Instr fromJson(const QJsonObject& obj);
+    static Instr from_json(const QJsonObject& obj);
 
     const QString& symbol() const noexcept { return impl_->symbol; }
     const QString& display() const noexcept { return impl_->display; }
-    const QString& baseAsset() const noexcept { return impl_->baseAsset; }
-    const QString& termCcy() const noexcept { return impl_->termCcy; }
-    int lotNumer() const noexcept { return impl_->lotNumer; }
-    int lotDenom() const noexcept { return impl_->lotDenom; }
-    double qtyInc() const noexcept { return impl_->qtyInc; }
-    int tickNumer() const noexcept { return impl_->tickNumer; }
-    int tickDenom() const noexcept { return impl_->tickDenom; }
-    double priceInc() const noexcept { return impl_->priceInc; }
-    int pipDp() const noexcept { return impl_->pipDp; }
-    int qtyDp() const noexcept { return impl_->qtyDp; }
-    int priceDp() const noexcept { return impl_->priceDp; }
-    Lots minLots() const noexcept { return impl_->minLots; }
-    Lots maxLots() const noexcept { return impl_->maxLots; }
+    const QString& base_asset() const noexcept { return impl_->base_asset; }
+    const QString& term_ccy() const noexcept { return impl_->term_ccy; }
+    int lot_numer() const noexcept { return impl_->lot_numer; }
+    int lot_denom() const noexcept { return impl_->lot_denom; }
+    double qty_inc() const noexcept { return impl_->qty_inc; }
+    int tick_numer() const noexcept { return impl_->tick_numer; }
+    int tick_denom() const noexcept { return impl_->tick_denom; }
+    double price_inc() const noexcept { return impl_->price_inc; }
+    int pip_dp() const noexcept { return impl_->pip_dp; }
+    int qty_dp() const noexcept { return impl_->qty_dp; }
+    int price_dp() const noexcept { return impl_->price_dp; }
+    Lots min_lots() const noexcept { return impl_->min_lots; }
+    Lots max_lots() const noexcept { return impl_->max_lots; }
 
   private:
     struct Impl {
-        Impl(const QString& symbol, const QString& display, const QString& baseAsset,
-             const QString& termCcy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
-             int pipDp, Lots minLots, Lots maxLots);
+        Impl(const QString& symbol, const QString& display, const QString& base_asset,
+             const QString& term_ccy, int lot_numer, int lot_denom, int tick_numer, int tick_denom,
+             int pip_dp, Lots min_lots, Lots max_lots);
         Impl() = default;
         ~Impl() = default;
         QString symbol{};
         QString display{};
-        QString baseAsset{};
-        QString termCcy{};
-        int lotNumer{};
-        int lotDenom{};
+        QString base_asset{};
+        QString term_ccy{};
+        int lot_numer{};
+        int lot_denom{};
         // Transient.
-        double qtyInc{};
-        int tickNumer{};
-        int tickDenom{};
+        double qty_inc{};
+        int tick_numer{};
+        int tick_denom{};
         // Transient.
-        double priceInc{};
-        int pipDp{};
+        double price_inc{};
+        int pip_dp{};
         // Transient.
-        int qtyDp{};
+        int qty_dp{};
         // Transient.
-        int priceDp{};
-        Lots minLots{};
-        Lots maxLots{};
+        int price_dp{};
+        Lots min_lots{};
+        Lots max_lots{};
     };
     static std::shared_ptr<const Impl> empty();
     std::shared_ptr<const Impl> impl_{empty()};
@@ -112,57 +113,57 @@ class Instr {
 
 QDebug operator<<(QDebug debug, const Instr& instr);
 
-inline bool isModified(const Instr& prev, const Instr& next) noexcept
+inline bool is_modified(const Instr& prev, const Instr& next) noexcept
 {
     // Immutable.
     return false;
 }
 
-inline Lots qtyToLots(double qty, const Instr& instr) noexcept
+inline Lots qty_to_lots(double qty, const Instr& instr) noexcept
 {
-    return swirly::qtyToLots(qty, instr.qtyInc());
+    return swirly::qty_to_lots(qty, instr.qty_inc());
 }
 
-inline double lotsToQty(Lots lots, const Instr& instr) noexcept
+inline double lots_to_qty(Lots lots, const Instr& instr) noexcept
 {
-    return swirly::lotsToQty(lots, instr.qtyInc());
+    return swirly::lots_to_qty(lots, instr.qty_inc());
 }
 
-inline QString lotsToQtyString(Lots lots, const Instr& instr)
+inline QString lots_to_qty_string(Lots lots, const Instr& instr)
 {
-    const auto qty = lotsToQty(lots, instr);
-    return QString::number(qty, 'f', instr.qtyDp());
+    const auto qty = lots_to_qty(lots, instr);
+    return QString::number(qty, 'f', instr.qty_dp());
 }
 
-inline Ticks priceToTicks(double price, const Instr& instr) noexcept
+inline Ticks price_to_ticks(double price, const Instr& instr) noexcept
 {
-    return swirly::priceToTicks(price, instr.priceInc());
+    return swirly::price_to_ticks(price, instr.price_inc());
 }
 
-inline double ticksToPrice(Ticks ticks, const Instr& instr) noexcept
+inline double ticks_to_price(Ticks ticks, const Instr& instr) noexcept
 {
-    return swirly::ticksToPrice(ticks, instr.priceInc());
+    return swirly::ticks_to_price(ticks, instr.price_inc());
 }
 
-inline QString ticksToPriceString(Ticks ticks, const Instr& instr)
+inline QString ticks_to_price_string(Ticks ticks, const Instr& instr)
 {
-    const auto price = ticksToPrice(ticks, instr);
-    return QString::number(price, 'f', instr.priceDp());
+    const auto price = ticks_to_price(ticks, instr);
+    return QString::number(price, 'f', instr.price_dp());
 }
 
-inline double ticksToAvgPrice(Lots lots, Cost cost, const Instr& instr) noexcept
+inline double ticks_to_avg_price(Lots lots, Cost cost, const Instr& instr) noexcept
 {
     double ticks = 0;
     if (lots != 0_lts) {
-        ticks = fractToReal(cost.count(), lots.count());
+        ticks = fract_to_real(cost.count(), lots.count());
     }
-    return ticks * instr.priceInc();
+    return ticks * instr.price_inc();
 }
 
-inline QString ticksToAvgPriceString(Lots lots, Cost cost, const Instr& instr)
+inline QString ticks_to_avg_price_string(Lots lots, Cost cost, const Instr& instr)
 {
-    const auto price = ticksToAvgPrice(lots, cost, instr);
-    return QString::number(price, 'f', instr.priceDp() + 1);
+    const auto price = ticks_to_avg_price(lots, cost, instr);
+    return QString::number(price, 'f', instr.price_dp() + 1);
 }
 
 } // namespace ui

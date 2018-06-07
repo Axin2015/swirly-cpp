@@ -35,9 +35,9 @@ Config& Config::operator=(Config&&) = default;
 
 void Config::read(istream& is)
 {
-    VarSub varSub;
-    parsePairs(is, [this, &varSub](const auto& key, string val) {
-        varSub(val);
+    VarSub var_sub;
+    parse_pairs(is, [this, &var_sub](const auto& key, string val) {
+        var_sub(val);
         this->map_.emplace(key, move(val));
     });
 }

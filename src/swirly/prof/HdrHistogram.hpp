@@ -32,19 +32,19 @@ class SWIRLY_API HdrHistogram {
     /**
      * Construct the histogram.
      *
-     * @param lowestTrackableValue The smallest possible value to be put into the histogram.
+     * @param lowest_trackable_value The smallest possible value to be put into the histogram.
      *
-     * @param highestTrackableValue The largest possible value to be put into the histogram.
+     * @param highest_trackable_value The largest possible value to be put into the histogram.
      *
-     * @param significantFigures The level of precision for this histogram, i.e. the number of
+     * @param significant_figures The level of precision for this histogram, i.e. the number of
      * figures in a decimal number that will be maintained. For example, a value of 3 will mean the
      * results from the histogram will be accurate up to the first three digits. Must be a value
      * between 1 and 5 (inclusive).
      *
      * @param result Output parameter to capture allocated histogram.
      */
-    HdrHistogram(std::int64_t lowestTrackableValue, std::int64_t highestTrackableValue,
-                 int significantFigures);
+    HdrHistogram(std::int64_t lowest_trackable_value, std::int64_t highest_trackable_value,
+                 int significant_figures);
     ~HdrHistogram();
 
     // Copy.
@@ -61,13 +61,13 @@ class SWIRLY_API HdrHistogram {
      *
      * @param stream The FILE to write the output to.
      *
-     * @param ticksPerHalfDistance The number of iteration steps per half-distance to 100%.
+     * @param ticks_per_half_distance The number of iteration steps per half-distance to 100%.
      *
-     * @param valueScale Scale the output values by this amount.
+     * @param value_scale Scale the output values by this amount.
      *
      * @param format CLASSIC or CSV.
      */
-    void print(std::FILE* stream, std::int32_t ticksPerHalfDistance, double valueScale,
+    void print(std::FILE* stream, std::int32_t ticks_per_half_distance, double value_scale,
                format_type format = CLASSIC) const;
 
     /**
@@ -75,13 +75,13 @@ class SWIRLY_API HdrHistogram {
      *
      * @param path The output file path.
      *
-     * @param ticksPerHalfDistance The number of iteration steps per half-distance to 100%.
+     * @param ticks_per_half_distance The number of iteration steps per half-distance to 100%.
      *
-     * @param valueScale Scale the output values by this amount.
+     * @param value_scale Scale the output values by this amount.
      *
      * @param format CLASSIC or CSV.
      */
-    void print(const char* path, int32_t ticksPerHalfDistance, double valueScale,
+    void print(const char* path, int32_t ticks_per_half_distance, double value_scale,
                format_type format = CLASSIC) const;
 
     /**
@@ -100,7 +100,7 @@ class SWIRLY_API HdrHistogram {
      */
     bool record(std::int64_t value) noexcept { return hdr_record_value(hist_, value); }
 
-    void write(Time startTime, Time endTime, HdrLogWriter& writer);
+    void write(Time start_time, Time end_time, HdrLogWriter& writer);
 
   private:
     hdr_histogram* hist_{nullptr};

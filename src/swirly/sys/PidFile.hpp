@@ -38,17 +38,17 @@ using PidFile = std::unique_ptr<pidfh, detail::PidFileDeleter>;
  * daemon is already running. If the path argument is null, then /var/run/{progname}.pid is used as
  * the pidfile location.
  */
-SWIRLY_API PidFile openPidFile(const char* path, mode_t mode);
+SWIRLY_API PidFile open_pid_file(const char* path, mode_t mode);
 
 /**
  * Close pidfile without removing it. This function should be used when forking daemon processes.
  */
-SWIRLY_API void closePidFile(PidFile& pf) noexcept;
+SWIRLY_API void close_pid_file(PidFile& pf) noexcept;
 
 /**
  * Write process' PID into pidfile.
  */
-SWIRLY_API void writePidFile(PidFile& pf);
+SWIRLY_API void write_pid_file(PidFile& pf);
 
 } // namespace sys
 } // namespace swirly

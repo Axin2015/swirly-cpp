@@ -103,14 +103,14 @@ class ArrayView {
 };
 
 template <typename ValueT>
-constexpr ArrayView<std::remove_volatile_t<ValueT>> makeArrayView(const ValueT* ptr,
-                                                                  std::size_t len) noexcept
+constexpr ArrayView<std::remove_volatile_t<ValueT>> make_array_view(const ValueT* ptr,
+                                                                    std::size_t len) noexcept
 {
     return {ptr, len};
 }
 
 template <typename ValueT, std::size_t SizeN>
-constexpr ArrayView<std::remove_cv_t<ValueT>> makeArrayView(ValueT (&arr)[SizeN]) noexcept
+constexpr ArrayView<std::remove_cv_t<ValueT>> make_array_view(ValueT (&arr)[SizeN]) noexcept
 {
     return {arr};
 }

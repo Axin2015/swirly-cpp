@@ -31,18 +31,18 @@ namespace ui {
 using namespace market;
 using namespace std;
 
-MarketView::MarketView(InstrModel& instrModel, MarketModel& model, QWidget* parent,
+MarketView::MarketView(InstrModel& instr_model, MarketModel& model, QWidget* parent,
                        Qt::WindowFlags f)
 : QWidget{parent, f}
 , model_(model)
 {
-    auto form = make_unique<MarketForm>(instrModel);
-    connect(form.get(), &MarketForm::createMarket, this, &MarketView::createMarket);
-    connect(form.get(), &MarketForm::createOrder, this, &MarketView::createOrder);
+    auto form = make_unique<MarketForm>(instr_model);
+    connect(form.get(), &MarketForm::create_market, this, &MarketView::create_market);
+    connect(form.get(), &MarketForm::create_order, this, &MarketView::create_order);
 
     auto table = make_unique<QTableView>();
     {
-        auto del = makeDeleter(table->model());
+        auto del = make_deleter(table->model());
         table->setModel(&model);
     }
     table->resizeColumnToContents(unbox(Column::CheckState));
@@ -57,31 +57,31 @@ MarketView::MarketView(InstrModel& instrModel, MarketModel& model, QWidget* pare
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::NoSelection);
 
-    connect(table.get(), &QTableView::clicked, this, &MarketView::slotClicked);
+    connect(table.get(), &QTableView::clicked, this, &MarketView::slot_clicked);
 
     auto layout = make_unique<QVBoxLayout>();
-    layout->addWidget(marketForm_ = form.release());
+    layout->addWidget(market_form_ = form.release());
     layout->addWidget(table.release());
     setLayout(layout.release());
 }
 
 MarketView::~MarketView() = default;
 
-void MarketView::setFields(const QString& instrSymbol, QDate settlDate, optional<Lots> lots,
-                           optional<Ticks> ticks)
+void MarketView::set_fields(const QString& instr_symbol, QDate settl_date, optional<Lots> lots,
+                            optional<Ticks> ticks)
 {
-    marketForm_->setFields(instrSymbol, settlDate, lots, ticks);
+    market_form_->set_fields(instr_symbol, settl_date, lots, ticks);
 }
 
-void MarketView::slotClicked(const QModelIndex& index)
+void MarketView::slot_clicked(const QModelIndex& index)
 {
     if (index.isValid()) {
-        const auto& market = model_.valueAt(index.row());
+        const auto& market = model_.value_at(index.row());
         optional<Lots> lots;
         optional<Ticks> ticks;
         switch (box<Column>(index.column())) {
         case Column::CheckState:
-            model_.toggleCheckState(index.row());
+            model_.toggle_check_state(index.row());
         // Fall-through.
         case Column::Id:
         case Column::Instr:
@@ -90,35 +90,35 @@ void MarketView::slotClicked(const QModelIndex& index)
         case Column::LastLots:
         case Column::LastPrice:
         case Column::LastTime:
-            if (market.lastLots() != 0_lts) {
-                lots = market.lastLots();
-                ticks = market.lastTicks();
+            if (market.last_lots() != 0_lts) {
+                lots = market.last_lots();
+                ticks = market.last_ticks();
             }
             break;
         case Column::BidCount:
         case Column::BidLots:
         case Column::BidPrice:
-            if (market.bestBid().lots() != 0_lts) {
-                lots = market.bestBid().lots();
-                ticks = market.bestBid().ticks();
-            } else if (market.lastLots() != 0_lts) {
-                lots = market.lastLots();
-                ticks = market.lastTicks();
+            if (market.best_bid().lots() != 0_lts) {
+                lots = market.best_bid().lots();
+                ticks = market.best_bid().ticks();
+            } else if (market.last_lots() != 0_lts) {
+                lots = market.last_lots();
+                ticks = market.last_ticks();
             }
             break;
         case Column::OfferPrice:
         case Column::OfferLots:
         case Column::OfferCount:
-            if (market.bestOffer().lots() != 0_lts) {
-                lots = market.bestOffer().lots();
-                ticks = market.bestOffer().ticks();
-            } else if (market.lastLots() != 0_lts) {
-                lots = market.lastLots();
-                ticks = market.lastTicks();
+            if (market.best_offer().lots() != 0_lts) {
+                lots = market.best_offer().lots();
+                ticks = market.best_offer().ticks();
+            } else if (market.last_lots() != 0_lts) {
+                lots = market.last_lots();
+                ticks = market.last_ticks();
             }
             break;
         }
-        setFields(market.instr().symbol(), market.settlDate(), lots, ticks);
+        set_fields(market.instr().symbol(), market.settl_date(), lots, ticks);
     }
 }
 

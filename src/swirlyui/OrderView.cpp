@@ -36,11 +36,11 @@ OrderView::OrderView(OrderModel& model, QWidget* parent, Qt::WindowFlags f)
 , model_(model)
 {
     auto form = make_unique<OrderForm>(model);
-    connect(form.get(), &OrderForm::cancelOrders, this, &OrderView::cancelOrders);
+    connect(form.get(), &OrderForm::cancel_orders, this, &OrderView::cancel_orders);
 
     auto table = make_unique<QTableView>();
     {
-        auto del = makeDeleter(table->model());
+        auto del = make_deleter(table->model());
         table->setModel(&model);
     }
     table->resizeColumnToContents(unbox(Column::CheckState));
@@ -53,7 +53,7 @@ OrderView::OrderView(OrderModel& model, QWidget* parent, Qt::WindowFlags f)
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::NoSelection);
 
-    connect(table.get(), &QTableView::clicked, this, &OrderView::slotClicked);
+    connect(table.get(), &QTableView::clicked, this, &OrderView::slot_clicked);
 
     auto layout = make_unique<QVBoxLayout>();
     layout->addWidget(form.release(), 0, nullptr);
@@ -63,15 +63,15 @@ OrderView::OrderView(OrderModel& model, QWidget* parent, Qt::WindowFlags f)
 
 OrderView::~OrderView() = default;
 
-void OrderView::slotClicked(const QModelIndex& index)
+void OrderView::slot_clicked(const QModelIndex& index)
 {
     if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
-        model_.toggleCheckState(index.row());
+        model_.toggle_check_state(index.row());
     }
-    const auto& order = model_.valueAt(index.row());
-    const auto lots = order.resdLots() > 0_lts ? order.resdLots() : order.lots();
+    const auto& order = model_.value_at(index.row());
+    const auto lots = order.resd_lots() > 0_lts ? order.resd_lots() : order.lots();
     const auto ticks = order.ticks();
-    emit setFields(order.instr().symbol(), order.settlDate(), lots, ticks);
+    emit set_fields(order.instr().symbol(), order.settl_date(), lots, ticks);
 }
 
 } // namespace ui

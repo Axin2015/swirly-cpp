@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(InstrToStringCase)
     Instr instr{1_id32, "EURUSD"sv, "EURUSD"sv, "EUR"sv, "USD"sv, 1000000,
                 1,      1,          10000,      4,       1_lts,   10_lts};
 
-    BOOST_TEST(toString(instr) == //
+    BOOST_TEST(to_string(instr) == //
                "{\"symbol\":\"EURUSD\""
                ",\"display\":\"EURUSD\""
                ",\"base_asset\":\"EUR\""

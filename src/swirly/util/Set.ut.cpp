@@ -38,7 +38,7 @@ class Foo : public RefCount<Foo, ThreadUnsafePolicy> {
 
     auto symbol() const noexcept { return symbol_; }
     auto display() const noexcept { return +display_; }
-    boost::intrusive::set_member_hook<> symbolHook;
+    boost::intrusive::set_member_hook<> symbol_hook;
 
   private:
     const Symbol symbol_;
@@ -59,7 +59,7 @@ class Bar : public RefCount<Bar, ThreadUnsafePolicy> {
 
     auto id() const noexcept { return id_; }
     auto display() const noexcept { return +display_; }
-    boost::intrusive::set_member_hook<> idHook;
+    boost::intrusive::set_member_hook<> id_hook;
 
   private:
     const Id64 id_;
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(SymbolSetCase)
         BOOST_TEST(&foo2 == &foo1);
 
         // Replace.
-        Foo& foo3{*s.emplaceOrReplace("FOO"sv, "Foo Three"sv, alive)};
+        Foo& foo3{*s.emplace_or_replace("FOO"sv, "Foo Three"sv, alive)};
         BOOST_TEST(alive == 1);
         BOOST_TEST(&foo3 != &foo1);
         BOOST_TEST(foo3.symbol() == "FOO"sv);
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE(IdSetCase)
         BOOST_TEST(&bar2 == &bar1);
 
         // Replace.
-        Bar& bar3{*s.emplaceOrReplace(1_id64, "Bar Three"sv, alive)};
+        Bar& bar3{*s.emplace_or_replace(1_id64, "Bar Three"sv, alive)};
         BOOST_TEST(alive == 1);
         BOOST_TEST(&bar3 != &bar1);
         BOOST_TEST(bar3.id() == 1_id64);

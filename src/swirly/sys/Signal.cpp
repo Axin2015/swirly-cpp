@@ -23,42 +23,42 @@ inline namespace sys {
 
 SigWait::SigWait()
 {
-    sigemptyset(&newMask_);
-    sigaddset(&newMask_, SIGHUP);
-    sigaddset(&newMask_, SIGINT);
-    sigaddset(&newMask_, SIGUSR1);
-    sigaddset(&newMask_, SIGUSR2);
-    sigaddset(&newMask_, SIGTERM);
+    sigemptyset(&new_mask_);
+    sigaddset(&new_mask_, SIGHUP);
+    sigaddset(&new_mask_, SIGINT);
+    sigaddset(&new_mask_, SIGUSR1);
+    sigaddset(&new_mask_, SIGUSR2);
+    sigaddset(&new_mask_, SIGTERM);
 
-    const auto err = pthread_sigmask(SIG_BLOCK, &newMask_, &oldMask_);
+    const auto err = pthread_sigmask(SIG_BLOCK, &new_mask_, &old_mask_);
     if (err != 0) {
-        throw std::system_error{os::makeError(err), "pthread_sigmask"};
+        throw std::system_error{os::make_error(err), "pthread_sigmask"};
     }
 }
 
 SigWait::~SigWait()
 {
     // Restore original signal mask.
-    pthread_sigmask(SIG_SETMASK, &oldMask_, nullptr);
+    pthread_sigmask(SIG_SETMASK, &old_mask_, nullptr);
 }
 
 int SigWait::operator()() const
 {
     int sig;
-    const auto err = sigwait(&newMask_, &sig);
+    const auto err = sigwait(&new_mask_, &sig);
     if (err != 0) {
-        throw std::system_error{os::makeError(err), "sigwait"};
+        throw std::system_error{os::make_error(err), "sigwait"};
     }
     return sig;
 }
 
-void sigBlockAll()
+void sig_block_all()
 {
     sigset_t ss;
     sigemptyset(&ss);
     const auto err = pthread_sigmask(SIG_SETMASK, &ss, nullptr);
     if (err != 0) {
-        throw std::system_error{os::makeError(err), "pthread_sigmask"};
+        throw std::system_error{os::make_error(err), "pthread_sigmask"};
     }
 }
 

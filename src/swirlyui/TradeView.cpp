@@ -36,7 +36,7 @@ TradeView::TradeView(TradeModel& model, QWidget* parent, Qt::WindowFlags f)
 {
     auto table = make_unique<QTableView>();
     {
-        auto del = makeDeleter(table->model());
+        auto del = make_deleter(table->model());
         table->setModel(&model);
     }
     table->resizeColumnToContents(unbox(Column::CheckState));
@@ -49,7 +49,7 @@ TradeView::TradeView(TradeModel& model, QWidget* parent, Qt::WindowFlags f)
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::NoSelection);
 
-    connect(table.get(), &QTableView::clicked, this, &TradeView::slotClicked);
+    connect(table.get(), &QTableView::clicked, this, &TradeView::slot_clicked);
 
     auto layout = make_unique<QGridLayout>();
     layout->addWidget(table.release(), 0, 0);
@@ -58,15 +58,15 @@ TradeView::TradeView(TradeModel& model, QWidget* parent, Qt::WindowFlags f)
 
 TradeView::~TradeView() = default;
 
-void TradeView::slotClicked(const QModelIndex& index)
+void TradeView::slot_clicked(const QModelIndex& index)
 {
     if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
-        model_.toggleCheckState(index.row());
+        model_.toggle_check_state(index.row());
     }
-    const auto& trade = model_.valueAt(index.row());
-    const auto lots = trade.resdLots() > 0_lts ? trade.resdLots() : trade.lots();
+    const auto& trade = model_.value_at(index.row());
+    const auto lots = trade.resd_lots() > 0_lts ? trade.resd_lots() : trade.lots();
     const auto ticks = trade.ticks();
-    emit setFields(trade.instr().symbol(), trade.settlDate(), lots, ticks);
+    emit set_fields(trade.instr().symbol(), trade.settl_date(), lots, ticks);
 }
 
 } // namespace ui

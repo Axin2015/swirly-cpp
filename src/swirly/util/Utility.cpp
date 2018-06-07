@@ -19,7 +19,7 @@
 namespace swirly {
 inline namespace util {
 
-int hexDigits(int64_t i) noexcept
+int hex_digits(int64_t i) noexcept
 {
     int n{0};
     if (i & 0xffffffff00000000) {

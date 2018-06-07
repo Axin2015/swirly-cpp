@@ -26,19 +26,19 @@ namespace swirly {
 inline namespace prof {
 using namespace std;
 namespace {
-inline error_code makeError(int err)
+inline error_code make_error(int err)
 {
     return error_code{err, system_category()};
 }
 } // namespace
 
-HdrHistogram::HdrHistogram(int64_t lowestTrackableValue, int64_t highestTrackableValue,
-                           int significantFigures)
+HdrHistogram::HdrHistogram(int64_t lowest_trackable_value, int64_t highest_trackable_value,
+                           int significant_figures)
 {
     const auto err
-        = hdr_init(lowestTrackableValue, highestTrackableValue, significantFigures, &hist_);
+        = hdr_init(lowest_trackable_value, highest_trackable_value, significant_figures, &hist_);
     if (err != 0) {
-        throw system_error{makeError(err), "hdr_init"};
+        throw system_error{make_error(err), "hdr_init"};
     }
     assert(hist_);
 }
@@ -50,25 +50,26 @@ HdrHistogram::~HdrHistogram()
     }
 }
 
-void HdrHistogram::print(FILE* stream, int32_t ticksPerHalfDistance, double valueScale,
+void HdrHistogram::print(FILE* stream, int32_t ticks_per_half_distance, double value_scale,
                          format_type format) const
 {
-    const auto err = hdr_percentiles_print(hist_, stream, ticksPerHalfDistance, valueScale, format);
+    const auto err
+        = hdr_percentiles_print(hist_, stream, ticks_per_half_distance, value_scale, format);
     if (err != 0) {
-        throw system_error{makeError(err), "hdr_percentiles_print"};
+        throw system_error{make_error(err), "hdr_percentiles_print"};
     }
 }
 
-void HdrHistogram::print(const char* path, int32_t ticksPerHalfDistance, double valueScale,
+void HdrHistogram::print(const char* path, int32_t ticks_per_half_distance, double value_scale,
                          format_type format) const
 {
-    auto fp = openFile(path, "w");
-    print(fp.get(), ticksPerHalfDistance, valueScale, format);
+    auto fp = open_file(path, "w");
+    print(fp.get(), ticks_per_half_distance, value_scale, format);
 }
 
-void HdrHistogram::write(Time startTime, Time endTime, HdrLogWriter& writer)
+void HdrHistogram::write(Time start_time, Time end_time, HdrLogWriter& writer)
 {
-    writer.write(startTime, endTime, *hist_);
+    writer.write(start_time, end_time, *hist_);
 }
 
 } // namespace prof

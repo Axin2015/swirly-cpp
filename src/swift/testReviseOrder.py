@@ -18,38 +18,38 @@ from swift import *
 class TestCase(RestTestCase):
 
   def test(self):
-    self.maxDiff = None
+    self.max_diff = None
     self.now = 1388534400000
-    with DbFile() as dbFile:
-      with Server(dbFile, self.now) as server:
+    with DbFile() as db_file:
+      with Server(db_file, self.now) as server:
         with Client() as client:
-          client.setTime(self.now)
+          client.set_time(self.now)
 
-          self.createMarket(client, 'EURUSD', 20140302)
+          self.create_market(client, 'EURUSD', 20140302)
 
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 5, 12345)
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 5, 12345)
+          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 5, 12345)
+          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 5, 12345)
 
-          self.checkAuth(client)
+          self.check_auth(client)
 
-          self.reviseSingle(client)
-          self.reviseMulti(client)
+          self.revise_single(client)
+          self.revise_multi(client)
 
-  def checkAuth(self, client):
-    client.setAuth(None, 0x2)
+  def check_auth(self, client):
+    client.set_auth(None, 0x2)
 
     resp = client.send('PUT', '/accnt/orders/EURUSD/20140302/1')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    client.setAuth('MARAYL', ~0x2 & 0x7fffffff)
+    client.set_auth('MARAYL', ~0x2 & 0x7fffffff)
 
     resp = client.send('PUT', '/accnt/orders/EURUSD/20140302/1')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-  def reviseSingle(self, client):
-    client.setTrader('MARAYL')
+  def revise_single(self, client):
+    client.set_trader('MARAYL')
     resp = client.send('PUT', '/accnt/orders/EURUSD/20140302/1', lots = 4)
 
     self.assertEqual(200, resp.status)
@@ -118,8 +118,8 @@ class TestCase(RestTestCase):
       u'posn': None
     }, resp.content)
 
-  def reviseMulti(self, client):
-    client.setTrader('MARAYL')
+  def revise_multi(self, client):
+    client.set_trader('MARAYL')
     resp = client.send('PUT', '/accnt/orders/EURUSD/20140302/1,2', lots = 3)
 
     self.assertEqual(200, resp.status)

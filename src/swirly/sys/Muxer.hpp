@@ -65,8 +65,8 @@ class EpollMuxer {
         return n;
     }
 
-    explicit EpollMuxer(std::size_t sizeHint)
-    : fh_{os::epoll_create(sizeHint)}
+    explicit EpollMuxer(std::size_t size_hint)
+    : fh_{os::epoll_create(size_hint)}
     {
     }
 
@@ -93,7 +93,7 @@ class EpollMuxer {
     void subscribe(int fd, int sid, unsigned events)
     {
         Event ev;
-        setEvents(ev, fd, sid, events);
+        set_events(ev, fd, sid, events);
         os::epoll_ctl(*fh_, EPOLL_CTL_ADD, fd, ev);
     }
     void unsubscribe(int fd) noexcept
@@ -104,15 +104,15 @@ class EpollMuxer {
         std::error_code ec;
         os::epoll_ctl(*fh_, EPOLL_CTL_DEL, fd, ev, ec);
     }
-    void setEvents(int fd, int sid, unsigned events)
+    void set_events(int fd, int sid, unsigned events)
     {
         Event ev;
-        setEvents(ev, fd, sid, events);
+        set_events(ev, fd, sid, events);
         os::epoll_ctl(*fh_, EPOLL_CTL_MOD, fd, ev);
     }
 
   private:
-    static void setEvents(Event& ev, int fd, int sid, unsigned events) noexcept
+    static void set_events(Event& ev, int fd, int sid, unsigned events) noexcept
     {
         unsigned n{};
         if (events & EventIn) {

@@ -49,46 +49,46 @@ class SWIRLY_API MarketSide {
      *
      * Throws std::bad_alloc.
      */
-    void insertOrder(const OrderPtr& order);
+    void insert_order(const OrderPtr& order);
 
     /**
      * Remove order from side. Internal housekeeping aside, the state of the order is not affected
      * by this function.
      */
-    void removeOrder(const Order& order) noexcept
+    void remove_order(const Order& order) noexcept
     {
         Level* const level{order.level()};
         if (level != nullptr) {
-            removeOrder(*level, order);
+            remove_order(*level, order);
         }
     }
     /**
      * Throws std::bad_alloc.
      */
-    void createOrder(const OrderPtr& order, Time now)
+    void create_order(const OrderPtr& order, Time now)
     {
         order->create(now);
-        insertOrder(order);
+        insert_order(order);
     }
-    void reviseOrder(Order& order, Lots lots, Time now) noexcept
+    void revise_order(Order& order, Lots lots, Time now) noexcept
     {
         assert(lots > 0_lts);
-        assert(lots >= order.execLots());
-        assert(lots >= order.minLots());
+        assert(lots >= order.exec_lots());
+        assert(lots >= order.min_lots());
         assert(lots <= order.lots());
 
         Level* const level{order.level()};
         if (level != nullptr) {
             const Lots delta = order.lots() - lots;
-            reduceLevel(*level, order, delta);
+            reduce_level(*level, order, delta);
         }
         order.revise(lots, now);
     }
-    void cancelOrder(Order& order, Time now) noexcept
+    void cancel_order(Order& order, Time now) noexcept
     {
         Level* const level{order.level()};
         if (level != nullptr) {
-            removeOrder(*level, order);
+            remove_order(*level, order);
         }
         order.cancel(now);
     }
@@ -96,11 +96,11 @@ class SWIRLY_API MarketSide {
      * Reduce residual lots by lots. If the resulting residual is zero, then the order is removed
      * from the side.
      */
-    void takeOrder(Order& order, Lots lots, Time now) noexcept
+    void take_order(Order& order, Lots lots, Time now) noexcept
     {
         Level* const level{order.level()};
         if (level != nullptr) {
-            reduceLevel(*level, order, lots);
+            reduce_level(*level, order, lots);
         }
         order.trade(lots, order.ticks(), now);
     }
@@ -111,11 +111,11 @@ class SWIRLY_API MarketSide {
      *
      * Throws std::bad_alloc.
      */
-    LevelSet::Iterator insertLevel(const OrderPtr& order);
+    LevelSet::Iterator insert_level(const OrderPtr& order);
 
-    void removeOrder(Level& level, const Order& order) noexcept;
+    void remove_order(Level& level, const Order& order) noexcept;
 
-    void reduceLevel(Level& level, const Order& order, Lots delta) noexcept;
+    void reduce_level(Level& level, const Order& order, Lots delta) noexcept;
 
     LevelSet levels_;
     OrderList orders_;

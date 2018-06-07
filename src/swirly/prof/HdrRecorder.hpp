@@ -35,8 +35,8 @@ class HdrHistogram;
  */
 class SWIRLY_API HdrRecorder {
   public:
-    explicit HdrRecorder(HdrHistogram& hdrHist) noexcept
-    : hdrHist_(hdrHist)
+    explicit HdrRecorder(HdrHistogram& hdr_hist) noexcept
+    : hdr_hist_(hdr_hist)
     , start_{std::chrono::high_resolution_clock::now()}
     {
     }
@@ -51,7 +51,7 @@ class SWIRLY_API HdrRecorder {
     HdrRecorder& operator=(HdrRecorder&&) = delete;
 
   private:
-    HdrHistogram& hdrHist_;
+    HdrHistogram& hdr_hist_;
     std::chrono::time_point<std::chrono::high_resolution_clock> start_;
 };
 

@@ -67,7 +67,7 @@ class BasicUrl {
         const auto& field = parser_.field_data[UF_FRAGMENT];
         return url().substr(field.off, field.len);
     }
-    auto userInfo() const noexcept
+    auto user_info() const noexcept
     {
         const auto& field = parser_.field_data[UF_USERINFO];
         return url().substr(field.off, field.len);
@@ -77,12 +77,12 @@ class BasicUrl {
     ~BasicUrl() = default;
 
     void reset() noexcept { http_parser_url_init(&parser_); }
-    void parse(bool isConnect = false)
+    void parse(bool is_connect = false)
     {
         const auto rc
-            = http_parser_parse_url(url().data(), url().size(), isConnect ? 1 : 0, &parser_);
+            = http_parser_parse_url(url().data(), url().size(), is_connect ? 1 : 0, &parser_);
         if (rc != 0) {
-            throw ParseException{errMsg() << "invalid url: " << url()};
+            throw ParseException{err_msg() << "invalid url: " << url()};
         }
     }
 

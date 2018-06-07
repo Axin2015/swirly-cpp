@@ -57,7 +57,7 @@ class SWIRLY_API Exception : public std::exception {
  * error messages before throwing. Note that the StaticStream is reset each time this function is
  * called.
  */
-SWIRLY_API ErrMsg& errMsg() noexcept;
+SWIRLY_API ErrMsg& err_msg() noexcept;
 
 } // namespace util
 } // namespace swirly

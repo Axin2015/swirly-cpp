@@ -33,7 +33,7 @@ void detail::PidFileDeleter::operator()(pidfh* pfh) const noexcept
     pidfile_remove(pfh);
 }
 
-PidFile openPidFile(const char* path, mode_t mode)
+PidFile open_pid_file(const char* path, mode_t mode)
 {
     pid_t pid{};
     PidFile pf{pidfile_open(path, mode, &pid)};
@@ -42,22 +42,22 @@ PidFile openPidFile(const char* path, mode_t mode)
             using namespace string_literals;
             throw runtime_error{"daemon already running, pid: "s + to_string(pid)};
         }
-        throw system_error{os::makeError(errno), "pidfile_open"};
+        throw system_error{os::make_error(errno), "pidfile_open"};
     }
     return pf;
 }
 
-void closePidFile(PidFile& pf) noexcept
+void close_pid_file(PidFile& pf) noexcept
 {
     if (pf) {
         pidfile_close(pf.release());
     }
 }
 
-void writePidFile(PidFile& pf)
+void write_pid_file(PidFile& pf)
 {
     if (pf && pidfile_write(pf.get()) < 0) {
-        throw system_error{os::makeError(errno), "pidfile_write"};
+        throw system_error{os::make_error(errno), "pidfile_write"};
     }
 }
 

@@ -51,36 +51,36 @@ class SWIRLY_API HttpSess
     HttpSess(HttpSess&&) = delete;
     HttpSess& operator=(HttpSess&&) = delete;
 
-    boost::intrusive::list_member_hook<AutoUnlinkOption> listHook;
+    boost::intrusive::list_member_hook<AutoUnlinkOption> list_hook;
 
   private:
     void close() noexcept;
 
-    bool onMessageBegin() noexcept
+    bool on_message_begin() noexcept
     {
         ++pending_;
         return true;
     }
-    bool onUrl(std::string_view sv) noexcept;
-    bool onStatus(std::string_view sv) noexcept
+    bool on_url(std::string_view sv) noexcept;
+    bool on_status(std::string_view sv) noexcept
     {
         // Only supported for HTTP responses.
         return false;
     }
-    bool onHeaderField(std::string_view sv, bool first) noexcept;
-    bool onHeaderValue(std::string_view sv, bool first) noexcept;
-    bool onHeadersEnd() noexcept;
-    bool onBody(std::string_view sv) noexcept;
-    bool onMessageEnd() noexcept;
-    bool onChunkHeader(size_t len) noexcept { return true; }
-    bool onChunkEnd() noexcept { return true; }
+    bool on_header_field(std::string_view sv, bool first) noexcept;
+    bool on_header_value(std::string_view sv, bool first) noexcept;
+    bool on_headers_end() noexcept;
+    bool on_body(std::string_view sv) noexcept;
+    bool on_message_end() noexcept;
+    bool on_chunk_header(size_t len) noexcept { return true; }
+    bool on_chunk_end() noexcept { return true; }
 
-    void onIoEvent(int fd, unsigned events, Time now);
-    void onTimer(Timer& tmr, Time now);
+    void on_io_event(int fd, unsigned events, Time now);
+    void on_timer(Timer& tmr, Time now);
 
-    LogMsg& logMsg() const noexcept
+    LogMsg& log_msg() const noexcept
     {
-        auto& ref = swirly::logMsg();
+        auto& ref = swirly::log_msg();
         ref << '<' << ep_ << "> "sv;
         return ref;
     }
@@ -88,7 +88,7 @@ class SWIRLY_API HttpSess
     Reactor& reactor_;
     IoSocket sock_;
     TcpEndpoint ep_;
-    RestServ& restServ_;
+    RestServ& rest_serv_;
     Reactor::Handle sub_;
     Timer tmr_;
     int pending_{0};

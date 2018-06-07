@@ -30,7 +30,7 @@ Asset::Asset(const Asset&) = default;
 
 Asset::Asset(Asset&&) = default;
 
-void Asset::toDsv(ostream& os, char delim) const
+void Asset::to_dsv(ostream& os, char delim) const
 {
     OStreamJoiner osj{os, delim};
     osj << id_      //
@@ -39,7 +39,7 @@ void Asset::toDsv(ostream& os, char delim) const
         << static_cast<int>(type_);
 }
 
-void Asset::toJson(ostream& os) const
+void Asset::to_json(ostream& os) const
 {
     os << "{\"symbol\":\""sv << symbol_     //
        << "\",\"display\":\""sv << display_ //

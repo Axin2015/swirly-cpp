@@ -47,8 +47,8 @@ class Range {
     Range(Range&&) = delete;
     Range& operator=(Range&&) = delete;
 
-    constexpr std::size_t stepOffset() const noexcept { return offset_; }
-    constexpr std::size_t stepSize() const noexcept { return std::min(size_ - offset_, StepN); }
+    constexpr std::size_t step_offset() const noexcept { return offset_; }
+    constexpr std::size_t step_size() const noexcept { return std::min(size_ - offset_, StepN); }
     constexpr std::size_t steps() const noexcept { return (size_ + StepN - 1) / StepN; }
     constexpr bool done() const noexcept { return offset_ >= size_; }
     bool next() noexcept
@@ -87,46 +87,46 @@ class SWIRLY_API MsgQueue {
     /**
      * Create Market.
      */
-    void createMarket(Id64 id, Symbol instr, JDay settlDay, MarketState state)
+    void create_market(Id64 id, Symbol instr, JDay settl_day, MarketState state)
     {
-        doCreateMarket(id, instr, settlDay, state);
+        do_create_market(id, instr, settl_day, state);
     }
     /**
      * Update Market.
      */
-    void updateMarket(Id64 id, MarketState state) { doUpdateMarket(id, state); }
+    void update_market(Id64 id, MarketState state) { do_update_market(id, state); }
     /**
      * Create Execution.
      */
-    void createExec(const Exec& exec) { doCreateExec(exec); }
+    void create_exec(const Exec& exec) { do_create_exec(exec); }
     /**
      * Create Executions.
      */
-    void createExec(ArrayView<ConstExecPtr> execs);
+    void create_exec(ArrayView<ConstExecPtr> execs);
     /**
      * Archive Trade.
      */
-    void archiveTrade(Id64 marketId, Id64 id, Time modified)
+    void archive_trade(Id64 market_id, Id64 id, Time modified)
     {
-        doArchiveTrade(marketId, {&id, 1}, modified);
+        do_archive_trade(market_id, {&id, 1}, modified);
     }
     /**
      * Archive Trades.
      */
-    void archiveTrade(Id64 marketId, ArrayView<Id64> ids, Time modified);
+    void archive_trade(Id64 market_id, ArrayView<Id64> ids, Time modified);
     /**
      * Returns false if queue is empty.
      */
     bool pop(Msg& msg) noexcept { return mq_.pop(msg); }
 
   private:
-    void doCreateMarket(Id64 id, Symbol instr, JDay settlDay, MarketState state);
+    void do_create_market(Id64 id, Symbol instr, JDay settl_day, MarketState state);
 
-    void doUpdateMarket(Id64 id, MarketState state);
+    void do_update_market(Id64 id, MarketState state);
 
-    void doCreateExec(const Exec& exec);
+    void do_create_exec(const Exec& exec);
 
-    void doArchiveTrade(Id64 marketId, ArrayView<Id64> ids, Time modified);
+    void do_archive_trade(Id64 market_id, ArrayView<Id64> ids, Time modified);
 
     MemQueue<Msg> mq_{nullptr};
 };

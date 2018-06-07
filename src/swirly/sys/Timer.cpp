@@ -30,7 +30,7 @@ constexpr size_t Overhead = 16;
 constexpr size_t PageSize = 4096;
 constexpr size_t SlabSize = (PageSize - Overhead) / sizeof(Timer);
 
-bool isAfter(const Timer& lhs, const Timer& rhs)
+bool is_after(const Timer& lhs, const Timer& rhs)
 {
     return lhs.expiry() > rhs.expiry();
 }
@@ -46,7 +46,7 @@ Timer TimerQueue::insert(Time expiry, Duration interval, TimerSlot slot)
 
     // Cannot fail.
     heap_.push_back(tmr);
-    push_heap(heap_.begin(), heap_.end(), isAfter);
+    push_heap(heap_.begin(), heap_.end(), is_after);
 
     return tmr;
 }
@@ -96,8 +96,8 @@ Timer TimerQueue::alloc(Time expiry, Duration interval, TimerSlot slot)
     }
 
     impl->tq = this;
-    impl->refCount = 1;
-    impl->id = ++maxId_;
+    impl->ref_count = 1;
+    impl->id = ++max_id_;
     impl->expiry = expiry;
     impl->interval = interval;
     impl->slot = slot;
@@ -139,11 +139,11 @@ void TimerQueue::expire(Time now)
         if (tmr.interval().count() > 0) {
 
             // Add interval to expiry, while ensuring that next expiry is always in the future.
-            tmr.setExpiry(max(tmr.expiry() + tmr.interval(), now + 1ns));
+            tmr.set_expiry(max(tmr.expiry() + tmr.interval(), now + 1ns));
 
             // Reschedule popped timer.
             heap_.push_back(tmr);
-            push_heap(heap_.begin(), heap_.end(), isAfter);
+            push_heap(heap_.begin(), heap_.end(), is_after);
 
         } else {
 
@@ -160,7 +160,7 @@ void TimerQueue::gc() noexcept
         const auto it
             = remove_if(heap_.begin(), heap_.end(), [](const auto& tmr) { return !tmr.pending(); });
         heap_.erase(it, heap_.end());
-        make_heap(heap_.begin(), heap_.end(), isAfter);
+        make_heap(heap_.begin(), heap_.end(), is_after);
         cancelled_ = 0;
     }
 }
@@ -168,15 +168,15 @@ void TimerQueue::gc() noexcept
 Timer TimerQueue::pop() noexcept
 {
     auto tmr = heap_.front();
-    pop_heap(heap_.begin(), heap_.end(), isAfter);
+    pop_heap(heap_.begin(), heap_.end(), is_after);
     heap_.pop_back();
     return tmr;
 }
 
 void intrusive_ptr_release(Timer::Impl* impl) noexcept
 {
-    --impl->refCount;
-    if (impl->refCount == 1) {
+    --impl->ref_count;
+    if (impl->ref_count == 1) {
         // Cancel pending if only one reference remains. If only one reference remains after
         // decrementing the counter, and the timer is still pending, then the final reference must
         // be held within the internal timer queue, which means that no more references exist
@@ -185,7 +185,7 @@ void intrusive_ptr_release(Timer::Impl* impl) noexcept
             impl->slot.reset();
             impl->tq->cancel();
         }
-    } else if (impl->refCount == 0) {
+    } else if (impl->ref_count == 0) {
         auto& tq = *impl->tq;
         impl->next = tq.free_;
         tq.free_ = impl;

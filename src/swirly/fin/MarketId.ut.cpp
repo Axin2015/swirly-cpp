@@ -22,9 +22,9 @@ using namespace swirly;
 
 BOOST_AUTO_TEST_SUITE(MarketIdSuite)
 
-BOOST_AUTO_TEST_CASE(toMarketIdCase)
+BOOST_AUTO_TEST_CASE(to_market_id_case)
 {
-    const auto id = toMarketId(171_id32, 2492719_jd);
+    const auto id = to_market_id(171_id32, 2492719_jd);
     BOOST_TEST(id == 0xabcdef_id64);
 }
 

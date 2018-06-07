@@ -32,7 +32,7 @@ namespace swirly {
 inline namespace util {
 
 template <typename FnT>
-void parsePairs(std::istream& is, FnT fn)
+void parse_pairs(std::istream& is, FnT fn)
 {
     std::string line;
     while (std::getline(is, line)) {
@@ -46,7 +46,7 @@ void parsePairs(std::istream& is, FnT fn)
         }
 
         std::string key, val;
-        std::tie(key, val) = splitPair(line, '=');
+        std::tie(key, val) = split_pair(line, '=');
         rtrim(key);
         ltrim(val);
 
@@ -86,7 +86,7 @@ class SWIRLY_API Config {
     ValueT get(const char* key, ValueT dfl) const noexcept
     {
         auto it = map_.find(key);
-        return it != map_.end() ? fromString<ValueT>(it->second) : dfl;
+        return it != map_.end() ? from_string<ValueT>(it->second) : dfl;
     }
     void clear() noexcept { map_.clear(); }
     void read(std::istream& is);

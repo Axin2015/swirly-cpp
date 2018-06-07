@@ -29,12 +29,12 @@ Client::Client(QObject* parent)
 
 void Client::reset()
 {
-    posnModel_.reset();
-    tradeModel_.reset();
-    execModel_.reset();
-    orderModel_.reset();
-    marketModel_.reset();
-    instrModel_.reset();
+    posn_model_.reset();
+    trade_model_.reset();
+    exec_model_.reset();
+    order_model_.reset();
+    market_model_.reset();
+    instr_model_.reset();
     assetModel_.reset();
 }
 

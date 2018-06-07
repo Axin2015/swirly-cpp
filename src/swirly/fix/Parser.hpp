@@ -52,26 +52,26 @@ class BasicFixParser {
         // If body length has not been read.
         if (offset_ == 0) {
             // Then try to read it.
-            if (!parseBodyLen(buf)) {
+            if (!parse_body_len(buf)) {
                 return 0;
             }
         }
         std::size_t sum{0};
         do {
-            const std::size_t len{offset_ + bodyLen_ + CheckSumLen};
+            const std::size_t len{offset_ + body_len_ + CheckSumLen};
             // Break if incomplete message.
             if (buffer_size(buf) < len) {
                 break;
             }
             const auto* const begin = buffer_cast<const char*>(buf);
             const FixVersion ver{begin[6] - '0', begin[8] - '0'};
-            static_cast<DerivedT*>(this)->onMessage(ver, {begin + offset_, bodyLen_});
+            static_cast<DerivedT*>(this)->on_message(ver, {begin + offset_, body_len_});
             // Skip to next message.
             buf = advance(buf, len);
             sum += len;
             clear();
             // Attempt to read next message.
-        } while (parseBodyLen(buf));
+        } while (parse_body_len(buf));
         return sum;
     }
 
@@ -79,9 +79,9 @@ class BasicFixParser {
     void clear() noexcept
     {
         offset_ = 0;
-        bodyLen_ = 0;
+        body_len_ = 0;
     }
-    bool parseBodyLen(ConstBuffer buf)
+    bool parse_body_len(ConstBuffer buf)
     {
         const auto len = buffer_size(buf);
         if (len <= BodyLenStart) {
@@ -94,9 +94,9 @@ class BasicFixParser {
         assert(it != end);
 
         // Attempt to extract body length digits.
-        std::size_t bodyLen{0};
+        std::size_t body_len{0};
         if (std::isdigit(*it)) {
-            bodyLen += *it++ - '0';
+            body_len += *it++ - '0';
             for (;;) {
                 if (it == end) {
                     // Partial body length.
@@ -105,8 +105,8 @@ class BasicFixParser {
                 if (!std::isdigit(*it)) {
                     break;
                 }
-                bodyLen *= 10;
-                bodyLen += *it++ - '0';
+                body_len *= 10;
+                body_len += *it++ - '0';
             }
         }
         // Verify that first non-digit charactor was SOH.
@@ -114,10 +114,10 @@ class BasicFixParser {
             throw FixException{"invalid FIX body length"sv};
         }
         offset_ = it + 1 - begin;
-        bodyLen_ = bodyLen;
+        body_len_ = body_len;
         return true;
     }
-    std::size_t offset_{0}, bodyLen_{0};
+    std::size_t offset_{0}, body_len_{0};
 };
 
 } // namespace fix

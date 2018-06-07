@@ -24,7 +24,7 @@
 namespace swirly {
 inline namespace fix {
 using namespace std;
-pair<string_view, bool> findTag(string_view msg, int tag) noexcept
+pair<string_view, bool> find_tag(string_view msg, int tag) noexcept
 {
     assert(tag >= 0);
 

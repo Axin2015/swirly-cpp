@@ -23,7 +23,7 @@ namespace swirly {
 inline namespace sys {
 namespace os {
 
-inline std::error_code makeError(int err)
+inline std::error_code make_error(int err)
 {
     return std::error_code{err, std::system_category()};
 }

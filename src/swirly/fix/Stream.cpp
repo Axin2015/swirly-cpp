@@ -23,7 +23,7 @@ namespace {
 // Assumption: begin-string is always FIX.x.y format.
 enum { BodyLenStart = "8=FIX.x.y^9="sv.size(), CheckSumLen = "10=000^"sv.size() };
 
-void putCheckSum(char* s, uint64_t sum) noexcept
+void put_check_sum(char* s, uint64_t sum) noexcept
 {
     int n = sum % 256;
     s[6] = '\1';
@@ -43,12 +43,12 @@ FixBuf::~FixBuf() = default;
 void FixBuf::commit() noexcept
 {
     if (pcount_ > 0) {
-        putCheckSum(pbase_ + pcount_, sum_);
+        put_check_sum(pbase_ + pcount_, sum_);
         buf_.commit(pcount_ + CheckSumLen);
     }
 }
 
-void FixBuf::setBodyLength(std::streamsize pos, std::streamsize len) noexcept
+void FixBuf::set_body_length(std::streamsize pos, std::streamsize len) noexcept
 {
     auto it = pbase_ + pos;
     do {
@@ -87,7 +87,7 @@ FixStream::~FixStream() = default;
 void FixStream::commit() noexcept
 {
     if (bloff_ > 0) {
-        buf_.setBodyLength(bloff_ - 1, pcount() - bloff_);
+        buf_.set_body_length(bloff_ - 1, pcount() - bloff_);
     }
     buf_.commit();
 }
