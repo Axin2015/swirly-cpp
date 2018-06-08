@@ -38,7 +38,7 @@ QVariant AssetModel::data(const QModelIndex& index, int role) const
     if (!index.isValid()) {
         // No-op.
     } else if (role == Qt::CheckStateRole) {
-        const auto& row = rowAt(index.row());
+        const auto& row = row_at(index.row());
         switch (box<Column>(index.column())) {
         case Column::CheckState:
             var = row.checked() ? Qt::Checked : Qt::Unchecked;
@@ -47,7 +47,7 @@ QVariant AssetModel::data(const QModelIndex& index, int role) const
             break;
         }
     } else if (role == Qt::DisplayRole) {
-        const auto& asset = valueAt(index.row());
+        const auto& asset = value_at(index.row());
         switch (box<Column>(index.column())) {
         case Column::CheckState:
             break;
@@ -58,7 +58,7 @@ QVariant AssetModel::data(const QModelIndex& index, int role) const
             var = asset.display();
             break;
         case Column::Type:
-            var = enumString(asset.type());
+            var = enum_string(asset.type());
             break;
         }
     } else if (role == Qt::TextAlignmentRole) {
@@ -72,7 +72,7 @@ QVariant AssetModel::data(const QModelIndex& index, int role) const
             break;
         }
     } else if (role == Qt::UserRole) {
-        var = QVariant::fromValue(valueAt(index.row()));
+        var = QVariant::fromValue(value_at(index.row()));
     }
     return var;
 }

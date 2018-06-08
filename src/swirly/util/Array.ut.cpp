@@ -51,8 +51,8 @@ BOOST_AUTO_TEST_CASE(ArrayViewCase)
 
     BOOST_TEST(equal(av.rbegin(), av.rend(), rev));
 
-    BOOST_TEST(makeArrayView(arr, 2).size() == 2U);
-    BOOST_TEST(makeArrayView(arr).size() == 3U);
+    BOOST_TEST(make_array_view(arr, 2).size() == 2U);
+    BOOST_TEST(make_array_view(arr).size() == 3U);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

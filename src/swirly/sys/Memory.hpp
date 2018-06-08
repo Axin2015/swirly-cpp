@@ -33,14 +33,14 @@ enum : std::size_t {
     PageSize = 1 << PageBits
 };
 
-constexpr std::size_t ceilCacheLine(std::size_t size) noexcept
+constexpr std::size_t ceil_cache_line(std::size_t size) noexcept
 {
-    return ceilPow2<CacheLineBits>(size);
+    return ceil_pow2<CacheLineBits>(size);
 }
 
-constexpr std::size_t ceilPage(std::size_t size) noexcept
+constexpr std::size_t ceil_page(std::size_t size) noexcept
 {
-    return ceilPow2<PageBits>(size);
+    return ceil_pow2<PageBits>(size);
 }
 
 } // namespace sys

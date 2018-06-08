@@ -44,15 +44,15 @@ int main(int argc, char* argv[])
         if (argc > 1) {
             config.set("sqlite_model", argv[1]);
         }
-        const BusinessDay busDay{MarketZone};
+        const BusinessDay bus_day{MarketZone};
 
         const auto now = UnixClock::now();
         SqlModel model{config};
         {
             ofstream os{"asset.txt"};
             os << "id\tsymbol\tdisplay\ttype\n";
-            model.readAsset([&os](auto ptr) {
-                ptr->toDsv(os, '\t');
+            model.read_asset([&os](auto ptr) {
+                ptr->to_dsv(os, '\t');
                 os << '\n';
             });
         }
@@ -60,16 +60,16 @@ int main(int argc, char* argv[])
             ofstream os{"instr.txt"};
             os << "id\tsymbol\tdisplay\tbase_asset\tterm_ccy\tlot_numer\tlot_denom\ttick_numer\t"
                   "tick_denom\tpip_dp\tmin_lots\tmax_lots\n";
-            model.readInstr([&os](auto ptr) {
-                ptr->toDsv(os, '\t');
+            model.read_instr([&os](auto ptr) {
+                ptr->to_dsv(os, '\t');
                 os << '\n';
             });
         }
         {
             ofstream os{"market.txt"};
             os << "id\tinstr\tsettl_day\tstate\tlast_lots\tlast_ticks\tlast_time\tmax_id\n";
-            model.readMarket([&os](auto ptr) {
-                ptr->toDsv(os, '\t');
+            model.read_market([&os](auto ptr) {
+                ptr->to_dsv(os, '\t');
                 os << '\n';
             });
         }
@@ -78,8 +78,8 @@ int main(int argc, char* argv[])
             os << "accnt\tmarket_id\tinstr\tsettl_date\tid\tref\tstate\tside\tlots\tticks\t"
                   "resd_lots\texec_lots\texec_cost\tlast_lots\tlast_ticks\tmin_lots\tcreated\t"
                   "modified\n";
-            model.readOrder([&os](auto ptr) {
-                ptr->toDsv(os, '\t');
+            model.read_order([&os](auto ptr) {
+                ptr->to_dsv(os, '\t');
                 os << '\n';
             });
         }
@@ -89,8 +89,8 @@ int main(int argc, char* argv[])
                   "ticks\tresd_lots\texec_lots\texec_cost\tlast_lots\tlast_ticks\tmin_lots\t"
                   "match_id\tposn_lots\tposn_cost\tliq_ind\tcpty\tcreated\n";
             // One week ago.
-            model.readExec(now - 604800000ms, [&os](auto ptr) {
-                ptr->toDsv(os, '\t');
+            model.read_exec(now - 604800000ms, [&os](auto ptr) {
+                ptr->to_dsv(os, '\t');
                 os << '\n';
             });
         }
@@ -99,16 +99,16 @@ int main(int argc, char* argv[])
             os << "accnt\tmarket_id\tinstr\tsettl_date\tid\torder_id\tref\tstate\tside\tlots\t"
                   "ticks\tresd_lots\texec_lots\texec_cost\tlast_lots\tlast_ticks\tmin_lots\t"
                   "match_id\tposn_lots\tposn_cost\tliq_ind\tcpty\tcreated\n";
-            model.readTrade([&os](auto ptr) {
-                ptr->toDsv(os, '\t');
+            model.read_trade([&os](auto ptr) {
+                ptr->to_dsv(os, '\t');
                 os << '\n';
             });
         }
         {
             ofstream os{"posn.txt"};
             os << "accnt\tmarket_id\tinstr\tsettl_date\tbuy_lots\tbuy_cost\tsell_lots\tsell_cost\n";
-            model.readPosn(busDay(now), [&os](auto ptr) {
-                ptr->toDsv(os, '\t');
+            model.read_posn(bus_day(now), [&os](auto ptr) {
+                ptr->to_dsv(os, '\t');
                 os << '\n';
             });
         }

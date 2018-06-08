@@ -18,22 +18,22 @@ from swift import *
 class TestCase(RestTestCase):
 
   def test(self):
-    self.maxDiff = None
+    self.max_diff = None
     self.now = 1388534400000
-    with DbFile() as dbFile:
-      with Server(dbFile, self.now) as server:
+    with DbFile() as db_file:
+      with Server(db_file, self.now) as server:
         with Client() as client:
-          client.setTime(self.now)
+          client.set_time(self.now)
 
-          self.checkAuth(client)
+          self.check_auth(client)
 
-          self.createMarket(client)
-          self.createMarketByInstr(client)
-          self.createMarketByMarket(client)
-          self.updateMarket(client)
+          self.create_market(client)
+          self.create_market_by_instr(client)
+          self.create_market_by_market(client)
+          self.update_market(client)
 
-  def checkAuth(self, client):
-    client.setAuth(None, 0x1)
+  def check_auth(self, client):
+    client.set_auth(None, 0x1)
 
     resp = client.send('POST', '/markets')
     self.assertEqual(401, resp.status)
@@ -51,7 +51,7 @@ class TestCase(RestTestCase):
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    client.setAuth('ADMIN', ~0x1 & 0x7fffffff)
+    client.set_auth('ADMIN', ~0x1 & 0x7fffffff)
 
     resp = client.send('POST', '/markets')
     self.assertEqual(403, resp.status)
@@ -69,8 +69,8 @@ class TestCase(RestTestCase):
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-  def createMarket(self, client):
-    client.setAdmin()
+  def create_market(self, client):
+    client.set_admin()
     resp = client.send('POST', '/markets',
                        instr = 'EURUSD',
                        settl_date = 20140302,
@@ -94,8 +94,8 @@ class TestCase(RestTestCase):
       u'state': 1
     }, resp.content)
 
-  def createMarketByInstr(self, client):
-    client.setAdmin()
+  def create_market_by_instr(self, client):
+    client.set_admin()
     resp = client.send('POST', '/markets/GBPUSD',
                        settl_date = 20140302,
                        state = 1)
@@ -118,8 +118,8 @@ class TestCase(RestTestCase):
       u'state': 1
     }, resp.content)
 
-  def createMarketByMarket(self, client):
-    client.setAdmin()
+  def create_market_by_market(self, client):
+    client.set_admin()
     resp = client.send('POST', '/markets/USDJPY/20140302',
                        state = 1)
 
@@ -141,8 +141,8 @@ class TestCase(RestTestCase):
       u'state': 1
     }, resp.content)
 
-  def updateMarket(self, client):
-    client.setAdmin()
+  def update_market(self, client):
+    client.set_admin()
     resp = client.send('PUT', '/markets/USDJPY/20140302',
                        state = 2)
     self.assertEqual(200, resp.status)

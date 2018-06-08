@@ -45,7 +45,7 @@ class Finally {
 };
 
 template <typename FnT>
-auto makeFinally(FnT fn) noexcept
+auto make_finally(FnT fn) noexcept
 {
     return Finally<FnT>{std::move(fn)};
 }

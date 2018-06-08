@@ -31,12 +31,12 @@ class HttpClient : public Client {
     HttpClient(QObject* parent = nullptr);
     ~HttpClient() override;
 
-    void createMarket(const Instr& instr, QDate settlDate) override;
+    void create_market(const Instr& instr, QDate settl_date) override;
 
-    void createOrder(const Instr& instr, QDate settlDate, const QString& ref, Side side, Lots lots,
-                     Ticks ticks) override;
+    void create_order(const Instr& instr, QDate settl_date, const QString& ref, Side side,
+                      Lots lots, Ticks ticks) override;
 
-    void cancelOrders(const OrderKeys& keys) override;
+    void cancel_orders(const OrderKeys& keys) override;
 
   signals:
 
@@ -44,21 +44,21 @@ class HttpClient : public Client {
     void timerEvent(QTimerEvent* event) override;
 
   private slots:
-    void slotFinished(QNetworkReply* reply);
+    void slot_finished(QNetworkReply* reply);
 
-    void slotNetworkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility accessible);
+    void slot_networkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility accessible);
 
   private:
-    Instr findInstr(const QJsonObject& obj) const;
+    Instr find_instr(const QJsonObject& obj) const;
 
-    void getRefData();
-    void getAccnt();
-    void putOrder(const QUrl& url);
+    void get_ref_data();
+    void get_accnt();
+    void put_order(const QUrl& url);
 
-    void onRefDataReply(QNetworkReply& reply);
-    void onAccntReply(QNetworkReply& reply);
-    void onMarketReply(QNetworkReply& reply);
-    void onOrderReply(QNetworkReply& reply);
+    void on_ref_data_reply(QNetworkReply& reply);
+    void on_accnt_reply(QNetworkReply& reply);
+    void on_market_reply(QNetworkReply& reply);
+    void on_order_reply(QNetworkReply& reply);
 
     QNetworkAccessManager nam_;
     std::uint64_t tag_{0};

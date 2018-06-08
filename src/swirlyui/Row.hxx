@@ -37,9 +37,9 @@ class Row {
     bool checked() const noexcept { return checked_ == 1; }
     const ValueT& value() const noexcept { return value_; }
 
-    void setTag(std::uint64_t tag) noexcept { tag_ = tag; }
-    void setChecked(bool checked = true) noexcept { checked_ = checked ? 1 : 0; }
-    void setValue(const ValueT& value) noexcept { value_ = value; }
+    void set_tag(std::uint64_t tag) noexcept { tag_ = tag; }
+    void set_checked(bool checked = true) noexcept { checked_ = checked ? 1 : 0; }
+    void set_value(const ValueT& value) noexcept { value_ = value; }
 
   private:
     struct {

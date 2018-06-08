@@ -18,18 +18,18 @@ from swift import *
 class TestCase(RestTestCase):
 
   def test(self):
-    self.maxDiff = None
+    self.max_diff = None
     self.now = 1388534400000
-    with DbFile() as dbFile:
-      with Server(dbFile, self.now) as server:
+    with DbFile() as db_file:
+      with Server(db_file, self.now) as server:
         with Client() as client:
-          client.setTime(self.now)
+          client.set_time(self.now)
 
-          self.getAll(client)
-          self.getBySymbol(client)
+          self.get_all(client)
+          self.get_by_symbol(client)
 
-  def getAll(self, client):
-    client.setAnon()
+  def get_all(self, client):
+    client.set_anon()
     resp = client.send('GET', '/refdata/instrs')
 
     self.assertEqual(200, resp.status)
@@ -288,8 +288,8 @@ class TestCase(RestTestCase):
       u'tick_numer': 1
     }], resp.content)
 
-  def getBySymbol(self, client):
-    client.setAnon()
+  def get_by_symbol(self, client):
+    client.set_anon()
     resp = client.send('GET', '/refdata/instrs/EURUSD')
 
     self.assertEqual(200, resp.status)

@@ -69,8 +69,8 @@ class SWIRLY_API EntitySet {
     bool exec() const noexcept { return (bs_ & Exec) != 0; }
     bool trade() const noexcept { return (bs_ & Trade) != 0; }
     bool posn() const noexcept { return (bs_ & Posn) != 0; }
-    bool onlyRec() const noexcept { return (bs_ & ~RecMask) == 0; }
-    bool onlyAccnt() const noexcept { return (bs_ & ~AccntMask) == 0; }
+    bool only_rec() const noexcept { return (bs_ & ~RecMask) == 0; }
+    bool only_accnt() const noexcept { return (bs_ & ~AccntMask) == 0; }
     int pop() noexcept
     {
         const auto i = top();

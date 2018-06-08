@@ -43,7 +43,7 @@ st = = uv =
 
     istringstream is{text};
     map<string, string> conf;
-    parsePairs(is, [&conf](const auto& key, const auto& val) { conf.emplace(key, val); });
+    parse_pairs(is, [&conf](const auto& key, const auto& val) { conf.emplace(key, val); });
     BOOST_TEST(conf.size() == 7U);
     BOOST_TEST(conf["ab"] == "");
     BOOST_TEST(conf["cd"] == "");

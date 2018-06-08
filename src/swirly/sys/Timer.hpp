@@ -42,7 +42,7 @@ class SWIRLY_API Timer {
             Impl* next;
             TimerQueue* tq;
         };
-        int refCount;
+        int ref_count;
         long id;
         Time expiry;
         Duration interval;
@@ -78,7 +78,7 @@ class SWIRLY_API Timer {
     Duration interval() const noexcept { return impl_->interval; }
     // Setting the interval will not reschedule any pending timer.
     template <typename RepT, typename PeriodT>
-    void setInterval(std::chrono::duration<RepT, PeriodT> interval) noexcept
+    void set_interval(std::chrono::duration<RepT, PeriodT> interval) noexcept
     {
         using namespace std::chrono;
         impl_->interval = duration_cast<Duration>(interval);
@@ -88,7 +88,7 @@ class SWIRLY_API Timer {
     void cancel() noexcept;
 
   private:
-    void setExpiry(Time expiry) noexcept { impl_->expiry = expiry; }
+    void set_expiry(Time expiry) noexcept { impl_->expiry = expiry; }
     TimerSlot& slot() noexcept { return impl_->slot; }
 
     boost::intrusive_ptr<Timer::Impl> impl_;
@@ -181,7 +181,7 @@ class SWIRLY_API TimerQueue {
     void gc() noexcept;
     Timer pop() noexcept;
 
-    long maxId_{};
+    long max_id_{};
     int cancelled_{};
     std::vector<SlabPtr> slabs_;
     // Head of free-list.
@@ -192,7 +192,7 @@ class SWIRLY_API TimerQueue {
 
 inline void intrusive_ptr_add_ref(Timer::Impl* impl) noexcept
 {
-    ++impl->refCount;
+    ++impl->ref_count;
 }
 
 SWIRLY_API void intrusive_ptr_release(Timer::Impl* impl) noexcept;

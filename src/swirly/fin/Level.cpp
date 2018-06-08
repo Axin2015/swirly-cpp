@@ -24,11 +24,11 @@ using namespace std;
 
 static_assert(sizeof(Level) <= 2 * 64, "no greater than specified cache-lines");
 
-Level::Level(const Order& firstOrder) noexcept
-: firstOrder_{&firstOrder}
-, key_{detail::composeKey(firstOrder.side(), firstOrder.ticks())}
-, ticks_{firstOrder.ticks()}
-, lots_{firstOrder.resdLots()}
+Level::Level(const Order& first_order) noexcept
+: first_order_{&first_order}
+, key_{detail::compose_key(first_order.side(), first_order.ticks())}
+, ticks_{first_order.ticks()}
+, lots_{first_order.resd_lots()}
 , count_{1}
 {
 }
@@ -37,15 +37,15 @@ Level::~Level() = default;
 
 Level::Level(Level&&) = default;
 
-void Level::addOrder(const Order& order) noexcept
+void Level::add_order(const Order& order) noexcept
 {
-    lots_ += order.resdLots();
+    lots_ += order.resd_lots();
     ++count_;
 }
 
-void Level::subOrder(const Order& order) noexcept
+void Level::sub_order(const Order& order) noexcept
 {
-    lots_ -= order.resdLots();
+    lots_ -= order.resd_lots();
     --count_;
 }
 
@@ -70,7 +70,7 @@ LevelSet::Iterator LevelSet::insert(ValuePtr value) noexcept
     return it;
 }
 
-LevelSet::Iterator LevelSet::insertHint(ConstIterator hint, ValuePtr value) noexcept
+LevelSet::Iterator LevelSet::insert_hint(ConstIterator hint, ValuePtr value) noexcept
 {
     auto it = set_.insert(hint, *value);
     // Take ownership.
@@ -78,7 +78,7 @@ LevelSet::Iterator LevelSet::insertHint(ConstIterator hint, ValuePtr value) noex
     return it;
 }
 
-LevelSet::Iterator LevelSet::insertOrReplace(ValuePtr value) noexcept
+LevelSet::Iterator LevelSet::insert_or_replace(ValuePtr value) noexcept
 {
     Iterator it;
     bool inserted;

@@ -45,7 +45,7 @@ constexpr char MarketZone[]{"MKST+2MKDT,M3.2.0/2,M11.1.0/2"};
  */
 class SWIRLY_API BusinessDay {
   public:
-    explicit BusinessDay(const char* timeZone);
+    explicit BusinessDay(const char* time_zone);
     ~BusinessDay();
 
     // Copy.
@@ -66,7 +66,7 @@ class SWIRLY_API BusinessDay {
     JDay operator()(Time time) const;
 
   private:
-    boost::local_time::time_zone_ptr timeZone_;
+    boost::local_time::time_zone_ptr time_zone_;
     /**
      * Cache entries for odd and even time_t values.
      */

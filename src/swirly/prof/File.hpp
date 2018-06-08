@@ -25,7 +25,7 @@ inline namespace prof {
 
 using FilePtr = std::unique_ptr<std::FILE, decltype(&std::fclose)>;
 
-FilePtr openFile(const char* path, const char* mode);
+FilePtr open_file(const char* path, const char* mode);
 
 } // namespace prof
 } // namespace swirly

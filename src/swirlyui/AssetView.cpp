@@ -36,7 +36,7 @@ AssetView::AssetView(AssetModel& model, QWidget* parent, Qt::WindowFlags f)
 {
     auto table = make_unique<QTableView>();
     {
-        auto del = makeDeleter(table->model());
+        auto del = make_deleter(table->model());
         table->setModel(&model);
     }
     table->resizeColumnToContents(unbox(Column::CheckState));
@@ -47,7 +47,7 @@ AssetView::AssetView(AssetModel& model, QWidget* parent, Qt::WindowFlags f)
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::NoSelection);
 
-    connect(table.get(), &QTableView::clicked, this, &AssetView::slotClicked);
+    connect(table.get(), &QTableView::clicked, this, &AssetView::slot_clicked);
 
     auto layout = make_unique<QGridLayout>();
     layout->addWidget(table_ = table.release(), 0, 0);
@@ -56,15 +56,15 @@ AssetView::AssetView(AssetModel& model, QWidget* parent, Qt::WindowFlags f)
 
 AssetView::~AssetView() = default;
 
-void AssetView::resizeColumnsToContents()
+void AssetView::resize_columns_to_contents()
 {
     table_->resizeColumnsToContents();
 }
 
-void AssetView::slotClicked(const QModelIndex& index)
+void AssetView::slot_clicked(const QModelIndex& index)
 {
     if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
-        model_.toggleCheckState(index.row());
+        model_.toggle_check_state(index.row());
     }
 }
 

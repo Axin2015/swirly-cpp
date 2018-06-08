@@ -28,7 +28,7 @@ inline namespace app {
 using namespace std;
 namespace {
 
-FileHandle reserveFile(const char* path, size_t size)
+FileHandle reserve_file(const char* path, size_t size)
 {
     FileHandle fh{os::open(path, O_RDWR | O_CREAT, 0644)};
     os::ftruncate(fh.get(), size);
@@ -38,49 +38,50 @@ FileHandle reserveFile(const char* path, size_t size)
 } // namespace
 
 struct MemCtx::Impl {
-    explicit Impl(size_t maxSize)
-    : maxSize{maxSize}
-    , memMap{os::mmap(nullptr, PageSize + maxSize, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE,
-                      -1, 0)}
-    , pool(*static_cast<MemPool*>(memMap.get().data()))
+    explicit Impl(size_t max_size)
+    : max_size{max_size}
+    , mem_map{os::mmap(nullptr, PageSize + max_size, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE,
+                       -1, 0)}
+    , pool(*static_cast<MemPool*>(mem_map.get().data()))
     {
     }
-    Impl(const char* path, size_t maxSize)
-    : maxSize{maxSize}
-    , fh{reserveFile(path, PageSize + maxSize)}
-    , memMap{os::mmap(nullptr, PageSize + maxSize, PROT_READ | PROT_WRITE, MAP_SHARED, fh.get(), 0)}
-    , pool(*static_cast<MemPool*>(memMap.get().data()))
+    Impl(const char* path, size_t max_size)
+    : max_size{max_size}
+    , fh{reserve_file(path, PageSize + max_size)}
+    , mem_map{os::mmap(nullptr, PageSize + max_size, PROT_READ | PROT_WRITE, MAP_SHARED, fh.get(),
+                       0)}
+    , pool(*static_cast<MemPool*>(mem_map.get().data()))
     {
     }
     void* alloc(size_t size)
     {
         void* addr;
         enum { Max = (1 << CacheLineBits) - 1 };
-        const auto cacheLines = (size + Max) >> CacheLineBits;
-        switch (nextPow2(cacheLines)) {
+        const auto cache_lines = (size + Max) >> CacheLineBits;
+        switch (next_pow2(cache_lines)) {
         case 1: // 64
-            addr = allocBlock(pool, pool.free1, maxSize);
+            addr = alloc_block(pool, pool.free1, max_size);
             break;
         case 2: // 128
-            addr = allocBlock(pool, pool.free2, maxSize);
+            addr = alloc_block(pool, pool.free2, max_size);
             break;
         case 4:
-            if (cacheLines == 3) {
+            if (cache_lines == 3) {
                 // 192
-                addr = allocBlock(pool, pool.free3, maxSize);
+                addr = alloc_block(pool, pool.free3, max_size);
             } else {
                 // 256
-                addr = allocBlock(pool, pool.free4, maxSize);
+                addr = alloc_block(pool, pool.free4, max_size);
             }
             break;
         case 8: // 512
-            addr = allocBlock(pool, pool.free8, maxSize);
+            addr = alloc_block(pool, pool.free8, max_size);
             break;
         case 16: // 1024
-            addr = allocBlock(pool, pool.free16, maxSize);
+            addr = alloc_block(pool, pool.free16, max_size);
             break;
         case 32: // 2048
-            addr = allocBlock(pool, pool.free32, maxSize);
+            addr = alloc_block(pool, pool.free32, max_size);
             break;
         default:
             throw bad_alloc{};
@@ -89,49 +90,49 @@ struct MemCtx::Impl {
     }
     void dealloc(void* addr, size_t size) noexcept
     {
-        const auto cacheLines = size >> CacheLineBits;
-        switch (nextPow2(cacheLines)) {
+        const auto cache_lines = size >> CacheLineBits;
+        switch (next_pow2(cache_lines)) {
         case 1: // 64
-            deallocBlock(pool, pool.free1, addr);
+            dealloc_block(pool, pool.free1, addr);
             break;
         case 2: // 128
-            deallocBlock(pool, pool.free2, addr);
+            dealloc_block(pool, pool.free2, addr);
             break;
         case 4:
-            if (cacheLines == 3) {
+            if (cache_lines == 3) {
                 // 192
-                deallocBlock(pool, pool.free3, addr);
+                dealloc_block(pool, pool.free3, addr);
             } else {
                 // 256
-                deallocBlock(pool, pool.free4, addr);
+                dealloc_block(pool, pool.free4, addr);
             }
             break;
         case 8: // 512
-            deallocBlock(pool, pool.free8, addr);
+            dealloc_block(pool, pool.free8, addr);
             break;
         case 16: // 1024
-            deallocBlock(pool, pool.free16, addr);
+            dealloc_block(pool, pool.free16, addr);
             break;
         case 32: // 2048
-            deallocBlock(pool, pool.free32, addr);
+            dealloc_block(pool, pool.free32, addr);
             break;
         default:
             abort();
         }
     }
-    const size_t maxSize;
+    const size_t max_size;
     FileHandle fh;
-    MMap memMap;
+    MMap mem_map;
     MemPool& pool;
 };
 
-MemCtx::MemCtx(size_t maxSize)
-: impl_{make_unique<Impl>(maxSize)}
+MemCtx::MemCtx(size_t max_size)
+: impl_{make_unique<Impl>(max_size)}
 {
 }
 
-MemCtx::MemCtx(const char* path, size_t maxSize)
-: impl_{make_unique<Impl>(path, maxSize)}
+MemCtx::MemCtx(const char* path, size_t max_size)
+: impl_{make_unique<Impl>(path, max_size)}
 {
 }
 
@@ -143,10 +144,10 @@ MemCtx::~MemCtx() = default;
 MemCtx::MemCtx(MemCtx&&) noexcept = default;
 MemCtx& MemCtx::operator=(MemCtx&&) noexcept = default;
 
-size_t MemCtx::maxSize() noexcept
+size_t MemCtx::max_size() noexcept
 {
     assert(impl_);
-    return impl_->maxSize;
+    return impl_->max_size;
 }
 
 void* MemCtx::alloc(size_t size)

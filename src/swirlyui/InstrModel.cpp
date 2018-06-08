@@ -46,7 +46,7 @@ QVariant InstrModel::data(const QModelIndex& index, int role) const
     if (!index.isValid()) {
         // No-op.
     } else if (role == Qt::CheckStateRole) {
-        const auto& row = rowAt(index.row());
+        const auto& row = row_at(index.row());
         switch (box<Column>(index.column())) {
         case Column::CheckState:
             var = row.checked() ? Qt::Checked : Qt::Unchecked;
@@ -55,7 +55,7 @@ QVariant InstrModel::data(const QModelIndex& index, int role) const
             break;
         }
     } else if (role == Qt::DisplayRole) {
-        const auto& instr = valueAt(index.row());
+        const auto& instr = value_at(index.row());
         switch (box<Column>(index.column())) {
         case Column::CheckState:
             break;
@@ -66,31 +66,31 @@ QVariant InstrModel::data(const QModelIndex& index, int role) const
             var = instr.display();
             break;
         case Column::BaseAsset:
-            var = instr.baseAsset();
+            var = instr.base_asset();
             break;
         case Column::TermCcy:
-            var = instr.termCcy();
+            var = instr.term_ccy();
             break;
         case Column::LotNumer:
-            var = instr.lotNumer();
+            var = instr.lot_numer();
             break;
         case Column::LotDenom:
-            var = instr.lotDenom();
+            var = instr.lot_denom();
             break;
         case Column::TickNumer:
-            var = instr.tickNumer();
+            var = instr.tick_numer();
             break;
         case Column::TickDenom:
-            var = instr.tickDenom();
+            var = instr.tick_denom();
             break;
         case Column::PipDp:
-            var = instr.pipDp();
+            var = instr.pip_dp();
             break;
         case Column::MinLots:
-            var = toVariant(instr.minLots());
+            var = to_variant(instr.min_lots());
             break;
         case Column::MaxLots:
-            var = toVariant(instr.maxLots());
+            var = to_variant(instr.max_lots());
             break;
         }
     } else if (role == Qt::TextAlignmentRole) {
@@ -114,7 +114,7 @@ QVariant InstrModel::data(const QModelIndex& index, int role) const
             break;
         }
     } else if (role == Qt::UserRole) {
-        var = QVariant::fromValue(valueAt(index.row()));
+        var = QVariant::fromValue(value_at(index.row()));
     }
     return var;
 }
@@ -138,7 +138,7 @@ Instr InstrModel::find(const QString& symbol) const
     return instr;
 }
 
-int InstrModel::indexOf(const QString& symbol) const
+int InstrModel::index_of(const QString& symbol) const
 {
     int i{-1};
     auto it = rows_.find(symbol);

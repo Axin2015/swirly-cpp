@@ -36,7 +36,7 @@ PosnView::PosnView(PosnModel& model, QWidget* parent, Qt::WindowFlags f)
 {
     auto table = make_unique<QTableView>();
     {
-        auto del = makeDeleter(table->model());
+        auto del = make_deleter(table->model());
         table->setModel(&model);
     }
     table->resizeColumnToContents(unbox(Column::CheckState));
@@ -49,7 +49,7 @@ PosnView::PosnView(PosnModel& model, QWidget* parent, Qt::WindowFlags f)
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::NoSelection);
 
-    connect(table.get(), &QTableView::clicked, this, &PosnView::slotClicked);
+    connect(table.get(), &QTableView::clicked, this, &PosnView::slot_clicked);
 
     auto layout = make_unique<QGridLayout>();
     layout->addWidget(table.release(), 0, 0);
@@ -58,15 +58,15 @@ PosnView::PosnView(PosnModel& model, QWidget* parent, Qt::WindowFlags f)
 
 PosnView::~PosnView() = default;
 
-void PosnView::slotClicked(const QModelIndex& index)
+void PosnView::slot_clicked(const QModelIndex& index)
 {
     if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
-        model_.toggleCheckState(index.row());
+        model_.toggle_check_state(index.row());
     }
     optional<Lots> lots;
     optional<Ticks> ticks;
-    const auto& posn = model_.valueAt(index.row());
-    emit setFields(posn.instr().symbol(), posn.settlDate(), lots, ticks);
+    const auto& posn = model_.value_at(index.row());
+    emit set_fields(posn.instr().symbol(), posn.settl_date(), lots, ticks);
 }
 
 } // namespace ui

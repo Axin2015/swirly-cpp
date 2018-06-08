@@ -29,7 +29,7 @@ static_assert(sizeof(Market) <= 4 * 64, "no greater than specified cache-lines")
 
 namespace {
 template <typename FnT>
-void toJsonLevels(LevelSet::ConstIterator it, LevelSet::ConstIterator end, ostream& os, FnT fn)
+void to_json_levels(LevelSet::ConstIterator it, LevelSet::ConstIterator end, ostream& os, FnT fn)
 {
     for (size_t i{0}; i < MaxLevels; ++i) {
         if (i > 0) {
@@ -49,69 +49,69 @@ Market::~Market() = default;
 
 Market::Market(Market&&) = default;
 
-void Market::toDsv(ostream& os, char delim) const
+void Market::to_dsv(ostream& os, char delim) const
 {
     OStreamJoiner osj{os, delim};
     osj << id_ //
         << instr_;
-    if (settlDay_ != 0_jd) {
-        osj << jdToIso(settlDay_);
+    if (settl_day_ != 0_jd) {
+        osj << jd_to_iso(settl_day_);
     } else {
         osj << ""sv;
     }
     osj << state_;
-    if (lastLots_ != 0_lts) {
-        osj << lastLots_  //
-            << lastTicks_ //
-            << lastTime_;
+    if (last_lots_ != 0_lts) {
+        osj << last_lots_  //
+            << last_ticks_ //
+            << last_time_;
     } else {
         osj << ""sv
             << ""sv
             << ""sv;
     }
-    osj << maxId_;
+    osj << max_id_;
 }
 
-void Market::toJson(ostream& os) const
+void Market::to_json(ostream& os) const
 {
     os << "{\"id\":"sv << id_         //
        << ",\"instr\":\""sv << instr_ //
        << "\",\"settl_date\":"sv;
-    if (settlDay_ != 0_jd) {
-        os << jdToIso(settlDay_);
+    if (settl_day_ != 0_jd) {
+        os << jd_to_iso(settl_day_);
     } else {
         os << "null"sv;
     }
     os << ",\"state\":"sv << state_;
-    if (lastLots_ != 0_lts) {
-        os << ",\"last_lots\":"sv << lastLots_   //
-           << ",\"last_ticks\":"sv << lastTicks_ //
-           << ",\"last_time\":"sv << lastTime_;
+    if (last_lots_ != 0_lts) {
+        os << ",\"last_lots\":"sv << last_lots_   //
+           << ",\"last_ticks\":"sv << last_ticks_ //
+           << ",\"last_time\":"sv << last_time_;
     } else {
         os << ",\"last_lots\":null,\"last_ticks\":null,\"last_time\":null"sv;
     }
 
-    const auto& bidLevels = bidSide_.levels();
+    const auto& bid_levels = bid_side_.levels();
     os << ",\"bid_ticks\":["sv;
-    toJsonLevels(bidLevels.begin(), bidLevels.end(), os,
-                 [](const auto& level) { return level.ticks(); });
+    to_json_levels(bid_levels.begin(), bid_levels.end(), os,
+                   [](const auto& level) { return level.ticks(); });
     os << "],\"bid_lots\":["sv;
-    toJsonLevels(bidLevels.begin(), bidLevels.end(), os,
-                 [](const auto& level) { return level.lots(); });
+    to_json_levels(bid_levels.begin(), bid_levels.end(), os,
+                   [](const auto& level) { return level.lots(); });
     os << "],\"bid_count\":["sv;
-    toJsonLevels(bidLevels.begin(), bidLevels.end(), os,
-                 [](const auto& level) { return level.count(); });
+    to_json_levels(bid_levels.begin(), bid_levels.end(), os,
+                   [](const auto& level) { return level.count(); });
 
-    const auto& offerLevels = offerSide_.levels();
+    const auto& offer_levels = offer_side_.levels();
     os << "],\"offer_ticks\":["sv;
-    toJsonLevels(offerLevels.begin(), offerLevels.end(), os,
-                 [](const auto& level) { return level.ticks(); });
+    to_json_levels(offer_levels.begin(), offer_levels.end(), os,
+                   [](const auto& level) { return level.ticks(); });
     os << "],\"offer_lots\":["sv;
-    toJsonLevels(offerLevels.begin(), offerLevels.end(), os,
-                 [](const auto& level) { return level.lots(); });
+    to_json_levels(offer_levels.begin(), offer_levels.end(), os,
+                   [](const auto& level) { return level.lots(); });
     os << "],\"offer_count\":["sv;
-    toJsonLevels(offerLevels.begin(), offerLevels.end(), os,
-                 [](const auto& level) { return level.count(); });
+    to_json_levels(offer_levels.begin(), offer_levels.end(), os,
+                   [](const auto& level) { return level.count(); });
     os << "]}"sv;
 }
 

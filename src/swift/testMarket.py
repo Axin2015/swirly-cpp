@@ -18,50 +18,50 @@ from swift import *
 class TestCase(RestTestCase):
 
   def test(self):
-    self.maxDiff = None
+    self.max_diff = None
     self.now = 1388534400000
-    with DbFile() as dbFile:
-      with Server(dbFile, self.now) as server:
+    with DbFile() as db_file:
+      with Server(db_file, self.now) as server:
         with Client() as client:
-          client.setTime(self.now)
+          client.set_time(self.now)
 
-          self.createMarket(client, 'EURUSD', 20140302)
-          self.createMarket(client, 'GBPUSD', 20140302)
-          self.createMarket(client, 'GBPUSD', 20140402)
-          self.createMarket(client, 'USDCHF', 20140302)
+          self.create_market(client, 'EURUSD', 20140302)
+          self.create_market(client, 'GBPUSD', 20140302)
+          self.create_market(client, 'GBPUSD', 20140402)
+          self.create_market(client, 'USDCHF', 20140302)
 
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Sell', 7, 12348)
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Sell', 5, 12347)
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Sell', 3, 12346)
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 3, 12344)
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 5, 12343)
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 7, 12343)
+          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Sell', 7, 12348)
+          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Sell', 5, 12347)
+          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Sell', 3, 12346)
+          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 3, 12344)
+          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 5, 12343)
+          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 7, 12343)
 
-          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'Sell', 5, 15346)
-          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'Sell', 3, 15346)
-          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'Buy', 3, 15344)
-          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'Buy', 5, 15343)
+          self.create_order(client, 'MARAYL', 'GBPUSD', 20140302, 'Sell', 5, 15346)
+          self.create_order(client, 'MARAYL', 'GBPUSD', 20140302, 'Sell', 3, 15346)
+          self.create_order(client, 'MARAYL', 'GBPUSD', 20140302, 'Buy', 3, 15344)
+          self.create_order(client, 'MARAYL', 'GBPUSD', 20140302, 'Buy', 5, 15343)
 
-          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140402, 'Sell', 7, 15347)
-          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140402, 'Buy', 7, 15342)
+          self.create_order(client, 'MARAYL', 'GBPUSD', 20140402, 'Sell', 7, 15347)
+          self.create_order(client, 'MARAYL', 'GBPUSD', 20140402, 'Buy', 7, 15342)
 
-          self.createOrder(client, 'MARAYL', 'USDCHF', 20140302, 'Sell', 3, 9346)
-          self.createOrder(client, 'MARAYL', 'USDCHF', 20140302, 'Buy', 3, 9344)
+          self.create_order(client, 'MARAYL', 'USDCHF', 20140302, 'Sell', 3, 9346)
+          self.create_order(client, 'MARAYL', 'USDCHF', 20140302, 'Buy', 3, 9344)
 
-          self.getAll(client)
-          self.getByInstr(client)
-          self.getByMarket(client)
+          self.get_all(client)
+          self.get_by_instr(client)
+          self.get_by_market(client)
 
-      with Server(dbFile, self.now) as server:
+      with Server(db_file, self.now) as server:
         with Client() as client:
-          client.setTime(self.now)
+          client.set_time(self.now)
 
-          self.getAll(client)
-          self.getByInstr(client)
-          self.getByMarket(client)
+          self.get_all(client)
+          self.get_by_instr(client)
+          self.get_by_market(client)
 
-  def getAll(self, client):
-    client.setAnon()
+  def get_all(self, client):
+    client.set_anon()
     resp = client.send('GET', '/markets')
 
     self.assertEqual(200, resp.status)
@@ -124,8 +124,8 @@ class TestCase(RestTestCase):
       u'state': 0
     }], resp.content)
 
-  def getByInstr(self, client):
-    client.setAnon()
+  def get_by_instr(self, client):
+    client.set_anon()
     resp = client.send('GET', '/markets/GBPUSD')
 
     self.assertEqual(200, resp.status)
@@ -160,8 +160,8 @@ class TestCase(RestTestCase):
       u'state': 0
     }], resp.content)
 
-  def getByMarket(self, client):
-    client.setAnon()
+  def get_by_market(self, client):
+    client.set_anon()
     resp = client.send('GET', '/markets/GBPUSD/20140302')
 
     self.assertEqual(200, resp.status)

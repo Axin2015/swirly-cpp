@@ -21,11 +21,11 @@
 namespace swirly {
 namespace ui {
 
-Asset Asset::fromJson(const QJsonObject& obj)
+Asset Asset::from_json(const QJsonObject& obj)
 {
-    using swirly::ui::fromJson;
-    return Asset{fromJson<QString>(obj["symbol"]), fromJson<QString>(obj["display"]),
-                 fromJson<AssetType>(obj["type"])};
+    using swirly::ui::from_json;
+    return Asset{from_json<QString>(obj["symbol"]), from_json<QString>(obj["display"]),
+                 from_json<AssetType>(obj["type"])};
 }
 
 QDebug operator<<(QDebug debug, const Asset& asset)

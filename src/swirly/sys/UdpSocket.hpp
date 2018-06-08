@@ -44,7 +44,7 @@ struct SWIRLY_API IpMcastGroup {
 /**
  * Join a multicast group.
  */
-inline void joinGroup(int sockfd, const IpMcastGroup& group, std::error_code& ec) noexcept
+inline void join_group(int sockfd, const IpMcastGroup& group, std::error_code& ec) noexcept
 {
     if (group.family == AF_INET6) {
         os::setsockopt(sockfd, IPPROTO_IPV6, IPV6_JOIN_GROUP, &group.ipv6, sizeof(group.ipv6), ec);
@@ -57,7 +57,7 @@ inline void joinGroup(int sockfd, const IpMcastGroup& group, std::error_code& ec
 /**
  * Join a multicast group.
  */
-inline void joinGroup(int sockfd, const IpMcastGroup& group)
+inline void join_group(int sockfd, const IpMcastGroup& group)
 {
     if (group.family == AF_INET6) {
         os::setsockopt(sockfd, IPPROTO_IPV6, IPV6_JOIN_GROUP, &group.ipv6, sizeof(group.ipv6));
@@ -70,41 +70,41 @@ inline void joinGroup(int sockfd, const IpMcastGroup& group)
 /**
  * Join a multicast group.
  */
-inline void joinGroup(int sockfd, const IpAddress& addr, unsigned ifindex,
-                      std::error_code& ec) noexcept
+inline void join_group(int sockfd, const IpAddress& addr, unsigned ifindex,
+                       std::error_code& ec) noexcept
 {
-    joinGroup(sockfd, IpMcastGroup{addr, ifindex}, ec);
+    join_group(sockfd, IpMcastGroup{addr, ifindex}, ec);
 }
 
 /**
  * Join a multicast group.
  */
-inline void joinGroup(int sockfd, const IpAddress& addr, unsigned ifindex)
+inline void join_group(int sockfd, const IpAddress& addr, unsigned ifindex)
 {
-    joinGroup(sockfd, IpMcastGroup{addr, ifindex});
+    join_group(sockfd, IpMcastGroup{addr, ifindex});
 }
 
 /**
  * Join a multicast group. The system will choose an appropriate interface if ifname is null.
  */
-inline void joinGroup(int sockfd, const IpAddress& addr, const char* ifname,
-                      std::error_code& ec) noexcept
+inline void join_group(int sockfd, const IpAddress& addr, const char* ifname,
+                       std::error_code& ec) noexcept
 {
-    joinGroup(sockfd, IpMcastGroup{addr, ifname}, ec);
+    join_group(sockfd, IpMcastGroup{addr, ifname}, ec);
 }
 
 /**
  * Join a multicast group. The system will choose an appropriate interface if ifname is null.
  */
-inline void joinGroup(int sockfd, const IpAddress& addr, const char* ifname)
+inline void join_group(int sockfd, const IpAddress& addr, const char* ifname)
 {
-    joinGroup(sockfd, IpMcastGroup{addr, ifname});
+    join_group(sockfd, IpMcastGroup{addr, ifname});
 }
 
 /**
  * Leave a multicast group.
  */
-inline void leaveGroup(int sockfd, const IpMcastGroup& group, std::error_code& ec) noexcept
+inline void leave_group(int sockfd, const IpMcastGroup& group, std::error_code& ec) noexcept
 {
     if (group.family == AF_INET6) {
         os::setsockopt(sockfd, IPPROTO_IPV6, IPV6_LEAVE_GROUP, &group.ipv6, sizeof(group.ipv6), ec);
@@ -117,7 +117,7 @@ inline void leaveGroup(int sockfd, const IpMcastGroup& group, std::error_code& e
 /**
  * Leave a multicast group.
  */
-inline void leaveGroup(int sockfd, const IpMcastGroup& group)
+inline void leave_group(int sockfd, const IpMcastGroup& group)
 {
     if (group.family == AF_INET6) {
         os::setsockopt(sockfd, IPPROTO_IPV6, IPV6_LEAVE_GROUP, &group.ipv6, sizeof(group.ipv6));
@@ -130,38 +130,38 @@ inline void leaveGroup(int sockfd, const IpMcastGroup& group)
 /**
  * Leave a multicast group.
  */
-inline void leaveGroup(int sockfd, const IpAddress& addr, unsigned ifindex,
-                       std::error_code& ec) noexcept
+inline void leave_group(int sockfd, const IpAddress& addr, unsigned ifindex,
+                        std::error_code& ec) noexcept
 {
-    leaveGroup(sockfd, IpMcastGroup{addr, ifindex}, ec);
+    leave_group(sockfd, IpMcastGroup{addr, ifindex}, ec);
 }
 
 /**
  * Leave a multicast group.
  */
-inline void leaveGroup(int sockfd, const IpAddress& addr, unsigned ifindex)
+inline void leave_group(int sockfd, const IpAddress& addr, unsigned ifindex)
 {
-    leaveGroup(sockfd, IpMcastGroup{addr, ifindex});
+    leave_group(sockfd, IpMcastGroup{addr, ifindex});
 }
 
 /**
  * Leave a multicast group. The system will leave on the first matching interface if ifname is null.
  */
-inline void leaveGroup(int sockfd, const IpAddress& addr, const char* ifname,
-                       std::error_code& ec) noexcept
+inline void leave_group(int sockfd, const IpAddress& addr, const char* ifname,
+                        std::error_code& ec) noexcept
 {
-    leaveGroup(sockfd, IpMcastGroup{addr, ifname}, ec);
+    leave_group(sockfd, IpMcastGroup{addr, ifname}, ec);
 }
 
 /**
  * Leave a multicast group. The system will leave on the first matching interface if ifname is null.
  */
-inline void leaveGroup(int sockfd, const IpAddress& addr, const char* ifname)
+inline void leave_group(int sockfd, const IpAddress& addr, const char* ifname)
 {
-    leaveGroup(sockfd, IpMcastGroup{addr, ifname});
+    leave_group(sockfd, IpMcastGroup{addr, ifname});
 }
 
-inline void setIpMcastIf(int sockfd, int family, unsigned ifindex, std::error_code& ec) noexcept
+inline void set_ip_mcast_if(int sockfd, int family, unsigned ifindex, std::error_code& ec) noexcept
 {
     if (family == AF_INET6) {
         os::setsockopt(sockfd, IPPROTO_IPV6, IPV6_MULTICAST_IF, &ifindex, sizeof(ifindex), ec);
@@ -173,7 +173,7 @@ inline void setIpMcastIf(int sockfd, int family, unsigned ifindex, std::error_co
     }
 }
 
-inline void setIpMcastIf(int sockfd, int family, unsigned ifindex)
+inline void set_ip_mcast_if(int sockfd, int family, unsigned ifindex)
 {
     if (family == AF_INET6) {
         os::setsockopt(sockfd, IPPROTO_IPV6, IPV6_MULTICAST_IF, &ifindex, sizeof(ifindex));
@@ -185,20 +185,21 @@ inline void setIpMcastIf(int sockfd, int family, unsigned ifindex)
     }
 }
 
-inline void setIpMcastIf(int sockfd, int family, const char* ifname, std::error_code& ec) noexcept
+inline void set_ip_mcast_if(int sockfd, int family, const char* ifname,
+                            std::error_code& ec) noexcept
 {
-    setIpMcastIf(sockfd, family, os::if_nametoindex(ifname), ec);
+    set_ip_mcast_if(sockfd, family, os::if_nametoindex(ifname), ec);
 }
 
-inline void setIpMcastIf(int sockfd, int family, const char* ifname)
+inline void set_ip_mcast_if(int sockfd, int family, const char* ifname)
 {
-    setIpMcastIf(sockfd, family, os::if_nametoindex(ifname));
+    set_ip_mcast_if(sockfd, family, os::if_nametoindex(ifname));
 }
 
 /**
  * Determines whether sent multicast packets should be looped back to the local sockets.
  */
-inline void setIpMcastLoop(int sockfd, int family, bool enabled, std::error_code& ec) noexcept
+inline void set_ip_mcast_loop(int sockfd, int family, bool enabled, std::error_code& ec) noexcept
 {
     if (family == AF_INET6) {
         const unsigned optval{enabled ? 1U : 0U};
@@ -213,7 +214,7 @@ inline void setIpMcastLoop(int sockfd, int family, bool enabled, std::error_code
 /**
  * Determines whether sent multicast packets should be looped back to the local sockets.
  */
-inline void setIpMcastLoop(int sockfd, int family, bool enabled)
+inline void set_ip_mcast_loop(int sockfd, int family, bool enabled)
 {
     if (family == AF_INET6) {
         const unsigned optval{enabled ? 1U : 0U};
@@ -228,7 +229,7 @@ inline void setIpMcastLoop(int sockfd, int family, bool enabled)
 /**
  * Set or read the time-to-live value of outgoing multicast packets for this socket.
  */
-inline void setIpMcastTtl(int sockfd, int family, int ttl, std::error_code& ec) noexcept
+inline void set_ip_mcast_ttl(int sockfd, int family, int ttl, std::error_code& ec) noexcept
 {
     if (family == AF_INET6) {
         const int optval{ttl};
@@ -243,7 +244,7 @@ inline void setIpMcastTtl(int sockfd, int family, int ttl, std::error_code& ec) 
 /**
  * Set or read the time-to-live value of outgoing multicast packets for this socket.
  */
-inline void setIpMcastTtl(int sockfd, int family, int ttl)
+inline void set_ip_mcast_ttl(int sockfd, int family, int ttl)
 {
     if (family == AF_INET6) {
         const int optval{ttl};
@@ -275,11 +276,11 @@ struct UdpSocket : IoSocket {
     UdpSocket() noexcept = default;
 
     // Logically const.
-    void getSockName(Endpoint& ep, std::error_code& ec) noexcept
+    void get_sock_name(Endpoint& ep, std::error_code& ec) noexcept
     {
         os::getsockname(*sock_, ep, ec);
     }
-    void getSockName(Endpoint& ep) { os::getsockname(*sock_, ep); }
+    void get_sock_name(Endpoint& ep) { os::getsockname(*sock_, ep); }
     void bind(const Endpoint& ep, std::error_code& ec) noexcept { os::bind(*sock_, ep, ec); }
     void bind(const Endpoint& ep) { os::bind(*sock_, ep); }
     void connect(const Endpoint& ep, std::error_code& ec) noexcept
@@ -326,59 +327,65 @@ struct UdpSocket : IoSocket {
         return os::sendto(*sock_, buf, flags, ep);
     }
 
-    void joinGroup(const IpAddress& addr, unsigned ifindex, std::error_code& ec) noexcept
+    void join_group(const IpAddress& addr, unsigned ifindex, std::error_code& ec) noexcept
     {
-        return swirly::joinGroup(*sock_, addr, ifindex, ec);
+        return swirly::join_group(*sock_, addr, ifindex, ec);
     }
-    void joinGroup(const IpAddress& addr, unsigned ifindex)
+    void join_group(const IpAddress& addr, unsigned ifindex)
     {
-        return swirly::joinGroup(*sock_, addr, ifindex);
-    }
-
-    void joinGroup(const IpAddress& addr, const char* ifname, std::error_code& ec) noexcept
-    {
-        return swirly::joinGroup(*sock_, addr, ifname, ec);
-    }
-    void joinGroup(const IpAddress& addr, const char* ifname)
-    {
-        return swirly::joinGroup(*sock_, addr, ifname);
+        return swirly::join_group(*sock_, addr, ifindex);
     }
 
-    void leaveGroup(const IpAddress& addr, unsigned ifindex, std::error_code& ec) noexcept
+    void join_group(const IpAddress& addr, const char* ifname, std::error_code& ec) noexcept
     {
-        return swirly::leaveGroup(*sock_, addr, ifindex, ec);
+        return swirly::join_group(*sock_, addr, ifname, ec);
     }
-    void leaveGroup(const IpAddress& addr, unsigned ifindex)
+    void join_group(const IpAddress& addr, const char* ifname)
     {
-        return swirly::leaveGroup(*sock_, addr, ifindex);
-    }
-
-    void leaveGroup(const IpAddress& addr, const char* ifname, std::error_code& ec) noexcept
-    {
-        return swirly::leaveGroup(*sock_, addr, ifname, ec);
-    }
-    void leaveGroup(const IpAddress& addr, const char* ifname)
-    {
-        return swirly::leaveGroup(*sock_, addr, ifname);
+        return swirly::join_group(*sock_, addr, ifname);
     }
 
-    void setIpMcastIf(const char* ifname, std::error_code& ec) noexcept
+    void leave_group(const IpAddress& addr, unsigned ifindex, std::error_code& ec) noexcept
     {
-        return swirly::setIpMcastIf(*sock_, family_, ifname, ec);
+        return swirly::leave_group(*sock_, addr, ifindex, ec);
     }
-    void setIpMcastIf(const char* ifname) { return swirly::setIpMcastIf(*sock_, family_, ifname); }
+    void leave_group(const IpAddress& addr, unsigned ifindex)
+    {
+        return swirly::leave_group(*sock_, addr, ifindex);
+    }
 
-    void setIpMcastLoop(bool enabled, std::error_code& ec) noexcept
+    void leave_group(const IpAddress& addr, const char* ifname, std::error_code& ec) noexcept
     {
-        return swirly::setIpMcastLoop(*sock_, family_, enabled, ec);
+        return swirly::leave_group(*sock_, addr, ifname, ec);
     }
-    void setIpMcastLoop(bool enabled) { return swirly::setIpMcastLoop(*sock_, family_, enabled); }
+    void leave_group(const IpAddress& addr, const char* ifname)
+    {
+        return swirly::leave_group(*sock_, addr, ifname);
+    }
 
-    void setIpMcastTtl(int ttl, std::error_code& ec) noexcept
+    void set_ip_mcast_if(const char* ifname, std::error_code& ec) noexcept
     {
-        return swirly::setIpMcastTtl(*sock_, family_, ttl, ec);
+        return swirly::set_ip_mcast_if(*sock_, family_, ifname, ec);
     }
-    void setIpMcastTtl(int ttl) { return swirly::setIpMcastTtl(*sock_, family_, ttl); }
+    void set_ip_mcast_if(const char* ifname)
+    {
+        return swirly::set_ip_mcast_if(*sock_, family_, ifname);
+    }
+
+    void set_ip_mcast_loop(bool enabled, std::error_code& ec) noexcept
+    {
+        return swirly::set_ip_mcast_loop(*sock_, family_, enabled, ec);
+    }
+    void set_ip_mcast_loop(bool enabled)
+    {
+        return swirly::set_ip_mcast_loop(*sock_, family_, enabled);
+    }
+
+    void set_ip_mcast_ttl(int ttl, std::error_code& ec) noexcept
+    {
+        return swirly::set_ip_mcast_ttl(*sock_, family_, ttl, ec);
+    }
+    void set_ip_mcast_ttl(int ttl) { return swirly::set_ip_mcast_ttl(*sock_, family_, ttl); }
 };
 
 } // namespace sys

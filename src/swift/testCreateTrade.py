@@ -18,28 +18,28 @@ from swift import *
 class TestCase(RestTestCase):
 
   def test(self):
-    self.maxDiff = None
+    self.max_diff = None
     self.now = 1388534400000
-    with DbFile() as dbFile:
-      with Server(dbFile, self.now) as server:
+    with DbFile() as db_file:
+      with Server(db_file, self.now) as server:
         with Client() as client:
-          client.setTime(self.now)
+          client.set_time(self.now)
 
-          self.createMarket(client, 'EURUSD', 20140302)
+          self.create_market(client, 'EURUSD', 20140302)
 
-          self.checkAuth(client)
+          self.check_auth(client)
 
-          self.createMakerBuy(client)
-          self.createTakerSell(client)
+          self.create_maker_buy(client)
+          self.create_taker_sell(client)
 
-          self.createMakerBuyByInstr(client)
-          self.createTakerSellByInstr(client)
+          self.create_maker_buy_by_instr(client)
+          self.create_taker_sell_by_instr(client)
 
-          self.createMakerBuyByMarket(client)
-          self.createTakerSellByMarket(client)
+          self.create_maker_buy_by_market(client)
+          self.create_taker_sell_by_market(client)
 
-  def checkAuth(self, client):
-    client.setAuth(None, 0x1)
+  def check_auth(self, client):
+    client.set_auth(None, 0x1)
 
     resp = client.send('POST', '/accnt/trades')
     self.assertEqual(401, resp.status)
@@ -53,7 +53,7 @@ class TestCase(RestTestCase):
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    client.setAuth('ADMIN', ~0x1 & 0x7fffffff)
+    client.set_auth('ADMIN', ~0x1 & 0x7fffffff)
 
     resp = client.send('POST', '/accnt/trades')
     self.assertEqual(403, resp.status)
@@ -67,8 +67,8 @@ class TestCase(RestTestCase):
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-  def createMakerBuy(self, client):
-    client.setAdmin()
+  def create_maker_buy(self, client):
+    client.set_admin()
     resp = client.send('POST', '/accnt/trades',
                        accnt = 'MARAYL',
                        instr = 'EURUSD',
@@ -132,8 +132,8 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }], resp.content)
 
-  def createTakerSell(self, client):
-    client.setAdmin()
+  def create_taker_sell(self, client):
+    client.set_admin()
     resp = client.send('POST', '/accnt/trades',
                        accnt = 'MARAYL',
                        instr = 'EURUSD',
@@ -197,8 +197,8 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }], resp.content)
 
-  def createMakerBuyByInstr(self, client):
-    client.setAdmin()
+  def create_maker_buy_by_instr(self, client):
+    client.set_admin()
     resp = client.send('POST', '/accnt/trades/EURUSD',
                        accnt = 'MARAYL',
                        settl_date = 20140302,
@@ -261,8 +261,8 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }], resp.content)
 
-  def createTakerSellByInstr(self, client):
-    client.setAdmin()
+  def create_taker_sell_by_instr(self, client):
+    client.set_admin()
     resp = client.send('POST', '/accnt/trades/EURUSD',
                        accnt = 'MARAYL',
                        settl_date = 20140302,
@@ -325,8 +325,8 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }], resp.content)
 
-  def createMakerBuyByMarket(self, client):
-    client.setAdmin()
+  def create_maker_buy_by_market(self, client):
+    client.set_admin()
     resp = client.send('POST', '/accnt/trades/EURUSD/20140302',
                        accnt = 'MARAYL',
                        ref = 'test1',
@@ -388,8 +388,8 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }], resp.content)
 
-  def createTakerSellByMarket(self, client):
-    client.setAdmin()
+  def create_taker_sell_by_market(self, client):
+    client.set_admin()
     resp = client.send('POST', '/accnt/trades/EURUSD/20140302',
                        accnt = 'MARAYL',
                        ref = 'test2',

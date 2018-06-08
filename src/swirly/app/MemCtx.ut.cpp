@@ -39,29 +39,29 @@ BOOST_AUTO_TEST_SUITE(MemCtxSuite)
 
 BOOST_AUTO_TEST_CASE(MemCtxCase)
 {
-    MemCtx memCtx{0};
+    MemCtx mem_ctx{0};
 
     // Throw if no memory has been reserved.
-    BOOST_TEST(memCtx.maxSize() == 0U);
+    BOOST_TEST(mem_ctx.max_size() == 0U);
 
     // These should all call the custom allocator with zero capacity.
-    BOOST_CHECK_THROW(memCtx.alloc(sizeof(Foo)), bad_alloc);
-    BOOST_CHECK_THROW(memCtx.alloc(sizeof(Bar)), bad_alloc);
+    BOOST_CHECK_THROW(mem_ctx.alloc(sizeof(Foo)), bad_alloc);
+    BOOST_CHECK_THROW(mem_ctx.alloc(sizeof(Bar)), bad_alloc);
 
     {
-        memCtx = MemCtx{4096};
-        BOOST_TEST(memCtx.maxSize() == 4096U);
+        mem_ctx = MemCtx{4096};
+        BOOST_TEST(mem_ctx.max_size() == 4096U);
     }
 
-    char* p1{static_cast<char*>(memCtx.alloc(sizeof(Foo)))};
+    char* p1{static_cast<char*>(mem_ctx.alloc(sizeof(Foo)))};
     // Check that it's writable.
     strcpy(p1, "test");
-    memCtx.dealloc(p1, sizeof(Foo));
+    mem_ctx.dealloc(p1, sizeof(Foo));
 
     // Check that the same address is returned.
-    char* p2{static_cast<char*>(memCtx.alloc(sizeof(Foo)))};
+    char* p2{static_cast<char*>(mem_ctx.alloc(sizeof(Foo)))};
     BOOST_TEST(p1 == p2);
-    memCtx.dealloc(p2, sizeof(Foo));
+    mem_ctx.dealloc(p2, sizeof(Foo));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

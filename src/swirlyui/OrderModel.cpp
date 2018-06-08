@@ -53,7 +53,7 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
     if (!index.isValid()) {
         // No-op.
     } else if (role == Qt::CheckStateRole) {
-        const auto& row = rowAt(index.row());
+        const auto& row = row_at(index.row());
         switch (box<Column>(index.column())) {
         case Column::CheckState:
             var = row.checked() ? Qt::Checked : Qt::Unchecked;
@@ -62,7 +62,7 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
             break;
         }
     } else if (role == Qt::DisplayRole) {
-        const auto& order = valueAt(index.row());
+        const auto& order = value_at(index.row());
         switch (box<Column>(index.column())) {
         case Column::CheckState:
             break;
@@ -70,53 +70,53 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
             var = order.accnt();
             break;
         case Column::MarketId:
-            var = toVariant(order.marketId());
+            var = to_variant(order.market_id());
             break;
         case Column::Instr:
             var = order.instr().symbol();
             break;
         case Column::SettlDate:
-            var = order.settlDate();
+            var = order.settl_date();
             break;
         case Column::Id:
-            var = toVariant(order.id());
+            var = to_variant(order.id());
             break;
         case Column::Ref:
             var = order.ref();
             break;
         case Column::State:
-            var = enumString(order.state());
+            var = enum_string(order.state());
             break;
         case Column::Side:
-            var = enumString(order.side());
+            var = enum_string(order.side());
             break;
         case Column::Lots:
-            var = toVariant(order.lots());
+            var = to_variant(order.lots());
             break;
         case Column::Price:
             if (order.lots() != 0_lts) {
-                var = ticksToPriceString(order.ticks(), order.instr());
+                var = ticks_to_price_string(order.ticks(), order.instr());
             }
             break;
         case Column::ResdLots:
-            var = toVariant(order.resdLots());
+            var = to_variant(order.resd_lots());
             break;
         case Column::ExecLots:
-            var = toVariant(order.execLots());
+            var = to_variant(order.exec_lots());
             break;
         case Column::AvgPrice:
-            var = ticksToAvgPriceString(order.execLots(), order.execCost(), order.instr());
+            var = ticks_to_avg_price_string(order.exec_lots(), order.exec_cost(), order.instr());
             break;
         case Column::LastLots:
-            var = toVariant(order.lastLots());
+            var = to_variant(order.last_lots());
             break;
         case Column::LastPrice:
-            if (order.lastLots() != 0_lts) {
-                var = ticksToPriceString(order.lastTicks(), order.instr());
+            if (order.last_lots() != 0_lts) {
+                var = ticks_to_price_string(order.last_ticks(), order.instr());
             }
             break;
         case Column::MinLots:
-            var = toVariant(order.minLots());
+            var = to_variant(order.min_lots());
             break;
         case Column::Created:
             var = order.created();
@@ -153,7 +153,7 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
             break;
         }
     } else if (role == Qt::UserRole) {
-        var = QVariant::fromValue(valueAt(index.row()));
+        var = QVariant::fromValue(value_at(index.row()));
     }
     return var;
 }

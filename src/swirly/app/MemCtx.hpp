@@ -30,12 +30,12 @@ class SWIRLY_API MemCtx {
     /**
      * This constructor uses a anonymous, private memory-map.
      */
-    explicit MemCtx(std::size_t maxSize);
+    explicit MemCtx(std::size_t max_size);
 
     /**
      * This constructor uses a shared memory-map.
      */
-    MemCtx(const char* path, std::size_t maxSize);
+    MemCtx(const char* path, std::size_t max_size);
 
     MemCtx();
     ~MemCtx();
@@ -47,7 +47,7 @@ class SWIRLY_API MemCtx {
     MemCtx(MemCtx&&) noexcept;
     MemCtx& operator=(MemCtx&&) noexcept;
 
-    std::size_t maxSize() noexcept;
+    std::size_t max_size() noexcept;
 
     void* alloc(std::size_t size);
 

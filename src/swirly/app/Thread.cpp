@@ -22,9 +22,9 @@ namespace swirly {
 inline namespace app {
 using namespace std;
 namespace {
-void runReactor(Reactor& r, ThreadConfig config, const std::atomic<bool>& stop)
+void run_reactor(Reactor& r, ThreadConfig config, const std::atomic<bool>& stop)
 {
-    sigBlockAll();
+    sig_block_all();
     pthread_setname_np(pthread_self(), config.name.c_str());
     SWIRLY_NOTICE << "started "sv << config.name << " thread"sv;
     try {
@@ -41,7 +41,7 @@ void runReactor(Reactor& r, ThreadConfig config, const std::atomic<bool>& stop)
 
 ReactorThread::ReactorThread(Reactor& r, ThreadConfig config)
 : reactor_(r)
-, thread_{runReactor, std::ref(r), config, std::cref(stop_)}
+, thread_{run_reactor, std::ref(r), config, std::cref(stop_)}
 {
 }
 

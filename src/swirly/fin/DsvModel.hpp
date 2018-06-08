@@ -36,19 +36,19 @@ class SWIRLY_API DsvModel : public Model {
     DsvModel& operator=(DsvModel&&) noexcept;
 
   protected:
-    void doReadAsset(const ModelCallback<AssetPtr>& cb) const override;
+    void do_read_asset(const ModelCallback<AssetPtr>& cb) const override;
 
-    void doReadInstr(const ModelCallback<InstrPtr>& cb) const override;
+    void do_read_instr(const ModelCallback<InstrPtr>& cb) const override;
 
-    void doReadMarket(const ModelCallback<MarketPtr>& cb) const override;
+    void do_read_market(const ModelCallback<MarketPtr>& cb) const override;
 
-    void doReadOrder(const ModelCallback<OrderPtr>& cb) const override;
+    void do_read_order(const ModelCallback<OrderPtr>& cb) const override;
 
-    void doReadExec(Time since, const ModelCallback<ExecPtr>& cb) const override;
+    void do_read_exec(Time since, const ModelCallback<ExecPtr>& cb) const override;
 
-    void doReadTrade(const ModelCallback<ExecPtr>& cb) const override;
+    void do_read_trade(const ModelCallback<ExecPtr>& cb) const override;
 
-    void doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const override;
+    void do_read_posn(JDay bus_day, const ModelCallback<PosnPtr>& cb) const override;
 };
 
 } // namespace fin

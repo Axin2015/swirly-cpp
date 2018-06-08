@@ -31,12 +31,12 @@ inline namespace fin {
 
 class SWIRLY_API Request {
   public:
-    Request(Symbol accnt, Id64 marketId, Symbol instr, JDay settlDay, Id64 id, std::string_view ref,
-            Side side, Lots lots, Time created) noexcept
+    Request(Symbol accnt, Id64 market_id, Symbol instr, JDay settl_day, Id64 id,
+            std::string_view ref, Side side, Lots lots, Time created) noexcept
     : accnt_{accnt}
-    , marketId_{marketId}
+    , market_id_{market_id}
     , instr_{instr}
-    , settlDay_{settlDay}
+    , settl_day_{settl_day}
     , id_{id}
     , ref_{ref}
     , side_{side}
@@ -54,9 +54,9 @@ class SWIRLY_API Request {
     Request& operator=(Request&&) = delete;
 
     auto accnt() const noexcept { return accnt_; }
-    auto marketId() const noexcept { return marketId_; }
+    auto market_id() const noexcept { return market_id_; }
     auto instr() const noexcept { return instr_; }
-    auto settlDay() const noexcept { return settlDay_; }
+    auto settl_day() const noexcept { return settl_day_; }
     auto id() const noexcept { return id_; }
     auto ref() const noexcept { return +ref_; }
     auto side() const noexcept { return side_; }
@@ -70,9 +70,9 @@ class SWIRLY_API Request {
      * The executing accnt.
      */
     const Symbol accnt_;
-    const Id64 marketId_;
+    const Id64 market_id_;
     const Symbol instr_;
-    const JDay settlDay_;
+    const JDay settl_day_;
     const Id64 id_;
     /**
      * Ref is optional.
@@ -94,7 +94,7 @@ class RequestIdSet {
     struct ValueCompare {
         int compare(const Request& lhs, const Request& rhs) const noexcept
         {
-            int result{swirly::compare(lhs.marketId(), rhs.marketId())};
+            int result{swirly::compare(lhs.market_id(), rhs.market_id())};
             if (result == 0) {
                 result = swirly::compare(lhs.id(), rhs.id());
             }
@@ -108,7 +108,7 @@ class RequestIdSet {
     struct KeyValueCompare {
         bool operator()(const Key& lhs, const Request& rhs) const noexcept
         {
-            int result{swirly::compare(std::get<0>(lhs), rhs.marketId())};
+            int result{swirly::compare(std::get<0>(lhs), rhs.market_id())};
             if (result == 0) {
                 result = swirly::compare(std::get<1>(lhs), rhs.id());
             }
@@ -116,7 +116,7 @@ class RequestIdSet {
         }
         bool operator()(const Request& lhs, const Key& rhs) const noexcept
         {
-            int result{swirly::compare(lhs.marketId(), std::get<0>(rhs))};
+            int result{swirly::compare(lhs.market_id(), std::get<0>(rhs))};
             if (result == 0) {
                 result = swirly::compare(lhs.id(), std::get<1>(rhs));
             }
@@ -126,7 +126,7 @@ class RequestIdSet {
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
     using CompareOption = boost::intrusive::compare<ValueCompare>;
     using MemberHookOption
-        = boost::intrusive::member_hook<RequestT, decltype(RequestT::idHook), &RequestT::idHook>;
+        = boost::intrusive::member_hook<RequestT, decltype(RequestT::id_hook), &RequestT::id_hook>;
     using Set
         = boost::intrusive::set<RequestT, ConstantTimeSizeOption, CompareOption, MemberHookOption>;
     using ValuePtr = boost::intrusive_ptr<RequestT>;
@@ -161,24 +161,24 @@ class RequestIdSet {
     Iterator end() noexcept { return set_.end(); }
 
     // Find.
-    ConstIterator find(Id64 marketId, Id64 id) const noexcept
+    ConstIterator find(Id64 market_id, Id64 id) const noexcept
     {
-        return set_.find(std::make_tuple(marketId, id), KeyValueCompare());
+        return set_.find(std::make_tuple(market_id, id), KeyValueCompare());
     }
-    Iterator find(Id64 marketId, Id64 id) noexcept
+    Iterator find(Id64 market_id, Id64 id) noexcept
     {
-        return set_.find(std::make_tuple(marketId, id), KeyValueCompare());
+        return set_.find(std::make_tuple(market_id, id), KeyValueCompare());
     }
-    std::pair<ConstIterator, bool> findHint(Id64 marketId, Id64 id) const noexcept
+    std::pair<ConstIterator, bool> find_hint(Id64 market_id, Id64 id) const noexcept
     {
-        const auto key = std::make_tuple(marketId, id);
+        const auto key = std::make_tuple(market_id, id);
         const auto comp = KeyValueCompare();
         auto it = set_.lower_bound(key, comp);
         return std::make_pair(it, it != set_.end() && !comp(key, *it));
     }
-    std::pair<Iterator, bool> findHint(Id64 marketId, Id64 id) noexcept
+    std::pair<Iterator, bool> find_hint(Id64 market_id, Id64 id) noexcept
     {
-        const auto key = std::make_tuple(marketId, id);
+        const auto key = std::make_tuple(market_id, id);
         const auto comp = KeyValueCompare();
         auto it = set_.lower_bound(key, comp);
         return std::make_pair(it, it != set_.end() && !comp(key, *it));
@@ -190,18 +190,18 @@ class RequestIdSet {
         std::tie(it, inserted) = set_.insert(*value);
         if (inserted) {
             // Take ownership if inserted.
-            value->addRef();
+            value->add_ref();
         }
         return it;
     }
-    Iterator insertHint(ConstIterator hint, const ValuePtr& value) noexcept
+    Iterator insert_hint(ConstIterator hint, const ValuePtr& value) noexcept
     {
         auto it = set_.insert(hint, *value);
         // Take ownership.
-        value->addRef();
+        value->add_ref();
         return it;
     }
-    Iterator insertOrReplace(const ValuePtr& value) noexcept
+    Iterator insert_or_replace(const ValuePtr& value) noexcept
     {
         Iterator it;
         bool inserted;
@@ -213,23 +213,23 @@ class RequestIdSet {
             it = Set::s_iterator_to(*value);
         }
         // Take ownership.
-        value->addRef();
+        value->add_ref();
         return it;
     }
     template <typename... ArgsT>
     Iterator emplace(ArgsT&&... args)
     {
-        return insert(makeIntrusive<RequestT>(std::forward<ArgsT>(args)...));
+        return insert(make_intrusive<RequestT>(std::forward<ArgsT>(args)...));
     }
     template <typename... ArgsT>
-    Iterator emplaceHint(ConstIterator hint, ArgsT&&... args)
+    Iterator emplace_hint(ConstIterator hint, ArgsT&&... args)
     {
-        return insertHint(hint, makeIntrusive<RequestT>(std::forward<ArgsT>(args)...));
+        return insert_hint(hint, make_intrusive<RequestT>(std::forward<ArgsT>(args)...));
     }
     template <typename... ArgsT>
-    Iterator emplaceOrReplace(ArgsT&&... args)
+    Iterator emplace_or_replace(ArgsT&&... args)
     {
-        return insertOrReplace(makeIntrusive<RequestT>(std::forward<ArgsT>(args)...));
+        return insert_or_replace(make_intrusive<RequestT>(std::forward<ArgsT>(args)...));
     }
     ValuePtr remove(const RequestT& ref) noexcept
     {

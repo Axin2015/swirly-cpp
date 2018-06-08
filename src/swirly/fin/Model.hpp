@@ -45,28 +45,31 @@ class SWIRLY_API Model {
     constexpr Model(Model&&) noexcept = default;
     Model& operator=(Model&&) noexcept = default;
 
-    void readAsset(const ModelCallback<AssetPtr>& cb) const { doReadAsset(cb); }
-    void readInstr(const ModelCallback<InstrPtr>& cb) const { doReadInstr(cb); }
-    void readMarket(const ModelCallback<MarketPtr>& cb) const { doReadMarket(cb); }
-    void readOrder(const ModelCallback<OrderPtr>& cb) const { doReadOrder(cb); }
-    void readExec(Time since, const ModelCallback<ExecPtr>& cb) const { doReadExec(since, cb); }
-    void readTrade(const ModelCallback<ExecPtr>& cb) const { doReadTrade(cb); }
-    void readPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const { doReadPosn(busDay, cb); }
+    void read_asset(const ModelCallback<AssetPtr>& cb) const { do_read_asset(cb); }
+    void read_instr(const ModelCallback<InstrPtr>& cb) const { do_read_instr(cb); }
+    void read_market(const ModelCallback<MarketPtr>& cb) const { do_read_market(cb); }
+    void read_order(const ModelCallback<OrderPtr>& cb) const { do_read_order(cb); }
+    void read_exec(Time since, const ModelCallback<ExecPtr>& cb) const { do_read_exec(since, cb); }
+    void read_trade(const ModelCallback<ExecPtr>& cb) const { do_read_trade(cb); }
+    void read_posn(JDay bus_day, const ModelCallback<PosnPtr>& cb) const
+    {
+        do_read_posn(bus_day, cb);
+    }
 
   protected:
-    virtual void doReadAsset(const ModelCallback<AssetPtr>& cb) const = 0;
+    virtual void do_read_asset(const ModelCallback<AssetPtr>& cb) const = 0;
 
-    virtual void doReadInstr(const ModelCallback<InstrPtr>& cb) const = 0;
+    virtual void do_read_instr(const ModelCallback<InstrPtr>& cb) const = 0;
 
-    virtual void doReadMarket(const ModelCallback<MarketPtr>& cb) const = 0;
+    virtual void do_read_market(const ModelCallback<MarketPtr>& cb) const = 0;
 
-    virtual void doReadOrder(const ModelCallback<OrderPtr>& cb) const = 0;
+    virtual void do_read_order(const ModelCallback<OrderPtr>& cb) const = 0;
 
-    virtual void doReadExec(Time since, const ModelCallback<ExecPtr>& cb) const = 0;
+    virtual void do_read_exec(Time since, const ModelCallback<ExecPtr>& cb) const = 0;
 
-    virtual void doReadTrade(const ModelCallback<ExecPtr>& cb) const = 0;
+    virtual void do_read_trade(const ModelCallback<ExecPtr>& cb) const = 0;
 
-    virtual void doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const = 0;
+    virtual void do_read_posn(JDay bus_day, const ModelCallback<PosnPtr>& cb) const = 0;
 };
 
 } // namespace fin

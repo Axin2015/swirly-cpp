@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
         if (argc > 1) {
             config.set("sqlite_model", argv[1]);
         }
-        const BusinessDay busDay{MarketZone};
+        const BusinessDay bus_day{MarketZone};
 
         const auto now = UnixClock::now();
         SqlModel model{config};
@@ -52,38 +52,38 @@ int main(int argc, char* argv[])
         cout << "{\"assets\":[";
         {
             OStreamJoiner it(cout, ',');
-            model.readAsset([&it](auto ptr) { it = *ptr; });
+            model.read_asset([&it](auto ptr) { it = *ptr; });
         }
         cout << "],\"instrs\":[";
         {
             OStreamJoiner it(cout, ',');
-            model.readInstr([&it](auto ptr) { it = *ptr; });
+            model.read_instr([&it](auto ptr) { it = *ptr; });
         }
         cout << "],\"markets\":[";
         {
             OStreamJoiner it(cout, ',');
-            model.readMarket([&it](MarketPtr ptr) { it = *ptr; });
+            model.read_market([&it](MarketPtr ptr) { it = *ptr; });
         }
         cout << "],\"orders\":[";
         {
             OStreamJoiner it(cout, ',');
-            model.readOrder([&it](auto ptr) { it = *ptr; });
+            model.read_order([&it](auto ptr) { it = *ptr; });
         }
         cout << "],\"execs\":[";
         {
             OStreamJoiner it(cout, ',');
             // One week ago.
-            model.readExec(now - 604800000ms, [&it](auto ptr) { it = *ptr; });
+            model.read_exec(now - 604800000ms, [&it](auto ptr) { it = *ptr; });
         }
         cout << "],\"trades\":[";
         {
             OStreamJoiner it(cout, ',');
-            model.readTrade([&it](auto ptr) { it = *ptr; });
+            model.read_trade([&it](auto ptr) { it = *ptr; });
         }
         cout << "],\"posns\":[";
         {
             OStreamJoiner it(cout, ',');
-            model.readPosn(busDay(now), [&it](auto ptr) { it = *ptr; });
+            model.read_posn(bus_day(now), [&it](auto ptr) { it = *ptr; });
         }
         cout << "]}\n";
 

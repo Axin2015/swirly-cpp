@@ -25,7 +25,7 @@ HdrRecorder::~HdrRecorder()
 {
     const auto end = chrono::high_resolution_clock::now();
     const auto diff = chrono::duration_cast<chrono::nanoseconds>(end - start_);
-    hdrHist_.record(diff.count());
+    hdr_hist_.record(diff.count());
 }
 } // namespace prof
 } // namespace swirly

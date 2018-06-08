@@ -40,7 +40,7 @@ class SWIRLY_API Response {
     Response(Response&&) noexcept;
     Response& operator=(Response&&) noexcept;
 
-    void toJson(std::ostream& os) const;
+    void to_json(std::ostream& os) const;
 
     ConstMarketPtr market() const noexcept;
     const Orders& orders() const noexcept { return orders_; }
@@ -49,15 +49,15 @@ class SWIRLY_API Response {
 
     void clear() noexcept;
 
-    void clearMatches() noexcept;
+    void clear_matches() noexcept;
 
-    void setMarket(const ConstMarketPtr& market) noexcept;
+    void set_market(const ConstMarketPtr& market) noexcept;
 
-    void insertOrder(const ConstOrderPtr& order);
+    void insert_order(const ConstOrderPtr& order);
 
-    void insertExec(const ConstExecPtr& exec);
+    void insert_exec(const ConstExecPtr& exec);
 
-    void setPosn(const ConstPosnPtr& posn) noexcept;
+    void set_posn(const ConstPosnPtr& posn) noexcept;
 
   private:
     ConstMarketPtr market_;
@@ -68,7 +68,7 @@ class SWIRLY_API Response {
 
 inline std::ostream& operator<<(std::ostream& os, const Response& resp)
 {
-    resp.toJson(os);
+    resp.to_json(os);
     return os;
 }
 

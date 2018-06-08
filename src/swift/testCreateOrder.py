@@ -18,27 +18,27 @@ from swift import *
 class TestCase(RestTestCase):
 
   def test(self):
-    self.maxDiff = None
+    self.max_diff = None
     self.now = 1388534400000
-    with DbFile() as dbFile:
-      with Server(dbFile, self.now) as server:
+    with DbFile() as db_file:
+      with Server(db_file, self.now) as server:
         with Client() as client:
-          client.setTime(self.now)
+          client.set_time(self.now)
 
-          self.createMarket(client, 'EURUSD', 20140302)
+          self.create_market(client, 'EURUSD', 20140302)
 
-          self.checkAuth(client)
+          self.check_auth(client)
 
-          self.createBid(client)
-          self.createBidByInstr(client)
-          self.createBidByMarket(client)
+          self.create_bid(client)
+          self.create_bid_by_instr(client)
+          self.create_bid_by_market(client)
 
-          self.createOffer(client)
-          self.createOfferByInstr(client)
-          self.createOfferByMarket(client)
+          self.create_offer(client)
+          self.create_offer_by_instr(client)
+          self.create_offer_by_market(client)
 
-  def checkAuth(self, client):
-    client.setAuth(None, 0x2)
+  def check_auth(self, client):
+    client.set_auth(None, 0x2)
 
     resp = client.send('POST', '/accnt/orders')
     self.assertEqual(401, resp.status)
@@ -52,7 +52,7 @@ class TestCase(RestTestCase):
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    client.setAuth('MARAYL', ~0x2 & 0x7fffffff)
+    client.set_auth('MARAYL', ~0x2 & 0x7fffffff)
 
     resp = client.send('POST', '/accnt/orders')
     self.assertEqual(403, resp.status)
@@ -66,8 +66,8 @@ class TestCase(RestTestCase):
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-  def createBid(self, client):
-    client.setTrader('MARAYL')
+  def create_bid(self, client):
+    client.set_trader('MARAYL')
     resp = client.send('POST', '/accnt/orders',
                        instr = 'EURUSD',
                        settl_date = 20140302,
@@ -141,8 +141,8 @@ class TestCase(RestTestCase):
       u'posn': None
     }, resp.content)
 
-  def createBidByInstr(self, client):
-    client.setTrader('GOSAYL')
+  def create_bid_by_instr(self, client):
+    client.set_trader('GOSAYL')
     resp = client.send('POST', '/accnt/orders',
                        instr = 'EURUSD',
                        settl_date = 20140302,
@@ -216,8 +216,8 @@ class TestCase(RestTestCase):
       u'posn': None
     }, resp.content)
 
-  def createBidByMarket(self, client):
-    client.setTrader('EDIAYL')
+  def create_bid_by_market(self, client):
+    client.set_trader('EDIAYL')
     resp = client.send('POST', '/accnt/orders/EURUSD/20140302',
                        side = 'Buy',
                        lots = 7,
@@ -289,8 +289,8 @@ class TestCase(RestTestCase):
       u'posn': None
     }, resp.content)
 
-  def createOffer(self, client):
-    client.setTrader('MARAYL')
+  def create_offer(self, client):
+    client.set_trader('MARAYL')
     resp = client.send('POST', '/accnt/orders',
                        instr = 'EURUSD',
                        settl_date = 20140302,
@@ -364,8 +364,8 @@ class TestCase(RestTestCase):
       u'posn': None
     }, resp.content)
 
-  def createOfferByInstr(self, client):
-    client.setTrader('GOSAYL')
+  def create_offer_by_instr(self, client):
+    client.set_trader('GOSAYL')
     resp = client.send('POST', '/accnt/orders',
                        instr = 'EURUSD',
                        settl_date = 20140302,
@@ -439,8 +439,8 @@ class TestCase(RestTestCase):
       u'posn': None
     }, resp.content)
 
-  def createOfferByMarket(self, client):
-    client.setTrader('EDIAYL')
+  def create_offer_by_market(self, client):
+    client.set_trader('EDIAYL')
     resp = client.send('POST', '/accnt/orders/EURUSD/20140302',
                        side = 'Sell',
                        lots = 7,

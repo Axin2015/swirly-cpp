@@ -61,14 +61,14 @@ enum class HttpMethod : int {
     Source = HTTP_SOURCE
 };
 
-inline const char* enumString(HttpMethod method)
+inline const char* enum_string(HttpMethod method)
 {
     return http_method_str(static_cast<http_method>(method));
 }
 
 inline std::ostream& operator<<(std::ostream& os, HttpMethod method)
 {
-    return os << enumString(method);
+    return os << enum_string(method);
 }
 
 enum class HttpType : int { Request = HTTP_REQUEST, Response = HTTP_RESPONSE };

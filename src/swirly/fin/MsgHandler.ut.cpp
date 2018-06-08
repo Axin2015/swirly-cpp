@@ -25,15 +25,15 @@ namespace {
 
 struct MsgHandler : BasicMsgHandler<MsgHandler> {
 
-    int createMarketCalls{0};
-    int updateMarketCalls{0};
-    int createExecCalls{0};
-    int archiveTradeCalls{0};
+    int create_market_calls{0};
+    int update_market_calls{0};
+    int create_exec_calls{0};
+    int archive_trade_calls{0};
 
-    void onCreateMarket(const CreateMarket& body) { ++createMarketCalls; }
-    void onUpdateMarket(const UpdateMarket& body) { ++updateMarketCalls; }
-    void onCreateExec(const CreateExec& body) { ++createExecCalls; }
-    void onArchiveTrade(const ArchiveTrade& body) { ++archiveTradeCalls; }
+    void on_create_market(const CreateMarket& body) { ++create_market_calls; }
+    void on_update_market(const UpdateMarket& body) { ++update_market_calls; }
+    void on_create_exec(const CreateExec& body) { ++create_exec_calls; }
+    void on_archive_trade(const ArchiveTrade& body) { ++archive_trade_calls; }
 };
 
 } // namespace
@@ -47,24 +47,24 @@ BOOST_AUTO_TEST_CASE(BasicMsgHandlerCase)
     memset(&m, 0, sizeof(m));
 
     m.type = MsgType::CreateMarket;
-    BOOST_TEST(h.createMarketCalls == 0);
+    BOOST_TEST(h.create_market_calls == 0);
     h.dispatch(m);
-    BOOST_TEST(h.createMarketCalls == 1);
+    BOOST_TEST(h.create_market_calls == 1);
 
     m.type = MsgType::UpdateMarket;
-    BOOST_TEST(h.updateMarketCalls == 0);
+    BOOST_TEST(h.update_market_calls == 0);
     h.dispatch(m);
-    BOOST_TEST(h.updateMarketCalls == 1);
+    BOOST_TEST(h.update_market_calls == 1);
 
     m.type = MsgType::CreateExec;
-    BOOST_TEST(h.createExecCalls == 0);
+    BOOST_TEST(h.create_exec_calls == 0);
     h.dispatch(m);
-    BOOST_TEST(h.createExecCalls == 1);
+    BOOST_TEST(h.create_exec_calls == 1);
 
     m.type = MsgType::ArchiveTrade;
-    BOOST_TEST(h.archiveTradeCalls == 0);
+    BOOST_TEST(h.archive_trade_calls == 0);
     h.dispatch(m);
-    BOOST_TEST(h.archiveTradeCalls == 1);
+    BOOST_TEST(h.archive_trade_calls == 1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

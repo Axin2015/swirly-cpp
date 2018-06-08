@@ -35,7 +35,7 @@ inline unsigned if_nametoindex(const char* ifname, std::error_code& ec) noexcept
     unsigned ifindex{0};
     if (ifname) {
         if (!(ifindex = ::if_nametoindex(ifname))) {
-            ec = makeError(errno);
+            ec = make_error(errno);
         }
     }
     return ifindex;
@@ -49,7 +49,7 @@ inline unsigned if_nametoindex(const char* ifname)
     unsigned ifindex{0};
     if (ifname) {
         if (!(ifindex = ::if_nametoindex(ifname))) {
-            throw std::system_error{makeError(errno), "if_nametoindex"};
+            throw std::system_error{make_error(errno), "if_nametoindex"};
         }
     }
     return ifindex;
@@ -62,7 +62,7 @@ inline FileHandle socket(int family, int type, int protocol, std::error_code& ec
 {
     const auto sockfd = ::socket(family, type, protocol);
     if (sockfd < 0) {
-        ec = makeError(errno);
+        ec = make_error(errno);
     }
     return sockfd;
 }
@@ -74,7 +74,7 @@ inline FileHandle socket(int family, int type, int protocol)
 {
     const auto sockfd = ::socket(family, type, protocol);
     if (sockfd < 0) {
-        throw std::system_error{makeError(errno), "socket"};
+        throw std::system_error{make_error(errno), "socket"};
     }
     return sockfd;
 }
@@ -105,7 +105,7 @@ inline std::pair<FileHandle, FileHandle> socketpair(int family, int type, int pr
 {
     int sv[2];
     if (::socketpair(family, type, protocol, sv) < 0) {
-        ec = makeError(errno);
+        ec = make_error(errno);
     }
     return {FileHandle{sv[0]}, FileHandle{sv[1]}};
 }
@@ -117,7 +117,7 @@ inline std::pair<FileHandle, FileHandle> socketpair(int family, int type, int pr
 {
     int sv[2];
     if (::socketpair(family, type, protocol, sv) < 0) {
-        throw std::system_error{makeError(errno), "socketpair"};
+        throw std::system_error{make_error(errno), "socketpair"};
     }
     return {FileHandle{sv[0]}, FileHandle{sv[1]}};
 }
@@ -150,7 +150,7 @@ inline FileHandle accept(int sockfd, sockaddr& addr, socklen_t& addrlen,
     // The returned address is truncated if the buffer provided is too small.
     const auto fd = ::accept(sockfd, &addr, &addrlen);
     if (fd < 0) {
-        ec = makeError(errno);
+        ec = make_error(errno);
     }
     return fd;
 }
@@ -164,7 +164,7 @@ inline FileHandle accept(int sockfd, sockaddr& addr, socklen_t& addrlen)
     // The returned address is truncated if the buffer provided is too small.
     const auto fd = ::accept(sockfd, &addr, &addrlen);
     if (fd < 0) {
-        throw std::system_error{makeError(errno), "accept"};
+        throw std::system_error{make_error(errno), "accept"};
     }
     return fd;
 }
@@ -176,7 +176,7 @@ inline FileHandle accept(int sockfd, std::error_code& ec) noexcept
 {
     const auto fd = ::accept(sockfd, nullptr, nullptr);
     if (fd < 0) {
-        ec = makeError(errno);
+        ec = make_error(errno);
     }
     return fd;
 }
@@ -188,7 +188,7 @@ inline FileHandle accept(int sockfd)
 {
     const auto fd = ::accept(sockfd, nullptr, nullptr);
     if (fd < 0) {
-        throw std::system_error{makeError(errno), "accept"};
+        throw std::system_error{make_error(errno), "accept"};
     }
     return fd;
 }
@@ -225,7 +225,7 @@ inline FileHandle accept(int sockfd, BasicEndpoint<TransportT>& ep)
 inline void bind(int sockfd, const sockaddr& addr, socklen_t addrlen, std::error_code& ec) noexcept
 {
     if (::bind(sockfd, &addr, addrlen) < 0) {
-        ec = makeError(errno);
+        ec = make_error(errno);
     }
 }
 
@@ -235,7 +235,7 @@ inline void bind(int sockfd, const sockaddr& addr, socklen_t addrlen, std::error
 inline void bind(int sockfd, const sockaddr& addr, socklen_t addrlen)
 {
     if (::bind(sockfd, &addr, addrlen) < 0) {
-        throw std::system_error{makeError(errno), "bind"};
+        throw std::system_error{make_error(errno), "bind"};
     }
 }
 
@@ -264,7 +264,7 @@ inline void connect(int sockfd, const sockaddr& addr, socklen_t addrlen,
                     std::error_code& ec) noexcept
 {
     if (::connect(sockfd, &addr, addrlen) < 0) {
-        ec = makeError(errno);
+        ec = make_error(errno);
     }
 }
 
@@ -274,7 +274,7 @@ inline void connect(int sockfd, const sockaddr& addr, socklen_t addrlen,
 inline void connect(int sockfd, const sockaddr& addr, socklen_t addrlen)
 {
     if (::connect(sockfd, &addr, addrlen) < 0) {
-        throw std::system_error{makeError(errno), "connect"};
+        throw std::system_error{make_error(errno), "connect"};
     }
 }
 
@@ -302,7 +302,7 @@ inline void connect(int sockfd, const BasicEndpoint<TransportT>& ep)
 inline void listen(int sockfd, int backlog, std::error_code& ec) noexcept
 {
     if (::listen(sockfd, backlog) < 0) {
-        ec = makeError(errno);
+        ec = make_error(errno);
     }
 }
 
@@ -312,7 +312,7 @@ inline void listen(int sockfd, int backlog, std::error_code& ec) noexcept
 inline void listen(int sockfd, int backlog)
 {
     if (::listen(sockfd, backlog) < 0) {
-        throw std::system_error{makeError(errno), "listen"};
+        throw std::system_error{make_error(errno), "listen"};
     }
 }
 
@@ -322,7 +322,7 @@ inline void listen(int sockfd, int backlog)
 inline void shutdown(int sockfd, int how, std::error_code& ec) noexcept
 {
     if (::shutdown(sockfd, how) < 0) {
-        ec = makeError(errno);
+        ec = make_error(errno);
     }
 }
 
@@ -332,7 +332,7 @@ inline void shutdown(int sockfd, int how, std::error_code& ec) noexcept
 inline void shutdown(int sockfd, int how)
 {
     if (::shutdown(sockfd, how) < 0) {
-        throw std::system_error{makeError(errno), "shutdown"};
+        throw std::system_error{make_error(errno), "shutdown"};
     }
 }
 
@@ -343,7 +343,7 @@ inline ssize_t recv(int sockfd, void* buf, std::size_t len, int flags, std::erro
 {
     const auto ret = ::recv(sockfd, buf, len, flags);
     if (ret < 0) {
-        ec = makeError(errno);
+        ec = make_error(errno);
     }
     return ret;
 }
@@ -355,7 +355,7 @@ inline std::size_t recv(int sockfd, void* buf, std::size_t len, int flags)
 {
     const auto ret = ::recv(sockfd, buf, len, flags);
     if (ret < 0) {
-        throw std::system_error{makeError(errno), "recv"};
+        throw std::system_error{make_error(errno), "recv"};
     }
     return ret;
 }
@@ -386,7 +386,7 @@ inline ssize_t recvfrom(int sockfd, void* buf, std::size_t len, int flags, socka
     // The returned address is truncated if the buffer provided is too small.
     const auto ret = ::recvfrom(sockfd, buf, len, flags, &addr, &addrlen);
     if (ret < 0) {
-        ec = makeError(errno);
+        ec = make_error(errno);
     }
     return ret;
 }
@@ -401,7 +401,7 @@ inline std::size_t recvfrom(int sockfd, void* buf, std::size_t len, int flags, s
     // The returned address is truncated if the buffer provided is too small.
     const auto ret = ::recvfrom(sockfd, buf, len, flags, &addr, &addrlen);
     if (ret < 0) {
-        throw std::system_error{makeError(errno), "recvfrom"};
+        throw std::system_error{make_error(errno), "recvfrom"};
     }
     return ret;
 }
@@ -461,7 +461,7 @@ inline ssize_t send(int sockfd, const void* buf, std::size_t len, int flags,
 {
     const auto ret = ::send(sockfd, buf, len, flags);
     if (ret < 0) {
-        ec = makeError(errno);
+        ec = make_error(errno);
     }
     return ret;
 }
@@ -473,7 +473,7 @@ inline std::size_t send(int sockfd, const void* buf, std::size_t len, int flags)
 {
     const auto ret = ::send(sockfd, buf, len, flags);
     if (ret < 0) {
-        throw std::system_error{makeError(errno), "send"};
+        throw std::system_error{make_error(errno), "send"};
     }
     return ret;
 }
@@ -502,7 +502,7 @@ inline ssize_t sendto(int sockfd, const void* buf, std::size_t len, int flags, c
 {
     const auto ret = ::sendto(sockfd, buf, len, flags, &addr, addrlen);
     if (ret < 0) {
-        ec = makeError(errno);
+        ec = make_error(errno);
     }
     return ret;
 }
@@ -515,7 +515,7 @@ inline std::size_t sendto(int sockfd, const void* buf, std::size_t len, int flag
 {
     const auto ret = ::sendto(sockfd, buf, len, flags, &addr, addrlen);
     if (ret < 0) {
-        throw std::system_error{makeError(errno), "sendto"};
+        throw std::system_error{make_error(errno), "sendto"};
     }
     return ret;
 }
@@ -571,7 +571,7 @@ inline void getsockname(int sockfd, sockaddr& addr, socklen_t& addrlen,
     // The addrlen argument is updated to contain the actual size of the source address.
     // The returned address is truncated if the buffer provided is too small.
     if (::getsockname(sockfd, &addr, &addrlen) < 0) {
-        ec = makeError(errno);
+        ec = make_error(errno);
     }
 }
 
@@ -583,7 +583,7 @@ inline void getsockname(int sockfd, sockaddr& addr, socklen_t& addrlen)
     // The addrlen argument is updated to contain the actual size of the source address.
     // The returned address is truncated if the buffer provided is too small.
     if (::getsockname(sockfd, &addr, &addrlen) < 0) {
-        throw std::system_error{makeError(errno), "getsockname"};
+        throw std::system_error{make_error(errno), "getsockname"};
     }
 }
 
@@ -618,7 +618,7 @@ inline void getsockopt(int sockfd, int level, int optname, void* optval, socklen
                        std::error_code& ec) noexcept
 {
     if (::getsockopt(sockfd, level, optname, optval, &optlen) < 0) {
-        ec = makeError(errno);
+        ec = make_error(errno);
     }
 }
 
@@ -628,7 +628,7 @@ inline void getsockopt(int sockfd, int level, int optname, void* optval, socklen
 inline void getsockopt(int sockfd, int level, int optname, void* optval, socklen_t& optlen)
 {
     if (::getsockopt(sockfd, level, optname, optval, &optlen) < 0) {
-        throw std::system_error{makeError(errno), "getsockopt"};
+        throw std::system_error{make_error(errno), "getsockopt"};
     }
 }
 
@@ -639,7 +639,7 @@ inline void setsockopt(int sockfd, int level, int optname, const void* optval, s
                        std::error_code& ec) noexcept
 {
     if (::setsockopt(sockfd, level, optname, optval, optlen) < 0) {
-        ec = makeError(errno);
+        ec = make_error(errno);
     }
 }
 
@@ -649,79 +649,79 @@ inline void setsockopt(int sockfd, int level, int optname, const void* optval, s
 inline void setsockopt(int sockfd, int level, int optname, const void* optval, socklen_t optlen)
 {
     if (::setsockopt(sockfd, level, optname, optval, optlen) < 0) {
-        throw std::system_error{makeError(errno), "setsockopt"};
+        throw std::system_error{make_error(errno), "setsockopt"};
     }
 }
 
 } // namespace os
 
 template <typename TransportT>
-inline void getSockName(int sockfd, BasicEndpoint<TransportT>& ep, std::error_code& ec) noexcept
+inline void get_sock_name(int sockfd, BasicEndpoint<TransportT>& ep, std::error_code& ec) noexcept
 {
     os::getsockname(sockfd, ep, ec);
 }
 
 template <typename TransportT>
-inline void getSockName(int sockfd, BasicEndpoint<TransportT>& ep)
+inline void get_sock_name(int sockfd, BasicEndpoint<TransportT>& ep)
 {
     os::getsockname(sockfd, ep);
 }
 
-inline std::error_code getSoError(int sockfd, std::error_code& ec) noexcept
+inline std::error_code get_so_error(int sockfd, std::error_code& ec) noexcept
 {
     int optval{};
     socklen_t optlen{sizeof(optval)};
     os::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &optval, optlen);
-    return os::makeError(optval);
+    return os::make_error(optval);
 }
 
-inline std::error_code getSoError(int sockfd)
+inline std::error_code get_so_error(int sockfd)
 {
     int optval{};
     socklen_t optlen{sizeof(optval)};
     os::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &optval, optlen);
-    return os::makeError(optval);
+    return os::make_error(optval);
 }
 
-inline void setSoReuseAddr(int sockfd, bool enabled, std::error_code& ec) noexcept
+inline void set_so_reuse_addr(int sockfd, bool enabled, std::error_code& ec) noexcept
 {
     int optval{enabled ? 1 : 0};
     os::setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval), ec);
 }
 
-inline void setSoReuseAddr(int sockfd, bool enabled)
+inline void set_so_reuse_addr(int sockfd, bool enabled)
 {
     int optval{enabled ? 1 : 0};
     os::setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
 }
 
-inline void setSoRcvBuf(int sockfd, int size, std::error_code& ec) noexcept
+inline void set_so_rcv_buf(int sockfd, int size, std::error_code& ec) noexcept
 {
     os::setsockopt(sockfd, SOL_SOCKET, SO_RCVBUF, &size, sizeof(size), ec);
 }
 
-inline void setSoRcvBuf(int sockfd, int size)
+inline void set_so_rcv_buf(int sockfd, int size)
 {
     os::setsockopt(sockfd, SOL_SOCKET, SO_RCVBUF, &size, sizeof(size));
 }
 
-inline void setSoSndBuf(int sockfd, int size, std::error_code& ec) noexcept
+inline void set_so_snd_buf(int sockfd, int size, std::error_code& ec) noexcept
 {
     os::setsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, &size, sizeof(size), ec);
 }
 
-inline void setSoSndBuf(int sockfd, int size)
+inline void set_so_snd_buf(int sockfd, int size)
 {
     os::setsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, &size, sizeof(size));
 }
 
-inline void setTcpNoDelay(int sockfd, bool enabled, std::error_code& ec) noexcept
+inline void set_tcp_no_delay(int sockfd, bool enabled, std::error_code& ec) noexcept
 {
     int optval{enabled ? 1 : 0};
     os::setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval), ec);
 }
 
-inline void setTcpNoDelay(int sockfd, bool enabled)
+inline void set_tcp_no_delay(int sockfd, bool enabled)
 {
     int optval{enabled ? 1 : 0};
     os::setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
@@ -741,37 +741,40 @@ struct Socket {
     int family() const noexcept { return family_; }
 
     // Logically const.
-    std::error_code getSoError(std::error_code& ec) const { return swirly::getSoError(*sock_, ec); }
-    std::error_code getSoError() const { return swirly::getSoError(*sock_); }
+    std::error_code get_so_error(std::error_code& ec) const
+    {
+        return swirly::get_so_error(*sock_, ec);
+    }
+    std::error_code get_so_error() const { return swirly::get_so_error(*sock_); }
 
     void close() { sock_.reset(); }
 
-    void setNonBlock(std::error_code& ec) noexcept { swirly::setNonBlock(*sock_, ec); }
-    void setNonBlock() { swirly::setNonBlock(*sock_); }
+    void set_non_block(std::error_code& ec) noexcept { swirly::set_non_block(*sock_, ec); }
+    void set_non_block() { swirly::set_non_block(*sock_); }
 
-    void setSoRcvBuf(int size, std::error_code& ec) noexcept
+    void set_so_rcv_buf(int size, std::error_code& ec) noexcept
     {
-        swirly::setSoRcvBuf(*sock_, size, ec);
+        swirly::set_so_rcv_buf(*sock_, size, ec);
     }
-    void setSoRcvBuf(int size) { swirly::setSoRcvBuf(*sock_, size); }
+    void set_so_rcv_buf(int size) { swirly::set_so_rcv_buf(*sock_, size); }
 
-    void setSoReuseAddr(bool enabled, std::error_code& ec) noexcept
+    void set_so_reuse_addr(bool enabled, std::error_code& ec) noexcept
     {
-        swirly::setSoReuseAddr(*sock_, enabled, ec);
+        swirly::set_so_reuse_addr(*sock_, enabled, ec);
     }
-    void setSoReuseAddr(bool enabled) { swirly::setSoReuseAddr(*sock_, enabled); }
+    void set_so_reuse_addr(bool enabled) { swirly::set_so_reuse_addr(*sock_, enabled); }
 
-    void setSoSndBuf(int size, std::error_code& ec) noexcept
+    void set_so_snd_buf(int size, std::error_code& ec) noexcept
     {
-        swirly::setSoSndBuf(*sock_, size, ec);
+        swirly::set_so_snd_buf(*sock_, size, ec);
     }
-    void setSoSndBuf(int size) { swirly::setSoSndBuf(*sock_, size); }
+    void set_so_snd_buf(int size) { swirly::set_so_snd_buf(*sock_, size); }
 
-    void setTcpNoDelay(bool enabled, std::error_code& ec) noexcept
+    void set_tcp_no_delay(bool enabled, std::error_code& ec) noexcept
     {
-        swirly::setTcpNoDelay(*sock_, enabled, ec);
+        swirly::set_tcp_no_delay(*sock_, enabled, ec);
     }
-    void setTcpNoDelay(bool enabled) { swirly::setTcpNoDelay(*sock_, enabled); }
+    void set_tcp_no_delay(bool enabled) { swirly::set_tcp_no_delay(*sock_, enabled); }
 
   protected:
     FileHandle sock_;

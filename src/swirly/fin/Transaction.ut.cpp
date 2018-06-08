@@ -25,20 +25,20 @@ namespace {
 
 struct Foo {
 
-    int beginCalls{0};
-    int commitCalls{0};
-    int rollbackCalls{0};
+    int begin_calls{0};
+    int commit_calls{0};
+    int rollback_calls{0};
 
     void clear() noexcept
     {
-        beginCalls = 0;
-        commitCalls = 0;
-        rollbackCalls = 0;
+        begin_calls = 0;
+        commit_calls = 0;
+        rollback_calls = 0;
     }
 
-    void begin() { ++beginCalls; }
-    void commit() { ++commitCalls; }
-    void rollback() noexcept { ++rollbackCalls; }
+    void begin() { ++begin_calls; }
+    void commit() { ++commit_calls; }
+    void rollback() noexcept { ++rollback_calls; }
 };
 
 using Transaction = BasicTransaction<Foo>;
@@ -54,16 +54,16 @@ BOOST_AUTO_TEST_CASE(TransScopedCommitCase)
         Transaction trans{foo};
         trans.commit();
     }
-    BOOST_TEST(foo.beginCalls == 1);
-    BOOST_TEST(foo.commitCalls == 1);
-    BOOST_TEST(foo.rollbackCalls == 0);
+    BOOST_TEST(foo.begin_calls == 1);
+    BOOST_TEST(foo.commit_calls == 1);
+    BOOST_TEST(foo.rollback_calls == 0);
     {
         Transaction trans{foo};
         trans.commit();
     }
-    BOOST_TEST(foo.beginCalls == 2);
-    BOOST_TEST(foo.commitCalls == 2);
-    BOOST_TEST(foo.rollbackCalls == 0);
+    BOOST_TEST(foo.begin_calls == 2);
+    BOOST_TEST(foo.commit_calls == 2);
+    BOOST_TEST(foo.rollback_calls == 0);
 }
 
 BOOST_AUTO_TEST_CASE(TransScopedRollbackCase)
@@ -72,15 +72,15 @@ BOOST_AUTO_TEST_CASE(TransScopedRollbackCase)
     {
         Transaction trans{foo};
     }
-    BOOST_TEST(foo.beginCalls == 1);
-    BOOST_TEST(foo.commitCalls == 0);
-    BOOST_TEST(foo.rollbackCalls == 1);
+    BOOST_TEST(foo.begin_calls == 1);
+    BOOST_TEST(foo.commit_calls == 0);
+    BOOST_TEST(foo.rollback_calls == 1);
     {
         Transaction trans{foo};
     }
-    BOOST_TEST(foo.beginCalls == 2);
-    BOOST_TEST(foo.commitCalls == 0);
-    BOOST_TEST(foo.rollbackCalls == 2);
+    BOOST_TEST(foo.begin_calls == 2);
+    BOOST_TEST(foo.commit_calls == 0);
+    BOOST_TEST(foo.rollback_calls == 2);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

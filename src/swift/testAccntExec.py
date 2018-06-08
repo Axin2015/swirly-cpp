@@ -18,61 +18,61 @@ from swift import *
 class TestCase(RestTestCase):
 
   def test(self):
-    self.maxDiff = None
+    self.max_diff = None
     self.now = 1388534400000
-    with DbFile() as dbFile:
-      with Server(dbFile, self.now) as server:
+    with DbFile() as db_file:
+      with Server(db_file, self.now) as server:
         with Client() as client:
-          client.setTime(self.now)
+          client.set_time(self.now)
 
-          self.createMarket(client, 'EURUSD', 20140302)
-          self.createMarket(client, 'GBPUSD', 20140302)
+          self.create_market(client, 'EURUSD', 20140302)
+          self.create_market(client, 'GBPUSD', 20140302)
 
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Sell', 5, 12347)
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Sell', 3, 12346)
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 3, 12344)
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 5, 12343)
+          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Sell', 5, 12347)
+          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Sell', 3, 12346)
+          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 3, 12344)
+          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 5, 12343)
 
-          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'Sell', 3, 15346)
-          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'Buy', 3, 15344)
+          self.create_order(client, 'MARAYL', 'GBPUSD', 20140302, 'Sell', 3, 15346)
+          self.create_order(client, 'MARAYL', 'GBPUSD', 20140302, 'Buy', 3, 15344)
 
-          self.checkAuth(client)
+          self.check_auth(client)
 
-          self.getAll(client)
-          self.getOffset(client)
-          self.getLimit(client)
-          self.getOffsetAndLimit(client)
+          self.get_all(client)
+          self.get_offset(client)
+          self.get_limit(client)
+          self.get_offset_and_limit(client)
 
-          self.exceedOffset(client)
-          self.exceedLimit(client)
+          self.exceed_offset(client)
+          self.exceed_limit(client)
 
-      with Server(dbFile, self.now) as server:
+      with Server(db_file, self.now) as server:
         with Client() as client:
-          client.setTime(self.now)
+          client.set_time(self.now)
 
-          self.getAll(client)
-          self.getOffset(client)
-          self.getLimit(client)
-          self.getOffsetAndLimit(client)
+          self.get_all(client)
+          self.get_offset(client)
+          self.get_limit(client)
+          self.get_offset_and_limit(client)
 
-          self.exceedOffset(client)
-          self.exceedLimit(client)
+          self.exceed_offset(client)
+          self.exceed_limit(client)
 
-  def checkAuth(self, client):
-    client.setAuth(None, 0x2)
+  def check_auth(self, client):
+    client.set_auth(None, 0x2)
 
     resp = client.send('GET', '/accnt/execs')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    client.setAuth('MARAYL', ~0x2 & 0x7fffffff)
+    client.set_auth('MARAYL', ~0x2 & 0x7fffffff)
 
     resp = client.send('GET', '/accnt/execs')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-  def getAll(self, client):
-    client.setTrader('MARAYL')
+  def get_all(self, client):
+    client.set_trader('MARAYL')
     resp = client.send('GET', '/accnt/execs')
 
     self.assertEqual(200, resp.status)
@@ -223,8 +223,8 @@ class TestCase(RestTestCase):
       u'ticks': 12347
     }], resp.content)
 
-  def getOffset(self, client):
-    client.setTrader('MARAYL')
+  def get_offset(self, client):
+    client.set_trader('MARAYL')
     resp = client.send('GET', '/accnt/execs?offset=2')
 
     self.assertEqual(200, resp.status)
@@ -327,8 +327,8 @@ class TestCase(RestTestCase):
       u'ticks': 12347
     }], resp.content)
 
-  def getLimit(self, client):
-    client.setTrader('MARAYL')
+  def get_limit(self, client):
+    client.set_trader('MARAYL')
     resp = client.send('GET', '/accnt/execs?limit=3')
 
     self.assertEqual(200, resp.status)
@@ -407,8 +407,8 @@ class TestCase(RestTestCase):
       u'ticks': 12343
     }], resp.content)
 
-  def getOffsetAndLimit(self, client):
-    client.setTrader('MARAYL')
+  def get_offset_and_limit(self, client):
+    client.set_trader('MARAYL')
     resp = client.send('GET', '/accnt/execs?offset=2&limit=3')
 
     self.assertEqual(200, resp.status)
@@ -487,8 +487,8 @@ class TestCase(RestTestCase):
       u'ticks': 12346
     }], resp.content)
 
-  def exceedOffset(self, client):
-    client.setTrader('MARAYL')
+  def exceed_offset(self, client):
+    client.set_trader('MARAYL')
     resp = client.send('GET', '/accnt/execs?offset=99&limit=3')
 
     self.assertEqual(200, resp.status)
@@ -496,8 +496,8 @@ class TestCase(RestTestCase):
     self.assertListEqual([
     ], resp.content)
 
-  def exceedLimit(self, client):
-    client.setTrader('MARAYL')
+  def exceed_limit(self, client):
+    client.set_trader('MARAYL')
     resp = client.send('GET', '/accnt/execs?offset=0&limit=99')
 
     self.assertEqual(200, resp.status)

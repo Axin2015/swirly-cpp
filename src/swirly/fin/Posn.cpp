@@ -30,110 +30,110 @@ Posn::~Posn() = default;
 
 Posn::Posn(Posn&&) = default;
 
-void Posn::toDsv(ostream& os, char delim) const
+void Posn::to_dsv(ostream& os, char delim) const
 {
     OStreamJoiner osj{os, delim};
-    osj << accnt_    //
-        << marketId_ //
+    osj << accnt_     //
+        << market_id_ //
         << instr_;
-    if (settlDay_ != 0_jd) {
-        osj << jdToIso(settlDay_);
+    if (settl_day_ != 0_jd) {
+        osj << jd_to_iso(settl_day_);
     } else {
         osj << ""sv;
     }
-    if (buyLots_ != 0_lts) {
-        osj << buyLots_ //
-            << buyCost_;
+    if (buy_lots_ != 0_lts) {
+        osj << buy_lots_ //
+            << buy_cost_;
     } else {
         osj << '0' << '0';
     }
-    if (sellLots_ != 0_lts) {
-        osj << sellLots_ //
-            << sellCost_;
+    if (sell_lots_ != 0_lts) {
+        osj << sell_lots_ //
+            << sell_cost_;
     } else {
         osj << '0' << '0';
     }
 }
 
-void Posn::toJson(ostream& os) const
+void Posn::to_json(ostream& os) const
 {
-    os << "{\"accnt\":\""sv << accnt_        //
-       << "\",\"market_id\":"sv << marketId_ //
-       << ",\"instr\":\""sv << instr_        //
+    os << "{\"accnt\":\""sv << accnt_         //
+       << "\",\"market_id\":"sv << market_id_ //
+       << ",\"instr\":\""sv << instr_         //
        << "\",\"settl_date\":"sv;
-    if (settlDay_ != 0_jd) {
-        os << jdToIso(settlDay_);
+    if (settl_day_ != 0_jd) {
+        os << jd_to_iso(settl_day_);
     } else {
         os << "null"sv;
     }
-    if (buyLots_ != 0_lts) {
-        os << ",\"buy_lots\":"sv << buyLots_ //
-           << ",\"buy_cost\":"sv << buyCost_;
+    if (buy_lots_ != 0_lts) {
+        os << ",\"buy_lots\":"sv << buy_lots_ //
+           << ",\"buy_cost\":"sv << buy_cost_;
     } else {
         os << ",\"buy_lots\":0,\"buy_cost\":0"sv;
     }
-    if (sellLots_ != 0_lts) {
-        os << ",\"sell_lots\":"sv << sellLots_ //
-           << ",\"sell_cost\":"sv << sellCost_;
+    if (sell_lots_ != 0_lts) {
+        os << ",\"sell_lots\":"sv << sell_lots_ //
+           << ",\"sell_cost\":"sv << sell_cost_;
     } else {
         os << ",\"sell_lots\":0,\"sell_cost\":0"sv;
     }
     os << '}';
 }
 
-void Posn::addBuy(Lots lots, Ticks ticks) noexcept
+void Posn::add_buy(Lots lots, Ticks ticks) noexcept
 {
     //   -2  -1   0   1
     //    +-------+---+
-    //    |-->    |   |     netLots < 0
-    //    |------>|   |     netLots == 0
-    //    |---------->|     netLots > 0 && netLots < lots
-    //    |       |   |-->  netLots >= lots
+    //    |-->    |   |     net_lots < 0
+    //    |------>|   |     net_lots == 0
+    //    |---------->|     net_lots > 0 && net_lots < lots
+    //    |       |   |-->  net_lots >= lots
 
     const auto cost = swirly::cost(lots, ticks);
-    const auto netLots = this->netLots() + lots;
-    buyLots_ += lots;
-    buyCost_ += cost;
-    if (netLots < 0_lts || netLots >= lots) {
+    const auto net_lots = this->net_lots() + lots;
+    buy_lots_ += lots;
+    buy_cost_ += cost;
+    if (net_lots < 0_lts || net_lots >= lots) {
         // Either short position was partially closed.
         // Or long position was extended.
-        netCost_ += cost;
-    } else if (netLots > 0_lts) {
-        assert(netLots < lots);
+        net_cost_ += cost;
+    } else if (net_lots > 0_lts) {
+        assert(net_lots < lots);
         // Short position was fully closed and long position opened.
-        netCost_ = swirly::cost(netLots, ticks);
+        net_cost_ = swirly::cost(net_lots, ticks);
     } else {
-        assert(netLots == 0_lts);
+        assert(net_lots == 0_lts);
         // Short position was fully closed.
-        netCost_ = 0_cst;
+        net_cost_ = 0_cst;
     }
 }
 
-void Posn::addSell(Lots lots, Ticks ticks) noexcept
+void Posn::add_sell(Lots lots, Ticks ticks) noexcept
 {
     //   -1   0   1   2
     //    +-------+---+
-    //    |   |    <--|     netLots > 0
-    //    |   |<------|     netLots == 0
-    //    |<----------|     netLots < 0 && netLots > -lots
-    // <--|   |       |     netLots <= -lots
+    //    |   |    <--|     net_lots > 0
+    //    |   |<------|     net_lots == 0
+    //    |<----------|     net_lots < 0 && net_lots > -lots
+    // <--|   |       |     net_lots <= -lots
 
     const auto cost = swirly::cost(lots, ticks);
-    const auto netLots = this->netLots() - lots;
-    sellLots_ += lots;
-    sellCost_ += cost;
-    if (netLots > 0_lts || netLots <= -lots) {
+    const auto net_lots = this->net_lots() - lots;
+    sell_lots_ += lots;
+    sell_cost_ += cost;
+    if (net_lots > 0_lts || net_lots <= -lots) {
         // Either long position was partially closed.
         // Or short position was extended.
-        netCost_ -= cost;
-    } else if (netLots < 0_lts) {
-        assert(netLots > -lots);
+        net_cost_ -= cost;
+    } else if (net_lots < 0_lts) {
+        assert(net_lots > -lots);
         // Long position was fully closed and short position opened.
-        netCost_ = swirly::cost(netLots, ticks);
+        net_cost_ = swirly::cost(net_lots, ticks);
     } else {
-        assert(netLots == 0_lts);
+        assert(net_lots == 0_lts);
         // Long position was fully closed.
-        netCost_ = 0_cst;
+        net_cost_ = 0_cst;
     }
 }
 
@@ -153,20 +153,20 @@ PosnSet::Iterator PosnSet::insert(const ValuePtr& value) noexcept
     tie(it, inserted) = set_.insert(*value);
     if (inserted) {
         // Take ownership if inserted.
-        value->addRef();
+        value->add_ref();
     }
     return it;
 }
 
-PosnSet::Iterator PosnSet::insertHint(ConstIterator hint, const ValuePtr& value) noexcept
+PosnSet::Iterator PosnSet::insert_hint(ConstIterator hint, const ValuePtr& value) noexcept
 {
     auto it = set_.insert(hint, *value);
     // Take ownership.
-    value->addRef();
+    value->add_ref();
     return it;
 }
 
-PosnSet::Iterator PosnSet::insertOrReplace(const ValuePtr& value) noexcept
+PosnSet::Iterator PosnSet::insert_or_replace(const ValuePtr& value) noexcept
 {
     Iterator it;
     bool inserted;
@@ -178,7 +178,7 @@ PosnSet::Iterator PosnSet::insertOrReplace(const ValuePtr& value) noexcept
         it = Set::s_iterator_to(*value);
     }
     // Take ownership.
-    value->addRef();
+    value->add_ref();
     return it;
 }
 

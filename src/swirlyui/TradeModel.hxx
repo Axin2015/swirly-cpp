@@ -33,15 +33,15 @@ class TradeModel
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-    void removeRow(std::uint64_t tag, const Exec& trade)
+    void remove_row(std::uint64_t tag, const Exec& trade)
     {
-        const ExecKey key{trade.marketId(), trade.id()};
-        TableModel::removeRow(key);
+        const ExecKey key{trade.market_id(), trade.id()};
+        TableModel::remove_row(key);
     }
-    void updateRow(std::uint64_t tag, const Exec& trade)
+    void update_row(std::uint64_t tag, const Exec& trade)
     {
-        const ExecKey key{trade.marketId(), trade.id()};
-        TableModel::updateRow(key, tag, trade);
+        const ExecKey key{trade.market_id(), trade.id()};
+        TableModel::update_row(key, tag, trade);
     }
 
   private:

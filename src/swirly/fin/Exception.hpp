@@ -40,18 +40,18 @@ class SWIRLY_API ServException : public Exception {
     ServException(ServException&&) noexcept = default;
     ServException& operator=(ServException&&) noexcept = default;
 
-    static void toJson(int status, const char* reason, const char* detail, std::ostream& os);
+    static void to_json(int status, const char* reason, const char* detail, std::ostream& os);
 
-    void toJson(std::ostream& os) const { toJson(httpStatus(), httpReason(), what(), os); }
+    void to_json(std::ostream& os) const { to_json(http_status(), http_reason(), what(), os); }
 
-    virtual int httpStatus() const noexcept = 0;
+    virtual int http_status() const noexcept = 0;
 
-    virtual const char* httpReason() const noexcept = 0;
+    virtual const char* http_reason() const noexcept = 0;
 };
 
 inline std::ostream& operator<<(std::ostream& os, const ServException& e)
 {
-    e.toJson(os);
+    e.to_json(os);
     return os;
 }
 
@@ -75,9 +75,9 @@ class SWIRLY_API BadRequestException : public ServException {
     BadRequestException(BadRequestException&&) noexcept = default;
     BadRequestException& operator=(BadRequestException&&) noexcept = default;
 
-    int httpStatus() const noexcept override;
+    int http_status() const noexcept override;
 
-    const char* httpReason() const noexcept override;
+    const char* http_reason() const noexcept override;
 };
 
 class SWIRLY_API AlreadyExistsException : public BadRequestException {
@@ -207,9 +207,9 @@ class SWIRLY_API ForbiddenException : public ServException {
     ForbiddenException(ForbiddenException&&) noexcept = default;
     ForbiddenException& operator=(ForbiddenException&&) noexcept = default;
 
-    int httpStatus() const noexcept override;
+    int http_status() const noexcept override;
 
-    const char* httpReason() const noexcept override;
+    const char* http_reason() const noexcept override;
 };
 
 /**
@@ -231,9 +231,9 @@ class SWIRLY_API InternalException : public ServException {
     InternalException(InternalException&&) noexcept = default;
     InternalException& operator=(InternalException&&) noexcept = default;
 
-    int httpStatus() const noexcept override;
+    int http_status() const noexcept override;
 
-    const char* httpReason() const noexcept override;
+    const char* http_reason() const noexcept override;
 };
 
 /**
@@ -257,9 +257,9 @@ class SWIRLY_API MethodNotAllowedException : public ServException {
     MethodNotAllowedException(MethodNotAllowedException&&) noexcept = default;
     MethodNotAllowedException& operator=(MethodNotAllowedException&&) noexcept = default;
 
-    int httpStatus() const noexcept override;
+    int http_status() const noexcept override;
 
-    const char* httpReason() const noexcept override;
+    const char* http_reason() const noexcept override;
 };
 
 /**
@@ -286,9 +286,9 @@ class SWIRLY_API NotFoundException : public ServException {
     NotFoundException(NotFoundException&&) noexcept = default;
     NotFoundException& operator=(NotFoundException&&) noexcept = default;
 
-    int httpStatus() const noexcept override;
+    int http_status() const noexcept override;
 
-    const char* httpReason() const noexcept override;
+    const char* http_reason() const noexcept override;
 };
 
 class SWIRLY_API MarketClosedException : public NotFoundException {
@@ -365,9 +365,9 @@ class SWIRLY_API ServiceUnavailableException : public ServException {
     ServiceUnavailableException(ServiceUnavailableException&&) noexcept = default;
     ServiceUnavailableException& operator=(ServiceUnavailableException&&) noexcept = default;
 
-    int httpStatus() const noexcept override;
+    int http_status() const noexcept override;
 
-    const char* httpReason() const noexcept override;
+    const char* http_reason() const noexcept override;
 };
 
 /**
@@ -397,9 +397,9 @@ class SWIRLY_API UnauthorizedException : public ServException {
     UnauthorizedException(UnauthorizedException&&) noexcept = default;
     UnauthorizedException& operator=(UnauthorizedException&&) noexcept = default;
 
-    int httpStatus() const noexcept override;
+    int http_status() const noexcept override;
 
-    const char* httpReason() const noexcept override;
+    const char* http_reason() const noexcept override;
 };
 
 } // namespace fin

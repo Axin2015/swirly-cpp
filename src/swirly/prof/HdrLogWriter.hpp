@@ -28,7 +28,7 @@ inline namespace prof {
 
 class SWIRLY_API HdrLogWriter {
   public:
-    HdrLogWriter(const char* path, const char* userPrefix);
+    HdrLogWriter(const char* path, const char* user_prefix);
     ~HdrLogWriter();
 
     // Copy.
@@ -39,7 +39,7 @@ class SWIRLY_API HdrLogWriter {
     HdrLogWriter(HdrLogWriter&&) noexcept = delete;
     HdrLogWriter& operator=(HdrLogWriter&&) noexcept = delete;
 
-    void write(Time startTime, Time endTime, hdr_histogram& hist);
+    void write(Time start_time, Time end_time, hdr_histogram& hist);
 
   private:
     hdr_log_writer writer_{};

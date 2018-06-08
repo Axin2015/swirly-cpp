@@ -26,19 +26,19 @@ import tempfile
 import time
 import unittest
 
-def waitForService(server, port, timeout):
+def wait_for_service(server, port, timeout):
   end = time.time() + timeout
   while True:
 
-    nextTimeout = end - time.time()
-    if nextTimeout <= 0:
+    next_timeout = end - time.time()
+    if next_timeout <= 0:
       return False
 
     try:
       # Sleep for 10ms before attempting to connect.
       time.sleep(0.01)
       with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
-        sock.settimeout(nextTimeout)
+        sock.settimeout(next_timeout)
         sock.connect((server, port))
 
     except socket.timeout, err:
@@ -50,22 +50,22 @@ def waitForService(server, port, timeout):
     else:
       return True
 
-def getPort():
+def get_port():
   with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
     sock.bind(('localhost', 0))
     addr, port = sock.getsockname()
     return port
 
-def getProg():
+def get_prog():
   return os.getenv('SWIRLY_PROGRAM', 'swirlyd')
 
-def getSchema():
+def get_schema():
   return os.getenv('SWIRLY_SCHEMA', 'schema.sqlite')
 
-def getRefData():
+def get_ref_data():
   return os.getenv('SWIRLY_REFDATA', 'test.sql')
 
-def executeScript(conn, path):
+def execute_script(conn, path):
   cur = conn.cursor()
   with open(path, 'r') as fd:
     script = fd.read()
@@ -95,15 +95,15 @@ class ConfFile(object):
 
 class DbFile(object):
 
-  schema = getSchema()
-  refData = getRefData()
+  schema = get_schema()
+  ref_data = get_ref_data()
 
   def __init__(self):
     temp = tempfile.NamedTemporaryFile(delete = True)
     try:
       with sqlite3.connect(temp.name) as conn:
-        executeScript(conn, DbFile.schema)
-        executeScript(conn, DbFile.refData)
+        execute_script(conn, DbFile.schema)
+        execute_script(conn, DbFile.ref_data)
     except:
       temp.close()
       raise
@@ -145,11 +145,11 @@ class LogFile(object):
 
 class Process(object):
 
-  def __init__(self, prog, confFile, startTime):
+  def __init__(self, prog, conf_file, start_time):
     proc = subprocess.Popen([
       prog,
-      '-f' + confFile,
-      '-s' + str(startTime)
+      '-f' + conf_file,
+      '-s' + str(start_time)
     ])
     self.proc = proc
 
@@ -166,37 +166,37 @@ class Process(object):
 
 class Server(object):
 
-  port = getPort()
-  prog = getProg()
+  port = get_port()
+  prog = get_prog()
 
-  def __init__(self, dbFile, startTime):
-    confFile = None
-    logFile = None
+  def __init__(self, db_file, start_time):
+    conf_file = None
+    log_file = None
     proc = None
     try:
-      confFile = ConfFile()
-      logFile = LogFile()
-      confFile.set('log_file', logFile.name)
-      confFile.set('log_level', 5)
-      confFile.set('http_port', Server.port)
-      confFile.set('sqlite_journ', dbFile.name)
-      confFile.set('sqlite_model', dbFile.name)
-      confFile.set('sqlite_enable_trace', 'yes')
-      confFile.set('sqlite_enable_fkey', 'yes')
-      proc = Process(Server.prog, confFile.name, startTime)
-      if not waitForService('localhost', Server.port, 5):
+      conf_file = ConfFile()
+      log_file = LogFile()
+      conf_file.set('log_file', log_file.name)
+      conf_file.set('log_level', 5)
+      conf_file.set('http_port', Server.port)
+      conf_file.set('sqlite_journ', db_file.name)
+      conf_file.set('sqlite_model', db_file.name)
+      conf_file.set('sqlite_enable_trace', 'yes')
+      conf_file.set('sqlite_enable_fkey', 'yes')
+      proc = Process(Server.prog, conf_file.name, start_time)
+      if not wait_for_service('localhost', Server.port, 5):
         raise RuntimeError, 'Failed to start service'
     except:
       if proc is not None:
         proc.close()
-      if logFile is not None:
-        logFile.close()
-      if confFile is not None:
-        confFile.close()
+      if log_file is not None:
+        log_file.close()
+      if conf_file is not None:
+        conf_file.close()
       raise
 
-    self.confFile = confFile
-    self.logFile = logFile
+    self.conf_file = conf_file
+    self.log_file = log_file
     self.proc = proc
 
   def __enter__(self):
@@ -207,8 +207,8 @@ class Server(object):
 
   def close(self):
     self.proc.close()
-    self.logFile.close()
-    self.confFile.close()
+    self.log_file.close()
+    self.conf_file.close()
 
 class Response(object):
 
@@ -238,22 +238,22 @@ class Client(object):
   def close(self):
     self.conn.close()
 
-  def setTime(self, time):
+  def set_time(self, time):
     self.time = time
 
-  def setAuth(self, accnt, perm = None):
+  def set_auth(self, accnt, perm = None):
     self.accnt = accnt
     self.perm = perm
 
-  def setAnon(self):
+  def set_anon(self):
     self.accnt = None
     self.perm = None
 
-  def setAdmin(self):
+  def set_admin(self):
     self.accnt = 'ADMIN'
     self.perm = 0x1
 
-  def setTrader(self, accnt):
+  def set_trader(self, accnt):
     self.accnt = accnt
     self.perm = 0x2
 
@@ -278,19 +278,19 @@ class Client(object):
 
 class RestTestCase(unittest.TestCase):
 
-  def createMarket(self, client, instr, settlDate):
-    client.setAdmin()
+  def create_market(self, client, instr, settl_date):
+    client.set_admin()
     resp = client.send('POST', '/markets',
                        instr = instr,
-                       settl_date = settlDate,
+                       settl_date = settl_date,
                        state = 0)
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
 
-  def createOrder(self, client, accnt, instr, settlDate, side, lots, ticks):
-    client.setTrader(accnt)
-    resp = client.send('POST', '/accnt/orders/' + instr + '/' + str(settlDate),
+  def create_order(self, client, accnt, instr, settl_date, side, lots, ticks):
+    client.set_trader(accnt)
+    resp = client.send('POST', '/accnt/orders/' + instr + '/' + str(settl_date),
                        side = side,
                        lots = lots,
                        ticks = ticks)

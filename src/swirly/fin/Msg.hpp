@@ -33,7 +33,7 @@ enum class MsgType : int { CreateMarket, UpdateMarket, CreateExec, ArchiveTrade 
 struct SWIRLY_PACKED CreateMarket {
     Id64 id;
     char instr[MaxSymbol];
-    JDay settlDay;
+    JDay settl_day;
     MarketState state;
 };
 static_assert(std::is_pod_v<CreateMarket>);
@@ -46,26 +46,26 @@ static_assert(std::is_pod_v<UpdateMarket>);
 
 struct SWIRLY_PACKED CreateExec {
     char accnt[MaxSymbol];
-    Id64 marketId;
+    Id64 market_id;
     char instr[MaxSymbol];
-    JDay settlDay;
+    JDay settl_day;
     Id64 id;
-    Id64 orderId;
+    Id64 order_id;
     char ref[MaxRef];
     State state;
     Side side;
     Lots lots;
     Ticks ticks;
-    Lots resdLots;
-    Lots execLots;
-    Cost execCost;
-    Lots lastLots;
-    Ticks lastTicks;
-    Lots minLots;
-    Id64 matchId;
-    Lots posnLots;
-    Cost posnCost;
-    LiqInd liqInd;
+    Lots resd_lots;
+    Lots exec_lots;
+    Cost exec_cost;
+    Lots last_lots;
+    Ticks last_ticks;
+    Lots min_lots;
+    Id64 match_id;
+    Lots posn_lots;
+    Cost posn_cost;
+    LiqInd liq_ind;
     char cpty[MaxSymbol];
     // std::chrono::time_point is not pod.
     int64_t created;
@@ -74,7 +74,7 @@ static_assert(std::is_pod_v<CreateExec>);
 
 constexpr std::size_t MaxIds{(sizeof(CreateExec) - sizeof(Id64) - sizeof(int64_t)) / sizeof(Id64)};
 struct SWIRLY_PACKED ArchiveTrade {
-    Id64 marketId;
+    Id64 market_id;
     Id64 ids[MaxIds];
     // std::chrono::time_point is not pod.
     int64_t modified;
@@ -84,10 +84,10 @@ static_assert(std::is_pod_v<ArchiveTrade>);
 struct SWIRLY_PACKED Msg {
     MsgType type;
     union SWIRLY_PACKED {
-        CreateMarket createMarket;
-        UpdateMarket updateMarket;
-        CreateExec createExec;
-        ArchiveTrade archiveTrade;
+        CreateMarket create_market;
+        UpdateMarket update_market;
+        CreateExec create_exec;
+        ArchiveTrade archive_trade;
     };
 };
 static_assert(std::is_pod_v<Msg>);

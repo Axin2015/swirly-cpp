@@ -32,7 +32,7 @@ TestModel& TestModel::operator=(const TestModel&) noexcept = default;
 constexpr TestModel::TestModel(TestModel&&) noexcept = default;
 TestModel& TestModel::operator=(TestModel&&) noexcept = default;
 
-void TestModel::doReadAsset(const ModelCallback<AssetPtr>& cb) const
+void TestModel::do_read_asset(const ModelCallback<AssetPtr>& cb) const
 {
     // Forex.
     cb(Asset::make(1_id32, "CHF"sv, "Switzerland, Francs"sv, AssetType::Ccy));
@@ -64,7 +64,7 @@ void TestModel::doReadAsset(const ModelCallback<AssetPtr>& cb) const
     cb(Asset::make(24_id32, "VZ"sv, "Verizon Com"sv, AssetType::Corp));
 }
 
-void TestModel::doReadInstr(const ModelCallback<InstrPtr>& cb) const
+void TestModel::do_read_instr(const ModelCallback<InstrPtr>& cb) const
 {
     // Forex.
     cb(Instr::make(1_id32, "EURUSD"sv, "EURUSD"sv, "EUR"sv, "USD"sv, 1000000, 1, 1, 10000, 4, 1_lts,
@@ -114,15 +114,15 @@ void TestModel::doReadInstr(const ModelCallback<InstrPtr>& cb) const
                    10_lts));
 }
 
-void TestModel::doReadMarket(const ModelCallback<MarketPtr>& cb) const {}
+void TestModel::do_read_market(const ModelCallback<MarketPtr>& cb) const {}
 
-void TestModel::doReadOrder(const ModelCallback<OrderPtr>& cb) const {}
+void TestModel::do_read_order(const ModelCallback<OrderPtr>& cb) const {}
 
-void TestModel::doReadExec(Time since, const ModelCallback<ExecPtr>& cb) const {}
+void TestModel::do_read_exec(Time since, const ModelCallback<ExecPtr>& cb) const {}
 
-void TestModel::doReadTrade(const ModelCallback<ExecPtr>& cb) const {}
+void TestModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const {}
 
-void TestModel::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const {}
+void TestModel::do_read_posn(JDay bus_day, const ModelCallback<PosnPtr>& cb) const {}
 
 } // namespace lob
 } // namespace swirly

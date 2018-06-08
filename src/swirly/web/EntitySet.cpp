@@ -47,7 +47,7 @@ int bit(string_view sv)
     } else if (sv == "posn") {
         i = EntitySet::Posn;
     } else {
-        throw NotFoundException{errMsg() << "unknown entity '"sv << sv << '\''};
+        throw NotFoundException{err_msg() << "unknown entity '"sv << sv << '\''};
     }
     return i;
 }

@@ -25,18 +25,18 @@ BOOST_AUTO_TEST_SUITE(UtilitySuite)
 
 BOOST_AUTO_TEST_CASE(HexDigitsCase)
 {
-    BOOST_TEST(hexDigits(0x1) == 1);
-    BOOST_TEST(hexDigits(0xf) == 1);
-    BOOST_TEST(hexDigits(0x10) == 2);
-    BOOST_TEST(hexDigits(0xff) == 2);
+    BOOST_TEST(hex_digits(0x1) == 1);
+    BOOST_TEST(hex_digits(0xf) == 1);
+    BOOST_TEST(hex_digits(0x10) == 2);
+    BOOST_TEST(hex_digits(0xff) == 2);
 
-    BOOST_TEST(hexDigits(0xcdef) == 4);
-    BOOST_TEST(hexDigits(0x10000) == 5);
-    BOOST_TEST(hexDigits(0x89abcdef) == 8);
-    BOOST_TEST(hexDigits(0x100000000) == 9);
-    BOOST_TEST(hexDigits(0x567890abcdef) == 12);
-    BOOST_TEST(hexDigits(0x1000000000000) == 13);
-    BOOST_TEST(hexDigits(0x1234567890abcdef) == 16);
+    BOOST_TEST(hex_digits(0xcdef) == 4);
+    BOOST_TEST(hex_digits(0x10000) == 5);
+    BOOST_TEST(hex_digits(0x89abcdef) == 8);
+    BOOST_TEST(hex_digits(0x100000000) == 9);
+    BOOST_TEST(hex_digits(0x567890abcdef) == 12);
+    BOOST_TEST(hex_digits(0x1000000000000) == 13);
+    BOOST_TEST(hex_digits(0x1234567890abcdef) == 16);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

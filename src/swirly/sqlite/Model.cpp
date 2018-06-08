@@ -67,7 +67,7 @@ constexpr auto SelectPosnSql = //
 } // namespace
 
 SqlModel::SqlModel(const Config& config)
-: db_{openDb(config.get("sqlite_model", "swirly.db"), SQLITE_OPEN_READONLY, config)}
+: db_{open_db(config.get("sqlite_model", "swirly.db"), SQLITE_OPEN_READONLY, config)}
 {
 }
 
@@ -77,7 +77,7 @@ SqlModel::SqlModel(SqlModel&&) = default;
 
 SqlModel& SqlModel::operator=(SqlModel&&) = default;
 
-void SqlModel::doReadAsset(const ModelCallback<AssetPtr>& cb) const
+void SqlModel::do_read_asset(const ModelCallback<AssetPtr>& cb) const
 {
     enum {
         Id,      //
@@ -95,7 +95,7 @@ void SqlModel::doReadAsset(const ModelCallback<AssetPtr>& cb) const
     }
 }
 
-void SqlModel::doReadInstr(const ModelCallback<InstrPtr>& cb) const
+void SqlModel::do_read_instr(const ModelCallback<InstrPtr>& cb) const
 {
     enum {
         Id,        //
@@ -129,7 +129,7 @@ void SqlModel::doReadInstr(const ModelCallback<InstrPtr>& cb) const
     }
 }
 
-void SqlModel::doReadMarket(const ModelCallback<MarketPtr>& cb) const
+void SqlModel::do_read_market(const ModelCallback<MarketPtr>& cb) const
 {
     enum {         //
         Id,        //
@@ -155,7 +155,7 @@ void SqlModel::doReadMarket(const ModelCallback<MarketPtr>& cb) const
     }
 }
 
-void SqlModel::doReadOrder(const ModelCallback<OrderPtr>& cb) const
+void SqlModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
 {
     enum {         //
         Accnt,     //
@@ -201,7 +201,7 @@ void SqlModel::doReadOrder(const ModelCallback<OrderPtr>& cb) const
     }
 }
 
-void SqlModel::doReadExec(Time since, const ModelCallback<ExecPtr>& cb) const
+void SqlModel::do_read_exec(Time since, const ModelCallback<ExecPtr>& cb) const
 {
     enum {         //
         Accnt,     //
@@ -259,7 +259,7 @@ void SqlModel::doReadExec(Time since, const ModelCallback<ExecPtr>& cb) const
     }
 }
 
-void SqlModel::doReadTrade(const ModelCallback<ExecPtr>& cb) const
+void SqlModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
 {
     enum {         //
         Accnt,     //
@@ -314,7 +314,7 @@ void SqlModel::doReadTrade(const ModelCallback<ExecPtr>& cb) const
     }
 }
 
-void SqlModel::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const
+void SqlModel::do_read_posn(JDay bus_day, const ModelCallback<PosnPtr>& cb) const
 {
     enum {        //
         Accnt,    //
@@ -332,29 +332,29 @@ void SqlModel::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const
     StmtPtr stmt{prepare(*db_, SelectPosnSql)};
     while (step(*stmt)) {
         const auto accnt = column<string_view>(*stmt, Accnt);
-        auto marketId = column<Id64>(*stmt, MarketId);
+        auto market_id = column<Id64>(*stmt, MarketId);
         const auto instr = column<string_view>(*stmt, Instr);
-        auto settlDay = column<JDay>(*stmt, SettlDay);
+        auto settl_day = column<JDay>(*stmt, SettlDay);
 
         // FIXME: review when end of day is implemented.
-        if (settlDay != 0_jd && settlDay <= busDay) {
-            marketId &= Id64{~0xffff};
-            settlDay = 0_jd;
+        if (settl_day != 0_jd && settl_day <= bus_day) {
+            market_id &= Id64{~0xffff};
+            settl_day = 0_jd;
         }
 
         bool found;
-        tie(it, found) = ps.findHint(accnt, marketId);
+        tie(it, found) = ps.find_hint(accnt, market_id);
         if (!found) {
-            it = ps.insertHint(it, Posn::make(accnt, marketId, instr, settlDay));
+            it = ps.insert_hint(it, Posn::make(accnt, market_id, instr, settl_day));
         }
 
         const auto side = column<swirly::Side>(*stmt, Side);
         const auto lots = column<swirly::Lots>(*stmt, Lots);
         const auto cost = column<swirly::Cost>(*stmt, Cost);
         if (side == swirly::Side::Buy) {
-            it->addBuy(lots, cost);
+            it->add_buy(lots, cost);
         } else {
-            it->addSell(lots, cost);
+            it->add_sell(lots, cost);
         }
     }
 

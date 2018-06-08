@@ -49,7 +49,7 @@ class Asset {
     Asset() = default;
     ~Asset() = default;
 
-    static Asset fromJson(const QJsonObject& obj);
+    static Asset from_json(const QJsonObject& obj);
 
     const QString& symbol() const noexcept { return symbol_; }
     const QString& display() const noexcept { return display_; }
@@ -63,7 +63,7 @@ class Asset {
 
 QDebug operator<<(QDebug debug, const Asset& asset);
 
-inline bool isModified(const Asset& prev, const Asset& next) noexcept
+inline bool is_modified(const Asset& prev, const Asset& next) noexcept
 {
     // Immutable.
     return false;

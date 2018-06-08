@@ -43,7 +43,7 @@ class ExecModel : public QAbstractTableModel {
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-    const Exec& valueAt(int n) const { return rowAt(n).value(); }
+    const Exec& value_at(int n) const { return row_at(n).value(); }
 
     void reset()
     {
@@ -51,19 +51,19 @@ class ExecModel : public QAbstractTableModel {
         rows_.clear();
         endResetModel();
     }
-    void toggleCheckState(int n)
+    void toggle_check_state(int n)
     {
-        auto& row = rowAt(n);
-        row.setChecked(!row.checked());
+        auto& row = row_at(n);
+        row.set_checked(!row.checked());
         const auto i = index(n, unbox(exec::Column::CheckState));
         emit dataChanged(i, i);
     }
 
-    void updateRow(std::uint64_t tag, const Exec& exec);
+    void update_row(std::uint64_t tag, const Exec& exec);
 
   private:
-    const Row<Exec>& rowAt(int n) const { return rows_[n]; }
-    Row<Exec>& rowAt(int n) { return rows_[n]; }
+    const Row<Exec>& row_at(int n) const { return rows_[n]; }
+    Row<Exec>& row_at(int n) { return rows_[n]; }
 
     QVariant header_[exec::ColumnCount];
     boost::circular_buffer<Row<Exec>> rows_{MaxExecs};

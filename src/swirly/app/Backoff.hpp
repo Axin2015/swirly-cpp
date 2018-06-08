@@ -41,7 +41,7 @@ struct SWIRLY_API YieldBackoff {
     void reset() noexcept {}
 };
 
-inline void cpuRelax() noexcept
+inline void cpu_relax() noexcept
 {
 #if defined(__x86_64__) || defined(__i386__)
     asm volatile("pause" ::: "memory");

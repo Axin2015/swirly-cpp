@@ -42,14 +42,14 @@ BOOST_AUTO_TEST_CASE(RefCountCase)
 {
     int alive{0};
     {
-        auto ptr1 = makeIntrusive<Foo>(alive);
+        auto ptr1 = make_intrusive<Foo>(alive);
         BOOST_TEST(alive == 1);
-        BOOST_TEST(ptr1->refCount() == 1);
+        BOOST_TEST(ptr1->ref_count() == 1);
         {
             auto ptr2 = ptr1;
-            BOOST_TEST(ptr1->refCount() == 2);
+            BOOST_TEST(ptr1->ref_count() == 2);
         }
-        BOOST_TEST(ptr1->refCount() == 1);
+        BOOST_TEST(ptr1->ref_count() == 1);
     }
     BOOST_TEST(alive == 0);
 }

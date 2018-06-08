@@ -24,67 +24,67 @@
 namespace swirly {
 inline namespace fin {
 
-constexpr int64_t roundHalfAway(double real) noexcept
+constexpr int64_t round_half_away(double real) noexcept
 {
     return static_cast<int64_t>(real < 0.0 ? real - 0.5 : real + 0.5);
 }
 
-constexpr double fractToReal(int numer, int denom) noexcept
+constexpr double fract_to_real(int numer, int denom) noexcept
 {
     return static_cast<double>(numer) / static_cast<double>(denom);
 }
 
-constexpr double fractToReal(Incs numer, Incs denom) noexcept
+constexpr double fract_to_real(Incs numer, Incs denom) noexcept
 {
     return static_cast<double>(numer) / static_cast<double>(denom);
 }
 
-constexpr Incs realToIncs(double real, double incSize) noexcept
+constexpr Incs real_to_incs(double real, double inc_size) noexcept
 {
-    return roundHalfAway(real / incSize);
+    return round_half_away(real / inc_size);
 }
 
-constexpr double incsToReal(Incs incs, double incSize) noexcept
+constexpr double incs_to_real(Incs incs, double inc_size) noexcept
 {
-    return incs * incSize;
+    return incs * inc_size;
 }
 
 /**
  * Convert quantity to lots.
  */
-constexpr Lots qtyToLots(double qty, double qtyInc) noexcept
+constexpr Lots qty_to_lots(double qty, double qty_inc) noexcept
 {
-    return Lots{realToIncs(qty, qtyInc)};
+    return Lots{real_to_incs(qty, qty_inc)};
 }
 
 /**
  * Convert lots to quantity.
  */
-constexpr double lotsToQty(Lots lots, double qtyInc) noexcept
+constexpr double lots_to_qty(Lots lots, double qty_inc) noexcept
 {
-    return incsToReal(lots.count(), qtyInc);
+    return incs_to_real(lots.count(), qty_inc);
 }
 
 /**
  * Convert price to ticks.
  */
-constexpr Ticks priceToTicks(double price, double priceInc) noexcept
+constexpr Ticks price_to_ticks(double price, double price_inc) noexcept
 {
-    return Ticks{realToIncs(price, priceInc)};
+    return Ticks{real_to_incs(price, price_inc)};
 }
 
 /**
  * Convert ticks to price.
  */
-constexpr double ticksToPrice(Ticks ticks, double priceInc) noexcept
+constexpr double ticks_to_price(Ticks ticks, double price_inc) noexcept
 {
-    return incsToReal(ticks.count(), priceInc);
+    return incs_to_real(ticks.count(), price_inc);
 }
 
 /**
  * Number of decimal places in real.
  */
-inline int realToDp(double d) noexcept
+inline int real_to_dp(double d) noexcept
 {
     int dp{0};
     for (; dp < 9; ++dp) {
@@ -101,7 +101,7 @@ inline int realToDp(double d) noexcept
 /**
  * Decimal places as real.
  */
-inline double dpToReal(int dp) noexcept
+inline double dp_to_real(int dp) noexcept
 {
     return std::pow(10, -dp);
 }

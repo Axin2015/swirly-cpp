@@ -40,9 +40,9 @@ using ConstAccntPtr = std::unique_ptr<const Accnt>;
 
 class SWIRLY_API Accnt : public Comparable<Accnt> {
   public:
-    Accnt(Symbol symbol, std::size_t maxExecs) noexcept
+    Accnt(Symbol symbol, std::size_t max_execs) noexcept
     : symbol_{symbol}
-    , execs_{maxExecs}
+    , execs_{max_execs}
     {
     }
     ~Accnt();
@@ -62,71 +62,74 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
     }
 
     int compare(const Accnt& rhs) const noexcept { return symbol_.compare(rhs.symbol_); }
-    bool exists(std::string_view ref) const noexcept { return refIdx_.find(ref) != refIdx_.end(); }
+    bool exists(std::string_view ref) const noexcept
+    {
+        return ref_idx_.find(ref) != ref_idx_.end();
+    }
     auto symbol() const noexcept { return symbol_; }
     const auto& orders() const noexcept { return orders_; }
     const auto& execs() const noexcept { return execs_; }
     const auto& trades() const noexcept { return trades_; }
-    const Exec& trade(Id64 marketId, Id64 id) const
+    const Exec& trade(Id64 market_id, Id64 id) const
     {
-        auto it = trades_.find(marketId, id);
+        auto it = trades_.find(market_id, id);
         if (it == trades_.end()) {
-            throw NotFoundException{errMsg() << "trade '"sv << id << "' does not exist"sv};
+            throw NotFoundException{err_msg() << "trade '"sv << id << "' does not exist"sv};
         }
         return *it;
     }
     const auto& posns() const noexcept { return posns_; }
 
     auto& orders() noexcept { return orders_; }
-    Order& order(Id64 marketId, Id64 id)
+    Order& order(Id64 market_id, Id64 id)
     {
-        auto it = orders_.find(marketId, id);
+        auto it = orders_.find(market_id, id);
         if (it == orders_.end()) {
-            throw OrderNotFoundException{errMsg() << "order '"sv << id << "' does not exist"sv};
+            throw OrderNotFoundException{err_msg() << "order '"sv << id << "' does not exist"sv};
         }
         return *it;
     }
     Order& order(std::string_view ref)
     {
-        auto it = refIdx_.find(ref);
-        if (it == refIdx_.end()) {
-            throw OrderNotFoundException{errMsg() << "order '"sv << ref << "' does not exist"sv};
+        auto it = ref_idx_.find(ref);
+        if (it == ref_idx_.end()) {
+            throw OrderNotFoundException{err_msg() << "order '"sv << ref << "' does not exist"sv};
         }
         return *it;
     }
-    void insertOrder(const OrderPtr& order) noexcept
+    void insert_order(const OrderPtr& order) noexcept
     {
         assert(order->accnt() == symbol_);
         orders_.insert(order);
         if (!order->ref().empty()) {
-            refIdx_.insert(order);
+            ref_idx_.insert(order);
         }
     }
-    OrderPtr removeOrder(const Order& order) noexcept
+    OrderPtr remove_order(const Order& order) noexcept
     {
         assert(order.accnt() == symbol_);
         if (!order.ref().empty()) {
-            refIdx_.remove(order);
+            ref_idx_.remove(order);
         }
         return orders_.remove(order);
     }
-    void pushExecBack(const ConstExecPtr& exec) noexcept
+    void push_exec_back(const ConstExecPtr& exec) noexcept
     {
         assert(exec->accnt() == symbol_);
         execs_.push_back(exec);
     }
-    void pushExecFront(const ConstExecPtr& exec) noexcept
+    void push_exec_front(const ConstExecPtr& exec) noexcept
     {
         assert(exec->accnt() == symbol_);
         execs_.push_front(exec);
     }
-    void insertTrade(const ExecPtr& trade) noexcept
+    void insert_trade(const ExecPtr& trade) noexcept
     {
         assert(trade->accnt() == symbol_);
         assert(trade->state() == State::Trade);
         trades_.insert(trade);
     }
-    ConstExecPtr removeTrade(const Exec& trade) noexcept
+    ConstExecPtr remove_trade(const Exec& trade) noexcept
     {
         assert(trade.accnt() == symbol_);
         return trades_.remove(trade);
@@ -134,14 +137,14 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
     /**
      * Throws std::bad_alloc.
      */
-    PosnPtr posn(Id64 marketId, Symbol instr, JDay settlDay);
+    PosnPtr posn(Id64 market_id, Symbol instr, JDay settl_day);
 
-    void insertPosn(const PosnPtr& posn) noexcept
+    void insert_posn(const PosnPtr& posn) noexcept
     {
         assert(posn->accnt() == symbol_);
         posns_.insert(posn);
     }
-    boost::intrusive::set_member_hook<> symbolHook;
+    boost::intrusive::set_member_hook<> symbol_hook;
     using PosnSet = IdSet<Posn, MarketIdTraits<Posn>>;
 
   private:
@@ -150,7 +153,7 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
     boost::circular_buffer<ConstExecPtr> execs_;
     ExecIdSet trades_;
     PosnSet posns_;
-    OrderRefSet refIdx_;
+    OrderRefSet ref_idx_;
 };
 
 using AccntSet = SymbolSet<Accnt>;

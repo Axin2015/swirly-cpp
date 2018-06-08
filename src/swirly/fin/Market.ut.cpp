@@ -26,9 +26,9 @@ BOOST_AUTO_TEST_SUITE(MarketSuite)
 
 BOOST_AUTO_TEST_CASE(MarketToStringCase)
 {
-    Market market{1_id64, "EURUSD"sv, ymdToJd(2014, 3, 14), 0x01};
+    Market market{1_id64, "EURUSD"sv, ymd_to_jd(2014, 3, 14), 0x01};
 
-    BOOST_TEST(toString(market) == //
+    BOOST_TEST(to_string(market) == //
                "{\"id\":1"
                ",\"instr\":\"EURUSD\""
                ",\"settl_date\":20140314"
@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(MarketToStringNullCase)
 {
     Market market{1_id64, "EURUSD"sv, 0_jd, 0x01};
 
-    BOOST_TEST(toString(market) == //
+    BOOST_TEST(to_string(market) == //
                "{\"id\":1"
                ",\"instr\":\"EURUSD\""
                ",\"settl_date\":null"

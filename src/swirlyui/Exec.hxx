@@ -53,65 +53,66 @@ constexpr int ColumnCount{unbox(Column::Created) + 1};
 
 class Exec {
   public:
-    Exec(const QString& accnt, Id64 marketId, const Instr& instr, QDate settlDate, Id64 id,
-         Id64 orderId, const QString& ref, State state, Side side, Lots lots, Ticks ticks,
-         Lots resdLots, Lots execLots, Cost execCost, Lots lastLots, Ticks lastTicks, Lots minLots,
-         Id64 matchId, LiqInd liqInd, const QString& cpty, const QDateTime& created);
+    Exec(const QString& accnt, Id64 market_id, const Instr& instr, QDate settl_date, Id64 id,
+         Id64 order_id, const QString& ref, State state, Side side, Lots lots, Ticks ticks,
+         Lots resd_lots, Lots exec_lots, Cost exec_cost, Lots last_lots, Ticks last_ticks,
+         Lots min_lots, Id64 match_id, LiqInd liq_ind, const QString& cpty,
+         const QDateTime& created);
     Exec() = default;
     ~Exec() = default;
 
-    static Exec fromJson(const Instr& instr, const QJsonObject& obj);
+    static Exec from_json(const Instr& instr, const QJsonObject& obj);
 
-    ExecKey key() const noexcept { return {marketId_, id_}; }
+    ExecKey key() const noexcept { return {market_id_, id_}; }
     const QString& accnt() const noexcept { return accnt_; }
-    Id64 marketId() const noexcept { return marketId_; }
+    Id64 market_id() const noexcept { return market_id_; }
     const Instr& instr() const noexcept { return instr_; }
-    QDate settlDate() const noexcept { return settlDate_; }
+    QDate settl_date() const noexcept { return settl_date_; }
     Id64 id() const noexcept { return id_; }
-    Id64 orderId() const noexcept { return orderId_; }
+    Id64 order_id() const noexcept { return order_id_; }
     const QString& ref() const noexcept { return ref_; }
     State state() const noexcept { return state_; }
     Side side() const noexcept { return side_; }
     Lots lots() const noexcept { return lots_; }
     Ticks ticks() const noexcept { return ticks_; }
-    Lots resdLots() const noexcept { return resdLots_; }
-    Lots execLots() const noexcept { return execLots_; }
-    Cost execCost() const noexcept { return execCost_; }
-    Lots lastLots() const noexcept { return lastLots_; }
-    Ticks lastTicks() const noexcept { return lastTicks_; }
-    Lots minLots() const noexcept { return minLots_; }
-    Id64 matchId() const noexcept { return matchId_; }
-    LiqInd liqInd() const noexcept { return liqInd_; }
+    Lots resd_lots() const noexcept { return resd_lots_; }
+    Lots exec_lots() const noexcept { return exec_lots_; }
+    Cost exec_cost() const noexcept { return exec_cost_; }
+    Lots last_lots() const noexcept { return last_lots_; }
+    Ticks last_ticks() const noexcept { return last_ticks_; }
+    Lots min_lots() const noexcept { return min_lots_; }
+    Id64 match_id() const noexcept { return match_id_; }
+    LiqInd liq_ind() const noexcept { return liq_ind_; }
     const QString& cpty() const noexcept { return cpty_; }
     const QDateTime& created() const noexcept { return created_; }
 
   private:
     QString accnt_{};
-    Id64 marketId_{};
+    Id64 market_id_{};
     Instr instr_{};
-    QDate settlDate_{};
+    QDate settl_date_{};
     Id64 id_{};
-    Id64 orderId_{};
+    Id64 order_id_{};
     QString ref_{};
     State state_{};
     Side side_{};
     Lots lots_{};
     Ticks ticks_{};
-    Lots resdLots_{};
-    Lots execLots_{};
-    Cost execCost_{};
-    Lots lastLots_{};
-    Ticks lastTicks_{};
-    Lots minLots_{};
-    Id64 matchId_{};
-    LiqInd liqInd_{};
+    Lots resd_lots_{};
+    Lots exec_lots_{};
+    Cost exec_cost_{};
+    Lots last_lots_{};
+    Ticks last_ticks_{};
+    Lots min_lots_{};
+    Id64 match_id_{};
+    LiqInd liq_ind_{};
     QString cpty_{};
     QDateTime created_{};
 };
 
 QDebug operator<<(QDebug debug, const Exec& exec);
 
-inline bool isModified(const Exec& prev, const Exec& next) noexcept
+inline bool is_modified(const Exec& prev, const Exec& next) noexcept
 {
     // Immutable.
     return false;

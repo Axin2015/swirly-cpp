@@ -32,15 +32,15 @@ using namespace std;
 using namespace swirly;
 namespace {
 
-constexpr auto Today = ymdToJd(2014, 3, 11);
+constexpr auto Today = ymd_to_jd(2014, 3, 11);
 constexpr auto SettlDay = Today + 2_jd;
-constexpr auto MarketId = toMarketId(1_id32, SettlDay);
+constexpr auto MarketId = to_market_id(1_id32, SettlDay);
 
-constexpr auto Now = jdToTime(Today);
+constexpr auto Now = jd_to_time(Today);
 
 class SWIRLY_API TestModel : public swirly::TestModel {
   protected:
-    void doReadMarket(const ModelCallback<MarketPtr>& cb) const override
+    void do_read_market(const ModelCallback<MarketPtr>& cb) const override
     {
         cb(Market::make(MarketId, "EURUSD"sv, SettlDay, 0x1U));
     }
@@ -81,18 +81,18 @@ BOOST_FIXTURE_TEST_CASE(ServInstrs, ServFixture, *utf::tolerance(0.0000001))
     BOOST_TEST(it->symbol() == "EURUSD"sv);
     BOOST_TEST(it->display() == "EURUSD"sv);
 
-    BOOST_TEST(it->baseAsset() == "EUR"sv);
-    BOOST_TEST(it->termCcy() == "USD"sv);
-    BOOST_TEST(it->lotNumer() == 1000000);
-    BOOST_TEST(it->lotDenom() == 1);
-    BOOST_TEST(it->qtyInc() == 1e6);
-    BOOST_TEST(it->tickNumer() == 1);
-    BOOST_TEST(it->tickDenom() == 10000);
-    BOOST_TEST(it->priceInc() == 1e-4);
-    BOOST_TEST(it->pipDp() == 4);
-    BOOST_TEST(it->qtyDp() == 0);
-    BOOST_TEST(it->minLots() == 1_lts);
-    BOOST_TEST(it->maxLots() == 10_lts);
+    BOOST_TEST(it->base_asset() == "EUR"sv);
+    BOOST_TEST(it->term_ccy() == "USD"sv);
+    BOOST_TEST(it->lot_numer() == 1000000);
+    BOOST_TEST(it->lot_denom() == 1);
+    BOOST_TEST(it->qty_inc() == 1e6);
+    BOOST_TEST(it->tick_numer() == 1);
+    BOOST_TEST(it->tick_denom() == 10000);
+    BOOST_TEST(it->price_inc() == 1e-4);
+    BOOST_TEST(it->pip_dp() == 4);
+    BOOST_TEST(it->qty_dp() == 0);
+    BOOST_TEST(it->min_lots() == 1_lts);
+    BOOST_TEST(it->max_lots() == 10_lts);
 }
 
 BOOST_FIXTURE_TEST_CASE(ServMarkets, ServFixture)
@@ -104,7 +104,7 @@ BOOST_FIXTURE_TEST_CASE(ServMarkets, ServFixture)
     BOOST_TEST(it->id() == MarketId);
 
     BOOST_TEST(it->instr() == "EURUSD"sv);
-    BOOST_TEST(it->settlDay() == SettlDay);
+    BOOST_TEST(it->settl_day() == SettlDay);
     BOOST_TEST(it->state() == 0x1U);
 }
 
@@ -117,47 +117,47 @@ BOOST_FIXTURE_TEST_CASE(ServMarket, ServFixture)
     BOOST_TEST(market.id() == MarketId);
 
     BOOST_TEST(market.instr() == "EURUSD"sv);
-    BOOST_TEST(market.settlDay() == SettlDay);
+    BOOST_TEST(market.settl_day() == SettlDay);
     BOOST_TEST(market.state() == 0x1U);
 }
 
 BOOST_FIXTURE_TEST_CASE(ServCreateMarket, ServFixture)
 {
     const Instr& instr = serv.instr("USDJPY"sv);
-    const auto marketId = toMarketId(instr.id(), SettlDay);
+    const auto market_id = to_market_id(instr.id(), SettlDay);
 
     // Settl-day before bus-day.
-    BOOST_CHECK_THROW(serv.createMarket(instr, Today - 1_jd, 0x1, Now), InvalidException);
+    BOOST_CHECK_THROW(serv.create_market(instr, Today - 1_jd, 0x1, Now), InvalidException);
 
-    auto& market = serv.createMarket(instr, SettlDay, 0x1, Now);
+    auto& market = serv.create_market(instr, SettlDay, 0x1, Now);
 
-    BOOST_TEST(market.id() == marketId);
+    BOOST_TEST(market.id() == market_id);
 
     BOOST_TEST(market.instr() == "USDJPY"sv);
-    BOOST_TEST(market.settlDay() == SettlDay);
+    BOOST_TEST(market.settl_day() == SettlDay);
     BOOST_TEST(market.state() == 0x1U);
 
     BOOST_TEST(distance(serv.markets().begin(), serv.markets().end()) == 2);
-    auto it = serv.markets().find(marketId);
+    auto it = serv.markets().find(market_id);
     BOOST_TEST(it != serv.markets().end());
     BOOST_TEST(&*it == &market);
 
     // Already exists.
-    BOOST_CHECK_THROW(serv.createMarket(instr, SettlDay, 0x1, Now), AlreadyExistsException);
+    BOOST_CHECK_THROW(serv.create_market(instr, SettlDay, 0x1, Now), AlreadyExistsException);
 }
 
 BOOST_FIXTURE_TEST_CASE(ServUpdateMarket, ServFixture)
 {
     const Instr& instr = serv.instr("USDJPY"sv);
-    const auto marketId = toMarketId(instr.id(), SettlDay);
-    auto& market = serv.createMarket(instr, SettlDay, 0x1, Now);
+    const auto market_id = to_market_id(instr.id(), SettlDay);
+    auto& market = serv.create_market(instr, SettlDay, 0x1, Now);
 
-    serv.updateMarket(market, 0x2, Now);
+    serv.update_market(market, 0x2, Now);
 
-    BOOST_TEST(market.id() == marketId);
+    BOOST_TEST(market.id() == market_id);
 
     BOOST_TEST(market.instr() == "USDJPY"sv);
-    BOOST_TEST(market.settlDay() == SettlDay);
+    BOOST_TEST(market.settl_day() == SettlDay);
     BOOST_TEST(market.state() == 0x2U);
 }
 
@@ -165,19 +165,19 @@ BOOST_FIXTURE_TEST_CASE(ServCreateOrder, ServFixture)
 {
     auto& accnt = serv.accnt("MARAYL"sv);
     const Instr& instr = serv.instr("EURUSD"sv);
-    const auto marketId = toMarketId(instr.id(), SettlDay);
-    auto& market = serv.market(marketId);
+    const auto market_id = to_market_id(instr.id(), SettlDay);
+    auto& market = serv.market(market_id);
 
     Response resp;
-    serv.createOrder(accnt, market, ""sv, Side::Buy, 5_lts, 12345_tks, 1_lts, Now, resp);
+    serv.create_order(accnt, market, ""sv, Side::Buy, 5_lts, 12345_tks, 1_lts, Now, resp);
 
     BOOST_TEST(resp.orders().size() == 1U);
     BOOST_TEST(resp.execs().size() == 1U);
 
     ConstOrderPtr order{resp.orders().front()};
-    BOOST_TEST(order->marketId() == market.id());
+    BOOST_TEST(order->market_id() == market.id());
     BOOST_TEST(order->instr() == instr.symbol());
-    BOOST_TEST(order->settlDay() == SettlDay);
+    BOOST_TEST(order->settl_day() == SettlDay);
     BOOST_TEST(order->id() == 1_id64);
     BOOST_TEST(order->accnt() == accnt.symbol());
     BOOST_TEST(order->ref().empty());
@@ -185,12 +185,12 @@ BOOST_FIXTURE_TEST_CASE(ServCreateOrder, ServFixture)
     BOOST_TEST(order->side() == Side::Buy);
     BOOST_TEST(order->lots() == 5_lts);
     BOOST_TEST(order->ticks() == 12345_tks);
-    BOOST_TEST(order->resdLots() == 5_lts);
-    BOOST_TEST(order->execLots() == 0_lts);
-    BOOST_TEST(order->execCost() == 0_cst);
-    BOOST_TEST(order->lastLots() == 0_lts);
-    BOOST_TEST(order->lastTicks() == 0_tks);
-    BOOST_TEST(order->minLots() == 1_lts);
+    BOOST_TEST(order->resd_lots() == 5_lts);
+    BOOST_TEST(order->exec_lots() == 0_lts);
+    BOOST_TEST(order->exec_cost() == 0_cst);
+    BOOST_TEST(order->last_lots() == 0_lts);
+    BOOST_TEST(order->last_ticks() == 0_tks);
+    BOOST_TEST(order->min_lots() == 1_lts);
     BOOST_TEST(order->created() == Now);
     BOOST_TEST(order->modified() == Now);
 }

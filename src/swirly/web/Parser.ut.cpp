@@ -63,23 +63,23 @@ class HttpParser
     using BasicHttpParser<HttpParser>::parse;
 
   private:
-    bool onMessageBegin() noexcept
+    bool on_message_begin() noexcept
     {
         BasicUrl<HttpParser>::reset();
         clear();
         return true;
     }
-    bool onUrl(string_view sv) noexcept
+    bool on_url(string_view sv) noexcept
     {
         url_.append(sv.data(), sv.size());
         return true;
     }
-    bool onStatus(string_view sv) noexcept
+    bool on_status(string_view sv) noexcept
     {
         status_.append(sv.data(), sv.size());
         return true;
     }
-    bool onHeaderField(string_view sv, bool first) noexcept
+    bool on_header_field(string_view sv, bool first) noexcept
     {
         if (first) {
             headers_.emplace_back(string{sv.data(), sv.size()}, "");
@@ -88,24 +88,24 @@ class HttpParser
         }
         return true;
     }
-    bool onHeaderValue(string_view sv, bool first) noexcept
+    bool on_header_value(string_view sv, bool first) noexcept
     {
         headers_.back().second.append(sv.data(), sv.size());
         return true;
     }
-    bool onHeadersEnd() noexcept { return true; }
-    bool onBody(string_view sv) noexcept
+    bool on_headers_end() noexcept { return true; }
+    bool on_body(string_view sv) noexcept
     {
         body_.append(sv.data(), sv.size());
         return true;
     }
-    bool onMessageEnd() noexcept
+    bool on_message_end() noexcept
     {
         BasicUrl<HttpParser>::parse();
         return true;
     }
-    bool onChunkHeader(size_t len) noexcept { return true; }
-    bool onChunkEnd() noexcept { return true; }
+    bool on_chunk_header(size_t len) noexcept { return true; }
+    bool on_chunk_end() noexcept { return true; }
 
     string url_;
     string status_;
@@ -125,9 +125,9 @@ BOOST_AUTO_TEST_CASE(HttpInitialRequestLineCase)
 
     HttpParser h{HttpType::Request};
     BOOST_TEST(h.parse({Message.data(), Message.size()}) == Message.size());
-    BOOST_TEST(!h.shouldKeepAlive());
-    BOOST_TEST(h.httpMajor() == 1);
-    BOOST_TEST(h.httpMinor() == 0);
+    BOOST_TEST(!h.should_keep_alive());
+    BOOST_TEST(h.http_major() == 1);
+    BOOST_TEST(h.http_minor() == 0);
 
     BOOST_TEST(h.method() == HttpMethod::Get);
     BOOST_TEST(h.url() == "/path/to/file/index.html"s);
@@ -144,11 +144,11 @@ BOOST_AUTO_TEST_CASE(HttpInitialResponseLineCase)
 
     HttpParser h{HttpType::Response};
     BOOST_TEST(h.parse({Message.data(), Message.size()}) == Message.size());
-    BOOST_TEST(!h.shouldKeepAlive());
-    BOOST_TEST(h.httpMajor() == 1);
-    BOOST_TEST(h.httpMinor() == 0);
+    BOOST_TEST(!h.should_keep_alive());
+    BOOST_TEST(h.http_major() == 1);
+    BOOST_TEST(h.http_minor() == 0);
 
-    BOOST_TEST(h.statusCode() == 404);
+    BOOST_TEST(h.status_code() == 404);
     BOOST_TEST(h.status() == "Not Found"s);
 
     BOOST_TEST(h.headers().empty());
@@ -165,9 +165,9 @@ BOOST_AUTO_TEST_CASE(HttpBasicRequestCase)
 
     HttpParser h{HttpType::Request};
     BOOST_TEST(h.parse({Message.data(), Message.size()}) == Message.size());
-    BOOST_TEST(!h.shouldKeepAlive());
-    BOOST_TEST(h.httpMajor() == 1);
-    BOOST_TEST(h.httpMinor() == 0);
+    BOOST_TEST(!h.should_keep_alive());
+    BOOST_TEST(h.http_major() == 1);
+    BOOST_TEST(h.http_minor() == 0);
 
     BOOST_TEST(h.method() == HttpMethod::Get);
     BOOST_TEST(h.url() == "/path/file.html"s);
@@ -191,11 +191,11 @@ BOOST_AUTO_TEST_CASE(HttpBasicResponseCase)
 
     HttpParser h{HttpType::Response};
     BOOST_TEST(h.parse({Message.data(), Message.size()}) == Message.size());
-    BOOST_TEST(!h.shouldKeepAlive());
-    BOOST_TEST(h.httpMajor() == 1);
-    BOOST_TEST(h.httpMinor() == 0);
+    BOOST_TEST(!h.should_keep_alive());
+    BOOST_TEST(h.http_major() == 1);
+    BOOST_TEST(h.http_minor() == 0);
 
-    BOOST_TEST(h.statusCode() == 200);
+    BOOST_TEST(h.status_code() == 200);
     BOOST_TEST(h.status() == "OK"s);
 
     BOOST_TEST(h.headers().size() == 3U);
@@ -219,9 +219,9 @@ BOOST_AUTO_TEST_CASE(HttpPostRequestCase)
 
     HttpParser h{HttpType::Request};
     BOOST_TEST(h.parse({Message.data(), Message.size()}) == Message.size());
-    BOOST_TEST(!h.shouldKeepAlive());
-    BOOST_TEST(h.httpMajor() == 1);
-    BOOST_TEST(h.httpMinor() == 0);
+    BOOST_TEST(!h.should_keep_alive());
+    BOOST_TEST(h.http_major() == 1);
+    BOOST_TEST(h.http_minor() == 0);
 
     BOOST_TEST(h.method() == HttpMethod::Post);
     BOOST_TEST(h.url() == "/path/script.cgi"s);
@@ -244,9 +244,9 @@ BOOST_AUTO_TEST_CASE(HttpKeepAliveRequestCase)
 
     HttpParser h{HttpType::Request};
     BOOST_TEST(h.parse({Message.data(), Message.size()}) == Message.size());
-    BOOST_TEST(h.shouldKeepAlive());
-    BOOST_TEST(h.httpMajor() == 1);
-    BOOST_TEST(h.httpMinor() == 1);
+    BOOST_TEST(h.should_keep_alive());
+    BOOST_TEST(h.http_major() == 1);
+    BOOST_TEST(h.http_minor() == 1);
 
     BOOST_TEST(h.method() == HttpMethod::Get);
     BOOST_TEST(h.url() == "/path/file.html"s);
@@ -276,11 +276,11 @@ BOOST_AUTO_TEST_CASE(HttpChunkedResponseCase)
 
     HttpParser h{HttpType::Response};
     BOOST_TEST(h.parse({Message.data(), Message.size()}) == Message.size());
-    BOOST_TEST(h.shouldKeepAlive());
-    BOOST_TEST(h.httpMajor() == 1);
-    BOOST_TEST(h.httpMinor() == 1);
+    BOOST_TEST(h.should_keep_alive());
+    BOOST_TEST(h.http_major() == 1);
+    BOOST_TEST(h.http_minor() == 1);
 
-    BOOST_TEST(h.statusCode() == 200);
+    BOOST_TEST(h.status_code() == 200);
     BOOST_TEST(h.status() == "OK"s);
 
     BOOST_TEST(h.headers().size() == 5U);
@@ -309,9 +309,9 @@ BOOST_AUTO_TEST_CASE(HttpMultiResponseCase)
 
     HttpParser h{HttpType::Request};
     BOOST_TEST(h.parse({Message.data(), Message.size()}) == Message.size());
-    BOOST_TEST(h.shouldKeepAlive());
-    BOOST_TEST(h.httpMajor() == 1);
-    BOOST_TEST(h.httpMinor() == 1);
+    BOOST_TEST(h.should_keep_alive());
+    BOOST_TEST(h.http_major() == 1);
+    BOOST_TEST(h.http_minor() == 1);
 
     BOOST_TEST(h.method() == HttpMethod::Post);
     BOOST_TEST(h.url() == "/path/script.cgi"s);

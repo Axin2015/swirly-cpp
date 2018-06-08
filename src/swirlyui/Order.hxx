@@ -50,68 +50,68 @@ constexpr int ColumnCount{unbox(Column::Modified) + 1};
 
 class Order {
   public:
-    Order(const QString& accnt, Id64 marketId, const Instr& instr, QDate settlDate, Id64 id,
-          const QString& ref, State state, Side side, Lots lots, Ticks ticks, Lots resdLots,
-          Lots execLots, Cost execCost, Lots lastLots, Ticks lastTicks, Lots minLots,
+    Order(const QString& accnt, Id64 market_id, const Instr& instr, QDate settl_date, Id64 id,
+          const QString& ref, State state, Side side, Lots lots, Ticks ticks, Lots resd_lots,
+          Lots exec_lots, Cost exec_cost, Lots last_lots, Ticks last_ticks, Lots min_lots,
           const QDateTime& created, const QDateTime& modified);
     Order() = default;
     ~Order() = default;
 
-    static Order fromJson(const Instr& instr, const QJsonObject& obj);
+    static Order from_json(const Instr& instr, const QJsonObject& obj);
 
-    OrderKey key() const noexcept { return {marketId_, id_}; }
+    OrderKey key() const noexcept { return {market_id_, id_}; }
     const QString& accnt() const noexcept { return accnt_; }
-    Id64 marketId() const noexcept { return marketId_; }
+    Id64 market_id() const noexcept { return market_id_; }
     const Instr& instr() const noexcept { return instr_; }
-    QDate settlDate() const noexcept { return settlDate_; }
+    QDate settl_date() const noexcept { return settl_date_; }
     Id64 id() const noexcept { return id_; }
     const QString& ref() const noexcept { return ref_; }
     State state() const noexcept { return state_; }
     Side side() const noexcept { return side_; }
     Lots lots() const noexcept { return lots_; }
     Ticks ticks() const noexcept { return ticks_; }
-    Lots resdLots() const noexcept { return resdLots_; }
-    Lots execLots() const noexcept { return execLots_; }
-    Cost execCost() const noexcept { return execCost_; }
-    Lots lastLots() const noexcept { return lastLots_; }
-    Ticks lastTicks() const noexcept { return lastTicks_; }
-    Lots minLots() const noexcept { return minLots_; }
-    bool done() const noexcept { return resdLots_ == 0_lts; }
+    Lots resd_lots() const noexcept { return resd_lots_; }
+    Lots exec_lots() const noexcept { return exec_lots_; }
+    Cost exec_cost() const noexcept { return exec_cost_; }
+    Lots last_lots() const noexcept { return last_lots_; }
+    Ticks last_ticks() const noexcept { return last_ticks_; }
+    Lots min_lots() const noexcept { return min_lots_; }
+    bool done() const noexcept { return resd_lots_ == 0_lts; }
     const QDateTime& created() const noexcept { return created_; }
     const QDateTime& modified() const noexcept { return modified_; }
 
   private:
     QString accnt_{};
-    Id64 marketId_{};
+    Id64 market_id_{};
     Instr instr_{};
-    QDate settlDate_{};
+    QDate settl_date_{};
     Id64 id_{};
     QString ref_{};
     State state_{};
     Side side_{};
     Lots lots_{};
     Ticks ticks_{};
-    Lots resdLots_{};
-    Lots execLots_{};
-    Cost execCost_{};
-    Lots lastLots_{};
-    Ticks lastTicks_{};
-    Lots minLots_{};
+    Lots resd_lots_{};
+    Lots exec_lots_{};
+    Cost exec_cost_{};
+    Lots last_lots_{};
+    Ticks last_ticks_{};
+    Lots min_lots_{};
     QDateTime created_{};
     QDateTime modified_{};
 };
 
 QDebug operator<<(QDebug debug, const Order& order);
 
-inline bool isModified(const Order& prev, const Order& next) noexcept
+inline bool is_modified(const Order& prev, const Order& next) noexcept
 {
-    return prev.state() != next.state()         //
-        || prev.lots() != next.lots()           //
-        || prev.resdLots() != next.resdLots()   //
-        || prev.execLots() != next.execLots()   //
-        || prev.execCost() != next.execCost()   //
-        || prev.lastLots() != next.lastLots()   //
-        || prev.lastTicks() != next.lastTicks() //
+    return prev.state() != next.state()           //
+        || prev.lots() != next.lots()             //
+        || prev.resd_lots() != next.resd_lots()   //
+        || prev.exec_lots() != next.exec_lots()   //
+        || prev.exec_cost() != next.exec_cost()   //
+        || prev.last_lots() != next.last_lots()   //
+        || prev.last_ticks() != next.last_ticks() //
         || prev.modified() != next.modified();
 }
 

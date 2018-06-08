@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE(FinallyCase)
 {
     bool success{false};
     {
-        const auto finally = makeFinally([&success]() noexcept { success = true; });
+        const auto finally = make_finally([&success]() noexcept { success = true; });
         BOOST_TEST(!success);
     }
     BOOST_TEST(success);

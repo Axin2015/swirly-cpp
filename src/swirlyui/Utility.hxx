@@ -24,7 +24,7 @@
 namespace swirly {
 namespace ui {
 
-inline auto makeDeleter(QObject* obj) noexcept
+inline auto make_deleter(QObject* obj) noexcept
 {
     if (obj) {
         obj->setParent(nullptr);

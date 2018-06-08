@@ -36,7 +36,7 @@ InstrView::InstrView(InstrModel& model, QWidget* parent, Qt::WindowFlags f)
 {
     auto table = make_unique<QTableView>();
     {
-        auto del = makeDeleter(table->model());
+        auto del = make_deleter(table->model());
         table->setModel(&model);
     }
     table->resizeColumnToContents(unbox(Column::CheckState));
@@ -47,7 +47,7 @@ InstrView::InstrView(InstrModel& model, QWidget* parent, Qt::WindowFlags f)
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::NoSelection);
 
-    connect(table.get(), &QTableView::clicked, this, &InstrView::slotClicked);
+    connect(table.get(), &QTableView::clicked, this, &InstrView::slot_clicked);
 
     auto layout = make_unique<QGridLayout>();
     layout->addWidget(table_ = table.release(), 0, 0);
@@ -56,15 +56,15 @@ InstrView::InstrView(InstrModel& model, QWidget* parent, Qt::WindowFlags f)
 
 InstrView::~InstrView() = default;
 
-void InstrView::resizeColumnsToContents()
+void InstrView::resize_columns_to_contents()
 {
     table_->resizeColumnsToContents();
 }
 
-void InstrView::slotClicked(const QModelIndex& index)
+void InstrView::slot_clicked(const QModelIndex& index)
 {
     if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
-        model_.toggleCheckState(index.row());
+        model_.toggle_check_state(index.row());
     }
 }
 

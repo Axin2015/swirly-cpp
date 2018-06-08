@@ -414,14 +414,14 @@ void RestBody::reset(bool clear) noexcept
   symbol_.len = 0;
   accnt_.len = 0;
   instr_.len = 0;
-  settlDate_ = 0_ymd;
+  settl_date_ = 0_ymd;
   ref_.len = 0;
   state_ = 0;
   side_ = static_cast<swirly::Side>(0);
   lots_ = 0_lts;
   ticks_ = 0_tks;
-  minLots_ = 0_lts;
-  liqInd_ = swirly::LiqInd::None;
+  min_lots_ = 0_lts;
+  liq_ind_ = swirly::LiqInd::None;
   cpty_.len = 0;
 }
 
@@ -610,14 +610,14 @@ _match:
 #line 124 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
 	{
     fields_ &= ~SettlDate;
-    settlDate_ = 0_ymd;
+    settl_date_ = 0_ymd;
   }
 	break;
 	case 15:
 #line 128 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
 	{
     fields_ |= SettlDate;
-    settlDate_ = IsoDate{num()};
+    settl_date_ = IsoDate{num()};
   }
 	break;
 	case 16:
@@ -705,35 +705,35 @@ _match:
 #line 198 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
 	{
     fields_ &= ~MinLots;
-    minLots_ = 0_lts;
+    min_lots_ = 0_lts;
   }
 	break;
 	case 28:
 #line 202 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
 	{
     fields_ |= MinLots;
-    minLots_ = swirly::Lots{num()};
+    min_lots_ = swirly::Lots{num()};
   }
 	break;
 	case 29:
 #line 209 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
 	{
     fields_ &= ~LiqInd;
-    liqInd_ = swirly::LiqInd::None;
+    liq_ind_ = swirly::LiqInd::None;
   }
 	break;
 	case 30:
 #line 213 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
 	{
     fields_ |= LiqInd;
-    liqInd_ = swirly::LiqInd::Maker;
+    liq_ind_ = swirly::LiqInd::Maker;
   }
 	break;
 	case 31:
 #line 217 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
 	{
     fields_ |= LiqInd;
-    liqInd_ = swirly::LiqInd::Taker;
+    liq_ind_ = swirly::LiqInd::Taker;
   }
 	break;
 	case 32:

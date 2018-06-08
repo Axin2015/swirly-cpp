@@ -48,28 +48,28 @@ class RestServ {
     RestServ(RestServ&&) = delete;
     RestServ& operator=(RestServ&&) = delete;
 
-    void handleRequest(const HttpRequest& req, HttpStream& os) noexcept;
+    void handle_request(const HttpRequest& req, HttpStream& os) noexcept;
 
   private:
     bool reset(const HttpRequest& req) noexcept;
 
-    void restRequest(const HttpRequest& req, Time now, HttpStream& os);
+    void rest_request(const HttpRequest& req, Time now, HttpStream& os);
 
-    void refDataRequest(const HttpRequest& req, Time now, HttpStream& os);
-    void assetRequest(const HttpRequest& req, Time now, HttpStream& os);
-    void instrRequest(const HttpRequest& req, Time now, HttpStream& os);
+    void ref_data_request(const HttpRequest& req, Time now, HttpStream& os);
+    void asset_request(const HttpRequest& req, Time now, HttpStream& os);
+    void instr_request(const HttpRequest& req, Time now, HttpStream& os);
 
-    void accntRequest(const HttpRequest& req, Time now, HttpStream& os);
-    void marketRequest(const HttpRequest& req, Time now, HttpStream& os);
+    void accnt_request(const HttpRequest& req, Time now, HttpStream& os);
+    void market_request(const HttpRequest& req, Time now, HttpStream& os);
 
-    void orderRequest(const HttpRequest& req, Time now, HttpStream& os);
-    void execRequest(const HttpRequest& req, Time now, HttpStream& os);
-    void tradeRequest(const HttpRequest& req, Time now, HttpStream& os);
-    void posnRequest(const HttpRequest& req, Time now, HttpStream& os);
+    void order_request(const HttpRequest& req, Time now, HttpStream& os);
+    void exec_request(const HttpRequest& req, Time now, HttpStream& os);
+    void trade_request(const HttpRequest& req, Time now, HttpStream& os);
+    void posn_request(const HttpRequest& req, Time now, HttpStream& os);
 
     Rest& rest_;
-    bool matchMethod_{false};
-    bool matchPath_{false};
+    bool match_method_{false};
+    bool match_path_{false};
     Tokeniser path_;
     std::vector<Id64> ids_;
     std::vector<Symbol> symbols_;

@@ -18,21 +18,21 @@ from swift import *
 class TestCase(RestTestCase):
 
   def test(self):
-    self.maxDiff = None
+    self.max_diff = None
     self.now = 1388534400000
-    with DbFile() as dbFile:
-      with Server(dbFile, self.now) as server:
+    with DbFile() as db_file:
+      with Server(db_file, self.now) as server:
         with Client() as client:
-          client.setTime(self.now)
+          client.set_time(self.now)
 
-          self.createMarket(client, 'EURUSD', 20140302)
+          self.create_market(client, 'EURUSD', 20140302)
 
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 5, 12345)
+          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 5, 12345)
 
-          self.takeOrder(client)
+          self.take_order(client)
 
-  def takeOrder(self, client):
-    client.setTrader('MARAYL')
+  def take_order(self, client):
+    client.set_trader('MARAYL')
     resp = client.send('POST', '/accnt/orders/EURUSD/20140302',
                        side = 'Sell',
                        lots = 5,

@@ -30,109 +30,109 @@ BOOST_AUTO_TEST_SUITE(PosnSuite)
 
 BOOST_AUTO_TEST_CASE(PosnSetCase)
 {
-    constexpr auto SettlDay = ymdToJd(2014, 3, 14);
-    constexpr auto MarketId = toMarketId(1_id32, SettlDay);
+    constexpr auto SettlDay = ymd_to_jd(2014, 3, 14);
+    constexpr auto MarketId = to_market_id(1_id32, SettlDay);
 
     using PosnSet = IdSet<Posn, MarketIdTraits<Posn>>;
     PosnSet s;
 
     PosnPtr posn1{&*s.emplace("MARAYL"sv, MarketId, "EURUSD"sv, SettlDay)};
-    BOOST_TEST(posn1->refCount() == 2);
+    BOOST_TEST(posn1->ref_count() == 2);
     BOOST_TEST(posn1->instr() == "EURUSD"sv);
-    BOOST_TEST(posn1->settlDay() == SettlDay);
+    BOOST_TEST(posn1->settl_day() == SettlDay);
     BOOST_TEST(s.find(MarketId) != s.end());
 
     // Duplicate.
     PosnPtr posn2{&*s.emplace("MARAYL"sv, MarketId, "EURUSD"sv, SettlDay)};
-    BOOST_TEST(posn2->refCount() == 3);
+    BOOST_TEST(posn2->ref_count() == 3);
     BOOST_TEST(posn2 == posn1);
 
     // Replace.
-    PosnPtr posn3{&*s.emplaceOrReplace("MARAYL"sv, MarketId, "EURUSD"sv, SettlDay)};
-    BOOST_TEST(posn3->refCount() == 2);
+    PosnPtr posn3{&*s.emplace_or_replace("MARAYL"sv, MarketId, "EURUSD"sv, SettlDay)};
+    BOOST_TEST(posn3->ref_count() == 2);
     BOOST_TEST(posn3 != posn1);
     BOOST_TEST(posn3->instr() == "EURUSD"sv);
-    BOOST_TEST(posn3->settlDay() == SettlDay);
+    BOOST_TEST(posn3->settl_day() == SettlDay);
 }
 
 BOOST_AUTO_TEST_CASE(PosnCloseLong)
 {
-    constexpr auto SettlDay = ymdToJd(2014, 3, 14);
-    constexpr auto MarketId = toMarketId(1_id32, SettlDay);
+    constexpr auto SettlDay = ymd_to_jd(2014, 3, 14);
+    constexpr auto MarketId = to_market_id(1_id32, SettlDay);
 
     Posn posn{"MARAYL"sv, MarketId, "EURUSD"sv, SettlDay};
 
-    posn.addTrade(Side::Buy, 10_lts, 2_tks);
-    BOOST_TEST(posn.buyLots() == 10_lts);
-    BOOST_TEST(posn.buyCost() == 20_cst);
-    BOOST_TEST(posn.sellLots() == 0_lts);
-    BOOST_TEST(posn.sellCost() == 0_cst);
-    BOOST_TEST(posn.netLots() == 10_lts);
-    BOOST_TEST(posn.netCost() == 20_cst);
+    posn.add_trade(Side::Buy, 10_lts, 2_tks);
+    BOOST_TEST(posn.buy_lots() == 10_lts);
+    BOOST_TEST(posn.buy_cost() == 20_cst);
+    BOOST_TEST(posn.sell_lots() == 0_lts);
+    BOOST_TEST(posn.sell_cost() == 0_cst);
+    BOOST_TEST(posn.net_lots() == 10_lts);
+    BOOST_TEST(posn.net_cost() == 20_cst);
 
-    posn.addTrade(Side::Buy, 5_lts, 3_tks);
-    BOOST_TEST(posn.buyLots() == 15_lts);
-    BOOST_TEST(posn.buyCost() == 35_cst);
-    BOOST_TEST(posn.sellLots() == 0_lts);
-    BOOST_TEST(posn.sellCost() == 0_cst);
-    BOOST_TEST(posn.netLots() == 15_lts);
-    BOOST_TEST(posn.netCost() == 35_cst);
+    posn.add_trade(Side::Buy, 5_lts, 3_tks);
+    BOOST_TEST(posn.buy_lots() == 15_lts);
+    BOOST_TEST(posn.buy_cost() == 35_cst);
+    BOOST_TEST(posn.sell_lots() == 0_lts);
+    BOOST_TEST(posn.sell_cost() == 0_cst);
+    BOOST_TEST(posn.net_lots() == 15_lts);
+    BOOST_TEST(posn.net_cost() == 35_cst);
 
-    posn.addTrade(Side::Sell, 5_lts, 2_tks);
-    BOOST_TEST(posn.buyLots() == 15_lts);
-    BOOST_TEST(posn.buyCost() == 35_cst);
-    BOOST_TEST(posn.sellLots() == 5_lts);
-    BOOST_TEST(posn.sellCost() == 10_cst);
-    BOOST_TEST(posn.netLots() == 10_lts);
-    BOOST_TEST(posn.netCost() == 25_cst);
+    posn.add_trade(Side::Sell, 5_lts, 2_tks);
+    BOOST_TEST(posn.buy_lots() == 15_lts);
+    BOOST_TEST(posn.buy_cost() == 35_cst);
+    BOOST_TEST(posn.sell_lots() == 5_lts);
+    BOOST_TEST(posn.sell_cost() == 10_cst);
+    BOOST_TEST(posn.net_lots() == 10_lts);
+    BOOST_TEST(posn.net_cost() == 25_cst);
 
-    posn.addTrade(Side::Sell, 15_lts, 3_tks);
-    BOOST_TEST(posn.buyLots() == 15_lts);
-    BOOST_TEST(posn.buyCost() == 35_cst);
-    BOOST_TEST(posn.sellLots() == 20_lts);
-    BOOST_TEST(posn.sellCost() == 55_cst);
-    BOOST_TEST(posn.netLots() == -5_lts);
-    BOOST_TEST(posn.netCost() == -15_cst);
+    posn.add_trade(Side::Sell, 15_lts, 3_tks);
+    BOOST_TEST(posn.buy_lots() == 15_lts);
+    BOOST_TEST(posn.buy_cost() == 35_cst);
+    BOOST_TEST(posn.sell_lots() == 20_lts);
+    BOOST_TEST(posn.sell_cost() == 55_cst);
+    BOOST_TEST(posn.net_lots() == -5_lts);
+    BOOST_TEST(posn.net_cost() == -15_cst);
 }
 
 BOOST_AUTO_TEST_CASE(PosnCloseShort)
 {
-    constexpr auto SettlDay = ymdToJd(2014, 3, 14);
-    constexpr auto MarketId = toMarketId(1_id32, SettlDay);
+    constexpr auto SettlDay = ymd_to_jd(2014, 3, 14);
+    constexpr auto MarketId = to_market_id(1_id32, SettlDay);
 
     Posn posn{"MARAYL"sv, MarketId, "EURUSD"sv, SettlDay};
 
-    posn.addTrade(Side::Sell, 10_lts, 2_tks);
-    BOOST_TEST(posn.buyLots() == 0_lts);
-    BOOST_TEST(posn.buyCost() == 0_cst);
-    BOOST_TEST(posn.sellLots() == 10_lts);
-    BOOST_TEST(posn.sellCost() == 20_cst);
-    BOOST_TEST(posn.netLots() == -10_lts);
-    BOOST_TEST(posn.netCost() == -20_cst);
+    posn.add_trade(Side::Sell, 10_lts, 2_tks);
+    BOOST_TEST(posn.buy_lots() == 0_lts);
+    BOOST_TEST(posn.buy_cost() == 0_cst);
+    BOOST_TEST(posn.sell_lots() == 10_lts);
+    BOOST_TEST(posn.sell_cost() == 20_cst);
+    BOOST_TEST(posn.net_lots() == -10_lts);
+    BOOST_TEST(posn.net_cost() == -20_cst);
 
-    posn.addTrade(Side::Sell, 5_lts, 3_tks);
-    BOOST_TEST(posn.buyLots() == 0_lts);
-    BOOST_TEST(posn.buyCost() == 0_cst);
-    BOOST_TEST(posn.sellLots() == 15_lts);
-    BOOST_TEST(posn.sellCost() == 35_cst);
-    BOOST_TEST(posn.netLots() == -15_lts);
-    BOOST_TEST(posn.netCost() == -35_cst);
+    posn.add_trade(Side::Sell, 5_lts, 3_tks);
+    BOOST_TEST(posn.buy_lots() == 0_lts);
+    BOOST_TEST(posn.buy_cost() == 0_cst);
+    BOOST_TEST(posn.sell_lots() == 15_lts);
+    BOOST_TEST(posn.sell_cost() == 35_cst);
+    BOOST_TEST(posn.net_lots() == -15_lts);
+    BOOST_TEST(posn.net_cost() == -35_cst);
 
-    posn.addTrade(Side::Buy, 5_lts, 2_tks);
-    BOOST_TEST(posn.buyLots() == 5_lts);
-    BOOST_TEST(posn.buyCost() == 10_cst);
-    BOOST_TEST(posn.sellLots() == 15_lts);
-    BOOST_TEST(posn.sellCost() == 35_cst);
-    BOOST_TEST(posn.netLots() == -10_lts);
-    BOOST_TEST(posn.netCost() == -25_cst);
+    posn.add_trade(Side::Buy, 5_lts, 2_tks);
+    BOOST_TEST(posn.buy_lots() == 5_lts);
+    BOOST_TEST(posn.buy_cost() == 10_cst);
+    BOOST_TEST(posn.sell_lots() == 15_lts);
+    BOOST_TEST(posn.sell_cost() == 35_cst);
+    BOOST_TEST(posn.net_lots() == -10_lts);
+    BOOST_TEST(posn.net_cost() == -25_cst);
 
-    posn.addTrade(Side::Buy, 15_lts, 3_tks);
-    BOOST_TEST(posn.buyLots() == 20_lts);
-    BOOST_TEST(posn.buyCost() == 55_cst);
-    BOOST_TEST(posn.sellLots() == 15_lts);
-    BOOST_TEST(posn.sellCost() == 35_cst);
-    BOOST_TEST(posn.netLots() == 5_lts);
-    BOOST_TEST(posn.netCost() == 15_cst);
+    posn.add_trade(Side::Buy, 15_lts, 3_tks);
+    BOOST_TEST(posn.buy_lots() == 20_lts);
+    BOOST_TEST(posn.buy_cost() == 55_cst);
+    BOOST_TEST(posn.sell_lots() == 15_lts);
+    BOOST_TEST(posn.sell_cost() == 35_cst);
+    BOOST_TEST(posn.net_lots() == 5_lts);
+    BOOST_TEST(posn.net_cost() == 15_cst);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

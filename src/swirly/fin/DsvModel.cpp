@@ -34,7 +34,7 @@ DsvModel::DsvModel() noexcept = default;
 
 DsvModel::~DsvModel() = default;
 
-void DsvModel::doReadAsset(const ModelCallback<AssetPtr>& cb) const
+void DsvModel::do_read_asset(const ModelCallback<AssetPtr>& cb) const
 {
     enum {
         Id,      //
@@ -54,15 +54,15 @@ void DsvModel::doReadAsset(const ModelCallback<AssetPtr>& cb) const
     while (getline(is, line)) {
         Row<TypeId + 1> row;
         split(line, "\t"sv, row);
-        const auto id = fromString<Id32>(row[Id]);
-        const auto symbol = fromString<string_view>(row[Symbol]);
-        const auto display = fromString<string_view>(row[Display]);
-        const auto type = fromString<AssetType>(row[TypeId]);
+        const auto id = from_string<Id32>(row[Id]);
+        const auto symbol = from_string<string_view>(row[Symbol]);
+        const auto display = from_string<string_view>(row[Display]);
+        const auto type = from_string<AssetType>(row[TypeId]);
         cb(Asset::make(id, symbol, display, type));
     }
 }
 
-void DsvModel::doReadInstr(const ModelCallback<InstrPtr>& cb) const
+void DsvModel::do_read_instr(const ModelCallback<InstrPtr>& cb) const
 {
     enum {
         Id,        //
@@ -90,24 +90,24 @@ void DsvModel::doReadInstr(const ModelCallback<InstrPtr>& cb) const
     while (getline(is, line)) {
         Row<MaxLots + 1> row;
         split(line, "\t"sv, row);
-        const auto id = fromString<Id32>(row[Id]);
-        const auto symbol = fromString<string_view>(row[Symbol]);
-        const auto display = fromString<string_view>(row[Display]);
-        const auto baseAsset = fromString<swirly::Symbol>(row[BaseAsset]);
-        const auto termCcy = fromString<swirly::Symbol>(row[TermCcy]);
-        const auto lotNumer = fromString<int>(row[LotNumer]);
-        const auto lotDenom = fromString<int>(row[LotDenom]);
-        const auto tickNumer = fromString<int>(row[TickNumer]);
-        const auto tickDenom = fromString<int>(row[TickDenom]);
-        const auto pipDp = fromString<int>(row[PipDp]);
-        const auto minLots = fromString<Lots>(row[MinLots]);
-        const auto maxLots = fromString<Lots>(row[MaxLots]);
-        cb(Instr::make(id, symbol, display, baseAsset, termCcy, lotNumer, lotDenom, tickNumer,
-                       tickDenom, pipDp, minLots, maxLots));
+        const auto id = from_string<Id32>(row[Id]);
+        const auto symbol = from_string<string_view>(row[Symbol]);
+        const auto display = from_string<string_view>(row[Display]);
+        const auto base_asset = from_string<swirly::Symbol>(row[BaseAsset]);
+        const auto term_ccy = from_string<swirly::Symbol>(row[TermCcy]);
+        const auto lot_numer = from_string<int>(row[LotNumer]);
+        const auto lot_denom = from_string<int>(row[LotDenom]);
+        const auto tick_numer = from_string<int>(row[TickNumer]);
+        const auto tick_denom = from_string<int>(row[TickDenom]);
+        const auto pip_dp = from_string<int>(row[PipDp]);
+        const auto min_lots = from_string<Lots>(row[MinLots]);
+        const auto max_lots = from_string<Lots>(row[MaxLots]);
+        cb(Instr::make(id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom, tick_numer,
+                       tick_denom, pip_dp, min_lots, max_lots));
     }
 }
 
-void DsvModel::doReadMarket(const ModelCallback<MarketPtr>& cb) const
+void DsvModel::do_read_market(const ModelCallback<MarketPtr>& cb) const
 {
     enum {         //
         Id,        //
@@ -131,19 +131,19 @@ void DsvModel::doReadMarket(const ModelCallback<MarketPtr>& cb) const
     while (getline(is, line)) {
         Row<MaxId + 1> row;
         split(line, "\t"sv, row);
-        const auto id = fromString<Id64>(row[Id]);
-        const auto instr = fromString<swirly::Symbol>(row[Instr]);
-        const auto settlDay = fromString<JDay>(row[SettlDay]);
-        const auto state = fromString<MarketState>(row[State]);
-        const auto lastLots = fromString<Lots>(row[LastLots]);
-        const auto lastTicks = fromString<Ticks>(row[LastTicks]);
-        const auto lastTime = fromString<Time>(row[LastTime]);
-        const auto maxId = fromString<Id64>(row[MaxId]);
-        cb(Market::make(id, instr, settlDay, state, lastLots, lastTicks, lastTime, maxId));
+        const auto id = from_string<Id64>(row[Id]);
+        const auto instr = from_string<swirly::Symbol>(row[Instr]);
+        const auto settl_day = from_string<JDay>(row[SettlDay]);
+        const auto state = from_string<MarketState>(row[State]);
+        const auto last_lots = from_string<Lots>(row[LastLots]);
+        const auto last_ticks = from_string<Ticks>(row[LastTicks]);
+        const auto last_time = from_string<Time>(row[LastTime]);
+        const auto max_id = from_string<Id64>(row[MaxId]);
+        cb(Market::make(id, instr, settl_day, state, last_lots, last_ticks, last_time, max_id));
     }
 }
 
-void DsvModel::doReadOrder(const ModelCallback<OrderPtr>& cb) const
+void DsvModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
 {
     enum {         //
         Accnt,     //
@@ -177,31 +177,31 @@ void DsvModel::doReadOrder(const ModelCallback<OrderPtr>& cb) const
     while (getline(is, line)) {
         Row<Modified + 1> row;
         split(line, "\t"sv, row);
-        const auto accnt = fromString<Symbol>(row[Accnt]);
-        const auto marketId = fromString<Id64>(row[MarketId]);
-        const auto instr = fromString<Symbol>(row[Instr]);
-        const auto settlDay = fromString<JDay>(row[SettlDay]);
-        const auto id = fromString<Id64>(row[Id]);
-        const auto ref = fromString<string_view>(row[Ref]);
-        const auto state = fromString<swirly::State>(row[State]);
-        const auto side = fromString<swirly::Side>(row[Side]);
-        const auto lots = fromString<swirly::Lots>(row[Lots]);
-        const auto ticks = fromString<swirly::Ticks>(row[Ticks]);
-        const auto resdLots = fromString<swirly::Lots>(row[ResdLots]);
-        const auto execLots = fromString<swirly::Lots>(row[ExecLots]);
-        const auto execCost = fromString<Cost>(row[ExecCost]);
-        const auto lastLots = fromString<swirly::Lots>(row[LastLots]);
-        const auto lastTicks = fromString<swirly::Ticks>(row[LastTicks]);
-        const auto minLots = fromString<swirly::Lots>(row[MinLots]);
-        const auto created = fromString<Time>(row[Created]);
-        const auto modified = fromString<Time>(row[Modified]);
-        cb(Order::make(accnt, marketId, instr, settlDay, id, ref, state, side, lots, ticks,
-                       resdLots, execLots, execCost, lastLots, lastTicks, minLots, created,
+        const auto accnt = from_string<Symbol>(row[Accnt]);
+        const auto market_id = from_string<Id64>(row[MarketId]);
+        const auto instr = from_string<Symbol>(row[Instr]);
+        const auto settl_day = from_string<JDay>(row[SettlDay]);
+        const auto id = from_string<Id64>(row[Id]);
+        const auto ref = from_string<string_view>(row[Ref]);
+        const auto state = from_string<swirly::State>(row[State]);
+        const auto side = from_string<swirly::Side>(row[Side]);
+        const auto lots = from_string<swirly::Lots>(row[Lots]);
+        const auto ticks = from_string<swirly::Ticks>(row[Ticks]);
+        const auto resd_lots = from_string<swirly::Lots>(row[ResdLots]);
+        const auto exec_lots = from_string<swirly::Lots>(row[ExecLots]);
+        const auto exec_cost = from_string<Cost>(row[ExecCost]);
+        const auto last_lots = from_string<swirly::Lots>(row[LastLots]);
+        const auto last_ticks = from_string<swirly::Ticks>(row[LastTicks]);
+        const auto min_lots = from_string<swirly::Lots>(row[MinLots]);
+        const auto created = from_string<Time>(row[Created]);
+        const auto modified = from_string<Time>(row[Modified]);
+        cb(Order::make(accnt, market_id, instr, settl_day, id, ref, state, side, lots, ticks,
+                       resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots, created,
                        modified));
     }
 }
 
-void DsvModel::doReadExec(Time since, const ModelCallback<ExecPtr>& cb) const
+void DsvModel::do_read_exec(Time since, const ModelCallback<ExecPtr>& cb) const
 {
     enum {         //
         Accnt,     //
@@ -240,36 +240,36 @@ void DsvModel::doReadExec(Time since, const ModelCallback<ExecPtr>& cb) const
     while (getline(is, line)) {
         Row<Created + 1> row;
         split(line, "\t"sv, row);
-        const auto accnt = fromString<swirly::Symbol>(row[Accnt]);
-        const auto marketId = fromString<Id64>(row[MarketId]);
-        const auto instr = fromString<Symbol>(row[Instr]);
-        const auto settlDay = fromString<JDay>(row[SettlDay]);
-        const auto id = fromString<Id64>(row[Id]);
-        const auto orderId = fromString<Id64>(row[OrderId]);
-        const auto ref = fromString<string_view>(row[Ref]);
-        const auto state = fromString<swirly::State>(row[State]);
-        const auto side = fromString<swirly::Side>(row[Side]);
-        const auto lots = fromString<swirly::Lots>(row[Lots]);
-        const auto ticks = fromString<swirly::Ticks>(row[Ticks]);
-        const auto resdLots = fromString<swirly::Lots>(row[ResdLots]);
-        const auto execLots = fromString<swirly::Lots>(row[ExecLots]);
-        const auto execCost = fromString<Cost>(row[ExecCost]);
-        const auto lastLots = fromString<swirly::Lots>(row[LastLots]);
-        const auto lastTicks = fromString<swirly::Ticks>(row[LastTicks]);
-        const auto minLots = fromString<swirly::Lots>(row[MinLots]);
-        const auto matchId = fromString<Id64>(row[MatchId]);
-        const auto posnLots = fromString<swirly::Lots>(row[PosnLots]);
-        const auto posnCost = fromString<Cost>(row[PosnCost]);
-        const auto liqInd = fromString<swirly::LiqInd>(row[LiqInd]);
-        const auto cpty = fromString<Symbol>(row[Cpty]);
-        const auto created = fromString<Time>(row[Created]);
-        cb(Exec::make(accnt, marketId, instr, settlDay, id, orderId, ref, state, side, lots, ticks,
-                      resdLots, execLots, execCost, lastLots, lastTicks, minLots, matchId, posnLots,
-                      posnCost, liqInd, cpty, created));
+        const auto accnt = from_string<swirly::Symbol>(row[Accnt]);
+        const auto market_id = from_string<Id64>(row[MarketId]);
+        const auto instr = from_string<Symbol>(row[Instr]);
+        const auto settl_day = from_string<JDay>(row[SettlDay]);
+        const auto id = from_string<Id64>(row[Id]);
+        const auto order_id = from_string<Id64>(row[OrderId]);
+        const auto ref = from_string<string_view>(row[Ref]);
+        const auto state = from_string<swirly::State>(row[State]);
+        const auto side = from_string<swirly::Side>(row[Side]);
+        const auto lots = from_string<swirly::Lots>(row[Lots]);
+        const auto ticks = from_string<swirly::Ticks>(row[Ticks]);
+        const auto resd_lots = from_string<swirly::Lots>(row[ResdLots]);
+        const auto exec_lots = from_string<swirly::Lots>(row[ExecLots]);
+        const auto exec_cost = from_string<Cost>(row[ExecCost]);
+        const auto last_lots = from_string<swirly::Lots>(row[LastLots]);
+        const auto last_ticks = from_string<swirly::Ticks>(row[LastTicks]);
+        const auto min_lots = from_string<swirly::Lots>(row[MinLots]);
+        const auto match_id = from_string<Id64>(row[MatchId]);
+        const auto posn_lots = from_string<swirly::Lots>(row[PosnLots]);
+        const auto posn_cost = from_string<Cost>(row[PosnCost]);
+        const auto liq_ind = from_string<swirly::LiqInd>(row[LiqInd]);
+        const auto cpty = from_string<Symbol>(row[Cpty]);
+        const auto created = from_string<Time>(row[Created]);
+        cb(Exec::make(accnt, market_id, instr, settl_day, id, order_id, ref, state, side, lots,
+                      ticks, resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots,
+                      match_id, posn_lots, posn_cost, liq_ind, cpty, created));
     }
 }
 
-void DsvModel::doReadTrade(const ModelCallback<ExecPtr>& cb) const
+void DsvModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
 {
     enum {         //
         Accnt,     //
@@ -307,35 +307,35 @@ void DsvModel::doReadTrade(const ModelCallback<ExecPtr>& cb) const
     while (getline(is, line)) {
         Row<Created + 1> row;
         split(line, "\t"sv, row);
-        const auto accnt = fromString<swirly::Symbol>(row[Accnt]);
-        const auto marketId = fromString<Id64>(row[MarketId]);
-        const auto instr = fromString<Symbol>(row[Instr]);
-        const auto settlDay = fromString<JDay>(row[SettlDay]);
-        const auto id = fromString<Id64>(row[Id]);
-        const auto orderId = fromString<Id64>(row[OrderId]);
-        const auto ref = fromString<string_view>(row[Ref]);
-        const auto side = fromString<swirly::Side>(row[Side]);
-        const auto lots = fromString<swirly::Lots>(row[Lots]);
-        const auto ticks = fromString<swirly::Ticks>(row[Ticks]);
-        const auto resdLots = fromString<swirly::Lots>(row[ResdLots]);
-        const auto execLots = fromString<swirly::Lots>(row[ExecLots]);
-        const auto execCost = fromString<Cost>(row[ExecCost]);
-        const auto lastLots = fromString<swirly::Lots>(row[LastLots]);
-        const auto lastTicks = fromString<swirly::Ticks>(row[LastTicks]);
-        const auto minLots = fromString<swirly::Lots>(row[MinLots]);
-        const auto matchId = fromString<Id64>(row[MatchId]);
-        const auto posnLots = fromString<swirly::Lots>(row[PosnLots]);
-        const auto posnCost = fromString<Cost>(row[PosnCost]);
-        const auto liqInd = fromString<swirly::LiqInd>(row[LiqInd]);
-        const auto cpty = fromString<Symbol>(row[Cpty]);
-        const auto created = fromString<Time>(row[Created]);
-        cb(Exec::make(accnt, marketId, instr, settlDay, id, orderId, ref, State::Trade, side, lots,
-                      ticks, resdLots, execLots, execCost, lastLots, lastTicks, minLots, matchId,
-                      posnLots, posnCost, liqInd, cpty, created));
+        const auto accnt = from_string<swirly::Symbol>(row[Accnt]);
+        const auto market_id = from_string<Id64>(row[MarketId]);
+        const auto instr = from_string<Symbol>(row[Instr]);
+        const auto settl_day = from_string<JDay>(row[SettlDay]);
+        const auto id = from_string<Id64>(row[Id]);
+        const auto order_id = from_string<Id64>(row[OrderId]);
+        const auto ref = from_string<string_view>(row[Ref]);
+        const auto side = from_string<swirly::Side>(row[Side]);
+        const auto lots = from_string<swirly::Lots>(row[Lots]);
+        const auto ticks = from_string<swirly::Ticks>(row[Ticks]);
+        const auto resd_lots = from_string<swirly::Lots>(row[ResdLots]);
+        const auto exec_lots = from_string<swirly::Lots>(row[ExecLots]);
+        const auto exec_cost = from_string<Cost>(row[ExecCost]);
+        const auto last_lots = from_string<swirly::Lots>(row[LastLots]);
+        const auto last_ticks = from_string<swirly::Ticks>(row[LastTicks]);
+        const auto min_lots = from_string<swirly::Lots>(row[MinLots]);
+        const auto match_id = from_string<Id64>(row[MatchId]);
+        const auto posn_lots = from_string<swirly::Lots>(row[PosnLots]);
+        const auto posn_cost = from_string<Cost>(row[PosnCost]);
+        const auto liq_ind = from_string<swirly::LiqInd>(row[LiqInd]);
+        const auto cpty = from_string<Symbol>(row[Cpty]);
+        const auto created = from_string<Time>(row[Created]);
+        cb(Exec::make(accnt, market_id, instr, settl_day, id, order_id, ref, State::Trade, side,
+                      lots, ticks, resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots,
+                      match_id, posn_lots, posn_cost, liq_ind, cpty, created));
     }
 }
 
-void DsvModel::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const
+void DsvModel::do_read_posn(JDay bus_day, const ModelCallback<PosnPtr>& cb) const
 {
     enum {        //
         Accnt,    //
@@ -359,15 +359,16 @@ void DsvModel::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const
     while (getline(is, line)) {
         Row<SellCost + 1> row;
         split(line, "\t"sv, row);
-        const auto accnt = fromString<Symbol>(row[Accnt]);
-        const auto marketId = fromString<Id64>(row[MarketId]);
-        const auto instr = fromString<Symbol>(row[Instr]);
-        const auto settlDay = fromString<JDay>(row[SettlDay]);
-        const auto buyLots = fromString<Lots>(row[BuyLots]);
-        const auto buyCost = fromString<Cost>(row[BuyCost]);
-        const auto sellLots = fromString<Lots>(row[SellLots]);
-        const auto sellCost = fromString<Cost>(row[SellCost]);
-        cb(Posn::make(accnt, marketId, instr, settlDay, buyLots, buyCost, sellLots, sellCost));
+        const auto accnt = from_string<Symbol>(row[Accnt]);
+        const auto market_id = from_string<Id64>(row[MarketId]);
+        const auto instr = from_string<Symbol>(row[Instr]);
+        const auto settl_day = from_string<JDay>(row[SettlDay]);
+        const auto buy_lots = from_string<Lots>(row[BuyLots]);
+        const auto buy_cost = from_string<Cost>(row[BuyCost]);
+        const auto sell_lots = from_string<Lots>(row[SellLots]);
+        const auto sell_cost = from_string<Cost>(row[SellCost]);
+        cb(Posn::make(accnt, market_id, instr, settl_day, buy_lots, buy_cost, sell_lots,
+                      sell_cost));
     }
 }
 

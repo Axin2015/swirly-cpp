@@ -20,7 +20,7 @@ namespace swirly {
 inline namespace util {
 using namespace std;
 namespace {
-thread_local ErrMsg errMsg_;
+thread_local ErrMsg err_msg_;
 } // namespace
 
 Exception::Exception(string_view what) noexcept
@@ -39,10 +39,10 @@ const char* Exception::what() const noexcept
     return what_;
 }
 
-ErrMsg& errMsg() noexcept
+ErrMsg& err_msg() noexcept
 {
-    errMsg_.reset();
-    return errMsg_;
+    err_msg_.reset();
+    return err_msg_;
 }
 
 } // namespace util

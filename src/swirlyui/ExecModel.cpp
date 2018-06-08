@@ -68,7 +68,7 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
     if (!index.isValid()) {
         // No-op.
     } else if (role == Qt::CheckStateRole) {
-        const auto& row = rowAt(index.row());
+        const auto& row = row_at(index.row());
         switch (box<Column>(index.column())) {
         case Column::CheckState:
             var = row.checked() ? Qt::Checked : Qt::Unchecked;
@@ -77,7 +77,7 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
             break;
         }
     } else if (role == Qt::DisplayRole) {
-        const auto& exec = valueAt(index.row());
+        const auto& exec = value_at(index.row());
         switch (box<Column>(index.column())) {
         case Column::CheckState:
             break;
@@ -85,69 +85,69 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
             var = exec.accnt();
             break;
         case Column::MarketId:
-            var = toVariant(exec.marketId());
+            var = to_variant(exec.market_id());
             break;
         case Column::Instr:
             var = exec.instr().symbol();
             break;
         case Column::SettlDate:
-            var = exec.settlDate();
+            var = exec.settl_date();
             break;
         case Column::Id:
-            var = toVariant(exec.id());
+            var = to_variant(exec.id());
             break;
         case Column::OrderId:
-            var = toVariant(exec.orderId());
+            var = to_variant(exec.order_id());
             break;
         case Column::Ref:
             var = exec.ref();
             break;
         case Column::State:
-            var = enumString(exec.state(), exec.resdLots());
+            var = enum_string(exec.state(), exec.resd_lots());
             break;
         case Column::Side:
-            var = enumString(exec.side());
+            var = enum_string(exec.side());
             break;
         case Column::Lots:
-            var = toVariant(exec.lots());
+            var = to_variant(exec.lots());
             break;
         case Column::Price:
             if (exec.lots() != 0_lts) {
-                var = ticksToPriceString(exec.ticks(), exec.instr());
+                var = ticks_to_price_string(exec.ticks(), exec.instr());
             }
             break;
         case Column::ResdLots:
-            var = toVariant(exec.resdLots());
+            var = to_variant(exec.resd_lots());
             break;
         case Column::ExecLots:
-            var = toVariant(exec.execLots());
+            var = to_variant(exec.exec_lots());
             break;
         case Column::AvgPrice:
-            var = ticksToAvgPriceString(exec.execLots(), exec.execCost(), exec.instr());
+            var = ticks_to_avg_price_string(exec.exec_lots(), exec.exec_cost(), exec.instr());
             break;
         case Column::LastLots:
-            var = toVariant(exec.lastLots());
+            var = to_variant(exec.last_lots());
             break;
         case Column::LastPrice:
-            if (exec.lastLots() != 0_lts) {
-                var = ticksToPriceString(exec.lastTicks(), exec.instr());
+            if (exec.last_lots() != 0_lts) {
+                var = ticks_to_price_string(exec.last_ticks(), exec.instr());
             }
             break;
         case Column::MinLots:
-            var = toVariant(exec.minLots());
+            var = to_variant(exec.min_lots());
             break;
         case Column::MatchId:
-            if (exec.matchId() != 0_id64) {
-                var = toVariant(exec.matchId());
+            if (exec.match_id() != 0_id64) {
+                var = to_variant(exec.match_id());
             }
             break;
         case Column::LiqInd:
-            if (exec.matchId() != 0_id64) {
-                var = enumString(exec.liqInd());
+            if (exec.match_id() != 0_id64) {
+                var = enum_string(exec.liq_ind());
             }
             break;
         case Column::Cpty:
-            if (exec.matchId() != 0_id64) {
+            if (exec.match_id() != 0_id64) {
                 var = exec.cpty();
             }
             break;
@@ -186,7 +186,7 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
             break;
         }
     } else if (role == Qt::UserRole) {
-        var = QVariant::fromValue(valueAt(index.row()));
+        var = QVariant::fromValue(value_at(index.row()));
     }
     return var;
 }
@@ -200,19 +200,19 @@ QVariant ExecModel::headerData(int section, Qt::Orientation orientation, int rol
     return var;
 }
 
-void ExecModel::updateRow(uint64_t tag, const Exec& exec)
+void ExecModel::update_row(uint64_t tag, const Exec& exec)
 {
     // Linear search is acceptable on small circular buffer.
     auto it = find_if(rows_.begin(), rows_.end(), [&exec](const auto& row) {
-        return row.value().marketId() == exec.marketId() && row.value().id() == exec.id();
+        return row.value().market_id() == exec.market_id() && row.value().id() == exec.id();
     });
 
     if (it != rows_.end()) {
         // Update tag for completeness. Note that this is not strictly necessary because the sweep
         // operation in not supported.
-        it->setTag(tag);
-        if (isModified(it->value(), exec)) {
-            it->setValue(exec);
+        it->set_tag(tag);
+        if (is_modified(it->value(), exec)) {
+            it->set_value(exec);
             const int row = distance(rows_.begin(), it);
             emit dataChanged(index(row, 0), index(row, ColumnCount - 1));
         }

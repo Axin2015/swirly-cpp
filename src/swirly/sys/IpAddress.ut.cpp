@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_SUITE(IpAddressSuite)
 
 BOOST_AUTO_TEST_CASE(ParseEndpointV4Case)
 {
-    const auto ep = parseEndpoint<Tcp>("192.168.1.2:443");
+    const auto ep = parse_endpoint<Tcp>("192.168.1.2:443");
 
     BOOST_TEST(ep.address().to_string() == "192.168.1.2");
     BOOST_TEST(ep.port() == 443);
@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE(ParseEndpointV4Case)
 
 BOOST_AUTO_TEST_CASE(ParseEndpointV6Case)
 {
-    const auto ep = parseEndpoint<Udp>("[2001:db8:85a3:8d3:1319:8a2e:370:7348]:443");
+    const auto ep = parse_endpoint<Udp>("[2001:db8:85a3:8d3:1319:8a2e:370:7348]:443");
 
     BOOST_TEST(ep.address().to_string() == "2001:db8:85a3:8d3:1319:8a2e:370:7348");
     BOOST_TEST(ep.port() == 443);

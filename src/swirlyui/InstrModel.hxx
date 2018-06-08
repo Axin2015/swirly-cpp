@@ -35,12 +35,12 @@ class InstrModel
 
     Instr find(const QString& symbol) const;
 
-    int indexOf(const QString& symbol) const;
+    int index_of(const QString& symbol) const;
 
-    void removeRow(const Instr& instr) { TableModel::removeRow(instr.symbol()); }
-    void updateRow(std::uint64_t tag, const Instr& instr)
+    void remove_row(const Instr& instr) { TableModel::remove_row(instr.symbol()); }
+    void update_row(std::uint64_t tag, const Instr& instr)
     {
-        TableModel::updateRow(instr.symbol(), tag, instr);
+        TableModel::update_row(instr.symbol(), tag, instr);
     }
 
   private:

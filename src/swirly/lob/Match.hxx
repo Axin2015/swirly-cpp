@@ -23,8 +23,8 @@ namespace swirly {
 inline namespace lob {
 
 struct Match {
-    Match(Lots lots, const OrderPtr& makerOrder, const ExecPtr& makerTrade,
-          const PosnPtr& makerPosn, const ExecPtr& takerTrade) noexcept;
+    Match(Lots lots, const OrderPtr& maker_order, const ExecPtr& maker_trade,
+          const PosnPtr& maker_posn, const ExecPtr& taker_trade) noexcept;
 
     ~Match();
 
@@ -37,10 +37,10 @@ struct Match {
     Match& operator=(Match&&) = delete;
 
     const Lots lots;
-    const OrderPtr makerOrder;
-    const ExecPtr makerTrade;
-    const PosnPtr makerPosn;
-    const ExecPtr takerTrade;
+    const OrderPtr maker_order;
+    const ExecPtr maker_trade;
+    const PosnPtr maker_posn;
+    const ExecPtr taker_trade;
 };
 
 } // namespace lob

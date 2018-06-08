@@ -18,35 +18,35 @@ from swift import *
 class TestCase(RestTestCase):
 
   def test(self):
-    self.maxDiff = None
+    self.max_diff = None
     self.now = 1388534400000
-    with DbFile() as dbFile:
-      with Server(dbFile, self.now) as server:
+    with DbFile() as db_file:
+      with Server(db_file, self.now) as server:
         with Client() as client:
-          client.setTime(self.now)
+          client.set_time(self.now)
 
-          self.createMarket(client, 'EURUSD', 20140302)
-          self.createMarket(client, 'EURUSD', 20140402)
-          self.createMarket(client, 'GBPUSD', 20140302)
+          self.create_market(client, 'EURUSD', 20140302)
+          self.create_market(client, 'EURUSD', 20140402)
+          self.create_market(client, 'GBPUSD', 20140302)
 
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Sell', 3, 12346)
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 3, 12346)
+          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Sell', 3, 12346)
+          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 3, 12346)
 
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140402, 'Sell', 5, 12347)
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140402, 'Buy', 5, 12347)
+          self.create_order(client, 'MARAYL', 'EURUSD', 20140402, 'Sell', 5, 12347)
+          self.create_order(client, 'MARAYL', 'EURUSD', 20140402, 'Buy', 5, 12347)
 
-          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'Sell', 3, 15346)
-          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'Buy', 3, 15346)
+          self.create_order(client, 'MARAYL', 'GBPUSD', 20140302, 'Sell', 3, 15346)
+          self.create_order(client, 'MARAYL', 'GBPUSD', 20140302, 'Buy', 3, 15346)
 
-          self.checkAuth(client)
+          self.check_auth(client)
 
-          self.getAll(client)
-          self.getByInstr(client)
-          self.getByMarket(client)
-          self.getById(client)
+          self.get_all(client)
+          self.get_by_instr(client)
+          self.get_by_market(client)
+          self.get_by_id(client)
 
-  def checkAuth(self, client):
-    client.setAuth(None, 0x2)
+  def check_auth(self, client):
+    client.set_auth(None, 0x2)
 
     resp = client.send('GET', '/accnt/trades')
     self.assertEqual(401, resp.status)
@@ -60,7 +60,7 @@ class TestCase(RestTestCase):
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    client.setAuth('MARAYL', ~0x2 & 0x7fffffff)
+    client.set_auth('MARAYL', ~0x2 & 0x7fffffff)
 
     resp = client.send('GET', '/accnt/trades')
     self.assertEqual(403, resp.status)
@@ -74,8 +74,8 @@ class TestCase(RestTestCase):
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-  def getAll(self, client):
-    client.setTrader('MARAYL')
+  def get_all(self, client):
+    client.set_trader('MARAYL')
     resp = client.send('GET', '/accnt/trades')
 
     self.assertEqual(200, resp.status)
@@ -226,8 +226,8 @@ class TestCase(RestTestCase):
       u'ticks': 15346
     }], resp.content)
 
-  def getByInstr(self, client):
-    client.setTrader('MARAYL')
+  def get_by_instr(self, client):
+    client.set_trader('MARAYL')
     resp = client.send('GET', '/accnt/trades/EURUSD')
 
     self.assertEqual(200, resp.status)
@@ -330,8 +330,8 @@ class TestCase(RestTestCase):
       u'ticks': 12347
     }], resp.content)
 
-  def getByMarket(self, client):
-    client.setTrader('MARAYL')
+  def get_by_market(self, client):
+    client.set_trader('MARAYL')
     resp = client.send('GET', '/accnt/trades/GBPUSD/20140302')
 
     self.assertEqual(200, resp.status)
@@ -386,8 +386,8 @@ class TestCase(RestTestCase):
       u'ticks': 15346
     }], resp.content)
 
-  def getById(self, client):
-    client.setTrader('MARAYL')
+  def get_by_id(self, client):
+    client.set_trader('MARAYL')
     resp = client.send('GET', '/accnt/trades/GBPUSD/20140302/3')
 
     self.assertEqual(200, resp.status)

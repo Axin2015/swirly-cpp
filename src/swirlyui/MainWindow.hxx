@@ -39,25 +39,25 @@ class MainWindow : public QMainWindow {
     void closeEvent(QCloseEvent* event) override;
 
   private slots:
-    void slotRefDataComplete();
-    void slotServiceError(const QString& error);
-    void slotCreateMarket(const Instr& instr, QDate settlDate);
-    void slotCreateOrder(const Instr& instr, QDate settlDate, const QString& ref, Side side,
-                         Lots lots, Ticks ticks);
-    void slotCancelOrders(const OrderKeys& keys);
-    void slotAbout();
+    void slot_ref_data_complete();
+    void slot_service_error(const QString& error);
+    void slot_create_market(const Instr& instr, QDate settl_date);
+    void slot_create_order(const Instr& instr, QDate settl_date, const QString& ref, Side side,
+                           Lots lots, Ticks ticks);
+    void slot_cancel_orders(const OrderKeys& keys);
+    void slot_about();
 
   private:
-    void createActions();
-    void createStatusBar();
-    void readSettings();
-    void writeSettings();
-    bool canClose();
+    void create_actions();
+    void create_status_bar();
+    void read_settings();
+    void write_settings();
+    bool can_close();
 
     HttpClient client_;
-    AssetView* assetView_{nullptr};
-    InstrView* instrView_{nullptr};
-    MarketView* marketView_{nullptr};
+    AssetView* asset_view_{nullptr};
+    InstrView* instr_view_{nullptr};
+    MarketView* market_view_{nullptr};
 };
 
 } // namespace ui

@@ -353,14 +353,14 @@ static_assert(sizeof(IntWrapper<Int32Policy>) == 4, "must be specific size");
 static_assert(sizeof(IntWrapper<Int64Policy>) == 8, "must be specific size");
 
 template <typename ValueT>
-constexpr bool isIntWrapper = std::is_base_of_v<IntBase, ValueT>;
+constexpr bool is_int_wrapper = std::is_base_of_v<IntBase, ValueT>;
 
 template <typename ValueT>
-struct TypeTraits<ValueT, std::enable_if_t<isIntWrapper<ValueT>>> {
-    static auto fromString(std::string_view sv) noexcept
+struct TypeTraits<ValueT, std::enable_if_t<is_int_wrapper<ValueT>>> {
+    static auto from_string(std::string_view sv) noexcept
     {
         using UnderlyingTraits = TypeTraits<typename ValueT::ValueType>;
-        return ValueT{UnderlyingTraits::fromString(sv)};
+        return ValueT{UnderlyingTraits::from_string(sv)};
     }
 };
 

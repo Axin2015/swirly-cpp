@@ -28,7 +28,7 @@
 namespace swirly {
 inline namespace app {
 namespace detail {
-inline std::size_t fileSize(int fd)
+inline std::size_t file_size(int fd)
 {
     struct stat st;
     os::fstat(fd, st);
@@ -61,11 +61,11 @@ class MemQueue {
 
     constexpr MemQueue(std::nullptr_t = nullptr) noexcept {}
     explicit MemQueue(std::size_t capacity)
-    : capacity_{nextPow2(capacity)}
+    : capacity_{next_pow2(capacity)}
     , mask_{capacity_ - 1}
-    , memMap_{os::mmap(nullptr, size(capacity_), PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1,
-                       0)}
-    , impl_{static_cast<Impl*>(memMap_.get().data())}
+    , mem_map_{os::mmap(nullptr, size(capacity_), PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE,
+                        -1, 0)}
+    , impl_{static_cast<Impl*>(mem_map_.get().data())}
     {
         assert(capacity >= 2);
 
@@ -77,12 +77,12 @@ class MemQueue {
     }
     explicit MemQueue(const char* path)
     : fh_{os::open(path, O_RDWR)}
-    , capacity_{capacity(detail::fileSize(fh_.get()))}
+    , capacity_{capacity(detail::file_size(fh_.get()))}
     , mask_{capacity_ - 1}
-    , memMap_{os::mmap(nullptr, size(capacity_), PROT_READ | PROT_WRITE, MAP_SHARED, fh_.get(), 0)}
-    , impl_{static_cast<Impl*>(memMap_.get().data())}
+    , mem_map_{os::mmap(nullptr, size(capacity_), PROT_READ | PROT_WRITE, MAP_SHARED, fh_.get(), 0)}
+    , impl_{static_cast<Impl*>(mem_map_.get().data())}
     {
-        if (!isPow2(capacity_)) {
+        if (!is_pow2(capacity_)) {
             throw std::runtime_error{"capacity not a power of two"};
         }
     }
@@ -97,7 +97,7 @@ class MemQueue {
     : fh_{rhs.fh}
     , capacity_{rhs.capacity_}
     , mask_{rhs.mask_}
-    , memMap_{std::move(rhs.memMap_)}
+    , mem_map_{std::move(rhs.mem_map_)}
     , impl_{rhs.impl_}
     {
         capacity_ = 0;
@@ -139,7 +139,7 @@ class MemQueue {
     {
         // Reverse order.
         impl_ = nullptr;
-        memMap_.reset(nullptr);
+        mem_map_.reset(nullptr);
         mask_ = 0;
         capacity_ = 0;
         fh_.reset(nullptr);
@@ -149,7 +149,7 @@ class MemQueue {
         fh_.swap(rhs.fh_);
         std::swap(capacity_, rhs.capacity_);
         std::swap(mask_, rhs.mask_);
-        memMap_.swap(rhs.memMap_);
+        mem_map_.swap(rhs.mem_map_);
         std::swap(impl_, rhs.impl_);
     }
     /**
@@ -247,7 +247,7 @@ class MemQueue {
 
     FileHandle fh_{nullptr};
     std::uint64_t capacity_{}, mask_{};
-    MMap memMap_{nullptr};
+    MMap mem_map_{nullptr};
     Impl* impl_{nullptr};
 };
 
@@ -255,20 +255,20 @@ class MemQueue {
  * Initialise file-based MemQueue.
  */
 template <typename ValueT>
-void createMemQueue(const char* path, std::size_t capacity, mode_t mode)
+void create_mem_queue(const char* path, std::size_t capacity, mode_t mode)
 {
     using Elem = typename MemQueue<ValueT>::Elem;
     using Impl = typename MemQueue<ValueT>::Impl;
 
     assert(capacity >= 2);
 
-    capacity = nextPow2(capacity);
+    capacity = next_pow2(capacity);
     const auto size = sizeof(Impl) + capacity * sizeof(Elem);
 
     FileHandle fh{os::open(path, O_RDWR | O_CREAT | O_EXCL, mode)};
     os::ftruncate(fh.get(), size);
-    MMap memMap{os::mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fh.get(), 0)};
-    auto* const impl = static_cast<Impl*>(memMap.get().data());
+    MMap mem_map{os::mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fh.get(), 0)};
+    auto* const impl = static_cast<Impl*>(mem_map.get().data());
 
     memset(impl, 0, size);
     // Initialise sequence numbers.

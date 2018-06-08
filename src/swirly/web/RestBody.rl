@@ -123,11 +123,11 @@ namespace {
 
   action nullSettlDate {
     fields_ &= ~SettlDate;
-    settlDate_ = 0_ymd;
+    settl_date_ = 0_ymd;
   }
   action endSettlDate {
     fields_ |= SettlDate;
-    settlDate_ = IsoDate{num()};
+    settl_date_ = IsoDate{num()};
   }
   settlDate = 'null' %nullSettlDate
     | num %endSettlDate;
@@ -197,26 +197,26 @@ namespace {
 
   action nullMinLots {
     fields_ &= ~MinLots;
-    minLots_ = 0_lts;
+    min_lots_ = 0_lts;
   }
   action endMinLots {
     fields_ |= MinLots;
-    minLots_ = swirly::Lots{num()};
+    min_lots_ = swirly::Lots{num()};
   }
   minLots = 'null' %nullMinLots
     | num %endMinLots;
 
   action nullLiqInd {
     fields_ &= ~LiqInd;
-    liqInd_ = swirly::LiqInd::None;
+    liq_ind_ = swirly::LiqInd::None;
   }
   action makerLiqInd {
     fields_ |= LiqInd;
-    liqInd_ = swirly::LiqInd::Maker;
+    liq_ind_ = swirly::LiqInd::Maker;
   }
   action takerLiqInd {
     fields_ |= LiqInd;
-    liqInd_ = swirly::LiqInd::Taker;
+    liq_ind_ = swirly::LiqInd::Taker;
   }
   liqInd = 'null' %nullLiqInd
     | '"Maker"'i %makerLiqInd
@@ -281,14 +281,14 @@ void RestBody::reset(bool clear) noexcept
   symbol_.len = 0;
   accnt_.len = 0;
   instr_.len = 0;
-  settlDate_ = 0_ymd;
+  settl_date_ = 0_ymd;
   ref_.len = 0;
   state_ = 0;
   side_ = static_cast<swirly::Side>(0);
   lots_ = 0_lts;
   ticks_ = 0_tks;
-  minLots_ = 0_lts;
-  liqInd_ = swirly::LiqInd::None;
+  min_lots_ = 0_lts;
+  liq_ind_ = swirly::LiqInd::None;
   cpty_.len = 0;
 }
 

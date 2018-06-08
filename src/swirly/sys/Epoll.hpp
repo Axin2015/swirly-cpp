@@ -30,7 +30,7 @@ inline FileHandle epoll_create(int size, std::error_code& ec) noexcept
 {
     const auto ret = ::epoll_create(size);
     if (ret < 0) {
-        ec = makeError(errno);
+        ec = make_error(errno);
     }
     return ret;
 }
@@ -39,7 +39,7 @@ inline FileHandle epoll_create(int size)
 {
     const auto fd = ::epoll_create(size);
     if (fd < 0) {
-        throw std::system_error{makeError(errno), "epoll_create"};
+        throw std::system_error{make_error(errno), "epoll_create"};
     }
     return fd;
 }
@@ -48,7 +48,7 @@ inline int epoll_ctl(int epfd, int op, int fd, epoll_event event, std::error_cod
 {
     const auto ret = ::epoll_ctl(epfd, op, fd, &event);
     if (ret < 0) {
-        ec = makeError(errno);
+        ec = make_error(errno);
     }
     return ret;
 }
@@ -57,7 +57,7 @@ inline void epoll_ctl(int epfd, int op, int fd, epoll_event event)
 {
     const auto ret = ::epoll_ctl(epfd, op, fd, &event);
     if (ret < 0) {
-        throw std::system_error{makeError(errno), "epoll_ctl"};
+        throw std::system_error{make_error(errno), "epoll_ctl"};
     }
 }
 
@@ -66,7 +66,7 @@ inline int epoll_wait(int epfd, epoll_event* events, int maxevents, int timeout,
 {
     const auto ret = ::epoll_wait(epfd, events, maxevents, timeout);
     if (ret < 0) {
-        ec = makeError(errno);
+        ec = make_error(errno);
     }
     return ret;
 }
@@ -75,7 +75,7 @@ inline int epoll_wait(int epfd, epoll_event* events, int maxevents, int timeout)
 {
     const auto ret = ::epoll_wait(epfd, events, maxevents, timeout);
     if (ret < 0) {
-        throw std::system_error{makeError(errno), "epoll_wait"};
+        throw std::system_error{make_error(errno), "epoll_wait"};
     }
     return ret;
 }

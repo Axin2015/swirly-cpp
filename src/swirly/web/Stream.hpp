@@ -47,7 +47,7 @@ class SWIRLY_API HttpBuf : public std::streambuf {
         pbase_ = nullptr;
         pcount_ = 0;
     }
-    void setContentLength(std::streamsize pos, std::streamsize len) noexcept;
+    void set_content_length(std::streamsize pos, std::streamsize len) noexcept;
 
   protected:
     int_type overflow(int_type c) noexcept override;

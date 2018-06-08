@@ -46,12 +46,12 @@ using MemTag = std::uint32_t;
  */
 using MemLink = std::uint64_t;
 
-constexpr MemSize linkToOffset(MemLink link) noexcept
+constexpr MemSize link_to_offset(MemLink link) noexcept
 {
     return link & 0xffffffff;
 }
 
-constexpr MemLink makeLink(MemTag tag, MemSize offset) noexcept
+constexpr MemLink make_link(MemTag tag, MemSize offset) noexcept
 {
     return (static_cast<MemLink>(tag) << 32) | offset;
 }
@@ -95,18 +95,18 @@ struct MemPool {
 static_assert(std::is_pod_v<MemPool>);
 static_assert(offsetof(MemPool, storage) == PageSize);
 
-constexpr void* offsetToPtr(const MemPool& pool, MemSize offset) noexcept
+constexpr void* offset_to_ptr(const MemPool& pool, MemSize offset) noexcept
 {
     return const_cast<char*>(&pool.storage[offset]);
 }
 
 template <typename PtrT>
-constexpr PtrT offsetToPtr(const MemPool& pool, MemSize offset) noexcept
+constexpr PtrT offset_to_ptr(const MemPool& pool, MemSize offset) noexcept
 {
-    return static_cast<PtrT>(offsetToPtr(pool, offset));
+    return static_cast<PtrT>(offset_to_ptr(pool, offset));
 }
 
-inline MemSize ptrToOffset(const MemPool& pool, void* ptr) noexcept
+inline MemSize ptr_to_offset(const MemPool& pool, void* ptr) noexcept
 {
     assert(ptr >= &pool.storage[0]);
     return static_cast<char*>(ptr) - &pool.storage[0];
@@ -117,15 +117,15 @@ inline void push(const MemPool& pool, MemStack<SizeN>& stack, MemNode<SizeN>* no
 {
     // Add then fetch.
     const auto tag = __atomic_add_fetch(&stack.tag, 1, __ATOMIC_RELAXED);
-    const auto newHead = makeLink(tag, ptrToOffset(pool, node));
+    const auto new_head = make_link(tag, ptr_to_offset(pool, node));
 
-    decltype(stack.head) oldHead;
-    __atomic_load(&stack.head, &oldHead, __ATOMIC_RELAXED);
+    decltype(stack.head) old_head;
+    __atomic_load(&stack.head, &old_head, __ATOMIC_RELAXED);
     do {
-        node->next = oldHead;
+        node->next = old_head;
     } while (!__atomic_compare_exchange_n(&stack.head,
-                                          &oldHead,         // Expected.
-                                          newHead,          // Desired.
+                                          &old_head,        // Expected.
+                                          new_head,         // Desired.
                                           1,                // Weak.
                                           __ATOMIC_RELEASE, // Success.
                                           __ATOMIC_RELAXED  // Failure.
@@ -137,15 +137,15 @@ inline MemNode<SizeN>* pop(const MemPool& pool, MemStack<SizeN>& stack)
 {
     MemNode<SizeN>* node;
 
-    decltype(stack.head) oldHead;
-    __atomic_load(&stack.head, &oldHead, __ATOMIC_ACQUIRE);
+    decltype(stack.head) old_head;
+    __atomic_load(&stack.head, &old_head, __ATOMIC_ACQUIRE);
     do {
-        if (oldHead == 0) {
+        if (old_head == 0) {
             return nullptr;
         }
-        node = offsetToPtr<decltype(node)>(pool, linkToOffset(oldHead));
+        node = offset_to_ptr<decltype(node)>(pool, link_to_offset(old_head));
     } while (!__atomic_compare_exchange_n(&stack.head,
-                                          &oldHead,         // Expected.
+                                          &old_head,        // Expected.
                                           node->next,       // Desired.
                                           1,                // Weak.
                                           __ATOMIC_ACQUIRE, // Success.
@@ -154,38 +154,38 @@ inline MemNode<SizeN>* pop(const MemPool& pool, MemStack<SizeN>& stack)
     return node;
 }
 
-inline MemSize reserve(MemPool& pool, MemSize size, MemSize maxSize)
+inline MemSize reserve(MemPool& pool, MemSize size, MemSize max_size)
 {
-    MemSize newOffset, oldOffset;
-    __atomic_load(&pool.offset, &oldOffset, __ATOMIC_RELAXED);
+    MemSize new_offset, old_offset;
+    __atomic_load(&pool.offset, &old_offset, __ATOMIC_RELAXED);
     do {
-        newOffset = oldOffset + size;
-        if (newOffset > maxSize) {
+        new_offset = old_offset + size;
+        if (new_offset > max_size) {
             throw std::bad_alloc{};
         }
     } while (!__atomic_compare_exchange_n(&pool.offset,
-                                          &oldOffset,       // Expected.
-                                          newOffset,        // Desired.
+                                          &old_offset,      // Expected.
+                                          new_offset,       // Desired.
                                           1,                // Weak.
                                           __ATOMIC_RELAXED, // Success.
                                           __ATOMIC_RELAXED  // Failure.
                                           ));
-    return oldOffset;
+    return old_offset;
 }
 
 template <std::size_t SizeN>
-inline void* allocBlock(MemPool& pool, MemStack<SizeN>& stack, MemSize maxSize)
+inline void* alloc_block(MemPool& pool, MemStack<SizeN>& stack, MemSize max_size)
 {
     void* addr = pop(pool, stack);
     if (!addr) {
-        const auto offset = reserve(pool, SizeN, maxSize);
-        addr = offsetToPtr(pool, offset);
+        const auto offset = reserve(pool, SizeN, max_size);
+        addr = offset_to_ptr(pool, offset);
     }
     return addr;
 }
 
 template <std::size_t SizeN>
-inline void deallocBlock(MemPool& pool, MemStack<SizeN>& stack, void* addr)
+inline void dealloc_block(MemPool& pool, MemStack<SizeN>& stack, void* addr)
 {
     push(pool, stack, static_cast<MemNode<SizeN>*>(addr));
 }

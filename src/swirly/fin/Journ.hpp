@@ -36,10 +36,10 @@ class SWIRLY_API Journ {
     constexpr Journ(Journ&&) noexcept = default;
     Journ& operator=(Journ&&) noexcept = default;
 
-    void write(const Msg& msg) { doWrite(msg); }
+    void write(const Msg& msg) { do_write(msg); }
 
   protected:
-    virtual void doWrite(const Msg& msg) = 0;
+    virtual void do_write(const Msg& msg) = 0;
 };
 
 } // namespace fin

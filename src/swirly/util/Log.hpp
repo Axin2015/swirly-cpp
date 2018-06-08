@@ -31,58 +31,58 @@ using Logger = void (*)(int, std::string_view);
 /**
  * Return log label for given log level.
  */
-SWIRLY_API const char* logLabel(int level) noexcept;
+SWIRLY_API const char* log_label(int level) noexcept;
 
 /**
  * Return current log level.
  */
-SWIRLY_API int getLogLevel() noexcept;
+SWIRLY_API int get_log_level() noexcept;
 
 /**
  * Return true if level is less than or equal to current log level.
  */
-inline bool isLogLevel(int level) noexcept
+inline bool is_log_level(int level) noexcept
 {
-    return level <= getLogLevel();
+    return level <= get_log_level();
 }
 
 /**
  * Set log level globally for all threads.
  */
-SWIRLY_API int setLogLevel(int level) noexcept;
+SWIRLY_API int set_log_level(int level) noexcept;
 
 /**
  * Return current logger.
  */
-SWIRLY_API Logger getLogger() noexcept;
+SWIRLY_API Logger get_logger() noexcept;
 
 /**
  * Set logger globally for all threads.
  */
-SWIRLY_API Logger setLogger(Logger logger) noexcept;
+SWIRLY_API Logger set_logger(Logger logger) noexcept;
 
 /**
  * Unconditionally write log message to the logger. Specifically, this function does not check that
- * level is allowed by the current log level; users are expected to call isLogLevel first, before
+ * level is allowed by the current log level; users are expected to call is_log_level first, before
  * formatting the log message.
  */
-SWIRLY_API void writeLog(int level, std::string_view msg) noexcept;
+SWIRLY_API void write_log(int level, std::string_view msg) noexcept;
 
 /**
  * Null logger. This logger does nothing and is effectively /dev/null.
  */
-SWIRLY_API void nullLogger(int level, std::string_view msg) noexcept;
+SWIRLY_API void null_logger(int level, std::string_view msg) noexcept;
 
 /**
  * Standard logger. This logger writes to stdout if the log level is greater than LogWarn, and
  * stdout otherwise.
  */
-SWIRLY_API void stdLogger(int level, std::string_view msg) noexcept;
+SWIRLY_API void std_logger(int level, std::string_view msg) noexcept;
 
 /**
  * System logger. This logger calls syslog().
  */
-SWIRLY_API void sysLogger(int level, std::string_view msg) noexcept;
+SWIRLY_API void sys_logger(int level, std::string_view msg) noexcept;
 
 /**
  * Logger callback function.
@@ -94,7 +94,7 @@ using LogMsg = StaticStream<MaxLogMsg>;
  * messages before writing to the log. Note that the StaticStream is reset each time this function
  * is called.
  */
-SWIRLY_API LogMsg& logMsg() noexcept;
+SWIRLY_API LogMsg& log_msg() noexcept;
 
 // Inspired by techniques developed by Rodrigo Fernandes.
 class Log {
@@ -134,10 +134,10 @@ class Log {
 
     explicit Log(int level) noexcept
     : level_{level}
-    , msg_(logMsg())
+    , msg_(log_msg())
     {
     }
-    ~Log() { writeLog(level_, msg_); }
+    ~Log() { write_log(level_, msg_); }
 
     // Copy.
     Log(const Log&) = delete;
@@ -171,7 +171,7 @@ Log& operator<<(Log&& log, const ValueT& val)
 } // namespace swirly
 
 // clang-format off
-#define SWIRLY_LOG(level) swirly::isLogLevel(level) && swirly::Log{level}
+#define SWIRLY_LOG(level) swirly::is_log_level(level) && swirly::Log{level}
 
 #define SWIRLY_CRIT SWIRLY_LOG(swirly::Log::Crit)
 #define SWIRLY_ERROR SWIRLY_LOG(swirly::Log::Error)

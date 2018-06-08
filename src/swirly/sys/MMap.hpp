@@ -82,7 +82,7 @@ inline MMap mmap(void* addr, size_t len, int prot, int flags, int fd, off_t off,
 {
     const MMapPointer p{::mmap(addr, len, prot, flags, fd, off), len};
     if (!p) {
-        ec = makeError(errno);
+        ec = make_error(errno);
     }
     return MMap{p};
 }
@@ -91,7 +91,7 @@ inline MMap mmap(void* addr, size_t len, int prot, int flags, int fd, off_t off)
 {
     const MMapPointer p{::mmap(addr, len, prot, flags, fd, off), len};
     if (!p) {
-        throw std::system_error{makeError(errno), "mmap"};
+        throw std::system_error{make_error(errno), "mmap"};
     }
     return MMap{p};
 }

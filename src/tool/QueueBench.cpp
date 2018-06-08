@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
                 const auto usec = diff.count();
                 hist.record(usec);
             } else {
-                cpuRelax();
+                cpu_relax();
             }
         }
 

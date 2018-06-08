@@ -69,43 +69,43 @@ constexpr Cost operator""_cst(unsigned long long val) noexcept
 using MarketState = unsigned;
 using AssetType = fbs::AssetType;
 
-inline const char* enumString(AssetType type) noexcept
+inline const char* enum_string(AssetType type) noexcept
 {
     return fbs::EnumNameAssetType(type);
 }
 
 using Direct = fbs::Direct;
 
-inline const char* enumString(Direct direct) noexcept
+inline const char* enum_string(Direct direct) noexcept
 {
     return fbs::EnumNameDirect(direct);
 }
 
 using LiqInd = fbs::LiqInd;
 
-inline const char* enumString(LiqInd liqInd) noexcept
+inline const char* enum_string(LiqInd liq_ind) noexcept
 {
-    return fbs::EnumNameLiqInd(liqInd);
+    return fbs::EnumNameLiqInd(liq_ind);
 }
 
-constexpr LiqInd opposite(LiqInd liqInd) noexcept
+constexpr LiqInd opposite(LiqInd liq_ind) noexcept
 {
-    switch (liqInd) {
+    switch (liq_ind) {
     case LiqInd::None:
         break;
     case LiqInd::Maker:
-        liqInd = LiqInd::Taker;
+        liq_ind = LiqInd::Taker;
         break;
     case LiqInd::Taker:
-        liqInd = LiqInd::Maker;
+        liq_ind = LiqInd::Maker;
         break;
     }
-    return liqInd;
+    return liq_ind;
 }
 
 using Side = fbs::Side;
 
-inline const char* enumString(Side side) noexcept
+inline const char* enum_string(Side side) noexcept
 {
     return fbs::EnumNameSide(side);
 }
@@ -131,7 +131,7 @@ constexpr Side opposite(Side side) noexcept
  */
 using State = fbs::State;
 
-inline const char* enumString(State state) noexcept
+inline const char* enum_string(State state) noexcept
 {
     return fbs::EnumNameState(state);
 }
@@ -139,7 +139,7 @@ inline const char* enumString(State state) noexcept
 /**
  * This overload is used for presentation purposes only. There is no inverse operation.
  */
-inline const char* enumString(State state, Lots resd) noexcept
+inline const char* enum_string(State state, Lots resd) noexcept
 {
     if (state == State::Trade) {
         return resd == 0_lts ? "Complete" : "Partial";
@@ -153,27 +153,27 @@ namespace fbs {
 
 inline std::ostream& operator<<(std::ostream& os, AssetType type)
 {
-    return os << enumString(type);
+    return os << enum_string(type);
 }
 
 inline std::ostream& operator<<(std::ostream& os, Direct direct)
 {
-    return os << enumString(direct);
+    return os << enum_string(direct);
 }
 
-inline std::ostream& operator<<(std::ostream& os, LiqInd liqInd)
+inline std::ostream& operator<<(std::ostream& os, LiqInd liq_ind)
 {
-    return os << enumString(liqInd);
+    return os << enum_string(liq_ind);
 }
 
 inline std::ostream& operator<<(std::ostream& os, Side side)
 {
-    return os << enumString(side);
+    return os << enum_string(side);
 }
 
 inline std::ostream& operator<<(std::ostream& os, State state)
 {
-    return os << enumString(state);
+    return os << enum_string(state);
 }
 
 } // namespace fbs

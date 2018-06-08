@@ -51,7 +51,7 @@ class TableModel : public QAbstractTableModel {
         }
         return flags;
     }
-    const ValueT& valueAt(int n) const { return rowAt(n).value(); }
+    const ValueT& value_at(int n) const { return row_at(n).value(); }
     void reset()
     {
         beginResetModel();
@@ -72,27 +72,27 @@ class TableModel : public QAbstractTableModel {
             }
         }
     }
-    void setChecked(bool checked = true)
+    void set_checked(bool checked = true)
     {
         if (!rows_.empty()) {
             for (auto& row : rows_) {
-                row.second.setChecked(checked);
+                row.second.set_checked(checked);
             }
             emit dataChanged(index(0, CheckStateN), index(rows_.size() - 1, CheckStateN));
         }
     }
-    void toggleCheckState(int n)
+    void toggle_check_state(int n)
     {
-        auto& row = rowAt(n);
-        row.setChecked(!row.checked());
+        auto& row = row_at(n);
+        row.set_checked(!row.checked());
         const auto i = index(n, CheckStateN);
         emit dataChanged(i, i);
     }
 
   protected:
-    const Row<ValueT>& rowAt(int n) const { return rows_.nth(n)->second; }
-    Row<ValueT>& rowAt(int n) { return rows_.nth(n)->second; }
-    void removeRow(const KeyT& key)
+    const Row<ValueT>& row_at(int n) const { return rows_.nth(n)->second; }
+    Row<ValueT>& row_at(int n) { return rows_.nth(n)->second; }
+    void remove_row(const KeyT& key)
     {
         auto it = rows_.find(key);
         if (it != rows_.end()) {
@@ -102,7 +102,7 @@ class TableModel : public QAbstractTableModel {
             endRemoveRows();
         }
     }
-    void updateRow(const KeyT& key, uint64_t tag, const ValueT& val)
+    void update_row(const KeyT& key, uint64_t tag, const ValueT& val)
     {
         auto it = rows_.lower_bound(key);
         const int row = distance(rows_.begin(), it);
@@ -110,9 +110,9 @@ class TableModel : public QAbstractTableModel {
         const bool found{it != rows_.end() && !rows_.key_comp()(key, it->first)};
         if (found) {
             // Update tag to avoid removal during sweep phase.
-            it->second.setTag(tag);
-            if (isModified(it->second.value(), val)) {
-                it->second.setValue(val);
+            it->second.set_tag(tag);
+            if (is_modified(it->second.value(), val)) {
+                it->second.set_value(val);
                 emit dataChanged(index(row, 0), index(row, ColumnCountN - 1));
             }
         } else {

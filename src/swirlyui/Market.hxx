@@ -48,49 +48,49 @@ class Market {
   public:
     using Levels = std::array<Level, MaxLevels>;
 
-    Market(Id64 id, const Instr& instr, QDate settlDate, MarketState state, Lots lastLots,
-           Ticks lastTicks, const QDateTime& lastTime)
+    Market(Id64 id, const Instr& instr, QDate settl_date, MarketState state, Lots last_lots,
+           Ticks last_ticks, const QDateTime& last_time)
     : id_{id}
     , instr_{instr}
-    , settlDate_{settlDate}
+    , settl_date_{settl_date}
     , state_{state}
-    , lastLots_{lastLots}
-    , lastTicks_{lastTicks}
-    , lastTime_{lastTime}
+    , last_lots_{last_lots}
+    , last_ticks_{last_ticks}
+    , last_time_{last_time}
     {
     }
     Market() = default;
     ~Market() = default;
 
-    static Market fromJson(const Instr& instr, const QJsonObject& obj);
+    static Market from_json(const Instr& instr, const QJsonObject& obj);
 
     Id64 id() const noexcept { return id_; }
     const Instr& instr() const noexcept { return instr_; }
-    QDate settlDate() const noexcept { return settlDate_; }
+    QDate settl_date() const noexcept { return settl_date_; }
     MarketState state() const noexcept { return state_; }
-    Lots lastLots() const noexcept { return lastLots_; }
-    Ticks lastTicks() const noexcept { return lastTicks_; }
-    const QDateTime& lastTime() const noexcept { return lastTime_; }
+    Lots last_lots() const noexcept { return last_lots_; }
+    Ticks last_ticks() const noexcept { return last_ticks_; }
+    const QDateTime& last_time() const noexcept { return last_time_; }
     const Levels& bids() const noexcept { return bids_; }
     const Levels& offers() const noexcept { return offers_; }
-    const Level& bestBid() const noexcept { return bids_.front(); }
-    const Level& bestOffer() const noexcept { return offers_.front(); }
+    const Level& best_bid() const noexcept { return bids_.front(); }
+    const Level& best_offer() const noexcept { return offers_.front(); }
 
   private:
     Id64 id_{};
     Instr instr_{};
-    QDate settlDate_{};
+    QDate settl_date_{};
     MarketState state_{};
-    Lots lastLots_{};
-    Ticks lastTicks_{};
-    QDateTime lastTime_{};
+    Lots last_lots_{};
+    Ticks last_ticks_{};
+    QDateTime last_time_{};
     Levels bids_{};
     Levels offers_{};
 };
 
 QDebug operator<<(QDebug debug, const Market& market);
 
-inline bool isModified(const Market& prev, const Market& next) noexcept
+inline bool is_modified(const Market& prev, const Market& next) noexcept
 {
     // Assume market-data has changed.
     return true;

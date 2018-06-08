@@ -72,14 +72,14 @@ class SWIRLY_API RestBody {
     swirly::Symbol symbol() const noexcept { return +symbol_; }
     swirly::Symbol accnt() const noexcept { return +accnt_; }
     swirly::Symbol instr() const noexcept { return +instr_; }
-    IsoDate settlDate() const noexcept { return settlDate_; }
+    IsoDate settl_date() const noexcept { return settl_date_; }
     std::string_view ref() const noexcept { return +ref_; }
     MarketState state() const noexcept { return state_; }
     swirly::Side side() const noexcept { return side_; }
     swirly::Lots lots() const noexcept { return lots_; }
     swirly::Ticks ticks() const noexcept { return ticks_; }
-    swirly::Lots minLots() const noexcept { return minLots_; }
-    swirly::LiqInd liqInd() const noexcept { return liqInd_; }
+    swirly::Lots min_lots() const noexcept { return min_lots_; }
+    swirly::LiqInd liq_ind() const noexcept { return liq_ind_; }
     swirly::Symbol cpty() const noexcept { return +cpty_; }
     /**
      * Validate fields.
@@ -116,14 +116,14 @@ class SWIRLY_API RestBody {
     StringData<MaxSymbol> symbol_;
     StringData<MaxSymbol> accnt_;
     StringData<MaxSymbol> instr_;
-    IsoDate settlDate_;
+    IsoDate settl_date_;
     StringData<MaxRef> ref_;
     MarketState state_;
     swirly::Side side_;
     swirly::Lots lots_;
     swirly::Ticks ticks_;
-    swirly::Lots minLots_;
-    swirly::LiqInd liqInd_;
+    swirly::Lots min_lots_;
+    swirly::LiqInd liq_ind_;
     StringData<MaxSymbol> cpty_;
 
     long num() const noexcept { return num_.sign * num_.digits; }

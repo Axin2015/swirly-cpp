@@ -23,20 +23,20 @@
 namespace swirly {
 inline namespace fin {
 
-constexpr Id64 toMarketId(Id32 instrId, JDay settlDay) noexcept
+constexpr Id64 to_market_id(Id32 instr_id, JDay settl_day) noexcept
 {
-    return Id64{(instrId.count() << 16) | (jdToTjd(settlDay) & 0xffff)};
+    return Id64{(instr_id.count() << 16) | (jd_to_tjd(settl_day) & 0xffff)};
 }
 
-constexpr Id64 toMarketId(Id32 instrId, IsoDate settlDate) noexcept
+constexpr Id64 to_market_id(Id32 instr_id, IsoDate settl_date) noexcept
 {
-    return toMarketId(instrId, maybeIsoToJd(settlDate));
+    return to_market_id(instr_id, maybe_iso_to_jd(settl_date));
 }
 
 template <typename ValueT>
 struct MarketIdTraits {
     using Id = Id64;
-    static Id id(const ValueT& value) noexcept { return value.marketId(); }
+    static Id id(const ValueT& value) noexcept { return value.market_id(); }
 };
 
 } // namespace fin

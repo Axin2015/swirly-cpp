@@ -32,7 +32,7 @@ inline void chdir(const char* path, std::error_code& ec) noexcept
 {
     const auto ret = ::chdir(path);
     if (ret < 0) {
-        ec = makeError(errno);
+        ec = make_error(errno);
     }
 }
 
@@ -43,7 +43,7 @@ inline void chdir(const char* path)
 {
     const auto ret = ::chdir(path);
     if (ret < 0) {
-        throw std::system_error{makeError(errno), "chdir"};
+        throw std::system_error{make_error(errno), "chdir"};
     }
 }
 
@@ -54,7 +54,7 @@ inline pid_t fork(std::error_code& ec) noexcept
 {
     const auto pid = ::fork();
     if (pid < 0) {
-        ec = makeError(errno);
+        ec = make_error(errno);
     }
     return pid;
 }
@@ -66,7 +66,7 @@ inline pid_t fork()
 {
     const auto pid = ::fork();
     if (pid < 0) {
-        throw std::system_error{makeError(errno), "fork"};
+        throw std::system_error{make_error(errno), "fork"};
     }
     return pid;
 }
@@ -78,7 +78,7 @@ inline pid_t setsid(std::error_code& ec) noexcept
 {
     const auto sid = ::setsid();
     if (sid < 0) {
-        ec = makeError(errno);
+        ec = make_error(errno);
     }
     return sid;
 }
@@ -90,7 +90,7 @@ inline pid_t setsid()
 {
     const auto sid = ::setsid();
     if (sid < 0) {
-        throw std::system_error{makeError(errno), "setsid"};
+        throw std::system_error{make_error(errno), "setsid"};
     }
     return sid;
 }

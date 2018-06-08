@@ -24,72 +24,72 @@ MarketSide::~MarketSide() = default;
 
 MarketSide::MarketSide(MarketSide&&) = default;
 
-void MarketSide::insertOrder(const OrderPtr& order)
+void MarketSide::insert_order(const OrderPtr& order)
 {
     assert(order->level() == nullptr);
     assert(order->ticks() != 0_tks);
-    assert(order->resdLots() > 0_lts);
-    assert(order->execLots() <= order->lots());
+    assert(order->resd_lots() > 0_lts);
+    assert(order->exec_lots() <= order->lots());
     assert(order->lots() > 0_lts);
-    assert(order->minLots() >= 0_lts);
+    assert(order->min_lots() >= 0_lts);
 
-    auto it = insertLevel(order);
+    auto it = insert_level(order);
     // Next level.
     ++it;
     if (it != levels_.end()) {
         // Insert order after the level's last order.
         // I.e. insert order before the next level's first order.
-        orders_.insertBefore(order, it->firstOrder());
+        orders_.insert_before(order, it->first_order());
     } else {
-        orders_.insertBack(order);
+        orders_.insert_back(order);
     }
 }
 
-LevelSet::Iterator MarketSide::insertLevel(const OrderPtr& order)
+LevelSet::Iterator MarketSide::insert_level(const OrderPtr& order)
 {
     LevelSet::Iterator it;
     bool found;
-    tie(it, found) = levels_.findHint(order->side(), order->ticks());
+    tie(it, found) = levels_.find_hint(order->side(), order->ticks());
     if (!found) {
-        it = levels_.emplaceHint(it, *order);
+        it = levels_.emplace_hint(it, *order);
     } else {
-        it->addOrder(*order);
+        it->add_order(*order);
     }
-    order->setLevel(&*it);
+    order->set_level(&*it);
     return it;
 }
 
-void MarketSide::removeOrder(Level& level, const Order& order) noexcept
+void MarketSide::remove_order(Level& level, const Order& order) noexcept
 {
-    level.subOrder(order);
+    level.sub_order(order);
 
     if (level.count() == 0) {
         // Remove level.
         assert(level.lots() == 0_lts);
         levels_.remove(level);
-    } else if (&level.firstOrder() == &order) {
+    } else if (&level.first_order() == &order) {
         // First order at this level is being removed.
-        auto it = OrderList::toIterator(order);
-        level.setFirstOrder(*++it);
+        auto it = OrderList::to_iterator(order);
+        level.set_first_order(*++it);
     }
 
     orders_.remove(order);
 
     // No longer associated with side.
-    order.setLevel(nullptr);
+    order.set_level(nullptr);
 }
 
-void MarketSide::reduceLevel(Level& level, const Order& order, Lots delta) noexcept
+void MarketSide::reduce_level(Level& level, const Order& order, Lots delta) noexcept
 {
     assert(delta >= 0_lts);
-    assert(delta <= order.resdLots());
+    assert(delta <= order.resd_lots());
 
-    if (delta < order.resdLots()) {
+    if (delta < order.resd_lots()) {
         // Reduce level's resd by delta.
         level.reduce(delta);
     } else {
-        assert(delta == order.resdLots());
-        removeOrder(level, order);
+        assert(delta == order.resd_lots());
+        remove_order(level, order);
     }
 }
 

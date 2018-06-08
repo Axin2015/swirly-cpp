@@ -33,10 +33,10 @@ class TcpAcceptor {
     TcpAcceptor(Reactor& r, const Endpoint& ep)
     : serv_{ep.protocol()}
     {
-        serv_.setSoReuseAddr(true);
+        serv_.set_so_reuse_addr(true);
         serv_.bind(ep);
         serv_.listen(SOMAXCONN);
-        sub_ = r.subscribe(*serv_, EventIn, bind<&TcpAcceptor::onInput>(this));
+        sub_ = r.subscribe(*serv_, EventIn, bind<&TcpAcceptor::on_input>(this));
     }
 
     // Copy.
@@ -51,11 +51,11 @@ class TcpAcceptor {
     ~TcpAcceptor() = default;
 
   private:
-    void onInput(int fd, unsigned events, Time now)
+    void on_input(int fd, unsigned events, Time now)
     {
         Endpoint ep;
         IoSocket sock{os::accept(fd, ep), serv_.family()};
-        static_cast<DerivedT*>(this)->doAccept(std::move(sock), ep, now);
+        static_cast<DerivedT*>(this)->do_accept(std::move(sock), ep, now);
     }
 
     TcpSocketServ serv_;

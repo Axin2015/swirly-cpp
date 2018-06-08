@@ -120,7 +120,7 @@ std::ostream& operator<<(std::ostream& os, const FixField<TagN, ValueT>& field)
 {
     os << field.tag() << '=';
     if constexpr (std::is_same_v<ValueT, Time>) {
-        os << putTime<Millis>(field.value(), "%Y%m%d-%T");
+        os << put_time<Millis>(field.value(), "%Y%m%d-%T");
     } else {
         os << field.value();
     }

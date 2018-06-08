@@ -39,7 +39,7 @@ static_assert(std::is_pod_v<MsgEvent>);
 static_assert(sizeof(MsgEvent) + sizeof(std::int64_t) == 1536);
 
 template <typename DataT>
-void emplaceEvent(MsgEvent& ev, int type) noexcept
+void emplace_event(MsgEvent& ev, int type) noexcept
 {
     static_assert(alignof(DataT) <= 8);
     static_assert(std::is_nothrow_default_constructible_v<DataT>);
@@ -49,7 +49,7 @@ void emplaceEvent(MsgEvent& ev, int type) noexcept
 }
 
 template <typename DataT, typename... ArgsT>
-void emplaceEvent(MsgEvent& ev, int type, ArgsT&&... args) noexcept
+void emplace_event(MsgEvent& ev, int type, ArgsT&&... args) noexcept
 {
     static_assert(alignof(DataT) <= 8);
     static_assert(std::is_nothrow_constructible_v<DataT, ArgsT...>);

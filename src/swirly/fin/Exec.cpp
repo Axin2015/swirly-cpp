@@ -29,56 +29,56 @@ Exec::~Exec() = default;
 
 Exec::Exec(Exec&&) = default;
 
-void Exec::toDsv(ostream& os, char delim) const
+void Exec::to_dsv(ostream& os, char delim) const
 {
     OStreamJoiner osj{os, delim};
-    osj << accnt_    //
-        << marketId_ //
+    osj << accnt_     //
+        << market_id_ //
         << instr_;
-    if (settlDay_ != 0_jd) {
-        osj << jdToIso(settlDay_);
+    if (settl_day_ != 0_jd) {
+        osj << jd_to_iso(settl_day_);
     } else {
         osj << ""sv;
     }
     osj << id_ //
-        << orderId_;
+        << order_id_;
     if (!ref_.empty()) {
         osj << ref_;
     } else {
         osj << ""sv;
     }
-    osj << state_    //
-        << side_     //
-        << lots_     //
-        << ticks_    //
-        << resdLots_ //
-        << execLots_ //
-        << execCost_;
-    if (lastLots_ != 0_lts) {
-        osj << lastLots_ //
-            << lastTicks_;
+    osj << state_     //
+        << side_      //
+        << lots_      //
+        << ticks_     //
+        << resd_lots_ //
+        << exec_lots_ //
+        << exec_cost_;
+    if (last_lots_ != 0_lts) {
+        osj << last_lots_ //
+            << last_ticks_;
     } else {
         osj << ""sv
             << ""sv;
     }
-    if (minLots_ != 0_lts) {
-        osj << minLots_;
+    if (min_lots_ != 0_lts) {
+        osj << min_lots_;
     } else {
         osj << ""sv;
     }
-    if (matchId_ != 0_id64) {
-        osj << matchId_;
+    if (match_id_ != 0_id64) {
+        osj << match_id_;
     } else {
         osj << ""sv;
     }
     if (state_ == State::Trade) {
-        osj << posnLots_ << posnCost_;
+        osj << posn_lots_ << posn_cost_;
     } else {
         osj << ""sv
             << ""sv;
     }
-    if (liqInd_ != LiqInd::None) {
-        osj << liqInd_;
+    if (liq_ind_ != LiqInd::None) {
+        osj << liq_ind_;
     } else {
         osj << ""sv;
     }
@@ -86,59 +86,59 @@ void Exec::toDsv(ostream& os, char delim) const
         << created_;
 }
 
-void Exec::toJson(ostream& os) const
+void Exec::to_json(ostream& os) const
 {
-    os << "{\"accnt\":\""sv << accnt_        //
-       << "\",\"market_id\":"sv << marketId_ //
-       << ",\"instr\":\""sv << instr_        //
+    os << "{\"accnt\":\""sv << accnt_         //
+       << "\",\"market_id\":"sv << market_id_ //
+       << ",\"instr\":\""sv << instr_         //
        << "\",\"settl_date\":"sv;
-    if (settlDay_ != 0_jd) {
-        os << jdToIso(settlDay_);
+    if (settl_day_ != 0_jd) {
+        os << jd_to_iso(settl_day_);
     } else {
         os << "null"sv;
     }
-    os << ",\"id\":"sv << id_            //
-       << ",\"order_id\":"sv << orderId_ //
+    os << ",\"id\":"sv << id_             //
+       << ",\"order_id\":"sv << order_id_ //
        << ",\"ref\":"sv;
     if (!ref_.empty()) {
         os << '"' << ref_ << '"';
     } else {
         os << "null"sv;
     }
-    os << ",\"state\":\""sv << state_      //
-       << "\",\"side\":\""sv << side_      //
-       << "\",\"lots\":"sv << lots_        //
-       << ",\"ticks\":"sv << ticks_        //
-       << ",\"resd_lots\":"sv << resdLots_ //
-       << ",\"exec_lots\":"sv << execLots_ //
-       << ",\"exec_cost\":"sv << execCost_;
-    if (lastLots_ != 0_lts) {
-        os << ",\"last_lots\":"sv << lastLots_ //
-           << ",\"last_ticks\":"sv << lastTicks_;
+    os << ",\"state\":\""sv << state_       //
+       << "\",\"side\":\""sv << side_       //
+       << "\",\"lots\":"sv << lots_         //
+       << ",\"ticks\":"sv << ticks_         //
+       << ",\"resd_lots\":"sv << resd_lots_ //
+       << ",\"exec_lots\":"sv << exec_lots_ //
+       << ",\"exec_cost\":"sv << exec_cost_;
+    if (last_lots_ != 0_lts) {
+        os << ",\"last_lots\":"sv << last_lots_ //
+           << ",\"last_ticks\":"sv << last_ticks_;
     } else {
         os << ",\"last_lots\":null,\"last_ticks\":null"sv;
     }
     os << ",\"min_lots\":"sv;
-    if (minLots_ != 0_lts) {
-        os << minLots_;
+    if (min_lots_ != 0_lts) {
+        os << min_lots_;
     } else {
         os << "null"sv;
     }
     os << ",\"match_id\":"sv;
-    if (matchId_ != 0_id64) {
-        os << matchId_;
+    if (match_id_ != 0_id64) {
+        os << match_id_;
     } else {
         os << "null"sv;
     }
     if (state_ == State::Trade) {
-        os << ",\"posn_lots\":"sv << posnLots_ //
-           << ",\"posn_cost\":"sv << posnCost_;
+        os << ",\"posn_lots\":"sv << posn_lots_ //
+           << ",\"posn_cost\":"sv << posn_cost_;
     } else {
         os << ",\"posn_lots\":null,\"posn_cost\":null"sv;
     }
     os << ",\"liq_ind\":"sv;
-    if (liqInd_ != LiqInd::None) {
-        os << '"' << liqInd_ << '"';
+    if (liq_ind_ != LiqInd::None) {
+        os << '"' << liq_ind_ << '"';
     } else {
         os << "null"sv;
     }
@@ -155,23 +155,23 @@ void Exec::toJson(ostream& os) const
 ExecPtr Exec::opposite(Id64 id) const
 {
     assert(!cpty_.empty());
-    return make(cpty_, marketId_, instr_, settlDay_, id, orderId_, +ref_, state_,
-                swirly::opposite(side_), lots_, ticks_, resdLots_, execLots_, execCost_, lastLots_,
-                lastTicks_, minLots_, matchId_, posnLots_, posnCost_, swirly::opposite(liqInd_),
-                accnt_, created_);
+    return make(cpty_, market_id_, instr_, settl_day_, id, order_id_, +ref_, state_,
+                swirly::opposite(side_), lots_, ticks_, resd_lots_, exec_lots_, exec_cost_,
+                last_lots_, last_ticks_, min_lots_, match_id_, posn_lots_, posn_cost_,
+                swirly::opposite(liq_ind_), accnt_, created_);
 }
 
-void Exec::trade(Lots sumLots, Cost sumCost, Lots lastLots, Ticks lastTicks, Id64 matchId,
-                 LiqInd liqInd, Symbol cpty) noexcept
+void Exec::trade(Lots sum_lots, Cost sum_cost, Lots last_lots, Ticks last_ticks, Id64 match_id,
+                 LiqInd liq_ind, Symbol cpty) noexcept
 {
     state_ = State::Trade;
-    resdLots_ -= sumLots;
-    execLots_ += sumLots;
-    execCost_ += sumCost;
-    lastLots_ = lastLots;
-    lastTicks_ = lastTicks;
-    matchId_ = matchId;
-    liqInd_ = liqInd;
+    resd_lots_ -= sum_lots;
+    exec_lots_ += sum_lots;
+    exec_cost_ += sum_cost;
+    last_lots_ = last_lots;
+    last_ticks_ = last_ticks;
+    match_id_ = match_id;
+    liq_ind_ = liq_ind;
     cpty_ = cpty;
 }
 

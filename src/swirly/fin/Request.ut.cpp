@@ -26,14 +26,14 @@ class Foo
 : public RefCount<Foo, ThreadUnsafePolicy>
 , public Request {
   public:
-    Foo(Id64 marketId, Id64 id, int& alive) noexcept
-    : Request{{}, marketId, {}, 0_jd, id, {}, Side::Buy, 0_lts, {}}
+    Foo(Id64 market_id, Id64 id, int& alive) noexcept
+    : Request{{}, market_id, {}, 0_jd, id, {}, Side::Buy, 0_lts, {}}
     , alive_{alive}
     {
         ++alive;
     }
     ~Foo() { --alive_; }
-    boost::intrusive::set_member_hook<> idHook;
+    boost::intrusive::set_member_hook<> id_hook;
 
   private:
     int& alive_;
@@ -53,23 +53,23 @@ BOOST_AUTO_TEST_CASE(RequestIdSetCase)
 
         FooPtr foo1{&*s.emplace(1_id64, 2_id64, alive)};
         BOOST_TEST(alive == 1);
-        BOOST_TEST(foo1->refCount() == 2);
-        BOOST_TEST(foo1->marketId() == 1_id64);
+        BOOST_TEST(foo1->ref_count() == 2);
+        BOOST_TEST(foo1->market_id() == 1_id64);
         BOOST_TEST(foo1->id() == 2_id64);
         BOOST_TEST(s.find(1_id64, 2_id64) != s.end());
 
         // Duplicate.
         FooPtr foo2{&*s.emplace(1_id64, 2_id64, alive)};
         BOOST_TEST(alive == 1);
-        BOOST_TEST(foo2->refCount() == 3);
+        BOOST_TEST(foo2->ref_count() == 3);
         BOOST_TEST(foo2 == foo1);
 
         // Replace.
-        FooPtr foo3{&*s.emplaceOrReplace(1_id64, 2_id64, alive)};
+        FooPtr foo3{&*s.emplace_or_replace(1_id64, 2_id64, alive)};
         BOOST_TEST(alive == 2);
-        BOOST_TEST(foo3->refCount() == 2);
+        BOOST_TEST(foo3->ref_count() == 2);
         BOOST_TEST(foo3 != foo1);
-        BOOST_TEST(foo3->marketId() == 1_id64);
+        BOOST_TEST(foo3->market_id() == 1_id64);
         BOOST_TEST(foo3->id() == 2_id64);
     }
     BOOST_TEST(alive == 0);

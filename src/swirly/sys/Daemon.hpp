@@ -27,7 +27,7 @@ inline namespace sys {
 /**
  * Close all non-standard file handles.
  */
-SWIRLY_API void closeAll() noexcept;
+SWIRLY_API void close_all() noexcept;
 
 /**
  * Daemonise process. Detach from controlling terminal and run in the background as a system daemon.

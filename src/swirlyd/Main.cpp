@@ -58,7 +58,7 @@ using namespace swirly;
 
 namespace {
 
-void openLogFile(const char* path)
+void open_log_file(const char* path)
 {
     const auto file = os::open(path, O_RDWR | O_CREAT | O_APPEND, 0644);
     dup2(*file, STDOUT_FILENO);
@@ -66,12 +66,12 @@ void openLogFile(const char* path)
 }
 
 struct Opts {
-    fs::path confFile;
+    fs::path conf_file;
     bool daemon{false};
-    Time startTime{};
+    Time start_time{};
 };
 
-void printUsage(ostream& os)
+void print_usage(ostream& os)
 {
     os << R"==(Usage: swirlyd [options]
 
@@ -85,7 +85,7 @@ Report bugs to: support@swirlycloud.com
 )==";
 }
 
-void getOpts(int argc, char* argv[], Opts& opts)
+void get_opts(int argc, char* argv[], Opts& opts)
 {
     opterr = 0;
     int ch;
@@ -95,34 +95,34 @@ void getOpts(int argc, char* argv[], Opts& opts)
             opts.daemon = true;
             break;
         case 'f':
-            opts.confFile = optarg;
+            opts.conf_file = optarg;
             break;
         case 'h':
-            printUsage(cout);
+            print_usage(cout);
             exit(0);
         case 's':
-            opts.startTime = toTime(Millis{stou64(optarg)});
+            opts.start_time = to_time(Millis{stou64(optarg)});
             break;
         case ':':
             cerr << "Option '"sv << static_cast<char>(optopt) << "' requires an argument\n"sv;
-            printUsage(cerr);
+            print_usage(cerr);
             exit(1);
         case '?':
         default:
             cerr << "Unknown option '"sv << static_cast<char>(optopt) << "'\n"sv;
-            printUsage(cerr);
+            print_usage(cerr);
             exit(1);
         }
     }
 
     if (optind < argc) {
         cerr << "Unknown argument '"sv << argv[optind] << "'\n"sv;
-        printUsage(cerr);
+        print_usage(cerr);
         exit(1);
     }
 }
 
-MemCtx memCtx;
+MemCtx mem_ctx;
 
 } // namespace
 
@@ -130,86 +130,86 @@ namespace swirly {
 
 void* alloc(size_t size)
 {
-    return memCtx.alloc(size);
+    return mem_ctx.alloc(size);
 }
 
 void* alloc(size_t size, align_val_t al)
 {
-    return memCtx.alloc(size, al);
+    return mem_ctx.alloc(size, al);
 }
 
 void dealloc(void* ptr, size_t size) noexcept
 {
-    return memCtx.dealloc(ptr, size);
+    return mem_ctx.dealloc(ptr, size);
 }
 
 } // namespace swirly
 
 int main(int argc, char* argv[])
 {
-    closeAll();
+    close_all();
 
     int ret = 1;
     try {
 
         Opts opts;
-        getOpts(argc, argv, opts);
+        get_opts(argc, argv, opts);
 
-        if (opts.startTime == Time{}) {
-            opts.startTime = UnixClock::now();
+        if (opts.start_time == Time{}) {
+            opts.start_time = UnixClock::now();
         }
 
         Config config;
-        if (!opts.confFile.empty()) {
-            ifstream is{opts.confFile};
+        if (!opts.conf_file.empty()) {
+            ifstream is{opts.conf_file};
             if (!is.is_open()) {
-                throw Exception{errMsg() << "open failed: "sv << opts.confFile};
+                throw Exception{err_msg() << "open failed: "sv << opts.conf_file};
             }
             config.read(is);
         }
 
-        memCtx = MemCtx{config.get<size_t>("mem_size", 1) << 20};
+        mem_ctx = MemCtx{config.get<size_t>("mem_size", 1) << 20};
 
-        const auto logLevel = config.get("log_level", ""sv);
-        if (!logLevel.empty()) {
-            setLogLevel(fromString<int>(logLevel));
+        const auto log_level = config.get("log_level", ""sv);
+        if (!log_level.empty()) {
+            set_log_level(from_string<int>(log_level));
         }
 
         // Restrict file creation mask if specified. The umask function is always successful.
-        const auto fileMode = config.get("file_mode", ""sv);
-        if (!fileMode.empty()) {
+        const auto file_mode = config.get("file_mode", ""sv);
+        if (!file_mode.empty()) {
             // Zero base to auto-detect: if the prefix is 0, the base is octal, if the prefix is 0x or 0X.
-            umask(fromString<mode_t>(fileMode));
+            umask(from_string<mode_t>(file_mode));
         } else if (opts.daemon) {
             umask(0027);
         }
 
-        fs::path runDir{config.get("run_dir", "")};
-        if (!runDir.empty()) {
+        fs::path run_dir{config.get("run_dir", "")};
+        if (!run_dir.empty()) {
             // Change the current working directory if specified.
-            runDir = fs::canonical(runDir, fs::current_path());
-            os::chdir(runDir.c_str());
+            run_dir = fs::canonical(run_dir, fs::current_path());
+            os::chdir(run_dir.c_str());
         } else if (opts.daemon) {
             // Default to root directory if daemon.
-            runDir = fs::current_path().root_path();
+            run_dir = fs::current_path().root_path();
         } else {
             // Otherwise, default to current directory.
-            runDir = fs::current_path();
+            run_dir = fs::current_path();
         }
 
-        fs::path logFile{config.get("log_file", "")};
-        fs::path pidFile{config.get("pid_file", "")};
+        fs::path log_file{config.get("log_file", "")};
+        fs::path pid_file{config.get("pid_file", "")};
 
         PidFile pf;
-        if (!pidFile.empty()) {
+        if (!pid_file.empty()) {
 
             // Pid file is relative to working directory. We use absolute, rather than canonical
             // here, because canonical requires that the file exists.
-            if (pidFile.is_relative()) {
-                pidFile = fs::absolute(pidFile, runDir);
+            if (pid_file.is_relative()) {
+                pid_file = fs::absolute(pid_file, run_dir);
             }
-            fs::create_directory(pidFile.parent_path());
-            pf = openPidFile(pidFile.c_str(), 0644);
+            fs::create_directory(pid_file.parent_path());
+            pf = open_pid_file(pid_file.c_str(), 0644);
         }
 
         if (opts.daemon) {
@@ -217,76 +217,76 @@ int main(int argc, char* argv[])
             daemon();
         }
 
-        writePidFile(pf);
-        if (logFile.empty()) {
+        write_pid_file(pf);
+        if (log_file.empty()) {
 
             // If a log file is not specified, then use syslog().
 
 #if SWIRLY_BUILD_DEBUG
             setlogmask(LOG_UPTO(LOG_DEBUG));
 #endif
-            setLogger(sysLogger);
+            set_logger(sys_logger);
 
-        } else if (logFile == "-") {
+        } else if (log_file == "-") {
 
             // A single dash in place of a file name is used to indicate stdout/stderr.
             // This is effectively a no-op and there is no need to open a file.
 
             // Clear so that SIGHUP does not attempt to reopen the log file.
-            logFile.clear();
+            log_file.clear();
 
         } else {
 
             // Log file is relative to working directory. We use absolute, rather than canonical
             // here, because canonical requires that the file exists.
-            if (logFile.is_relative()) {
-                logFile = fs::absolute(logFile, runDir);
+            if (log_file.is_relative()) {
+                log_file = fs::absolute(log_file, run_dir);
             }
-            fs::create_directory(logFile.parent_path());
+            fs::create_directory(log_file.parent_path());
 
-            SWIRLY_NOTICE << "opening log file: "sv << logFile;
-            openLogFile(logFile.c_str());
+            SWIRLY_NOTICE << "opening log file: "sv << log_file;
+            open_log_file(log_file.c_str());
         }
 
-        const fs::path mqFile{config.get("mq_file", "")};
-        const char* const httpPort{config.get("http_port", "8080")};
-        const auto maxExecs = config.get<size_t>("max_execs", 1 << 4);
+        const fs::path mq_file{config.get("mq_file", "")};
+        const char* const http_port{config.get("http_port", "8080")};
+        const auto max_execs = config.get<size_t>("max_execs", 1 << 4);
 
         SWIRLY_NOTICE << "initialising daemon"sv;
-        SWIRLY_INFO << "conf_file:     "sv << opts.confFile;
+        SWIRLY_INFO << "conf_file:     "sv << opts.conf_file;
         SWIRLY_INFO << "daemon:        "sv << (opts.daemon ? "yes"sv : "no"sv);
-        SWIRLY_INFO << "start_time:    "sv << opts.startTime;
+        SWIRLY_INFO << "start_time:    "sv << opts.start_time;
 
-        SWIRLY_INFO << "file_mode:     "sv << setfill('0') << setw(3) << oct << swirly::fileMode();
-        SWIRLY_INFO << "http_port:     "sv << httpPort;
-        SWIRLY_INFO << "log_file:      "sv << logFile;
-        SWIRLY_INFO << "log_level:     "sv << getLogLevel();
-        SWIRLY_INFO << "max_execs:     "sv << maxExecs;
-        SWIRLY_INFO << "mem_size:      "sv << (memCtx.maxSize() >> 20) << "MiB"sv;
-        SWIRLY_INFO << "mq_file:       "sv << mqFile;
-        SWIRLY_INFO << "pid_file:      "sv << pidFile;
-        SWIRLY_INFO << "run_dir:       "sv << runDir;
+        SWIRLY_INFO << "file_mode:     "sv << setfill('0') << setw(3) << oct << swirly::file_mode();
+        SWIRLY_INFO << "http_port:     "sv << http_port;
+        SWIRLY_INFO << "log_file:      "sv << log_file;
+        SWIRLY_INFO << "log_level:     "sv << get_log_level();
+        SWIRLY_INFO << "max_execs:     "sv << max_execs;
+        SWIRLY_INFO << "mem_size:      "sv << (mem_ctx.max_size() >> 20) << "MiB"sv;
+        SWIRLY_INFO << "mq_file:       "sv << mq_file;
+        SWIRLY_INFO << "pid_file:      "sv << pid_file;
+        SWIRLY_INFO << "run_dir:       "sv << run_dir;
 
         MsgQueue mq;
-        if (!mqFile.empty()) {
-            mq = MsgQueue{mqFile.c_str()};
+        if (!mq_file.empty()) {
+            mq = MsgQueue{mq_file.c_str()};
         } else {
             mq = MsgQueue{1 << 10};
         }
-        Rest rest{mq, maxExecs};
+        Rest rest{mq, max_execs};
         {
             SqlModel model{config};
-            rest.load(model, opts.startTime);
+            rest.load(model, opts.start_time);
         }
-        RestServ restServ{rest};
+        RestServ rest_serv{rest};
         SqlJourn journ{config};
 
         EpollReactor reactor{1024};
-        const TcpEndpoint ep{Tcp::v4(), stou16(httpPort)};
-        HttpServ httpServ{reactor, ep, restServ};
+        const TcpEndpoint ep{Tcp::v4(), stou16(http_port)};
+        HttpServ http_serv{reactor, ep, rest_serv};
 
-        ReactorThread reactorThread{reactor, ThreadConfig{"reactor"s}};
-        auto journAgent = [&mq, &journ]() {
+        ReactorThread reactor_thread{reactor, ThreadConfig{"reactor"s}};
+        auto journ_agent = [&mq, &journ]() {
             int n{0};
             Msg msg;
             while (mq.pop(msg)) {
@@ -295,19 +295,19 @@ int main(int argc, char* argv[])
             }
             return n;
         };
-        AgentThread journThread{journAgent, ThreadConfig{"journ"s}};
+        AgentThread journ_thread{journ_agent, ThreadConfig{"journ"s}};
 
-        SWIRLY_NOTICE << "started http server on port "sv << httpPort;
+        SWIRLY_NOTICE << "started http server on port "sv << http_port;
 
         // Wait for termination.
-        SigWait sigWait;
-        while (const auto sig = sigWait()) {
+        SigWait sig_wait;
+        while (const auto sig = sig_wait()) {
             switch (sig) {
             case SIGHUP:
                 SWIRLY_INFO << "received SIGHUP"sv;
-                if (!logFile.empty()) {
-                    SWIRLY_NOTICE << "reopening log file: "sv << logFile;
-                    openLogFile(logFile.c_str());
+                if (!log_file.empty()) {
+                    SWIRLY_NOTICE << "reopening log file: "sv << log_file;
+                    open_log_file(log_file.c_str());
                 }
                 continue;
             case SIGINT:

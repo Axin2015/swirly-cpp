@@ -29,26 +29,27 @@ using namespace std;
 
 MsgQueue::~MsgQueue() = default;
 
-void MsgQueue::archiveTrade(Id64 marketId, ArrayView<Id64> ids, Time modified)
+void MsgQueue::archive_trade(Id64 market_id, ArrayView<Id64> ids, Time modified)
 {
     detail::Range<MaxIds> r{ids.size()};
     if (mq_.reserve() < r.steps()) {
         throw std::runtime_error{"insufficient queue capacity"};
     }
     do {
-        doArchiveTrade(marketId, makeArrayView(&ids[r.stepOffset()], r.stepSize()), modified);
+        do_archive_trade(market_id, make_array_view(&ids[r.step_offset()], r.step_size()),
+                         modified);
     } while (r.next());
 }
 
-void MsgQueue::doCreateMarket(Id64 id, Symbol instr, JDay settlDay, MarketState state)
+void MsgQueue::do_create_market(Id64 id, Symbol instr, JDay settl_day, MarketState state)
 {
-    const auto fn = [ id, &instr, settlDay, state ](Msg & msg) noexcept
+    const auto fn = [ id, &instr, settl_day, state ](Msg & msg) noexcept
     {
         msg.type = MsgType::CreateMarket;
-        auto& body = msg.createMarket;
+        auto& body = msg.create_market;
         body.id = id;
         pstrcpy<'\0'>(body.instr, instr);
-        body.settlDay = settlDay;
+        body.settl_day = settl_day;
         body.state = state;
     };
     if (!mq_.post(fn)) {
@@ -56,12 +57,12 @@ void MsgQueue::doCreateMarket(Id64 id, Symbol instr, JDay settlDay, MarketState 
     }
 }
 
-void MsgQueue::doUpdateMarket(Id64 id, MarketState state)
+void MsgQueue::do_update_market(Id64 id, MarketState state)
 {
     const auto fn = [&id, state ](Msg & msg) noexcept
     {
         msg.type = MsgType::UpdateMarket;
-        auto& body = msg.updateMarket;
+        auto& body = msg.update_market;
         body.id = id;
         body.state = state;
     };
@@ -70,59 +71,59 @@ void MsgQueue::doUpdateMarket(Id64 id, MarketState state)
     }
 }
 
-void MsgQueue::doCreateExec(const Exec& exec)
+void MsgQueue::do_create_exec(const Exec& exec)
 {
     const auto fn = [&exec](Msg & msg) noexcept
     {
         msg.type = MsgType::CreateExec;
-        auto& body = msg.createExec;
+        auto& body = msg.create_exec;
         pstrcpy<'\0'>(body.accnt, exec.accnt());
-        body.marketId = exec.marketId();
+        body.market_id = exec.market_id();
         pstrcpy<'\0'>(body.instr, exec.instr());
-        body.settlDay = exec.settlDay();
+        body.settl_day = exec.settl_day();
         body.id = exec.id();
-        body.orderId = exec.orderId();
+        body.order_id = exec.order_id();
         pstrcpy<'\0'>(body.ref, exec.ref());
         body.state = exec.state();
         body.side = exec.side();
         body.lots = exec.lots();
         body.ticks = exec.ticks();
-        body.resdLots = exec.resdLots();
-        body.execLots = exec.execLots();
-        body.execCost = exec.execCost();
-        body.lastLots = exec.lastLots();
-        body.lastTicks = exec.lastTicks();
-        body.minLots = exec.minLots();
-        body.matchId = exec.matchId();
-        body.posnLots = exec.posnLots();
-        body.posnCost = exec.posnCost();
-        body.liqInd = exec.liqInd();
+        body.resd_lots = exec.resd_lots();
+        body.exec_lots = exec.exec_lots();
+        body.exec_cost = exec.exec_cost();
+        body.last_lots = exec.last_lots();
+        body.last_ticks = exec.last_ticks();
+        body.min_lots = exec.min_lots();
+        body.match_id = exec.match_id();
+        body.posn_lots = exec.posn_lots();
+        body.posn_cost = exec.posn_cost();
+        body.liq_ind = exec.liq_ind();
         pstrcpy<'\0'>(body.cpty, exec.cpty());
-        body.created = msSinceEpoch(exec.created());
+        body.created = ms_since_epoch(exec.created());
     };
     if (!mq_.post(fn)) {
         throw std::runtime_error{"insufficient queue capacity"};
     }
 }
 
-void MsgQueue::createExec(ArrayView<ConstExecPtr> execs)
+void MsgQueue::create_exec(ArrayView<ConstExecPtr> execs)
 {
     if (mq_.reserve() < execs.size()) {
         throw std::runtime_error{"insufficient queue capacity"};
     }
     for (const auto& exec : execs) {
-        doCreateExec(*exec);
+        do_create_exec(*exec);
     }
 }
 
-void MsgQueue::doArchiveTrade(Id64 marketId, ArrayView<Id64> ids, Time modified)
+void MsgQueue::do_archive_trade(Id64 market_id, ArrayView<Id64> ids, Time modified)
 {
     assert(ids.size() <= MaxIds);
-    const auto fn = [&marketId, ids, modified ](Msg & msg) noexcept
+    const auto fn = [&market_id, ids, modified ](Msg & msg) noexcept
     {
         msg.type = MsgType::ArchiveTrade;
-        auto& body = msg.archiveTrade;
-        body.marketId = marketId;
+        auto& body = msg.archive_trade;
+        body.market_id = market_id;
         // Cannot use copy and fill here because ArchiveBody is a packed struct:
         // auto it = copy(ids.begin(), ids.end(), begin(body.ids));
         // fill(it, end(body.ids), 0);
@@ -133,7 +134,7 @@ void MsgQueue::doArchiveTrade(Id64 marketId, ArrayView<Id64> ids, Time modified)
         for (; i < MaxIds; ++i) {
             body.ids[i] = 0_id64;
         }
-        body.modified = msSinceEpoch(modified);
+        body.modified = ms_since_epoch(modified);
     };
     if (!mq_.post(fn)) {
         throw std::runtime_error{"insufficient queue capacity"};

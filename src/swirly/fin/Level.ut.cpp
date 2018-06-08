@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(LevelSetCase)
     BOOST_TEST(&level2 == &level1);
 
     // Replace.
-    Level& level3{*s.emplaceOrReplace(order)};
+    Level& level3{*s.emplace_or_replace(order)};
     BOOST_TEST(&level3 != &level1);
     BOOST_TEST(level3.key() == -12345);
 }

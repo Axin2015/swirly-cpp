@@ -62,59 +62,59 @@ using Millis = std::chrono::milliseconds;
 using Micros = std::chrono::microseconds;
 using Nanos = std::chrono::nanoseconds;
 
-SWIRLY_API Time getTime() noexcept;
+SWIRLY_API Time get_time() noexcept;
 SWIRLY_API std::ostream& operator<<(std::ostream& os, Time time);
 
 inline UnixClock::time_point UnixClock::now() noexcept
 {
-    return getTime();
+    return get_time();
 }
 
-constexpr bool isZero(Time time) noexcept
+constexpr bool is_zero(Time time) noexcept
 {
     return time == Time{};
 }
 
 template <typename RepT, typename PeriodT>
-constexpr Time toTime(std::chrono::duration<RepT, PeriodT> d) noexcept
+constexpr Time to_time(std::chrono::duration<RepT, PeriodT> d) noexcept
 {
     using namespace std::chrono;
     return Time{duration_cast<Duration>(d)};
 }
 
-constexpr Time toTime(timeval tv) noexcept
+constexpr Time to_time(timeval tv) noexcept
 {
     using namespace std::chrono;
-    return toTime(seconds{tv.tv_sec} + microseconds{tv.tv_usec});
+    return to_time(seconds{tv.tv_sec} + microseconds{tv.tv_usec});
 }
 
-constexpr Time toTime(timespec ts) noexcept
+constexpr Time to_time(timespec ts) noexcept
 {
     using namespace std::chrono;
-    return toTime(seconds{ts.tv_sec} + nanoseconds{ts.tv_nsec});
+    return to_time(seconds{ts.tv_sec} + nanoseconds{ts.tv_nsec});
 }
 
 template <typename DurationT>
-constexpr DurationT timeSinceEpoch(Time time) noexcept
+constexpr DurationT time_since_epoch(Time time) noexcept
 {
     using namespace std::chrono;
     const Duration d{time.time_since_epoch()};
     return duration_cast<DurationT>(d);
 }
 
-constexpr std::int64_t msSinceEpoch(Time time) noexcept
+constexpr std::int64_t ms_since_epoch(Time time) noexcept
 {
     using namespace std::chrono;
-    return timeSinceEpoch<milliseconds>(time).count();
+    return time_since_epoch<milliseconds>(time).count();
 }
 
-constexpr std::int64_t usSinceEpoch(Time time) noexcept
+constexpr std::int64_t us_since_epoch(Time time) noexcept
 {
     using namespace std::chrono;
-    return timeSinceEpoch<microseconds>(time).count();
+    return time_since_epoch<microseconds>(time).count();
 }
 
-constexpr std::int64_t nsSinceEpoch(Time time) noexcept
+constexpr std::int64_t ns_since_epoch(Time time) noexcept
 {
     using namespace std::chrono;
     const nanoseconds ns{time.time_since_epoch()};
@@ -128,7 +128,7 @@ struct PutTime {
 };
 
 template <typename DurationT = Seconds>
-auto putTime(Time time, const char* fmt)
+auto put_time(Time time, const char* fmt)
 {
     return PutTime<DurationT>{time, fmt};
 }
@@ -141,17 +141,17 @@ std::ostream& operator<<(std::ostream& os, PutTime<DurationT> pt)
     os << std::put_time(gmtime_r(&t, &gmt), pt.fmt);
 
     if constexpr (std::is_same_v<DurationT, Nanos>) {
-        const auto ns = nsSinceEpoch(pt.time);
+        const auto ns = ns_since_epoch(pt.time);
         boost::io::ios_fill_saver ifs{os};
         boost::io::ios_width_saver iws{os};
         os << '.' << std::setfill('0') << std::setw(9) << (ns % 1'000'000'000L);
     } else if constexpr (std::is_same_v<DurationT, Micros>) {
-        const auto us = usSinceEpoch(pt.time);
+        const auto us = us_since_epoch(pt.time);
         boost::io::ios_fill_saver ifs{os};
         boost::io::ios_width_saver iws{os};
         os << '.' << std::setfill('0') << std::setw(6) << (us % 1'000'000L);
     } else if constexpr (std::is_same_v<DurationT, Millis>) {
-        const auto ms = msSinceEpoch(pt.time);
+        const auto ms = ms_since_epoch(pt.time);
         boost::io::ios_fill_saver ifs{os};
         boost::io::ios_width_saver iws{os};
         os << '.' << std::setfill('0') << std::setw(3) << (ms % 1'000L);
@@ -162,7 +162,7 @@ std::ostream& operator<<(std::ostream& os, PutTime<DurationT> pt)
     return os;
 }
 
-constexpr bool isZero(timeval tv) noexcept
+constexpr bool is_zero(timeval tv) noexcept
 {
     return tv.tv_sec == 0 && tv.tv_usec == 0;
 }
@@ -196,7 +196,7 @@ inline timeval operator-(timeval lhs, timeval rhs) noexcept
     return tv;
 }
 
-constexpr bool isZero(timespec ts) noexcept
+constexpr bool is_zero(timespec ts) noexcept
 {
     return ts.tv_sec == 0 && ts.tv_nsec == 0;
 }

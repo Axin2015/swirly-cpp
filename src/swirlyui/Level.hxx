@@ -37,7 +37,7 @@ class Level {
     Level() = default;
     ~Level() = default;
 
-    static Level fromJson(const QJsonObject& obj);
+    static Level from_json(const QJsonObject& obj);
 
     Ticks ticks() const noexcept { return ticks_; }
     Lots lots() const noexcept { return lots_; }

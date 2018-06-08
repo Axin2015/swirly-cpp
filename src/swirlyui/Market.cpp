@@ -24,52 +24,53 @@ namespace ui {
 using namespace std;
 namespace {
 
-void toLevels(const QJsonArray& ticks, const QJsonArray& resd, const QJsonArray& count,
-              Market::Levels& levels)
+void to_levels(const QJsonArray& ticks, const QJsonArray& resd, const QJsonArray& count,
+               Market::Levels& levels)
 {
     for (size_t i{0}; i < MaxLevels; ++i) {
-        levels[i] = {fromJson<Ticks>(ticks[i]), fromJson<Lots>(resd[i]), fromJson<int>(count[i])};
+        levels[i]
+            = {from_json<Ticks>(ticks[i]), from_json<Lots>(resd[i]), from_json<int>(count[i])};
     }
 }
 
 } // namespace
 
-Market Market::fromJson(const Instr& instr, const QJsonObject& obj)
+Market Market::from_json(const Instr& instr, const QJsonObject& obj)
 {
-    using swirly::ui::fromJson;
+    using swirly::ui::from_json;
 
-    Market market{fromJson<Id64>(obj["id"]),
+    Market market{from_json<Id64>(obj["id"]),
                   instr,
-                  fromJson<QDate>(obj["settl_date"]),
-                  fromJson<MarketState>(obj["state"]),
-                  fromJson<Lots>(obj["last_lots"]),
-                  fromJson<Ticks>(obj["last_ticks"]),
-                  fromJson<QDateTime>(obj["last_time"])};
+                  from_json<QDate>(obj["settl_date"]),
+                  from_json<MarketState>(obj["state"]),
+                  from_json<Lots>(obj["last_lots"]),
+                  from_json<Ticks>(obj["last_ticks"]),
+                  from_json<QDateTime>(obj["last_time"])};
 
-    const auto bidTicks = obj["bid_ticks"].toArray();
-    const auto bidLots = obj["bid_lots"].toArray();
-    const auto bidCount = obj["bid_count"].toArray();
-    toLevels(bidTicks, bidLots, bidCount, market.bids_);
+    const auto bid_ticks = obj["bid_ticks"].toArray();
+    const auto bid_lots = obj["bid_lots"].toArray();
+    const auto bid_count = obj["bid_count"].toArray();
+    to_levels(bid_ticks, bid_lots, bid_count, market.bids_);
 
-    const auto offerTicks = obj["offer_ticks"].toArray();
-    const auto offerLots = obj["offer_lots"].toArray();
-    const auto offerCount = obj["offer_count"].toArray();
-    toLevels(offerTicks, offerLots, offerCount, market.offers_);
+    const auto offer_ticks = obj["offer_ticks"].toArray();
+    const auto offer_lots = obj["offer_lots"].toArray();
+    const auto offer_count = obj["offer_count"].toArray();
+    to_levels(offer_ticks, offer_lots, offer_count, market.offers_);
 
     return market;
 }
 
 QDebug operator<<(QDebug debug, const Market& market)
 {
-    debug.nospace() << "Market{id=" << market.id()              //
-                    << ",instr=" << market.instr().symbol()     //
-                    << ",settlDate=" << market.settlDate()      //
-                    << ",state=" << market.state()              //
-                    << ",lastLots=" << market.lastLots()        //
-                    << ",lastTicks=" << market.lastTicks()      //
-                    << ",lastTime=" << market.lastTime()        //
-                    << ",bestBid=" << market.bids().front()     //
-                    << ",bestOffer=" << market.offers().front() //
+    debug.nospace() << "Market{id=" << market.id()               //
+                    << ",instr=" << market.instr().symbol()      //
+                    << ",settl_date=" << market.settl_date()     //
+                    << ",state=" << market.state()               //
+                    << ",last_lots=" << market.last_lots()       //
+                    << ",last_ticks=" << market.last_ticks()     //
+                    << ",last_time=" << market.last_time()       //
+                    << ",best_bid=" << market.bids().front()     //
+                    << ",best_offer=" << market.offers().front() //
                     << '}';
     return debug;
 }

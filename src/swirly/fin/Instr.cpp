@@ -26,25 +26,25 @@ using namespace std;
 
 static_assert(sizeof(Instr) <= 4 * 64, "no greater than specified cache-lines");
 
-Instr::Instr(Id32 id, Symbol symbol, string_view display, Symbol baseAsset, Symbol termCcy,
-             int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
-             Lots maxLots) noexcept
+Instr::Instr(Id32 id, Symbol symbol, string_view display, Symbol base_asset, Symbol term_ccy,
+             int lot_numer, int lot_denom, int tick_numer, int tick_denom, int pip_dp,
+             Lots min_lots, Lots max_lots) noexcept
 : id_{id}
 , symbol_{symbol}
 , display_{display}
-, baseAsset_{baseAsset}
-, termCcy_{termCcy}
-, lotNumer_{lotNumer}
-, lotDenom_{lotDenom}
-, qtyInc_{fractToReal(lotNumer, lotDenom)}
-, tickNumer_{tickNumer}
-, tickDenom_{tickDenom}
-, priceInc_{fractToReal(tickNumer, tickDenom)}
-, pipDp_{pipDp}
-, qtyDp_{realToDp(qtyInc_)}
-, priceDp_{realToDp(priceInc_)}
-, minLots_{minLots}
-, maxLots_{maxLots}
+, base_asset_{base_asset}
+, term_ccy_{term_ccy}
+, lot_numer_{lot_numer}
+, lot_denom_{lot_denom}
+, qty_inc_{fract_to_real(lot_numer, lot_denom)}
+, tick_numer_{tick_numer}
+, tick_denom_{tick_denom}
+, price_inc_{fract_to_real(tick_numer, tick_denom)}
+, pip_dp_{pip_dp}
+, qty_dp_{real_to_dp(qty_inc_)}
+, price_dp_{real_to_dp(price_inc_)}
+, min_lots_{min_lots}
+, max_lots_{max_lots}
 {
 }
 
@@ -54,36 +54,36 @@ Instr::Instr(const Instr&) = default;
 
 Instr::Instr(Instr&&) = default;
 
-void Instr::toDsv(ostream& os, char delim) const
+void Instr::to_dsv(ostream& os, char delim) const
 {
     OStreamJoiner osj{os, delim};
-    osj << id_        //
-        << symbol_    //
-        << display_   //
-        << baseAsset_ //
-        << termCcy_   //
-        << lotNumer_  //
-        << lotDenom_  //
-        << tickNumer_ //
-        << tickDenom_ //
-        << pipDp_     //
-        << minLots_   //
-        << maxLots_;
+    osj << id_         //
+        << symbol_     //
+        << display_    //
+        << base_asset_ //
+        << term_ccy_   //
+        << lot_numer_  //
+        << lot_denom_  //
+        << tick_numer_ //
+        << tick_denom_ //
+        << pip_dp_     //
+        << min_lots_   //
+        << max_lots_;
 }
 
-void Instr::toJson(ostream& os) const
+void Instr::to_json(ostream& os) const
 {
-    os << "{\"symbol\":\""sv << symbol_          //
-       << "\",\"display\":\""sv << display_      //
-       << "\",\"base_asset\":\""sv << baseAsset_ //
-       << "\",\"term_ccy\":\""sv << termCcy_     //
-       << "\",\"lot_numer\":"sv << lotNumer_     //
-       << ",\"lot_denom\":"sv << lotDenom_       //
-       << ",\"tick_numer\":"sv << tickNumer_     //
-       << ",\"tick_denom\":"sv << tickDenom_     //
-       << ",\"pip_dp\":"sv << pipDp_             //
-       << ",\"min_lots\":"sv << minLots_         //
-       << ",\"max_lots\":"sv << maxLots_         //
+    os << "{\"symbol\":\""sv << symbol_           //
+       << "\",\"display\":\""sv << display_       //
+       << "\",\"base_asset\":\""sv << base_asset_ //
+       << "\",\"term_ccy\":\""sv << term_ccy_     //
+       << "\",\"lot_numer\":"sv << lot_numer_     //
+       << ",\"lot_denom\":"sv << lot_denom_       //
+       << ",\"tick_numer\":"sv << tick_numer_     //
+       << ",\"tick_denom\":"sv << tick_denom_     //
+       << ",\"pip_dp\":"sv << pip_dp_             //
+       << ",\"min_lots\":"sv << min_lots_         //
+       << ",\"max_lots\":"sv << max_lots_         //
        << "}"sv;
 }
 

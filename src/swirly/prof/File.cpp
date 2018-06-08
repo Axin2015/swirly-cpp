@@ -22,17 +22,17 @@ namespace swirly {
 inline namespace prof {
 using namespace std;
 namespace {
-inline error_code makeError(int err)
+inline error_code make_error(int err)
 {
     return error_code{err, system_category()};
 }
 } // namespace
 
-FilePtr openFile(const char* path, const char* mode)
+FilePtr open_file(const char* path, const char* mode)
 {
     FilePtr fp{fopen(path, mode), fclose};
     if (!fp) {
-        throw system_error{makeError(errno), "fopen"};
+        throw system_error{make_error(errno), "fopen"};
     }
     return fp;
 }

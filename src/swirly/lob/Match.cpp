@@ -23,13 +23,13 @@
 namespace swirly {
 inline namespace lob {
 
-Match::Match(Lots lots, const OrderPtr& makerOrder, const ExecPtr& makerTrade,
-             const PosnPtr& makerPosn, const ExecPtr& takerTrade) noexcept
+Match::Match(Lots lots, const OrderPtr& maker_order, const ExecPtr& maker_trade,
+             const PosnPtr& maker_posn, const ExecPtr& taker_trade) noexcept
 : lots{lots}
-, makerOrder{makerOrder}
-, makerTrade{makerTrade}
-, makerPosn{makerPosn}
-, takerTrade{takerTrade}
+, maker_order{maker_order}
+, maker_trade{maker_trade}
+, maker_posn{maker_posn}
+, taker_trade{taker_trade}
 {
 }
 

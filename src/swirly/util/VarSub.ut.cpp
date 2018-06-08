@@ -24,13 +24,13 @@ using namespace swirly;
 namespace {
 
 template <typename FnT>
-string applyCopy(FnT fn, string s)
+string apply_copy(FnT fn, string s)
 {
     fn(s);
     return s;
 }
 
-string getVar(const string& name)
+string get_var(const string& name)
 {
     string val;
     if (name == "FOO") {
@@ -53,60 +53,60 @@ BOOST_AUTO_TEST_SUITE(VarSubSuite)
 
 BOOST_AUTO_TEST_CASE(VarSubBasicCase)
 {
-    VarSub fn{getVar};
+    VarSub fn{get_var};
 
-    BOOST_TEST(applyCopy(fn, "${FOO}") == "101");
-    BOOST_TEST(applyCopy(fn, "${BAR}") == "202");
-    BOOST_TEST(applyCopy(fn, "<${FOO}>") == "<101>");
-    BOOST_TEST(applyCopy(fn, "<${FOO} ${BAR}>") == "<101 202>");
+    BOOST_TEST(apply_copy(fn, "${FOO}") == "101");
+    BOOST_TEST(apply_copy(fn, "${BAR}") == "202");
+    BOOST_TEST(apply_copy(fn, "<${FOO}>") == "<101>");
+    BOOST_TEST(apply_copy(fn, "<${FOO} ${BAR}>") == "<101 202>");
 }
 
 BOOST_AUTO_TEST_CASE(VarSubEmptyCase)
 {
-    VarSub fn{getVar};
+    VarSub fn{get_var};
 
-    BOOST_TEST(applyCopy(fn, "${}").empty());
-    BOOST_TEST(applyCopy(fn, "${123}").empty());
-    BOOST_TEST(applyCopy(fn, "${EMPTY}").empty());
+    BOOST_TEST(apply_copy(fn, "${}").empty());
+    BOOST_TEST(apply_copy(fn, "${123}").empty());
+    BOOST_TEST(apply_copy(fn, "${EMPTY}").empty());
 }
 
 BOOST_AUTO_TEST_CASE(VarSubEscapeCase)
 {
-    VarSub fn{getVar};
+    VarSub fn{get_var};
 
-    BOOST_TEST(applyCopy(fn, "\\\\") == "\\");
-    BOOST_TEST(applyCopy(fn, "\\\\>") == "\\>");
-    BOOST_TEST(applyCopy(fn, "<\\\\") == "<\\");
-    BOOST_TEST(applyCopy(fn, "\\${FOO}") == "${FOO}");
-    BOOST_TEST(applyCopy(fn, "$\\{FOO}") == "${FOO}");
-    BOOST_TEST(applyCopy(fn, "${\\FOO}") == "101");
-    BOOST_TEST(applyCopy(fn, "${FOO\\}") == "${FOO}");
-    BOOST_TEST(applyCopy(fn, "${FOO}\\") == "101\\");
+    BOOST_TEST(apply_copy(fn, "\\\\") == "\\");
+    BOOST_TEST(apply_copy(fn, "\\\\>") == "\\>");
+    BOOST_TEST(apply_copy(fn, "<\\\\") == "<\\");
+    BOOST_TEST(apply_copy(fn, "\\${FOO}") == "${FOO}");
+    BOOST_TEST(apply_copy(fn, "$\\{FOO}") == "${FOO}");
+    BOOST_TEST(apply_copy(fn, "${\\FOO}") == "101");
+    BOOST_TEST(apply_copy(fn, "${FOO\\}") == "${FOO}");
+    BOOST_TEST(apply_copy(fn, "${FOO}\\") == "101\\");
 }
 
 BOOST_AUTO_TEST_CASE(VarSubPartialCase)
 {
-    VarSub fn{getVar};
+    VarSub fn{get_var};
 
-    BOOST_TEST(applyCopy(fn, "$") == "$");
-    BOOST_TEST(applyCopy(fn, "{") == "{");
-    BOOST_TEST(applyCopy(fn, "}") == "}");
-    BOOST_TEST(applyCopy(fn, "$FOO") == "$FOO");
-    BOOST_TEST(applyCopy(fn, "{FOO") == "{FOO");
-    BOOST_TEST(applyCopy(fn, "${FOO") == "${FOO");
-    BOOST_TEST(applyCopy(fn, "FOO}") == "FOO}");
-    BOOST_TEST(applyCopy(fn, "$${FOO}") == "$101");
+    BOOST_TEST(apply_copy(fn, "$") == "$");
+    BOOST_TEST(apply_copy(fn, "{") == "{");
+    BOOST_TEST(apply_copy(fn, "}") == "}");
+    BOOST_TEST(apply_copy(fn, "$FOO") == "$FOO");
+    BOOST_TEST(apply_copy(fn, "{FOO") == "{FOO");
+    BOOST_TEST(apply_copy(fn, "${FOO") == "${FOO");
+    BOOST_TEST(apply_copy(fn, "FOO}") == "FOO}");
+    BOOST_TEST(apply_copy(fn, "$${FOO}") == "$101");
 }
 
 BOOST_AUTO_TEST_CASE(VarSubNestedCase)
 {
-    VarSub fn{getVar};
+    VarSub fn{get_var};
 
-    BOOST_TEST(applyCopy(fn, "${FOOBAR}") == "101202");
-    BOOST_TEST(applyCopy(fn, "${${BAZ}}") == "101");
-    BOOST_TEST(applyCopy(fn, "${${BAZ}BAR}") == "101202");
-    BOOST_TEST(applyCopy(fn, "${FOO${QUX}}") == "101202");
-    BOOST_TEST(applyCopy(fn, "${${BAZ}${QUX}}") == "101202");
+    BOOST_TEST(apply_copy(fn, "${FOOBAR}") == "101202");
+    BOOST_TEST(apply_copy(fn, "${${BAZ}}") == "101");
+    BOOST_TEST(apply_copy(fn, "${${BAZ}BAR}") == "101202");
+    BOOST_TEST(apply_copy(fn, "${FOO${QUX}}") == "101202");
+    BOOST_TEST(apply_copy(fn, "${${BAZ}${QUX}}") == "101202");
 }
 
 BOOST_AUTO_TEST_CASE(VarSubLoopCase)
@@ -125,12 +125,12 @@ BOOST_AUTO_TEST_CASE(VarSubLoopCase)
         return val;
     }};
 
-    BOOST_TEST(applyCopy(fn, "${FOO}").empty());
-    BOOST_TEST(applyCopy(fn, "${FOO}${FOO}").empty());
-    BOOST_TEST(applyCopy(fn, "${FOO${FOO}}").empty());
-    BOOST_TEST(applyCopy(fn, "<${FOO}>") == "<>");
-    BOOST_TEST(applyCopy(fn, "<${FOO${FOO}}>") == "<>");
-    BOOST_TEST(applyCopy(fn, "<${FOO} ${FOO}>") == "< >");
+    BOOST_TEST(apply_copy(fn, "${FOO}").empty());
+    BOOST_TEST(apply_copy(fn, "${FOO}${FOO}").empty());
+    BOOST_TEST(apply_copy(fn, "${FOO${FOO}}").empty());
+    BOOST_TEST(apply_copy(fn, "<${FOO}>") == "<>");
+    BOOST_TEST(apply_copy(fn, "<${FOO${FOO}}>") == "<>");
+    BOOST_TEST(apply_copy(fn, "<${FOO} ${FOO}>") == "< >");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

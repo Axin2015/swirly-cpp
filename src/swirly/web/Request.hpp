@@ -59,9 +59,9 @@ class SWIRLY_API HttpRequest : public BasicUrl<HttpRequest> {
         partial_ = false;
     }
     void flush() { BasicUrl<HttpRequest>::parse(); }
-    void setMethod(HttpMethod method) noexcept { method_ = method; }
-    void appendUrl(std::string_view sv) { url_ += sv; }
-    void appendHeaderField(std::string_view sv, bool first)
+    void set_method(HttpMethod method) noexcept { method_ = method; }
+    void append_url(std::string_view sv) { url_ += sv; }
+    void append_header_field(std::string_view sv, bool first)
     {
         if (first) {
             field_ = sv;
@@ -69,7 +69,7 @@ class SWIRLY_API HttpRequest : public BasicUrl<HttpRequest> {
             field_ += sv;
         }
     }
-    void appendHeaderValue(std::string_view sv, bool first)
+    void append_header_value(std::string_view sv, bool first)
     {
         if (first) {
             if (field_ == "Swirly-Accnt"sv) {
@@ -86,7 +86,7 @@ class SWIRLY_API HttpRequest : public BasicUrl<HttpRequest> {
             value_->append(sv);
         }
     }
-    void appendBody(std::string_view sv) { partial_ = !body_.parse(sv); }
+    void append_body(std::string_view sv) { partial_ = !body_.parse(sv); }
 
   private:
     HttpMethod method_{HttpMethod::Get};

@@ -20,7 +20,7 @@ namespace swirly {
 inline namespace sys {
 namespace {
 
-std::pair<std::string, int> splitPair(const std::string& s, char delim)
+std::pair<std::string, int> split_pair(const std::string& s, char delim)
 {
     const auto pos = s.find_last_of(delim);
     std::string addr, num;
@@ -34,13 +34,13 @@ std::pair<std::string, int> splitPair(const std::string& s, char delim)
 }
 
 template <typename TransportT>
-BasicEndpoint<TransportT> parseImpl(const std::string& s, boost::system::error_code& ec)
+BasicEndpoint<TransportT> parse_impl(const std::string& s, boost::system::error_code& ec)
 {
     using Endpoint = BasicEndpoint<TransportT>;
 
     std::string addr;
     int port;
-    tie(addr, port) = splitPair(s, ':');
+    tie(addr, port) = split_pair(s, ':');
 
     Endpoint ep{};
     if (addr.size() >= 2 && addr.front() == '[' && addr.back() == ']') {
@@ -56,22 +56,22 @@ BasicEndpoint<TransportT> parseImpl(const std::string& s, boost::system::error_c
 }
 
 template <typename TransportT>
-BasicEndpoint<TransportT> parseImpl(const std::string& s)
+BasicEndpoint<TransportT> parse_impl(const std::string& s)
 {
     boost::system::error_code ec;
-    const auto ep = parseEndpoint<TransportT>(s, ec);
+    const auto ep = parse_endpoint<TransportT>(s, ec);
     boost::asio::detail::throw_error(ec);
     return ep;
 }
 
 template <typename TransportT>
-std::istream& parseImpl(std::istream& is, BasicEndpoint<TransportT>& ep)
+std::istream& parse_impl(std::istream& is, BasicEndpoint<TransportT>& ep)
 {
     std::string tok;
     is >> tok;
 
     boost::system::error_code ec;
-    ep = swirly::parseImpl<TransportT>(tok, ec);
+    ep = swirly::parse_impl<TransportT>(tok, ec);
     if (ec) {
         is.setstate(std::ios_base::failbit);
     }
@@ -79,34 +79,36 @@ std::istream& parseImpl(std::istream& is, BasicEndpoint<TransportT>& ep)
 }
 } // namespace
 
-TcpEndpoint TransportTraits<Tcp>::parseEndpoint(const std::string& s, boost::system::error_code& ec)
+TcpEndpoint TransportTraits<Tcp>::parse_endpoint(const std::string& s,
+                                                 boost::system::error_code& ec)
 {
-    return parseImpl<Tcp>(s, ec);
+    return parse_impl<Tcp>(s, ec);
 }
 
-TcpEndpoint TransportTraits<Tcp>::parseEndpoint(const std::string& s)
+TcpEndpoint TransportTraits<Tcp>::parse_endpoint(const std::string& s)
 {
-    return parseImpl<Tcp>(s);
+    return parse_impl<Tcp>(s);
 }
 
-UdpEndpoint TransportTraits<Udp>::parseEndpoint(const std::string& s, boost::system::error_code& ec)
+UdpEndpoint TransportTraits<Udp>::parse_endpoint(const std::string& s,
+                                                 boost::system::error_code& ec)
 {
-    return parseImpl<Udp>(s, ec);
+    return parse_impl<Udp>(s, ec);
 }
 
-UdpEndpoint TransportTraits<Udp>::parseEndpoint(const std::string& s)
+UdpEndpoint TransportTraits<Udp>::parse_endpoint(const std::string& s)
 {
-    return parseImpl<Udp>(s);
+    return parse_impl<Udp>(s);
 }
 } // namespace sys
 } // namespace swirly
 
 std::istream& boost::asio::ip::operator>>(std::istream& is, basic_endpoint<tcp>& ep)
 {
-    return swirly::parseImpl<tcp>(is, ep);
+    return swirly::parse_impl<tcp>(is, ep);
 }
 
 std::istream& boost::asio::ip::operator>>(std::istream& is, basic_endpoint<udp>& ep)
 {
-    return swirly::parseImpl<udp>(is, ep);
+    return swirly::parse_impl<udp>(is, ep);
 }

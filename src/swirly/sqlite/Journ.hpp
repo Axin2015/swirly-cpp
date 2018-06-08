@@ -50,7 +50,7 @@ class SWIRLY_API SqlJourn
     SqlJourn& operator=(SqlJourn&&);
 
   protected:
-    void doWrite(const Msg& msg) override;
+    void do_write(const Msg& msg) override;
 
   private:
     void begin();
@@ -59,22 +59,22 @@ class SWIRLY_API SqlJourn
 
     void rollback() noexcept;
 
-    void onCreateMarket(const CreateMarket& body);
+    void on_create_market(const CreateMarket& body);
 
-    void onUpdateMarket(const UpdateMarket& body);
+    void on_update_market(const UpdateMarket& body);
 
-    void onCreateExec(const CreateExec& body);
+    void on_create_exec(const CreateExec& body);
 
-    void onArchiveTrade(const ArchiveTrade& body);
+    void on_archive_trade(const ArchiveTrade& body);
 
     sqlite::DbPtr db_;
-    sqlite::StmtPtr beginStmt_;
-    sqlite::StmtPtr commitStmt_;
-    sqlite::StmtPtr rollbackStmt_;
-    sqlite::StmtPtr insertMarketStmt_;
-    sqlite::StmtPtr updateMarketStmt_;
-    sqlite::StmtPtr insertExecStmt_;
-    sqlite::StmtPtr updateExecStmt_;
+    sqlite::StmtPtr begin_stmt_;
+    sqlite::StmtPtr commit_stmt_;
+    sqlite::StmtPtr rollback_stmt_;
+    sqlite::StmtPtr insert_market_stmt_;
+    sqlite::StmtPtr update_market_stmt_;
+    sqlite::StmtPtr insert_exec_stmt_;
+    sqlite::StmtPtr update_exec_stmt_;
 };
 
 } // namespace sqlite

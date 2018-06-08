@@ -38,30 +38,30 @@ class Client : public QObject {
     ~Client() override = default;
 
     const AssetModel& assetModel() const noexcept { return assetModel_; }
-    const InstrModel& instrModel() const noexcept { return instrModel_; }
-    const MarketModel& marketModel() const noexcept { return marketModel_; }
-    const OrderModel& orderModel() const noexcept { return orderModel_; }
-    const ExecModel& execModel() const noexcept { return execModel_; }
-    const TradeModel& tradeModel() const noexcept { return tradeModel_; }
-    const PosnModel& posnModel() const noexcept { return posnModel_; }
+    const InstrModel& instr_model() const noexcept { return instr_model_; }
+    const MarketModel& market_model() const noexcept { return market_model_; }
+    const OrderModel& order_model() const noexcept { return order_model_; }
+    const ExecModel& exec_model() const noexcept { return exec_model_; }
+    const TradeModel& trade_model() const noexcept { return trade_model_; }
+    const PosnModel& posn_model() const noexcept { return posn_model_; }
 
     AssetModel& assetModel() noexcept { return assetModel_; }
-    InstrModel& instrModel() noexcept { return instrModel_; }
-    MarketModel& marketModel() noexcept { return marketModel_; }
-    OrderModel& orderModel() noexcept { return orderModel_; }
-    ExecModel& execModel() noexcept { return execModel_; }
-    TradeModel& tradeModel() noexcept { return tradeModel_; }
-    PosnModel& posnModel() noexcept { return posnModel_; }
+    InstrModel& instr_model() noexcept { return instr_model_; }
+    MarketModel& market_model() noexcept { return market_model_; }
+    OrderModel& order_model() noexcept { return order_model_; }
+    ExecModel& exec_model() noexcept { return exec_model_; }
+    TradeModel& trade_model() noexcept { return trade_model_; }
+    PosnModel& posn_model() noexcept { return posn_model_; }
 
-    virtual void createMarket(const Instr& instr, QDate settlDate) = 0;
-    virtual void createOrder(const Instr& instr, QDate settlDate, const QString& ref, Side side,
-                             Lots lots, Ticks ticks)
+    virtual void create_market(const Instr& instr, QDate settl_date) = 0;
+    virtual void create_order(const Instr& instr, QDate settl_date, const QString& ref, Side side,
+                              Lots lots, Ticks ticks)
         = 0;
-    virtual void cancelOrders(const OrderKeys& keys) = 0;
+    virtual void cancel_orders(const OrderKeys& keys) = 0;
 
   signals:
-    void refDataComplete();
-    void serviceError(const QString& error);
+    void ref_data_complete();
+    void service_error(const QString& error);
 
   protected:
     void reset();
@@ -70,12 +70,12 @@ class Client : public QObject {
 
   private:
     AssetModel assetModel_;
-    InstrModel instrModel_;
-    MarketModel marketModel_;
-    OrderModel orderModel_;
-    ExecModel execModel_;
-    TradeModel tradeModel_;
-    PosnModel posnModel_;
+    InstrModel instr_model_;
+    MarketModel market_model_;
+    OrderModel order_model_;
+    ExecModel exec_model_;
+    TradeModel trade_model_;
+    PosnModel posn_model_;
 };
 
 } // namespace ui

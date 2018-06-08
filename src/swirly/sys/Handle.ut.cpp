@@ -24,12 +24,12 @@ using namespace std;
 using namespace swirly;
 
 namespace {
-int lastClosed{};
+int last_closed{};
 
 struct TestPolicy {
     using Id = int;
     static constexpr int invalid() noexcept { return -1; }
-    static void close(int id) noexcept { lastClosed = id; }
+    static void close(int id) noexcept { last_closed = id; }
 };
 
 using TestHandle = BasicHandle<TestPolicy>;
@@ -45,63 +45,63 @@ BOOST_AUTO_TEST_SUITE(HandleSuite)
 
 BOOST_AUTO_TEST_CASE(HandleInvalidCase)
 {
-    lastClosed = 0;
+    last_closed = 0;
 
     BOOST_TEST(!TestHandle{});
     BOOST_TEST(TestHandle{}.get() == -1);
-    BOOST_TEST(lastClosed == 0);
+    BOOST_TEST(last_closed == 0);
 
     BOOST_TEST(!TestHandle{nullptr});
     BOOST_TEST(TestHandle{nullptr}.get() == -1);
-    BOOST_TEST(lastClosed == 0);
+    BOOST_TEST(last_closed == 0);
 }
 
 BOOST_AUTO_TEST_CASE(HandleCloseCase)
 {
-    lastClosed = 0;
+    last_closed = 0;
 
     BOOST_TEST(TestHandle{1});
     BOOST_TEST(TestHandle{1}.get() == 1);
-    BOOST_TEST(lastClosed == 1);
+    BOOST_TEST(last_closed == 1);
 }
 
 BOOST_AUTO_TEST_CASE(HandleReleaseCase)
 {
-    lastClosed = 0;
+    last_closed = 0;
 
     BOOST_TEST(TestHandle{1}.release() == 1);
-    BOOST_TEST(lastClosed == 0);
+    BOOST_TEST(last_closed == 0);
 }
 
 BOOST_AUTO_TEST_CASE(HandleResetCase)
 {
-    lastClosed = 0;
+    last_closed = 0;
     {
         TestHandle h{1};
         h.reset(2);
-        BOOST_TEST(lastClosed == 1);
+        BOOST_TEST(last_closed == 1);
     }
-    BOOST_TEST(lastClosed == 2);
+    BOOST_TEST(last_closed == 2);
 }
 
 BOOST_AUTO_TEST_CASE(HandleSwapCase)
 {
-    lastClosed = 0;
+    last_closed = 0;
     {
         TestHandle h{1};
         TestHandle{2}.swap(h);
-        BOOST_TEST(lastClosed == 1);
+        BOOST_TEST(last_closed == 1);
     }
-    BOOST_TEST(lastClosed == 2);
+    BOOST_TEST(last_closed == 2);
 }
 
 BOOST_AUTO_TEST_CASE(HandleMoveCase)
 {
-    lastClosed = 0;
+    last_closed = 0;
 
     TestHandle h{1};
     TestHandle{move(h)};
-    BOOST_TEST(lastClosed == 1);
+    BOOST_TEST(last_closed == 1);
     BOOST_TEST(h.get() == -1);
 
     h.reset(2);
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(HandleMoveCase)
         TestHandle tmp;
         tmp = move(h);
     }
-    BOOST_TEST(lastClosed == 2);
+    BOOST_TEST(last_closed == 2);
     BOOST_TEST(h.get() == -1);
 }
 

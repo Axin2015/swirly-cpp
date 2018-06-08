@@ -32,21 +32,21 @@ inline namespace fin {
 
 class SWIRLY_API Posn : public RefCount<Posn, ThreadUnsafePolicy> {
   public:
-    Posn(Symbol accnt, Id64 marketId, Symbol instr, JDay settlDay, Lots buyLots, Cost buyCost,
-         Lots sellLots, Cost sellCost) noexcept
+    Posn(Symbol accnt, Id64 market_id, Symbol instr, JDay settl_day, Lots buy_lots, Cost buy_cost,
+         Lots sell_lots, Cost sell_cost) noexcept
     : accnt_{accnt}
-    , marketId_{marketId}
+    , market_id_{market_id}
     , instr_{instr}
-    , settlDay_{settlDay}
-    , buyLots_{buyLots}
-    , buyCost_{buyCost}
-    , sellLots_{sellLots}
-    , sellCost_{sellCost}
-    , netCost_{buyCost - sellCost}
+    , settl_day_{settl_day}
+    , buy_lots_{buy_lots}
+    , buy_cost_{buy_cost}
+    , sell_lots_{sell_lots}
+    , sell_cost_{sell_cost}
+    , net_cost_{buy_cost - sell_cost}
     {
     }
-    Posn(Symbol accnt, Id64 marketId, Symbol instr, JDay settlDay) noexcept
-    : Posn{accnt, marketId, instr, settlDay, 0_lts, 0_cst, 0_lts, 0_cst}
+    Posn(Symbol accnt, Id64 market_id, Symbol instr, JDay settl_day) noexcept
+    : Posn{accnt, market_id, instr, settl_day, 0_lts, 0_cst, 0_lts, 0_cst}
     {
     }
     ~Posn();
@@ -62,69 +62,69 @@ class SWIRLY_API Posn : public RefCount<Posn, ThreadUnsafePolicy> {
     template <typename... ArgsT>
     static PosnPtr make(ArgsT&&... args)
     {
-        return makeIntrusive<Posn>(std::forward<ArgsT>(args)...);
+        return make_intrusive<Posn>(std::forward<ArgsT>(args)...);
     }
 
-    void toDsv(std::ostream& os, char delim = ',') const;
-    void toJson(std::ostream& os) const;
+    void to_dsv(std::ostream& os, char delim = ',') const;
+    void to_json(std::ostream& os) const;
 
     auto accnt() const noexcept { return accnt_; }
-    auto marketId() const noexcept { return marketId_; }
+    auto market_id() const noexcept { return market_id_; }
     auto instr() const noexcept { return instr_; }
-    auto settlDay() const noexcept { return settlDay_; }
-    auto buyLots() const noexcept { return buyLots_; }
-    auto buyCost() const noexcept { return buyCost_; }
-    auto sellLots() const noexcept { return sellLots_; }
-    auto sellCost() const noexcept { return sellCost_; }
-    auto netLots() const noexcept { return buyLots_ - sellLots_; }
-    auto netCost() const noexcept { return netCost_; }
+    auto settl_day() const noexcept { return settl_day_; }
+    auto buy_lots() const noexcept { return buy_lots_; }
+    auto buy_cost() const noexcept { return buy_cost_; }
+    auto sell_lots() const noexcept { return sell_lots_; }
+    auto sell_cost() const noexcept { return sell_cost_; }
+    auto net_lots() const noexcept { return buy_lots_ - sell_lots_; }
+    auto net_cost() const noexcept { return net_cost_; }
 
-    void addBuy(Lots lots, Cost cost) noexcept
+    void add_buy(Lots lots, Cost cost) noexcept
     {
-        buyLots_ += lots;
-        buyCost_ += cost;
-        netCost_ = buyCost_ - sellCost_;
+        buy_lots_ += lots;
+        buy_cost_ += cost;
+        net_cost_ = buy_cost_ - sell_cost_;
     }
-    void addSell(Lots lots, Cost cost) noexcept
+    void add_sell(Lots lots, Cost cost) noexcept
     {
-        sellLots_ += lots;
-        sellCost_ += cost;
-        netCost_ = buyCost_ - sellCost_;
+        sell_lots_ += lots;
+        sell_cost_ += cost;
+        net_cost_ = buy_cost_ - sell_cost_;
     }
-    void addBuy(Lots lots, Ticks ticks) noexcept;
-    void addSell(Lots lots, Ticks ticks) noexcept;
-    void addPosn(const Posn& rhs) noexcept
+    void add_buy(Lots lots, Ticks ticks) noexcept;
+    void add_sell(Lots lots, Ticks ticks) noexcept;
+    void add_posn(const Posn& rhs) noexcept
     {
-        addBuy(rhs.buyLots_, rhs.buyCost_);
-        addSell(rhs.sellLots_, rhs.sellCost_);
+        add_buy(rhs.buy_lots_, rhs.buy_cost_);
+        add_sell(rhs.sell_lots_, rhs.sell_cost_);
     }
-    void addTrade(Side side, Lots lots, Ticks ticks) noexcept
+    void add_trade(Side side, Lots lots, Ticks ticks) noexcept
     {
         if (side == Side::Buy) {
-            addBuy(lots, ticks);
+            add_buy(lots, ticks);
         } else {
             assert(side == Side::Sell);
-            addSell(lots, ticks);
+            add_sell(lots, ticks);
         }
     }
 
-    boost::intrusive::set_member_hook<> idHook;
+    boost::intrusive::set_member_hook<> id_hook;
 
   private:
     const Symbol accnt_;
-    const Id64 marketId_;
+    const Id64 market_id_;
     const Symbol instr_;
-    JDay settlDay_;
-    Lots buyLots_;
-    Cost buyCost_;
-    Lots sellLots_;
-    Cost sellCost_;
-    Cost netCost_;
+    JDay settl_day_;
+    Lots buy_lots_;
+    Cost buy_cost_;
+    Lots sell_lots_;
+    Cost sell_cost_;
+    Cost net_cost_;
 };
 
 inline std::ostream& operator<<(std::ostream& os, const Posn& posn)
 {
-    posn.toJson(os);
+    posn.to_json(os);
     return os;
 }
 
@@ -135,7 +135,7 @@ class SWIRLY_API PosnSet {
         {
             int result{lhs.accnt().compare(rhs.accnt())};
             if (result == 0) {
-                result = swirly::compare(lhs.marketId(), rhs.marketId());
+                result = swirly::compare(lhs.market_id(), rhs.market_id());
             }
             return result;
         }
@@ -149,7 +149,7 @@ class SWIRLY_API PosnSet {
         {
             int result{std::get<0>(lhs).compare(rhs.accnt())};
             if (result == 0) {
-                result = swirly::compare(std::get<1>(lhs), rhs.marketId());
+                result = swirly::compare(std::get<1>(lhs), rhs.market_id());
             }
             return result < 0;
         }
@@ -157,7 +157,7 @@ class SWIRLY_API PosnSet {
         {
             int result{lhs.accnt().compare(std::get<0>(rhs))};
             if (result == 0) {
-                result = swirly::compare(lhs.marketId(), std::get<1>(rhs));
+                result = swirly::compare(lhs.market_id(), std::get<1>(rhs));
             }
             return result < 0;
         }
@@ -165,7 +165,7 @@ class SWIRLY_API PosnSet {
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
     using CompareOption = boost::intrusive::compare<ValueCompare>;
     using MemberHookOption
-        = boost::intrusive::member_hook<Posn, decltype(Posn::idHook), &Posn::idHook>;
+        = boost::intrusive::member_hook<Posn, decltype(Posn::id_hook), &Posn::id_hook>;
     using Set
         = boost::intrusive::set<Posn, ConstantTimeSizeOption, CompareOption, MemberHookOption>;
     using ValuePtr = boost::intrusive_ptr<Posn>;
@@ -197,48 +197,48 @@ class SWIRLY_API PosnSet {
     Iterator end() noexcept { return set_.end(); }
 
     // Find.
-    ConstIterator find(Symbol accnt, Id64 marketId) const noexcept
+    ConstIterator find(Symbol accnt, Id64 market_id) const noexcept
     {
-        return set_.find(std::make_tuple(accnt, marketId), KeyValueCompare());
+        return set_.find(std::make_tuple(accnt, market_id), KeyValueCompare());
     }
-    Iterator find(Symbol accnt, Id64 marketId) noexcept
+    Iterator find(Symbol accnt, Id64 market_id) noexcept
     {
-        return set_.find(std::make_tuple(accnt, marketId), KeyValueCompare());
+        return set_.find(std::make_tuple(accnt, market_id), KeyValueCompare());
     }
-    std::pair<ConstIterator, bool> findHint(Symbol accnt, Id64 marketId) const noexcept
+    std::pair<ConstIterator, bool> find_hint(Symbol accnt, Id64 market_id) const noexcept
     {
-        const auto key = std::make_tuple(accnt, marketId);
+        const auto key = std::make_tuple(accnt, market_id);
         const auto comp = KeyValueCompare();
         auto it = set_.lower_bound(key, comp);
         return std::make_pair(it, it != set_.end() && !comp(key, *it));
     }
-    std::pair<Iterator, bool> findHint(Symbol accnt, Id64 marketId) noexcept
+    std::pair<Iterator, bool> find_hint(Symbol accnt, Id64 market_id) noexcept
     {
-        const auto key = std::make_tuple(accnt, marketId);
+        const auto key = std::make_tuple(accnt, market_id);
         const auto comp = KeyValueCompare();
         auto it = set_.lower_bound(key, comp);
         return std::make_pair(it, it != set_.end() && !comp(key, *it));
     }
     Iterator insert(const ValuePtr& value) noexcept;
 
-    Iterator insertHint(ConstIterator hint, const ValuePtr& value) noexcept;
+    Iterator insert_hint(ConstIterator hint, const ValuePtr& value) noexcept;
 
-    Iterator insertOrReplace(const ValuePtr& value) noexcept;
+    Iterator insert_or_replace(const ValuePtr& value) noexcept;
 
     template <typename... ArgsT>
     Iterator emplace(ArgsT&&... args)
     {
-        return insert(makeIntrusive<Posn>(std::forward<ArgsT>(args)...));
+        return insert(make_intrusive<Posn>(std::forward<ArgsT>(args)...));
     }
     template <typename... ArgsT>
-    Iterator emplaceHint(ConstIterator hint, ArgsT&&... args)
+    Iterator emplace_hint(ConstIterator hint, ArgsT&&... args)
     {
-        return insertHint(hint, makeIntrusive<Posn>(std::forward<ArgsT>(args)...));
+        return insert_hint(hint, make_intrusive<Posn>(std::forward<ArgsT>(args)...));
     }
     template <typename... ArgsT>
-    Iterator emplaceOrReplace(ArgsT&&... args)
+    Iterator emplace_or_replace(ArgsT&&... args)
     {
-        return insertOrReplace(makeIntrusive<Posn>(std::forward<ArgsT>(args)...));
+        return insert_or_replace(make_intrusive<Posn>(std::forward<ArgsT>(args)...));
     }
     ValuePtr remove(Iterator it) noexcept
     {

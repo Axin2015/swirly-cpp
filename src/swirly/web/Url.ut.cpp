@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(UrlCase)
     BOOST_TEST(url.path() == "/accnt/execs"s);
     BOOST_TEST(url.query() == "offset=3&limit5"s);
     BOOST_TEST(url.fragment().empty());
-    BOOST_TEST(url.userInfo().empty());
+    BOOST_TEST(url.user_info().empty());
 }
 
 BOOST_AUTO_TEST_CASE(UrlViewCase)
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(UrlViewCase)
     BOOST_TEST(url.path() == "/accnt/execs"sv);
     BOOST_TEST(url.query() == "offset=3&limit5"sv);
     BOOST_TEST(url.fragment().empty());
-    BOOST_TEST(url.userInfo().empty());
+    BOOST_TEST(url.user_info().empty());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

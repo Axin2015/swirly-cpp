@@ -29,14 +29,14 @@ Order::~Order() = default;
 
 Order::Order(Order&&) = default;
 
-void Order::toDsv(ostream& os, char delim) const
+void Order::to_dsv(ostream& os, char delim) const
 {
     OStreamJoiner osj{os, delim};
-    osj << accnt_    //
-        << marketId_ //
+    osj << accnt_     //
+        << market_id_ //
         << instr_;
-    if (settlDay_ != 0_jd) {
-        osj << jdToIso(settlDay_);
+    if (settl_day_ != 0_jd) {
+        osj << jd_to_iso(settl_day_);
     } else {
         osj << ""sv;
     }
@@ -46,22 +46,22 @@ void Order::toDsv(ostream& os, char delim) const
     } else {
         osj << ""sv;
     }
-    osj << state_    //
-        << side_     //
-        << lots_     //
-        << ticks_    //
-        << resdLots_ //
-        << execLots_ //
-        << execCost_;
-    if (lastLots_ != 0_lts) {
-        osj << lastLots_ //
-            << lastTicks_;
+    osj << state_     //
+        << side_      //
+        << lots_      //
+        << ticks_     //
+        << resd_lots_ //
+        << exec_lots_ //
+        << exec_cost_;
+    if (last_lots_ != 0_lts) {
+        osj << last_lots_ //
+            << last_ticks_;
     } else {
         osj << ""sv
             << ""sv;
     }
-    if (minLots_ != 0_lts) {
-        osj << minLots_;
+    if (min_lots_ != 0_lts) {
+        osj << min_lots_;
     } else {
         osj << ""sv;
     }
@@ -69,14 +69,14 @@ void Order::toDsv(ostream& os, char delim) const
         << modified_;
 }
 
-void Order::toJson(ostream& os) const
+void Order::to_json(ostream& os) const
 {
-    os << "{\"accnt\":\""sv << accnt_        //
-       << "\",\"market_id\":"sv << marketId_ //
-       << ",\"instr\":\""sv << instr_        //
+    os << "{\"accnt\":\""sv << accnt_         //
+       << "\",\"market_id\":"sv << market_id_ //
+       << ",\"instr\":\""sv << instr_         //
        << "\",\"settl_date\":"sv;
-    if (settlDay_ != 0_jd) {
-        os << jdToIso(settlDay_);
+    if (settl_day_ != 0_jd) {
+        os << jd_to_iso(settl_day_);
     } else {
         os << "null"sv;
     }
@@ -87,22 +87,22 @@ void Order::toJson(ostream& os) const
     } else {
         os << "null"sv;
     }
-    os << ",\"state\":\""sv << state_      //
-       << "\",\"side\":\""sv << side_      //
-       << "\",\"lots\":"sv << lots_        //
-       << ",\"ticks\":"sv << ticks_        //
-       << ",\"resd_lots\":"sv << resdLots_ //
-       << ",\"exec_lots\":"sv << execLots_ //
-       << ",\"exec_cost\":"sv << execCost_;
-    if (lastLots_ != 0_lts) {
-        os << ",\"last_lots\":"sv << lastLots_ //
-           << ",\"last_ticks\":"sv << lastTicks_;
+    os << ",\"state\":\""sv << state_       //
+       << "\",\"side\":\""sv << side_       //
+       << "\",\"lots\":"sv << lots_         //
+       << ",\"ticks\":"sv << ticks_         //
+       << ",\"resd_lots\":"sv << resd_lots_ //
+       << ",\"exec_lots\":"sv << exec_lots_ //
+       << ",\"exec_cost\":"sv << exec_cost_;
+    if (last_lots_ != 0_lts) {
+        os << ",\"last_lots\":"sv << last_lots_ //
+           << ",\"last_ticks\":"sv << last_ticks_;
     } else {
         os << ",\"last_lots\":null,\"last_ticks\":null"sv;
     }
     os << ",\"min_lots\":"sv;
-    if (minLots_ != 0_lts) {
-        os << minLots_;
+    if (min_lots_ != 0_lts) {
+        os << min_lots_;
     } else {
         os << "null"sv;
     }
@@ -127,20 +127,20 @@ OrderRefSet::Iterator OrderRefSet::insert(const ValuePtr& value) noexcept
     tie(it, inserted) = set_.insert(*value);
     if (inserted) {
         // Take ownership if inserted.
-        value->addRef();
+        value->add_ref();
     }
     return it;
 }
 
-OrderRefSet::Iterator OrderRefSet::insertHint(ConstIterator hint, const ValuePtr& value) noexcept
+OrderRefSet::Iterator OrderRefSet::insert_hint(ConstIterator hint, const ValuePtr& value) noexcept
 {
     auto it = set_.insert(hint, *value);
     // Take ownership.
-    value->addRef();
+    value->add_ref();
     return it;
 }
 
-OrderRefSet::Iterator OrderRefSet::insertOrReplace(const ValuePtr& value) noexcept
+OrderRefSet::Iterator OrderRefSet::insert_or_replace(const ValuePtr& value) noexcept
 {
     Iterator it;
     bool inserted;
@@ -152,7 +152,7 @@ OrderRefSet::Iterator OrderRefSet::insertOrReplace(const ValuePtr& value) noexce
         it = Set::s_iterator_to(*value);
     }
     // Take ownership.
-    value->addRef();
+    value->add_ref();
     return it;
 }
 
@@ -165,19 +165,19 @@ OrderList::OrderList(OrderList&&) = default;
 
 OrderList& OrderList::operator=(OrderList&&) = default;
 
-OrderList::Iterator OrderList::insertBack(const OrderPtr& value) noexcept
+OrderList::Iterator OrderList::insert_back(const OrderPtr& value) noexcept
 {
     list_.push_back(*value);
     // Take ownership.
-    value->addRef();
+    value->add_ref();
     return List::s_iterator_to(*value);
 }
 
-OrderList::Iterator OrderList::insertBefore(const OrderPtr& value, const Order& next) noexcept
+OrderList::Iterator OrderList::insert_before(const OrderPtr& value, const Order& next) noexcept
 {
     auto it = list_.insert(List::s_iterator_to(next), *value);
     // Take ownership.
-    value->addRef();
+    value->add_ref();
     return it;
 }
 

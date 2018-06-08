@@ -20,9 +20,9 @@ namespace swirly {
 inline namespace util {
 using namespace std;
 
-SWIRLY_WEAK Time getTime() noexcept;
+SWIRLY_WEAK Time get_time() noexcept;
 
-Time getTime() noexcept
+Time get_time() noexcept
 {
     using chrono::nanoseconds;
     timespec ts;
@@ -33,7 +33,7 @@ Time getTime() noexcept
 ostream& operator<<(ostream& os, Time time)
 {
     // TODO: change to a higher resolution.
-    return os << msSinceEpoch(time);
+    return os << ms_since_epoch(time);
 }
 
 } // namespace util

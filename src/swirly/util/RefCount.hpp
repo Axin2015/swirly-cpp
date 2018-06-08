@@ -29,26 +29,26 @@ inline namespace util {
 struct ThreadSafePolicy {
     using Type = std::atomic<int>;
     static void acquire() noexcept { std::atomic_thread_fence(std::memory_order_acquire); }
-    static int fetchAdd(Type& refCount) noexcept
+    static int fetch_add(Type& ref_count) noexcept
     {
-        return refCount.fetch_add(1, std::memory_order_relaxed);
+        return ref_count.fetch_add(1, std::memory_order_relaxed);
     }
-    static int fetchSub(Type& refCount) noexcept
+    static int fetch_sub(Type& ref_count) noexcept
     {
-        return refCount.fetch_sub(1, std::memory_order_release);
+        return ref_count.fetch_sub(1, std::memory_order_release);
     }
-    static int load(const Type& refCount) noexcept
+    static int load(const Type& ref_count) noexcept
     {
-        return refCount.load(std::memory_order_relaxed);
+        return ref_count.load(std::memory_order_relaxed);
     }
 };
 
 struct ThreadUnsafePolicy {
     using Type = int;
     static void acquire() noexcept {}
-    static int fetchAdd(Type& refCount) noexcept { return refCount++; }
-    static int fetchSub(Type& refCount) noexcept { return refCount--; }
-    static int load(Type refCount) noexcept { return refCount; }
+    static int fetch_add(Type& ref_count) noexcept { return ref_count++; }
+    static int fetch_sub(Type& ref_count) noexcept { return ref_count--; }
+    static int load(Type ref_count) noexcept { return ref_count; }
 };
 
 /**
@@ -68,15 +68,15 @@ class RefCount {
     constexpr RefCount(RefCount&&) noexcept = default;
     RefCount& operator=(RefCount&&) noexcept = default;
 
-    void addRef() const noexcept { PolicyT::fetchAdd(refs_); }
+    void add_ref() const noexcept { PolicyT::fetch_add(refs_); }
     void release() const noexcept
     {
-        if (PolicyT::fetchSub(refs_) == 1) {
+        if (PolicyT::fetch_sub(refs_) == 1) {
             PolicyT::acquire();
             delete static_cast<const DerivedT*>(this);
         }
     }
-    int refCount() const noexcept { return PolicyT::load(refs_); }
+    int ref_count() const noexcept { return PolicyT::load(refs_); }
 
   private:
     mutable typename PolicyT::Type refs_{1};
@@ -85,7 +85,7 @@ class RefCount {
 template <typename DerivedT, typename PolicyT>
 void intrusive_ptr_add_ref(const RefCount<DerivedT, PolicyT>* ptr) noexcept
 {
-    ptr->addRef();
+    ptr->add_ref();
 }
 
 template <typename DerivedT, typename PolicyT>
@@ -95,7 +95,7 @@ void intrusive_ptr_release(const RefCount<DerivedT, PolicyT>* ptr) noexcept
 }
 
 template <typename ValueT, typename... ArgsT>
-boost::intrusive_ptr<ValueT> makeIntrusive(ArgsT&&... args)
+boost::intrusive_ptr<ValueT> make_intrusive(ArgsT&&... args)
 {
     return {new (std::align_val_t(alignof(ValueT))) ValueT{std::forward<ArgsT>(args)...}, false};
 }

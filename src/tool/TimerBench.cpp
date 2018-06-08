@@ -28,7 +28,7 @@ using namespace swirly;
 namespace {
 
 struct TimerHandler : RefCount<TimerHandler, ThreadUnsafePolicy> {
-    void onTimer(Timer& tmr, Time now) {}
+    void on_timer(Timer& tmr, Time now) {}
 };
 
 } // namespace
@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
         EpollReactor r{1024};
         Timer ts[128];
 
-        auto h = makeIntrusive<TimerHandler>();
+        auto h = make_intrusive<TimerHandler>();
         for (int i{0}; i < 5000000; ++i) {
             const auto now = UnixClock::now();
             auto& t = ts[dis(gen) % 128];
@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
                 t = {};
             } else {
                 t = r.timer(now + Micros{dis(gen) % 100}, Priority::High,
-                            bind<&TimerHandler::onTimer>(h.get()));
+                            bind<&TimerHandler::on_timer>(h.get()));
             }
             r.poll(0ms);
         }

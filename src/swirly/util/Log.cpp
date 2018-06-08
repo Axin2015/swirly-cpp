@@ -40,20 +40,20 @@ const char* labels_[] = {"CRIT", "ERROR", "WARNING", "NOTICE", "INFO", "DEBUG"};
 
 // Global log level and logger function.
 atomic<int> level_{Log::Info};
-atomic<Logger> logger_{stdLogger};
+atomic<Logger> logger_{std_logger};
 mutex mutex_;
 
-inline int acquireLevel() noexcept
+inline int acquire_level() noexcept
 {
     return level_.load(memory_order_acquire);
 }
 
-inline Logger acquireLogger() noexcept
+inline Logger acquire_logger() noexcept
 {
     return logger_.load(memory_order_acquire);
 }
 
-thread_local LogMsg logMsg_;
+thread_local LogMsg log_msg_;
 
 // The gettid() function is a Linux-specific function call.
 #if defined(__linux__)
@@ -70,43 +70,43 @@ inline pid_t gettid()
 
 } // namespace
 
-const char* logLabel(int level) noexcept
+const char* log_label(int level) noexcept
 {
     return labels_[min<int>(max<int>(level, Log::Crit), Log::Debug)];
 }
 
-int getLogLevel() noexcept
+int get_log_level() noexcept
 {
-    return acquireLevel();
+    return acquire_level();
 }
 
-int setLogLevel(int level) noexcept
+int set_log_level(int level) noexcept
 {
     return level_.exchange(max(level, 0), memory_order_acq_rel);
 }
 
-Logger getLogger() noexcept
+Logger get_logger() noexcept
 {
-    return acquireLogger();
+    return acquire_logger();
 }
 
-Logger setLogger(Logger logger) noexcept
+Logger set_logger(Logger logger) noexcept
 {
-    return logger_.exchange(logger ? logger : nullLogger, memory_order_acq_rel);
+    return logger_.exchange(logger ? logger : null_logger, memory_order_acq_rel);
 }
 
-void writeLog(int level, string_view msg) noexcept
+void write_log(int level, string_view msg) noexcept
 {
-    acquireLogger()(level, msg);
+    acquire_logger()(level, msg);
 }
 
-void nullLogger(int level, string_view msg) noexcept {}
+void null_logger(int level, string_view msg) noexcept {}
 
-void stdLogger(int level, string_view msg) noexcept
+void std_logger(int level, string_view msg) noexcept
 {
     const auto now = UnixClock::now();
     const auto t = UnixClock::to_time_t(now);
-    const auto ms = msSinceEpoch(now);
+    const auto ms = ms_since_epoch(now);
 
     struct tm tm;
     localtime_r(&t, &tm);
@@ -119,7 +119,7 @@ void stdLogger(int level, string_view msg) noexcept
     // <---------------------------------------->
     char head[42 + 1];
     size_t hlen = strftime(head, sizeof(head), "%b %d %H:%M:%S", &tm);
-    hlen += sprintf(head + hlen, ".%03d %-7s [%d]: ", static_cast<int>(ms % 1000), logLabel(level),
+    hlen += sprintf(head + hlen, ".%03d %-7s [%d]: ", static_cast<int>(ms % 1000), log_label(level),
                     static_cast<int>(gettid()));
     char tail{'\n'};
     iovec iov[] = {
@@ -138,7 +138,7 @@ void stdLogger(int level, string_view msg) noexcept
 #pragma GCC diagnostic pop
 }
 
-void sysLogger(int level, string_view msg) noexcept
+void sys_logger(int level, string_view msg) noexcept
 {
     int prio;
     switch (level) {
@@ -163,10 +163,10 @@ void sysLogger(int level, string_view msg) noexcept
     syslog(prio, "%.*s", static_cast<int>(msg.size()), msg.data());
 }
 
-LogMsg& logMsg() noexcept
+LogMsg& log_msg() noexcept
 {
-    logMsg_.reset();
-    return logMsg_;
+    log_msg_.reset();
+    return log_msg_;
 }
 
 } // namespace util

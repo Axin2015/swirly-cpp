@@ -26,7 +26,7 @@ void PhasedBackoff::idle() noexcept
 {
     using namespace std::literals::chrono_literals;
     if (i_ < 1000) {
-        cpuRelax();
+        cpu_relax();
     } else if (i_ < 2000) {
         sched_yield();
     } else if (i_ < 4000) {

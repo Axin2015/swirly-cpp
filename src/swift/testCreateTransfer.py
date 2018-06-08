@@ -18,35 +18,35 @@ from swift import *
 class TestCase(RestTestCase):
 
   def test(self):
-    self.maxDiff = None
+    self.max_diff = None
     self.now = 1388534400000
-    with DbFile() as dbFile:
-      with Server(dbFile, self.now) as server:
+    with DbFile() as db_file:
+      with Server(db_file, self.now) as server:
         with Client() as client:
-          client.setTime(self.now)
+          client.set_time(self.now)
 
-          self.createMarket(client, 'EURUSD', 20140302)
+          self.create_market(client, 'EURUSD', 20140302)
 
-          self.checkAuth(client)
+          self.check_auth(client)
 
-          self.createDeposit(client)
-          self.createWithdraw(client)
+          self.create_deposit(client)
+          self.create_withdraw(client)
 
-  def checkAuth(self, client):
-    client.setAuth(None, 0x1)
+  def check_auth(self, client):
+    client.set_auth(None, 0x1)
 
     resp = client.send('POST', '/accnt/trades/EURUSD/20140302')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    client.setAuth('ADMIN', ~0x1 & 0x7fffffff)
+    client.set_auth('ADMIN', ~0x1 & 0x7fffffff)
 
     resp = client.send('POST', '/accnt/trades/EURUSD/20140302')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-  def createDeposit(self, client):
-    client.setAdmin()
+  def create_deposit(self, client):
+    client.set_admin()
     resp = client.send('POST', '/accnt/trades/EURUSD/20140302',
                        accnt = 'MARAYL',
                        ref = 'test1',
@@ -81,8 +81,8 @@ class TestCase(RestTestCase):
       u'ticks': 0
     }], resp.content)
 
-  def createWithdraw(self, client):
-    client.setAdmin()
+  def create_withdraw(self, client):
+    client.set_admin()
     resp = client.send('POST', '/accnt/trades/EURUSD/20140302',
                        accnt = 'MARAYL',
                        ref = 'test1',

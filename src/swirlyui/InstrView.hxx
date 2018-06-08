@@ -35,12 +35,12 @@ class InstrView : public QWidget {
     InstrView(InstrModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
     ~InstrView() override;
 
-    void resizeColumnsToContents();
+    void resize_columns_to_contents();
 
   signals:
 
   private slots:
-    void slotClicked(const QModelIndex& index);
+    void slot_clicked(const QModelIndex& index);
 
   private:
     InstrModel& model_;

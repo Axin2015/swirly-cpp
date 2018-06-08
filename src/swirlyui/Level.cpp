@@ -21,11 +21,11 @@
 namespace swirly {
 namespace ui {
 
-Level Level::fromJson(const QJsonObject& obj)
+Level Level::from_json(const QJsonObject& obj)
 {
-    using swirly::ui::fromJson;
-    return Level{fromJson<Ticks>(obj["ticks"]), fromJson<Lots>(obj["lots"]),
-                 fromJson<int>(obj["count"])};
+    using swirly::ui::from_json;
+    return Level{from_json<Ticks>(obj["ticks"]), from_json<Lots>(obj["lots"]),
+                 from_json<int>(obj["count"])};
 }
 
 QDebug operator<<(QDebug debug, const Level& level)

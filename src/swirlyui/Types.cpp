@@ -20,7 +20,7 @@ namespace swirly {
 namespace ui {
 using namespace std;
 
-AssetType TypeTraits<AssetType>::fromString(const QString& value)
+AssetType TypeTraits<AssetType>::from_string(const QString& value)
 {
     AssetType type;
     if (value == "Cmdty") {
@@ -41,7 +41,7 @@ AssetType TypeTraits<AssetType>::fromString(const QString& value)
     return type;
 }
 
-Direct TypeTraits<Direct>::fromString(const QString& value)
+Direct TypeTraits<Direct>::from_string(const QString& value)
 {
     Direct direct;
     if (value == "Paid") {
@@ -54,24 +54,24 @@ Direct TypeTraits<Direct>::fromString(const QString& value)
     return direct;
 }
 
-LiqInd TypeTraits<LiqInd>::fromString(const QString& value)
+LiqInd TypeTraits<LiqInd>::from_string(const QString& value)
 {
-    LiqInd liqInd;
+    LiqInd liq_ind;
     if (value.isNull()) {
-        liqInd = LiqInd::None;
+        liq_ind = LiqInd::None;
     } else {
         if (value == "Maker") {
-            liqInd = LiqInd::Maker;
+            liq_ind = LiqInd::Maker;
         } else if (value == "Taker") {
-            liqInd = LiqInd::Taker;
+            liq_ind = LiqInd::Taker;
         } else {
             throw domain_error{"invalid liquidity-indicator"};
         }
     }
-    return liqInd;
+    return liq_ind;
 }
 
-Side TypeTraits<Side>::fromString(const QString& value)
+Side TypeTraits<Side>::from_string(const QString& value)
 {
     Side side;
     if (value == "Buy") {
@@ -84,7 +84,7 @@ Side TypeTraits<Side>::fromString(const QString& value)
     return side;
 }
 
-State TypeTraits<State>::fromString(const QString& value)
+State TypeTraits<State>::from_string(const QString& value)
 {
     State state;
     if (value == "None") {

@@ -26,14 +26,14 @@
 namespace swirly {
 inline namespace util {
 
-SWIRLY_API std::string getEnv(const std::string& name);
+SWIRLY_API std::string get_env(const std::string& name);
 
 /**
  * Variable substitution.
  */
 class SWIRLY_API VarSub {
   public:
-    explicit VarSub(std::function<std::string(const std::string&)> fn = getEnv)
+    explicit VarSub(std::function<std::string(const std::string&)> fn = get_env)
     : fn_{std::move(fn)}
     {
     }

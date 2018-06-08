@@ -51,7 +51,7 @@ struct SqlTraits;
  */
 template <typename ValueT>
 struct SqlTraits<ValueT, std::enable_if_t<std::is_integral_v<ValueT> && (sizeof(ValueT) <= 4)>> {
-    static constexpr bool isNull(ValueT val) noexcept { return val == 0; }
+    static constexpr bool is_null(ValueT val) noexcept { return val == 0; }
     static void bind(sqlite3_stmt& stmt, int col, ValueT val) { bind32(stmt, col, val); }
     static auto column(sqlite3_stmt& stmt, int col) noexcept
     {
@@ -64,7 +64,7 @@ struct SqlTraits<ValueT, std::enable_if_t<std::is_integral_v<ValueT> && (sizeof(
  */
 template <typename ValueT>
 struct SqlTraits<ValueT, std::enable_if_t<std::is_integral_v<ValueT> && (sizeof(ValueT) > 4)>> {
-    static constexpr bool isNull(ValueT val) noexcept { return val == 0; }
+    static constexpr bool is_null(ValueT val) noexcept { return val == 0; }
     static void bind(sqlite3_stmt& stmt, int col, ValueT val) { bind64(stmt, col, val); }
     static auto column(sqlite3_stmt& stmt, int col) noexcept
     {
@@ -76,11 +76,11 @@ struct SqlTraits<ValueT, std::enable_if_t<std::is_integral_v<ValueT> && (sizeof(
  * IntWrapper.
  */
 template <typename ValueT>
-struct SqlTraits<ValueT, std::enable_if_t<isIntWrapper<ValueT>>> {
+struct SqlTraits<ValueT, std::enable_if_t<is_int_wrapper<ValueT>>> {
 
     using UnderlyingTraits = SqlTraits<typename ValueT::ValueType>;
 
-    static constexpr bool isNull(ValueT val) noexcept { return val == ValueT{0}; }
+    static constexpr bool is_null(ValueT val) noexcept { return val == ValueT{0}; }
     static void bind(sqlite3_stmt& stmt, int col, ValueT val)
     {
         UnderlyingTraits::bind(stmt, col, val.count());
@@ -99,7 +99,7 @@ struct SqlTraits<ValueT, std::enable_if_t<std::is_enum_v<ValueT>>> {
 
     using UnderlyingTraits = SqlTraits<std::underlying_type_t<ValueT>>;
 
-    static constexpr bool isNull(ValueT val) noexcept { return unbox(val) == 0; }
+    static constexpr bool is_null(ValueT val) noexcept { return unbox(val) == 0; }
     static void bind(sqlite3_stmt& stmt, int col, ValueT val)
     {
         UnderlyingTraits::bind(stmt, col, unbox(val));
@@ -115,14 +115,14 @@ struct SqlTraits<ValueT, std::enable_if_t<std::is_enum_v<ValueT>>> {
  */
 template <>
 struct SqlTraits<Time> {
-    static constexpr bool isNull(Time val) noexcept { return val == Time{}; }
+    static constexpr bool is_null(Time val) noexcept { return val == Time{}; }
     static void bind(sqlite3_stmt& stmt, int col, Time val)
     {
-        bind64(stmt, col, msSinceEpoch(val));
+        bind64(stmt, col, ms_since_epoch(val));
     }
     static auto column(sqlite3_stmt& stmt, int col) noexcept
     {
-        return toTime(Millis{sqlite3_column_int64(&stmt, col)});
+        return to_time(Millis{sqlite3_column_int64(&stmt, col)});
     }
 };
 
@@ -131,7 +131,7 @@ struct SqlTraits<Time> {
  */
 template <>
 struct SqlTraits<std::string_view> {
-    static constexpr bool isNull(std::string_view val) noexcept { return val.empty(); }
+    static constexpr bool is_null(std::string_view val) noexcept { return val.empty(); }
     static void bind(sqlite3_stmt& stmt, int col, std::string_view val) { bindsv(stmt, col, val); }
     static std::string_view column(sqlite3_stmt& stmt, int col) noexcept
     {
@@ -141,15 +141,15 @@ struct SqlTraits<std::string_view> {
 
 } // namespace detail
 
-DbPtr openDb(const char* path, int flags, const Config& config);
+DbPtr open_db(const char* path, int flags, const Config& config);
 
 StmtPtr prepare(sqlite3& db, std::string_view sql);
 
 bool step(sqlite3_stmt& stmt);
 
-inline bool stepOnce(sqlite3_stmt& stmt)
+inline bool step_once(sqlite3_stmt& stmt)
 {
-    const auto finally = makeFinally([&stmt]() noexcept { sqlite3_reset(&stmt); });
+    const auto finally = make_finally([&stmt]() noexcept { sqlite3_reset(&stmt); });
     return step(stmt);
 }
 
@@ -176,7 +176,7 @@ template <typename ValueT>
 void bind(sqlite3_stmt& stmt, int col, ValueT val, MaybeNullTag)
 {
     using Traits = detail::SqlTraits<ValueT>;
-    if (!Traits::isNull(val)) {
+    if (!Traits::is_null(val)) {
         bind(stmt, col, val);
     } else {
         bind(stmt, col, nullptr);
