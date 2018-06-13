@@ -17,6 +17,8 @@
 #ifndef SWIRLY_WEB_STREAM_HPP
 #define SWIRLY_WEB_STREAM_HPP
 
+#include <swirly/web/Types.hpp>
+
 #include <swirly/sys/Buffer.hpp>
 
 #include <swirly/util/Stream.hpp>
@@ -85,7 +87,8 @@ class SWIRLY_API HttpStream : public std::ostream {
         swirly::reset(*this);
         cloff_ = hcount_ = 0;
     }
-    void reset(int status, const char* reason, bool cache = false);
+    void reset(HttpStatus status, const char* reason, bool cache = false);
+    void reset(HttpStatus status, bool cache = false) { reset(status, http_reason(status), cache); }
 
   private:
     HttpBuf buf_;

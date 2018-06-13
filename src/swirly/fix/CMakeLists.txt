@@ -27,7 +27,6 @@ else()
 endif()
 
 set(lib_SOURCES
-  Exception.cpp
   Field.cpp
   Parser.cpp
   Stream.cpp
@@ -36,13 +35,13 @@ set(lib_SOURCES
 
 add_library(swirly-fix-static STATIC ${lib_SOURCES})
 set_target_properties(swirly-fix-static PROPERTIES OUTPUT_NAME swirly-fix)
-target_link_libraries(swirly-fix-static swirly-sys-static)
+target_link_libraries(swirly-fix-static swirly-fin-static)
 install(TARGETS swirly-fix-static DESTINATION lib64 COMPONENT static)
 
 if(SWIRLY_BUILD_SHARED)
   add_library(swirly-fix-shared SHARED ${lib_SOURCES})
   set_target_properties(swirly-fix-shared PROPERTIES OUTPUT_NAME swirly-fix)
-  target_link_libraries(swirly-fix-shared swirly-sys-shared)
+  target_link_libraries(swirly-fix-shared swirly-fin-shared)
   install(TARGETS swirly-fix-shared DESTINATION lib64 COMPONENT shared)
 endif()
 

@@ -23,20 +23,33 @@ namespace {
 thread_local ErrMsg err_msg_;
 } // namespace
 
-Exception::Exception(string_view what) noexcept
+Exception::Exception(error_code ec)
+: runtime_error{ec.message()}
+, ec_{ec}
 {
-    const auto len = min(what.size(), MaxErrMsg);
-    if (len > 0) {
-        memcpy(what_, what.data(), len);
-    }
-    what_[len] = '\0';
+}
+Exception::Exception(int err, const error_category& ecat)
+: Exception{error_code{err, ecat}}
+{
+}
+Exception::Exception(error_code ec, string_view what)
+: runtime_error{string{what} + ": " + ec.message()}
+, ec_{ec}
+{
+}
+Exception::Exception(int err, const error_category& ecat, string_view what)
+: Exception(error_code{err, ecat}, what)
+{
 }
 
 Exception::~Exception() = default;
 
-const char* Exception::what() const noexcept
+void Exception::to_json(ostream& os, int status, const char* reason, const char* detail)
 {
-    return what_;
+    os << "{\"status\":"sv << status     //
+       << ",\"reason\":\""sv << reason   //
+       << "\",\"detail\":\""sv << detail //
+       << "\"}"sv;
 }
 
 ErrMsg& err_msg() noexcept

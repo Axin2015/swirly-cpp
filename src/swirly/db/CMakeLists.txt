@@ -26,7 +26,6 @@ endif()
 
 set(lib_SOURCES
   DbCtx.cpp
-  Exception.cpp
   Sql.cpp
   SqliteJourn.cpp
   SqliteModel.cpp

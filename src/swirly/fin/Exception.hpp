@@ -17,357 +17,135 @@
 #ifndef SWIRLY_FIN_EXCEPTION_HPP
 #define SWIRLY_FIN_EXCEPTION_HPP
 
-#include <swirly/util/Exception.hpp>
+#include <swirly/fin/Error.hpp>
 
-#include <iosfwd>
+#include <swirly/util/Exception.hpp>
 
 namespace swirly {
 inline namespace fin {
-
-class SWIRLY_API ServException : public Exception {
-  public:
-    explicit ServException(std::string_view what) noexcept
-    : Exception{what}
-    {
-    }
-    ~ServException() override;
-
-    // Copy.
-    ServException(const ServException&) noexcept = default;
-    ServException& operator=(const ServException&) noexcept = default;
-
-    // Move.
-    ServException(ServException&&) noexcept = default;
-    ServException& operator=(ServException&&) noexcept = default;
-
-    static void to_json(int status, const char* reason, const char* detail, std::ostream& os);
-
-    void to_json(std::ostream& os) const { to_json(http_status(), http_reason(), what(), os); }
-
-    virtual int http_status() const noexcept = 0;
-
-    virtual const char* http_reason() const noexcept = 0;
-};
-
-inline std::ostream& operator<<(std::ostream& os, const ServException& e)
-{
-    e.to_json(os);
-    return os;
-}
 
 /**
  * The request could not be understood by the server due to malformed syntax. The client SHOULD NOT
  * repeat the request without modifications.
  */
-class SWIRLY_API BadRequestException : public ServException {
-  public:
-    explicit BadRequestException(std::string_view what) noexcept
-    : ServException{what}
+struct SWIRLY_API BadRequestException : Exception {
+    BadRequestException()
+    : Exception{Error::BadRequest}
+    {
+    }
+    explicit BadRequestException(std::string_view what)
+    : Exception{Error::BadRequest, what}
     {
     }
     ~BadRequestException() override;
 
-    // Copy.
-    BadRequestException(const BadRequestException&) noexcept = default;
-    BadRequestException& operator=(const BadRequestException&) noexcept = default;
-
-    // Move.
-    BadRequestException(BadRequestException&&) noexcept = default;
-    BadRequestException& operator=(BadRequestException&&) noexcept = default;
-
-    int http_status() const noexcept override;
-
-    const char* http_reason() const noexcept override;
+  protected:
+    using Exception::Exception;
 };
 
-class SWIRLY_API AlreadyExistsException : public BadRequestException {
-  public:
-    explicit AlreadyExistsException(std::string_view what) noexcept
-    : BadRequestException{what}
+struct SWIRLY_API AlreadyExistsException : BadRequestException {
+    AlreadyExistsException()
+    : BadRequestException{Error::AlreadyExists}
+    {
+    }
+    explicit AlreadyExistsException(std::string_view what)
+    : BadRequestException{Error::AlreadyExists, what}
     {
     }
     ~AlreadyExistsException() override;
 
-    // Copy.
-    AlreadyExistsException(const AlreadyExistsException&) noexcept = default;
-    AlreadyExistsException& operator=(const AlreadyExistsException&) noexcept = default;
-
-    // Move.
-    AlreadyExistsException(AlreadyExistsException&&) noexcept = default;
-    AlreadyExistsException& operator=(AlreadyExistsException&&) noexcept = default;
+  protected:
+    using BadRequestException::BadRequestException;
 };
 
-class SWIRLY_API RefAlreadyExistsException : public AlreadyExistsException {
-  public:
-    explicit RefAlreadyExistsException(std::string_view what) noexcept
-    : AlreadyExistsException{what}
+struct SWIRLY_API RefAlreadyExistsException : AlreadyExistsException {
+    RefAlreadyExistsException()
+    : AlreadyExistsException{Error::RefAlreadyExists}
     {
     }
-    RefAlreadyExistsException() noexcept = default;
-
+    explicit RefAlreadyExistsException(std::string_view what)
+    : AlreadyExistsException{Error::RefAlreadyExists, what}
+    {
+    }
     ~RefAlreadyExistsException() override;
 
-    // Copy.
-    RefAlreadyExistsException(const RefAlreadyExistsException&) noexcept = default;
-    RefAlreadyExistsException& operator=(const RefAlreadyExistsException&) noexcept = default;
-
-    // Move.
-    RefAlreadyExistsException(RefAlreadyExistsException&&) noexcept = default;
-    RefAlreadyExistsException& operator=(RefAlreadyExistsException&&) noexcept = default;
+  protected:
+    using AlreadyExistsException::AlreadyExistsException;
 };
 
-class SWIRLY_API InvalidException : public BadRequestException {
-  public:
-    explicit InvalidException(std::string_view what) noexcept
-    : BadRequestException{what}
+struct SWIRLY_API InvalidException : BadRequestException {
+    InvalidException()
+    : BadRequestException{Error::Invalid}
+    {
+    }
+    explicit InvalidException(std::string_view what)
+    : BadRequestException{Error::Invalid, what}
     {
     }
     ~InvalidException() override;
 
-    // Copy.
-    InvalidException(const InvalidException&) noexcept = default;
-    InvalidException& operator=(const InvalidException&) noexcept = default;
-
-    // Move.
-    InvalidException(InvalidException&&) noexcept = default;
-    InvalidException& operator=(InvalidException&&) noexcept = default;
+  protected:
+    using BadRequestException::BadRequestException;
 };
 
-class SWIRLY_API InvalidLotsException : public InvalidException {
-  public:
-    explicit InvalidLotsException(std::string_view what) noexcept
-    : InvalidException{what}
+struct SWIRLY_API InvalidLotsException : InvalidException {
+    InvalidLotsException()
+    : InvalidException{Error::InvalidLots}
+    {
+    }
+    explicit InvalidLotsException(std::string_view what)
+    : InvalidException{Error::InvalidLots, what}
     {
     }
     ~InvalidLotsException() override;
 
-    // Copy.
-    InvalidLotsException(const InvalidLotsException&) noexcept = default;
-    InvalidLotsException& operator=(const InvalidLotsException&) noexcept = default;
-
-    // Move.
-    InvalidLotsException(InvalidLotsException&&) noexcept = default;
-    InvalidLotsException& operator=(InvalidLotsException&&) noexcept = default;
+  protected:
+    using InvalidException::InvalidException;
 };
 
-class SWIRLY_API InvalidTicksException : public InvalidException {
-  public:
-    explicit InvalidTicksException(std::string_view what) noexcept
-    : InvalidException{what}
+struct SWIRLY_API InvalidTicksException : InvalidException {
+    InvalidTicksException()
+    : InvalidException{Error::InvalidTicks}
+    {
+    }
+    explicit InvalidTicksException(std::string_view what)
+    : InvalidException{Error::InvalidTicks, what}
     {
     }
     ~InvalidTicksException() override;
 
-    // Copy.
-    InvalidTicksException(const InvalidTicksException&) noexcept = default;
-    InvalidTicksException& operator=(const InvalidTicksException&) noexcept = default;
-
-    // Move.
-    InvalidTicksException(InvalidTicksException&&) noexcept = default;
-    InvalidTicksException& operator=(InvalidTicksException&&) noexcept = default;
+  protected:
+    using InvalidException::InvalidException;
 };
 
-class SWIRLY_API TooLateException : public BadRequestException {
-  public:
-    explicit TooLateException(std::string_view what) noexcept
-    : BadRequestException{what}
+struct SWIRLY_API ProtocolException : BadRequestException {
+    ProtocolException()
+    : BadRequestException{Error::ProtocolError}
+    {
+    }
+    explicit ProtocolException(std::string_view what)
+    : BadRequestException{Error::ProtocolError, what}
+    {
+    }
+    ~ProtocolException() override;
+
+  protected:
+    using BadRequestException::BadRequestException;
+};
+
+struct SWIRLY_API TooLateException : BadRequestException {
+    TooLateException()
+    : BadRequestException{Error::TooLate}
+    {
+    }
+    explicit TooLateException(std::string_view what)
+    : BadRequestException{Error::TooLate, what}
     {
     }
     ~TooLateException() override;
 
-    // Copy.
-    TooLateException(const TooLateException&) noexcept = default;
-    TooLateException& operator=(const TooLateException&) noexcept = default;
-
-    // Move.
-    TooLateException(TooLateException&&) noexcept = default;
-    TooLateException& operator=(TooLateException&&) noexcept = default;
-};
-
-/**
- * The server understood the request, but is refusing to fulfill it. Authorization will not help and
- * the request SHOULD NOT be repeated. If the request method was not HEAD and the server wishes to
- * make public why the request has not been fulfilled, it SHOULD describe the reason for the refusal
- * in the entity. If the server does not wish to make this information available to the client, the
- * status code 404 (Not Found) can be used instead.
- */
-class SWIRLY_API ForbiddenException : public ServException {
-  public:
-    explicit ForbiddenException(std::string_view what) noexcept
-    : ServException{what}
-    {
-    }
-    ~ForbiddenException() override;
-
-    // Copy.
-    ForbiddenException(const ForbiddenException&) noexcept = default;
-    ForbiddenException& operator=(const ForbiddenException&) noexcept = default;
-
-    // Move.
-    ForbiddenException(ForbiddenException&&) noexcept = default;
-    ForbiddenException& operator=(ForbiddenException&&) noexcept = default;
-
-    int http_status() const noexcept override;
-
-    const char* http_reason() const noexcept override;
-};
-
-/**
- * The server encountered an unexpected condition which prevented it from fulfilling the request.
- */
-class SWIRLY_API InternalException : public ServException {
-  public:
-    explicit InternalException(std::string_view what) noexcept
-    : ServException{what}
-    {
-    }
-    ~InternalException() override;
-
-    // Copy.
-    InternalException(const InternalException&) noexcept = default;
-    InternalException& operator=(const InternalException&) noexcept = default;
-
-    // Move.
-    InternalException(InternalException&&) noexcept = default;
-    InternalException& operator=(InternalException&&) noexcept = default;
-
-    int http_status() const noexcept override;
-
-    const char* http_reason() const noexcept override;
-};
-
-/**
- * The method specified in the Request-Line is not allowed for the resource identified by the
- * Request-URI. The response MUST include an Allow header containing a list of valid methods for the
- * requested resource.
- */
-class SWIRLY_API MethodNotAllowedException : public ServException {
-  public:
-    explicit MethodNotAllowedException(std::string_view what) noexcept
-    : ServException{what}
-    {
-    }
-    ~MethodNotAllowedException() override;
-
-    // Copy.
-    MethodNotAllowedException(const MethodNotAllowedException&) noexcept = default;
-    MethodNotAllowedException& operator=(const MethodNotAllowedException&) noexcept = default;
-
-    // Move.
-    MethodNotAllowedException(MethodNotAllowedException&&) noexcept = default;
-    MethodNotAllowedException& operator=(MethodNotAllowedException&&) noexcept = default;
-
-    int http_status() const noexcept override;
-
-    const char* http_reason() const noexcept override;
-};
-
-/**
- * The server has not found anything matching the Request-URI. No indication is given of whether the
- * condition is temporary or permanent. The 410 (Gone) status code SHOULD be used if the server
- * knows, through some internally configurable mechanism, that an old resource is permanently
- * unavailable and has no forwarding address. This status code is commonly used when the server does
- * not wish to reveal exactly why the request has been refused, or when no other response is
- * applicable.
- */
-class SWIRLY_API NotFoundException : public ServException {
-  public:
-    explicit NotFoundException(std::string_view what) noexcept
-    : ServException{what}
-    {
-    }
-    ~NotFoundException() override;
-
-    // Copy.
-    NotFoundException(const NotFoundException&) noexcept = default;
-    NotFoundException& operator=(const NotFoundException&) noexcept = default;
-
-    // Move.
-    NotFoundException(NotFoundException&&) noexcept = default;
-    NotFoundException& operator=(NotFoundException&&) noexcept = default;
-
-    int http_status() const noexcept override;
-
-    const char* http_reason() const noexcept override;
-};
-
-class SWIRLY_API MarketClosedException : public NotFoundException {
-  public:
-    explicit MarketClosedException(std::string_view what) noexcept
-    : NotFoundException{what}
-    {
-    }
-    ~MarketClosedException() override;
-
-    // Copy.
-    MarketClosedException(const MarketClosedException&) noexcept = default;
-    MarketClosedException& operator=(const MarketClosedException&) noexcept = default;
-
-    // Move.
-    MarketClosedException(MarketClosedException&&) noexcept = default;
-    MarketClosedException& operator=(MarketClosedException&&) noexcept = default;
-};
-
-class SWIRLY_API MarketNotFoundException : public NotFoundException {
-  public:
-    explicit MarketNotFoundException(std::string_view what) noexcept
-    : NotFoundException{what}
-    {
-    }
-    ~MarketNotFoundException() override;
-
-    // Copy.
-    MarketNotFoundException(const MarketNotFoundException&) noexcept = default;
-    MarketNotFoundException& operator=(const MarketNotFoundException&) noexcept = default;
-
-    // Move.
-    MarketNotFoundException(MarketNotFoundException&&) noexcept = default;
-    MarketNotFoundException& operator=(MarketNotFoundException&&) noexcept = default;
-};
-
-class SWIRLY_API OrderNotFoundException : public NotFoundException {
-  public:
-    explicit OrderNotFoundException(std::string_view what) noexcept
-    : NotFoundException{what}
-    {
-    }
-    ~OrderNotFoundException() override;
-
-    // Copy.
-    OrderNotFoundException(const OrderNotFoundException&) noexcept = default;
-    OrderNotFoundException& operator=(const OrderNotFoundException&) noexcept = default;
-
-    // Move.
-    OrderNotFoundException(OrderNotFoundException&&) noexcept = default;
-    OrderNotFoundException& operator=(OrderNotFoundException&&) noexcept = default;
-};
-
-/**
- * The server is currently unable to handle the request due to a temporary overloading or
- * maintenance of the server. The implication is that this is a temporary condition which will be
- * alleviated after some delay. If known, the length of the delay MAY be indicated in a Retry-After
- * header. If no Retry-After is given, the client SHOULD handle the response as it would for a 500
- * response.
- */
-class SWIRLY_API ServiceUnavailableException : public ServException {
-  public:
-    explicit ServiceUnavailableException(std::string_view what) noexcept
-    : ServException{what}
-    {
-    }
-    ~ServiceUnavailableException() override;
-
-    // Copy.
-    ServiceUnavailableException(const ServiceUnavailableException&) noexcept = default;
-    ServiceUnavailableException& operator=(const ServiceUnavailableException&) noexcept = default;
-
-    // Move.
-    ServiceUnavailableException(ServiceUnavailableException&&) noexcept = default;
-    ServiceUnavailableException& operator=(ServiceUnavailableException&&) noexcept = default;
-
-    int http_status() const noexcept override;
-
-    const char* http_reason() const noexcept override;
+  protected:
+    using BadRequestException::BadRequestException;
 };
 
 /**
@@ -381,25 +159,199 @@ class SWIRLY_API ServiceUnavailableException : public ServException {
  * include relevant diagnostic information. HTTP access authentication is explained in "HTTP
  * Authentication: Basic and Digest Access Authentication".
  */
-class SWIRLY_API UnauthorizedException : public ServException {
-  public:
-    explicit UnauthorizedException(std::string_view what) noexcept
-    : ServException{what}
+struct SWIRLY_API UnauthorizedException : Exception {
+    UnauthorizedException()
+    : Exception{Error::Unauthorized}
+    {
+    }
+    explicit UnauthorizedException(std::string_view what)
+    : Exception{Error::Unauthorized, what}
     {
     }
     ~UnauthorizedException() override;
 
-    // Copy.
-    UnauthorizedException(const UnauthorizedException&) noexcept = default;
-    UnauthorizedException& operator=(const UnauthorizedException&) noexcept = default;
+  protected:
+    using Exception::Exception;
+};
 
-    // Move.
-    UnauthorizedException(UnauthorizedException&&) noexcept = default;
-    UnauthorizedException& operator=(UnauthorizedException&&) noexcept = default;
+/**
+ * The server understood the request, but is refusing to fulfill it. Authorization will not help and
+ * the request SHOULD NOT be repeated. If the request method was not HEAD and the server wishes to
+ * make public why the request has not been fulfilled, it SHOULD describe the reason for the refusal
+ * in the entity. If the server does not wish to make this information available to the client, the
+ * status code 404 (Not Found) can be used instead.
+ */
+struct SWIRLY_API ForbiddenException : Exception {
+    ForbiddenException()
+    : Exception{Error::Forbidden}
+    {
+    }
+    explicit ForbiddenException(std::string_view what)
+    : Exception{Error::Forbidden, what}
+    {
+    }
+    ~ForbiddenException() override;
 
-    int http_status() const noexcept override;
+  protected:
+    using Exception::Exception;
+};
 
-    const char* http_reason() const noexcept override;
+/**
+ * The server has not found anything matching the Request-URI. No indication is given of whether the
+ * condition is temporary or permanent. The 410 (Gone) status code SHOULD be used if the server
+ * knows, through some internally configurable mechanism, that an old resource is permanently
+ * unavailable and has no forwarding address. This status code is commonly used when the server does
+ * not wish to reveal exactly why the request has been refused, or when no other response is
+ * applicable.
+ */
+struct SWIRLY_API NotFoundException : Exception {
+    NotFoundException()
+    : Exception{Error::NotFound}
+    {
+    }
+    explicit NotFoundException(std::string_view what)
+    : Exception{Error::NotFound, what}
+    {
+    }
+    ~NotFoundException() override;
+
+  protected:
+    using Exception::Exception;
+};
+
+struct SWIRLY_API AccntNotFoundException : NotFoundException {
+    AccntNotFoundException()
+    : NotFoundException{Error::AccntNotFound}
+    {
+    }
+    explicit AccntNotFoundException(std::string_view what)
+    : NotFoundException{Error::AccntNotFound, what}
+    {
+    }
+    ~AccntNotFoundException() override;
+
+  protected:
+    using NotFoundException::NotFoundException;
+};
+
+struct SWIRLY_API MarketNotFoundException : NotFoundException {
+    MarketNotFoundException()
+    : NotFoundException{Error::MarketNotFound}
+    {
+    }
+    explicit MarketNotFoundException(std::string_view what)
+    : NotFoundException{Error::MarketNotFound, what}
+    {
+    }
+    ~MarketNotFoundException() override;
+
+  protected:
+    using NotFoundException::NotFoundException;
+};
+
+struct SWIRLY_API OrderNotFoundException : NotFoundException {
+    OrderNotFoundException()
+    : NotFoundException{Error::OrderNotFound}
+    {
+    }
+    explicit OrderNotFoundException(std::string_view what)
+    : NotFoundException{Error::OrderNotFound, what}
+    {
+    }
+    ~OrderNotFoundException() override;
+
+  protected:
+    using NotFoundException::NotFoundException;
+};
+
+/**
+ * The method specified in the Request-Line is not allowed for the resource identified by the
+ * Request-URI. The response MUST include an Allow header containing a list of valid methods for the
+ * requested resource.
+ */
+struct SWIRLY_API MethodNotAllowedException : Exception {
+    MethodNotAllowedException()
+    : Exception{Error::MethodNotAllowed}
+    {
+    }
+    explicit MethodNotAllowedException(std::string_view what)
+    : Exception{Error::MethodNotAllowed, what}
+    {
+    }
+    ~MethodNotAllowedException() override;
+
+  protected:
+    using Exception::Exception;
+};
+
+/**
+ * The server encountered an unexpected condition which prevented it from fulfilling the request.
+ */
+struct SWIRLY_API InternalException : Exception {
+    InternalException()
+    : Exception{Error::InternalError}
+    {
+    }
+    explicit InternalException(std::string_view what)
+    : Exception{Error::InternalError, what}
+    {
+    }
+    ~InternalException() override;
+
+  protected:
+    using Exception::Exception;
+};
+
+struct SWIRLY_API DatabaseException : InternalException {
+    DatabaseException()
+    : InternalException{Error::DatabaseError}
+    {
+    }
+    explicit DatabaseException(std::string_view what)
+    : InternalException{Error::DatabaseError, what}
+    {
+    }
+    ~DatabaseException() override;
+
+  protected:
+    using InternalException::InternalException;
+};
+
+/**
+ * The server is currently unable to handle the request due to a temporary overloading or
+ * maintenance of the server. The implication is that this is a temporary condition which will be
+ * alleviated after some delay. If known, the length of the delay MAY be indicated in a Retry-After
+ * header. If no Retry-After is given, the client SHOULD handle the response as it would for a 500
+ * response.
+ */
+struct SWIRLY_API ServiceUnavailableException : Exception {
+    ServiceUnavailableException()
+    : Exception{Error::ServiceUnavailable}
+    {
+    }
+    explicit ServiceUnavailableException(std::string_view what)
+    : Exception{Error::ServiceUnavailable, what}
+    {
+    }
+    ~ServiceUnavailableException() override;
+
+  protected:
+    using Exception::Exception;
+};
+
+struct SWIRLY_API MarketClosedException : ServiceUnavailableException {
+    MarketClosedException()
+    : ServiceUnavailableException{Error::MarketClosed}
+    {
+    }
+    explicit MarketClosedException(std::string_view what)
+    : ServiceUnavailableException{Error::MarketClosed, what}
+    {
+    }
+    ~MarketClosedException() override;
+
+  protected:
+    using ServiceUnavailableException::ServiceUnavailableException;
 };
 
 } // namespace fin

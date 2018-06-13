@@ -16,7 +16,7 @@
  */
 #include "Tokeniser.hpp"
 
-#include <swirly/fix/Exception.hpp>
+#include <swirly/fin/Exception.hpp>
 
 #include <cassert>
 #include <cctype>
@@ -74,7 +74,7 @@ int FixTokeniser::tag(string_view::const_iterator& it) const
         tag += *it++ - '0';
         for (;;) {
             if (it == msg_.cend()) {
-                throw FixException{"partial FIX tag"};
+                throw ProtocolException{"partial FIX tag"};
             }
             if (!isdigit(*it)) {
                 break;
@@ -85,7 +85,7 @@ int FixTokeniser::tag(string_view::const_iterator& it) const
     }
     // Verify that first non-digit charactor was '=' delimiter.
     if (*it != '=') {
-        throw FixException{"invalid FIX tag"};
+        throw ProtocolException{"invalid FIX tag"};
     }
     // Skip delimiter.
     ++it;

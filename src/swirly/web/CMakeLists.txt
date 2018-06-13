@@ -37,7 +37,6 @@ endif(RAGEL_EXECUTABLE)
 
 set(lib_SOURCES
   EntitySet.cpp
-  Exception.cpp
   Page.cpp
   Parser.cpp
   Request.cpp
@@ -75,6 +74,7 @@ set(test_SOURCES
   Page.ut.cpp
   Parser.ut.cpp
   RestBody.ut.cpp
+  Types.ut.cpp
   Url.ut.cpp)
 
 add_executable(swirly-web-test

@@ -98,9 +98,9 @@ void RestServ::handle_request(const HttpRequest& req, HttpStream& os) noexcept
     const auto now = get_time(req); // noexcept
 
     if (req.method() != HttpMethod::Delete) {
-        os.reset(200, "OK", cache); // noexcept
+        os.reset(HttpStatus::Ok, cache); // noexcept
     } else {
-        os.reset(204, "No Content"); // noexcept
+        os.reset(HttpStatus::NoContent); // noexcept
     }
     try {
         const auto& body = req.body();
@@ -116,18 +116,20 @@ void RestServ::handle_request(const HttpRequest& req, HttpStream& os) noexcept
             throw MethodNotAllowedException{err_msg() << "method '"sv << req.method()
                                                       << "' is not allowed"sv};
         }
-    } catch (const ServException& e) {
-        SWIRLY_ERROR << "exception: status="sv << e.http_status() << ", reason="sv
-                     << e.http_reason() << ", detail="sv << e.what();
-        os.reset(e.http_status(), e.http_reason());
-        os << e;
-    } catch (const exception& e) {
-        const int status{500};
-        const char* const reason{"Internal Server Error"};
+    } catch (const Exception& e) {
+        const auto status = http_status(e.code());
+        const char* const reason = http_reason(status);
         SWIRLY_ERROR << "exception: status="sv << status << ", reason="sv << reason << ", detail="sv
                      << e.what();
         os.reset(status, reason);
-        ServException::to_json(status, reason, e.what(), os);
+        Exception::to_json(os, static_cast<int>(status), reason, e.what());
+    } catch (const exception& e) {
+        const auto status = HttpStatus::InternalServerError;
+        const char* const reason = http_reason(status);
+        SWIRLY_ERROR << "exception: status="sv << status << ", reason="sv << reason << ", detail="sv
+                     << e.what();
+        os.reset(status, reason);
+        Exception::to_json(os, static_cast<int>(status), reason, e.what());
     }
     os.commit(); // noexcept
 }

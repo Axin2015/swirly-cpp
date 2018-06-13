@@ -23,9 +23,10 @@ namespace {
 
 // All 1xx (informational), 204 (no content), and 304 (not modified) responses must not include a
 // body.
-constexpr bool with_body(int status) noexcept
+constexpr bool with_body(HttpStatus status) noexcept
 {
-    return !((status >= 100 && status < 200) || status == 204 || status == 304);
+    const auto n = static_cast<int>(status);
+    return !((n >= 100 && n < 200) || n == 204 || n == 304);
 }
 
 } // namespace
@@ -71,7 +72,7 @@ void HttpStream::commit() noexcept
     buf_.commit();
 }
 
-void HttpStream::reset(int status, const char* reason, bool cache)
+void HttpStream::reset(HttpStatus status, const char* reason, bool cache)
 {
     buf_.reset();
     swirly::reset(*this);

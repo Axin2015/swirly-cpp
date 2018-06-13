@@ -32,6 +32,7 @@ set(lib_SOURCES
   Conv.cpp
   Date.cpp
   DsvModel.cpp
+  Error.cpp
   Exception.cpp
   Exec.cpp
   Instr.cpp

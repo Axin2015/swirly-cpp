@@ -24,8 +24,10 @@ BOOST_AUTO_TEST_SUITE(ExceptionSuite)
 
 BOOST_AUTO_TEST_CASE(ExceptionCase)
 {
-    Exception e{"Foo"};
-    BOOST_TEST(strcmp(e.what(), "Foo") == 0);
+    const auto ec = std::make_error_code(std::errc::invalid_argument);
+    const Exception e{ec, "foo"};
+    BOOST_TEST(e.what() == std::string{"foo: "} + std::strerror(EINVAL));
+    BOOST_TEST(e.code() == ec);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

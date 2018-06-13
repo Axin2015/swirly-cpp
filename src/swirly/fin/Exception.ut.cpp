@@ -28,7 +28,10 @@ BOOST_AUTO_TEST_CASE(ExceptionToStringCase)
 {
     const NotFoundException e{"this is a test"};
 
-    BOOST_TEST(to_string(e) == //
+    std::stringstream ss;
+    e.to_json(ss, 404, "Not Found", "this is a test");
+
+    BOOST_TEST(ss.str() == //
                "{\"status\":404"
                ",\"reason\":\"Not Found\""
                ",\"detail\":\"this is a test\""

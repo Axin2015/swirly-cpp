@@ -16,8 +16,6 @@
  */
 #include "DbCtx.hpp"
 
-#include "Exception.hpp"
-
 #include "Sqlite.hxx"
 #include "SqliteJourn.hpp"
 #include "SqliteModel.hpp"
@@ -27,6 +25,8 @@
 #include "MySqlJourn.hpp"
 #include "MySqlModel.hpp"
 #endif
+
+#include <swirly/fin/Exception.hpp>
 
 #include <swirly/util/Config.hpp>
 #include <swirly/util/Log.hpp>
@@ -97,7 +97,7 @@ std::unique_ptr<DbCtx::Impl> make_impl(const Config& config)
             mysql::open_db(db_host, db_user, db_pass, db_name, db_port, config));
 #endif
     } else {
-        throw DbException{err_msg() << "db_type '"sv << db_type << "' not supported"sv};
+        throw DatabaseException{err_msg() << "db_type '"sv << db_type << "' not supported"sv};
     }
     return impl;
 }

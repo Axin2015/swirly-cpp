@@ -16,33 +16,11 @@
  */
 #include "Exception.hpp"
 
-#include <iostream>
-
 namespace swirly {
 inline namespace fin {
 using namespace std;
 
-ServException::~ServException() = default;
-
-void ServException::to_json(int status, const char* reason, const char* detail, ostream& os)
-{
-    os << "{\"status\":"sv << status     //
-       << ",\"reason\":\""sv << reason   //
-       << "\",\"detail\":\""sv << detail //
-       << "\"}"sv;
-}
-
 BadRequestException::~BadRequestException() = default;
-
-int BadRequestException::http_status() const noexcept
-{
-    return 400;
-}
-
-const char* BadRequestException::http_reason() const noexcept
-{
-    return "Bad Request";
-}
 
 AlreadyExistsException::~AlreadyExistsException() = default;
 
@@ -54,85 +32,31 @@ InvalidLotsException::~InvalidLotsException() = default;
 
 InvalidTicksException::~InvalidTicksException() = default;
 
+ProtocolException::~ProtocolException() = default;
+
 TooLateException::~TooLateException() = default;
+
+UnauthorizedException::~UnauthorizedException() = default;
 
 ForbiddenException::~ForbiddenException() = default;
 
-int ForbiddenException::http_status() const noexcept
-{
-    return 403;
-}
-
-const char* ForbiddenException::http_reason() const noexcept
-{
-    return "Forbidden";
-}
-
-InternalException::~InternalException() = default;
-
-int InternalException::http_status() const noexcept
-{
-    return 500;
-}
-
-const char* InternalException::http_reason() const noexcept
-{
-    return "Internal Server Error";
-}
-
-MethodNotAllowedException::~MethodNotAllowedException() = default;
-
-int MethodNotAllowedException::http_status() const noexcept
-{
-    return 405;
-}
-
-const char* MethodNotAllowedException::http_reason() const noexcept
-{
-    return "Method Not Allowed";
-}
-
 NotFoundException::~NotFoundException() = default;
 
-int NotFoundException::http_status() const noexcept
-{
-    return 404;
-}
-
-const char* NotFoundException::http_reason() const noexcept
-{
-    return "Not Found";
-}
-
-MarketClosedException::~MarketClosedException() = default;
+AccntNotFoundException::~AccntNotFoundException() = default;
 
 MarketNotFoundException::~MarketNotFoundException() = default;
 
 OrderNotFoundException::~OrderNotFoundException() = default;
 
+MethodNotAllowedException::~MethodNotAllowedException() = default;
+
+InternalException::~InternalException() = default;
+
+DatabaseException::~DatabaseException() = default;
+
 ServiceUnavailableException::~ServiceUnavailableException() = default;
 
-int ServiceUnavailableException::http_status() const noexcept
-{
-    return 503;
-}
-
-const char* ServiceUnavailableException::http_reason() const noexcept
-{
-    return "Service Unavailable";
-}
-
-UnauthorizedException::~UnauthorizedException() = default;
-
-int UnauthorizedException::http_status() const noexcept
-{
-    return 401;
-}
-
-const char* UnauthorizedException::http_reason() const noexcept
-{
-    return "Unauthorized";
-}
+MarketClosedException::~MarketClosedException() = default;
 
 } // namespace fin
 } // namespace swirly
