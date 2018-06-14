@@ -35,7 +35,7 @@ void Client::reset()
     order_model_.reset();
     market_model_.reset();
     instr_model_.reset();
-    assetModel_.reset();
+    asset_model_.reset();
 }
 
 } // namespace ui

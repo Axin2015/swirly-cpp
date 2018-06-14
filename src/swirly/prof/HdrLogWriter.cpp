@@ -50,7 +50,7 @@ HdrLogWriter::HdrLogWriter(const char* path, const char* user_prefix)
     auto ts = to_time_spec(UnixClock::now());
     err = hdr_log_write_header(&writer_, file_.get(), user_prefix, &ts);
     if (err != 0) {
-        throw runtime_error{"hdr_log_write_header failed:"s + hdr_strerror(err)};
+        throw runtime_error{"hdr_log_write_header: "s + hdr_strerror(err)};
     }
 }
 
@@ -62,7 +62,7 @@ void HdrLogWriter::write(Time start_time, Time end_time, hdr_histogram& hist)
     auto end_ts = to_time_spec(end_time);
     const auto err = hdr_log_write(&writer_, file_.get(), &start_ts, &end_ts, &hist);
     if (err != 0) {
-        throw runtime_error{"hdr_log_write failed:"s + hdr_strerror(err)};
+        throw runtime_error{"hdr_log_write: "s + hdr_strerror(err)};
     }
 }
 

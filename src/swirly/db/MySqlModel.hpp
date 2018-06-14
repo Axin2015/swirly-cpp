@@ -14,28 +14,29 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SQLITE_MODEL_HPP
-#define SWIRLY_SQLITE_MODEL_HPP
+#ifndef SWIRLY_DB_MYSQLMODEL_HPP
+#define SWIRLY_DB_MYSQLMODEL_HPP
 
-#include <swirly/sqlite/Types.hpp>
+#include <swirly/db/Types.hpp>
 
 #include <swirly/fin/Model.hpp>
 
 namespace swirly {
-inline namespace sqlite {
+inline namespace db {
 
-class SWIRLY_API SqlModel : public Model {
+class SWIRLY_API MySqlModel : public Model {
   public:
-    explicit SqlModel(const Config& config);
-    ~SqlModel() override;
+    explicit MySqlModel(const mysql::DbPtr& db);
+    explicit MySqlModel(const Config& config);
+    ~MySqlModel() override;
 
     // Copy.
-    SqlModel(const SqlModel&) = delete;
-    SqlModel& operator=(const SqlModel&) = delete;
+    MySqlModel(const MySqlModel&) = delete;
+    MySqlModel& operator=(const MySqlModel&) = delete;
 
     // Move.
-    SqlModel(SqlModel&&);
-    SqlModel& operator=(SqlModel&&);
+    MySqlModel(MySqlModel&&);
+    MySqlModel& operator=(MySqlModel&&);
 
   protected:
     void do_read_asset(const ModelCallback<AssetPtr>& cb) const override;
@@ -53,10 +54,10 @@ class SWIRLY_API SqlModel : public Model {
     void do_read_posn(JDay bus_day, const ModelCallback<PosnPtr>& cb) const override;
 
   private:
-    sqlite::DbPtr db_;
+    mysql::DbPtr db_;
 };
 
-} // namespace sqlite
+} // namespace db
 } // namespace swirly
 
-#endif // SWIRLY_SQLITE_MODEL_HPP
+#endif // SWIRLY_DB_MYSQLMODEL_HPP

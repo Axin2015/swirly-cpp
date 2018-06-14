@@ -14,78 +14,60 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Journ.hpp"
+#include "SqliteJourn.hpp"
 
-#include "Utility.hxx"
+#include "Sql.hxx"
+#include "Sqlite.hxx"
 
 #include <swirly/fin/Exec.hpp>
 
 #include <swirly/util/Config.hpp>
+#include <swirly/util/Log.hpp>
 
 namespace swirly {
-inline namespace sqlite {
+inline namespace db {
+using namespace sqlite;
 using namespace std;
 namespace {
-
 constexpr auto BeginSql = "BEGIN TRANSACTION"sv;
 constexpr auto CommitSql = "COMMIT TRANSACTION"sv;
 constexpr auto RollbackSql = "ROLLBACK TRANSACTION"sv;
-
-constexpr auto InsertMarketSql =                         //
-    "INSERT INTO market_t (id, instr, settl_day, state)" //
-    " VALUES (?, ?, ?, ?)"sv;
-
-constexpr auto UpdateMarketSql =     //
-    "UPDATE Market_t SET state = ?2" //
-    " WHERE id = ?1"sv;
-
-constexpr auto InsertExecSql =                                                     //
-    "INSERT INTO exec_t (market_id, instr, settl_day, id, order_id, accnt, ref,"   //
-    " state_id, side_id, lots, ticks, resd_lots, exec_lots, exec_cost, last_lots," //
-    " last_ticks, min_lots, match_id, posn_lots, posn_cost, liq_ind_id, cpty,"     //
-    " created)"                                                                    //
-    " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"sv;
-
-constexpr auto UpdateExecSql =       //
-    "UPDATE exec_t SET archive = ?3" //
-    " WHERE market_id = ?1 AND id = ?2"sv;
-
 } // namespace
 
-SqlJourn::SqlJourn(const Config& config)
-: db_{open_db(config.get("sqlite_journ", "swirly.db"), SQLITE_OPEN_READWRITE, config)}
-, begin_stmt_{prepare(*db_, BeginSql)}
-, commit_stmt_{prepare(*db_, CommitSql)}
-, rollback_stmt_{prepare(*db_, RollbackSql)}
-, insert_market_stmt_{prepare(*db_, InsertMarketSql)}
-, update_market_stmt_{prepare(*db_, UpdateMarketSql)}
-, insert_exec_stmt_{prepare(*db_, InsertExecSql)}
-, update_exec_stmt_{prepare(*db_, UpdateExecSql)}
+SqliteJourn::SqliteJourn(const DbPtr& db)
+: db_{db}
+, begin_stmt_{prepare(*db, BeginSql)}
+, commit_stmt_{prepare(*db, CommitSql)}
+, rollback_stmt_{prepare(*db, RollbackSql)}
+, insert_market_stmt_{prepare(*db, market::InsertSql)}
+, update_market_stmt_{prepare(*db, market::UpdateSql)}
+, insert_exec_stmt_{prepare(*db, exec::InsertSql)}
+, update_exec_stmt_{prepare(*db, exec::UpdateSql)}
 {
 }
 
-SqlJourn::~SqlJourn() = default;
-
-SqlJourn::SqlJourn(SqlJourn&&) = default;
-
-SqlJourn& SqlJourn::operator=(SqlJourn&&) = default;
-
-void SqlJourn::do_write(const Msg& msg)
+SqliteJourn::SqliteJourn(const Config& config)
+: SqliteJourn{open_db(config.get("db_name", "swirly.db"), SQLITE_OPEN_READWRITE, config)}
 {
-    dispatch(msg);
 }
 
-void SqlJourn::begin()
+SqliteJourn::~SqliteJourn() = default;
+
+SqliteJourn::SqliteJourn(SqliteJourn&&) = default;
+
+SqliteJourn& SqliteJourn::operator=(SqliteJourn&&) = default;
+
+void SqliteJourn::do_begin()
 {
     step_once(*begin_stmt_);
 }
 
-void SqlJourn::commit()
+void SqliteJourn::do_commit()
 {
     step_once(*commit_stmt_);
 }
 
-void SqlJourn::rollback() noexcept
+void SqliteJourn::do_rollback() noexcept
 {
     try {
         step_once(*rollback_stmt_);
@@ -94,7 +76,12 @@ void SqlJourn::rollback() noexcept
     }
 }
 
-void SqlJourn::on_create_market(const CreateMarket& body)
+void SqliteJourn::do_write(const Msg& msg)
+{
+    dispatch(msg);
+}
+
+void SqliteJourn::on_create_market(const CreateMarket& body)
 {
     auto& stmt = *insert_market_stmt_;
 
@@ -107,29 +94,28 @@ void SqlJourn::on_create_market(const CreateMarket& body)
     step_once(stmt);
 }
 
-void SqlJourn::on_update_market(const UpdateMarket& body)
+void SqliteJourn::on_update_market(const UpdateMarket& body)
 {
     auto& stmt = *update_market_stmt_;
 
     ScopedBind bind{stmt};
-    bind(body.id);
     bind(body.state);
+    bind(body.id);
 
     step_once(stmt);
 }
 
-void SqlJourn::on_create_exec(const CreateExec& body)
+void SqliteJourn::on_create_exec(const CreateExec& body)
 {
-    Transaction trans{*this};
     auto& stmt = *insert_exec_stmt_;
 
     ScopedBind bind{stmt};
+    bind(to_string_view(body.accnt));
     bind(body.market_id);
     bind(to_string_view(body.instr));
     bind(body.settl_day, MaybeNull);
     bind(body.id);
     bind(body.order_id, MaybeNull);
-    bind(to_string_view(body.accnt));
     bind(to_string_view(body.ref), MaybeNull);
     bind(body.state);
     bind(body.side);
@@ -154,10 +140,9 @@ void SqlJourn::on_create_exec(const CreateExec& body)
     bind(body.created); // Created.
 
     step_once(stmt);
-    trans.commit();
 }
 
-void SqlJourn::on_archive_trade(const ArchiveTrade& body)
+void SqliteJourn::on_archive_trade(const ArchiveTrade& body)
 {
     Transaction trans{*this};
     auto& stmt = *update_exec_stmt_;
@@ -168,14 +153,14 @@ void SqlJourn::on_archive_trade(const ArchiveTrade& body)
             break;
         }
         ScopedBind bind{stmt};
+        bind(body.modified);
         bind(body.market_id);
         bind(id);
-        bind(body.modified);
 
         step_once(stmt);
     }
     trans.commit();
 }
 
-} // namespace sqlite
+} // namespace db
 } // namespace swirly

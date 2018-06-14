@@ -214,6 +214,19 @@ CREATE INDEX exec_state_archive_idx ON exec_t (state_id, archive);
 
 CREATE TRIGGER before_insert_on_exec1
   BEFORE INSERT ON exec_t
+  WHEN NEW.state_id = 4
+  BEGIN
+    UPDATE market_t
+    SET
+      last_lots = NEW.last_lots,
+      last_ticks = NEW.last_ticks,
+      last_time = NEW.created
+    WHERE id = NEW.market_id;
+  END
+;
+
+CREATE TRIGGER before_insert_on_exec2
+  BEFORE INSERT ON exec_t
   WHEN NEW.order_id IS NOT NULL
   AND NEW.state_id = 1
   BEGIN
@@ -259,7 +272,7 @@ CREATE TRIGGER before_insert_on_exec1
   END
 ;
 
-CREATE TRIGGER before_insert_on_exec2
+CREATE TRIGGER before_insert_on_exec3
   BEFORE INSERT ON exec_t
   WHEN NEW.order_id IS NOT NULL
   AND NEW.state_id != 1
@@ -275,19 +288,6 @@ CREATE TRIGGER before_insert_on_exec2
       last_ticks = NEW.last_ticks,
       modified = NEW.created
     WHERE id = NEW.order_id;
-  END
-;
-
-CREATE TRIGGER before_insert_on_exec3
-  BEFORE INSERT ON exec_t
-  WHEN NEW.state_id = 4
-  BEGIN
-    UPDATE market_t
-    SET
-      last_lots = NEW.last_lots,
-      last_ticks = NEW.last_ticks,
-      last_time = NEW.created
-    WHERE id = NEW.market_id;
   END
 ;
 

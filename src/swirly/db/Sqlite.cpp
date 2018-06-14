@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Utility.hxx"
+#include "Sqlite.hxx"
 
 #include "Exception.hpp"
 
@@ -25,7 +25,8 @@
 #include <cassert>
 
 namespace swirly {
-inline namespace sqlite {
+inline namespace db {
+namespace sqlite {
 using namespace std;
 namespace {
 
@@ -52,7 +53,7 @@ void bind32(sqlite3_stmt& stmt, int col, int32_t val)
 {
     int rc{sqlite3_bind_int(&stmt, col, val)};
     if (rc != SQLITE_OK) {
-        throw SqlException{err_msg() << "sqlite3_bind_int failed: "sv << last_error(stmt)};
+        throw DbException{err_msg() << "sqlite3_bind_int: "sv << last_error(stmt)};
     }
 }
 
@@ -60,7 +61,7 @@ void bind64(sqlite3_stmt& stmt, int col, int64_t val)
 {
     int rc{sqlite3_bind_int64(&stmt, col, val)};
     if (rc != SQLITE_OK) {
-        throw SqlException{err_msg() << "sqlite3_bind_int64 failed: "sv << last_error(stmt)};
+        throw DbException{err_msg() << "sqlite3_bind_int64: "sv << last_error(stmt)};
     }
 }
 
@@ -68,7 +69,7 @@ void bindsv(sqlite3_stmt& stmt, int col, string_view val)
 {
     int rc{sqlite3_bind_text(&stmt, col, val.data(), val.size(), SQLITE_STATIC)};
     if (rc != SQLITE_OK) {
-        throw SqlException{err_msg() << "sqlite3_bind_text failed: "sv << last_error(stmt)};
+        throw DbException{err_msg() << "sqlite3_bind_text: "sv << last_error(stmt)};
     }
 }
 
@@ -80,8 +81,7 @@ DbPtr open_db(const char* path, int flags, const Config& config)
     int rc{sqlite3_open_v2(path, &db, flags, nullptr)};
     DbPtr ptr{db, sqlite3_close};
     if (rc != SQLITE_OK) {
-        throw SqlException{err_msg()
-                           << "sqlite3_open_v2 failed: "sv << path << ": "sv << last_error(*db)};
+        throw DbException{err_msg() << "sqlite3_open_v2: "sv << last_error(*db) << ": "sv << path};
     }
     if (config.get("sqlite_enable_trace", false)) {
 #pragma GCC diagnostic push
@@ -92,8 +92,8 @@ DbPtr open_db(const char* path, int flags, const Config& config)
     if (config.get("sqlite_enable_fkey", false)) {
         rc = sqlite3_db_config(db, SQLITE_DBCONFIG_ENABLE_FKEY, 1, nullptr);
         if (rc != SQLITE_OK) {
-            throw SqlException{err_msg() << "sqlite3_db_config failed: "sv << path << ": "sv
-                                         << last_error(*db)};
+            throw DbException{err_msg()
+                              << "sqlite3_db_config: "sv << last_error(*db) << ": "sv << path};
         }
     }
     {
@@ -113,8 +113,7 @@ StmtPtr prepare(sqlite3& db, string_view sql)
     int rc{sqlite3_prepare_v2(&db, sql.data(), sql.size(), &stmt, nullptr)};
     StmtPtr ptr{stmt, sqlite3_finalize};
     if (rc != SQLITE_OK) {
-        throw SqlException{err_msg()
-                           << "sqlite3_prepare_v2 failed: "sv << sql << ": "sv << last_error(db)};
+        throw DbException{err_msg() << "sqlite3_prepare_v2: "sv << last_error(db) << ": "sv << sql};
     }
     return ptr;
 }
@@ -130,7 +129,7 @@ bool step(sqlite3_stmt& stmt)
     case SQLITE_DONE:
         return false;
     default:
-        throw SqlException{err_msg() << "sqlite3_step failed: "sv << last_error(stmt)};
+        throw DbException{err_msg() << "sqlite3_step: "sv << last_error(stmt)};
         break;
     }
 }
@@ -139,9 +138,10 @@ void bind(sqlite3_stmt& stmt, int col, nullptr_t)
 {
     int rc{sqlite3_bind_null(&stmt, col)};
     if (rc != SQLITE_OK) {
-        throw SqlException{err_msg() << "sqlite3_bind_null failed: "sv << last_error(stmt)};
+        throw DbException{err_msg() << "sqlite3_bind_null: "sv << last_error(stmt)};
     }
 }
 
 } // namespace sqlite
+} // namespace db
 } // namespace swirly

@@ -14,10 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SQLITE_UTILITY_HXX
-#define SWIRLY_SQLITE_UTILITY_HXX
+#ifndef SWIRLY_DB_SQLITE_HXX
+#define SWIRLY_DB_SQLITE_HXX
 
-#include <swirly/sqlite/Types.hpp>
+#include <swirly/db/Types.hpp>
 
 #include <swirly/util/Enum.hpp>
 #include <swirly/util/Finally.hpp>
@@ -29,14 +29,11 @@
 
 #include <type_traits>
 
-namespace swirly {
-inline namespace util {
-class Config;
-} // namespace util
-} // namespace swirly
+#include <sqlite3.h>
 
 namespace swirly {
-inline namespace sqlite {
+inline namespace db {
+namespace sqlite {
 namespace detail {
 
 void bind32(sqlite3_stmt& stmt, int col, int32_t val);
@@ -44,13 +41,13 @@ void bind64(sqlite3_stmt& stmt, int col, int64_t val);
 void bindsv(sqlite3_stmt& stmt, int col, std::string_view val);
 
 template <typename ValueT, typename EnableT = void>
-struct SqlTraits;
+struct DbTraits;
 
 /**
  * Integer 32bit.
  */
 template <typename ValueT>
-struct SqlTraits<ValueT, std::enable_if_t<std::is_integral_v<ValueT> && (sizeof(ValueT) <= 4)>> {
+struct DbTraits<ValueT, std::enable_if_t<std::is_integral_v<ValueT> && (sizeof(ValueT) <= 4)>> {
     static constexpr bool is_null(ValueT val) noexcept { return val == 0; }
     static void bind(sqlite3_stmt& stmt, int col, ValueT val) { bind32(stmt, col, val); }
     static auto column(sqlite3_stmt& stmt, int col) noexcept
@@ -63,7 +60,7 @@ struct SqlTraits<ValueT, std::enable_if_t<std::is_integral_v<ValueT> && (sizeof(
  * Integer 64bit.
  */
 template <typename ValueT>
-struct SqlTraits<ValueT, std::enable_if_t<std::is_integral_v<ValueT> && (sizeof(ValueT) > 4)>> {
+struct DbTraits<ValueT, std::enable_if_t<std::is_integral_v<ValueT> && (sizeof(ValueT) > 4)>> {
     static constexpr bool is_null(ValueT val) noexcept { return val == 0; }
     static void bind(sqlite3_stmt& stmt, int col, ValueT val) { bind64(stmt, col, val); }
     static auto column(sqlite3_stmt& stmt, int col) noexcept
@@ -76,9 +73,9 @@ struct SqlTraits<ValueT, std::enable_if_t<std::is_integral_v<ValueT> && (sizeof(
  * IntWrapper.
  */
 template <typename ValueT>
-struct SqlTraits<ValueT, std::enable_if_t<is_int_wrapper<ValueT>>> {
+struct DbTraits<ValueT, std::enable_if_t<is_int_wrapper<ValueT>>> {
 
-    using UnderlyingTraits = SqlTraits<typename ValueT::ValueType>;
+    using UnderlyingTraits = DbTraits<typename ValueT::ValueType>;
 
     static constexpr bool is_null(ValueT val) noexcept { return val == ValueT{0}; }
     static void bind(sqlite3_stmt& stmt, int col, ValueT val)
@@ -95,9 +92,9 @@ struct SqlTraits<ValueT, std::enable_if_t<is_int_wrapper<ValueT>>> {
  * Enum.
  */
 template <typename ValueT>
-struct SqlTraits<ValueT, std::enable_if_t<std::is_enum_v<ValueT>>> {
+struct DbTraits<ValueT, std::enable_if_t<std::is_enum_v<ValueT>>> {
 
-    using UnderlyingTraits = SqlTraits<std::underlying_type_t<ValueT>>;
+    using UnderlyingTraits = DbTraits<std::underlying_type_t<ValueT>>;
 
     static constexpr bool is_null(ValueT val) noexcept { return unbox(val) == 0; }
     static void bind(sqlite3_stmt& stmt, int col, ValueT val)
@@ -114,7 +111,7 @@ struct SqlTraits<ValueT, std::enable_if_t<std::is_enum_v<ValueT>>> {
  * Time.
  */
 template <>
-struct SqlTraits<Time> {
+struct DbTraits<Time> {
     static constexpr bool is_null(Time val) noexcept { return val == Time{}; }
     static void bind(sqlite3_stmt& stmt, int col, Time val)
     {
@@ -130,7 +127,7 @@ struct SqlTraits<Time> {
  * StringView.
  */
 template <>
-struct SqlTraits<std::string_view> {
+struct DbTraits<std::string_view> {
     static constexpr bool is_null(std::string_view val) noexcept { return val.empty(); }
     static void bind(sqlite3_stmt& stmt, int col, std::string_view val) { bindsv(stmt, col, val); }
     static std::string_view column(sqlite3_stmt& stmt, int col) noexcept
@@ -156,26 +153,23 @@ inline bool step_once(sqlite3_stmt& stmt)
 template <typename ValueT>
 inline ValueT column(sqlite3_stmt& stmt, int col) noexcept
 {
-    using Traits = detail::SqlTraits<ValueT>;
+    using Traits = detail::DbTraits<ValueT>;
     return Traits::column(stmt, col);
 }
-
-constexpr struct MaybeNullTag {
-} MaybeNull{};
 
 void bind(sqlite3_stmt& stmt, int col, std::nullptr_t);
 
 template <typename ValueT>
 void bind(sqlite3_stmt& stmt, int col, ValueT val)
 {
-    using Traits = detail::SqlTraits<ValueT>;
+    using Traits = detail::DbTraits<ValueT>;
     Traits::bind(stmt, col, val);
 }
 
 template <typename ValueT>
 void bind(sqlite3_stmt& stmt, int col, ValueT val, MaybeNullTag)
 {
-    using Traits = detail::SqlTraits<ValueT>;
+    using Traits = detail::DbTraits<ValueT>;
     if (!Traits::is_null(val)) {
         bind(stmt, col, val);
     } else {
@@ -201,18 +195,18 @@ class ScopedBind {
     template <typename ValueT>
     void operator()(ValueT val)
     {
-        bind(stmt_, ++col_, val);
+        bind(stmt_, ++next_, val);
     }
 
     template <typename ValueT>
     void operator()(ValueT val, MaybeNullTag)
     {
-        bind(stmt_, ++col_, val, MaybeNull);
+        bind(stmt_, ++next_, val, MaybeNull);
     }
 
   private:
     sqlite3_stmt& stmt_;
-    int col_{0};
+    int next_{0};
 };
 
 class ScopedStep {
@@ -237,6 +231,7 @@ class ScopedStep {
 };
 
 } // namespace sqlite
+} // namespace db
 } // namespace swirly
 
-#endif // SWIRLY_SQLITE_UTILITY_HXX
+#endif // SWIRLY_DB_SQLITE_HXX

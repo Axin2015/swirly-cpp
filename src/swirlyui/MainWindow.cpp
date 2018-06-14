@@ -55,7 +55,7 @@ MainWindow::MainWindow()
     connect(posn_view.get(), &PosnView::set_fields, market_view.get(), &MarketView::set_fields);
 
     auto top_tabs = make_unique<QTabWidget>();
-    top_tabs->addTab(asset_view_ = new AssetView{client_.assetModel()}, tr("Asset"));
+    top_tabs->addTab(asset_view_ = new AssetView{client_.asset_model()}, tr("Asset"));
     top_tabs->addTab(instr_view_ = new InstrView{client_.instr_model()}, tr("Instr"));
     top_tabs->addTab(market_view_ = market_view.release(), tr("Market"));
     top_tabs->setCurrentIndex(2);

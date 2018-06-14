@@ -45,7 +45,7 @@ if(SQLITE3_EXECUTABLE)
 
 endif()
 
-add_custom_target(swirly-db ALL DEPENDS ${dbfiles})
+add_custom_target(swirly-sqlite ALL DEPENDS ${dbfiles})
 install(FILES ${dbfiles} DESTINATION var COMPONENT config)
 
 set(sql_SOURCES

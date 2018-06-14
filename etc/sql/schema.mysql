@@ -23,7 +23,7 @@ DROP DATABASE IF EXISTS swirlydb
 CREATE DATABASE swirlydb
 ;
 
-GRANT ALL PRIVILEGES ON swirlydb.* TO 'swirlyuser'@'localhost' IDENTIFIED BY 'swirlypassword'
+GRANT ALL PRIVILEGES ON swirlydb.* TO 'swirlyuser'@'localhost' IDENTIFIED BY 'swirlypass'
 ;
 
 USE swirlydb
@@ -173,7 +173,6 @@ CREATE TABLE order_t (
 
   PRIMARY KEY (market_id, id),
 
-  FOREIGN KEY (market_id) REFERENCES market_t (id),
   FOREIGN KEY (instr) REFERENCES instr_t (symbol),
   FOREIGN KEY (state_id) REFERENCES state_t (id),
   FOREIGN KEY (side_id) REFERENCES side_t (id)
@@ -211,7 +210,6 @@ CREATE TABLE exec_t (
 
   PRIMARY KEY (market_id, id),
 
-  FOREIGN KEY (market_id) REFERENCES market_t (id),
   FOREIGN KEY (market_id, order_id) REFERENCES order_t (market_id, id),
   FOREIGN KEY (instr) REFERENCES instr_t (symbol),
   FOREIGN KEY (state_id) REFERENCES state_t (id),
@@ -228,6 +226,14 @@ CREATE TRIGGER before_insert_on_exec
   BEFORE INSERT ON exec_t
   FOR EACH ROW
   BEGIN
+    IF NEW.state_id = 4 THEN
+      UPDATE market_t
+      SET
+        last_lots = NEW.last_lots,
+        last_ticks = NEW.last_ticks,
+        last_time = NEW.created
+      WHERE id = NEW.market_id;
+    END IF;
     IF NEW.order_id IS NOT NULL THEN
       IF NEW.state_id = 1 THEN
         INSERT INTO order_t (
@@ -283,22 +289,6 @@ CREATE TRIGGER before_insert_on_exec
         WHERE id = NEW.order_id;
       END IF;
     END IF;
-    IF NEW.state_id = 4 THEN
-      UPDATE market_t
-      SET
-        last_lots = NEW.last_lots,
-        last_ticks = NEW.last_ticks,
-        last_time = NEW.created
-      WHERE id = NEW.market_id;
-    END IF;
-  END //
-DELIMITER ;
-
-DELIMITER //
-CREATE TRIGGER after_insert_on_exec
-  AFTER INSERT ON exec_t
-  FOR EACH ROW
-  BEGIN
     INSERT IGNORE INTO accnt_t (
       symbol,
       created,
@@ -313,11 +303,19 @@ CREATE TRIGGER after_insert_on_exec
       max_id = max_id + 1,
       modified = NEW.created
     WHERE symbol = NEW.accnt;
-    UPDATE exec_t
-    SET
-      seq_id = (SELECT max_id FROM accnt_t WHERE symbol = NEW.accnt)
-    WHERE market_id = NEW.market_id
-    AND id = NEW.id;
+    SET NEW.seq_id = (
+      SELECT max_id
+      FROM accnt_t
+      WHERE symbol = NEW.accnt
+    );
+  END //
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER after_insert_on_exec
+  AFTER INSERT ON exec_t
+  FOR EACH ROW
+  BEGIN
   END //
 DELIMITER ;
 

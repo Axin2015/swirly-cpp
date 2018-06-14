@@ -40,18 +40,18 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${PROJECT_SOURCE_DIR}/etc/cmake")
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Optimise for target architecture.
-SET(CMAKE_C_FLAGS_RELEASE          "${CMAKE_C_FLAGS_RELEASE} -march=${SWIRLY_BUILD_ARCH}")
-SET(CMAKE_CXX_FLAGS_RELEASE        "${CMAKE_CXX_FLAGS_RELEASE} -march=${SWIRLY_BUILD_ARCH}")
-SET(CMAKE_C_FLAGS_RELWITHDEBINFO   "${CMAKE_C_FLAGS_RELWITHDEBINFO} -march=${SWIRLY_BUILD_ARCH}")
-SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -march=${SWIRLY_BUILD_ARCH}")
-SET(CMAKE_C_FLAGS_MINSIZEREL       "${CMAKE_C_FLAGS_MINSIZEREL} -march=${SWIRLY_BUILD_ARCH}")
-SET(CMAKE_CXX_FLAGS_MINSIZEREL     "${CMAKE_CXX_FLAGS_MINSIZEREL} -march=${SWIRLY_BUILD_ARCH}")
+set(CMAKE_C_FLAGS_RELEASE          "${CMAKE_C_FLAGS_RELEASE} -march=${SWIRLY_BUILD_ARCH}")
+set(CMAKE_CXX_FLAGS_RELEASE        "${CMAKE_CXX_FLAGS_RELEASE} -march=${SWIRLY_BUILD_ARCH}")
+set(CMAKE_C_FLAGS_RELWITHDEBINFO   "${CMAKE_C_FLAGS_RELWITHDEBINFO} -march=${SWIRLY_BUILD_ARCH}")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -march=${SWIRLY_BUILD_ARCH}")
+set(CMAKE_C_FLAGS_MINSIZEREL       "${CMAKE_C_FLAGS_MINSIZEREL} -march=${SWIRLY_BUILD_ARCH}")
+set(CMAKE_CXX_FLAGS_MINSIZEREL     "${CMAKE_CXX_FLAGS_MINSIZEREL} -march=${SWIRLY_BUILD_ARCH}")
 
 # Intended for use with Linux Perf:
 # $ perf record -g swirly_bench
 # $ perf report -g "graph,0.5,caller"
-SET(CMAKE_C_FLAGS_PERF   "${CMAKE_C_FLAGS_RELEASE} -fno-omit-frame-pointer")
-SET(CMAKE_CXX_FLAGS_PERF "${CMAKE_CXX_FLAGS_RELEASE} -fno-omit-frame-pointer")
+set(CMAKE_C_FLAGS_PERF   "${CMAKE_C_FLAGS_RELEASE} -fno-omit-frame-pointer")
+set(CMAKE_CXX_FLAGS_PERF "${CMAKE_CXX_FLAGS_RELEASE} -fno-omit-frame-pointer")
 
 if(NOT CMAKE_BUILD_TYPE)
   #set(CMAKE_BUILD_TYPE DEBUG)
@@ -110,8 +110,15 @@ find_program(RAGEL_EXECUTABLE ragel)
 
 set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost 1.60 REQUIRED COMPONENTS date_time unit_test_framework)
+
 # The sqlite3_errstr() function was added in 3.7.15.
 find_package(SQLite3 3.7.15 REQUIRED)
+find_package(MySQL 5.5)
+if(MYSQL_FOUND)
+  set(SWIRLY_HAVE_MYSQL 1)
+else()
+  set(SWIRLY_HAVE_MYSQL 0)
+endif()
 
 find_package(Doxygen)                # Optional.
 find_package(Perl)                   # Optional.
@@ -151,7 +158,7 @@ if(SWIRLY_BUILD_SHARED)
   set(swirly_fin_LIBRARY swirly-fin-shared)
   set(swirly_lob_LIBRARY swirly-lob-shared)
   set(swirly_web_LIBRARY swirly-web-shared)
-  set(swirly_sqlite_LIBRARY swirly-sqlite-shared)
+  set(swirly_db_LIBRARY swirly-db-shared)
 else()
   set(swirly_util_LIBRARY swirly-util-static)
   set(swirly_prof_LIBRARY swirly-prof-static)
@@ -161,7 +168,7 @@ else()
   set(swirly_fin_LIBRARY swirly-fin-static)
   set(swirly_lob_LIBRARY swirly-lob-static)
   set(swirly_web_LIBRARY swirly-web-static)
-  set(swirly_sqlite_LIBRARY swirly-sqlite-static)
+  set(swirly_db_LIBRARY swirly-db-static)
 endif()
 
 enable_testing()

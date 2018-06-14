@@ -38,11 +38,21 @@ http_port = 8080
 # Max Exec history.
 max_execs = 16
 
-# Sqlite journal database.
-sqlite_journ = ${CMAKE_INSTALL_PREFIX}/var/forex.db
+# Database configuration.
+db_type = sqlite
+db_host =
+db_user =
+db_pass =
+db_name = ${CMAKE_INSTALL_PREFIX}/var/forex.db
+db_port =
 
-# Sqlite model database.
-sqlite_model = ${CMAKE_INSTALL_PREFIX}/var/forex.db
+# MySQL example.
+#db_type = mysql
+#db_host = localhost
+#db_user = swirlyuser
+#db_pass = swirlypass
+#db_name = swirlydb
+#db_port = 3306
 
 # Enable SQL tracing.
 sqlite_enable_trace = no

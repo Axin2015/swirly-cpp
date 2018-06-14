@@ -17,8 +17,7 @@
 #include "HttpServ.hpp"
 #include "RestServ.hpp"
 
-#include <swirly/sqlite/Journ.hpp>
-#include <swirly/sqlite/Model.hpp>
+#include <swirly/db/DbCtx.hpp>
 
 #include <swirly/web/Rest.hpp>
 
@@ -253,20 +252,21 @@ int main(int argc, char* argv[])
         const auto max_execs = config.get<size_t>("max_execs", 1 << 4);
 
         SWIRLY_NOTICE << "initialising daemon"sv;
-        SWIRLY_INFO << "conf_file:     "sv << opts.conf_file;
-        SWIRLY_INFO << "daemon:        "sv << (opts.daemon ? "yes"sv : "no"sv);
-        SWIRLY_INFO << "start_time:    "sv << opts.start_time;
+        SWIRLY_INFO << "conf_file:  "sv << opts.conf_file;
+        SWIRLY_INFO << "daemon:     "sv << (opts.daemon ? "yes"sv : "no"sv);
+        SWIRLY_INFO << "start_time: "sv << opts.start_time;
 
-        SWIRLY_INFO << "file_mode:     "sv << setfill('0') << setw(3) << oct << swirly::file_mode();
-        SWIRLY_INFO << "http_port:     "sv << http_port;
-        SWIRLY_INFO << "log_file:      "sv << log_file;
-        SWIRLY_INFO << "log_level:     "sv << get_log_level();
-        SWIRLY_INFO << "max_execs:     "sv << max_execs;
-        SWIRLY_INFO << "mem_size:      "sv << (mem_ctx.max_size() >> 20) << "MiB"sv;
-        SWIRLY_INFO << "mq_file:       "sv << mq_file;
-        SWIRLY_INFO << "pid_file:      "sv << pid_file;
-        SWIRLY_INFO << "run_dir:       "sv << run_dir;
+        SWIRLY_INFO << "file_mode:  "sv << setfill('0') << setw(3) << oct << swirly::file_mode();
+        SWIRLY_INFO << "http_port:  "sv << http_port;
+        SWIRLY_INFO << "log_file:   "sv << log_file;
+        SWIRLY_INFO << "log_level:  "sv << get_log_level();
+        SWIRLY_INFO << "max_execs:  "sv << max_execs;
+        SWIRLY_INFO << "mem_size:   "sv << (mem_ctx.max_size() >> 20) << "MiB"sv;
+        SWIRLY_INFO << "mq_file:    "sv << mq_file;
+        SWIRLY_INFO << "pid_file:   "sv << pid_file;
+        SWIRLY_INFO << "run_dir:    "sv << run_dir;
 
+        DbCtx db_ctx{config};
         MsgQueue mq;
         if (!mq_file.empty()) {
             mq = MsgQueue{mq_file.c_str()};
@@ -275,11 +275,11 @@ int main(int argc, char* argv[])
         }
         Rest rest{mq, max_execs};
         {
-            SqlModel model{config};
+            Model& model = db_ctx.model();
             rest.load(model, opts.start_time);
         }
         RestServ rest_serv{rest};
-        SqlJourn journ{config};
+        Journ& journ = db_ctx.journ();
 
         EpollReactor reactor{1024};
         const TcpEndpoint ep{Tcp::v4(), stou16(http_port)};
@@ -295,7 +295,7 @@ int main(int argc, char* argv[])
             }
             return n;
         };
-        AgentThread journ_thread{journ_agent, ThreadConfig{"journ"s}};
+        AgentThread journ_thread{journ_agent, PhasedBackoff{}, ThreadConfig{"journ"s}};
 
         SWIRLY_NOTICE << "started http server on port "sv << http_port;
 

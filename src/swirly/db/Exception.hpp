@@ -14,20 +14,32 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_SQLITE_TYPES_HPP
-#define SWIRLY_SQLITE_TYPES_HPP
+#ifndef SWIRLY_DB_EXCEPTION_HPP
+#define SWIRLY_DB_EXCEPTION_HPP
 
-#include <memory>
-
-#include <sqlite3.h>
+#include <swirly/util/Exception.hpp>
 
 namespace swirly {
-inline namespace sqlite {
+inline namespace db {
 
-using DbPtr = std::unique_ptr<sqlite3, int (*)(sqlite3*)>;
-using StmtPtr = std::unique_ptr<sqlite3_stmt, int (*)(sqlite3_stmt*)>;
+class DbException : public Exception {
+  public:
+    explicit DbException(std::string_view what) noexcept
+    : Exception{what}
+    {
+    }
+    ~DbException() override;
 
-} // namespace sqlite
+    // Copy.
+    DbException(const DbException&) noexcept = default;
+    DbException& operator=(const DbException&) noexcept = default;
+
+    // Move.
+    DbException(DbException&&) noexcept = default;
+    DbException& operator=(DbException&&) noexcept = default;
+};
+
+} // namespace db
 } // namespace swirly
 
-#endif // SWIRLY_SQLITE_TYPES_HPP
+#endif // SWIRLY_DB_EXCEPTION_HPP
