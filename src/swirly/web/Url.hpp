@@ -17,7 +17,7 @@
 #ifndef SWIRLY_WEB_URL_HPP
 #define SWIRLY_WEB_URL_HPP
 
-#include <swirly/web/Exception.hpp>
+#include <swirly/fin/Exception.hpp>
 
 #include <swirly/contrib/http_parser.h>
 
@@ -82,7 +82,7 @@ class BasicUrl {
         const auto rc
             = http_parser_parse_url(url().data(), url().size(), is_connect ? 1 : 0, &parser_);
         if (rc != 0) {
-            throw ParseException{err_msg() << "invalid url: " << url()};
+            throw ProtocolException{err_msg() << "invalid url: " << url()};
         }
     }
 

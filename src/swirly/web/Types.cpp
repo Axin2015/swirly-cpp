@@ -15,3 +15,70 @@
  * 02110-1301, USA.
  */
 #include "Types.hpp"
+
+#include <swirly/fin/Error.hpp>
+
+namespace swirly {
+inline namespace web {
+
+const char* enum_string(HttpStatus status) noexcept
+{
+    switch (static_cast<int>(status)) {
+#define XX(num, name, string)                                                                      \
+    case num:                                                                                      \
+        return #string;
+        HTTP_STATUS_MAP(XX)
+#undef XX
+    }
+    std::terminate();
+}
+
+HttpStatus http_status(const std::error_code& ec)
+{
+    if (ec.category() != error_category()) {
+        return HttpStatus::InternalServerError;
+    }
+    HttpStatus status;
+    switch (static_cast<Error>(ec.value())) {
+    case Error::BadRequest:
+    case Error::AlreadyExists:
+    case Error::RefAlreadyExists:
+    case Error::Invalid:
+    case Error::InvalidLots:
+    case Error::InvalidTicks:
+    case Error::ProtocolError:
+    case Error::TooLate:
+        status = HttpStatus::BadRequest;
+        break;
+    case Error::Unauthorized:
+        status = HttpStatus::Unauthorized;
+        break;
+    case Error::Forbidden:
+        status = HttpStatus::Forbidden;
+        break;
+    case Error::NotFound:
+    case Error::AccntNotFound:
+    case Error::MarketNotFound:
+    case Error::OrderNotFound:
+        status = HttpStatus::NotFound;
+        break;
+    case Error::MethodNotAllowed:
+        status = HttpStatus::MethodNotAllowed;
+        break;
+    case Error::InternalError:
+    case Error::DatabaseError:
+        status = HttpStatus::InternalServerError;
+        break;
+    case Error::ServiceUnavailable:
+    case Error::MarketClosed:
+        status = HttpStatus::ServiceUnavailable;
+        break;
+    default:
+        status = HttpStatus::InternalServerError;
+        break;
+    }
+    return status;
+}
+
+} // namespace web
+} // namespace swirly

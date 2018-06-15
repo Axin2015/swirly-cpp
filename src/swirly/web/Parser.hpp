@@ -17,8 +17,9 @@
 #ifndef SWIRLY_WEB_PARSER_HPP
 #define SWIRLY_WEB_PARSER_HPP
 
-#include <swirly/web/Exception.hpp>
 #include <swirly/web/Types.hpp>
+
+#include <swirly/fin/Exception.hpp>
 
 #include <swirly/sys/Buffer.hpp>
 
@@ -77,8 +78,8 @@ class BasicHttpParser {
                 // Clear pause state.
                 http_parser_pause(&parser_, 0);
             } else {
-                throw ParseException{err_msg() << http_errno_name(err) << ": "
-                                               << http_errno_description(err)};
+                throw ProtocolException{err_msg() << http_errno_name(err) << ": "
+                                                  << http_errno_description(err)};
             }
         }
         return rc;

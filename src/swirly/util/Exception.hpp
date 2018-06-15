@@ -20,36 +20,35 @@
 #include <swirly/util/Limits.hpp>
 #include <swirly/util/Stream.hpp>
 
-#include <cstring> // strcpy()
-#include <exception>
+#include <stdexcept>
 
 namespace swirly {
 inline namespace util {
 
 using ErrMsg = StaticStream<MaxErrMsg>;
 
-class SWIRLY_API Exception : public std::exception {
+class SWIRLY_API Exception : public std::runtime_error {
   public:
-    explicit Exception(std::string_view what) noexcept;
-
+    explicit Exception(std::error_code ec = std::error_code());
+    Exception(int err, const std::error_category& ecat);
+    Exception(std::error_code ec, std::string_view what);
+    Exception(int err, const std::error_category& ecat, std::string_view what);
     ~Exception() override;
 
     // Copy.
-    Exception(const Exception& rhs) noexcept { *this = rhs; }
-    Exception& operator=(const Exception& rhs) noexcept
-    {
-        std::strcpy(what_, rhs.what_);
-        return *this;
-    }
+    Exception(const Exception&) = default;
+    Exception& operator=(const Exception&) = default;
 
     // Move.
-    Exception(Exception&&) noexcept = default;
-    Exception& operator=(Exception&&) noexcept = default;
+    Exception(Exception&&) = default;
+    Exception& operator=(Exception&&) = default;
 
-    const char* what() const noexcept override;
+    static void to_json(std::ostream& os, int status, const char* reason, const char* detail);
+
+    const std::error_code& code() const noexcept { return ec_; }
 
   private:
-    char what_[MaxErrMsg + 1];
+    std::error_code ec_;
 };
 
 /**

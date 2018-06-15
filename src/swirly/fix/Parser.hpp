@@ -17,8 +17,9 @@
 #ifndef SWIRLY_FIX_PARSER_HPP
 #define SWIRLY_FIX_PARSER_HPP
 
-#include <swirly/fix/Exception.hpp>
 #include <swirly/fix/Types.hpp>
+
+#include <swirly/fin/Exception.hpp>
 
 #include <swirly/sys/Buffer.hpp>
 
@@ -111,7 +112,7 @@ class BasicFixParser {
         }
         // Verify that first non-digit charactor was SOH.
         if (*it != Soh) {
-            throw FixException{"invalid FIX body length"sv};
+            throw ProtocolException{"invalid FIX body length"sv};
         }
         offset_ = it + 1 - begin;
         body_len_ = body_len;

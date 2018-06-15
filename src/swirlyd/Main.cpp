@@ -162,7 +162,8 @@ int main(int argc, char* argv[])
         if (!opts.conf_file.empty()) {
             ifstream is{opts.conf_file};
             if (!is.is_open()) {
-                throw Exception{err_msg() << "open failed: "sv << opts.conf_file};
+                throw Exception{make_error_code(errc::io_error),
+                                err_msg() << "open failed: "sv << opts.conf_file};
             }
             config.read(is);
         }

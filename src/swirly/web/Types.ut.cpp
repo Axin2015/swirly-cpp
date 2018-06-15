@@ -14,12 +14,24 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Exception.hpp"
+#include "Types.hpp"
 
-namespace swirly {
-inline namespace web {
+#include <boost/test/unit_test.hpp>
 
-ParseException::~ParseException() = default;
+using namespace std;
+using namespace swirly;
 
-} // namespace web
-} // namespace swirly
+BOOST_AUTO_TEST_SUITE(TypesSuite)
+
+BOOST_AUTO_TEST_CASE(TypesCase)
+{
+    BOOST_TEST(enum_string(HttpStatus::BadRequest) == "Bad Request");
+    BOOST_TEST(enum_string(HttpStatus::Unauthorized) == "Unauthorized");
+    BOOST_TEST(enum_string(HttpStatus::Forbidden) == "Forbidden");
+    BOOST_TEST(enum_string(HttpStatus::NotFound) == "Not Found");
+    BOOST_TEST(enum_string(HttpStatus::MethodNotAllowed) == "Method Not Allowed");
+    BOOST_TEST(enum_string(HttpStatus::InternalServerError) == "Internal Server Error");
+    BOOST_TEST(enum_string(HttpStatus::ServiceUnavailable) == "Service Unavailable");
+}
+
+BOOST_AUTO_TEST_SUITE_END()

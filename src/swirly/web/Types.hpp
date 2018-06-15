@@ -61,7 +61,7 @@ enum class HttpMethod : int {
     Source = HTTP_SOURCE
 };
 
-inline const char* enum_string(HttpMethod method)
+inline const char* enum_string(HttpMethod method) noexcept
 {
     return http_method_str(static_cast<http_method>(method));
 }
@@ -69,6 +69,32 @@ inline const char* enum_string(HttpMethod method)
 inline std::ostream& operator<<(std::ostream& os, HttpMethod method)
 {
     return os << enum_string(method);
+}
+
+enum class HttpStatus : int {
+    Ok = HTTP_STATUS_OK,
+    NoContent = HTTP_STATUS_NO_CONTENT,
+    BadRequest = HTTP_STATUS_BAD_REQUEST,
+    Unauthorized = HTTP_STATUS_UNAUTHORIZED,
+    Forbidden = HTTP_STATUS_FORBIDDEN,
+    NotFound = HTTP_STATUS_NOT_FOUND,
+    MethodNotAllowed = HTTP_STATUS_METHOD_NOT_ALLOWED,
+    InternalServerError = HTTP_STATUS_INTERNAL_SERVER_ERROR,
+    ServiceUnavailable = HTTP_STATUS_SERVICE_UNAVAILABLE
+};
+
+SWIRLY_API const char* enum_string(HttpStatus status) noexcept;
+
+SWIRLY_API HttpStatus http_status(const std::error_code& ec);
+
+inline const char* http_reason(HttpStatus status) noexcept
+{
+    return enum_string(status);
+}
+
+inline std::ostream& operator<<(std::ostream& os, HttpStatus status)
+{
+    return os << static_cast<int>(status);
 }
 
 enum class HttpType : int { Request = HTTP_REQUEST, Response = HTTP_RESPONSE };
