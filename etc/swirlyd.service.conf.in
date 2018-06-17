@@ -46,14 +46,6 @@ db_pass =
 db_name = ${CMAKE_INSTALL_PREFIX}/var/forex.db
 db_port =
 
-# MySQL example.
-#db_type = mysql
-#db_host = localhost
-#db_user = swirlyuser
-#db_pass = swirlypass
-#db_name = swirlydb
-#db_port = 3306
-
 # Enable SQL tracing.
 sqlite_enable_trace = no
 
