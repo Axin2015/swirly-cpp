@@ -20,6 +20,10 @@ PRAGMA foreign_keys = ON
 BEGIN TRANSACTION
 ;
 
+INSERT INTO accnt_t (symbol, display, email)
+       VALUES ('ADMIN', 'Administrator', 'admin@swirlycloud.com')
+;
+
 INSERT INTO asset_t (id, symbol, display, type_id)
        VALUES (1, 'USD', 'United States of America, Dollars', 3)
 ;
