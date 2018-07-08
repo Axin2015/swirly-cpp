@@ -35,20 +35,17 @@ HttpSess::HttpSess(Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, RestServ&
 , ep_{ep}
 , rest_serv_(rs)
 {
-    SWIRLY_INFO << "accept session"sv;
+    SWIRLY_DEBUG << "accept session"sv;
 
     sub_ = r.subscribe(*sock_, EventIn, bind<&HttpSess::on_io_event>(this));
     tmr_ = r.timer(now + IdleTimeout, Priority::Low, bind<&HttpSess::on_timer>(this));
 }
 
-HttpSess::~HttpSess()
-{
-    SWIRLY_INFO << "~HttpSess()"sv;
-}
+HttpSess::~HttpSess() = default;
 
 void HttpSess::close() noexcept
 {
-    SWIRLY_INFO << "close session"sv;
+    SWIRLY_DEBUG << "close session"sv;
     tmr_.cancel();
     sub_.reset();
     delete this;
@@ -61,7 +58,7 @@ bool HttpSess::on_url(string_view sv) noexcept
         req_.append_url(sv);
         ret = true;
     } catch (const std::exception& e) {
-        SWIRLY_ERROR << "exception handling url: "sv << e.what();
+        SWIRLY_ERROR << "error handling url: "sv << e.what();
     }
     return ret;
 }
@@ -73,7 +70,7 @@ bool HttpSess::on_header_field(string_view sv, bool first) noexcept
         req_.append_header_field(sv, first);
         ret = true;
     } catch (const std::exception& e) {
-        SWIRLY_ERROR << "exception handling header field: "sv << e.what();
+        SWIRLY_ERROR << "error handling header field: "sv << e.what();
     }
     return ret;
 }
@@ -85,7 +82,7 @@ bool HttpSess::on_header_value(string_view sv, bool first) noexcept
         req_.append_header_value(sv, first);
         ret = true;
     } catch (const std::exception& e) {
-        SWIRLY_ERROR << "exception handling header value: "sv << e.what();
+        SWIRLY_ERROR << "error handling header value: "sv << e.what();
     }
     return ret;
 }
@@ -103,7 +100,7 @@ bool HttpSess::on_body(string_view sv) noexcept
         req_.append_body(sv);
         ret = true;
     } catch (const std::exception& e) {
-        SWIRLY_ERROR << "exception handling body: "sv << e.what();
+        SWIRLY_ERROR << "error handling body: "sv << e.what();
     }
     return ret;
 }
@@ -124,7 +121,7 @@ bool HttpSess::on_message_end() noexcept
         }
         ret = true;
     } catch (const std::exception& e) {
-        SWIRLY_ERROR << "exception handling message: "sv << e.what();
+        SWIRLY_ERROR << "error handling message: "sv << e.what();
     }
     req_.clear();
     return ret;
@@ -157,7 +154,7 @@ void HttpSess::on_io_event(int fd, unsigned events, Time now)
             }
         }
     } catch (const std::exception& e) {
-        SWIRLY_ERROR << "exception handling url: "sv << e.what();
+        SWIRLY_ERROR << "error handling io event: "sv << e.what();
         close();
     }
 }
