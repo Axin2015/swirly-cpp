@@ -119,9 +119,11 @@ CREATE TABLE instr_t (
 
 CREATE TABLE accnt_t (
   symbol CHAR(16) NOT NULL PRIMARY KEY,
+  display VARCHAR(64) NULL,
+  email VARCHAR(64) NULL,
   max_id BIGINT NOT NULL DEFAULT 0,
-  created BIGINT NOT NULL,
-  modified BIGINT NOT NULL
+  created BIGINT NOT NULL DEFAULT 0,
+  modified BIGINT NOT NULL DEFAULT 0
 )
 ;
 
