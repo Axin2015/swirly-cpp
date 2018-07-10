@@ -30,7 +30,7 @@ class TestCase(RestTestCase):
 
   def get_all(self, client):
     client.set_anon()
-    resp = client.send('GET', '/refdata/assets')
+    resp = client.send('GET', '/api/refdata/asset')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -63,7 +63,7 @@ class TestCase(RestTestCase):
 
   def get_by_symbol(self, client):
     client.set_anon()
-    resp = client.send('GET', '/refdata/assets/EUR')
+    resp = client.send('GET', '/api/refdata/asset/EUR')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)

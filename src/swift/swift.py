@@ -280,7 +280,7 @@ class RestTestCase(unittest.TestCase):
 
   def create_market(self, client, instr, settl_date):
     client.set_admin()
-    resp = client.send('POST', '/markets',
+    resp = client.send('POST', '/api/market',
                        instr = instr,
                        settl_date = settl_date,
                        state = 0)
@@ -290,7 +290,7 @@ class RestTestCase(unittest.TestCase):
 
   def create_order(self, client, accnt, instr, settl_date, side, lots, ticks):
     client.set_trader(accnt)
-    resp = client.send('POST', '/accnt/orders/' + instr + '/' + str(settl_date),
+    resp = client.send('POST', '/api/accnt/order/' + instr + '/' + str(settl_date),
                        side = side,
                        lots = lots,
                        ticks = ticks)

@@ -66,7 +66,7 @@ void HttpClient::timerEvent(QTimerEvent* event)
 
 void HttpClient::create_market(const Instr& instr, QDate settl_date)
 {
-    QNetworkRequest request{QUrl{"http://127.0.0.1:8080/markets"}};
+    QNetworkRequest request{QUrl{"http://127.0.0.1:8080/api/market"}};
     request.setAttribute(QNetworkRequest::User, PostMarket);
     request.setRawHeader("Content-Type", "application/json");
     request.setRawHeader("Swirly-Accnt", "MARAYL");
@@ -85,7 +85,7 @@ void HttpClient::create_market(const Instr& instr, QDate settl_date)
 void HttpClient::create_order(const Instr& instr, QDate settl_date, const QString& ref, Side side,
                               Lots lots, Ticks ticks)
 {
-    QNetworkRequest request{QUrl{"http://127.0.0.1:8080/accnt/orders"}};
+    QNetworkRequest request{QUrl{"http://127.0.0.1:8080/api/accnt/order"}};
     request.setAttribute(QNetworkRequest::User, PostOrder);
     request.setRawHeader("Content-Type", "application/json");
     request.setRawHeader("Swirly-Accnt", "MARAYL");
@@ -119,8 +119,8 @@ void HttpClient::cancel_orders(const OrderKeys& keys)
                 out.reset();
             }
             market = market_model().find(key.first);
-            out << "http://127.0.0.1:8080/accnt/orders/" << market.instr().symbol() //
-                << '/' << date_to_iso(market.settl_date())                          //
+            out << "http://127.0.0.1:8080/api/accnt/order/" << market.instr().symbol() //
+                << '/' << date_to_iso(market.settl_date())                             //
                 << '/' << id;
         } else {
             out << ',' << id;
@@ -188,7 +188,7 @@ Instr HttpClient::find_instr(const QJsonObject& obj) const
 
 void HttpClient::get_ref_data()
 {
-    QNetworkRequest request{QUrl{"http://127.0.0.1:8080/refdata"}};
+    QNetworkRequest request{QUrl{"http://127.0.0.1:8080/api/refdata"}};
     request.setAttribute(QNetworkRequest::User, GetRefData);
     request.setRawHeader("Swirly-Accnt", "MARAYL");
     request.setRawHeader("Swirly-Perm", "2");
@@ -198,7 +198,7 @@ void HttpClient::get_ref_data()
 
 void HttpClient::get_accnt()
 {
-    QUrl url{"http://127.0.0.1:8080/accnt"};
+    QUrl url{"http://127.0.0.1:8080/api/accnt"};
     QUrlQuery query;
     query.addQueryItem("limit", QString::number(MaxExecs));
     url.setQuery(query.query());

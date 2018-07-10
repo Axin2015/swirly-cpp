@@ -35,43 +35,43 @@ class TestCase(RestTestCase):
   def check_auth(self, client):
     client.set_auth(None, 0x1)
 
-    resp = client.send('POST', '/markets')
+    resp = client.send('POST', '/api/market')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    resp = client.send('POST', '/markets/USDJPY')
+    resp = client.send('POST', '/api/market/USDJPY')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    resp = client.send('POST', '/markets/USDJPY/20140302')
+    resp = client.send('POST', '/api/market/USDJPY/20140302')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    resp = client.send('PUT', '/markets/USDJPY/20140302')
+    resp = client.send('PUT', '/api/market/USDJPY/20140302')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
     client.set_auth('ADMIN', ~0x1 & 0x7fffffff)
 
-    resp = client.send('POST', '/markets')
+    resp = client.send('POST', '/api/market')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-    resp = client.send('POST', '/markets/USDJPY')
+    resp = client.send('POST', '/api/market/USDJPY')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-    resp = client.send('POST', '/markets/USDJPY/20140302')
+    resp = client.send('POST', '/api/market/USDJPY/20140302')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-    resp = client.send('PUT', '/markets/USDJPY/20140302')
+    resp = client.send('PUT', '/api/market/USDJPY/20140302')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
   def create_market(self, client):
     client.set_admin()
-    resp = client.send('POST', '/markets',
+    resp = client.send('POST', '/api/market',
                        instr = 'EURUSD',
                        settl_date = 20140302,
                        state = 1)
@@ -96,7 +96,7 @@ class TestCase(RestTestCase):
 
   def create_market_by_instr(self, client):
     client.set_admin()
-    resp = client.send('POST', '/markets/GBPUSD',
+    resp = client.send('POST', '/api/market/GBPUSD',
                        settl_date = 20140302,
                        state = 1)
 
@@ -120,7 +120,7 @@ class TestCase(RestTestCase):
 
   def create_market_by_market(self, client):
     client.set_admin()
-    resp = client.send('POST', '/markets/USDJPY/20140302',
+    resp = client.send('POST', '/api/market/USDJPY/20140302',
                        state = 1)
 
     self.assertEqual(200, resp.status)
@@ -143,7 +143,7 @@ class TestCase(RestTestCase):
 
   def update_market(self, client):
     client.set_admin()
-    resp = client.send('PUT', '/markets/USDJPY/20140302',
+    resp = client.send('PUT', '/api/market/USDJPY/20140302',
                        state = 2)
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
