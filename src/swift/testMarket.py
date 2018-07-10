@@ -62,7 +62,7 @@ class TestCase(RestTestCase):
 
   def get_all(self, client):
     client.set_anon()
-    resp = client.send('GET', '/markets')
+    resp = client.send('GET', '/api/market')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -126,7 +126,7 @@ class TestCase(RestTestCase):
 
   def get_by_instr(self, client):
     client.set_anon()
-    resp = client.send('GET', '/markets/GBPUSD')
+    resp = client.send('GET', '/api/market/GBPUSD')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -162,7 +162,7 @@ class TestCase(RestTestCase):
 
   def get_by_market(self, client):
     client.set_anon()
-    resp = client.send('GET', '/markets/GBPUSD/20140302')
+    resp = client.send('GET', '/api/market/GBPUSD/20140302')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
