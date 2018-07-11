@@ -100,9 +100,9 @@ class MemQueue {
     , mem_map_{std::move(rhs.mem_map_)}
     , impl_{rhs.impl_}
     {
-        capacity_ = 0;
-        mask_ = 0;
-        impl_ = nullptr;
+        rhs.capacity_ = 0;
+        rhs.mask_ = 0;
+        rhs.impl_ = nullptr;
     }
     MemQueue& operator=(MemQueue&& rhs) noexcept
     {
