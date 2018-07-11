@@ -48,35 +48,35 @@ class TestCase(RestTestCase):
   def check_auth(self, client):
     client.set_auth(None, 0x2)
 
-    resp = client.send('GET', '/api/accnt/trade')
+    resp = client.send('GET', '/api/sess/trade')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    resp = client.send('GET', '/api/accnt/trade/EURUSD')
+    resp = client.send('GET', '/api/sess/trade/EURUSD')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    resp = client.send('GET', '/api/accnt/trade/EURUSD/20140302')
+    resp = client.send('GET', '/api/sess/trade/EURUSD/20140302')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
     client.set_auth('MARAYL', ~0x2 & 0x7fffffff)
 
-    resp = client.send('GET', '/api/accnt/trade')
+    resp = client.send('GET', '/api/sess/trade')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-    resp = client.send('GET', '/api/accnt/trade/EURUSD')
+    resp = client.send('GET', '/api/sess/trade/EURUSD')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-    resp = client.send('GET', '/api/accnt/trade/EURUSD/20140302')
+    resp = client.send('GET', '/api/sess/trade/EURUSD/20140302')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
   def get_all(self, client):
     client.set_trader('MARAYL')
-    resp = client.send('GET', '/api/accnt/trade')
+    resp = client.send('GET', '/api/sess/trade')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -228,7 +228,7 @@ class TestCase(RestTestCase):
 
   def get_by_instr(self, client):
     client.set_trader('MARAYL')
-    resp = client.send('GET', '/api/accnt/trade/EURUSD')
+    resp = client.send('GET', '/api/sess/trade/EURUSD')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -332,7 +332,7 @@ class TestCase(RestTestCase):
 
   def get_by_market(self, client):
     client.set_trader('MARAYL')
-    resp = client.send('GET', '/api/accnt/trade/GBPUSD/20140302')
+    resp = client.send('GET', '/api/sess/trade/GBPUSD/20140302')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -388,7 +388,7 @@ class TestCase(RestTestCase):
 
   def get_by_id(self, client):
     client.set_trader('MARAYL')
-    resp = client.send('GET', '/api/accnt/trade/GBPUSD/20140302/3')
+    resp = client.send('GET', '/api/sess/trade/GBPUSD/20140302/3')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)

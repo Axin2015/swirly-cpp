@@ -39,8 +39,8 @@ class MsgQueue;
 
 inline namespace lob {
 
-class Accnt;
 class Response;
+class Sess;
 
 using TradePair = std::pair<ConstExecPtr, ConstExecPtr>;
 
@@ -66,7 +66,7 @@ class SWIRLY_API Serv {
 
     const InstrSet& instrs() const noexcept;
 
-    const Accnt& accnt(Symbol symbol) const;
+    const Sess& sess(Symbol accnt) const;
 
     const Market& market(Id64 id) const;
 
@@ -76,30 +76,30 @@ class SWIRLY_API Serv {
 
     void update_market(const Market& market, MarketState state, Time now);
 
-    void create_order(const Accnt& accnt, const Market& market, std::string_view ref, Side side,
+    void create_order(const Sess& sess, const Market& market, std::string_view ref, Side side,
                       Lots lots, Ticks ticks, Lots min_lots, Time now, Response& resp);
 
-    void revise_order(const Accnt& accnt, const Market& market, const Order& order, Lots lots,
+    void revise_order(const Sess& sess, const Market& market, const Order& order, Lots lots,
                       Time now, Response& resp);
 
-    void revise_order(const Accnt& accnt, const Market& market, Id64 id, Lots lots, Time now,
+    void revise_order(const Sess& sess, const Market& market, Id64 id, Lots lots, Time now,
                       Response& resp);
 
-    void revise_order(const Accnt& accnt, const Market& market, std::string_view ref, Lots lots,
+    void revise_order(const Sess& sess, const Market& market, std::string_view ref, Lots lots,
                       Time now, Response& resp);
 
-    void revise_order(const Accnt& accnt, const Market& market, ArrayView<Id64> ids, Lots lots,
+    void revise_order(const Sess& sess, const Market& market, ArrayView<Id64> ids, Lots lots,
                       Time now, Response& resp);
 
-    void cancel_order(const Accnt& accnt, const Market& market, const Order& order, Time now,
+    void cancel_order(const Sess& sess, const Market& market, const Order& order, Time now,
                       Response& resp);
 
-    void cancel_order(const Accnt& accnt, const Market& market, Id64 id, Time now, Response& resp);
+    void cancel_order(const Sess& sess, const Market& market, Id64 id, Time now, Response& resp);
 
-    void cancel_order(const Accnt& accnt, const Market& market, std::string_view ref, Time now,
+    void cancel_order(const Sess& sess, const Market& market, std::string_view ref, Time now,
                       Response& resp);
 
-    void cancel_order(const Accnt& accnt, const Market& market, ArrayView<Id64> ids, Time now,
+    void cancel_order(const Sess& sess, const Market& market, ArrayView<Id64> ids, Time now,
                       Response& resp);
 
     /**
@@ -110,19 +110,18 @@ class SWIRLY_API Serv {
      * @param now
      *            The current time.
      */
-    void cancel_order(const Accnt& accnt, Time now);
+    void cancel_order(const Sess& sess, Time now);
 
     void cancel_order(const Market& market, Time now);
 
-    TradePair create_trade(const Accnt& accnt, const Market& market, std::string_view ref,
-                           Side side, Lots lots, Ticks ticks, LiqInd liq_ind, Symbol cpty,
-                           Time created);
+    TradePair create_trade(const Sess& sess, const Market& market, std::string_view ref, Side side,
+                           Lots lots, Ticks ticks, LiqInd liq_ind, Symbol cpty, Time created);
 
-    void archive_trade(const Accnt& accnt, const Exec& trade, Time now);
+    void archive_trade(const Sess& sess, const Exec& trade, Time now);
 
-    void archive_trade(const Accnt& accnt, Id64 market_id, Id64 id, Time now);
+    void archive_trade(const Sess& sess, Id64 market_id, Id64 id, Time now);
 
-    void archive_trade(const Accnt& accnt, Id64 market_id, ArrayView<Id64> ids, Time now);
+    void archive_trade(const Sess& sess, Id64 market_id, ArrayView<Id64> ids, Time now);
 
     /**
      * This method may partially fail.

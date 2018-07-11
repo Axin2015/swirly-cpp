@@ -41,35 +41,35 @@ class TestCase(RestTestCase):
   def check_auth(self, client):
     client.set_auth(None, 0x1)
 
-    resp = client.send('POST', '/api/accnt/trade')
+    resp = client.send('POST', '/api/sess/trade')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    resp = client.send('POST', '/api/accnt/trade/EURUSD')
+    resp = client.send('POST', '/api/sess/trade/EURUSD')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    resp = client.send('POST', '/api/accnt/trade/EURUSD/20140302')
+    resp = client.send('POST', '/api/sess/trade/EURUSD/20140302')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
     client.set_auth('ADMIN', ~0x1 & 0x7fffffff)
 
-    resp = client.send('POST', '/api/accnt/trade')
+    resp = client.send('POST', '/api/sess/trade')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-    resp = client.send('POST', '/api/accnt/trade/EURUSD')
+    resp = client.send('POST', '/api/sess/trade/EURUSD')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-    resp = client.send('POST', '/api/accnt/trade/EURUSD/20140302')
+    resp = client.send('POST', '/api/sess/trade/EURUSD/20140302')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
   def create_maker_buy(self, client):
     client.set_admin()
-    resp = client.send('POST', '/api/accnt/trade',
+    resp = client.send('POST', '/api/sess/trade',
                        accnt = 'MARAYL',
                        instr = 'EURUSD',
                        settl_date = 20140302,
@@ -134,7 +134,7 @@ class TestCase(RestTestCase):
 
   def create_taker_sell(self, client):
     client.set_admin()
-    resp = client.send('POST', '/api/accnt/trade',
+    resp = client.send('POST', '/api/sess/trade',
                        accnt = 'MARAYL',
                        instr = 'EURUSD',
                        settl_date = 20140302,
@@ -199,7 +199,7 @@ class TestCase(RestTestCase):
 
   def create_maker_buy_by_instr(self, client):
     client.set_admin()
-    resp = client.send('POST', '/api/accnt/trade/EURUSD',
+    resp = client.send('POST', '/api/sess/trade/EURUSD',
                        accnt = 'MARAYL',
                        settl_date = 20140302,
                        ref = 'test1',
@@ -263,7 +263,7 @@ class TestCase(RestTestCase):
 
   def create_taker_sell_by_instr(self, client):
     client.set_admin()
-    resp = client.send('POST', '/api/accnt/trade/EURUSD',
+    resp = client.send('POST', '/api/sess/trade/EURUSD',
                        accnt = 'MARAYL',
                        settl_date = 20140302,
                        ref = 'test2',
@@ -327,7 +327,7 @@ class TestCase(RestTestCase):
 
   def create_maker_buy_by_market(self, client):
     client.set_admin()
-    resp = client.send('POST', '/api/accnt/trade/EURUSD/20140302',
+    resp = client.send('POST', '/api/sess/trade/EURUSD/20140302',
                        accnt = 'MARAYL',
                        ref = 'test1',
                        side = 'Buy',
@@ -390,7 +390,7 @@ class TestCase(RestTestCase):
 
   def create_taker_sell_by_market(self, client):
     client.set_admin()
-    resp = client.send('POST', '/api/accnt/trade/EURUSD/20140302',
+    resp = client.send('POST', '/api/sess/trade/EURUSD/20140302',
                        accnt = 'MARAYL',
                        ref = 'test2',
                        side = 'Sell',

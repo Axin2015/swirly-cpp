@@ -20,9 +20,9 @@
 #include <swirly/db/SqliteJourn.hpp>
 #include <swirly/db/SqliteModel.hpp>
 
-#include <swirly/lob/Accnt.hpp>
 #include <swirly/lob/Response.hpp>
 #include <swirly/lob/Serv.hpp>
+#include <swirly/lob/Sess.hpp>
 #include <swirly/lob/Test.hpp>
 
 #include <swirly/fin/Date.hpp>
@@ -63,15 +63,15 @@ class Archiver {
     : serv_(serv)
     {
     }
-    void operator()(const Accnt& accnt, Id64 market_id, Time now)
+    void operator()(const Sess& sess, Id64 market_id, Time now)
     {
         ids_.clear();
-        for (const auto& trade : accnt.trades()) {
+        for (const auto& trade : sess.trades()) {
             if (trade.market_id() == market_id) {
                 ids_.push_back(trade.id());
             }
         }
-        serv_.archive_trade(accnt, market_id, ids_, now);
+        serv_.archive_trade(sess, market_id, ids_, now);
     }
 
   private:
@@ -153,10 +153,10 @@ int main(int argc, char* argv[])
 
         auto& market = create_market(serv, "EURUSD"sv, bus_day(start_time), 0, start_time);
 
-        auto& eddayl = serv.accnt("EDDAYL"sv);
-        auto& gosayl = serv.accnt("GOSAYL"sv);
-        auto& marayl = serv.accnt("MARAYL"sv);
-        auto& pipayl = serv.accnt("PIPAYL"sv);
+        auto& eddayl = serv.sess("EDDAYL"sv);
+        auto& gosayl = serv.sess("GOSAYL"sv);
+        auto& marayl = serv.sess("MARAYL"sv);
+        auto& pipayl = serv.sess("PIPAYL"sv);
 
         HdrHistogram maker{1, 1'000'000, 5};
         HdrHistogram taker{1, 1'000'000, 5};

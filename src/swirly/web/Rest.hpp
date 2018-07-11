@@ -53,62 +53,61 @@ class SWIRLY_API Rest {
 
     void get_instr(Symbol symbol, Time now, std::ostream& out) const;
 
-    void get_accnt(Symbol symbol, EntitySet es, Page page, Time now, std::ostream& out) const;
+    void get_sess(Symbol accnt, EntitySet es, Page page, Time now, std::ostream& out) const;
 
     void get_market(Time now, std::ostream& out) const;
 
-    void get_market(Symbol instr_symbol, Time now, std::ostream& out) const;
+    void get_market(Symbol instr, Time now, std::ostream& out) const;
 
-    void get_market(Symbol instr_symbol, IsoDate settl_date, Time now, std::ostream& out) const;
+    void get_market(Symbol instr, IsoDate settl_date, Time now, std::ostream& out) const;
 
-    void get_order(Symbol accnt_symbol, Time now, std::ostream& out) const;
+    void get_order(Symbol accnt, Time now, std::ostream& out) const;
 
-    void get_order(Symbol accnt_symbol, Symbol instr_symbol, Time now, std::ostream& out) const;
+    void get_order(Symbol accnt, Symbol instr, Time now, std::ostream& out) const;
 
-    void get_order(Symbol accnt_symbol, Symbol instr_symbol, IsoDate settl_date, Time now,
+    void get_order(Symbol accnt, Symbol instr, IsoDate settl_date, Time now,
                    std::ostream& out) const;
 
-    void get_order(Symbol accnt_symbol, Symbol instr_symbol, IsoDate settl_date, Id64 id, Time now,
+    void get_order(Symbol accnt, Symbol instr, IsoDate settl_date, Id64 id, Time now,
                    std::ostream& out) const;
 
-    void get_exec(Symbol accnt_symbol, Page page, Time now, std::ostream& out) const;
+    void get_exec(Symbol accnt, Page page, Time now, std::ostream& out) const;
 
-    void get_trade(Symbol accnt_symbol, Time now, std::ostream& out) const;
+    void get_trade(Symbol accnt, Time now, std::ostream& out) const;
 
-    void get_trade(Symbol accnt_symbol, Symbol instr_symbol, Time now, std::ostream& out) const;
+    void get_trade(Symbol accnt, Symbol instr, Time now, std::ostream& out) const;
 
-    void get_trade(Symbol accnt_symbol, Symbol instr_symbol, IsoDate settl_date, Time now,
+    void get_trade(Symbol accnt, Symbol instr, IsoDate settl_date, Time now,
                    std::ostream& out) const;
 
-    void get_trade(Symbol accnt_symbol, Symbol instr_symbol, IsoDate settl_date, Id64 id, Time now,
+    void get_trade(Symbol accnt, Symbol instr, IsoDate settl_date, Id64 id, Time now,
                    std::ostream& out) const;
 
-    void get_posn(Symbol accnt_symbol, Time now, std::ostream& out) const;
+    void get_posn(Symbol accnt, Time now, std::ostream& out) const;
 
-    void get_posn(Symbol accnt_symbol, Symbol instr_symbol, Time now, std::ostream& out) const;
+    void get_posn(Symbol accnt, Symbol instr, Time now, std::ostream& out) const;
 
-    void get_posn(Symbol accnt_symbol, Symbol instr_symbol, IsoDate settl_date, Time now,
+    void get_posn(Symbol accnt, Symbol instr, IsoDate settl_date, Time now,
                   std::ostream& out) const;
 
-    void post_market(Symbol instr_symbol, IsoDate settl_date, MarketState state, Time now,
+    void post_market(Symbol instr, IsoDate settl_date, MarketState state, Time now,
                      std::ostream& out);
 
-    void put_market(Symbol instr_symbol, IsoDate settl_date, MarketState state, Time now,
+    void put_market(Symbol instr, IsoDate settl_date, MarketState state, Time now,
                     std::ostream& out);
 
-    void post_order(Symbol accnt_symbol, Symbol instr_symbol, IsoDate settl_date,
-                    std::string_view ref, Side side, Lots lots, Ticks ticks, Lots min_lots,
-                    Time now, std::ostream& out);
+    void post_order(Symbol accnt, Symbol instr, IsoDate settl_date, std::string_view ref, Side side,
+                    Lots lots, Ticks ticks, Lots min_lots, Time now, std::ostream& out);
 
-    void put_order(Symbol accnt_symbol, Symbol instr_symbol, IsoDate settl_date,
-                   ArrayView<Id64> ids, Lots lots, Time now, std::ostream& out);
+    void put_order(Symbol accnt, Symbol instr, IsoDate settl_date, ArrayView<Id64> ids, Lots lots,
+                   Time now, std::ostream& out);
 
-    void post_trade(Symbol accnt_symbol, Symbol instr_symbol, IsoDate settl_date,
-                    std::string_view ref, Side side, Lots lots, Ticks ticks, LiqInd liq_ind,
-                    Symbol cpty, Time now, std::ostream& out);
+    void post_trade(Symbol accnt, Symbol instr, IsoDate settl_date, std::string_view ref, Side side,
+                    Lots lots, Ticks ticks, LiqInd liq_ind, Symbol cpty, Time now,
+                    std::ostream& out);
 
-    void delete_trade(Symbol accnt_symbol, Symbol instr_symbol, IsoDate settl_date,
-                      ArrayView<Id64> ids, Time now);
+    void delete_trade(Symbol accnt, Symbol instr, IsoDate settl_date, ArrayView<Id64> ids,
+                      Time now);
 
   private:
     Serv serv_;

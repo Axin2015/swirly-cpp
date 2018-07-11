@@ -61,19 +61,19 @@ class TestCase(RestTestCase):
   def check_auth(self, client):
     client.set_auth(None, 0x2)
 
-    resp = client.send('GET', '/api/accnt/exec')
+    resp = client.send('GET', '/api/sess/exec')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
     client.set_auth('MARAYL', ~0x2 & 0x7fffffff)
 
-    resp = client.send('GET', '/api/accnt/exec')
+    resp = client.send('GET', '/api/sess/exec')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
   def get_all(self, client):
     client.set_trader('MARAYL')
-    resp = client.send('GET', '/api/accnt/exec')
+    resp = client.send('GET', '/api/sess/exec')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -225,7 +225,7 @@ class TestCase(RestTestCase):
 
   def get_offset(self, client):
     client.set_trader('MARAYL')
-    resp = client.send('GET', '/api/accnt/exec?offset=2')
+    resp = client.send('GET', '/api/sess/exec?offset=2')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -329,7 +329,7 @@ class TestCase(RestTestCase):
 
   def get_limit(self, client):
     client.set_trader('MARAYL')
-    resp = client.send('GET', '/api/accnt/exec?limit=3')
+    resp = client.send('GET', '/api/sess/exec?limit=3')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -409,7 +409,7 @@ class TestCase(RestTestCase):
 
   def get_offset_and_limit(self, client):
     client.set_trader('MARAYL')
-    resp = client.send('GET', '/api/accnt/exec?offset=2&limit=3')
+    resp = client.send('GET', '/api/sess/exec?offset=2&limit=3')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -489,7 +489,7 @@ class TestCase(RestTestCase):
 
   def exceed_offset(self, client):
     client.set_trader('MARAYL')
-    resp = client.send('GET', '/api/accnt/exec?offset=99&limit=3')
+    resp = client.send('GET', '/api/sess/exec?offset=99&limit=3')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -498,7 +498,7 @@ class TestCase(RestTestCase):
 
   def exceed_limit(self, client):
     client.set_trader('MARAYL')
-    resp = client.send('GET', '/api/accnt/exec?offset=0&limit=99')
+    resp = client.send('GET', '/api/sess/exec?offset=0&limit=99')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)

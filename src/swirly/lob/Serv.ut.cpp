@@ -16,8 +16,8 @@
  */
 #include "Serv.hpp"
 
-#include <swirly/lob/Accnt.hpp>
 #include <swirly/lob/Response.hpp>
+#include <swirly/lob/Sess.hpp>
 #include <swirly/lob/Test.hpp>
 
 #include <swirly/fin/Exception.hpp>
@@ -163,13 +163,13 @@ BOOST_FIXTURE_TEST_CASE(ServUpdateMarket, ServFixture)
 
 BOOST_FIXTURE_TEST_CASE(ServCreateOrder, ServFixture)
 {
-    auto& accnt = serv.accnt("MARAYL"sv);
+    auto& sess = serv.sess("MARAYL"sv);
     const Instr& instr = serv.instr("EURUSD"sv);
     const auto market_id = to_market_id(instr.id(), SettlDay);
     auto& market = serv.market(market_id);
 
     Response resp;
-    serv.create_order(accnt, market, ""sv, Side::Buy, 5_lts, 12345_tks, 1_lts, Now, resp);
+    serv.create_order(sess, market, ""sv, Side::Buy, 5_lts, 12345_tks, 1_lts, Now, resp);
 
     BOOST_TEST(resp.orders().size() == 1U);
     BOOST_TEST(resp.execs().size() == 1U);
@@ -179,7 +179,7 @@ BOOST_FIXTURE_TEST_CASE(ServCreateOrder, ServFixture)
     BOOST_TEST(order->instr() == instr.symbol());
     BOOST_TEST(order->settl_day() == SettlDay);
     BOOST_TEST(order->id() == 1_id64);
-    BOOST_TEST(order->accnt() == accnt.symbol());
+    BOOST_TEST(order->accnt() == sess.accnt());
     BOOST_TEST(order->ref().empty());
     BOOST_TEST(order->state() == State::New);
     BOOST_TEST(order->side() == Side::Buy);

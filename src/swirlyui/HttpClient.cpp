@@ -35,7 +35,7 @@ namespace swirly {
 namespace ui {
 namespace {
 
-enum : int { GetRefData = 1, GetAccnt, PostMarket, PostOrder, PutOrder };
+enum : int { GetRefData = 1, GetSess, PostMarket, PostOrder, PutOrder };
 
 } // namespace
 
@@ -85,7 +85,7 @@ void HttpClient::create_market(const Instr& instr, QDate settl_date)
 void HttpClient::create_order(const Instr& instr, QDate settl_date, const QString& ref, Side side,
                               Lots lots, Ticks ticks)
 {
-    QNetworkRequest request{QUrl{"http://127.0.0.1:8080/api/accnt/order"}};
+    QNetworkRequest request{QUrl{"http://127.0.0.1:8080/api/sess/order"}};
     request.setAttribute(QNetworkRequest::User, PostOrder);
     request.setRawHeader("Content-Type", "application/json");
     request.setRawHeader("Swirly-Accnt", "MARAYL");
@@ -119,8 +119,8 @@ void HttpClient::cancel_orders(const OrderKeys& keys)
                 out.reset();
             }
             market = market_model().find(key.first);
-            out << "http://127.0.0.1:8080/api/accnt/order/" << market.instr().symbol() //
-                << '/' << date_to_iso(market.settl_date())                             //
+            out << "http://127.0.0.1:8080/api/sess/order/" << market.instr().symbol() //
+                << '/' << date_to_iso(market.settl_date())                            //
                 << '/' << id;
         } else {
             out << ',' << id;
@@ -150,8 +150,8 @@ void HttpClient::slot_finished(QNetworkReply* reply)
     case GetRefData:
         on_ref_data_reply(*reply);
         break;
-    case GetAccnt:
-        on_accnt_reply(*reply);
+    case GetSess:
+        on_sess_reply(*reply);
         break;
     case PostMarket:
         on_market_reply(*reply);
@@ -198,13 +198,14 @@ void HttpClient::get_ref_data()
 
 void HttpClient::get_accnt()
 {
-    QUrl url{"http://127.0.0.1:8080/api/accnt"};
+    QUrl url{"http://127.0.0.1:8080/api/sess"};
     QUrlQuery query;
     query.addQueryItem("limit", QString::number(MaxExecs));
     url.setQuery(query.query());
 
     QNetworkRequest request{url};
-    request.setAttribute(QNetworkRequest::User, GetAccnt);
+    request.setAttribute(QNetworkRequest::User, GetSess);
+    // FIXME: add login dialog or command-line options.
     request.setRawHeader("Swirly-Accnt", "MARAYL");
     request.setRawHeader("Swirly-Perm", "2");
     nam_.get(request);
@@ -255,7 +256,7 @@ void HttpClient::on_ref_data_reply(QNetworkReply& reply)
     get_accnt();
 }
 
-void HttpClient::on_accnt_reply(QNetworkReply& reply)
+void HttpClient::on_sess_reply(QNetworkReply& reply)
 {
     auto body = reply.readAll();
 
