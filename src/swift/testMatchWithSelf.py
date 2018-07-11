@@ -33,7 +33,7 @@ class TestCase(RestTestCase):
 
   def take_order(self, client):
     client.set_trader('MARAYL')
-    resp = client.send('POST', '/api/accnt/order/EURUSD/20140302',
+    resp = client.send('POST', '/api/sess/order/EURUSD/20140302',
                        side = 'Sell',
                        lots = 5,
                        ticks = 12345)

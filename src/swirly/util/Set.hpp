@@ -158,20 +158,31 @@ class IdSet {
     Set set_;
 };
 
-/**
- * Set keyed by symbolonic.
- */
 template <typename ValueT>
+struct SymbolTraits {
+    static Symbol symbol(const ValueT& value) noexcept { return value.symbol(); }
+};
+
+/**
+ * Set keyed by symbol.
+ */
+template <typename ValueT, typename TraitsT = SymbolTraits<ValueT>>
 class SymbolSet {
     struct ValueCompare {
         bool operator()(const ValueT& lhs, const ValueT& rhs) const noexcept
         {
-            return lhs.symbol() < rhs.symbol();
+            return TraitsT::symbol(lhs) < TraitsT::symbol(rhs);
         }
     };
     struct KeyValueCompare {
-        bool operator()(Symbol lhs, const ValueT& rhs) const noexcept { return lhs < rhs.symbol(); }
-        bool operator()(const ValueT& lhs, Symbol rhs) const noexcept { return lhs.symbol() < rhs; }
+        bool operator()(Symbol lhs, const ValueT& rhs) const noexcept
+        {
+            return lhs < TraitsT::symbol(rhs);
+        }
+        bool operator()(const ValueT& lhs, Symbol rhs) const noexcept
+        {
+            return TraitsT::symbol(lhs) < rhs;
+        }
     };
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
     using CompareOption = boost::intrusive::compare<ValueCompare>;

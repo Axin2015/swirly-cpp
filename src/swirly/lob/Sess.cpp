@@ -14,25 +14,25 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Accnt.hpp"
+#include "Sess.hpp"
 
 namespace swirly {
 inline namespace lob {
 using namespace std;
 
-static_assert(sizeof(Accnt) <= 6 * 64, "no greater than specified cache-lines");
+static_assert(sizeof(Sess) <= 6 * 64, "no greater than specified cache-lines");
 
-Accnt::~Accnt() = default;
+Sess::~Sess() = default;
 
-Accnt::Accnt(Accnt&&) = default;
+Sess::Sess(Sess&&) = default;
 
-PosnPtr Accnt::posn(Id64 market_id, Symbol instr, JDay settl_day)
+PosnPtr Sess::posn(Id64 market_id, Symbol instr, JDay settl_day)
 {
     PosnSet::Iterator it;
     bool found;
     tie(it, found) = posns_.find_hint(market_id);
     if (!found) {
-        it = posns_.insert_hint(it, Posn::make(symbol_, market_id, instr, settl_day));
+        it = posns_.insert_hint(it, Posn::make(accnt_, market_id, instr, settl_day));
     }
     return &*it;
 }

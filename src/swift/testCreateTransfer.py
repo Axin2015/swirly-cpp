@@ -35,19 +35,19 @@ class TestCase(RestTestCase):
   def check_auth(self, client):
     client.set_auth(None, 0x1)
 
-    resp = client.send('POST', '/api/accnt/trade/EURUSD/20140302')
+    resp = client.send('POST', '/api/sess/trade/EURUSD/20140302')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
     client.set_auth('ADMIN', ~0x1 & 0x7fffffff)
 
-    resp = client.send('POST', '/api/accnt/trade/EURUSD/20140302')
+    resp = client.send('POST', '/api/sess/trade/EURUSD/20140302')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
   def create_deposit(self, client):
     client.set_admin()
-    resp = client.send('POST', '/api/accnt/trade/EURUSD/20140302',
+    resp = client.send('POST', '/api/sess/trade/EURUSD/20140302',
                        accnt = 'MARAYL',
                        ref = 'test1',
                        side = 'Buy',
@@ -83,7 +83,7 @@ class TestCase(RestTestCase):
 
   def create_withdraw(self, client):
     client.set_admin()
-    resp = client.send('POST', '/api/accnt/trade/EURUSD/20140302',
+    resp = client.send('POST', '/api/sess/trade/EURUSD/20140302',
                        accnt = 'MARAYL',
                        ref = 'test1',
                        side = 'Sell',

@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_LOB_ACCNT_HPP
-#define SWIRLY_LOB_ACCNT_HPP
+#ifndef SWIRLY_LOB_SESS_HPP
+#define SWIRLY_LOB_SESS_HPP
 
 #include <swirly/fin/Exception.hpp>
 #include <swirly/fin/Exec.hpp>
@@ -33,40 +33,40 @@
 namespace swirly {
 inline namespace lob {
 
-class Accnt;
+class Sess;
 
-using AccntPtr = std::unique_ptr<Accnt>;
-using ConstAccntPtr = std::unique_ptr<const Accnt>;
+using SessPtr = std::unique_ptr<Sess>;
+using ConstSessPtr = std::unique_ptr<const Sess>;
 
-class SWIRLY_API Accnt : public Comparable<Accnt> {
+class SWIRLY_API Sess : public Comparable<Sess> {
   public:
-    Accnt(Symbol symbol, std::size_t max_execs) noexcept
-    : symbol_{symbol}
+    Sess(Symbol accnt, std::size_t max_execs) noexcept
+    : accnt_{accnt}
     , execs_{max_execs}
     {
     }
-    ~Accnt();
+    ~Sess();
 
     // Copy.
-    Accnt(const Accnt&) = delete;
-    Accnt& operator=(const Accnt&) = delete;
+    Sess(const Sess&) = delete;
+    Sess& operator=(const Sess&) = delete;
 
     // Move.
-    Accnt(Accnt&&);
-    Accnt& operator=(Accnt&&) = delete;
+    Sess(Sess&&);
+    Sess& operator=(Sess&&) = delete;
 
     template <typename... ArgsT>
-    static AccntPtr make(ArgsT&&... args)
+    static SessPtr make(ArgsT&&... args)
     {
-        return std::make_unique<Accnt>(std::forward<ArgsT>(args)...);
+        return std::make_unique<Sess>(std::forward<ArgsT>(args)...);
     }
 
-    int compare(const Accnt& rhs) const noexcept { return symbol_.compare(rhs.symbol_); }
+    int compare(const Sess& rhs) const noexcept { return accnt_.compare(rhs.accnt_); }
     bool exists(std::string_view ref) const noexcept
     {
         return ref_idx_.find(ref) != ref_idx_.end();
     }
-    auto symbol() const noexcept { return symbol_; }
+    auto accnt() const noexcept { return accnt_; }
     const auto& orders() const noexcept { return orders_; }
     const auto& execs() const noexcept { return execs_; }
     const auto& trades() const noexcept { return trades_; }
@@ -99,7 +99,7 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
     }
     void insert_order(const OrderPtr& order) noexcept
     {
-        assert(order->accnt() == symbol_);
+        assert(order->accnt() == accnt_);
         orders_.insert(order);
         if (!order->ref().empty()) {
             ref_idx_.insert(order);
@@ -107,7 +107,7 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
     }
     OrderPtr remove_order(const Order& order) noexcept
     {
-        assert(order.accnt() == symbol_);
+        assert(order.accnt() == accnt_);
         if (!order.ref().empty()) {
             ref_idx_.remove(order);
         }
@@ -115,23 +115,23 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
     }
     void push_exec_back(const ConstExecPtr& exec) noexcept
     {
-        assert(exec->accnt() == symbol_);
+        assert(exec->accnt() == accnt_);
         execs_.push_back(exec);
     }
     void push_exec_front(const ConstExecPtr& exec) noexcept
     {
-        assert(exec->accnt() == symbol_);
+        assert(exec->accnt() == accnt_);
         execs_.push_front(exec);
     }
     void insert_trade(const ExecPtr& trade) noexcept
     {
-        assert(trade->accnt() == symbol_);
+        assert(trade->accnt() == accnt_);
         assert(trade->state() == State::Trade);
         trades_.insert(trade);
     }
     ConstExecPtr remove_trade(const Exec& trade) noexcept
     {
-        assert(trade.accnt() == symbol_);
+        assert(trade.accnt() == accnt_);
         return trades_.remove(trade);
     }
     /**
@@ -141,14 +141,14 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
 
     void insert_posn(const PosnPtr& posn) noexcept
     {
-        assert(posn->accnt() == symbol_);
+        assert(posn->accnt() == accnt_);
         posns_.insert(posn);
     }
     boost::intrusive::set_member_hook<> symbol_hook;
     using PosnSet = IdSet<Posn, MarketIdTraits<Posn>>;
 
   private:
-    const Symbol symbol_;
+    const Symbol accnt_;
     OrderIdSet orders_;
     boost::circular_buffer<ConstExecPtr> execs_;
     ExecIdSet trades_;
@@ -156,9 +156,15 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
     OrderRefSet ref_idx_;
 };
 
-using AccntSet = SymbolSet<Accnt>;
+namespace detail {
+struct SessTraits {
+    static Symbol symbol(const Sess& sess) noexcept { return sess.accnt(); }
+};
+} // namespace detail
+
+using SessSet = SymbolSet<Sess, detail::SessTraits>;
 
 } // namespace lob
 } // namespace swirly
 
-#endif // SWIRLY_LOB_ACCNT_HPP
+#endif // SWIRLY_LOB_SESS_HPP

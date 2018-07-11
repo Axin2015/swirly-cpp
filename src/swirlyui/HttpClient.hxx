@@ -56,7 +56,7 @@ class HttpClient : public Client {
     void put_order(const QUrl& url);
 
     void on_ref_data_reply(QNetworkReply& reply);
-    void on_accnt_reply(QNetworkReply& reply);
+    void on_sess_reply(QNetworkReply& reply);
     void on_market_reply(QNetworkReply& reply);
     void on_order_reply(QNetworkReply& reply);
 

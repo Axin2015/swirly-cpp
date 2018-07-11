@@ -33,7 +33,7 @@ constexpr std::size_t MaxErrMsg{511};
 constexpr std::size_t MaxLogMsg{2048};
 
 /**
- * Maximum symbolonic characters.
+ * Maximum symbol characters.
  */
 constexpr std::size_t MaxSymbol{16};
 

@@ -59,7 +59,7 @@ class RestServ {
     void asset_request(const HttpRequest& req, Time now, HttpStream& os);
     void instr_request(const HttpRequest& req, Time now, HttpStream& os);
 
-    void accnt_request(const HttpRequest& req, Time now, HttpStream& os);
+    void sess_request(const HttpRequest& req, Time now, HttpStream& os);
     void market_request(const HttpRequest& req, Time now, HttpStream& os);
 
     void order_request(const HttpRequest& req, Time now, HttpStream& os);

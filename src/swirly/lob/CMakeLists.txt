@@ -27,10 +27,10 @@ else()
 endif()
 
 set(lib_SOURCES
-  Accnt.cpp
   Match.cpp
   Response.cpp
   Serv.cpp
+  Sess.cpp
   Test.cpp)
 
 add_library(swirly-lob-static STATIC ${lib_SOURCES})
