@@ -671,7 +671,7 @@ inline std::error_code get_so_error(int sockfd, std::error_code& ec) noexcept
 {
     int optval{};
     socklen_t optlen{sizeof(optval)};
-    os::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &optval, optlen);
+    os::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &optval, optlen, ec);
     return os::make_error(optval);
 }
 
