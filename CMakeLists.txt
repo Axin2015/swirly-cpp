@@ -37,7 +37,6 @@ if (NOT "${SWIRLY_TOOLSET}" STREQUAL "")
 endif()
 
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${PROJECT_SOURCE_DIR}/etc/cmake")
-set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Optimise for target architecture.
 set(CMAKE_C_FLAGS_RELEASE          "${CMAKE_C_FLAGS_RELEASE} -march=${SWIRLY_BUILD_ARCH}")
@@ -142,10 +141,12 @@ if(DOXYGEN_FOUND)
   add_dependencies(doc image)
 endif()
 
-include_directories("${Boost_INCLUDE_DIRS}")
-include_directories(
-  "${PROJECT_SOURCE_DIR}/HdrHistogram_c/src"
+include_directories(SYSTEM
+  "${Boost_INCLUDE_DIRS}"
   "${PROJECT_SOURCE_DIR}/flatbuffers/include"
+  "${PROJECT_SOURCE_DIR}/HdrHistogram_c/src")
+
+include_directories(
   "${PROJECT_SOURCE_DIR}/src"
   "${PROJECT_BINARY_DIR}/include")
 
@@ -172,6 +173,31 @@ else()
 endif()
 
 enable_testing()
+
+# Add cppcheck target if tool is available
+find_program(CPPCHECK cppcheck HINTS "${SWIRLY_TOOLSET}/bin")
+if (CPPCHECK)
+  message (STATUS "Found cppcheck")
+  cmake_host_system_information(RESULT CORE_COUNT QUERY NUMBER_OF_LOGICAL_CORES)
+  add_custom_target(cppcheck COMMAND ${CPPCHECK}
+        --std=c++14
+        -j ${CORE_COUNT}
+        --quiet
+        --project=${PROJECT_BINARY_DIR}/compile_commands.json)
+endif()
+
+
+# Add clang-tidy target if tool is available
+find_program(CLANG_TIDY run-clang-tidy.py HINTS "/usr/share/clang/" "${SWIRLY_TOOLSET}/share/clang")
+if (CLANG_TIDY)
+  message (STATUS "Found clang-tidy")
+  cmake_host_system_information(RESULT CORE_COUNT QUERY NUMBER_OF_LOGICAL_CORES)
+  add_custom_target(clang-tidy COMMAND ${CLANG_TIDY}
+        -quiet
+        -j ${CORE_COUNT}
+        -checks "*,-readability-braces-around-statements,-fuchsia-*,-google-*,-hicpp-braces-*,-readability-implicit-bool-conversion,-cppcoreguidelines-pro-*"
+        -p ${PROJECT_BINARY_DIR})
+endif()
 
 add_subdirectory(flatbuffers)
 add_subdirectory(HdrHistogram_c)
