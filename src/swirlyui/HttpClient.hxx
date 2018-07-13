@@ -52,7 +52,7 @@ class HttpClient : public Client {
     Instr find_instr(const QJsonObject& obj) const;
 
     void get_ref_data();
-    void get_accnt();
+    void get_sess();
     void put_order(const QUrl& url);
 
     void on_ref_data_reply(QNetworkReply& reply);
