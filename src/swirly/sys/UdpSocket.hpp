@@ -188,7 +188,10 @@ inline void set_ip_mcast_if(int sockfd, int family, unsigned ifindex)
 inline void set_ip_mcast_if(int sockfd, int family, const char* ifname,
                             std::error_code& ec) noexcept
 {
-    set_ip_mcast_if(sockfd, family, os::if_nametoindex(ifname), ec);
+    const auto ifindex = os::if_nametoindex(ifname, ec);
+    if (!ec) {
+        set_ip_mcast_if(sockfd, family, ifindex, ec);
+    }
 }
 
 inline void set_ip_mcast_if(int sockfd, int family, const char* ifname)
