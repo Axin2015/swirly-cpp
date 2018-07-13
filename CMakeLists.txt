@@ -192,7 +192,7 @@ find_program(CLANG_TIDY run-clang-tidy.py HINTS "/usr/share/clang/" "${SWIRLY_TO
 if (CLANG_TIDY)
   message (STATUS "Found clang-tidy")
   cmake_host_system_information(RESULT CORE_COUNT QUERY NUMBER_OF_LOGICAL_CORES)
-  add_custom_target(clang-tidy COMMAND "${CLANG_TIDY}"}
+  add_custom_target(clang-tidy COMMAND "${CLANG_TIDY}"
         -quiet
         -j ${CORE_COUNT}
         -checks "*,-readability-braces-around-statements,-fuchsia-*,-google-*,-hicpp-braces-*,-readability-implicit-bool-conversion,-cppcoreguidelines-pro-*"
