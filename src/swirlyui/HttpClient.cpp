@@ -196,7 +196,7 @@ void HttpClient::get_ref_data()
     ++pending_;
 }
 
-void HttpClient::get_accnt()
+void HttpClient::get_sess()
 {
     QUrl url{"http://127.0.0.1:8080/api/sess"};
     QUrlQuery query;
