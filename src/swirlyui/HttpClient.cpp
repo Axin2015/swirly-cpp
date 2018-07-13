@@ -60,7 +60,7 @@ void HttpClient::timerEvent(QTimerEvent* event)
             get_ref_data();
         }
     } else {
-        get_accnt();
+        get_sess();
     }
 }
 
@@ -253,7 +253,7 @@ void HttpClient::on_ref_data_reply(QNetworkReply& reply)
     instr_model().sweep(tag_);
     emit ref_data_complete();
 
-    get_accnt();
+    get_sess();
 }
 
 void HttpClient::on_sess_reply(QNetworkReply& reply)

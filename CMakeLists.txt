@@ -179,11 +179,11 @@ find_program(CPPCHECK cppcheck HINTS "${SWIRLY_TOOLSET}/bin")
 if (CPPCHECK)
   message (STATUS "Found cppcheck")
   cmake_host_system_information(RESULT CORE_COUNT QUERY NUMBER_OF_LOGICAL_CORES)
-  add_custom_target(cppcheck COMMAND ${CPPCHECK}
+  add_custom_target(cppcheck COMMAND "${CPPCHECK}"
         --std=c++14
         -j ${CORE_COUNT}
         --quiet
-        --project=${PROJECT_BINARY_DIR}/compile_commands.json)
+        --project="${PROJECT_BINARY_DIR}/compile_commands.json")
 endif()
 
 
@@ -192,11 +192,11 @@ find_program(CLANG_TIDY run-clang-tidy.py HINTS "/usr/share/clang/" "${SWIRLY_TO
 if (CLANG_TIDY)
   message (STATUS "Found clang-tidy")
   cmake_host_system_information(RESULT CORE_COUNT QUERY NUMBER_OF_LOGICAL_CORES)
-  add_custom_target(clang-tidy COMMAND ${CLANG_TIDY}
+  add_custom_target(clang-tidy COMMAND "${CLANG_TIDY}"}
         -quiet
         -j ${CORE_COUNT}
         -checks "*,-readability-braces-around-statements,-fuchsia-*,-google-*,-hicpp-braces-*,-readability-implicit-bool-conversion,-cppcoreguidelines-pro-*"
-        -p ${PROJECT_BINARY_DIR})
+        -p "${PROJECT_BINARY_DIR}")
 endif()
 
 add_subdirectory(flatbuffers)
