@@ -103,19 +103,19 @@ void get_opts(int argc, char* argv[], Opts& opts)
             opts.start_time = to_time(Millis{stou64(optarg)});
             break;
         case ':':
-            cerr << "Option '"sv << static_cast<char>(optopt) << "' requires an argument\n"sv;
+            cerr << "Option '" << static_cast<char>(optopt) << "' requires an argument\n";
             print_usage(cerr);
             exit(1);
         case '?':
         default:
-            cerr << "Unknown option '"sv << static_cast<char>(optopt) << "'\n"sv;
+            cerr << "Unknown option '" << static_cast<char>(optopt) << "'\n";
             print_usage(cerr);
             exit(1);
         }
     }
 
     if (optind < argc) {
-        cerr << "Unknown argument '"sv << argv[optind] << "'\n"sv;
+        cerr << "Unknown argument '" << argv[optind] << "'\n";
         print_usage(cerr);
         exit(1);
     }
@@ -163,7 +163,7 @@ int main(int argc, char* argv[])
             ifstream is{opts.conf_file};
             if (!is.is_open()) {
                 throw Exception{make_error_code(errc::io_error),
-                                err_msg() << "open failed: "sv << opts.conf_file};
+                                err_msg() << "open failed: " << opts.conf_file};
             }
             config.read(is);
         }
@@ -244,7 +244,7 @@ int main(int argc, char* argv[])
             }
             fs::create_directory(log_file.parent_path());
 
-            SWIRLY_NOTICE << "opening log file: "sv << log_file;
+            SWIRLY_NOTICE << "opening log file: " << log_file;
             open_log_file(log_file.c_str());
         }
 
@@ -252,20 +252,20 @@ int main(int argc, char* argv[])
         const char* const http_port{config.get("http_port", "8080")};
         const auto max_execs = config.get<size_t>("max_execs", 1 << 4);
 
-        SWIRLY_NOTICE << "initialising daemon"sv;
-        SWIRLY_INFO << "conf_file:  "sv << opts.conf_file;
-        SWIRLY_INFO << "daemon:     "sv << (opts.daemon ? "yes"sv : "no"sv);
-        SWIRLY_INFO << "start_time: "sv << opts.start_time;
+        SWIRLY_NOTICE << "initialising daemon";
+        SWIRLY_INFO << "conf_file:  " << opts.conf_file;
+        SWIRLY_INFO << "daemon:     " << (opts.daemon ? "yes" : "no");
+        SWIRLY_INFO << "start_time: " << opts.start_time;
 
-        SWIRLY_INFO << "file_mode:  "sv << setfill('0') << setw(3) << oct << swirly::file_mode();
-        SWIRLY_INFO << "http_port:  "sv << http_port;
-        SWIRLY_INFO << "log_file:   "sv << log_file;
-        SWIRLY_INFO << "log_level:  "sv << get_log_level();
-        SWIRLY_INFO << "max_execs:  "sv << max_execs;
-        SWIRLY_INFO << "mem_size:   "sv << (mem_ctx.max_size() >> 20) << "MiB"sv;
-        SWIRLY_INFO << "mq_file:    "sv << mq_file;
-        SWIRLY_INFO << "pid_file:   "sv << pid_file;
-        SWIRLY_INFO << "run_dir:    "sv << run_dir;
+        SWIRLY_INFO << "file_mode:  " << setfill('0') << setw(3) << oct << swirly::file_mode();
+        SWIRLY_INFO << "http_port:  " << http_port;
+        SWIRLY_INFO << "log_file:   " << log_file;
+        SWIRLY_INFO << "log_level:  " << get_log_level();
+        SWIRLY_INFO << "max_execs:  " << max_execs;
+        SWIRLY_INFO << "mem_size:   " << (mem_ctx.max_size() >> 20) << "MiB";
+        SWIRLY_INFO << "mq_file:    " << mq_file;
+        SWIRLY_INFO << "pid_file:   " << pid_file;
+        SWIRLY_INFO << "run_dir:    " << run_dir;
 
         DbCtx db_ctx{config};
         MsgQueue mq;
@@ -298,34 +298,34 @@ int main(int argc, char* argv[])
         };
         AgentThread journ_thread{journ_agent, PhasedBackoff{}, ThreadConfig{"journ"s}};
 
-        SWIRLY_NOTICE << "started http server on port "sv << http_port;
+        SWIRLY_NOTICE << "started http server on port " << http_port;
 
         // Wait for termination.
         SigWait sig_wait;
         while (const auto sig = sig_wait()) {
             switch (sig) {
             case SIGHUP:
-                SWIRLY_INFO << "received SIGHUP"sv;
+                SWIRLY_INFO << "received SIGHUP";
                 if (!log_file.empty()) {
-                    SWIRLY_NOTICE << "reopening log file: "sv << log_file;
+                    SWIRLY_NOTICE << "reopening log file: " << log_file;
                     open_log_file(log_file.c_str());
                 }
                 continue;
             case SIGINT:
-                SWIRLY_INFO << "received SIGINT"sv;
+                SWIRLY_INFO << "received SIGINT";
                 break;
             case SIGTERM:
-                SWIRLY_INFO << "received SIGTERM"sv;
+                SWIRLY_INFO << "received SIGTERM";
                 break;
             default:
-                SWIRLY_INFO << "received signal: "sv << sig;
+                SWIRLY_INFO << "received signal: " << sig;
                 continue;
             }
             break;
         }
         ret = 0;
     } catch (const exception& e) {
-        SWIRLY_ERROR << "exception: "sv << e.what();
+        SWIRLY_ERROR << "exception: " << e.what();
     }
     return ret;
 }

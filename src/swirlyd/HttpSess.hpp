@@ -81,7 +81,7 @@ class SWIRLY_API HttpSess
     LogMsg& log_msg() const noexcept
     {
         auto& ref = swirly::log_msg();
-        ref << '<' << ep_ << "> "sv;
+        ref << '<' << ep_ << "> ";
         return ref;
     }
 

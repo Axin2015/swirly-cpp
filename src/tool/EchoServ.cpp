@@ -49,7 +49,7 @@ class EchoSess {
     }
     void close() noexcept
     {
-        SWIRLY_INFO << "session closed"sv;
+        SWIRLY_INFO << "session closed";
         tmr_.cancel();
         sub_.reset();
         delete this;
@@ -74,13 +74,13 @@ class EchoSess {
                 }
             }
         } catch (const std::exception& e) {
-            SWIRLY_ERROR << "exception: "sv << e.what();
+            SWIRLY_ERROR << "exception: " << e.what();
             close();
         }
     }
     void on_timer(Timer& tmr, Time now)
     {
-        SWIRLY_INFO << "timeout"sv;
+        SWIRLY_INFO << "timeout";
         close();
     }
     boost::intrusive::list_member_hook<AutoUnlinkOption> list_hook;
@@ -115,7 +115,7 @@ class EchoServ : public TcpAcceptor<EchoServ> {
   private:
     void do_accept(IoSocket&& sock, const Endpoint& ep, Time now)
     {
-        SWIRLY_INFO << "session opened: "sv << ep;
+        SWIRLY_INFO << "session opened: " << ep;
         // High performance TCP servers could use a custom allocator.
         auto* const sess = new EchoSess{reactor_, move(sock), ep, now};
         sess_list_.push_back(*sess);
@@ -143,16 +143,16 @@ int main(int argc, char* argv[])
         while (const auto sig = sig_wait()) {
             switch (sig) {
             case SIGHUP:
-                SWIRLY_INFO << "received SIGHUP"sv;
+                SWIRLY_INFO << "received SIGHUP";
                 continue;
             case SIGINT:
-                SWIRLY_INFO << "received SIGINT"sv;
+                SWIRLY_INFO << "received SIGINT";
                 break;
             case SIGTERM:
-                SWIRLY_INFO << "received SIGTERM"sv;
+                SWIRLY_INFO << "received SIGTERM";
                 break;
             default:
-                SWIRLY_INFO << "received signal: "sv << sig;
+                SWIRLY_INFO << "received signal: " << sig;
                 continue;
             }
             break;
@@ -160,7 +160,7 @@ int main(int argc, char* argv[])
         ret = 0;
 
     } catch (const std::exception& e) {
-        SWIRLY_ERROR << "exception: "sv << e.what();
+        SWIRLY_ERROR << "exception: " << e.what();
     }
     return ret;
 }

@@ -109,25 +109,24 @@ void RestServ::handle_request(const HttpRequest& req, HttpStream& os) noexcept
         }
         rest_request(req, now, os);
         if (!match_path_) {
-            throw NotFoundException{err_msg()
-                                    << "resource '"sv << req.path() << "' does not exist"sv};
+            throw NotFoundException{err_msg() << "resource '" << req.path() << "' does not exist"};
         }
         if (!match_method_) {
-            throw MethodNotAllowedException{err_msg() << "method '"sv << req.method()
-                                                      << "' is not allowed"sv};
+            throw MethodNotAllowedException{err_msg()
+                                            << "method '" << req.method() << "' is not allowed"};
         }
     } catch (const Exception& e) {
         const auto status = http_status(e.code());
         const char* const reason = http_reason(status);
-        SWIRLY_ERROR << "exception: status="sv << status << ", reason="sv << reason << ", detail="sv
-                     << e.what();
+        SWIRLY_ERROR << "exception: status=" << status << ", reason=" << reason
+                     << ", detail=" << e.what();
         os.reset(status, reason);
         Exception::to_json(os, static_cast<int>(status), reason, e.what());
     } catch (const exception& e) {
         const auto status = HttpStatus::InternalServerError;
         const char* const reason = http_reason(status);
-        SWIRLY_ERROR << "exception: status="sv << status << ", reason="sv << reason << ", detail="sv
-                     << e.what();
+        SWIRLY_ERROR << "exception: status=" << status << ", reason=" << reason
+                     << ", detail=" << e.what();
         os.reset(status, reason);
         Exception::to_json(os, static_cast<int>(status), reason, e.what());
     }

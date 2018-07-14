@@ -72,7 +72,7 @@ void SqliteJourn::do_rollback() noexcept
     try {
         step_once(*rollback_stmt_);
     } catch (const std::exception& e) {
-        SWIRLY_ERROR << "failed to rollback transaction: "sv << e.what();
+        SWIRLY_ERROR << "failed to rollback transaction: " << e.what();
     }
 }
 

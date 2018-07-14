@@ -74,7 +74,7 @@ class SWIRLY_API Sess : public Comparable<Sess> {
     {
         auto it = trades_.find(market_id, id);
         if (it == trades_.end()) {
-            throw NotFoundException{err_msg() << "trade '"sv << id << "' does not exist"sv};
+            throw NotFoundException{err_msg() << "trade '" << id << "' does not exist"};
         }
         return *it;
     }
@@ -85,7 +85,7 @@ class SWIRLY_API Sess : public Comparable<Sess> {
     {
         auto it = orders_.find(market_id, id);
         if (it == orders_.end()) {
-            throw OrderNotFoundException{err_msg() << "order '"sv << id << "' does not exist"sv};
+            throw OrderNotFoundException{err_msg() << "order '" << id << "' does not exist"};
         }
         return *it;
     }
@@ -93,7 +93,7 @@ class SWIRLY_API Sess : public Comparable<Sess> {
     {
         auto it = ref_idx_.find(ref);
         if (it == ref_idx_.end()) {
-            throw OrderNotFoundException{err_msg() << "order '"sv << ref << "' does not exist"sv};
+            throw OrderNotFoundException{err_msg() << "order '" << ref << "' does not exist"};
         }
         return *it;
     }

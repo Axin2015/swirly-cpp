@@ -30,10 +30,10 @@ BOOST_AUTO_TEST_CASE(StaticStreamCase)
 {
     StaticStream<7> ss;
     BOOST_TEST(ss.empty());
-    ss << "foo"sv;
+    ss << "foo";
     BOOST_TEST(ss.size() == 3U);
     BOOST_TEST(ss.str() == "foo");
-    ss << ',' << "bar"sv;
+    ss << ',' << "bar";
     BOOST_TEST(ss.size() == 7U);
     BOOST_TEST(ss.str() == "foo,bar");
 
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(StaticStreamCase)
 
     ss.reset();
     BOOST_TEST(!!ss);
-    BOOST_TEST((ss << "test"sv).str() == "test");
+    BOOST_TEST((ss << "test").str() == "test");
 }
 
 BOOST_AUTO_TEST_CASE(OStreamJoinerCase)

@@ -108,7 +108,7 @@ struct Serv::Impl {
         auto it = instrs_.find(symbol);
         if (it == instrs_.end()) {
             throw MarketNotFoundException{err_msg()
-                                          << "instrument '"sv << symbol << "' does not exist"sv};
+                                          << "instrument '" << symbol << "' does not exist"};
         }
         return *it;
     }
@@ -130,7 +130,7 @@ struct Serv::Impl {
     {
         auto it = markets_.find(id);
         if (it == markets_.end()) {
-            throw MarketNotFoundException{err_msg() << "market '"sv << id << "' does not exist"sv};
+            throw MarketNotFoundException{err_msg() << "market '" << id << "' does not exist"};
         }
         return *it;
     }
@@ -163,9 +163,8 @@ struct Serv::Impl {
         bool found;
         tie(it, found) = markets_.find_hint(id);
         if (found) {
-            throw AlreadyExistsException{err_msg()
-                                         << "market for '"sv << instr.symbol() << "' on "sv
-                                         << jd_to_iso(settl_day) << " already exists"sv};
+            throw AlreadyExistsException{err_msg() << "market for '" << instr.symbol() << "' on "
+                                                   << jd_to_iso(settl_day) << " already exists"};
         }
         {
             auto market = Market::make(id, instr.symbol(), settl_day, state);
@@ -188,18 +187,17 @@ struct Serv::Impl {
         // and order-refs can be reused so long as only one order is live in the system at any given
         // time.
         if (!ref.empty() && sess.exists(ref)) {
-            throw RefAlreadyExistsException{err_msg()
-                                            << "order '"sv << ref << "' already exists"sv};
+            throw RefAlreadyExistsException{err_msg() << "order '" << ref << "' already exists"};
         }
 
         const auto bus_day = bus_day_(now);
         if (market.settl_day() != 0_jd && market.settl_day() < bus_day) {
             throw MarketClosedException{err_msg()
-                                        << "market for '"sv << market.instr() << "' on "sv
-                                        << jd_to_iso(market.settl_day()) << " has closed"sv};
+                                        << "market for '" << market.instr() << "' on "
+                                        << jd_to_iso(market.settl_day()) << " has closed"};
         }
         if (lots == 0_lts || lots < min_lots) {
-            throw InvalidLotsException{err_msg() << "invalid lots '"sv << lots << '\''};
+            throw InvalidLotsException{err_msg() << "invalid lots '" << lots << '\''};
         }
         const auto id = market.alloc_id();
         auto order = Order::make(sess.accnt(), market.id(), market.instr(), market.settl_day(), id,
@@ -268,7 +266,7 @@ struct Serv::Impl {
     void revise_order(Sess& sess, Market& market, Order& order, Lots lots, Time now, Response& resp)
     {
         if (order.done()) {
-            throw TooLateException{err_msg() << "order '"sv << order.id() << "' is done"sv};
+            throw TooLateException{err_msg() << "order '" << order.id() << "' is done"};
         }
         do_revise_order(sess, market, order, lots, now, resp);
     }
@@ -277,7 +275,7 @@ struct Serv::Impl {
     {
         auto& order = sess.order(market.id(), id);
         if (order.done()) {
-            throw TooLateException{err_msg() << "order '"sv << order.id() << "' is done"sv};
+            throw TooLateException{err_msg() << "order '" << order.id() << "' is done"};
         }
         do_revise_order(sess, market, order, lots, now, resp);
     }
@@ -287,7 +285,7 @@ struct Serv::Impl {
     {
         auto& order = sess.order(ref);
         if (order.done()) {
-            throw TooLateException{err_msg() << "order '"sv << order.id() << "' is done"sv};
+            throw TooLateException{err_msg() << "order '" << order.id() << "' is done"};
         }
         do_revise_order(sess, market, order, lots, now, resp);
     }
@@ -300,7 +298,7 @@ struct Serv::Impl {
 
             auto& order = sess.order(market.id(), id);
             if (order.done()) {
-                throw TooLateException{err_msg() << "order '"sv << order.id() << "' is done"sv};
+                throw TooLateException{err_msg() << "order '" << order.id() << "' is done"};
             }
             // Revised lots must not be:
             // 1. greater than original lots;
@@ -310,7 +308,7 @@ struct Serv::Impl {
                 || lots > order.lots()      //
                 || lots < order.exec_lots() //
                 || lots < order.min_lots()) {
-                throw new InvalidLotsException{err_msg() << "invalid lots '"sv << lots << '\''};
+                throw new InvalidLotsException{err_msg() << "invalid lots '" << lots << '\''};
             }
             auto exec = new_exec(order, market.alloc_id(), now);
             exec->revise(lots);
@@ -334,7 +332,7 @@ struct Serv::Impl {
     void cancel_order(Sess& sess, Market& market, Order& order, Time now, Response& resp)
     {
         if (order.done()) {
-            throw TooLateException{err_msg() << "order '"sv << order.id() << "' is done"sv};
+            throw TooLateException{err_msg() << "order '" << order.id() << "' is done"};
         }
         do_cancel_order(sess, market, order, now, resp);
     }
@@ -343,7 +341,7 @@ struct Serv::Impl {
     {
         auto& order = sess.order(market.id(), id);
         if (order.done()) {
-            throw TooLateException{err_msg() << "order '"sv << order.id() << "' is done"sv};
+            throw TooLateException{err_msg() << "order '" << order.id() << "' is done"};
         }
         do_cancel_order(sess, market, order, now, resp);
     }
@@ -352,7 +350,7 @@ struct Serv::Impl {
     {
         auto& order = sess.order(ref);
         if (order.done()) {
-            throw TooLateException{err_msg() << "order '"sv << order.id() << "' is done"sv};
+            throw TooLateException{err_msg() << "order '" << order.id() << "' is done"};
         }
         do_cancel_order(sess, market, order, now, resp);
     }
@@ -364,7 +362,7 @@ struct Serv::Impl {
 
             auto& order = sess.order(market.id(), id);
             if (order.done()) {
-                throw TooLateException{err_msg() << "order '"sv << order.id() << "' is done"sv};
+                throw TooLateException{err_msg() << "order '" << order.id() << "' is done"};
             }
             auto exec = new_exec(order, market.alloc_id(), now);
             exec->cancel();
@@ -437,7 +435,7 @@ struct Serv::Impl {
     void archive_trade(Sess& sess, const Exec& trade, Time now)
     {
         if (trade.state() != State::Trade) {
-            throw InvalidException{err_msg() << "exec '"sv << trade.id() << "' is not a trade"sv};
+            throw InvalidException{err_msg() << "exec '" << trade.id() << "' is not a trade"};
         }
         do_archive_trade(sess, trade, now);
     }
@@ -663,7 +661,7 @@ struct Serv::Impl {
             || lots > order.lots()      //
             || lots < order.exec_lots() //
             || lots < order.min_lots()) {
-            throw new InvalidLotsException{err_msg() << "invalid lots '"sv << lots << '\''};
+            throw new InvalidLotsException{err_msg() << "invalid lots '" << lots << '\''};
         }
         auto exec = new_exec(order, market.alloc_id(), now);
         exec->revise(lots);

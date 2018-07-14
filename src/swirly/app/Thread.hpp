@@ -73,7 +73,7 @@ class AgentThread {
 
         sig_block_all();
         pthread_setname_np(pthread_self(), config.name.c_str());
-        SWIRLY_NOTICE << "started "sv << config.name << " thread"sv;
+        SWIRLY_NOTICE << "started " << config.name << " thread";
         try {
             while (!stop.load(std::memory_order_relaxed)) {
                 if (agent() == 0) {
@@ -87,10 +87,10 @@ class AgentThread {
                 }
             }
         } catch (const std::exception& e) {
-            SWIRLY_ERROR << "exception: "sv << e.what();
+            SWIRLY_ERROR << "exception: " << e.what();
             kill(getpid(), SIGTERM);
         }
-        SWIRLY_NOTICE << "stopping "sv << config.name << " thread"sv;
+        SWIRLY_NOTICE << "stopping " << config.name << " thread";
     }
     std::atomic<bool> stop_{false};
     std::thread thread_;

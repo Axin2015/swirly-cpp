@@ -46,10 +46,10 @@ Exception::~Exception() = default;
 
 void Exception::to_json(ostream& os, int status, const char* reason, const char* detail)
 {
-    os << "{\"status\":"sv << status     //
-       << ",\"reason\":\""sv << reason   //
-       << "\",\"detail\":\""sv << detail //
-       << "\"}"sv;
+    os << "{\"status\":" << status     //
+       << ",\"reason\":\"" << reason   //
+       << "\",\"detail\":\"" << detail //
+       << "\"}";
 }
 
 ErrMsg& err_msg() noexcept

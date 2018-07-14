@@ -39,7 +39,7 @@ void Posn::to_dsv(ostream& os, char delim) const
     if (settl_day_ != 0_jd) {
         osj << jd_to_iso(settl_day_);
     } else {
-        osj << ""sv;
+        osj << "";
     }
     if (buy_lots_ != 0_lts) {
         osj << buy_lots_ //
@@ -57,26 +57,26 @@ void Posn::to_dsv(ostream& os, char delim) const
 
 void Posn::to_json(ostream& os) const
 {
-    os << "{\"accnt\":\""sv << accnt_         //
-       << "\",\"market_id\":"sv << market_id_ //
-       << ",\"instr\":\""sv << instr_         //
-       << "\",\"settl_date\":"sv;
+    os << "{\"accnt\":\"" << accnt_         //
+       << "\",\"market_id\":" << market_id_ //
+       << ",\"instr\":\"" << instr_         //
+       << "\",\"settl_date\":";
     if (settl_day_ != 0_jd) {
         os << jd_to_iso(settl_day_);
     } else {
-        os << "null"sv;
+        os << "null";
     }
     if (buy_lots_ != 0_lts) {
-        os << ",\"buy_lots\":"sv << buy_lots_ //
-           << ",\"buy_cost\":"sv << buy_cost_;
+        os << ",\"buy_lots\":" << buy_lots_ //
+           << ",\"buy_cost\":" << buy_cost_;
     } else {
-        os << ",\"buy_lots\":0,\"buy_cost\":0"sv;
+        os << ",\"buy_lots\":0,\"buy_cost\":0";
     }
     if (sell_lots_ != 0_lts) {
-        os << ",\"sell_lots\":"sv << sell_lots_ //
-           << ",\"sell_cost\":"sv << sell_cost_;
+        os << ",\"sell_lots\":" << sell_lots_ //
+           << ",\"sell_cost\":" << sell_cost_;
     } else {
-        os << ",\"sell_lots\":0,\"sell_cost\":0"sv;
+        os << ",\"sell_lots\":0,\"sell_cost\":0";
     }
     os << '}';
 }

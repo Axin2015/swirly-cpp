@@ -69,13 +69,13 @@ struct MySqlImpl : DbCtx::Impl {
 std::unique_ptr<DbCtx::Impl> make_impl(const Config& config)
 {
     const char* const db_type{config.get("db_type", "sqlite")};
-    SWIRLY_INFO << "db_type:    "sv << db_type;
+    SWIRLY_INFO << "db_type:    " << db_type;
 
     std::unique_ptr<DbCtx::Impl> impl;
     if (std::strcmp(db_type, "sqlite") == 0) {
 
         const char* const db_name{config.get("db_name", "swirly.db")};
-        SWIRLY_INFO << "db_name:    "sv << db_name;
+        SWIRLY_INFO << "db_name:    " << db_name;
         impl
             = std::make_unique<SqliteImpl>(sqlite::open_db(db_name, SQLITE_OPEN_READWRITE, config));
 
@@ -88,16 +88,16 @@ std::unique_ptr<DbCtx::Impl> make_impl(const Config& config)
         const char* const db_name{config.get("db_name", "swirlydb")};
         const auto db_port{config.get<unsigned>("db_port", 3306)};
 
-        SWIRLY_INFO << "db_host:    "sv << db_host;
-        SWIRLY_INFO << "db_user:    "sv << db_user;
-        SWIRLY_INFO << "db_name:    "sv << db_name;
-        SWIRLY_INFO << "db_port:    "sv << db_port;
+        SWIRLY_INFO << "db_host:    " << db_host;
+        SWIRLY_INFO << "db_user:    " << db_user;
+        SWIRLY_INFO << "db_name:    " << db_name;
+        SWIRLY_INFO << "db_port:    " << db_port;
 
         impl = std::make_unique<MySqlImpl>(
             mysql::open_db(db_host, db_user, db_pass, db_name, db_port, config));
 #endif
     } else {
-        throw DatabaseException{err_msg() << "db_type '"sv << db_type << "' not supported"sv};
+        throw DatabaseException{err_msg() << "db_type '" << db_type << "' not supported"};
     }
     return impl;
 }
