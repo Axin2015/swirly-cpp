@@ -52,7 +52,7 @@ void bind32(sqlite3_stmt& stmt, int col, int32_t val)
 {
     int rc{sqlite3_bind_int(&stmt, col, val)};
     if (rc != SQLITE_OK) {
-        throw DatabaseException{err_msg() << "sqlite3_bind_int: "sv << last_error(stmt)};
+        throw DatabaseException{err_msg() << "sqlite3_bind_int: " << last_error(stmt)};
     }
 }
 
@@ -60,7 +60,7 @@ void bind64(sqlite3_stmt& stmt, int col, int64_t val)
 {
     int rc{sqlite3_bind_int64(&stmt, col, val)};
     if (rc != SQLITE_OK) {
-        throw DatabaseException{err_msg() << "sqlite3_bind_int64: "sv << last_error(stmt)};
+        throw DatabaseException{err_msg() << "sqlite3_bind_int64: " << last_error(stmt)};
     }
 }
 
@@ -68,7 +68,7 @@ void bindsv(sqlite3_stmt& stmt, int col, string_view val)
 {
     int rc{sqlite3_bind_text(&stmt, col, val.data(), val.size(), SQLITE_STATIC)};
     if (rc != SQLITE_OK) {
-        throw DatabaseException{err_msg() << "sqlite3_bind_text: "sv << last_error(stmt)};
+        throw DatabaseException{err_msg() << "sqlite3_bind_text: " << last_error(stmt)};
     }
 }
 
@@ -81,7 +81,7 @@ DbPtr open_db(const char* path, int flags, const Config& config)
     DbPtr ptr{db, sqlite3_close};
     if (rc != SQLITE_OK) {
         throw DatabaseException{err_msg()
-                                << "sqlite3_open_v2: "sv << last_error(*db) << ": "sv << path};
+                                << "sqlite3_open_v2: " << last_error(*db) << ": " << path};
     }
     if (config.get("sqlite_enable_trace", false)) {
 #pragma GCC diagnostic push
@@ -92,8 +92,8 @@ DbPtr open_db(const char* path, int flags, const Config& config)
     if (config.get("sqlite_enable_fkey", false)) {
         rc = sqlite3_db_config(db, SQLITE_DBCONFIG_ENABLE_FKEY, 1, nullptr);
         if (rc != SQLITE_OK) {
-            throw DatabaseException{err_msg() << "sqlite3_db_config: "sv << last_error(*db)
-                                              << ": "sv << path};
+            throw DatabaseException{err_msg()
+                                    << "sqlite3_db_config: " << last_error(*db) << ": " << path};
         }
     }
     {
@@ -114,7 +114,7 @@ StmtPtr prepare(sqlite3& db, string_view sql)
     StmtPtr ptr{stmt, sqlite3_finalize};
     if (rc != SQLITE_OK) {
         throw DatabaseException{err_msg()
-                                << "sqlite3_prepare_v2: "sv << last_error(db) << ": "sv << sql};
+                                << "sqlite3_prepare_v2: " << last_error(db) << ": " << sql};
     }
     return ptr;
 }
@@ -130,7 +130,7 @@ bool step(sqlite3_stmt& stmt)
     case SQLITE_DONE:
         return false;
     default:
-        throw DatabaseException{err_msg() << "sqlite3_step: "sv << last_error(stmt)};
+        throw DatabaseException{err_msg() << "sqlite3_step: " << last_error(stmt)};
         break;
     }
 }
@@ -139,7 +139,7 @@ void bind(sqlite3_stmt& stmt, int col, nullptr_t)
 {
     int rc{sqlite3_bind_null(&stmt, col)};
     if (rc != SQLITE_OK) {
-        throw DatabaseException{err_msg() << "sqlite3_bind_null: "sv << last_error(stmt)};
+        throw DatabaseException{err_msg() << "sqlite3_bind_null: " << last_error(stmt)};
     }
 }
 

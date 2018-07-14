@@ -73,18 +73,18 @@ void Instr::to_dsv(ostream& os, char delim) const
 
 void Instr::to_json(ostream& os) const
 {
-    os << "{\"symbol\":\""sv << symbol_           //
-       << "\",\"display\":\""sv << display_       //
-       << "\",\"base_asset\":\""sv << base_asset_ //
-       << "\",\"term_ccy\":\""sv << term_ccy_     //
-       << "\",\"lot_numer\":"sv << lot_numer_     //
-       << ",\"lot_denom\":"sv << lot_denom_       //
-       << ",\"tick_numer\":"sv << tick_numer_     //
-       << ",\"tick_denom\":"sv << tick_denom_     //
-       << ",\"pip_dp\":"sv << pip_dp_             //
-       << ",\"min_lots\":"sv << min_lots_         //
-       << ",\"max_lots\":"sv << max_lots_         //
-       << "}"sv;
+    os << "{\"symbol\":\"" << symbol_           //
+       << "\",\"display\":\"" << display_       //
+       << "\",\"base_asset\":\"" << base_asset_ //
+       << "\",\"term_ccy\":\"" << term_ccy_     //
+       << "\",\"lot_numer\":" << lot_numer_     //
+       << ",\"lot_denom\":" << lot_denom_       //
+       << ",\"tick_numer\":" << tick_numer_     //
+       << ",\"tick_denom\":" << tick_denom_     //
+       << ",\"pip_dp\":" << pip_dp_             //
+       << ",\"min_lots\":" << min_lots_         //
+       << ",\"max_lots\":" << max_lots_         //
+       << "}";
 }
 
 } // namespace fin

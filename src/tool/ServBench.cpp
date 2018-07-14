@@ -268,7 +268,7 @@ int main(int argc, char* argv[])
         fflush(stderr);
         ret = 0;
     } catch (const exception& e) {
-        SWIRLY_ERROR << "exception: "sv << e.what();
+        SWIRLY_ERROR << "exception: " << e.what();
     }
     return ret;
 }

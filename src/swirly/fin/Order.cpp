@@ -38,13 +38,13 @@ void Order::to_dsv(ostream& os, char delim) const
     if (settl_day_ != 0_jd) {
         osj << jd_to_iso(settl_day_);
     } else {
-        osj << ""sv;
+        osj << "";
     }
     osj << id_;
     if (!ref_.empty()) {
         osj << ref_;
     } else {
-        osj << ""sv;
+        osj << "";
     }
     osj << state_     //
         << side_      //
@@ -57,13 +57,13 @@ void Order::to_dsv(ostream& os, char delim) const
         osj << last_lots_ //
             << last_ticks_;
     } else {
-        osj << ""sv
-            << ""sv;
+        osj << ""
+            << "";
     }
     if (min_lots_ != 0_lts) {
         osj << min_lots_;
     } else {
-        osj << ""sv;
+        osj << "";
     }
     osj << created_ //
         << modified_;
@@ -71,43 +71,43 @@ void Order::to_dsv(ostream& os, char delim) const
 
 void Order::to_json(ostream& os) const
 {
-    os << "{\"accnt\":\""sv << accnt_         //
-       << "\",\"market_id\":"sv << market_id_ //
-       << ",\"instr\":\""sv << instr_         //
-       << "\",\"settl_date\":"sv;
+    os << "{\"accnt\":\"" << accnt_         //
+       << "\",\"market_id\":" << market_id_ //
+       << ",\"instr\":\"" << instr_         //
+       << "\",\"settl_date\":";
     if (settl_day_ != 0_jd) {
         os << jd_to_iso(settl_day_);
     } else {
-        os << "null"sv;
+        os << "null";
     }
-    os << ",\"id\":"sv << id_ //
-       << ",\"ref\":"sv;
+    os << ",\"id\":" << id_ //
+       << ",\"ref\":";
     if (!ref_.empty()) {
         os << '"' << ref_ << '"';
     } else {
-        os << "null"sv;
+        os << "null";
     }
-    os << ",\"state\":\""sv << state_       //
-       << "\",\"side\":\""sv << side_       //
-       << "\",\"lots\":"sv << lots_         //
-       << ",\"ticks\":"sv << ticks_         //
-       << ",\"resd_lots\":"sv << resd_lots_ //
-       << ",\"exec_lots\":"sv << exec_lots_ //
-       << ",\"exec_cost\":"sv << exec_cost_;
+    os << ",\"state\":\"" << state_       //
+       << "\",\"side\":\"" << side_       //
+       << "\",\"lots\":" << lots_         //
+       << ",\"ticks\":" << ticks_         //
+       << ",\"resd_lots\":" << resd_lots_ //
+       << ",\"exec_lots\":" << exec_lots_ //
+       << ",\"exec_cost\":" << exec_cost_;
     if (last_lots_ != 0_lts) {
-        os << ",\"last_lots\":"sv << last_lots_ //
-           << ",\"last_ticks\":"sv << last_ticks_;
+        os << ",\"last_lots\":" << last_lots_ //
+           << ",\"last_ticks\":" << last_ticks_;
     } else {
-        os << ",\"last_lots\":null,\"last_ticks\":null"sv;
+        os << ",\"last_lots\":null,\"last_ticks\":null";
     }
-    os << ",\"min_lots\":"sv;
+    os << ",\"min_lots\":";
     if (min_lots_ != 0_lts) {
         os << min_lots_;
     } else {
-        os << "null"sv;
+        os << "null";
     }
-    os << ",\"created\":"sv << created_   //
-       << ",\"modified\":"sv << modified_ //
+    os << ",\"created\":" << created_   //
+       << ",\"modified\":" << modified_ //
        << '}';
 }
 

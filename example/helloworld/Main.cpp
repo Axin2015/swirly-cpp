@@ -20,6 +20,6 @@ using namespace swirly;
 
 int main(int argc, char* argv[])
 {
-    SWIRLY_INFO << "Hello, World!"sv;
+    SWIRLY_INFO << "Hello, World!";
     return 0;
 }

@@ -39,7 +39,7 @@ void to_json_levels(LevelSet::ConstIterator it, LevelSet::ConstIterator end, ost
             os << fn(*it);
             ++it;
         } else {
-            os << "null"sv;
+            os << "null";
         }
     }
 }
@@ -57,7 +57,7 @@ void Market::to_dsv(ostream& os, char delim) const
     if (settl_day_ != 0_jd) {
         osj << jd_to_iso(settl_day_);
     } else {
-        osj << ""sv;
+        osj << "";
     }
     osj << state_;
     if (last_lots_ != 0_lts) {
@@ -65,54 +65,54 @@ void Market::to_dsv(ostream& os, char delim) const
             << last_ticks_ //
             << last_time_;
     } else {
-        osj << ""sv
-            << ""sv
-            << ""sv;
+        osj << ""
+            << ""
+            << "";
     }
     osj << max_id_;
 }
 
 void Market::to_json(ostream& os) const
 {
-    os << "{\"id\":"sv << id_         //
-       << ",\"instr\":\""sv << instr_ //
-       << "\",\"settl_date\":"sv;
+    os << "{\"id\":" << id_         //
+       << ",\"instr\":\"" << instr_ //
+       << "\",\"settl_date\":";
     if (settl_day_ != 0_jd) {
         os << jd_to_iso(settl_day_);
     } else {
-        os << "null"sv;
+        os << "null";
     }
-    os << ",\"state\":"sv << state_;
+    os << ",\"state\":" << state_;
     if (last_lots_ != 0_lts) {
-        os << ",\"last_lots\":"sv << last_lots_   //
-           << ",\"last_ticks\":"sv << last_ticks_ //
-           << ",\"last_time\":"sv << last_time_;
+        os << ",\"last_lots\":" << last_lots_   //
+           << ",\"last_ticks\":" << last_ticks_ //
+           << ",\"last_time\":" << last_time_;
     } else {
-        os << ",\"last_lots\":null,\"last_ticks\":null,\"last_time\":null"sv;
+        os << ",\"last_lots\":null,\"last_ticks\":null,\"last_time\":null";
     }
 
     const auto& bid_levels = bid_side_.levels();
-    os << ",\"bid_ticks\":["sv;
+    os << ",\"bid_ticks\":[";
     to_json_levels(bid_levels.begin(), bid_levels.end(), os,
                    [](const auto& level) { return level.ticks(); });
-    os << "],\"bid_lots\":["sv;
+    os << "],\"bid_lots\":[";
     to_json_levels(bid_levels.begin(), bid_levels.end(), os,
                    [](const auto& level) { return level.lots(); });
-    os << "],\"bid_count\":["sv;
+    os << "],\"bid_count\":[";
     to_json_levels(bid_levels.begin(), bid_levels.end(), os,
                    [](const auto& level) { return level.count(); });
 
     const auto& offer_levels = offer_side_.levels();
-    os << "],\"offer_ticks\":["sv;
+    os << "],\"offer_ticks\":[";
     to_json_levels(offer_levels.begin(), offer_levels.end(), os,
                    [](const auto& level) { return level.ticks(); });
-    os << "],\"offer_lots\":["sv;
+    os << "],\"offer_lots\":[";
     to_json_levels(offer_levels.begin(), offer_levels.end(), os,
                    [](const auto& level) { return level.lots(); });
-    os << "],\"offer_count\":["sv;
+    os << "],\"offer_count\":[";
     to_json_levels(offer_levels.begin(), offer_levels.end(), os,
                    [](const auto& level) { return level.count(); });
-    os << "]}"sv;
+    os << "]}";
 }
 
 } // namespace fin

@@ -32,7 +32,7 @@ DbPtr open_db(const char* host, const char* user, const char* pass, const char* 
         throw std::bad_alloc{};
     }
     if (!mysql_real_connect(db.get(), host, user, pass, dbname, 0, unix_socket, client_flag)) {
-        throw DatabaseException{err_msg() << "mysql_real_connect: "sv << mysql_error(db.get())};
+        throw DatabaseException{err_msg() << "mysql_real_connect: " << mysql_error(db.get())};
     }
     return db;
 }
@@ -48,7 +48,7 @@ DbPtr open_db(const char* host, const char* user, const char* pass, const char* 
     mysql_options(db.get(), MYSQL_OPT_PROTOCOL, &prot);
 
     if (!mysql_real_connect(db.get(), host, user, pass, dbname, port, nullptr, client_flag)) {
-        throw DatabaseException{err_msg() << "mysql_real_connect: "sv << mysql_error(db.get())};
+        throw DatabaseException{err_msg() << "mysql_real_connect: " << mysql_error(db.get())};
     }
     return db;
 }
@@ -56,7 +56,7 @@ DbPtr open_db(const char* host, const char* user, const char* pass, const char* 
 void query(MYSQL& db, std::string_view sql)
 {
     if (mysql_real_query(&db, sql.data(), sql.size()) != 0) {
-        throw DatabaseException{err_msg() << "mysql_real_query: "sv << mysql_error(&db)};
+        throw DatabaseException{err_msg() << "mysql_real_query: " << mysql_error(&db)};
     }
 }
 
@@ -64,7 +64,7 @@ ResPtr store_result(MYSQL& db)
 {
     ResPtr res{mysql_store_result(&db), mysql_free_result};
     if (!res) {
-        throw DatabaseException{err_msg() << "mysql_store_result: "sv << mysql_error(&db)};
+        throw DatabaseException{err_msg() << "mysql_store_result: " << mysql_error(&db)};
     }
     return res;
 }
@@ -73,11 +73,11 @@ StmtPtr prepare(MYSQL& db, std::string_view sql)
 {
     StmtPtr stmt{mysql_stmt_init(&db), mysql_stmt_close};
     if (!stmt) {
-        throw DatabaseException{err_msg() << "mysql_stmt_init: "sv << mysql_error(&db)};
+        throw DatabaseException{err_msg() << "mysql_stmt_init: " << mysql_error(&db)};
     }
     if (mysql_stmt_prepare(stmt.get(), sql.data(), sql.size()) != 0) {
         throw DatabaseException{err_msg()
-                                << "mysql_stmt_prepare: "sv << mysql_stmt_error(stmt.get())};
+                                << "mysql_stmt_prepare: " << mysql_stmt_error(stmt.get())};
     }
     return stmt;
 }
@@ -85,7 +85,7 @@ StmtPtr prepare(MYSQL& db, std::string_view sql)
 void execute(MYSQL_STMT& stmt)
 {
     if (mysql_stmt_execute(&stmt) != 0) {
-        throw DatabaseException{err_msg() << "mysql_stmt_execute: "sv << mysql_stmt_error(&stmt)};
+        throw DatabaseException{err_msg() << "mysql_stmt_execute: " << mysql_stmt_error(&stmt)};
     }
 }
 ResPtr result_metadata(MYSQL_STMT& stmt)
@@ -93,7 +93,7 @@ ResPtr result_metadata(MYSQL_STMT& stmt)
     ResPtr res{mysql_stmt_result_metadata(&stmt), mysql_free_result};
     if (!res) {
         throw DatabaseException{err_msg()
-                                << "mysql_stmt_result_metadata: "sv << mysql_stmt_error(&stmt)};
+                                << "mysql_stmt_result_metadata: " << mysql_stmt_error(&stmt)};
     }
     return res;
 }
@@ -101,16 +101,14 @@ ResPtr result_metadata(MYSQL_STMT& stmt)
 void bind_param(MYSQL_STMT& stmt, MYSQL_BIND* bind)
 {
     if (mysql_stmt_bind_param(&stmt, bind) != 0) {
-        throw DatabaseException{err_msg()
-                                << "mysql_stmt_bind_param: "sv << mysql_stmt_error(&stmt)};
+        throw DatabaseException{err_msg() << "mysql_stmt_bind_param: " << mysql_stmt_error(&stmt)};
     }
 }
 
 void bind_result(MYSQL_STMT& stmt, MYSQL_BIND* bind)
 {
     if (mysql_stmt_bind_result(&stmt, bind) != 0) {
-        throw DatabaseException{err_msg()
-                                << "mysql_stmt_bind_result: "sv << mysql_stmt_error(&stmt)};
+        throw DatabaseException{err_msg() << "mysql_stmt_bind_result: " << mysql_stmt_error(&stmt)};
     }
 }
 
@@ -127,10 +125,10 @@ bool fetch(MYSQL_STMT& stmt)
     case MYSQL_NO_DATA:
         return false;
     case MYSQL_DATA_TRUNCATED:
-        throw DatabaseException{err_msg() << "mysql_stmt_fetch: data truncated"sv};
+        throw DatabaseException{err_msg() << "mysql_stmt_fetch: data truncated"};
     case 1:
     default:
-        throw DatabaseException{err_msg() << "mysql_stmt_fetch: "sv << mysql_stmt_error(&stmt)};
+        throw DatabaseException{err_msg() << "mysql_stmt_fetch: " << mysql_stmt_error(&stmt)};
     }
     return true;
 }

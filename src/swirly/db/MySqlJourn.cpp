@@ -73,7 +73,7 @@ void MySqlJourn::do_rollback() noexcept
     try {
         query(*db_, RollbackSql);
     } catch (const std::exception& e) {
-        SWIRLY_ERROR << "failed to rollback transaction: "sv << e.what();
+        SWIRLY_ERROR << "failed to rollback transaction: " << e.what();
     }
 }
 
@@ -146,7 +146,7 @@ void MySqlJourn::on_create_exec(const CreateExec& body)
     bind_param(stmt, &param[0]);
 
     execute(stmt);
-    SWIRLY_DEBUG << "affected rows: "sv << affected_rows(stmt);
+    SWIRLY_DEBUG << "affected rows: " << affected_rows(stmt);
 }
 
 void MySqlJourn::on_archive_trade(const ArchiveTrade& body)

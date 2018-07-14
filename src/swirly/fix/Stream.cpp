@@ -96,7 +96,7 @@ void FixStream::reset(FixVersion ver)
 {
     buf_.reset();
     swirly::reset(*this);
-    *this << "8=FIX."sv << ver.major << '.' << ver.minor << "\19=0000\1"sv;
+    *this << "8=FIX." << ver.major << '.' << ver.minor << "\19=0000\1";
     bloff_ = pcount();
 }
 
