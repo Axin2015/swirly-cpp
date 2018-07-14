@@ -110,6 +110,8 @@ find_program(RAGEL_EXECUTABLE ragel)
 set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost 1.60 REQUIRED COMPONENTS date_time unit_test_framework)
 
+find_package(FlatBuffers REQUIRED)
+
 # The sqlite3_errstr() function was added in 3.7.15.
 find_package(SQLite3 3.7.15 REQUIRED)
 find_package(MySQL 5.5)
@@ -141,10 +143,12 @@ if(DOXYGEN_FOUND)
   add_dependencies(doc image)
 endif()
 
+
 include_directories(SYSTEM
   "${Boost_INCLUDE_DIRS}"
-  "${PROJECT_SOURCE_DIR}/flatbuffers/include"
+  "${FLATBUFFERS_INCLUDE_DIRS}"
   "${PROJECT_SOURCE_DIR}/HdrHistogram_c/src")
+
 
 include_directories(
   "${PROJECT_SOURCE_DIR}/src"
@@ -199,7 +203,6 @@ if (CLANG_TIDY)
         -p "${PROJECT_BINARY_DIR}")
 endif()
 
-add_subdirectory(flatbuffers)
 add_subdirectory(HdrHistogram_c)
 add_subdirectory(etc)
 add_subdirectory(image)
