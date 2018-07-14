@@ -34,7 +34,7 @@ target_link_libraries(swirly-db-to-json ${swirly_db_LIBRARY})
 install(TARGETS swirly-db-to-json DESTINATION bin COMPONENT program)
 
 add_executable(swirly-echo-serv EchoServ.cpp)
-target_link_libraries(swirly-echo-serv ${swirly_app_LIBRARY} ${swirly_fix_LIBRARY})
+target_link_libraries(swirly-echo-serv ${swirly_fix_LIBRARY})
 install(TARGETS swirly-echo-serv DESTINATION bin COMPONENT program)
 
 add_executable(swirly-queue-bench QueueBench.cpp)
