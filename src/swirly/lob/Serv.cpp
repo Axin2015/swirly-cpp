@@ -220,7 +220,8 @@ struct Serv::Impl {
 
         // Avoid allocating position when there are no matches.
         PosnPtr posn;
-        if (!matches_.empty()) {
+        const bool have_matches = !matches_.empty();
+        if (have_matches) {
             // Avoid allocating position when there are no matches.
             // N.B. before commit phase, because this may fail.
             posn = sess.posn(market.id(), market.instr(), market.settl_day());
@@ -257,7 +258,7 @@ struct Serv::Impl {
         sess.push_exec_front(exec);
 
         // Commit matches.
-        if (!matches_.empty()) {
+        if (have_matches) {
             assert(posn);
             commit_matches(sess, market, *posn, now);
         }
@@ -308,7 +309,7 @@ struct Serv::Impl {
                 || lots > order.lots()      //
                 || lots < order.exec_lots() //
                 || lots < order.min_lots()) {
-                throw new InvalidLotsException{err_msg() << "invalid lots '" << lots << '\''};
+                throw InvalidLotsException{err_msg() << "invalid lots '" << lots << '\''};
             }
             auto exec = new_exec(order, market.alloc_id(), now);
             exec->revise(lots);
@@ -575,9 +576,9 @@ struct Serv::Impl {
             }
             resp.insert_exec(match.taker_trade);
 
-            matches_.push_back(move(match));
             execs_.push_back(match.maker_trade);
             execs_.push_back(match.taker_trade);
+            matches_.push_back(move(match));
         }
 
         if (!matches_.empty()) {
@@ -661,7 +662,7 @@ struct Serv::Impl {
             || lots > order.lots()      //
             || lots < order.exec_lots() //
             || lots < order.min_lots()) {
-            throw new InvalidLotsException{err_msg() << "invalid lots '" << lots << '\''};
+            throw InvalidLotsException{err_msg() << "invalid lots '" << lots << '\''};
         }
         auto exec = new_exec(order, market.alloc_id(), now);
         exec->revise(lots);

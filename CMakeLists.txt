@@ -199,7 +199,6 @@ if (CLANG_TIDY)
   add_custom_target(clang-tidy COMMAND "${CLANG_TIDY}"
         -quiet
         -j ${CORE_COUNT}
-        -checks "*,-readability-braces-around-statements,-fuchsia-*,-google-*,-hicpp-braces-*,-readability-implicit-bool-conversion,-cppcoreguidelines-pro-*"
         -p "${PROJECT_BINARY_DIR}")
 endif()
 
