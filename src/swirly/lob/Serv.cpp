@@ -326,6 +326,9 @@ struct Serv::Impl {
             auto it = sess.orders().find(market.id(), exec->order_id());
             assert(it != sess.orders().end());
             market.revise_order(*it, lots, now);
+            if (it->done()) {
+                sess.remove_order(*it);
+            }
             sess.push_exec_front(exec);
         }
     }
@@ -676,6 +679,9 @@ struct Serv::Impl {
         // Commit phase.
 
         market.revise_order(order, lots, now);
+        if (order.done()) {
+            sess.remove_order(order);
+        }
         sess.push_exec_front(exec);
     }
     void do_cancel_order(Sess& sess, Market& market, Order& order, Time now, Response& resp)
