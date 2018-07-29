@@ -1,0 +1,59 @@
+image: marayl/toolchain:latest
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+stages:
+  - build
+
+build-debug-clang:
+  stage: build
+  before_script:
+    - export CMAKE_BUILD_TYPE=DEBUG
+    - export CMAKE_C_COMPILER=clang
+    - export CMAKE_CXX_COMPILER=clang++
+    - export SWIRLY_BUILD_SHARED=ON
+    - mkdir -p build
+    - cd build
+    - cmake -G "Unix Makefiles" ../
+  script:
+    - make -j all test
+
+build-release-clang:
+  stage: build
+  before_script:
+    - export CMAKE_BUILD_TYPE=RELEASE
+    - export CMAKE_C_COMPILER=clang
+    - export CMAKE_CXX_COMPILER=clang++
+    - export SWIRLY_BUILD_SHARED=ON
+    - mkdir -p build
+    - cd build
+    - cmake -G "Unix Makefiles" ../
+  script:
+    - make -j all test
+
+build-debug-gcc:
+  stage: build
+  before_script:
+    - export CMAKE_BUILD_TYPE=DEBUG
+    - export CMAKE_C_COMPILER=gcc
+    - export CMAKE_CXX_COMPILER=g++
+    - export SWIRLY_BUILD_SHARED=ON
+    - mkdir -p build
+    - cd build
+    - cmake -G "Unix Makefiles" ../
+  script:
+    - make -j all test
+
+build-release-gcc:
+  stage: build
+  before_script:
+    - export CMAKE_BUILD_TYPE=RELEASE
+    - export CMAKE_C_COMPILER=gcc
+    - export CMAKE_CXX_COMPILER=g++
+    - export SWIRLY_BUILD_SHARED=ON
+    - mkdir -p build
+    - cd build
+    - cmake -G "Unix Makefiles" ../
+  script:
+    - make -j all test
