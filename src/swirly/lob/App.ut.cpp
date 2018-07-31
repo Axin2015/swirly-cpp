@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Serv.hpp"
+#include "App.hpp"
 
 #include <swirly/lob/Response.hpp>
 #include <swirly/lob/Sess.hpp>
@@ -46,24 +46,24 @@ class SWIRLY_API TestModel : public swirly::TestModel {
     }
 };
 
-struct ServFixture {
-    ServFixture() { serv.load(TestModel{}, Now); }
+struct AppFixture {
+    AppFixture() { app.load(TestModel{}, Now); }
     MsgQueue mq{1 << 10};
-    Serv serv{mq, 1 << 4};
+    App app{mq, 1 << 4};
 };
 
 } // namespace
 
 namespace utf = boost::unit_test;
 
-BOOST_AUTO_TEST_SUITE(ServSuite)
+BOOST_AUTO_TEST_SUITE(AppSuite)
 
-BOOST_FIXTURE_TEST_CASE(ServAssets, ServFixture)
+BOOST_FIXTURE_TEST_CASE(AppAssets, AppFixture)
 {
-    BOOST_TEST(distance(serv.assets().begin(), serv.assets().end()) == 24);
+    BOOST_TEST(distance(app.assets().begin(), app.assets().end()) == 24);
 
-    auto it = serv.assets().find("CHF"sv);
-    BOOST_TEST(it != serv.assets().end());
+    auto it = app.assets().find("CHF"sv);
+    BOOST_TEST(it != app.assets().end());
     BOOST_TEST(it->id() == 1_id32);
     BOOST_TEST(it->symbol() == "CHF"sv);
     BOOST_TEST(it->display() == "Switzerland, Francs"sv);
@@ -71,12 +71,12 @@ BOOST_FIXTURE_TEST_CASE(ServAssets, ServFixture)
     BOOST_TEST(it->type() == AssetType::Ccy);
 }
 
-BOOST_FIXTURE_TEST_CASE(ServInstrs, ServFixture, *utf::tolerance(0.0000001))
+BOOST_FIXTURE_TEST_CASE(AppInstrs, AppFixture, *utf::tolerance(0.0000001))
 {
-    BOOST_TEST(distance(serv.instrs().begin(), serv.instrs().end()) == 21);
+    BOOST_TEST(distance(app.instrs().begin(), app.instrs().end()) == 21);
 
-    auto it = serv.instrs().find("EURUSD"sv);
-    BOOST_TEST(it != serv.instrs().end());
+    auto it = app.instrs().find("EURUSD"sv);
+    BOOST_TEST(it != app.instrs().end());
     BOOST_TEST(it->id() == 1_id32);
     BOOST_TEST(it->symbol() == "EURUSD"sv);
     BOOST_TEST(it->display() == "EURUSD"sv);
@@ -95,12 +95,12 @@ BOOST_FIXTURE_TEST_CASE(ServInstrs, ServFixture, *utf::tolerance(0.0000001))
     BOOST_TEST(it->max_lots() == 10_lts);
 }
 
-BOOST_FIXTURE_TEST_CASE(ServMarkets, ServFixture)
+BOOST_FIXTURE_TEST_CASE(AppMarkets, AppFixture)
 {
-    BOOST_TEST(distance(serv.markets().begin(), serv.markets().end()) == 1);
+    BOOST_TEST(distance(app.markets().begin(), app.markets().end()) == 1);
 
-    auto it = serv.markets().find(MarketId);
-    BOOST_TEST(it != serv.markets().end());
+    auto it = app.markets().find(MarketId);
+    BOOST_TEST(it != app.markets().end());
     BOOST_TEST(it->id() == MarketId);
 
     BOOST_TEST(it->instr() == "EURUSD"sv);
@@ -108,12 +108,12 @@ BOOST_FIXTURE_TEST_CASE(ServMarkets, ServFixture)
     BOOST_TEST(it->state() == 0x1U);
 }
 
-BOOST_FIXTURE_TEST_CASE(ServMarket, ServFixture)
+BOOST_FIXTURE_TEST_CASE(AppMarket, AppFixture)
 {
     // Not found.
-    BOOST_CHECK_THROW(serv.market(1_id64), MarketNotFoundException);
+    BOOST_CHECK_THROW(app.market(1_id64), MarketNotFoundException);
 
-    auto& market = serv.market(MarketId);
+    auto& market = app.market(MarketId);
     BOOST_TEST(market.id() == MarketId);
 
     BOOST_TEST(market.instr() == "EURUSD"sv);
@@ -121,15 +121,15 @@ BOOST_FIXTURE_TEST_CASE(ServMarket, ServFixture)
     BOOST_TEST(market.state() == 0x1U);
 }
 
-BOOST_FIXTURE_TEST_CASE(ServCreateMarket, ServFixture)
+BOOST_FIXTURE_TEST_CASE(AppCreateMarket, AppFixture)
 {
-    const Instr& instr = serv.instr("USDJPY"sv);
+    const Instr& instr = app.instr("USDJPY"sv);
     const auto market_id = to_market_id(instr.id(), SettlDay);
 
     // Settl-day before bus-day.
-    BOOST_CHECK_THROW(serv.create_market(instr, Today - 1_jd, 0x1, Now), InvalidException);
+    BOOST_CHECK_THROW(app.create_market(instr, Today - 1_jd, 0x1, Now), InvalidException);
 
-    auto& market = serv.create_market(instr, SettlDay, 0x1, Now);
+    auto& market = app.create_market(instr, SettlDay, 0x1, Now);
 
     BOOST_TEST(market.id() == market_id);
 
@@ -137,22 +137,22 @@ BOOST_FIXTURE_TEST_CASE(ServCreateMarket, ServFixture)
     BOOST_TEST(market.settl_day() == SettlDay);
     BOOST_TEST(market.state() == 0x1U);
 
-    BOOST_TEST(distance(serv.markets().begin(), serv.markets().end()) == 2);
-    auto it = serv.markets().find(market_id);
-    BOOST_TEST(it != serv.markets().end());
+    BOOST_TEST(distance(app.markets().begin(), app.markets().end()) == 2);
+    auto it = app.markets().find(market_id);
+    BOOST_TEST(it != app.markets().end());
     BOOST_TEST(&*it == &market);
 
     // Already exists.
-    BOOST_CHECK_THROW(serv.create_market(instr, SettlDay, 0x1, Now), AlreadyExistsException);
+    BOOST_CHECK_THROW(app.create_market(instr, SettlDay, 0x1, Now), AlreadyExistsException);
 }
 
-BOOST_FIXTURE_TEST_CASE(ServUpdateMarket, ServFixture)
+BOOST_FIXTURE_TEST_CASE(AppUpdateMarket, AppFixture)
 {
-    const Instr& instr = serv.instr("USDJPY"sv);
+    const Instr& instr = app.instr("USDJPY"sv);
     const auto market_id = to_market_id(instr.id(), SettlDay);
-    auto& market = serv.create_market(instr, SettlDay, 0x1, Now);
+    auto& market = app.create_market(instr, SettlDay, 0x1, Now);
 
-    serv.update_market(market, 0x2, Now);
+    app.update_market(market, 0x2, Now);
 
     BOOST_TEST(market.id() == market_id);
 
@@ -161,15 +161,15 @@ BOOST_FIXTURE_TEST_CASE(ServUpdateMarket, ServFixture)
     BOOST_TEST(market.state() == 0x2U);
 }
 
-BOOST_FIXTURE_TEST_CASE(ServCreateOrder, ServFixture)
+BOOST_FIXTURE_TEST_CASE(AppCreateOrder, AppFixture)
 {
-    auto& sess = serv.sess("MARAYL"sv);
-    const Instr& instr = serv.instr("EURUSD"sv);
+    auto& sess = app.sess("MARAYL"sv);
+    const Instr& instr = app.instr("EURUSD"sv);
     const auto market_id = to_market_id(instr.id(), SettlDay);
-    auto& market = serv.market(market_id);
+    auto& market = app.market(market_id);
 
     Response resp;
-    serv.create_order(sess, market, ""sv, Side::Buy, 5_lts, 12345_tks, 1_lts, Now, resp);
+    app.create_order(sess, market, ""sv, Side::Buy, 5_lts, 12345_tks, 1_lts, Now, resp);
 
     BOOST_TEST(resp.orders().size() == 1U);
     BOOST_TEST(resp.execs().size() == 1U);

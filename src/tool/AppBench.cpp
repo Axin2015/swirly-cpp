@@ -20,8 +20,8 @@
 #include <swirly/db/SqliteJourn.hpp>
 #include <swirly/db/SqliteModel.hpp>
 
+#include <swirly/lob/App.hpp>
 #include <swirly/lob/Response.hpp>
-#include <swirly/lob/Serv.hpp>
 #include <swirly/lob/Sess.hpp>
 #include <swirly/lob/Test.hpp>
 
@@ -45,22 +45,22 @@ using namespace swirly;
 
 namespace {
 
-const Market& create_market(Serv& serv, Symbol instr_symbol, JDay settl_day, MarketState state,
+const Market& create_market(App& app, Symbol instr_symbol, JDay settl_day, MarketState state,
                             Time now)
 {
-    const auto& instr = serv.instr(instr_symbol);
+    const auto& instr = app.instr(instr_symbol);
     const auto market_id = to_market_id(instr.id(), settl_day);
-    auto it = serv.markets().find(market_id);
-    if (it != serv.markets().end()) {
+    auto it = app.markets().find(market_id);
+    if (it != app.markets().end()) {
         return *it;
     }
-    return serv.create_market(instr, settl_day, state, now);
+    return app.create_market(instr, settl_day, state, now);
 }
 
 class Archiver {
   public:
-    explicit Archiver(Serv& serv) noexcept
-    : serv_(serv)
+    explicit Archiver(App& app) noexcept
+    : app_(app)
     {
     }
     void operator()(const Sess& sess, Id64 market_id, Time now)
@@ -71,11 +71,11 @@ class Archiver {
                 ids_.push_back(trade.id());
             }
         }
-        serv_.archive_trade(sess, market_id, ids_, now);
+        app_.archive_trade(sess, market_id, ids_, now);
     }
 
   private:
-    Serv& serv_;
+    App& app_;
     vector<Id64> ids_;
 };
 
@@ -135,8 +135,8 @@ int main(int argc, char* argv[])
         const auto start_time = UnixClock::now();
 
         MsgQueue mq{1 << 10};
-        Serv serv{mq, 1 << 4};
-        serv.load(*model, start_time);
+        App app{mq, 1 << 4};
+        app.load(*model, start_time);
         model = nullptr;
 
         NullJourn journ;
@@ -151,17 +151,17 @@ int main(int argc, char* argv[])
         };
         AgentThread journ_thread{journ_agent, ThreadConfig{"journ"s}};
 
-        auto& market = create_market(serv, "EURUSD"sv, bus_day(start_time), 0, start_time);
+        auto& market = create_market(app, "EURUSD"sv, bus_day(start_time), 0, start_time);
 
-        auto& eddayl = serv.sess("EDDAYL"sv);
-        auto& gosayl = serv.sess("GOSAYL"sv);
-        auto& marayl = serv.sess("MARAYL"sv);
-        auto& pipayl = serv.sess("PIPAYL"sv);
+        auto& eddayl = app.sess("EDDAYL"sv);
+        auto& gosayl = app.sess("GOSAYL"sv);
+        auto& marayl = app.sess("MARAYL"sv);
+        auto& pipayl = app.sess("PIPAYL"sv);
 
         HdrHistogram maker{1, 1'000'000, 5};
         HdrHistogram taker{1, 1'000'000, 5};
 
-        Archiver arch{serv};
+        Archiver arch{app};
         Response resp;
         for (int i = 0; i < 1'001'000; ++i) {
 
@@ -175,80 +175,80 @@ int main(int argc, char* argv[])
             {
                 HdrRecorder tr{maker};
                 resp.clear();
-                serv.create_order(gosayl, market, ""sv, Side::Sell, 10_lts, 12348_tks, 1_lts,
-                                  start_time, resp);
+                app.create_order(gosayl, market, ""sv, Side::Sell, 10_lts, 12348_tks, 1_lts,
+                                 start_time, resp);
             }
             {
                 HdrRecorder tr{maker};
                 resp.clear();
-                serv.create_order(marayl, market, ""sv, Side::Sell, 10_lts, 12348_tks, 1_lts,
-                                  start_time, resp);
+                app.create_order(marayl, market, ""sv, Side::Sell, 10_lts, 12348_tks, 1_lts,
+                                 start_time, resp);
             }
             {
                 HdrRecorder tr{maker};
                 resp.clear();
-                serv.create_order(gosayl, market, ""sv, Side::Sell, 10_lts, 12347_tks, 1_lts,
-                                  start_time, resp);
+                app.create_order(gosayl, market, ""sv, Side::Sell, 10_lts, 12347_tks, 1_lts,
+                                 start_time, resp);
             }
             {
                 HdrRecorder tr{maker};
                 resp.clear();
-                serv.create_order(marayl, market, ""sv, Side::Sell, 5_lts, 12347_tks, 1_lts,
-                                  start_time, resp);
+                app.create_order(marayl, market, ""sv, Side::Sell, 5_lts, 12347_tks, 1_lts,
+                                 start_time, resp);
             }
             {
                 HdrRecorder tr{maker};
                 resp.clear();
-                serv.create_order(gosayl, market, ""sv, Side::Sell, 5_lts, 12346_tks, 1_lts,
-                                  start_time, resp);
+                app.create_order(gosayl, market, ""sv, Side::Sell, 5_lts, 12346_tks, 1_lts,
+                                 start_time, resp);
             }
 
             // Maker buy-side.
             {
                 HdrRecorder tr{maker};
                 resp.clear();
-                serv.create_order(marayl, market, ""sv, Side::Buy, 5_lts, 12344_tks, 1_lts,
-                                  start_time, resp);
+                app.create_order(marayl, market, ""sv, Side::Buy, 5_lts, 12344_tks, 1_lts,
+                                 start_time, resp);
             }
             {
                 HdrRecorder tr{maker};
                 resp.clear();
-                serv.create_order(gosayl, market, ""sv, Side::Buy, 5_lts, 12343_tks, 1_lts,
-                                  start_time, resp);
+                app.create_order(gosayl, market, ""sv, Side::Buy, 5_lts, 12343_tks, 1_lts,
+                                 start_time, resp);
             }
             {
                 HdrRecorder tr{maker};
                 resp.clear();
-                serv.create_order(marayl, market, ""sv, Side::Buy, 10_lts, 12343_tks, 1_lts,
-                                  start_time, resp);
+                app.create_order(marayl, market, ""sv, Side::Buy, 10_lts, 12343_tks, 1_lts,
+                                 start_time, resp);
             }
             {
                 HdrRecorder tr{maker};
                 resp.clear();
-                serv.create_order(gosayl, market, ""sv, Side::Buy, 10_lts, 12342_tks, 1_lts,
-                                  start_time, resp);
+                app.create_order(gosayl, market, ""sv, Side::Buy, 10_lts, 12342_tks, 1_lts,
+                                 start_time, resp);
             }
             {
                 HdrRecorder tr{maker};
                 resp.clear();
-                serv.create_order(marayl, market, ""sv, Side::Buy, 10_lts, 12342_tks, 1_lts,
-                                  start_time, resp);
+                app.create_order(marayl, market, ""sv, Side::Buy, 10_lts, 12342_tks, 1_lts,
+                                 start_time, resp);
             }
 
             // Taker sell-side.
             {
                 HdrRecorder tr{taker};
                 resp.clear();
-                serv.create_order(eddayl, market, ""sv, Side::Sell, 40_lts, 12342_tks, 1_lts,
-                                  start_time, resp);
+                app.create_order(eddayl, market, ""sv, Side::Sell, 40_lts, 12342_tks, 1_lts,
+                                 start_time, resp);
             }
 
             // Taker buy-side.
             {
                 HdrRecorder tr{taker};
                 resp.clear();
-                serv.create_order(pipayl, market, ""sv, Side::Buy, 40_lts, 12348_tks, 1_lts,
-                                  start_time, resp);
+                app.create_order(pipayl, market, ""sv, Side::Buy, 40_lts, 12348_tks, 1_lts,
+                                 start_time, resp);
             }
 
             arch(eddayl, market.id(), start_time);

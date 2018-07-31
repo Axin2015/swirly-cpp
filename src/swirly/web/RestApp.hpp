@@ -20,7 +20,7 @@
 #include <swirly/web/EntitySet.hpp>
 #include <swirly/web/Page.hpp>
 
-#include <swirly/lob/Serv.hpp>
+#include <swirly/lob/App.hpp>
 
 namespace swirly {
 inline namespace web {
@@ -28,7 +28,7 @@ inline namespace web {
 class SWIRLY_API RestApp {
   public:
     RestApp(MsgQueue& mq, std::size_t max_execs)
-    : serv_{mq, max_execs}
+    : app_{mq, max_execs}
     {
     }
     ~RestApp();
@@ -41,7 +41,7 @@ class SWIRLY_API RestApp {
     RestApp(RestApp&&);
     RestApp& operator=(RestApp&&);
 
-    void load(const Model& model, Time now) { serv_.load(model, now); }
+    void load(const Model& model, Time now) { app_.load(model, now); }
 
     void get_ref_data(EntitySet es, Time now, std::ostream& out) const;
 
@@ -110,7 +110,7 @@ class SWIRLY_API RestApp {
                       Time now);
 
   private:
-    Serv serv_;
+    App app_;
 };
 
 } // namespace web

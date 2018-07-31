@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_LOB_SERV_HPP
-#define SWIRLY_LOB_SERV_HPP
+#ifndef SWIRLY_LOB_APP_HPP
+#define SWIRLY_LOB_APP_HPP
 
 #include <swirly/fin/Asset.hpp>
 #include <swirly/fin/Instr.hpp>
@@ -44,19 +44,19 @@ class Sess;
 
 using TradePair = std::pair<ConstExecPtr, ConstExecPtr>;
 
-class SWIRLY_API Serv {
+class SWIRLY_API App {
   public:
-    Serv(MsgQueue& mq, std::size_t max_execs);
+    App(MsgQueue& mq, std::size_t max_execs);
 
-    ~Serv();
+    ~App();
 
     // Copy.
-    Serv(const Serv&) = delete;
-    Serv& operator=(const Serv&) = delete;
+    App(const App&) = delete;
+    App& operator=(const App&) = delete;
 
     // Move.
-    Serv(Serv&&);
-    Serv& operator=(Serv&&);
+    App(App&&);
+    App& operator=(App&&);
 
     void load(const Model& model, Time now);
 
@@ -141,4 +141,4 @@ class SWIRLY_API Serv {
 } // namespace lob
 } // namespace swirly
 
-#endif // SWIRLY_LOB_SERV_HPP
+#endif // SWIRLY_LOB_APP_HPP
