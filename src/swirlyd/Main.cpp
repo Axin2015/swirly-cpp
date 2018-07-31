@@ -19,7 +19,7 @@
 
 #include <swirly/db/DbCtx.hpp>
 
-#include <swirly/web/Rest.hpp>
+#include <swirly/web/RestApp.hpp>
 
 #include <swirly/fin/Journ.hpp>
 #include <swirly/fin/Model.hpp>
@@ -274,12 +274,12 @@ int main(int argc, char* argv[])
         } else {
             mq = MsgQueue{1 << 10};
         }
-        Rest rest{mq, max_execs};
+        RestApp rest_app{mq, max_execs};
         {
             Model& model = db_ctx.model();
-            rest.load(model, opts.start_time);
+            rest_app.load(model, opts.start_time);
         }
-        RestServ rest_serv{rest};
+        RestServ rest_serv{rest_app};
         Journ& journ = db_ctx.journ();
 
         EpollReactor reactor{1024};

@@ -27,9 +27,9 @@ else()
 endif()
 
 set(lib_SOURCES
+  App.cpp
   Match.cpp
   Response.cpp
-  Serv.cpp
   Sess.cpp
   Test.cpp)
 
@@ -56,8 +56,8 @@ foreach(file ${lib_SOURCES})
 endforeach()
 
 set(test_SOURCES
-  Response.ut.cpp
-  Serv.ut.cpp)
+  App.ut.cpp
+  Response.ut.cpp)
 
 add_executable(swirly-lob-test
   ${test_SOURCES}

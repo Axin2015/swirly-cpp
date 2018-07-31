@@ -40,7 +40,7 @@ set(lib_SOURCES
   Page.cpp
   Parser.cpp
   Request.cpp
-  Rest.cpp
+  RestApp.cpp
   RestBody.cpp
   Stream.cpp
   Types.cpp

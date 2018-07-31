@@ -25,21 +25,21 @@ inline namespace sys {
 /**
  * Passive TCP Server Socket. All state is in base class, so object can be sliced.
  */
-struct TcpSocketServ : Socket {
+struct TcpServSocket : Socket {
     using Transport = Tcp;
     using Endpoint = TcpEndpoint;
 
     using Socket::Socket;
 
-    TcpSocketServ(Transport trans, std::error_code& ec) noexcept
+    TcpServSocket(Transport trans, std::error_code& ec) noexcept
     : Socket{os::socket(trans, ec), trans.family()}
     {
     }
-    explicit TcpSocketServ(Transport trans)
+    explicit TcpServSocket(Transport trans)
     : Socket{os::socket(trans), trans.family()}
     {
     }
-    TcpSocketServ() noexcept = default;
+    TcpServSocket() noexcept = default;
 
     // Logically const.
     void get_sock_name(Endpoint& ep, std::error_code& ec) noexcept
@@ -63,21 +63,21 @@ struct TcpSocketServ : Socket {
 /**
  * Active TCP Client Socket. All state is in base class, so object can be sliced.
  */
-struct TcpSocketClnt : IoSocket {
+struct TcpClntSocket : IoSocket {
     using Transport = Tcp;
     using Endpoint = TcpEndpoint;
 
     using IoSocket::IoSocket;
 
-    TcpSocketClnt(Transport trans, std::error_code& ec) noexcept
+    TcpClntSocket(Transport trans, std::error_code& ec) noexcept
     : IoSocket{os::socket(trans, ec), trans.family()}
     {
     }
-    explicit TcpSocketClnt(Transport trans)
+    explicit TcpClntSocket(Transport trans)
     : IoSocket{os::socket(trans), trans.family()}
     {
     }
-    TcpSocketClnt() noexcept = default;
+    TcpClntSocket() noexcept = default;
 
     // Logically const.
     void get_sock_name(Endpoint& ep, std::error_code& ec) noexcept

@@ -29,13 +29,13 @@ namespace swirly {
 inline namespace web {
 class HttpRequest;
 class HttpStream;
-class Rest;
+class RestApp;
 } // namespace web
 
 class RestServ {
   public:
-    explicit RestServ(Rest& rest) noexcept
-    : rest_(rest)
+    explicit RestServ(RestApp& app) noexcept
+    : app_(app)
     {
     }
     ~RestServ();
@@ -67,7 +67,7 @@ class RestServ {
     void trade_request(const HttpRequest& req, Time now, HttpStream& os);
     void posn_request(const HttpRequest& req, Time now, HttpStream& os);
 
-    Rest& rest_;
+    RestApp& app_;
     bool match_method_{false};
     bool match_path_{false};
     Tokeniser path_;
