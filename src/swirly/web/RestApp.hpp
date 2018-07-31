@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_WEB_REST_HPP
-#define SWIRLY_WEB_REST_HPP
+#ifndef SWIRLY_WEB_RESTAPP_HPP
+#define SWIRLY_WEB_RESTAPP_HPP
 
 #include <swirly/web/EntitySet.hpp>
 #include <swirly/web/Page.hpp>
@@ -25,21 +25,21 @@
 namespace swirly {
 inline namespace web {
 
-class SWIRLY_API Rest {
+class SWIRLY_API RestApp {
   public:
-    Rest(MsgQueue& mq, std::size_t max_execs)
+    RestApp(MsgQueue& mq, std::size_t max_execs)
     : serv_{mq, max_execs}
     {
     }
-    ~Rest();
+    ~RestApp();
 
     // Copy.
-    Rest(const Rest&) = delete;
-    Rest& operator=(const Rest&) = delete;
+    RestApp(const RestApp&) = delete;
+    RestApp& operator=(const RestApp&) = delete;
 
     // Move.
-    Rest(Rest&&);
-    Rest& operator=(Rest&&);
+    RestApp(RestApp&&);
+    RestApp& operator=(RestApp&&);
 
     void load(const Model& model, Time now) { serv_.load(model, now); }
 
@@ -116,4 +116,4 @@ class SWIRLY_API Rest {
 } // namespace web
 } // namespace swirly
 
-#endif // SWIRLY_WEB_REST_HPP
+#endif // SWIRLY_WEB_RESTAPP_HPP
