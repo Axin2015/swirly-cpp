@@ -58,7 +58,7 @@ class TcpAcceptor {
         static_cast<DerivedT*>(this)->do_accept(std::move(sock), ep, now);
     }
 
-    TcpSocketServ serv_;
+    TcpServSocket serv_;
     Reactor::Handle sub_;
 };
 
