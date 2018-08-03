@@ -38,7 +38,9 @@ class SWIRLY_API Timer {
 
     struct Impl {
         union {
-            // Singly-linked free-list.
+            /**
+             * Singly-linked free-list.
+             */
             Impl* next;
             TimerQueue* tq;
         };
@@ -76,7 +78,9 @@ class SWIRLY_API Timer {
 
     Time expiry() const noexcept { return impl_->expiry; }
     Duration interval() const noexcept { return impl_->interval; }
-    // Setting the interval will not reschedule any pending timer.
+    /**
+     * Setting the interval will not reschedule any pending timer.
+     */
     template <typename RepT, typename PeriodT>
     void set_interval(std::chrono::duration<RepT, PeriodT> interval) noexcept
     {
@@ -165,7 +169,13 @@ class SWIRLY_API TimerQueue {
     const Timer& front() const { return heap_.front(); }
 
     // clang-format off
+    /**
+     * Throws std::bad_alloc only.
+     */
     [[nodiscard]] Timer insert(Time expiry, Duration interval, TimerSlot slot);
+    /**
+     * Throws std::bad_alloc only.
+     */
     [[nodiscard]] Timer insert(Time expiry, TimerSlot slot)
     {
         return insert(expiry, Duration::zero(), slot);
@@ -184,9 +194,13 @@ class SWIRLY_API TimerQueue {
     long max_id_{};
     int cancelled_{};
     std::vector<SlabPtr> slabs_;
-    // Head of free-list.
+    /**
+     * Head of free-list.
+     */
     Timer::Impl* free_{nullptr};
-    // Heap of timers ordered by expiry time.
+    /**
+     * Heap of timers ordered by expiry time.
+     */
     std::vector<Timer> heap_;
 };
 

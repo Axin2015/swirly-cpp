@@ -34,12 +34,12 @@ class SWIRLY_API FixTokeniser {
     {
     }
     // Copy.
-    FixTokeniser(const FixTokeniser&) = delete;
-    FixTokeniser& operator=(const FixTokeniser&) = delete;
+    FixTokeniser(const FixTokeniser&) = default;
+    FixTokeniser& operator=(const FixTokeniser&) = default;
 
     // Move.
-    FixTokeniser(FixTokeniser&&) = delete;
-    FixTokeniser& operator=(FixTokeniser&&) = delete;
+    FixTokeniser(FixTokeniser&&) = default;
+    FixTokeniser& operator=(FixTokeniser&&) = default;
 
     bool empty() const noexcept { return it_ == msg_.cend(); }
     std::pair<std::string_view, bool> find(int tag) const noexcept { return find_tag(msg_, tag); }

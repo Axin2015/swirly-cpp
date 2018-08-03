@@ -80,7 +80,9 @@ class SWIRLY_API Reactor {
             std::swap(sid_, rhs.sid_);
         }
 
-        // Modify IO event subscription.
+        /**
+         * Modify IO event subscription.
+         */
         void set_events(unsigned events, IoSlot slot)
         {
             reactor_->do_set_events(fd_, sid_, events, slot);
@@ -109,10 +111,16 @@ class SWIRLY_API Reactor {
     {
         return do_subscribe(fd, events, slot);
     }
+    /**
+     * Throws std::bad_alloc only.
+     */
     [[nodiscard]] Timer timer(Time expiry, Duration interval, Priority priority, TimerSlot slot)
     {
         return do_timer(expiry, interval, priority, slot);
     }
+    /**
+     * Throws std::bad_alloc only.
+     */
     [[nodiscard]] Timer timer(Time expiry, Priority priority, TimerSlot slot)
     {
         return do_timer(expiry, priority, slot);
@@ -137,7 +145,13 @@ class SWIRLY_API Reactor {
     virtual void do_set_events(int fd, int sid, unsigned events, IoSlot slot) = 0;
     virtual void do_set_events(int fd, int sid, unsigned events) = 0;
 
+    /**
+     * Throws std::bad_alloc only.
+     */
     virtual Timer do_timer(Time expiry, Duration interval, Priority priority, TimerSlot slot) = 0;
+    /**
+     * Throws std::bad_alloc only.
+     */
     virtual Timer do_timer(Time expiry, Priority priority, TimerSlot slot) = 0;
 
     virtual int do_poll(Time now, Millis timeout) = 0;

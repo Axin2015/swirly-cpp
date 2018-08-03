@@ -51,7 +51,13 @@ class SWIRLY_API EpollReactor : public Reactor {
     void do_set_events(int fd, int sid, unsigned events, IoSlot slot) override;
     void do_set_events(int fd, int sid, unsigned events) override;
 
+    /**
+     * Throws std::bad_alloc only.
+     */
     Timer do_timer(Time expiry, Duration interval, Priority priority, TimerSlot slot) override;
+    /**
+     * Throws std::bad_alloc only.
+     */
     Timer do_timer(Time expiry, Priority priority, TimerSlot slot) override;
 
     int do_poll(Time now, Millis timeout) override;
