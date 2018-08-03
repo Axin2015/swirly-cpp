@@ -47,6 +47,7 @@ set(lib_SOURCES
   Socket.cpp
   System.cpp
   TcpAcceptor.cpp
+  TcpConnector.cpp
   TcpSocket.cpp
   Timer.cpp
   UdpSocket.cpp)
