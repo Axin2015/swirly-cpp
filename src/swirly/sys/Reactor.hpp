@@ -126,17 +126,13 @@ class SWIRLY_API Reactor {
         return do_timer(expiry, priority, slot);
     }
     // clang-format on
-    int poll(Millis timeout = Millis::max())
+    int poll(Time now, Millis timeout = Millis::max())
     {
-        return do_poll(UnixClock::now(), timeout);
+        return do_poll(now, timeout);
     }
+    int poll(Millis timeout = Millis::max()) { return do_poll(UnixClock::now(), timeout); }
 
   protected:
-    /**
-     * Overload for unit-testing.
-     */
-    int poll(Time now, Millis timeout) { return do_poll(now, timeout); }
-
     virtual void do_interrupt() noexcept = 0;
 
     virtual Handle do_subscribe(int fd, unsigned events, IoSlot slot) = 0;
