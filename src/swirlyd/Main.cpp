@@ -165,7 +165,7 @@ int main(int argc, char* argv[])
                 throw Exception{make_error_code(errc::io_error),
                                 err_msg() << "open failed: " << opts.conf_file};
             }
-            config.read(is);
+            config.read_section(is);
         }
 
         mem_ctx = MemCtx{config.get<size_t>("mem_size", 1) << 20};

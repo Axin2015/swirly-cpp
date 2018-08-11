@@ -32,7 +32,7 @@ namespace swirly {
 inline namespace util {
 
 template <typename FnT>
-void parse_pairs(std::istream& is, FnT fn)
+std::istream& parse_section(std::istream& is, FnT fn, std::string* name = nullptr)
 {
     std::string line;
     while (std::getline(is, line)) {
@@ -45,6 +45,14 @@ void parse_pairs(std::istream& is, FnT fn)
             continue;
         }
 
+        if (line.front() == '[' && line.back() == ']') {
+            if (name) {
+                name->assign(line, 1, line.size() - 2);
+                trim(*name);
+            }
+            return is;
+        }
+
         std::string key, val;
         std::tie(key, val) = split_pair(line, '=');
         rtrim(key);
@@ -52,6 +60,10 @@ void parse_pairs(std::istream& is, FnT fn)
 
         fn(key, val);
     }
+    if (name) {
+        name->clear();
+    }
+    return is;
 }
 
 /**
@@ -59,8 +71,6 @@ void parse_pairs(std::istream& is, FnT fn)
  */
 class SWIRLY_API Config {
   public:
-    explicit Config(std::istream& is) { read(is); }
-
     Config();
     ~Config();
 
@@ -75,25 +85,42 @@ class SWIRLY_API Config {
     const char* get(const char* key, const char* dfl) const noexcept
     {
         auto it = map_.find(key);
-        return it != map_.end() ? it->second.c_str() : dfl;
+        if (it != map_.end()) {
+            return it->second.c_str();
+        }
+        return parent_ ? parent_->get(key, dfl) : dfl;
     }
     const char* get(const char* key, std::nullptr_t) const noexcept
     {
         auto it = map_.find(key);
-        return it != map_.end() ? it->second.c_str() : nullptr;
+        if (it != map_.end()) {
+            return it->second.c_str();
+        }
+        return parent_ ? parent_->get(key, nullptr) : nullptr;
     }
     template <typename ValueT>
     ValueT get(const char* key, ValueT dfl) const noexcept
     {
         auto it = map_.find(key);
-        return it != map_.end() ? from_string<ValueT>(it->second) : dfl;
+        if (it != map_.end()) {
+            return from_string<ValueT>(it->second);
+        }
+        return parent_ ? parent_->get(key, dfl) : dfl;
     }
+    std::size_t size() const noexcept { return map_.size(); }
     void clear() noexcept { map_.clear(); }
-    void read(std::istream& is);
+    std::istream& read_section(std::istream& is) { return read_section(is, nullptr); }
+    std::istream& read_section(std::istream& is, std::string& next)
+    {
+        return read_section(is, &next);
+    }
     void set(std::string key, std::string val) { map_.emplace(std::move(key), std::move(val)); }
+    void set_parent(Config& parent) noexcept { parent_ = &parent; }
 
   private:
+    std::istream& read_section(std::istream& is, std::string* next);
     boost::container::flat_map<std::string, std::string> map_;
+    Config* parent_{nullptr};
 };
 
 } // namespace util

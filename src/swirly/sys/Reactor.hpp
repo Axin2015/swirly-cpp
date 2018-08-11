@@ -85,9 +85,14 @@ class SWIRLY_API Reactor {
          */
         void set_events(unsigned events, IoSlot slot)
         {
+            assert(reactor_);
             reactor_->do_set_events(fd_, sid_, events, slot);
         }
-        void set_events(unsigned events) { reactor_->do_set_events(fd_, sid_, events); }
+        void set_events(unsigned events)
+        {
+            assert(reactor_);
+            reactor_->do_set_events(fd_, sid_, events);
+        }
 
       private:
         Reactor* reactor_{nullptr};
@@ -126,17 +131,13 @@ class SWIRLY_API Reactor {
         return do_timer(expiry, priority, slot);
     }
     // clang-format on
-    int poll(Millis timeout = Millis::max())
+    int poll(Time now, Millis timeout = Millis::max())
     {
-        return do_poll(UnixClock::now(), timeout);
+        return do_poll(now, timeout);
     }
+    int poll(Millis timeout = Millis::max()) { return do_poll(UnixClock::now(), timeout); }
 
   protected:
-    /**
-     * Overload for unit-testing.
-     */
-    int poll(Time now, Millis timeout) { return do_poll(now, timeout); }
-
     virtual void do_interrupt() noexcept = 0;
 
     virtual Handle do_subscribe(int fd, unsigned events, IoSlot slot) = 0;

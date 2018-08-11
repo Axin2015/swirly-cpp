@@ -43,11 +43,9 @@ HttpSess::HttpSess(Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, RestServ&
 
 HttpSess::~HttpSess() = default;
 
-void HttpSess::close() noexcept
+void HttpSess::dispose() noexcept
 {
     SWIRLY_DEBUG << "close session";
-    tmr_.cancel();
-    sub_.reset();
     delete this;
 }
 
@@ -137,7 +135,7 @@ void HttpSess::on_io_event(int fd, unsigned events, Time now)
                     // May throw.
                     sub_.set_events(EventIn);
                 } else {
-                    close();
+                    dispose();
                 }
             }
         }
@@ -150,19 +148,19 @@ void HttpSess::on_io_event(int fd, unsigned events, Time now)
                 tmr_ = reactor_.timer(now + IdleTimeout, Priority::Low,
                                       bind<&HttpSess::on_timer>(this));
             } else {
-                close();
+                dispose();
             }
         }
     } catch (const std::exception& e) {
         SWIRLY_ERROR << "error handling io event: " << e.what();
-        close();
+        dispose();
     }
 }
 
 void HttpSess::on_timer(Timer& tmr, Time now)
 {
-    SWIRLY_INFO << "timeout";
-    close();
+    SWIRLY_WARNING << "session timeout";
+    dispose();
 }
 
 } // namespace swirly

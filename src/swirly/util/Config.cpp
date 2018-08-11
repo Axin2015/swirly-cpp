@@ -33,13 +33,15 @@ Config& Config::operator=(const Config&) = default;
 Config::Config(Config&&) = default;
 Config& Config::operator=(Config&&) = default;
 
-void Config::read(istream& is)
+istream& Config::read_section(istream& is, string* next)
 {
     VarSub var_sub;
-    parse_pairs(is, [this, &var_sub](const auto& key, string val) {
-        var_sub(val);
-        this->map_.emplace(key, move(val));
-    });
+    return parse_section(is,
+                         [this, &var_sub](const auto& key, string val) {
+                             var_sub(val);
+                             map_.emplace(key, move(val));
+                         },
+                         next);
 }
 
 } // namespace util

@@ -25,7 +25,7 @@ using namespace swirly;
 
 BOOST_AUTO_TEST_SUITE(ConfigSuite)
 
-BOOST_AUTO_TEST_CASE(ParsePairsCase)
+BOOST_AUTO_TEST_CASE(ParseSectionSingleCase)
 {
     const string text{R"(
 # comment
@@ -43,7 +43,7 @@ st = = uv =
 
     istringstream is{text};
     map<string, string> conf;
-    parse_pairs(is, [&conf](const auto& key, const auto& val) { conf.emplace(key, val); });
+    parse_section(is, [&conf](const auto& key, const auto& val) { conf.emplace(key, val); });
     BOOST_TEST(conf.size() == 7U);
     BOOST_TEST(conf["ab"] == "");
     BOOST_TEST(conf["cd"] == "");
@@ -52,6 +52,91 @@ st = = uv =
     BOOST_TEST(conf["kl"] == "mn");
     BOOST_TEST(conf["op"] == "qr");
     BOOST_TEST(conf["st"] == "= uv =");
+    BOOST_TEST(is.eof());
+}
+
+BOOST_AUTO_TEST_CASE(ParseSectionMultiCase)
+{
+    const string text{R"(
+# comment
+  # indented comment
+ab
+cd=
+
+[foo]
+ef=gh
+=ij
+
+ [ bar ] 
+kl = mn
+ op = qr 
+st = = uv =
+
+)"};
+
+    istringstream is{text};
+    map<string, string> conf;
+
+    string next;
+    parse_section(is, [&conf](const auto& key, const auto& val) { conf.emplace(key, val); }, &next);
+    BOOST_TEST(conf.size() == 2U);
+    BOOST_TEST(conf["ab"] == "");
+    BOOST_TEST(conf["cd"] == "");
+    BOOST_TEST(next == "foo");
+    BOOST_TEST(!is.fail());
+
+    conf.clear();
+    parse_section(is, [&conf](const auto& key, const auto& val) { conf.emplace(key, val); }, &next);
+    BOOST_TEST(conf.size() == 2U);
+    BOOST_TEST(conf["ef"] == "gh");
+    BOOST_TEST(conf[""] == "ij");
+    BOOST_TEST(next == "bar");
+    BOOST_TEST(!is.fail());
+
+    conf.clear();
+    parse_section(is, [&conf](const auto& key, const auto& val) { conf.emplace(key, val); }, &next);
+    BOOST_TEST(conf.size() == 3U);
+    BOOST_TEST(conf["kl"] == "mn");
+    BOOST_TEST(conf["op"] == "qr");
+    BOOST_TEST(conf["st"] == "= uv =");
+    BOOST_TEST(next.empty());
+    BOOST_TEST(is.eof());
+}
+
+BOOST_AUTO_TEST_CASE(ConfigOverrideCase)
+{
+    const string text{R"(
+foo=101
+bar=202
+
+[session]
+
+bar=303
+baz=404
+)"};
+
+    istringstream is{text};
+    string next;
+
+    Config parent;
+    parent.read_section(is, next);
+
+    BOOST_TEST(parent.size() == 2U);
+    BOOST_TEST(parent.get<int>("foo", 0) == 101);
+    BOOST_TEST(parent.get<int>("bar", 0) == 202);
+    BOOST_TEST(next == "session");
+    BOOST_TEST(!is.fail());
+
+    Config child;
+    child.read_section(is, next);
+    child.set_parent(parent);
+
+    BOOST_TEST(child.size() == 2U);
+    BOOST_TEST(child.get<int>("foo", 0) == 101);
+    BOOST_TEST(child.get<int>("bar", 0) == 303);
+    BOOST_TEST(child.get<int>("baz", 0) == 404);
+    BOOST_TEST(next.empty());
+    BOOST_TEST(is.eof());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

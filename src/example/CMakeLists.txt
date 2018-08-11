@@ -13,24 +13,18 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-cmake_minimum_required(VERSION 3.0)
-project(helloworld)
+add_custom_target(swirly-example DEPENDS
+  swirly-echo-clnt
+  swirly-echo-serv
+  swirly-scratch
+)
 
-if(DEFINED ENV{SWIRLY_HOME})
-  message("SWIRLY_HOME is set to $ENV{SWIRLY_HOME}")
-else()
-  message(FATAL_ERROR "SWIRLY_HOME is not set")
-endif()
+add_executable(swirly-echo-clnt EchoClnt.cpp)
+target_link_libraries(swirly-echo-clnt ${swirly_fix_LIBRARY})
 
-set(COMMON_WARN "-Wall -Werror -Wextra -Wstrict-aliasing=2 -Wno-unused-parameter")
-set(COMMON_FLAGS "-fstrict-aliasing -fvisibility=hidden")
-set(CMAKE_CXX_FLAGS "-std=c++17 ${COMMON_FLAGS} ${COMMON_WARN} -fno-rtti")
+add_executable(swirly-echo-serv EchoServ.cpp)
+target_link_libraries(swirly-echo-serv ${swirly_fix_LIBRARY})
 
-set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "$ENV{SWIRLY_HOME}/etc")
-
-find_package(Swirly REQUIRED)
-
-include_directories(${SWIRLY_INCLUDE_DIRS})
-
-add_executable(helloworld Main.cpp)
-target_link_libraries(helloworld ${SWIRLY_UTIL_LIBRARY})
+# Reserved as an ad-hoc scratch pad.
+add_executable(swirly-scratch Scratch.cpp)
+target_link_libraries(swirly-scratch ${swirly_db_LIBRARY})

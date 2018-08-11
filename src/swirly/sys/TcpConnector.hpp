@@ -44,7 +44,7 @@ class TcpConnector {
      * Returns true if connection was established synchronously or false if connection is pending
      * asynchronous completion.
      */
-    bool connect(Reactor& r, const Endpoint& ep, Time now) noexcept
+    bool connect(Reactor& r, const Endpoint& ep, Time now)
     {
         TcpClntSocket sock{ep.protocol()};
         sock.set_non_block();

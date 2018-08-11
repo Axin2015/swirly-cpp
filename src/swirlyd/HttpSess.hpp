@@ -54,7 +54,7 @@ class SWIRLY_API HttpSess
     boost::intrusive::list_member_hook<AutoUnlinkOption> list_hook;
 
   private:
-    void close() noexcept;
+    void dispose() noexcept;
 
     bool on_message_begin() noexcept
     {
