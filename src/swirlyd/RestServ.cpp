@@ -467,17 +467,17 @@ void RestServ::order_request(const HttpRequest& req, Time now, HttpStream& os)
 {
     if (path_.empty()) {
 
-        // /api/sesss/orders
+        // /api/sess/orders
         match_path_ = true;
 
         switch (req.method()) {
         case HttpMethod::Get:
-            // GET /api/sesss/orders
+            // GET /api/sess/orders
             match_method_ = true;
             app_.get_order(get_trader(req), now, os);
             break;
         case HttpMethod::Post:
-            // POST /api/sesss/orders
+            // POST /api/sess/orders
             match_method_ = true;
             {
                 // Validate account before request.
