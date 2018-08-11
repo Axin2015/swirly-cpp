@@ -62,7 +62,7 @@ class EchoSess {
                     assert(size > 0);
                     // Echo bytes back to client.
                     if (os::write(fd, buf, size) < size) {
-                        throw runtime_error{"Partial write"};
+                        throw runtime_error{"partial write"};
                     }
                     tmr_.cancel();
                     tmr_ = reactor_.timer(now + IdleTimeout, Priority::Low,

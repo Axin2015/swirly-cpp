@@ -77,7 +77,7 @@ class EchoSess {
     {
         try {
             if (sock_.send("ping", 4, 0) < 4) {
-                throw runtime_error{"Partial write"};
+                throw runtime_error{"partial write"};
             }
         } catch (const std::exception& e) {
             SWIRLY_ERROR << "failed to write data: " << e.what();
