@@ -127,6 +127,12 @@ baz=404
     BOOST_TEST(next == "session");
     BOOST_TEST(!is.fail());
 
+    // Verify that getter with nullptr default compiles.
+    BOOST_TEST(parent.get("foo", nullptr) != nullptr);
+
+    // Conversion from internal std::string to std::string_view is a special case.
+    BOOST_TEST(parent.get<string_view>("foo") == "101"sv);
+
     Config child;
     child.read_section(is, next);
     child.set_parent(parent);
@@ -137,6 +143,9 @@ baz=404
     BOOST_TEST(child.get<int>("baz", 0) == 404);
     BOOST_TEST(next.empty());
     BOOST_TEST(is.eof());
+
+    BOOST_CHECK_THROW(child.get("bad"), runtime_error);
+    BOOST_CHECK_THROW(child.get<int>("bad"), runtime_error);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

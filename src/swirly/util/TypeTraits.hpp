@@ -31,7 +31,7 @@ struct TypeTraits<std::int16_t> {
     static auto from_string(std::string_view sv) noexcept { return stoi16(sv); }
     static auto from_string(const std::string& s) noexcept
     {
-        return from_string(std::string_view{s.data(), s.size()});
+        return from_string(std::string_view{s});
     }
 };
 
@@ -40,7 +40,7 @@ struct TypeTraits<std::int32_t> {
     static auto from_string(std::string_view sv) noexcept { return stoi32(sv); }
     static auto from_string(const std::string& s) noexcept
     {
-        return from_string(std::string_view{s.data(), s.size()});
+        return from_string(std::string_view{s});
     }
 };
 
@@ -49,7 +49,7 @@ struct TypeTraits<std::int64_t> {
     static auto from_string(std::string_view sv) noexcept { return stoi32(sv); }
     static auto from_string(const std::string& s) noexcept
     {
-        return from_string(std::string_view{s.data(), s.size()});
+        return from_string(std::string_view{s});
     }
 };
 
@@ -58,7 +58,7 @@ struct TypeTraits<std::uint16_t> {
     static auto from_string(std::string_view sv) noexcept { return stou16(sv); }
     static auto from_string(const std::string& s) noexcept
     {
-        return from_string(std::string_view{s.data(), s.size()});
+        return from_string(std::string_view{s});
     }
 };
 
@@ -67,7 +67,7 @@ struct TypeTraits<std::uint32_t> {
     static auto from_string(std::string_view sv) noexcept { return stou32(sv); }
     static auto from_string(const std::string& s) noexcept
     {
-        return from_string(std::string_view{s.data(), s.size()});
+        return from_string(std::string_view{s});
     }
 };
 
@@ -76,7 +76,7 @@ struct TypeTraits<std::uint64_t> {
     static auto from_string(std::string_view sv) noexcept { return stou32(sv); }
     static auto from_string(const std::string& s) noexcept
     {
-        return from_string(std::string_view{s.data(), s.size()});
+        return from_string(std::string_view{s});
     }
 };
 
@@ -85,7 +85,7 @@ struct TypeTraits<bool> {
     static auto from_string(std::string_view sv) noexcept { return stob(sv); }
     static auto from_string(const std::string& s) noexcept
     {
-        return from_string(std::string_view{s.data(), s.size()});
+        return from_string(std::string_view{s});
     }
 };
 
@@ -98,7 +98,7 @@ struct TypeTraits<ValueT, std::enable_if_t<std::is_enum_v<ValueT>>> {
     }
     static auto from_string(const std::string& s) noexcept
     {
-        return from_string(std::string_view{s.data(), s.size()});
+        return from_string(std::string_view{s});
     }
 };
 
@@ -107,26 +107,24 @@ struct TypeTraits<Time> {
     static auto from_string(std::string_view sv) noexcept { return to_time(Millis{stoi64(sv)}); }
     static auto from_string(const std::string& s) noexcept
     {
-        return from_string(std::string_view{s.data(), s.size()});
+        return from_string(std::string_view{s});
     }
 };
 
 template <>
 struct TypeTraits<std::string_view> {
     static auto from_string(std::string_view sv) noexcept { return sv; }
-    static auto from_string(const std::string& s) noexcept
-    {
-        return from_string(std::string_view{s.data(), s.size()});
-    }
+    /**
+     * Disable conversion from std::string to std::string_view due to possible danger of dangling
+     * reference to temporary.
+     */
+    static std::string_view from_string(const std::string& s) noexcept = delete;
 };
 
 template <>
 struct TypeTraits<std::string> {
-    static auto from_string(std::string_view sv) noexcept
-    {
-        return std::string{sv.data(), sv.size()};
-    }
-    static auto from_string(const std::string& s) noexcept { return s; }
+    static std::string from_string(std::string_view sv) noexcept { return {sv.data(), sv.size()}; }
+    static std::string from_string(const std::string& s) noexcept { return s; }
 };
 
 template <typename ValueT>
