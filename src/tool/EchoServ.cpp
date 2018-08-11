@@ -45,11 +45,12 @@ class EchoSess {
         sub_ = r.subscribe(sock_.get(), EventIn, bind<&EchoSess::on_input>(this));
         tmr_ = r.timer(now + IdleTimeout, Priority::Low, bind<&EchoSess::on_timer>(this));
     }
-    void close() noexcept
+    boost::intrusive::list_member_hook<AutoUnlinkOption> list_hook;
+
+  private:
+    void dispose() noexcept
     {
         SWIRLY_INFO << "session closed";
-        tmr_.cancel();
-        sub_.reset();
         delete this;
     }
     void on_input(int fd, unsigned events, Time now)
@@ -68,22 +69,19 @@ class EchoSess {
                     tmr_ = reactor_.timer(now + IdleTimeout, Priority::Low,
                                           bind<&EchoSess::on_timer>(this));
                 } else {
-                    close();
+                    dispose();
                 }
             }
         } catch (const std::exception& e) {
             SWIRLY_ERROR << "exception: " << e.what();
-            close();
+            dispose();
         }
     }
     void on_timer(Timer& tmr, Time now)
     {
         SWIRLY_INFO << "timeout";
-        close();
+        dispose();
     }
-    boost::intrusive::list_member_hook<AutoUnlinkOption> list_hook;
-
-  private:
     Reactor& reactor_;
     IoSocket sock_;
     const TcpEndpoint ep_;

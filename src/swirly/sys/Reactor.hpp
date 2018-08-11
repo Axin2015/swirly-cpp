@@ -85,9 +85,14 @@ class SWIRLY_API Reactor {
          */
         void set_events(unsigned events, IoSlot slot)
         {
+            assert(reactor_);
             reactor_->do_set_events(fd_, sid_, events, slot);
         }
-        void set_events(unsigned events) { reactor_->do_set_events(fd_, sid_, events); }
+        void set_events(unsigned events)
+        {
+            assert(reactor_);
+            reactor_->do_set_events(fd_, sid_, events);
+        }
 
       private:
         Reactor* reactor_{nullptr};

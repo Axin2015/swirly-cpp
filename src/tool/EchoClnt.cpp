@@ -45,11 +45,12 @@ class EchoSess {
         sub_ = r.subscribe(sock_.get(), EventIn, bind<&EchoSess::on_input>(this));
         tmr_ = r.timer(now, PingInterval, Priority::Low, bind<&EchoSess::on_timer>(this));
     }
-    void close() noexcept
+    boost::intrusive::list_member_hook<AutoUnlinkOption> list_hook;
+
+  private:
+    void dispose() noexcept
     {
         SWIRLY_INFO << "session closed";
-        tmr_.cancel();
-        sub_.reset();
         delete this;
     }
     void on_input(int fd, unsigned events, Time now)
@@ -62,15 +63,15 @@ class EchoSess {
                     assert(size > 0);
                     SWIRLY_INFO << "received: " << string_view{buf, size};
                     if (++count_ == 5) {
-                        close();
+                        dispose();
                     }
                 } else {
-                    close();
+                    dispose();
                 }
             }
         } catch (const std::exception& e) {
             SWIRLY_ERROR << "failed to read data: " << e.what();
-            close();
+            dispose();
         }
     }
     void on_timer(Timer& tmr, Time now)
@@ -81,12 +82,9 @@ class EchoSess {
             }
         } catch (const std::exception& e) {
             SWIRLY_ERROR << "failed to write data: " << e.what();
-            close();
+            dispose();
         }
     }
-    boost::intrusive::list_member_hook<AutoUnlinkOption> list_hook;
-
-  private:
     Reactor& reactor_;
     IoSocket sock_;
     const TcpEndpoint ep_;
