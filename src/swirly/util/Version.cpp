@@ -14,17 +14,18 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_FIX_TYPES_HPP
-#define SWIRLY_FIX_TYPES_HPP
+#include "Version.hpp"
 
-#include <swirly/util/Version.hpp>
+#include <iostream>
 
 namespace swirly {
-inline namespace fix {
+inline namespace util {
+using namespace std;
 
-using FixPair = std::pair<int, std::string_view>;
+ostream& operator<<(ostream& os, Version ver)
+{
+    return os << ver.major << '.' << ver.minor;
+}
 
-} // namespace fix
+} // namespace util
 } // namespace swirly
-
-#endif // SWIRLY_FIX_TYPES_HPP

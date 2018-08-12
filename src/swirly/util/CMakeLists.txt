@@ -54,7 +54,8 @@ set(lib_SOURCES
   TypeTraits.cpp
   Types.cpp
   Utility.cpp
-  VarSub.cpp)
+  VarSub.cpp
+  Version.cpp)
 
 add_library(swirly-util-static STATIC ${lib_SOURCES})
 set_target_properties(swirly-util-static PROPERTIES OUTPUT_NAME swirly-util)
@@ -100,7 +101,8 @@ set(test_SOURCES
   Tokeniser.ut.cpp
   Traits.ut.cpp
   Utility.ut.cpp
-  VarSub.ut.cpp)
+  VarSub.ut.cpp
+  Version.ut.cpp)
 
 add_executable(swirly-util-test
   ${test_SOURCES}

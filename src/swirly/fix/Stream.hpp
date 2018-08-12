@@ -89,7 +89,7 @@ class SWIRLY_API FixStream : public std::ostream {
         swirly::reset(*this);
         bloff_ = 0;
     }
-    void reset(FixVersion ver);
+    void reset(Version ver);
 
   private:
     FixBuf buf_;

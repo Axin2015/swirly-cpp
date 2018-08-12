@@ -92,7 +92,7 @@ void FixStream::commit() noexcept
     buf_.commit();
 }
 
-void FixStream::reset(FixVersion ver)
+void FixStream::reset(Version ver)
 {
     buf_.reset();
     swirly::reset(*this);

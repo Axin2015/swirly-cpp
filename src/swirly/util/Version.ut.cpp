@@ -14,17 +14,23 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_FIX_TYPES_HPP
-#define SWIRLY_FIX_TYPES_HPP
+#include "Version.hpp"
 
-#include <swirly/util/Version.hpp>
+#include <boost/test/unit_test.hpp>
 
-namespace swirly {
-inline namespace fix {
+using namespace std;
+using namespace swirly;
 
-using FixPair = std::pair<int, std::string_view>;
+namespace {
+} // namespace
 
-} // namespace fix
-} // namespace swirly
+BOOST_AUTO_TEST_SUITE(VersionSuite)
 
-#endif // SWIRLY_FIX_TYPES_HPP
+BOOST_AUTO_TEST_CASE(VersionFromStringCase)
+{
+    BOOST_TEST(from_string<Version>("0.0"sv) == Version());
+    BOOST_TEST(from_string<Version>("1.0"sv) == Version(1));
+    BOOST_TEST(from_string<Version>("1.2"sv) == Version(1, 2));
+}
+
+BOOST_AUTO_TEST_SUITE_END()

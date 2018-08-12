@@ -65,7 +65,7 @@ class BasicFixParser {
                 break;
             }
             const auto* const begin = buffer_cast<const char*>(buf);
-            const FixVersion ver{begin[6] - '0', begin[8] - '0'};
+            const Version ver{begin[6] - '0', begin[8] - '0'};
             static_cast<DerivedT*>(this)->on_message(ver, {begin + offset_, body_len_});
             // Skip to next message.
             buf = advance(buf, len);
