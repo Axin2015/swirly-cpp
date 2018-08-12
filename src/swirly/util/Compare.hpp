@@ -23,8 +23,7 @@ namespace swirly {
 inline namespace util {
 
 template <typename ValueT>
-class Comparable {
-  public:
+struct Comparable {
     friend constexpr bool operator==(const ValueT& lhs, const ValueT& rhs) noexcept
     {
         return lhs.compare(rhs) == 0;
@@ -55,6 +54,10 @@ class Comparable {
         return lhs.compare(rhs) >= 0;
     }
 
+  protected:
+    constexpr Comparable() noexcept = default;
+    ~Comparable() = default;
+
     // Copy.
     constexpr Comparable(const Comparable&) noexcept = default;
     Comparable& operator=(const Comparable&) noexcept = default;
@@ -62,10 +65,6 @@ class Comparable {
     // Move.
     constexpr Comparable(Comparable&&) noexcept = default;
     Comparable& operator=(Comparable&&) noexcept = default;
-
-  protected:
-    constexpr Comparable() noexcept = default;
-    ~Comparable() = default;
 };
 
 template <typename ValueT>

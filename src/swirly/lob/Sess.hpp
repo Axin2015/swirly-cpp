@@ -38,7 +38,7 @@ class Sess;
 using SessPtr = std::unique_ptr<Sess>;
 using ConstSessPtr = std::unique_ptr<const Sess>;
 
-class SWIRLY_API Sess : public Comparable<Sess> {
+class SWIRLY_API Sess : protected Comparable<Sess> {
   public:
     Sess(Symbol accnt, std::size_t max_execs) noexcept
     : accnt_{accnt}
