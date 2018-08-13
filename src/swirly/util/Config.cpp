@@ -33,6 +33,27 @@ Config& Config::operator=(const Config&) = default;
 Config::Config(Config&&) = default;
 Config& Config::operator=(Config&&) = default;
 
+const std::string& Config::get(const std::string& key) const
+{
+    auto it = map_.find(key);
+    if (it != map_.end()) {
+        return it->second;
+    }
+    if (!parent_) {
+        throw runtime_error{"missing config key: "s + key};
+    }
+    return parent_->get(key);
+}
+
+const char* Config::get(const std::string& key, const char* dfl) const noexcept
+{
+    auto it = map_.find(key);
+    if (it != map_.end()) {
+        return it->second.c_str();
+    }
+    return parent_ ? parent_->get(key, dfl) : dfl;
+}
+
 istream& Config::read_section(istream& is, string* next)
 {
     VarSub var_sub;

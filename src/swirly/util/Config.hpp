@@ -82,30 +82,52 @@ class SWIRLY_API Config {
     Config(Config&&);
     Config& operator=(Config&&);
 
-    const char* get(const char* key, const char* dfl) const noexcept
+    /**
+     * Throws std::runtime_error if key does not exist.
+     */
+    const std::string& get(const std::string& key) const;
+    const char* get(const std::string& key, const char* dfl) const noexcept;
+    const char* get(const std::string& key, std::nullptr_t) const noexcept
     {
-        auto it = map_.find(key);
-        if (it != map_.end()) {
-            return it->second.c_str();
-        }
-        return parent_ ? parent_->get(key, dfl) : dfl;
+        return get(key, static_cast<const char*>(nullptr));
     }
-    const char* get(const char* key, std::nullptr_t) const noexcept
+    /**
+     * Throws std::runtime_error if key does not exist.
+     */
+    template <typename ValueT>
+    ValueT get(const std::string& key) const
     {
+        using namespace std::string_literals;
+
         auto it = map_.find(key);
         if (it != map_.end()) {
-            return it->second.c_str();
+            if constexpr (std::is_same_v<ValueT, std::string_view>) {
+                // Explicitly allow conversion to std::string_view in this case, because we know
+                // that the argument is not a temporary.
+                return from_string<ValueT>(std::string_view{it->second});
+            } else {
+                return from_string<ValueT>(it->second);
+            }
         }
-        return parent_ ? parent_->get(key, nullptr) : nullptr;
+        if (!parent_) {
+            throw std::runtime_error{"missing config key: "s + key};
+        }
+        return parent_->get<ValueT>(key);
     }
     template <typename ValueT>
-    ValueT get(const char* key, ValueT dfl) const noexcept
+    ValueT get(const std::string& key, ValueT dfl) const noexcept
     {
         auto it = map_.find(key);
         if (it != map_.end()) {
-            return from_string<ValueT>(it->second);
+            if constexpr (std::is_same_v<ValueT, std::string_view>) {
+                // Explicitly allow conversion to std::string_view in this case, because we know
+                // that the argument is not a temporary.
+                return from_string<ValueT>(std::string_view{it->second});
+            } else {
+                return from_string<ValueT>(it->second);
+            }
         }
-        return parent_ ? parent_->get(key, dfl) : dfl;
+        return parent_ ? parent_->get<ValueT>(key, dfl) : dfl;
     }
     std::size_t size() const noexcept { return map_.size(); }
     void clear() noexcept { map_.clear(); }

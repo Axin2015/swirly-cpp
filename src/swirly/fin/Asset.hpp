@@ -27,7 +27,7 @@ inline namespace fin {
 /**
  * An item of value.
  */
-class SWIRLY_API Asset : public Comparable<Asset> {
+class SWIRLY_API Asset : protected Comparable<Asset> {
   public:
     Asset(Id32 id, Symbol symbol, std::string_view display, AssetType type) noexcept
     : id_{id}

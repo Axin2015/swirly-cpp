@@ -27,7 +27,7 @@ inline namespace fin {
 /**
  * A specification that stipulates the terms and conditions of sale.
  */
-class SWIRLY_API Instr : public Comparable<Instr> {
+class SWIRLY_API Instr : protected Comparable<Instr> {
   public:
     Instr(Id32 id, Symbol symbol, std::string_view display, Symbol base_asset, Symbol term_ccy,
           int lot_numer, int lot_denom, int tick_numer, int tick_denom, int pip_dp, Lots min_lots,
