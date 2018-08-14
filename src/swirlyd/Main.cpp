@@ -39,6 +39,7 @@
 #include <swirly/util/Exception.hpp>
 #include <swirly/util/Finally.hpp>
 #include <swirly/util/Log.hpp>
+#include <swirly/util/Options.hpp>
 
 #include <experimental/filesystem>
 
@@ -51,6 +52,16 @@
 #include <unistd.h> // dup2()
 
 namespace fs = std::experimental::filesystem;
+
+namespace swirly {
+inline namespace util {
+template <>
+struct TypeTraits<fs::path> {
+    static auto from_string(std::string_view sv) noexcept { return fs::path{sv}; }
+    static auto from_string(const std::string& s) noexcept { return fs::path{s}; }
+};
+} // namespace util
+} // namespace swirly
 
 using namespace std;
 using namespace swirly;
@@ -70,55 +81,22 @@ struct Opts {
     Time start_time{};
 };
 
-void print_usage(ostream& os)
-{
-    os << R"==(Usage: swirlyd [options]
-
-Options:
-  -h           Show this help message.
-  -d           Run in the background as a daemon process.
-  -f path      Path to configuration file.
-  -s time      Initial time of day in millis since epoch.
-
-Report bugs to: support@swirlycloud.com
-)==";
-}
-
 void get_opts(int argc, char* argv[], Opts& opts)
 {
     opterr = 0;
     int ch;
-    while ((ch = getopt(argc, argv, ":df:hs:t")) != -1) {
-        switch (ch) {
-        case 'd':
-            opts.daemon = true;
-            break;
-        case 'f':
-            opts.conf_file = optarg;
-            break;
-        case 'h':
-            print_usage(cout);
-            exit(0);
-        case 's':
-            opts.start_time = to_time(Millis{stou64(optarg)});
-            break;
-        case ':':
-            cerr << "Option '" << static_cast<char>(optopt) << "' requires an argument\n";
-            print_usage(cerr);
-            exit(1);
-        case '?':
-        default:
-            cerr << "Unknown option '" << static_cast<char>(optopt) << "'\n";
-            print_usage(cerr);
-            exit(1);
-        }
-    }
 
-    if (optind < argc) {
-        cerr << "Unknown argument '" << argv[optind] << "'\n";
-        print_usage(cerr);
-        exit(1);
-    }
+    Options options{"Swirly [Options]"};
+
+    // clang-format off
+    options('d',"daemon", Switch{opts.daemon}, "Daemonize")
+           ('f',"file", Value{opts.conf_file}, "Configuration File")
+           ('s',"start", Value{opts.start_time}, "Start time (ms)")
+           ('h',"help", Help{}, "Display help")
+           ;
+    // clang-format on
+
+    options.parse(argc, argv);
 }
 
 MemCtx mem_ctx;
