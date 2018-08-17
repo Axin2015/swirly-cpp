@@ -18,7 +18,7 @@
 #define SWIRLY_UTIL_VERSION_HPP
 
 #include <swirly/util/Compare.hpp>
-#include <swirly/util/TypeTraits.hpp>
+#include <swirly/util/String.hpp>
 
 #include <boost/container_hash/hash.hpp>
 

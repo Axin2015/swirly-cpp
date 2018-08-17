@@ -17,6 +17,7 @@
 #include "Market.hpp"
 
 #include <swirly/util/Date.hpp>
+#include <swirly/util/String.hpp>
 
 #include <boost/test/unit_test.hpp>
 

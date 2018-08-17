@@ -20,6 +20,7 @@
 #include <swirly/Config.h>
 
 #include <cstdint>
+#include <string_view>
 #include <type_traits>
 
 namespace swirly {
@@ -30,6 +31,20 @@ struct DependentFalse : std::false_type {
 };
 
 SWIRLY_API int hex_digits(int64_t i) noexcept;
+
+SWIRLY_API int16_t stoi16(std::string_view sv) noexcept;
+
+SWIRLY_API int32_t stoi32(std::string_view sv) noexcept;
+
+SWIRLY_API int64_t stoi64(std::string_view sv) noexcept;
+
+SWIRLY_API uint16_t stou16(std::string_view sv) noexcept;
+
+SWIRLY_API uint32_t stou32(std::string_view sv) noexcept;
+
+SWIRLY_API uint64_t stou64(std::string_view sv) noexcept;
+
+SWIRLY_API bool stob(std::string_view sv, bool dfl = false) noexcept;
 
 } // namespace util
 } // namespace swirly

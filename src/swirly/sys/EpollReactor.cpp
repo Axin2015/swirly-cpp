@@ -166,7 +166,6 @@ int EpollReactor::dispatch(Event* buf, int size, Time now)
         try {
             ref.slot(fd, events, now);
         } catch (const std::exception& e) {
-            using namespace string_literals;
             SWIRLY_ERROR << "error handling io event: " << e.what();
         }
         ++n;

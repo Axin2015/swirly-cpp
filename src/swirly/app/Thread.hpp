@@ -69,8 +69,6 @@ class AgentThread {
     static void run(AgentT& agent, BackoffT backoff, ThreadConfig config,
                     const std::atomic<bool>& stop)
     {
-        using namespace std::literals::string_view_literals;
-
         sig_block_all();
         pthread_setname_np(pthread_self(), config.name.c_str());
         SWIRLY_NOTICE << "started " << config.name << " thread";

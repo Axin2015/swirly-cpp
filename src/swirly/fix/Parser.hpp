@@ -26,7 +26,6 @@
 #include <cassert>
 
 namespace swirly {
-using namespace std::literals::string_view_literals;
 inline namespace fix {
 
 template <typename DerivedT>

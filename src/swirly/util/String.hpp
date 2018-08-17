@@ -17,15 +17,30 @@
 #ifndef SWIRLY_UTIL_STRING_HPP
 #define SWIRLY_UTIL_STRING_HPP
 
-#include <swirly/Config.h>
+#include <swirly/util/TypeTraits.hpp>
 
 #include <cstring>
 #include <sstream>
 #include <string_view>
 
 namespace swirly {
+using namespace std::literals::string_literals;
 using namespace std::literals::string_view_literals;
 inline namespace util {
+
+template <typename ValueT>
+inline ValueT from_string(std::string_view sv) noexcept
+{
+    using Traits = TypeTraits<ValueT>;
+    return Traits::from_string(sv);
+}
+
+template <typename ValueT>
+inline ValueT from_string(const std::string& s) noexcept
+{
+    using Traits = TypeTraits<ValueT>;
+    return Traits::from_string(s);
+}
 
 template <typename ValueT, typename std::enable_if_t<std::is_arithmetic_v<ValueT>>* = nullptr>
 std::string to_string(ValueT val)
@@ -46,20 +61,6 @@ std::string_view to_string_view(const char (&val)[SizeN]) noexcept
 {
     return {val, strnlen(val, SizeN)};
 }
-
-SWIRLY_API int16_t stoi16(std::string_view sv) noexcept;
-
-SWIRLY_API int32_t stoi32(std::string_view sv) noexcept;
-
-SWIRLY_API int64_t stoi64(std::string_view sv) noexcept;
-
-SWIRLY_API uint16_t stou16(std::string_view sv) noexcept;
-
-SWIRLY_API uint32_t stou32(std::string_view sv) noexcept;
-
-SWIRLY_API uint64_t stou64(std::string_view sv) noexcept;
-
-SWIRLY_API bool stob(std::string_view sv, bool dfl = false) noexcept;
 
 SWIRLY_API void ltrim(std::string_view& s) noexcept;
 
