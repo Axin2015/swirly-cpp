@@ -22,6 +22,7 @@
 #include <swirly/web/Url.hpp>
 
 namespace swirly {
+using namespace std::literals::string_view_literals;
 inline namespace web {
 
 class SWIRLY_API HttpRequest : public BasicUrl<HttpRequest> {

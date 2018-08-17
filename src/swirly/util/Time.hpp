@@ -17,7 +17,7 @@
 #ifndef SWIRLY_UTIL_TIME_HPP
 #define SWIRLY_UTIL_TIME_HPP
 
-#include <swirly/util/Utility.hpp>
+#include <swirly/util/TypeTraits.hpp>
 
 #include <boost/io/ios_state.hpp>
 
@@ -229,6 +229,15 @@ inline timespec operator-(timespec lhs, timespec rhs) noexcept
     }
     return ts;
 }
+
+template <>
+struct TypeTraits<Time> {
+    static auto from_string(std::string_view sv) noexcept { return to_time(Millis{stoi64(sv)}); }
+    static auto from_string(const std::string& s) noexcept
+    {
+        return from_string(std::string_view{s});
+    }
+};
 
 } // namespace util
 } // namespace swirly

@@ -39,7 +39,6 @@ PidFile open_pid_file(const char* path, mode_t mode)
     PidFile pf{pidfile_open(path, mode, &pid)};
     if (!pf) {
         if (errno == EEXIST) {
-            using namespace string_literals;
             throw runtime_error{"daemon already running, pid: "s + to_string(pid)};
         }
         throw system_error{os::make_error(errno), "pidfile_open"};

@@ -38,8 +38,7 @@ class EchoSess {
 
   public:
     EchoSess(Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, Time now)
-    : reactor_(r)
-    , sock_{move(sock)}
+    : sock_{move(sock)}
     , ep_{ep}
     {
         sub_ = r.subscribe(sock_.get(), EventIn, bind<&EchoSess::on_input>(this));
@@ -85,7 +84,6 @@ class EchoSess {
             dispose();
         }
     }
-    Reactor& reactor_;
     IoSocket sock_;
     const TcpEndpoint ep_;
     Reactor::Handle sub_;

@@ -16,6 +16,8 @@
  */
 #include "Asset.hpp"
 
+#include <swirly/util/String.hpp>
+
 #include <boost/test/unit_test.hpp>
 
 using namespace std;

@@ -97,8 +97,6 @@ class SWIRLY_API Config {
     template <typename ValueT>
     ValueT get(const std::string& key) const
     {
-        using namespace std::string_literals;
-
         auto it = map_.find(key);
         if (it != map_.end()) {
             if constexpr (std::is_same_v<ValueT, std::string_view>) {

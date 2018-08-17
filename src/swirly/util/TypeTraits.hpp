@@ -17,8 +17,9 @@
 #ifndef SWIRLY_UTIL_TYPETRAITS_HPP
 #define SWIRLY_UTIL_TYPETRAITS_HPP
 
-#include <swirly/util/String.hpp>
-#include <swirly/util/Time.hpp>
+#include <swirly/util/Utility.hpp>
+
+#include <string>
 
 namespace swirly {
 inline namespace util {
@@ -46,7 +47,7 @@ struct TypeTraits<std::int32_t> {
 
 template <>
 struct TypeTraits<std::int64_t> {
-    static auto from_string(std::string_view sv) noexcept { return stoi32(sv); }
+    static auto from_string(std::string_view sv) noexcept { return stoi64(sv); }
     static auto from_string(const std::string& s) noexcept
     {
         return from_string(std::string_view{s});
@@ -73,7 +74,7 @@ struct TypeTraits<std::uint32_t> {
 
 template <>
 struct TypeTraits<std::uint64_t> {
-    static auto from_string(std::string_view sv) noexcept { return stou32(sv); }
+    static auto from_string(std::string_view sv) noexcept { return stou64(sv); }
     static auto from_string(const std::string& s) noexcept
     {
         return from_string(std::string_view{s});
@@ -103,15 +104,6 @@ struct TypeTraits<ValueT, std::enable_if_t<std::is_enum_v<ValueT>>> {
 };
 
 template <>
-struct TypeTraits<Time> {
-    static auto from_string(std::string_view sv) noexcept { return to_time(Millis{stoi64(sv)}); }
-    static auto from_string(const std::string& s) noexcept
-    {
-        return from_string(std::string_view{s});
-    }
-};
-
-template <>
 struct TypeTraits<std::string_view> {
     static auto from_string(std::string_view sv) noexcept { return sv; }
     /**
@@ -126,20 +118,6 @@ struct TypeTraits<std::string> {
     static std::string from_string(std::string_view sv) noexcept { return {sv.data(), sv.size()}; }
     static std::string from_string(const std::string& s) noexcept { return s; }
 };
-
-template <typename ValueT>
-inline ValueT from_string(std::string_view sv) noexcept
-{
-    using Traits = TypeTraits<ValueT>;
-    return Traits::from_string(sv);
-}
-
-template <typename ValueT>
-inline ValueT from_string(const std::string& s) noexcept
-{
-    using Traits = TypeTraits<ValueT>;
-    return Traits::from_string(s);
-}
 
 } // namespace util
 } // namespace swirly
