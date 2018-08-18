@@ -14,34 +14,34 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Backoff.hpp"
-
-#include <chrono>
-#include <thread>
+#include "Acceptor.hpp"
 
 namespace swirly {
-using namespace std::literals::chrono_literals;
-inline namespace app {
+inline namespace fix {
+using namespace std;
 
-void PhasedBackoff::idle() noexcept
+FixAcceptor::FixAcceptor(Reactor& r, const Endpoint& ep, const FixConfig& config, FixApp& app,
+                         Time now)
+: TcpAcceptor{r, ep}
+, reactor_(r)
+, config_(config)
+, app_(app)
 {
-    if (i_ < 1000) {
-        cpu_relax();
-    } else if (i_ < 2000) {
-        sched_yield();
-    } else if (i_ < 4000) {
-        std::this_thread::sleep_for(1ms);
-    } else {
-        // Deep sleep.
-        std::this_thread::sleep_for(250ms);
-    }
-    ++i_;
 }
 
-void YieldBackoff::idle() noexcept
+FixAcceptor::~FixAcceptor()
 {
-    sched_yield();
+    sess_list_.clear_and_dispose([](auto* sess) { delete sess; });
 }
 
-} // namespace app
+void FixAcceptor::do_accept(IoSocket&& sock, const Endpoint& ep, Time now)
+{
+    sock.set_non_block();
+    sock.set_tcp_no_delay(true);
+    // High performance TCP servers could use a custom allocator.
+    auto* const sess = new FixSess{reactor_, move(sock), ep, config_, app_, now};
+    sess_list_.push_back(*sess);
+}
+
+} // namespace fix
 } // namespace swirly

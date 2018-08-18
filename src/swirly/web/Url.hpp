@@ -115,7 +115,7 @@ class Url : public BasicUrl<Url> {
 
 class UrlView : public BasicUrl<UrlView> {
   public:
-    explicit UrlView(const std::string_view& url)
+    explicit UrlView(std::string_view url)
     : url_{url}
     {
         parse();

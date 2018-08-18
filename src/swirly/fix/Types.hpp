@@ -22,6 +22,34 @@
 namespace swirly {
 inline namespace fix {
 
+/**
+ * Assumption: begin-string is always FIX.x.y format.
+ */
+enum : std::size_t { BodyLenStart = "8=FIX.x.y^9="sv.size(), CheckSumLen = "10=000^"sv.size() };
+
+/**
+ * Ascii 1: Start Of Header.
+ */
+constexpr char Soh = '\01';
+
+constexpr Version Fix42{4, 2};
+constexpr Version Fix43{4, 3};
+constexpr Version Fix44{4, 4};
+constexpr Version Fix50{5, 0};
+
+enum class FixMode {
+    /**
+     * The Initiator establishes the telecommunications link and initiates the session via
+     * transmission of the initial Logon message.
+     */
+    Initiator = 1,
+    /**
+     * The Acceptor is the receiving party of the FIX session. This party has responsibility to
+     * perform first level authentication and formally declare the connection request "accepted"
+     * through transmission of an acknowledgment Logon message.
+     */
+    Acceptor
+};
 using FixPair = std::pair<int, std::string_view>;
 
 } // namespace fix

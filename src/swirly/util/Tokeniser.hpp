@@ -67,6 +67,7 @@ class Tokeniser {
   private:
     std::string_view buf_;
     std::string_view delims_;
+    // Assumption: std::string_view iterators are equivalent across copies of the std::string_view.
     std::string_view::const_iterator i_, j_;
 };
 

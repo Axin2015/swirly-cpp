@@ -14,34 +14,24 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Backoff.hpp"
+#ifndef SWIRLY_FIX_LOGON_HPP
+#define SWIRLY_FIX_LOGON_HPP
 
-#include <chrono>
-#include <thread>
+#include <swirly/fix/Field.hpp>
 
 namespace swirly {
-using namespace std::literals::chrono_literals;
-inline namespace app {
+inline namespace fix {
 
-void PhasedBackoff::idle() noexcept
-{
-    if (i_ < 1000) {
-        cpu_relax();
-    } else if (i_ < 2000) {
-        sched_yield();
-    } else if (i_ < 4000) {
-        std::this_thread::sleep_for(1ms);
-    } else {
-        // Deep sleep.
-        std::this_thread::sleep_for(250ms);
-    }
-    ++i_;
-}
+struct Logon {
+    EncryptMethod encrypt_method;
+    HeartBtInt heart_bt_int;
+};
 
-void YieldBackoff::idle() noexcept
-{
-    sched_yield();
-}
+SWIRLY_API std::ostream& operator<<(std::ostream& os, const Logon& body);
 
-} // namespace app
+SWIRLY_API void parse_body(std::string_view msg, std::size_t body_off, Logon& body);
+
+} // namespace fix
 } // namespace swirly
+
+#endif // SWIRLY_FIX_LOGON_HPP
