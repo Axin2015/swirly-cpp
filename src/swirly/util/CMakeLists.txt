@@ -39,6 +39,7 @@ set(lib_SOURCES
   Limits.cpp
   Log.cpp
   Math.cpp
+  Options.cpp
   RefCount.cpp
   RingBuffer.cpp
   Set.cpp
@@ -89,6 +90,7 @@ set(test_SOURCES
   IntWrapper.ut.cpp
   Log.ut.cpp
   Math.ut.cpp
+  Options.ut.cpp
   RefCount.ut.cpp
   RingBuffer.ut.cpp
   Set.ut.cpp
