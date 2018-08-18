@@ -57,12 +57,12 @@ class AgentThread {
     }
 
     // Copy.
-    AgentThread(const AgentThread&) noexcept = delete;
-    AgentThread& operator=(const AgentThread&) noexcept = delete;
+    AgentThread(const AgentThread&) = delete;
+    AgentThread& operator=(const AgentThread&) = delete;
 
     // Move.
-    AgentThread(AgentThread&&) noexcept = delete;
-    AgentThread& operator=(AgentThread&&) noexcept = delete;
+    AgentThread(AgentThread&&) = delete;
+    AgentThread& operator=(AgentThread&&) = delete;
 
   private:
     template <typename AgentT, typename BackoffT>
@@ -100,12 +100,12 @@ class SWIRLY_API ReactorThread {
     ~ReactorThread();
 
     // Copy.
-    ReactorThread(const ReactorThread&) noexcept = delete;
-    ReactorThread& operator=(const ReactorThread&) noexcept = delete;
+    ReactorThread(const ReactorThread&) = delete;
+    ReactorThread& operator=(const ReactorThread&) = delete;
 
     // Move.
-    ReactorThread(ReactorThread&&) noexcept = delete;
-    ReactorThread& operator=(ReactorThread&&) noexcept = delete;
+    ReactorThread(ReactorThread&&) = delete;
+    ReactorThread& operator=(ReactorThread&&) = delete;
 
   private:
     Reactor& reactor_;

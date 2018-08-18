@@ -17,7 +17,7 @@
 #ifndef SWIRLY_SYS_IPADDRESS_HPP
 #define SWIRLY_SYS_IPADDRESS_HPP
 
-#include <swirly/Config.h>
+#include <swirly/util/TypeTraits.hpp>
 
 #include <boost/asio/ip/address.hpp>
 #include <boost/asio/ip/tcp.hpp>
@@ -67,6 +67,16 @@ BasicEndpoint<TransportT> parse_endpoint(const std::string& s)
 }
 
 } // namespace sys
+} // namespace swirly
+
+namespace swirly {
+inline namespace util {
+template <typename TransportT>
+struct TypeTraits<sys::BasicEndpoint<TransportT>> {
+    static auto from_string(std::string_view sv) { return sys::parse_endpoint<TransportT>(sv); }
+    static auto from_string(const std::string& s) { return sys::parse_endpoint<TransportT>(s); }
+};
+} // namespace util
 } // namespace swirly
 
 namespace boost {

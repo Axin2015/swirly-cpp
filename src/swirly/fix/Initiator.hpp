@@ -33,8 +33,8 @@ class SWIRLY_API FixInitiator : public TcpConnector<FixInitiator> {
     using ConnList = boost::intrusive::list<FixConn, ConstantTimeSizeOption, MemberHookOption>;
 
   public:
-    FixInitiator(Time now, Reactor& r, const Endpoint& ep, const FixConfig& config,
-                 const FixSessId& sess_id, FixApp& app);
+    FixInitiator(Time now, Reactor& r, const Endpoint& ep, FixSessMap::node_type&& node,
+                 FixApp& app);
     ~FixInitiator();
 
   private:
@@ -44,9 +44,9 @@ class SWIRLY_API FixInitiator : public TcpConnector<FixInitiator> {
 
     Reactor& reactor_;
     const Endpoint ep_;
-    const FixConfig& config_;
-    const FixSessId sess_id_;
     FixApp& app_;
+    // Singleton map for initiator.
+    FixSessMap sess_map_;
     Timer tmr_;
     bool inprogress_{false};
     // List of active connections.

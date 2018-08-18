@@ -52,8 +52,8 @@ class SWIRLY_API HdrHistogram {
     HdrHistogram& operator=(const HdrHistogram& rhs) = delete;
 
     // Move.
-    HdrHistogram(HdrHistogram&&) noexcept = delete;
-    HdrHistogram& operator=(HdrHistogram&&) noexcept = delete;
+    HdrHistogram(HdrHistogram&&) = delete;
+    HdrHistogram& operator=(HdrHistogram&&) = delete;
 
     /**
      * Print out a percentile based histogram to the supplied stream. Note that this call will not

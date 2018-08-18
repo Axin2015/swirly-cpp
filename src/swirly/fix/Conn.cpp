@@ -17,7 +17,6 @@
 #include "Conn.hpp"
 
 #include "App.hpp"
-#include "Config.hpp"
 #include "Hdr.hpp"
 #include "Lexer.hpp"
 #include "Logon.hpp"
@@ -31,12 +30,12 @@ namespace swirly {
 inline namespace fix {
 using namespace std;
 
-FixConn::FixConn(Time now, Reactor& r, IoSocket&& sock, const Endpoint& ep, const FixConfig& config,
-                 FixApp& app)
+FixConn::FixConn(Time now, Reactor& r, IoSocket&& sock, const Endpoint& ep,
+                 const FixSessMap& sess_map, FixApp& app)
 : reactor_(r)
 , sock_{move(sock)}
 , ep_{ep}
-, config_(config)
+, sess_map_(sess_map)
 , app_(app)
 {
     sub_ = r.subscribe(sock_.get(), EventIn, bind<&FixConn::on_io_event>(this));
@@ -48,8 +47,8 @@ void FixConn::logon(Time now, const FixSessId& sess_id)
 {
     if (state_ == LoggedOut) {
         sess_id_ = sess_id;
-        const auto it = config_.sess_map.find(sess_id);
-        if (it == config_.sess_map.end()) {
+        const auto it = sess_map_.find(sess_id);
+        if (it == sess_map_.end()) {
             throw std::runtime_error{"invalid session: "s + to_string(sess_id)};
         }
         hb_int_ = Seconds{it->second.get<int>("heart_bt_int")};

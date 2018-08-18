@@ -103,12 +103,12 @@ class SWIRLY_API Reactor {
     virtual ~Reactor();
 
     // Copy.
-    Reactor(const Reactor&) noexcept = delete;
-    Reactor& operator=(const Reactor&) noexcept = delete;
+    Reactor(const Reactor&) = delete;
+    Reactor& operator=(const Reactor&) = delete;
 
     // Move.
-    Reactor(Reactor&&) noexcept = delete;
-    Reactor& operator=(Reactor&&) noexcept = delete;
+    Reactor(Reactor&&) = delete;
+    Reactor& operator=(Reactor&&) = delete;
 
     void interrupt() noexcept { do_interrupt(); }
     // clang-format off
