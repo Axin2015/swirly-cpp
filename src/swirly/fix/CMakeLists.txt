@@ -27,10 +27,18 @@ else()
 endif()
 
 set(lib_SOURCES
+  Acceptor.cpp
+  App.cpp
+  Config.cpp
   Field.cpp
+  Hdr.cpp
+  Initiator.cpp
+  Lexer.cpp
+  Logon.cpp
   Parser.cpp
+  Sess.cpp
+  SessId.cpp
   Stream.cpp
-  Tokeniser.cpp
   Types.cpp)
 
 add_library(swirly-fix-static STATIC ${lib_SOURCES})
@@ -56,8 +64,9 @@ foreach(file ${lib_SOURCES})
 endforeach()
 
 set(test_SOURCES
-  Stream.ut.cpp
-  Tokeniser.ut.cpp)
+  Lexer.ut.cpp
+  SessId.ut.cpp
+  Stream.ut.cpp)
 
 add_executable(swirly-fix-test
   ${test_SOURCES}

@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Tokeniser.hpp"
+#include "Lexer.hpp"
 
 #include <swirly/fin/Exception.hpp>
 
@@ -66,10 +66,23 @@ pair<string_view, bool> find_tag(string_view msg, int tag) noexcept
     return {msg.substr(pos, len), true};
 }
 
-int FixTokeniser::tag(string_view::const_iterator& it) const
+void FixLexer::pop() noexcept
 {
-    int tag{0};
+    if (i_ == j_) {
+        const auto pos = msg_.find('\1', i_ - msg_.cbegin());
+        if (pos != string_view::npos) {
+            j_ = msg_.cbegin() + pos + 1;
+        } else {
+            j_ = msg_.cend();
+        }
+    }
+    i_ = j_;
+}
+
+FixLexer::ConstIterator FixLexer::get_tag(ConstIterator it, int& tag) const
+{
     assert(it != msg_.cend());
+    tag = 0;
     if (isdigit(*it)) {
         tag += *it++ - '0';
         for (;;) {
@@ -88,11 +101,10 @@ int FixTokeniser::tag(string_view::const_iterator& it) const
         throw ProtocolException{"invalid FIX tag"};
     }
     // Skip delimiter.
-    ++it;
-    return tag;
+    return it + 1;
 }
 
-string_view FixTokeniser::value(string_view::const_iterator& it) const noexcept
+FixLexer::ConstIterator FixLexer::get_value(ConstIterator it, string_view& val) const noexcept
 {
     const auto begin = it;
     auto pos = string_view::npos;
@@ -102,7 +114,8 @@ string_view FixTokeniser::value(string_view::const_iterator& it) const noexcept
             break;
         }
     }
-    return msg_.substr(begin - msg_.cbegin(), pos);
+    val = msg_.substr(begin - msg_.cbegin(), pos);
+    return it;
 }
 } // namespace fix
 } // namespace swirly

@@ -17,6 +17,7 @@
 #include "Error.hpp"
 
 namespace swirly {
+using namespace std::string_literals;
 inline namespace fin {
 namespace {
 class ErrorCategory : public std::error_category {
@@ -35,8 +36,6 @@ class ErrorCategory : public std::error_category {
     const char* name() const noexcept override { return "swirly"; }
     std::string message(int err) const override
     {
-        using namespace std::string_literals;
-
         std::string msg;
         switch (static_cast<Error>(err)) {
         case Error::BadRequest:

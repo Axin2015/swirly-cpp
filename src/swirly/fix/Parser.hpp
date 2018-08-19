@@ -23,18 +23,16 @@
 
 #include <swirly/sys/Buffer.hpp>
 
+#include <swirly/util/Time.hpp>
+
 #include <cassert>
 
 namespace swirly {
+using namespace std::literals::string_view_literals;
 inline namespace fix {
 
 template <typename DerivedT>
 class BasicFixParser {
-    // Assumption: begin-string is always FIX.x.y format.
-    enum { BodyLenStart = "8=FIX.x.y^9="sv.size(), CheckSumLen = "10=000^"sv.size() };
-    // Ascii 1: Start Of Header.
-    static constexpr auto Soh = '\01';
-
   public:
     BasicFixParser() noexcept = default;
     ~BasicFixParser() = default;
@@ -47,10 +45,10 @@ class BasicFixParser {
     BasicFixParser(BasicFixParser&&) = default;
     BasicFixParser& operator=(BasicFixParser&&) = default;
 
-    std::size_t parse(ConstBuffer buf)
+    std::size_t parse(ConstBuffer buf, Time now)
     {
         // If body length has not been read.
-        if (offset_ == 0) {
+        if (msg_type_off_ == 0) {
             // Then try to read it.
             if (!parse_body_len(buf)) {
                 return 0;
@@ -58,14 +56,14 @@ class BasicFixParser {
         }
         std::size_t sum{0};
         do {
-            const std::size_t len{offset_ + body_len_ + CheckSumLen};
+            const std::size_t len{msg_type_off_ + body_len_ + CheckSumLen};
             // Break if incomplete message.
             if (buffer_size(buf) < len) {
                 break;
             }
             const auto* const begin = buffer_cast<const char*>(buf);
             const Version ver{begin[6] - '0', begin[8] - '0'};
-            static_cast<DerivedT*>(this)->on_message(ver, {begin + offset_, body_len_});
+            static_cast<DerivedT*>(this)->on_message({begin, len}, msg_type_off_, ver, now);
             // Skip to next message.
             buf = advance(buf, len);
             sum += len;
@@ -78,7 +76,7 @@ class BasicFixParser {
   private:
     void clear() noexcept
     {
-        offset_ = 0;
+        msg_type_off_ = 0;
         body_len_ = 0;
     }
     bool parse_body_len(ConstBuffer buf)
@@ -113,11 +111,11 @@ class BasicFixParser {
         if (*it != Soh) {
             throw ProtocolException{"invalid FIX body length"sv};
         }
-        offset_ = it + 1 - begin;
+        msg_type_off_ = it + 1 - begin;
         body_len_ = body_len;
         return true;
     }
-    std::size_t offset_{0}, body_len_{0};
+    std::size_t msg_type_off_{0}, body_len_{0};
 };
 
 } // namespace fix

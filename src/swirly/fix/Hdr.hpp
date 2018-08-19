@@ -14,34 +14,36 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Backoff.hpp"
+#ifndef SWIRLY_FIX_HDR_HPP
+#define SWIRLY_FIX_HDR_HPP
 
-#include <chrono>
-#include <thread>
+#include <swirly/fix/Field.hpp>
+#include <swirly/fix/SessId.hpp>
 
 namespace swirly {
-using namespace std::literals::chrono_literals;
-inline namespace app {
+inline namespace fix {
 
-void PhasedBackoff::idle() noexcept
+struct FixHdr {
+    MsgType::View msg_type;
+    SenderCompId::View sender_comp_id;
+    TargetCompId::View target_comp_id;
+    MsgSeqNum msg_seq_num;
+    SendingTime sending_time;
+    std::optional<PossDupFlag> poss_dup;
+    std::optional<PossResend> poss_resend;
+};
+
+SWIRLY_API std::ostream& operator<<(std::ostream& os, const FixHdr& hdr);
+
+SWIRLY_API std::size_t parse_hdr(std::string_view msg, std::size_t msg_type_off, FixHdr& hdr);
+
+template <typename StringT>
+BasicFixSessId<StringT> get_sess_id(Version ver, const FixHdr& hdr) noexcept
 {
-    if (i_ < 1000) {
-        cpu_relax();
-    } else if (i_ < 2000) {
-        sched_yield();
-    } else if (i_ < 4000) {
-        std::this_thread::sleep_for(1ms);
-    } else {
-        // Deep sleep.
-        std::this_thread::sleep_for(250ms);
-    }
-    ++i_;
+    return {ver, StringT{hdr.sender_comp_id.value}, StringT{hdr.target_comp_id.value}};
 }
 
-void YieldBackoff::idle() noexcept
-{
-    sched_yield();
-}
-
-} // namespace app
+} // namespace fix
 } // namespace swirly
+
+#endif // SWIRLY_FIX_HDR_HPP

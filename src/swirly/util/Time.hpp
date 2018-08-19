@@ -28,8 +28,8 @@
 #include <sys/time.h>
 
 namespace swirly {
-inline namespace util {
 using namespace std::literals::chrono_literals;
+inline namespace util {
 
 struct SWIRLY_API UnixClock {
     using duration = std::chrono::nanoseconds;

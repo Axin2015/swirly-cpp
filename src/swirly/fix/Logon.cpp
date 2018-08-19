@@ -14,34 +14,35 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Backoff.hpp"
+#include "Logon.hpp"
 
-#include <chrono>
-#include <thread>
+#include "Lexer.hpp"
 
 namespace swirly {
-using namespace std::literals::chrono_literals;
-inline namespace app {
+inline namespace fix {
+using namespace std;
 
-void PhasedBackoff::idle() noexcept
+ostream& operator<<(ostream& os, const Logon& body)
 {
-    if (i_ < 1000) {
-        cpu_relax();
-    } else if (i_ < 2000) {
-        sched_yield();
-    } else if (i_ < 4000) {
-        std::this_thread::sleep_for(1ms);
-    } else {
-        // Deep sleep.
-        std::this_thread::sleep_for(250ms);
+    return os << body.encrypt_method << body.heart_bt_int;
+}
+
+void parse_body(string_view msg, size_t body_off, Logon& body)
+{
+    msg.remove_suffix(CheckSumLen);
+    FixLexer lex{msg, body_off};
+    while (!lex.empty()) {
+        const auto [t, v] = lex.next();
+        switch (t) {
+        case EncryptMethod::Tag:
+            body.encrypt_method = from_string<EncryptMethod::Type>(v);
+            break;
+        case HeartBtInt::Tag:
+            body.heart_bt_int = from_string<HeartBtInt::Type>(v);
+            break;
+        }
     }
-    ++i_;
 }
 
-void YieldBackoff::idle() noexcept
-{
-    sched_yield();
-}
-
-} // namespace app
+} // namespace fix
 } // namespace swirly

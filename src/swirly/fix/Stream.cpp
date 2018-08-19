@@ -20,8 +20,6 @@ namespace swirly {
 inline namespace fix {
 using namespace std;
 namespace {
-// Assumption: begin-string is always FIX.x.y format.
-enum { BodyLenStart = "8=FIX.x.y^9="sv.size(), CheckSumLen = "10=000^"sv.size() };
 
 void put_check_sum(char* s, uint64_t sum) noexcept
 {
@@ -36,6 +34,7 @@ void put_check_sum(char* s, uint64_t sum) noexcept
     s[1] = '0';
     s[0] = '1';
 }
+
 } // namespace
 
 FixBuf::~FixBuf() = default;

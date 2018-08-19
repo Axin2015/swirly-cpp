@@ -25,13 +25,25 @@
 namespace swirly {
 inline namespace fix {
 
-template <int TagN, typename ValueT, typename EnableT = void>
-class FixField;
+template <typename ValueT>
+struct ViewTraits {
+    using Type = void;
+};
+
+template <>
+struct ViewTraits<std::string> {
+    using Type = std::string_view;
+};
+
+template <std::size_t MaxN>
+struct ViewTraits<StringBuf<MaxN>> {
+    using Type = std::string_view;
+};
 
 template <int TagN, typename ValueT>
-class FixField<TagN, ValueT, std::enable_if_t<!std::is_arithmetic_v<ValueT>>> {
-  public:
-    using ValueType = ValueT;
+struct FixField {
+    using Type = ValueT;
+    using View = FixField<TagN, typename ViewTraits<ValueT>::Type>;
 
     FixField() = default;
     ~FixField() = default;
@@ -44,110 +56,79 @@ class FixField<TagN, ValueT, std::enable_if_t<!std::is_arithmetic_v<ValueT>>> {
     FixField(FixField&&) = default;
     FixField& operator=(FixField&&) = default;
 
-    FixField(const ValueT& value)
-    : value_{value}
+    template <typename ArgT>
+    constexpr FixField(ArgT&& arg)
+    : value(std::forward<ArgT>(arg))
     {
     }
-    FixField& operator=(const ValueT& value)
+    template <typename ArgT>
+    constexpr FixField& operator=(ArgT&& arg)
     {
-        value_ = value;
+        value = std::forward<ArgT>(arg);
         return *this;
     }
-    FixField(ValueT&& value)
-    : value_{std::move(value)}
-    {
-    }
-    FixField& operator=(ValueT&& value)
-    {
-        value_ = std::move(value);
-        return *this;
-    }
-    static constexpr int tag() noexcept { return TagN; }
-    constexpr const ValueT& value() const noexcept { return value_; }
-
-  private:
-    ValueT value_{};
+    static constexpr int Tag = TagN;
+    ValueT value{};
 };
-
-template <int TagN, typename ValueT>
-class FixField<TagN, ValueT, std::enable_if_t<std::is_arithmetic_v<ValueT>>> {
-  public:
-    using ValueType = ValueT;
-
-    constexpr FixField() noexcept = default;
-    ~FixField() = default;
-
-    // Copy.
-    constexpr FixField(const FixField&) noexcept = default;
-    constexpr FixField& operator=(const FixField&) noexcept = default;
-
-    // Move.
-    constexpr FixField(FixField&&) noexcept = default;
-    constexpr FixField& operator=(FixField&&) noexcept = default;
-
-    constexpr FixField(ValueT value) noexcept
-    : value_{value}
-    {
-    }
-    constexpr FixField& operator=(ValueT value) noexcept
-    {
-        value_ = value;
-        return *this;
-    }
-    static constexpr int tag() noexcept { return TagN; }
-    constexpr ValueT value() const noexcept { return value_; }
-
-  private:
-    ValueT value_{};
-};
-
-static_assert(FixField<9, int>{101}.value() == FixField<9, int>{101}.value());
 
 template <int TagN, typename ValueT>
 bool operator==(const FixField<TagN, ValueT>& lhs, const FixField<TagN, ValueT>& rhs) noexcept
 {
-    return lhs.value() == rhs.value();
+    return lhs.value == rhs.value;
 }
 
 template <int TagN, typename ValueT>
 bool operator!=(const FixField<TagN, ValueT>& lhs, const FixField<TagN, ValueT>& rhs) noexcept
 {
-    return lhs.value() != rhs.value();
+    return lhs.value != rhs.value;
 }
 
 template <int TagN, typename ValueT>
 std::ostream& operator<<(std::ostream& os, const FixField<TagN, ValueT>& field)
 {
-    os << field.tag() << '=';
-    if constexpr (std::is_same_v<ValueT, Time>) {
-        os << put_time<Millis>(field.value(), "%Y%m%d-%T");
+    os << field.Tag << '=';
+    if constexpr (std::is_same_v<ValueT, bool>) {
+        os << (field.value ? 'Y' : 'N');
+    } else if constexpr (std::is_same_v<ValueT, Time>) {
+        os << put_time<Millis>(field.value, "%Y%m%d-%T");
     } else {
-        os << field.value();
+        os << field.value;
     }
     return os << '\1';
 }
 
 template <int TagN>
-using DoubleFixField = FixField<TagN, double>;
+using BoolField = FixField<TagN, bool>;
 
 template <int TagN>
-using IntFixField = FixField<TagN, int>;
+using DoubleField = FixField<TagN, double>;
+
+template <int TagN>
+using IntField = FixField<TagN, int>;
 
 template <int TagN, std::size_t MaxN>
-using StringFixField = FixField<TagN, StringBuf<MaxN>>;
+using StringField = FixField<TagN, StringBuf<MaxN>>;
 
 template <int TagN>
-using TimeFixField = FixField<TagN, Time>;
+using StringViewField = FixField<TagN, std::string_view>;
 
-using BeginString = StringFixField<8, 7>;
-using BodyLength = IntFixField<9>;
-using MsgSeqNum = IntFixField<34>;
-using MsgType = StringFixField<35, 2>;
-using SenderCompId = StringFixField<49, 32>;
-using SendingTime = TimeFixField<52>;
-using TargetCompId = StringFixField<56, 32>;
-using EncryptMethod = IntFixField<98>;
-using HeartBtInt = IntFixField<108>;
+template <int TagN>
+using TimeField = FixField<TagN, Time>;
+
+using BeginString = StringField<8, 7>;
+using BodyLength = IntField<9>;
+using MsgSeqNum = IntField<34>;
+using MsgType = StringField<35, 2>;
+using SenderCompId = StringField<49, 32>;
+using PossDupFlag = BoolField<43>;
+using SendingTime = TimeField<52>;
+using TargetCompId = StringField<56, 32>;
+using PossResend = BoolField<97>;
+using EncryptMethod = IntField<98>;
+using HeartBtInt = IntField<108>;
+
+static_assert(FixField<8, std::string_view>{}.Tag == 8);
+static_assert(BodyLength{101}.value == BodyLength{101}.value);
 
 } // namespace fix
 } // namespace swirly

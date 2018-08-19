@@ -31,6 +31,20 @@ using namespace swirly;
 
 BOOST_AUTO_TEST_SUITE(StringSuite)
 
+BOOST_AUTO_TEST_CASE(StringViewCase)
+{
+    // Make sure the string is not optimised away.
+    const auto s = to_string(time(nullptr));
+
+    // Ensure that std::string_view iterators are equivalent across copies of the std::string_view.
+    const string_view a{s};
+    const string_view b{a};
+
+    // Best effort to detect broken assumption.
+    BOOST_TEST(a.begin() == b.begin());
+    BOOST_TEST(a.end() == b.end());
+}
+
 BOOST_AUTO_TEST_CASE(ToStringCase)
 {
     BOOST_TEST(to_string("foo"sv) == "foo"s);
