@@ -84,7 +84,7 @@ FixLexer::ConstIterator FixLexer::get_tag(ConstIterator it, int& tag) const
     assert(it != msg_.cend());
     tag = 0;
     if (isdigit(*it)) {
-        tag += *it++ - '0';
+        tag = *it++ - '0';
         for (;;) {
             if (it == msg_.cend()) {
                 throw ProtocolException{"partial FIX tag"};

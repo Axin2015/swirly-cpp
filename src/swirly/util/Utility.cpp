@@ -57,12 +57,10 @@ ValueT stoi(string_view sv) noexcept
     // ValueT type must be signed.
     enable_if_t<is_signed_v<ValueT>, ValueT> i{0};
     if (isdigit(*it)) {
-        i += *it - '0';
-        ++it;
+        i = *it++ - '0';
         while (it != end && isdigit(*it)) {
             i *= 10;
-            i += *it - '0';
-            ++it;
+            i += *it++ - '0';
         }
     }
     return neg ? -i : i;
@@ -88,12 +86,10 @@ ValueT stou(string_view sv) noexcept
     // ValueT type must be unsigned.
     enable_if_t<is_unsigned_v<ValueT>, ValueT> u{0};
     if (isdigit(*it)) {
-        u += *it - '0';
-        ++it;
+        u = *it++ - '0';
         while (it != end && isdigit(*it)) {
             u *= 10;
-            u += *it - '0';
-            ++it;
+            u += *it++ - '0';
         }
     }
     return u;

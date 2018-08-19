@@ -94,7 +94,7 @@ class BasicFixParser {
         // Attempt to extract body length digits.
         std::size_t body_len{0};
         if (std::isdigit(*it)) {
-            body_len += *it++ - '0';
+            body_len = *it++ - '0';
             for (;;) {
                 if (it == end) {
                     // Partial body length.
