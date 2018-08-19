@@ -1,3 +1,3 @@
 [submodule "HdrHistogram_c"]
 	path = HdrHistogram_c
-	url = https://github.com/swirlycloud/HdrHistogram_c.git
+	url = https://gitlab.com/swirlycloud/HdrHistogram_c.git
