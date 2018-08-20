@@ -148,8 +148,10 @@ class Process(object):
   def __init__(self, prog, conf_file, start_time):
     proc = subprocess.Popen([
       prog,
-      '-f' + conf_file,
-      '-s' + str(start_time)
+      '-f',
+      conf_file,
+      '-s',
+      str(start_time)
     ])
     self.proc = proc
 

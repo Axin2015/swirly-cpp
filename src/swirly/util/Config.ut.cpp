@@ -128,7 +128,7 @@ baz=404
     BOOST_TEST(!is.fail());
 
     // Verify that getter with nullptr default compiles.
-    BOOST_TEST(parent.get("foo", nullptr) != nullptr);
+    BOOST_TEST(parent.get("foo", nullptr));
 
     // Conversion from internal std::string to std::string_view is a special case.
     BOOST_TEST(parent.get<string_view>("foo") == "101"sv);
