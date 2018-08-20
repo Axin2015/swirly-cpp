@@ -129,8 +129,10 @@ std::size_t hash_value(const BasicFixSessId<StringT>& sess_id)
 {
     std::size_t h{0};
     boost::hash_combine(h, sess_id.version);
-    boost::hash_combine(h, sess_id.sender_comp_id);
-    boost::hash_combine(h, sess_id.target_comp_id);
+    boost::hash_combine(
+        h, boost::hash_range(sess_id.sender_comp_id.begin(), sess_id.sender_comp_id.end()));
+    boost::hash_combine(
+        h, boost::hash_range(sess_id.target_comp_id.begin(), sess_id.target_comp_id.end()));
     return h;
 }
 

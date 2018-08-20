@@ -11,14 +11,18 @@ SUDOERS_FILE=/etc/sudoers
 # 0. update package lists
 sudo apt-get update
 sudo apt-get install -y gnupg2 wget
+sudo apt-get install --allow-unauthenticated -y deb-multimedia-keyring
 echo 'deb http://deb.debian.org/debian unstable main' \
     | sudo tee -a /etc/apt/sources.list
 echo 'deb http://apt.llvm.org/stretch/ llvm-toolchain-stretch-6.0 main' \
     | sudo tee -a /etc/apt/sources.list
+echo 'deb http://www.deb-multimedia.org sid main' \
+    | sudo tee -a /etc/apt/sources.list
 wget --no-check-certificate -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
 sudo apt-get update
-sudo apt-get install -y clang-6.0 clang-format-6.0 clang-tools-6.0 cmake g++-8 gdb git \
-     libboost-date-time1.63-dev libboost-test1.63-dev libsqlite3-dev sqlite3 valgrind vim
+sudo apt-get install -y clang-6.0 clang-format-6.0 clang-tools-6.0 cmake g++-8 \
+     flatbuffers-compiler gdb git libboost-date-time1.63-dev libboost-test1.63-dev \
+     libflatbuffers-dev libsqlite3-dev zlib1g-dev sqlite3 valgrind vim
 
 # 0.1. reinstall sshd (workaround for initial version of WSL)
 sudo apt remove -y --purge openssh-server

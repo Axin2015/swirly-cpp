@@ -20,7 +20,7 @@
 #include <swirly/util/Compare.hpp>
 #include <swirly/util/String.hpp>
 
-#include <boost/container_hash/hash.hpp>
+#include <boost/functional/hash.hpp>
 
 namespace swirly {
 inline namespace util {
