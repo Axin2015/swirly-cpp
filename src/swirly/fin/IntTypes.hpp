@@ -14,10 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_FIN_BASICTYPES_HPP
-#define SWIRLY_FIN_BASICTYPES_HPP
+#ifndef SWIRLY_FIN_INTTYPES_HPP
+#define SWIRLY_FIN_INTTYPES_HPP
 
-#include <swirly/util/IntWrapper.hpp>
+#include <swirly/util/IntTypes.hpp>
 
 #include <swirly/fbs/Types_generated.h>
 
@@ -179,4 +179,4 @@ inline std::ostream& operator<<(std::ostream& os, State state)
 } // namespace fbs
 } // namespace swirly
 
-#endif // SWIRLY_FIN_BASICTYPES_HPP
+#endif // SWIRLY_FIN_INTTYPES_HPP

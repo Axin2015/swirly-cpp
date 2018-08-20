@@ -28,7 +28,6 @@ endif()
 
 set(lib_SOURCES
   Asset.cpp
-  BasicTypes.cpp
   Conv.cpp
   Date.cpp
   DsvModel.cpp
@@ -36,6 +35,7 @@ set(lib_SOURCES
   Exception.cpp
   Exec.cpp
   Instr.cpp
+  IntTypes.cpp
   Journ.cpp
   Level.cpp
   Limits.cpp
@@ -78,13 +78,13 @@ endforeach()
 
 set(test_SOURCES
   Asset.ut.cpp
-  BasicTypes.ut.cpp
-  Instr.ut.cpp
   Date.ut.cpp
   Exception.ut.cpp
+  Instr.ut.cpp
+  IntTypes.ut.cpp
   Level.ut.cpp
-  MarketId.ut.cpp
   Market.ut.cpp
+  MarketId.ut.cpp
   MsgHandler.ut.cpp
   MsgQueue.ut.cpp
   Posn.ut.cpp

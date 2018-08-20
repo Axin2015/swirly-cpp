@@ -17,7 +17,7 @@
 #ifndef SWIRLY_FIN_CONV_HPP
 #define SWIRLY_FIN_CONV_HPP
 
-#include <swirly/fin/BasicTypes.hpp>
+#include <swirly/fin/IntTypes.hpp>
 
 #include <cmath>
 

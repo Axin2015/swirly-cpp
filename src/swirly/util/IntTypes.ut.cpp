@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "IntWrapper.hpp"
+#include "IntTypes.hpp"
 
 #include <boost/test/unit_test.hpp>
 
@@ -37,7 +37,7 @@ constexpr Test operator""_test(unsigned long long val) noexcept
 
 } // namespace
 
-BOOST_AUTO_TEST_SUITE(IntWrapperSuite)
+BOOST_AUTO_TEST_SUITE(IntTypesSuite)
 
 BOOST_AUTO_TEST_CASE(IntAddAssignCase)
 {

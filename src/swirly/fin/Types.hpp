@@ -17,7 +17,7 @@
 #ifndef SWIRLY_FIN_TYPES_HPP
 #define SWIRLY_FIN_TYPES_HPP
 
-#include <swirly/fin/BasicTypes.hpp>
+#include <swirly/fin/IntTypes.hpp>
 #include <swirly/fin/Limits.hpp>
 
 #include <swirly/util/StringBuf.hpp>

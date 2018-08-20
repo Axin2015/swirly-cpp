@@ -17,11 +17,15 @@
 #ifndef SWIRLY_UTIL_TYPES_HPP
 #define SWIRLY_UTIL_TYPES_HPP
 
-#include <swirly/util/BasicTypes.hpp>
-#include <swirly/util/Date.hpp>
-
 namespace swirly {
 inline namespace util {
+
+template <typename ValueT>
+struct Result {
+    ValueT value{};
+    bool valid{false};
+};
+
 } // namespace util
 } // namespace swirly
 

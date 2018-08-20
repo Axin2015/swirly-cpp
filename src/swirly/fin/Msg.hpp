@@ -21,7 +21,6 @@
 
 #include <swirly/app/MemQueue.hpp>
 
-#include <swirly/util/BasicTypes.hpp>
 #include <swirly/util/Date.hpp>
 #include <swirly/util/Symbol.hpp>
 

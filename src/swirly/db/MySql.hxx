@@ -19,7 +19,7 @@
 
 #include <swirly/db/Types.hpp>
 
-#include <swirly/util/IntWrapper.hpp>
+#include <swirly/util/IntTypes.hpp>
 #include <swirly/util/String.hpp>
 
 #include <mysql.h>

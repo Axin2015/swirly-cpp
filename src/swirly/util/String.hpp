@@ -28,25 +28,27 @@ using namespace std::literals::string_view_literals;
 inline namespace util {
 
 template <typename ValueT>
-inline ValueT from_string(std::string_view sv) noexcept
+constexpr ValueT from_string(std::string_view sv)
 {
     using Traits = TypeTraits<ValueT>;
     return Traits::from_string(sv);
 }
+static_assert(from_string<int>("-123"sv) == -123);
 
 template <typename ValueT>
-inline ValueT from_string(const std::string& s) noexcept
+constexpr ValueT from_string(const std::string& s)
 {
     using Traits = TypeTraits<ValueT>;
     return Traits::from_string(s);
 }
 
 template <typename ValueT>
-inline ValueT from_string(const char* s) noexcept
+constexpr ValueT from_string(const char* s)
 {
     using Traits = TypeTraits<ValueT>;
     return Traits::from_string(std::string_view{s});
 }
+static_assert(from_string<int>("-123") == -123);
 
 template <typename ValueT, typename std::enable_if_t<std::is_arithmetic_v<ValueT>>* = nullptr>
 std::string to_string(ValueT val)
@@ -63,7 +65,7 @@ std::string to_string(const ValueT& val)
 }
 
 template <std::size_t SizeN>
-std::string_view to_string_view(const char (&val)[SizeN]) noexcept
+constexpr std::string_view to_string_view(const char (&val)[SizeN]) noexcept
 {
     return {val, strnlen(val, SizeN)};
 }

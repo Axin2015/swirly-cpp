@@ -17,7 +17,7 @@
 #ifndef SWIRLYD_RESTSERV_HPP
 #define SWIRLYD_RESTSERV_HPP
 
-#include <swirly/util/BasicTypes.hpp>
+#include <swirly/util/IntTypes.hpp>
 #include <swirly/util/Symbol.hpp>
 #include <swirly/util/Time.hpp>
 #include <swirly/util/Tokeniser.hpp>
