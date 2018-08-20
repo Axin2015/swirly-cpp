@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_SUITE(OptionsSuite)
 
 BOOST_AUTO_TEST_CASE(OptionsNormalCase)
 {
-    int var;
+    int var{-1};
     bool flag{false};
     std::string command;
 
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(OptionsNormalCase)
 
 BOOST_AUTO_TEST_CASE(OptionsExceptionsCase)
 {
-    int var;
+    int var{-1};
 
     Options opts{"Exception Test options"};
     opts('l', "long_option", Value{var}, "LongOption Description");
@@ -83,13 +83,29 @@ BOOST_AUTO_TEST_CASE(OptionsExceptionsCase)
 
 BOOST_AUTO_TEST_CASE(OptionsInvalidOptionCase)
 {
-    int var{-1};
-    Options opts{"Options"};
-    opts('l', "long_option", Value{var}, "LongOption Description");
+    {
+        int var{-1};
+        Options opts{"Options"};
+        opts('l', "long_option", Value{var}, "LongOption Description");
 
-    const char* argv[] = {"executable_name", "--bad"};
-    int argc = 2;
-    BOOST_CHECK_THROW(opts.parse(argc, const_cast<char**>(argv)), std::runtime_error);
+        const char* argv[] = {"executable_name", "--bad", "123"};
+        int argc = 3;
+
+        BOOST_CHECK_THROW(opts.parse(argc, const_cast<char**>(argv)), std::runtime_error);
+    }
+
+    {
+        int var{-1};
+        Options opts{"Options"};
+        opts('l', "long_option", Value{var}, "LongOption Description");
+
+        const char* argv[] = {"executable_name", "-l123", "456"};
+        int argc = 3;
+
+        // FIXME: this is incorrect.
+        opts.parse(argc, const_cast<char**>(argv));
+        BOOST_TEST(var == 456);
+    }
 }
 
 BOOST_AUTO_TEST_CASE(OptionsNoValueCase)
@@ -106,7 +122,7 @@ BOOST_AUTO_TEST_CASE(OptionsNoValueCase)
 
 BOOST_AUTO_TEST_CASE(OptionsMultiToken)
 {
-    int var;
+    int var{-1};
     std::vector<int> single;
     std::vector<int> multiple;
 
