@@ -16,86 +16,9 @@
  */
 #include "Utility.hpp"
 
-#include <cassert>
-#include <cctype>
-
 namespace swirly {
 inline namespace util {
 using namespace std;
-
-namespace {
-
-template <typename ValueT>
-ValueT stoi(string_view sv) noexcept
-{
-    auto it = sv.begin(), end = sv.end();
-
-    // Skip leading whitespace.
-    for (;;) {
-        if (it == end) {
-            return 0;
-        }
-        if (!isspace(*it)) {
-            break;
-        }
-        ++it;
-    }
-    assert(it != end);
-
-    // Handle sign.
-    bool neg{false};
-    if (*it == '-') {
-        if (++it == end) {
-            return 0;
-        }
-        neg = true;
-    } else if (*it == '+' && ++it == end) {
-        return 0;
-    }
-    assert(it != end);
-
-    // ValueT type must be signed.
-    enable_if_t<is_signed_v<ValueT>, ValueT> i{0};
-    if (isdigit(*it)) {
-        i = *it++ - '0';
-        while (it != end && isdigit(*it)) {
-            i *= 10;
-            i += *it++ - '0';
-        }
-    }
-    return neg ? -i : i;
-}
-
-template <typename ValueT>
-ValueT stou(string_view sv) noexcept
-{
-    auto it = sv.begin(), end = sv.end();
-
-    // Skip leading whitespace.
-    for (;;) {
-        if (it == end) {
-            return 0;
-        }
-        if (!isspace(*it)) {
-            break;
-        }
-        ++it;
-    }
-    assert(it != end);
-
-    // ValueT type must be unsigned.
-    enable_if_t<is_unsigned_v<ValueT>, ValueT> u{0};
-    if (isdigit(*it)) {
-        u = *it++ - '0';
-        while (it != end && isdigit(*it)) {
-            u *= 10;
-            u += *it++ - '0';
-        }
-    }
-    return u;
-}
-
-} // namespace
 
 int hex_digits(int64_t i) noexcept
 {
@@ -118,36 +41,6 @@ int hex_digits(int64_t i) noexcept
         ++n;
     }
     return n;
-}
-
-int16_t stoi16(string_view sv) noexcept
-{
-    return stoi<int16_t>(sv);
-}
-
-int32_t stoi32(string_view sv) noexcept
-{
-    return stoi<int32_t>(sv);
-}
-
-int64_t stoi64(string_view sv) noexcept
-{
-    return stoi<int64_t>(sv);
-}
-
-uint16_t stou16(string_view sv) noexcept
-{
-    return stou<uint16_t>(sv);
-}
-
-uint32_t stou32(string_view sv) noexcept
-{
-    return stou<uint32_t>(sv);
-}
-
-uint64_t stou64(string_view sv) noexcept
-{
-    return stou<uint64_t>(sv);
 }
 
 bool stob(string_view sv, bool dfl) noexcept

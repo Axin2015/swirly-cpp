@@ -62,7 +62,7 @@ struct TypeTraits<Version> {
     static auto from_string(std::string_view sv) noexcept
     {
         const auto [major, minor] = split_pair(sv, '.');
-        return Version{stoi32(major), stoi32(minor)};
+        return Version{TypeTraits<int>::from_string(major), TypeTraits<int>::from_string(minor)};
     }
     static auto from_string(const std::string& s) noexcept
     {

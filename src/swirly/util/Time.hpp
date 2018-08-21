@@ -230,9 +230,27 @@ inline timespec operator-(timespec lhs, timespec rhs) noexcept
     return ts;
 }
 
+template <typename RepT, typename PeriodT>
+struct TypeTraits<std::chrono::duration<RepT, PeriodT>> {
+    static auto from_string(std::string_view sv) noexcept
+    {
+        using namespace std::chrono;
+        using Duration = duration<RepT, PeriodT>;
+        using Rep = typename Duration::rep;
+        return Duration{TypeTraits<Rep>::from_string(sv)};
+    }
+    static auto from_string(const std::string& s) noexcept
+    {
+        return from_string(std::string_view{s});
+    }
+};
+
 template <>
 struct TypeTraits<Time> {
-    static auto from_string(std::string_view sv) noexcept { return to_time(Millis{stoi64(sv)}); }
+    static auto from_string(std::string_view sv) noexcept
+    {
+        return to_time(TypeTraits<Millis>::from_string(sv));
+    }
     static auto from_string(const std::string& s) noexcept
     {
         return from_string(std::string_view{s});

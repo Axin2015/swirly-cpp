@@ -32,9 +32,9 @@ Page parse_query(string_view query) noexcept
         string_view key, val;
         tie(key, val) = split_pair(toks.top(), '=');
         if (key == "offset"sv) {
-            page.offset = stou64(val);
+            page.offset = from_string<uint64_t>(val);
         } else if (key == "limit"sv) {
-            page.limit = stou64(val);
+            page.limit = from_string<uint64_t>(val);
         }
         toks.pop();
     }

@@ -261,7 +261,7 @@ int main(int argc, char* argv[])
         Journ& journ = db_ctx.journ();
 
         EpollReactor reactor{1024};
-        const TcpEndpoint ep{Tcp::v4(), stou16(http_port)};
+        const TcpEndpoint ep{Tcp::v4(), from_string<uint16_t>(http_port)};
         HttpServ http_serv{reactor, ep, rest_serv};
 
         ReactorThread reactor_thread{reactor, ThreadConfig{"reactor"s}};

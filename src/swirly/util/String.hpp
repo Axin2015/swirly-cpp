@@ -21,7 +21,6 @@
 
 #include <cstring>
 #include <sstream>
-#include <string_view>
 
 namespace swirly {
 using namespace std::literals::string_literals;
@@ -40,6 +39,13 @@ inline ValueT from_string(const std::string& s) noexcept
 {
     using Traits = TypeTraits<ValueT>;
     return Traits::from_string(s);
+}
+
+template <typename ValueT>
+inline ValueT from_string(const char* s) noexcept
+{
+    using Traits = TypeTraits<ValueT>;
+    return Traits::from_string(std::string_view{s});
 }
 
 template <typename ValueT, typename std::enable_if_t<std::is_arithmetic_v<ValueT>>* = nullptr>
