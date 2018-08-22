@@ -30,19 +30,42 @@ template <typename>
 struct DependentFalse : std::false_type {
 };
 
+constexpr bool isdigit(int c) noexcept
+{
+    return c >= '0' && c <= '9';
+}
+static_assert(isdigit('0') && isdigit('9') && !isdigit('A'));
+
+template <typename ValueT>
+constexpr ValueT ston(std::string_view sv) noexcept
+{
+    auto it = sv.begin(), end = sv.end();
+
+    bool neg{false};
+    if constexpr (std::is_signed_v<ValueT>) {
+        // Handle sign.
+        if (*it == '-') {
+            if (++it == end) {
+                return 0;
+            }
+            neg = true;
+        }
+    }
+
+    // ValueT type must be signed.
+    ValueT n{0};
+    if (isdigit(*it)) {
+        n = *it++ - '0';
+        while (it != end && isdigit(*it)) {
+            n *= 10;
+            n += *it++ - '0';
+        }
+    }
+    return neg ? -n : n;
+}
+static_assert(ston<int>(std::string_view{"-123"}) == -123);
+
 SWIRLY_API int hex_digits(int64_t i) noexcept;
-
-SWIRLY_API int16_t stoi16(std::string_view sv) noexcept;
-
-SWIRLY_API int32_t stoi32(std::string_view sv) noexcept;
-
-SWIRLY_API int64_t stoi64(std::string_view sv) noexcept;
-
-SWIRLY_API uint16_t stou16(std::string_view sv) noexcept;
-
-SWIRLY_API uint32_t stou32(std::string_view sv) noexcept;
-
-SWIRLY_API uint64_t stou64(std::string_view sv) noexcept;
 
 SWIRLY_API bool stob(std::string_view sv, bool dfl = false) noexcept;
 

@@ -27,54 +27,9 @@ inline namespace util {
 template <typename ValueT, typename EnableT = void>
 struct TypeTraits;
 
-template <>
-struct TypeTraits<std::int16_t> {
-    static auto from_string(std::string_view sv) noexcept { return stoi16(sv); }
-    static auto from_string(const std::string& s) noexcept
-    {
-        return from_string(std::string_view{s});
-    }
-};
-
-template <>
-struct TypeTraits<std::int32_t> {
-    static auto from_string(std::string_view sv) noexcept { return stoi32(sv); }
-    static auto from_string(const std::string& s) noexcept
-    {
-        return from_string(std::string_view{s});
-    }
-};
-
-template <>
-struct TypeTraits<std::int64_t> {
-    static auto from_string(std::string_view sv) noexcept { return stoi64(sv); }
-    static auto from_string(const std::string& s) noexcept
-    {
-        return from_string(std::string_view{s});
-    }
-};
-
-template <>
-struct TypeTraits<std::uint16_t> {
-    static auto from_string(std::string_view sv) noexcept { return stou16(sv); }
-    static auto from_string(const std::string& s) noexcept
-    {
-        return from_string(std::string_view{s});
-    }
-};
-
-template <>
-struct TypeTraits<std::uint32_t> {
-    static auto from_string(std::string_view sv) noexcept { return stou32(sv); }
-    static auto from_string(const std::string& s) noexcept
-    {
-        return from_string(std::string_view{s});
-    }
-};
-
-template <>
-struct TypeTraits<std::uint64_t> {
-    static auto from_string(std::string_view sv) noexcept { return stou64(sv); }
+template <typename ValueT>
+struct TypeTraits<ValueT, std::enable_if_t<std::is_integral_v<ValueT>>> {
+    static auto from_string(std::string_view sv) noexcept { return ston<ValueT>(sv); }
     static auto from_string(const std::string& s) noexcept
     {
         return from_string(std::string_view{s});

@@ -38,7 +38,7 @@ class ScopedIds {
     {
         Tokeniser toks{sv, ","sv};
         while (!toks.empty()) {
-            ids.push_back(static_cast<Id64>(stou64(toks.top())));
+            ids.push_back(static_cast<Id64>(from_string<int64_t>(toks.top())));
             toks.pop();
         }
     }
@@ -59,13 +59,13 @@ string_view get_accnt(const HttpRequest& req)
 
 uint32_t get_perm(const HttpRequest& req)
 {
-    return stou32(req.perm());
+    return from_string<uint32_t>(req.perm());
 }
 
 Time get_time(const HttpRequest& req) noexcept
 {
     const string_view val{req.time()};
-    return val.empty() ? UnixClock::now() : to_time(Millis{stou64(val)});
+    return val.empty() ? UnixClock::now() : to_time(from_string<Millis>(val));
 }
 
 string_view get_admin(const HttpRequest& req)
@@ -417,7 +417,7 @@ void RestServ::market_request(const HttpRequest& req, Time now, HttpStream& os)
         return;
     }
 
-    const auto settl_date = IsoDate{stou64(path_.top())};
+    const auto settl_date = from_string<IsoDate>(path_.top());
     path_.pop();
 
     if (path_.empty()) {
@@ -536,7 +536,7 @@ void RestServ::order_request(const HttpRequest& req, Time now, HttpStream& os)
         return;
     }
 
-    const auto settl_date = IsoDate{stou64(path_.top())};
+    const auto settl_date = from_string<IsoDate>(path_.top());
     path_.pop();
 
     if (path_.empty()) {
@@ -697,7 +697,7 @@ void RestServ::trade_request(const HttpRequest& req, Time now, HttpStream& os)
         return;
     }
 
-    const auto settl_date = IsoDate{stou64(path_.top())};
+    const auto settl_date = from_string<IsoDate>(path_.top());
     path_.pop();
 
     if (path_.empty()) {
@@ -790,7 +790,7 @@ void RestServ::posn_request(const HttpRequest& req, Time now, HttpStream& os)
         return;
     }
 
-    const auto settl_date = IsoDate{stou64(path_.top())};
+    const auto settl_date = from_string<IsoDate>(path_.top());
     path_.pop();
 
     if (path_.empty()) {

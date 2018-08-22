@@ -52,67 +52,6 @@ BOOST_AUTO_TEST_CASE(ToStringCase)
     BOOST_TEST(stod(to_string(12345.67)) == 12345.67);
 }
 
-BOOST_AUTO_TEST_CASE(Stoi32NoSignCase)
-{
-    BOOST_TEST(stoi32(""sv) == 0);
-    BOOST_TEST(stoi32("1"sv) == 1);
-    BOOST_TEST(stoi32("123"sv) == 123);
-    BOOST_TEST(stoi32(" "sv) == 0);
-    BOOST_TEST(stoi32(" 1 "sv) == 1);
-    BOOST_TEST(stoi32(" 123 "sv) == 123);
-    BOOST_TEST(stoi32("x"sv) == 0);
-    BOOST_TEST(stoi32(" 1x"sv) == 1);
-    BOOST_TEST(stoi32(" 123x"sv) == 123);
-    BOOST_TEST(stoi32("x1 "sv) == 0);
-    BOOST_TEST(stoi32("x123 "sv) == 0);
-}
-
-BOOST_AUTO_TEST_CASE(Stoi32PosSignCase)
-{
-    BOOST_TEST(stoi32("+"sv) == 0);
-    BOOST_TEST(stoi32("+1"sv) == 1);
-    BOOST_TEST(stoi32("+123"sv) == 123);
-    BOOST_TEST(stoi32(" + "sv) == 0);
-    BOOST_TEST(stoi32(" +1 "sv) == 1);
-    BOOST_TEST(stoi32(" +123 "sv) == 123);
-    BOOST_TEST(stoi32("+x"sv) == 0);
-    BOOST_TEST(stoi32(" +1x"sv) == 1);
-    BOOST_TEST(stoi32(" +123x"sv) == 123);
-    BOOST_TEST(stoi32("x+1 "sv) == 0);
-    BOOST_TEST(stoi32("x+123 "sv) == 0);
-}
-
-BOOST_AUTO_TEST_CASE(Stoi32NegSignCase)
-{
-    BOOST_TEST(stoi32("-"sv) == 0);
-    BOOST_TEST(stoi32("-1"sv) == -1);
-    BOOST_TEST(stoi32("-123"sv) == -123);
-    BOOST_TEST(stoi32(" - "sv) == 0);
-    BOOST_TEST(stoi32(" -1 "sv) == -1);
-    BOOST_TEST(stoi32(" -123 "sv) == -123);
-    BOOST_TEST(stoi32("-x"sv) == 0);
-    BOOST_TEST(stoi32(" -1x"sv) == -1);
-    BOOST_TEST(stoi32(" -123x"sv) == -123);
-    BOOST_TEST(stoi32("x-1 "sv) == 0);
-    BOOST_TEST(stoi32("x-123 "sv) == 0);
-}
-
-BOOST_AUTO_TEST_CASE(Stou64Case)
-{
-    BOOST_TEST(stou64(""sv) == 0UL);
-    BOOST_TEST(stou64("1"sv) == 1UL);
-    BOOST_TEST(stou64("123"sv) == 123UL);
-    BOOST_TEST(stou64(" "sv) == 0UL);
-    BOOST_TEST(stou64(" 1 "sv) == 1UL);
-    BOOST_TEST(stou64(" 123 "sv) == 123UL);
-    BOOST_TEST(stou64("x"sv) == 0UL);
-    BOOST_TEST(stou64(" 1x"sv) == 1UL);
-    BOOST_TEST(stou64(" 123x"sv) == 123UL);
-    BOOST_TEST(stou64("x1 "sv) == 0UL);
-    BOOST_TEST(stou64("x123 "sv) == 0UL);
-    BOOST_TEST(stou64("18446744073709551615"sv) == 18446744073709551615ULL);
-}
-
 BOOST_AUTO_TEST_CASE(StobCase)
 {
     BOOST_TEST(stob(""sv, false) == false);
