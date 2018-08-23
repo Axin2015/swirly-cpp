@@ -57,6 +57,7 @@ foreach(file ${lib_SOURCES})
 endforeach()
 
 set(test_SOURCES
+  MemAlloc.ut.cpp
   MemCtx.ut.cpp)
 
 add_executable(swirly-app-test

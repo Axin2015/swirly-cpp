@@ -96,6 +96,7 @@ MemCtx mem_ctx;
 } // namespace
 
 namespace swirly {
+inline namespace app {
 
 void* alloc(size_t size)
 {
@@ -112,6 +113,12 @@ void dealloc(void* ptr, size_t size) noexcept
     return mem_ctx.dealloc(ptr, size);
 }
 
+void dealloc(void* ptr, size_t size, align_val_t al) noexcept
+{
+    return mem_ctx.dealloc(ptr, size, al);
+}
+
+} // namespace app
 } // namespace swirly
 
 int main(int argc, char* argv[])
