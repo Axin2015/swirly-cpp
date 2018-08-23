@@ -27,11 +27,16 @@ inline namespace app {
 SWIRLY_API void* alloc(std::size_t size);
 SWIRLY_API void* alloc(std::size_t size, std::align_val_t al);
 SWIRLY_API void dealloc(void* ptr, std::size_t size) noexcept;
+SWIRLY_API void dealloc(void* ptr, std::size_t size, std::align_val_t al) noexcept;
 
 struct MemAlloc {
     static void* operator new(std::size_t size) { return alloc(size); }
     static void* operator new(std::size_t size, std::align_val_t al) { return alloc(size, al); }
     static void operator delete(void* ptr, std::size_t size) noexcept { return dealloc(ptr, size); }
+    static void operator delete(void* ptr, std::size_t size, std::align_val_t al) noexcept
+    {
+        return dealloc(ptr, size, al);
+    }
 
   protected:
     ~MemAlloc() = default;

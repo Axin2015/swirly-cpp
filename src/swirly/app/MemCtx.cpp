@@ -169,5 +169,12 @@ void MemCtx::dealloc(void* addr, size_t size) noexcept
     impl_->dealloc(addr, size);
 }
 
+void MemCtx::dealloc(void* addr, size_t size, align_val_t al) noexcept
+{
+    assert(impl_);
+    assert(static_cast<size_t>(al) <= CacheLineSize);
+    impl_->dealloc(addr, size);
+}
+
 } // namespace app
 } // namespace swirly

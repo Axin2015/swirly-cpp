@@ -97,7 +97,7 @@ void intrusive_ptr_release(const RefCount<DerivedT, PolicyT>* ptr) noexcept
 template <typename ValueT, typename... ArgsT>
 boost::intrusive_ptr<ValueT> make_intrusive(ArgsT&&... args)
 {
-    return {new (std::align_val_t(alignof(ValueT))) ValueT{std::forward<ArgsT>(args)...}, false};
+    return {new ValueT{std::forward<ArgsT>(args)...}, false};
 }
 
 } // namespace util

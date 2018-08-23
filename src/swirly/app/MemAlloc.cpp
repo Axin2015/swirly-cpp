@@ -23,6 +23,7 @@ using namespace std;
 SWIRLY_WEAK void* alloc(size_t size);
 SWIRLY_WEAK void* alloc(size_t size, align_val_t al);
 SWIRLY_WEAK void dealloc(void* ptr, size_t size) noexcept;
+SWIRLY_WEAK void dealloc(void* ptr, size_t size, align_val_t al) noexcept;
 
 void* alloc(size_t size)
 {
@@ -36,7 +37,20 @@ void* alloc(size_t size, align_val_t al)
 
 void dealloc(void* ptr, size_t size) noexcept
 {
+#if __cpp_sized_deallocation
+    ::operator delete(ptr, size);
+#else
     ::operator delete(ptr);
+#endif
+}
+
+void dealloc(void* ptr, size_t size, align_val_t al) noexcept
+{
+#if __cpp_sized_deallocation
+    ::operator delete(ptr, size, al);
+#else
+    ::operator delete(ptr, al);
+#endif
 }
 
 } // namespace app

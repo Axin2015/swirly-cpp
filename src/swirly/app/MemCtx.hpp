@@ -56,6 +56,8 @@ class SWIRLY_API MemCtx {
 
     void dealloc(void* addr, std::size_t size) noexcept;
 
+    void dealloc(void* addr, std::size_t size, std::align_val_t al) noexcept;
+
   private:
     struct Impl;
     std::unique_ptr<Impl> impl_;
