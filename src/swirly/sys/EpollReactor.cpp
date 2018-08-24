@@ -157,8 +157,9 @@ int EpollReactor::dispatch(Event* buf, int size, Time now)
         }
         // Apply the interest events to filter-out any events that the user may have removed from
         // the events since the call to wait() was made. This would typically happen via a reentrant
-        // call into the reactor from an event-handler.
-        const auto events = mux_.events(ev) & ref.events;
+        // call into the reactor from an event-handler. N.B. EventErr and EventHup are always
+        // reported if they occur, regardless of whether they are specified in events.
+        const auto events = mux_.events(ev) & (ref.events | EventErr | EventHup);
         if (!events) {
             continue;
         }

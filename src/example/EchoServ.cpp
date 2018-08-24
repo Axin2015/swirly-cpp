@@ -56,7 +56,7 @@ class EchoSess {
     void on_input(int fd, unsigned events, Time now)
     {
         try {
-            if (events & EventIn) {
+            if (events & (EventIn | EventHup)) {
                 char buf[2048];
                 const auto size = os::read(fd, buf, sizeof(buf));
                 if (size > 0) {
