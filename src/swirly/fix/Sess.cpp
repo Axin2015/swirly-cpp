@@ -132,7 +132,7 @@ void FixSess::on_io_event(int fd, unsigned events, Time now)
                 read_only(now);
             }
         }
-        if (events & EventIn) {
+        if (events & (EventIn | EventHup)) {
             const auto size = os::read(fd, in_.buf.prepare(2048));
             if (size > 0) {
                 // Commit actual bytes read.

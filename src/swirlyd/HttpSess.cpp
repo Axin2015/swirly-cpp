@@ -139,7 +139,7 @@ void HttpSess::on_io_event(int fd, unsigned events, Time now)
                 }
             }
         }
-        if (events & EventIn) {
+        if (events & (EventIn | EventHup)) {
             char in[MaxData];
             const auto size = os::read(fd, in, sizeof(in));
             if (size > 0) {
