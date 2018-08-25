@@ -17,7 +17,7 @@
 #ifndef SWIRLY_UTIL_SET_HPP
 #define SWIRLY_UTIL_SET_HPP
 
-#include <swirly/util/BasicTypes.hpp>
+#include <swirly/util/IntTypes.hpp>
 #include <swirly/util/RefCount.hpp>
 #include <swirly/util/Symbol.hpp>
 

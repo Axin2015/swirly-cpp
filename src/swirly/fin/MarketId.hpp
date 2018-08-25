@@ -17,7 +17,6 @@
 #ifndef SWIRLY_FIN_MARKETID_HPP
 #define SWIRLY_FIN_MARKETID_HPP
 
-#include <swirly/util/BasicTypes.hpp>
 #include <swirly/util/Date.hpp>
 
 namespace swirly {

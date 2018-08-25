@@ -28,14 +28,13 @@ endif()
 
 set(lib_SOURCES
   Array.cpp
-  BasicTypes.cpp
   Compare.cpp
   Config.cpp
   Date.cpp
   Enum.cpp
   Exception.cpp
   Finally.cpp
-  IntWrapper.cpp
+  IntTypes.cpp
   Limits.cpp
   Log.cpp
   Math.cpp
@@ -87,7 +86,7 @@ set(test_SOURCES
   Enum.ut.cpp
   Exception.ut.cpp
   Finally.ut.cpp
-  IntWrapper.ut.cpp
+  IntTypes.ut.cpp
   Log.ut.cpp
   Math.ut.cpp
   Options.ut.cpp
@@ -100,6 +99,7 @@ set(test_SOURCES
   StringBuf.ut.cpp
   Struct.ut.cpp
   Symbol.ut.cpp
+  Time.ut.cpp
   Tokeniser.ut.cpp
   Traits.ut.cpp
   Utility.ut.cpp

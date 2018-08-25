@@ -17,7 +17,7 @@
 #ifndef SWIRLY_UTIL_DATE_HPP
 #define SWIRLY_UTIL_DATE_HPP
 
-#include <swirly/util/IntWrapper.hpp>
+#include <swirly/util/IntTypes.hpp>
 #include <swirly/util/Time.hpp>
 
 #include <cassert>
@@ -177,10 +177,59 @@ constexpr bool is_week_day(JDay jday) noexcept
     return (jday.count() % 7) < 5;
 }
 
-constexpr bool is_week_end_day(JDay jday) noexcept
+constexpr bool is_weekend_day(JDay jday) noexcept
 {
     return !is_week_day(jday);
 }
+
+/**
+ * Date represented in UTC (Universal Time Coordinated, also known as "GMT") in YYYYMMDD format.
+ * This special-purpose field is paired with UTCTimeOnly to form a proper UTCTimestamp for
+ * bandwidth-sensitive messages. Valid values: YYYY = 0000-9999, MM = 01-12, DD = 01-31.
+ */
+constexpr auto parse_date(std::string_view sv) noexcept
+{
+    return TypeTraits<IsoDate>::from_string(sv);
+}
+static_assert(parse_date("20180117") == 20180117_ymd);
+
+/**
+ * Time/date combination represented in UTC (Universal Time Coordinated, also known as "GMT") in
+ * either YYYYMMDD-HH:MM:SS (whole seconds) or YYYYMMDD-HH:MM:SS.sss (milliseconds) format, colons,
+ * dash, and period required. Valid values: YYYY = 0000-9999, MM = 01-12, DD = 01-31, HH = 00-23, MM
+ * = 00-59, SS = 00-5960 (60 only if UTC leap second) (without milliseconds). YYYY = 0000-9999, MM =
+ * 01-12, DD = 01-31, HH = 00-23, MM = 00-59, SS = 00-5960 (60 only if UTC leap second), sss=000-999
+ * (indicating milliseconds).
+ */
+constexpr Result<Time> parse_time(std::string_view sv) noexcept
+{
+    if (sv.size() < 8) {
+        // Date part is too short.
+        return {};
+    }
+    const IsoDate d{parse_date(sv.substr(0, 8))};
+    Time dt{};
+    if (d != 0_ymd) {
+        // Julian days start at noon.
+        dt = jd_to_time(iso_to_jd(d)) - 12h;
+    }
+    // If there is a time component.
+    if (sv.size() > 8) {
+        if (sv[8] != '-' && sv[8] != 'T') {
+            // Invalid delimiter.
+            return {dt, false};
+        }
+        const auto [t, valid] = parse_time_only(sv.substr(9));
+        if (!valid) {
+            // Invalid time.
+            return {dt, false};
+        }
+        dt += t;
+    }
+    return {dt, true};
+}
+static_assert(ms_since_epoch(parse_time("20180824-05:32:29.123"sv).value) == 1535088749123);
+
 } // namespace util
 } // namespace swirly
 

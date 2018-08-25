@@ -14,39 +14,4 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_UTIL_BASICTYPES_HPP
-#define SWIRLY_UTIL_BASICTYPES_HPP
-
-#include <swirly/util/IntWrapper.hpp>
-
-namespace swirly {
-inline namespace util {
-struct Id32Policy : Int32Policy {
-};
-struct Id64Policy : Int64Policy {
-};
-
-/**
- * 32 bit identifier.
- */
-using Id32 = IntWrapper<Id32Policy>;
-
-constexpr Id32 operator""_id32(unsigned long long val) noexcept
-{
-    return Id32{val};
-}
-
-/**
- * 64 bit identifier.
- */
-using Id64 = IntWrapper<Id64Policy>;
-
-constexpr Id64 operator""_id64(unsigned long long val) noexcept
-{
-    return Id64{val};
-}
-
-} // namespace util
-} // namespace swirly
-
-#endif // SWIRLY_UTIL_BASICTYPES_HPP
+#include "IntTypes.hpp"

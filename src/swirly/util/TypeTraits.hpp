@@ -29,8 +29,8 @@ struct TypeTraits;
 
 template <typename ValueT>
 struct TypeTraits<ValueT, std::enable_if_t<std::is_integral_v<ValueT>>> {
-    static auto from_string(std::string_view sv) noexcept { return ston<ValueT>(sv); }
-    static auto from_string(const std::string& s) noexcept
+    static constexpr auto from_string(std::string_view sv) noexcept { return ston<ValueT>(sv); }
+    static constexpr auto from_string(const std::string& s) noexcept
     {
         return from_string(std::string_view{s});
     }
@@ -47,12 +47,12 @@ struct TypeTraits<bool> {
 
 template <typename ValueT>
 struct TypeTraits<ValueT, std::enable_if_t<std::is_enum_v<ValueT>>> {
-    static auto from_string(std::string_view sv) noexcept
+    static constexpr auto from_string(std::string_view sv) noexcept
     {
         using UnderlyingTraits = TypeTraits<std::underlying_type_t<ValueT>>;
         return static_cast<ValueT>(UnderlyingTraits::from_string(sv));
     }
-    static auto from_string(const std::string& s) noexcept
+    static constexpr auto from_string(const std::string& s) noexcept
     {
         return from_string(std::string_view{s});
     }
@@ -60,7 +60,7 @@ struct TypeTraits<ValueT, std::enable_if_t<std::is_enum_v<ValueT>>> {
 
 template <>
 struct TypeTraits<std::string_view> {
-    static auto from_string(std::string_view sv) noexcept { return sv; }
+    static constexpr auto from_string(std::string_view sv) noexcept { return sv; }
     /**
      * Disable conversion from std::string to std::string_view due to possible danger of dangling
      * reference to temporary.

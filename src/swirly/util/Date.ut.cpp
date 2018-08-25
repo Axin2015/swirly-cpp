@@ -54,4 +54,28 @@ BOOST_AUTO_TEST_CASE(JdToTimeCase)
     BOOST_TEST(1394798400000ms == jd_to_time(ymd_to_jd(2014, 3, 14)).time_since_epoch());
 }
 
+BOOST_AUTO_TEST_CASE(ParseDateCase)
+{
+    BOOST_TEST(parse_date("20180820"sv) == IsoDate{20180820});
+}
+
+BOOST_AUTO_TEST_CASE(TimeParseTimeCase)
+{
+    BOOST_TEST(!parse_time(""sv).valid);
+    BOOST_TEST(!parse_time("20180824x05:32:29.123"sv).valid);
+    BOOST_TEST(!parse_time("20180824-05x32:29.123"sv).valid);
+
+    BOOST_TEST(ms_since_epoch(parse_time("00000000-00:00:00.000"sv).value) == 0);
+    BOOST_TEST(ms_since_epoch(parse_time("20180824"sv).value) == 1535068800000);
+    BOOST_TEST(ms_since_epoch(parse_time("20180824-05:32:29"sv).value) == 1535088749000);
+    BOOST_TEST(ms_since_epoch(parse_time("20180824-05:32:29.123"sv).value) == 1535088749123);
+    BOOST_TEST(us_since_epoch(parse_time("20180824-05:32:29.123456"sv).value) == 1535088749123456);
+
+    BOOST_TEST(ms_since_epoch(parse_time("00000000T00:00:00.000"sv).value) == 0);
+    BOOST_TEST(ms_since_epoch(parse_time("20180824"sv).value) == 1535068800000);
+    BOOST_TEST(ms_since_epoch(parse_time("20180824T05:32:29"sv).value) == 1535088749000);
+    BOOST_TEST(ms_since_epoch(parse_time("20180824T05:32:29.123"sv).value) == 1535088749123);
+    BOOST_TEST(us_since_epoch(parse_time("20180824T05:32:29.123456"sv).value) == 1535088749123456);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

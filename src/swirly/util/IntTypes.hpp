@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_UTIL_INTWRAPPER_HPP
-#define SWIRLY_UTIL_INTWRAPPER_HPP
+#ifndef SWIRLY_UTIL_INTTYPES_HPP
+#define SWIRLY_UTIL_INTTYPES_HPP
 
 #include <swirly/util/TypeTraits.hpp>
 
@@ -357,14 +357,39 @@ constexpr bool is_int_wrapper = std::is_base_of_v<IntBase, ValueT>;
 
 template <typename ValueT>
 struct TypeTraits<ValueT, std::enable_if_t<is_int_wrapper<ValueT>>> {
-    static auto from_string(std::string_view sv) noexcept
+    static constexpr auto from_string(std::string_view sv) noexcept
     {
         using UnderlyingTraits = TypeTraits<typename ValueT::ValueType>;
         return ValueT{UnderlyingTraits::from_string(sv)};
     }
 };
 
+struct Id32Policy : Int32Policy {
+};
+struct Id64Policy : Int64Policy {
+};
+
+/**
+ * 32 bit identifier.
+ */
+using Id32 = IntWrapper<Id32Policy>;
+
+constexpr Id32 operator""_id32(unsigned long long val) noexcept
+{
+    return Id32{val};
+}
+
+/**
+ * 64 bit identifier.
+ */
+using Id64 = IntWrapper<Id64Policy>;
+
+constexpr Id64 operator""_id64(unsigned long long val) noexcept
+{
+    return Id64{val};
+}
+
 } // namespace util
 } // namespace swirly
 
-#endif // SWIRLY_UTIL_INTWRAPPER_HPP
+#endif // SWIRLY_UTIL_INTTYPES_HPP

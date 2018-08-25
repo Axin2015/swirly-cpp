@@ -17,11 +17,10 @@
 #ifndef SWIRLYUI_TYPES_HXX
 #define SWIRLYUI_TYPES_HXX
 
-#include <swirly/fin/BasicTypes.hpp>
 #include <swirly/fin/Conv.hpp>
+#include <swirly/fin/IntTypes.hpp>
 #include <swirly/fin/Limits.hpp>
 
-#include <swirly/util/BasicTypes.hpp>
 #include <swirly/util/Enum.hpp>
 #include <swirly/util/Limits.hpp>
 

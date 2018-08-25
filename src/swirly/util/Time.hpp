@@ -18,6 +18,7 @@
 #define SWIRLY_UTIL_TIME_HPP
 
 #include <swirly/util/TypeTraits.hpp>
+#include <swirly/util/Types.hpp>
 
 #include <boost/io/ios_state.hpp>
 
@@ -29,6 +30,7 @@
 
 namespace swirly {
 using namespace std::literals::chrono_literals;
+using namespace std::literals::string_view_literals;
 inline namespace util {
 
 struct SWIRLY_API UnixClock {
@@ -41,13 +43,13 @@ struct SWIRLY_API UnixClock {
 
     static time_point now() noexcept;
 
-    static std::time_t to_time_t(const time_point& tp) noexcept
+    static constexpr std::time_t to_time_t(const time_point& tp) noexcept
     {
         using namespace std::chrono;
         return duration_cast<seconds>(tp.time_since_epoch()).count();
     }
 
-    static time_point from_time_t(std::time_t t) noexcept
+    static constexpr time_point from_time_t(std::time_t t) noexcept
     {
         using namespace std::chrono;
         using FromPoint = std::chrono::time_point<UnixClock, seconds>;
@@ -256,6 +258,85 @@ struct TypeTraits<Time> {
         return from_string(std::string_view{s});
     }
 };
+
+/**
+ * Parse fractional nanoseconds.
+ * @param sv String of decimal digits.
+ * @return nanoseconds.
+ */
+constexpr auto parse_nanos(std::string_view sv) noexcept
+{
+    // clang-format off
+    constexpr int c[] = {
+                  0,
+        100'000'000,
+         10'000'000,
+          1'000'000,
+            100'000,
+             10'000,
+              1'000,
+                100,
+                 10,
+                  1
+    };
+    // clang-format on
+
+    // Truncate to ensure that we process no more than 9 decimal places.
+    sv = sv.substr(0, 9);
+    auto it = sv.begin(), end = sv.end();
+
+    int ns{0};
+    if (isdigit(*it)) {
+        ns = *it++ - '0';
+        while (it != end && isdigit(*it)) {
+            ns *= 10;
+            ns += *it++ - '0';
+        }
+    }
+    return Nanos{ns * c[it - sv.begin()]};
+}
+static_assert(parse_nanos("000000001") == 1ns);
+
+/**
+ * Time-only represented in UTC (Universal Time Coordinated, also known as "GMT") in either HH:MM:SS
+ * (whole seconds) or HH:MM:SS.sss (milliseconds) format, colons, and period required. This
+ * special-purpose field is paired with UTCDateOnly to form a proper UTCTimestamp for
+ * bandwidth-sensitive messages. Valid values: HH = 00-23, MM = 00-59, SS = 00-5960 (60 only if UTC
+ * leap second) (without milliseconds). HH = 00-23, MM = 00-59, SS = 00-5960 (60 only if UTC leap
+ * second), sss=000-999 (indicating milliseconds).
+ */
+constexpr Result<Nanos> parse_time_only(std::string_view sv) noexcept
+{
+    using namespace std::chrono;
+
+    // clang-format off
+    if (sv.size() < 8
+        || !isdigit(sv[0])
+        || !isdigit(sv[1])
+        || sv[2] != ':'
+        || !isdigit(sv[3])
+        || !isdigit(sv[4])
+        || sv[5] != ':'
+        || !isdigit(sv[6])
+        || !isdigit(sv[7])) {
+        // Invalid format.
+        return {};
+    }
+    // clang-format on
+    const hours h{(sv[0] - '0') * 10 + sv[1] - '0'};
+    const minutes m{(sv[3] - '0') * 10 + sv[4] - '0'};
+    const seconds s{(sv[6] - '0') * 10 + sv[7] - '0'};
+    Nanos ns{h + m + s};
+    if (sv.size() > 8) {
+        if (sv[8] != '.') {
+            // Invalid delimiter.
+            return {ns, false};
+        }
+        ns += parse_nanos(sv.substr(9));
+    }
+    return {ns, true};
+}
+static_assert(parse_time_only("12:00:00"sv).value == 12h);
 
 } // namespace util
 } // namespace swirly
