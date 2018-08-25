@@ -17,6 +17,7 @@
 #ifndef SWIRLY_UTIL_OPTIONS_HPP
 #define SWIRLY_UTIL_OPTIONS_HPP
 
+#include <swirly/util/RefCount.hpp>
 #include <swirly/util/String.hpp>
 
 #include <functional>
@@ -111,59 +112,45 @@ class Switch : public Presence<Switch> {
     bool& flag_;
 };
 
-struct OptionKey {
-    char short_opt{0};
-    std::string long_opt;
-};
-
-inline bool operator<(const OptionKey& lhs, const OptionKey& rhs)
-{
-    // clang-format off
-    return (lhs.short_opt != 0 && lhs.short_opt == rhs.short_opt)
-        || (!lhs.long_opt.empty() && lhs.long_opt == rhs.long_opt)
-        ? false
-        : lhs.short_opt != rhs.short_opt ? lhs.short_opt < rhs.short_opt
-                                         : lhs.long_opt < rhs.long_opt;
-    // clang-format on
-}
-inline bool operator<(const OptionKey& lhs, const std::string& rhs)
-{
-    return lhs.long_opt < rhs;
-}
-inline bool operator<(const std::string& lhs, const OptionKey& rhs)
-{
-    return lhs < rhs.long_opt;
-}
-inline bool operator<(const OptionKey& lhs, std::string_view rhs)
-{
-    return lhs.long_opt < rhs;
-}
-inline bool operator<(std::string_view lhs, const OptionKey& rhs)
-{
-    return lhs < rhs.long_opt;
-}
-inline bool operator<(const OptionKey& lhs, char rhs)
-{
-    return lhs.short_opt < rhs;
-}
-inline bool operator<(char lhs, const OptionKey& rhs)
-{
-    return lhs < rhs.short_opt;
-}
-
 class SWIRLY_API Options {
 
-    struct DataDesc {
-        template <typename DataT>
-        DataDesc(DataT data, std::string description)
-        : data_{std::move(data)}
-        , description_{std::move(description)}
+    struct OptionCompare {
+        using is_transparent = void;
+        bool operator()(const std::string& lhs, const std::string& rhs) const noexcept
         {
+            return lhs < rhs;
         }
-
-        std::variant<Value, Help, NoOp, Switch> data_;
-        std::string description_;
+        bool operator()(const std::string& lhs, std::string_view rhs) const noexcept
+        {
+            return lhs < rhs;
+        }
+        bool operator()(std::string_view lhs, const std::string& rhs) const noexcept
+        {
+            return lhs < rhs;
+        }
     };
+
+    using Data = std::variant<Value, Help, NoOp, Switch>;
+
+    struct OptionData : RefCount<OptionData, ThreadUnsafePolicy> {
+        template <typename DataT>
+        OptionData(char short_opt, const std::string& long_opt, DataT data, std::string description)
+        : long_opt{long_opt}
+        , data{std::move(data)}
+        , description{std::move(description)}
+        {
+            if (short_opt) {
+                this->short_opt.push_back(short_opt);
+            }
+        }
+        const std::string& opt() const noexcept { return long_opt.empty() ? short_opt : long_opt; }
+
+        std::string short_opt, long_opt;
+        Data data;
+        std::string description;
+    };
+
+    using OptionDataPtr = boost::intrusive_ptr<OptionData>;
 
   public:
     explicit Options(std::string description = "");
@@ -177,22 +164,32 @@ class SWIRLY_API Options {
     }
 
     template <typename DataT>
-    Options& operator()(char short_opt, const std::string& long_opt, DataT&& option_data,
+    Options& operator()(char short_opt, const std::string& long_opt, DataT&& data,
                         std::string description = "")
     {
-        const auto& result
-            = opts_.emplace(OptionKey{short_opt, long_opt},
-                            DataDesc{std::forward<DataT>(option_data), std::move(description)});
-        if (!result.second) {
-            throw std::runtime_error("attempting to register duplicate option " + long_opt);
+        auto opt_data = make_intrusive<OptionData>(short_opt, long_opt, std::forward<DataT>(data),
+                                                   std::move(description));
+        help_.push_back(opt_data);
+        if (short_opt) {
+            const bool inserted = opts_.emplace(opt_data->short_opt, opt_data).second;
+            if (!inserted) {
+                throw std::runtime_error{"attempting to register duplicate option "
+                                         + opt_data->short_opt};
+            }
+        }
+        if (!long_opt.empty()) {
+            const bool inserted = opts_.emplace(long_opt, opt_data).second;
+            if (!inserted) {
+                throw std::runtime_error{"attempting to register duplicate option " + long_opt};
+            }
         }
         return *this;
     }
 
     template <typename DataT>
-    Options& operator()(DataT&& option_data, std::string description = "")
+    Options& operator()(DataT&& data, std::string description = "")
     {
-        positional_.emplace_back(std::forward<DataT>(option_data), std::move(description));
+        positional_.push_back(std::forward<DataT>(data));
         return *this;
     }
 
@@ -205,16 +202,18 @@ class SWIRLY_API Options {
 
     bool operator[](const std::string& long_opt) const noexcept;
     bool operator[](char short_opt) const noexcept;
-    void parse(int argc, char* argv[]);
+    void parse(int argc, const char* const argv[]);
 
   private:
     friend std::ostream& operator<<(std::ostream& out, const Options& options);
 
     std::string description_;
-    using OptsMap = std::map<OptionKey, DataDesc, std::less<>>;
+    using HelpVec = std::vector<OptionDataPtr>;
+    HelpVec help_;
+    using OptsMap = std::map<std::string, OptionDataPtr, OptionCompare>;
     OptsMap opts_;
-    using OptsVec = std::vector<DataDesc>;
-    OptsVec positional_;
+    using DataVec = std::vector<Data>;
+    DataVec positional_;
 };
 
 SWIRLY_API std::ostream& operator<<(std::ostream& out, const Options& options);

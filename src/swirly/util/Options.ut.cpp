@@ -44,9 +44,9 @@ BOOST_AUTO_TEST_CASE(OptionsNormalCase)
     ss << opts;
     const string expected{"Usage: Unit Test options [OPTIONS] [COMMAND]\n"
                           "Options:\n"
-                          "  --long_opt     LongOption Description\n"
                           "  -o, --option   Option Description\n"
                           "  -s             ShortOption Description\n"
+                          "  --long_opt     LongOption Description\n"
                           "  -x             Switch Description\n"};
     BOOST_CHECK_EQUAL(ss.str(), expected);
 
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(OptionsNormalCase)
         const char* argv[] = {"executable_name", "-o", "123", "print"};
         int argc = 4;
 
-        opts.parse(argc, const_cast<char**>(argv));
+        opts.parse(argc, argv);
         BOOST_CHECK_EQUAL(var, 123);
         BOOST_CHECK_EQUAL(flag, false);
         BOOST_CHECK_EQUAL(command, "print");
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(OptionsNormalCase)
         const char* argv[] = {"executable_name", "-x"};
         int argc = 2;
 
-        opts.parse(argc, const_cast<char**>(argv));
+        opts.parse(argc, argv);
         BOOST_CHECK_EQUAL(flag, true);
     }
 }
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(OptionsInvalidOptionCase)
         const char* argv[] = {"executable_name", "--bad", "123"};
         int argc = 3;
 
-        BOOST_CHECK_THROW(opts.parse(argc, const_cast<char**>(argv)), std::runtime_error);
+        BOOST_CHECK_THROW(opts.parse(argc, argv), std::runtime_error);
     }
 
     {
@@ -102,9 +102,7 @@ BOOST_AUTO_TEST_CASE(OptionsInvalidOptionCase)
         const char* argv[] = {"executable_name", "-l123", "456"};
         int argc = 3;
 
-        // FIXME: this is incorrect.
-        opts.parse(argc, const_cast<char**>(argv));
-        BOOST_TEST(var == 456);
+        BOOST_CHECK_THROW(opts.parse(argc, argv), std::runtime_error);
     }
 }
 
@@ -117,7 +115,7 @@ BOOST_AUTO_TEST_CASE(OptionsNoValueCase)
     const char* argv[] = {"executable_name", "-l"};
     int argc = 2;
 
-    BOOST_CHECK_THROW(opts.parse(argc, const_cast<char**>(argv));, std::runtime_error);
+    BOOST_CHECK_THROW(opts.parse(argc, argv);, std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(OptionsMultiToken)
@@ -134,7 +132,7 @@ BOOST_AUTO_TEST_CASE(OptionsMultiToken)
         const char* argv[] = {"executable_name", "-v", "1", "-s", "2", "-m", "3", "-m", "4"};
         int argc = 9;
 
-        opts.parse(argc, const_cast<char**>(argv));
+        opts.parse(argc, argv);
         BOOST_CHECK_EQUAL(var, 1);
         BOOST_CHECK_EQUAL(single[0], 2);
         BOOST_CHECK_EQUAL(multiple[0], 3);
@@ -149,7 +147,7 @@ BOOST_AUTO_TEST_CASE(OptionsMultiToken)
         const char* argv[] = {"executable_name", "-s", "1", "-s", "2"};
         int argc = 5;
 
-        BOOST_CHECK_THROW(opts.parse(argc, const_cast<char**>(argv)), std::runtime_error);
+        BOOST_CHECK_THROW(opts.parse(argc, argv), std::runtime_error);
     }
 }
 
