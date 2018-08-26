@@ -1,4 +1,4 @@
-image: marayl/toolchain:latest
+image: registry.gitlab.com/swirlycloud/swirly-docker/toolchain:latest
 
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
