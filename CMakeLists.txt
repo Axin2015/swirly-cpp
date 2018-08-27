@@ -89,9 +89,6 @@ elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
 endif()
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
 
-add_definitions(-DBOOST_NO_AUTO_PTR=1 -DBOOST_NO_RTTI=1 -DBOOST_NO_TYPEID=1)
-add_definitions(-DBOOST_ASIO_DISABLE_THREADS=1 -DBOOST_ASIO_HEADER_ONLY=1)
-
 if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
   add_definitions(-DSWIRLY_BUILD_DEBUG=1)
 endif()
@@ -110,13 +107,32 @@ find_program(DOT_EXECUTABLE dot)
 find_program(ENV_EXECUTABLE env)
 find_program(RAGEL_EXECUTABLE ragel)
 
-set(Boost_USE_STATIC_LIBS ON)
-find_package(Boost 1.60 REQUIRED COMPONENTS date_time unit_test_framework)
+function(install_libraries)
+  foreach(FILE ${ARGN})
+    if(NOT "${FILE}" MATCHES "\\.a$")
+      get_filename_component(FILE_REALPATH "${FILE}" REALPATH)
+      message(STATUS "Runtime dependency: ${FILE_REALPATH}")
+      install(FILES "${FILE_REALPATH}" DESTINATION lib64 COMPONENT shared)
+    endif()
+  endforeach()
+endfunction()
+
+set(Boost_USE_STATIC_LIBS OFF)
+find_package(Boost 1.67 REQUIRED COMPONENTS date_time unit_test_framework)
+install_libraries("${Boost_DATE_TIME_LIBRARY}")
+
+add_definitions(-DBOOST_NO_AUTO_PTR=1 -DBOOST_NO_RTTI=1 -DBOOST_NO_TYPEID=1)
+add_definitions(-DBOOST_ASIO_DISABLE_THREADS=1 -DBOOST_ASIO_HEADER_ONLY=1)
+if(NOT "${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}" MATCHES "\\.a$")
+  add_definitions(-DBOOST_TEST_DYN_LINK)
+endif()
 
 find_package(FlatBuffers REQUIRED)
 
 # The sqlite3_errstr() function was added in 3.7.15.
 find_package(SQLite3 3.7.15 REQUIRED)
+install_libraries(${SQLITE3_LIBRARIES})
+
 find_package(MySQL 5.5)
 if(MYSQL_FOUND)
   set(SWIRLY_HAVE_MYSQL 1)
@@ -133,7 +149,6 @@ find_package(Qt5Widgets QUIET)
 find_package(Qt5Network QUIET)
 
 if(DOXYGEN_FOUND)
-
   configure_file("${PROJECT_SOURCE_DIR}/Doxyfile.in"
     "${PROJECT_BINARY_DIR}/Doxyfile")
 
@@ -146,12 +161,10 @@ if(DOXYGEN_FOUND)
   add_dependencies(doc image)
 endif()
 
-
 include_directories(SYSTEM
   "${Boost_INCLUDE_DIRS}"
   "${FLATBUFFERS_INCLUDE_DIRS}"
   "${PROJECT_SOURCE_DIR}/HdrHistogram_c/src")
-
 
 include_directories(
   "${PROJECT_SOURCE_DIR}/src"
@@ -184,7 +197,7 @@ enable_testing()
 # Add cppcheck target if tool is available
 find_program(CPPCHECK cppcheck HINTS "${SWIRLY_TOOLSET}/bin")
 if (CPPCHECK)
-  message (STATUS "Found cppcheck")
+  message(STATUS "Found cppcheck")
   cmake_host_system_information(RESULT CORE_COUNT QUERY NUMBER_OF_LOGICAL_CORES)
   add_custom_target(cppcheck COMMAND "${CPPCHECK}"
         --std=c++14
@@ -193,11 +206,10 @@ if (CPPCHECK)
         --project="${PROJECT_BINARY_DIR}/compile_commands.json")
 endif()
 
-
 # Add clang-tidy target if tool is available
 find_program(CLANG_TIDY run-clang-tidy.py HINTS "/usr/share/clang/" "${SWIRLY_TOOLSET}/share/clang")
 if (CLANG_TIDY)
-  message (STATUS "Found clang-tidy")
+  message(STATUS "Found clang-tidy")
   cmake_host_system_information(RESULT CORE_COUNT QUERY NUMBER_OF_LOGICAL_CORES)
   add_custom_target(clang-tidy COMMAND "${CLANG_TIDY}"
         -quiet
