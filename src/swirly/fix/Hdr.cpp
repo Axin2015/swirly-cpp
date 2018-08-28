@@ -18,6 +18,10 @@
 
 #include "Lexer.hpp"
 
+#include <swirly/fin/Exception.hpp>
+
+#include <swirly/util/Date.hpp>
+
 #include <algorithm>
 
 namespace swirly {
@@ -71,9 +75,13 @@ size_t parse_hdr(string_view msg, size_t msg_type_off, FixHdr& hdr)
         case MsgSeqNum::Tag:
             hdr.msg_seq_num = from_string<MsgSeqNum::Type>(v);
             break;
-        case SendingTime::Tag:
-            // FIXME: unpack field.
-            break;
+        case SendingTime::Tag: {
+            auto [time, valid] = parse_time(v);
+            if (!valid) {
+                throw ProtocolException{"invalid SendingTime(52)"};
+            }
+            hdr.sending_time = time;
+        } break;
         case PossDupFlag::Tag:
             hdr.poss_dup = from_string<PossDupFlag::Type>(v);
             break;
