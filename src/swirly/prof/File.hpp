@@ -17,6 +17,8 @@
 #ifndef SWIRLY_PROF_FILE_HPP
 #define SWIRLY_PROF_FILE_HPP
 
+#include <swirly/util/Config.hpp>
+
 #include <cstdio>
 #include <memory>
 
@@ -25,7 +27,7 @@ inline namespace prof {
 
 using FilePtr = std::unique_ptr<std::FILE, decltype(&std::fclose)>;
 
-FilePtr open_file(const char* path, const char* mode);
+SWIRLY_API FilePtr open_file(const char* path, const char* mode);
 
 } // namespace prof
 } // namespace swirly

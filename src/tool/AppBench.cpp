@@ -14,6 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
+#include <swirly/prof/File.hpp>
 #include <swirly/prof/HdrHistogram.hpp>
 #include <swirly/prof/HdrRecorder.hpp>
 
@@ -170,6 +171,10 @@ int main(int argc, char* argv[])
 
         Archiver arch{app};
         Response resp;
+
+        auto maker_fh = open_file("maker.hdr", "w+");
+        auto taker_fh = open_file("taker.hdr", "w+");
+
         for (int i = 0; i < 1'001'000; ++i) {
 
             // Reset profiles after warmup period.
@@ -264,15 +269,12 @@ int main(int argc, char* argv[])
             arch(start_time, pipayl, market.id());
         }
 
-        fprintf(stderr, "Maker Percentile Report\n");
-        fprintf(stderr, "-----------------------\n");
-        maker.print(stderr, 5, 1000);
+        fprintf(maker_fh.get(), "# Maker Percentile Report\n");
+        maker.print(maker_fh.get(), 5, 1000);
 
-        fprintf(stderr, "Taker Percentile Report\n");
-        fprintf(stderr, "-----------------------\n");
-        taker.print(stderr, 5, 1000);
+        fprintf(taker_fh.get(), "# Taker Percentile Report\n");
+        taker.print(taker_fh.get(), 5, 1000);
 
-        fflush(stderr);
         ret = 0;
     } catch (const exception& e) {
         SWIRLY_ERROR << "exception: " << e.what();
