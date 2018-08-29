@@ -27,6 +27,7 @@ else()
 endif()
 
 set(lib_SOURCES
+  Argv.cpp
   Array.cpp
   Compare.cpp
   Config.cpp
@@ -80,6 +81,7 @@ foreach(file ${lib_SOURCES})
 endforeach()
 
 set(test_SOURCES
+  Argv.ut.cpp
   Array.ut.cpp
   Config.ut.cpp
   Date.ut.cpp
