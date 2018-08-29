@@ -44,13 +44,13 @@ set(lib_SOURCES
 add_library(swirly-fix-static STATIC ${lib_SOURCES})
 set_target_properties(swirly-fix-static PROPERTIES OUTPUT_NAME swirly-fix)
 target_link_libraries(swirly-fix-static swirly-fin-static)
-install(TARGETS swirly-fix-static DESTINATION lib64 COMPONENT static)
+install(TARGETS swirly-fix-static DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT static)
 
 if(SWIRLY_BUILD_SHARED)
   add_library(swirly-fix-shared SHARED ${lib_SOURCES})
   set_target_properties(swirly-fix-shared PROPERTIES OUTPUT_NAME swirly-fix)
   target_link_libraries(swirly-fix-shared swirly-fin-shared)
-  install(TARGETS swirly-fix-shared DESTINATION lib64 COMPONENT shared)
+  install(TARGETS swirly-fix-shared DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT shared)
 endif()
 
 foreach(file ${lib_SOURCES})
