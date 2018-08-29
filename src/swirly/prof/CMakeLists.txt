@@ -35,13 +35,13 @@ set(lib_SOURCES
 add_library(swirly-prof-static STATIC ${lib_SOURCES})
 set_target_properties(swirly-prof-static PROPERTIES OUTPUT_NAME swirly-prof)
 target_link_libraries(swirly-prof-static swirly-util-static hdr_histogram_static pthread)
-install(TARGETS swirly-prof-static DESTINATION lib64 COMPONENT static)
+install(TARGETS swirly-prof-static DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT static)
 
 if(SWIRLY_BUILD_SHARED)
   add_library(swirly-prof-shared SHARED ${lib_SOURCES})
   set_target_properties(swirly-prof-shared PROPERTIES OUTPUT_NAME swirly-prof)
   target_link_libraries(swirly-prof-shared swirly-util-shared hdr_histogram pthread)
-  install(TARGETS swirly-prof-shared DESTINATION lib64 COMPONENT shared)
+  install(TARGETS swirly-prof-shared DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT shared)
 endif()
 
 foreach(file ${lib_SOURCES})

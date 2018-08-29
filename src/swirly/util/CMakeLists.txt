@@ -61,13 +61,13 @@ set(lib_SOURCES
 add_library(swirly-util-static STATIC ${lib_SOURCES})
 set_target_properties(swirly-util-static PROPERTIES OUTPUT_NAME swirly-util)
 target_link_libraries(swirly-util-static)
-install(TARGETS swirly-util-static DESTINATION lib64 COMPONENT static)
+install(TARGETS swirly-util-static DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT static)
 
 if(SWIRLY_BUILD_SHARED)
   add_library(swirly-util-shared SHARED ${lib_SOURCES})
   set_target_properties(swirly-util-shared PROPERTIES OUTPUT_NAME swirly-util)
   target_link_libraries(swirly-util-shared)
-  install(TARGETS swirly-util-shared DESTINATION lib64 COMPONENT shared)
+  install(TARGETS swirly-util-shared DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT shared)
 endif()
 
 foreach(file ${lib_SOURCES})

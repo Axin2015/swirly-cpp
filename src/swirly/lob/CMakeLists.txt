@@ -36,13 +36,13 @@ set(lib_SOURCES
 add_library(swirly-lob-static STATIC ${lib_SOURCES})
 set_target_properties(swirly-lob-static PROPERTIES OUTPUT_NAME swirly-lob)
 target_link_libraries(swirly-lob-static swirly-fin-static)
-install(TARGETS swirly-lob-static DESTINATION lib64 COMPONENT static)
+install(TARGETS swirly-lob-static DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT static)
 
 if(SWIRLY_BUILD_SHARED)
   add_library(swirly-lob-shared SHARED ${lib_SOURCES})
   set_target_properties(swirly-lob-shared PROPERTIES OUTPUT_NAME swirly-lob)
   target_link_libraries(swirly-lob-shared swirly-fin-shared)
-  install(TARGETS swirly-lob-shared DESTINATION lib64 COMPONENT shared)
+  install(TARGETS swirly-lob-shared DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT shared)
 endif()
 
 foreach(file ${lib_SOURCES})
