@@ -17,7 +17,7 @@ build-debug-clang:
       -DCMAKE_CXX_COMPILER=clang++
       -DSWIRLY_BUILD_SHARED=ON
   script:
-    - make -j2 all test
+    - make -j2 all test swift
 
 build-release-clang:
   stage: build
@@ -30,7 +30,7 @@ build-release-clang:
       -DCMAKE_CXX_COMPILER=clang++
       -DSWIRLY_BUILD_SHARED=ON
   script:
-    - make -j2 all test
+    - make -j2 all test swift
 
 build-debug-gcc:
   stage: build
@@ -43,7 +43,7 @@ build-debug-gcc:
       -DCMAKE_CXX_COMPILER=g++
       -DSWIRLY_BUILD_SHARED=ON
   script:
-    - make -j2 all test
+    - make -j2 all test swift
 
 build-release-gcc:
   stage: build
@@ -56,4 +56,4 @@ build-release-gcc:
       -DCMAKE_CXX_COMPILER=g++
       -DSWIRLY_BUILD_SHARED=ON
   script:
-    - make -j2 all test
+    - make -j2 all test swift
