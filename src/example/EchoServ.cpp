@@ -21,6 +21,7 @@
 #include <swirly/sys/TcpAcceptor.hpp>
 
 #include <swirly/util/Log.hpp>
+#include <swirly/util/Tokeniser.hpp>
 
 #include <boost/intrusive/list.hpp>
 
@@ -48,7 +49,7 @@ class EchoSess {
     boost::intrusive::list_member_hook<AutoUnlinkOption> list_hook;
 
   private:
-    void dispose() noexcept
+    void dispose(Time now) noexcept
     {
         SWIRLY_INFO << "session closed";
         delete this;
@@ -57,35 +58,46 @@ class EchoSess {
     {
         try {
             if (events & (EventIn | EventHup)) {
-                char buf[2048];
-                const auto size = os::read(fd, buf, sizeof(buf));
+
+                const auto size = os::read(fd, buf_.prepare(2048));
                 if (size > 0) {
-                    assert(size > 0);
-                    // Echo bytes back to client.
-                    if (os::write(fd, buf, size) < size) {
-                        throw runtime_error{"partial write"};
-                    }
+                    // Commit actual bytes read.
+                    buf_.commit(size);
+
+                    // Parse each buffered line.
+                    auto fn = [](std::string_view line, Time now) {
+                        // Echo bytes back to client.
+                        std::string buf{line};
+                        buf += '\n';
+                        if (os::write(1, {buf.data(), buf.size()}) < buf.size()) {
+                            throw runtime_error{"partial write"};
+                        }
+                    };
+                    buf_.consume(parseLine(buf_.str(), now, fn));
+
+                    // Reset timer.
                     tmr_.cancel();
                     tmr_ = reactor_.timer(now + IdleTimeout, Priority::Low,
                                           bind<&EchoSess::on_timer>(this));
                 } else {
-                    dispose();
+                    dispose(now);
                 }
             }
         } catch (const std::exception& e) {
             SWIRLY_ERROR << "exception: " << e.what();
-            dispose();
+            dispose(now);
         }
     }
     void on_timer(Timer& tmr, Time now)
     {
         SWIRLY_INFO << "timeout";
-        dispose();
+        dispose(now);
     }
     Reactor& reactor_;
     IoSocket sock_;
     const TcpEndpoint ep_;
     Reactor::Handle sub_;
+    Buffer buf_;
     Timer tmr_;
 };
 

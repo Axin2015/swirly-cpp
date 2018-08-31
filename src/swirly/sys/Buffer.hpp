@@ -45,13 +45,27 @@ class SWIRLY_API Buffer {
     Buffer& operator=(Buffer&& rhs) noexcept = default;
 
     /**
-     * Returns read buffer for available data.
+     * Returns available data as a buffer.
      */
     ConstBuffer data() const noexcept { return {rptr(), size()}; }
+
     /**
-     * Returns read buffer for available data with upper bound.
+     * Returns slice of available data as a buffer.
      */
     ConstBuffer data(std::size_t limit) const noexcept { return {rptr(), std::min(limit, size())}; }
+
+    /**
+     * Returns available data as a string view.
+     */
+    std::string_view str() const noexcept { return {rptr(), size()}; }
+
+    /**
+     * Returns slice of available data as a string view.
+     */
+    std::string_view str(std::size_t limit) const noexcept
+    {
+        return {rptr(), std::min(limit, size())};
+    }
 
     /**
      * Returns true if read buffer is empty.

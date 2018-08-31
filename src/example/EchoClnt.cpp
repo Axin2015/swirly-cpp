@@ -47,7 +47,7 @@ class EchoSess {
     boost::intrusive::list_member_hook<AutoUnlinkOption> list_hook;
 
   private:
-    void dispose() noexcept
+    void dispose(Time now) noexcept
     {
         SWIRLY_INFO << "session closed";
         delete this;
@@ -56,21 +56,22 @@ class EchoSess {
     {
         try {
             if (events & (EventIn | EventHup)) {
-                char buf[2048];
-                const auto size = os::read(fd, buf, sizeof(buf));
+                const auto size = os::read(fd, buf_.prepare(2048));
                 if (size > 0) {
-                    assert(size > 0);
-                    SWIRLY_INFO << "received: " << string_view{buf, size};
+                    // Commit actual bytes read.
+                    buf_.commit(size);
+                    SWIRLY_INFO << "received: " << buf_.str();
+                    buf_.consume(size);
                     if (++count_ == 5) {
-                        dispose();
+                        dispose(now);
                     }
                 } else {
-                    dispose();
+                    dispose(now);
                 }
             }
         } catch (const std::exception& e) {
             SWIRLY_ERROR << "failed to read data: " << e.what();
-            dispose();
+            dispose(now);
         }
     }
     void on_timer(Timer& tmr, Time now)
@@ -81,12 +82,13 @@ class EchoSess {
             }
         } catch (const std::exception& e) {
             SWIRLY_ERROR << "failed to write data: " << e.what();
-            dispose();
+            dispose(now);
         }
     }
     IoSocket sock_;
     const TcpEndpoint ep_;
     Reactor::Handle sub_;
+    Buffer buf_;
     Timer tmr_;
     int count_{0};
 };
