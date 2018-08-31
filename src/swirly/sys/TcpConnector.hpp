@@ -56,7 +56,7 @@ class TcpConnector {
             if (ec.value() != EINPROGRESS) {
                 throw std::system_error{ec, "connect"};
             }
-            sub_ = r.subscribe(*sock, EventOut, bind<&TcpConnector::on_io_event>(this));
+            sub_ = r.subscribe(*sock, EventIn | EventOut, bind<&TcpConnector::on_io_event>(this));
             ep_ = ep;
             sock_ = std::move(sock);
             return false;
