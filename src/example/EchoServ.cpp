@@ -65,11 +65,11 @@ class EchoSess {
                     buf_.commit(size);
 
                     // Parse each buffered line.
-                    auto fn = [](std::string_view line, Time now) {
+                    auto fn = [fd](std::string_view line, Time now) {
                         // Echo bytes back to client.
                         std::string buf{line};
                         buf += '\n';
-                        if (os::write(1, {buf.data(), buf.size()}) < buf.size()) {
+                        if (os::write(fd, {buf.data(), buf.size()}) < buf.size()) {
                             throw runtime_error{"partial write"};
                         }
                     };

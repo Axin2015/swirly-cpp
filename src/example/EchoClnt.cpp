@@ -21,6 +21,7 @@
 #include <swirly/sys/TcpConnector.hpp>
 
 #include <swirly/util/Log.hpp>
+#include <swirly/util/Tokeniser.hpp>
 
 #include <boost/intrusive/list.hpp>
 
@@ -29,7 +30,7 @@ using namespace swirly;
 
 namespace {
 
-constexpr auto PingInterval = 1s;
+constexpr auto PingInterval = 100ms;
 
 class EchoSess {
 
@@ -60,9 +61,15 @@ class EchoSess {
                 if (size > 0) {
                     // Commit actual bytes read.
                     buf_.commit(size);
-                    SWIRLY_INFO << "received: " << buf_.str();
-                    buf_.consume(size);
-                    if (++count_ == 5) {
+
+                    // Parse each buffered line.
+                    auto fn = [this](std::string_view line, Time now) {
+                        ++count_;
+                        // Echo bytes back to client.
+                        SWIRLY_INFO << "received: " << line;
+                    };
+                    buf_.consume(parseLine(buf_.str(), now, fn));
+                    if (count_ == 5) {
                         dispose(now);
                     }
                 } else {
@@ -77,7 +84,7 @@ class EchoSess {
     void on_timer(Timer& tmr, Time now)
     {
         try {
-            if (sock_.send("ping", 4, 0) < 4) {
+            if (sock_.send("ping\n", 5, 0) < 5) {
                 throw runtime_error{"partial write"};
             }
         } catch (const std::exception& e) {
