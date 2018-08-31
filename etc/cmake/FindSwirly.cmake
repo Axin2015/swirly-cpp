@@ -21,32 +21,32 @@
 #  SWIRLY_FOUND        - True if Swirly found.
 
 # Look for the header file.
-FIND_PATH(SWIRLY_INCLUDE_DIR NAMES swirly/Config.h
+find_path(SWIRLY_INCLUDE_DIR NAMES swirly/Config.h
           HINTS "$ENV{SWIRLY_HOME}/include")
 
 # Look for the libraries.
-FIND_LIBRARY(SWIRLY_DB_LIBRARY NAMES swirly_db
+find_library(SWIRLY_DB_LIBRARY NAMES swirly_db
              HINTS "$ENV{SWIRLY_HOME}/lib")
-FIND_LIBRARY(SWIRLY_WEB_LIBRARY NAMES swirly_web
+find_library(SWIRLY_WEB_LIBRARY NAMES swirly_web
              HINTS "$ENV{SWIRLY_HOME}/lib")
-FIND_LIBRARY(SWIRLY_LOB_LIBRARY NAMES swirly_lob
+find_library(SWIRLY_LOB_LIBRARY NAMES swirly_lob
              HINTS "$ENV{SWIRLY_HOME}/lib")
-FIND_LIBRARY(SWIRLY_FIN_LIBRARY NAMES swirly_fin
+find_library(SWIRLY_FIN_LIBRARY NAMES swirly_fin
              HINTS "$ENV{SWIRLY_HOME}/lib")
-FIND_LIBRARY(SWIRLY_FIX_LIBRARY NAMES swirly_fix
+find_library(SWIRLY_FIX_LIBRARY NAMES swirly_fix
              HINTS "$ENV{SWIRLY_HOME}/lib")
-FIND_LIBRARY(SWIRLY_APP_LIBRARY NAMES swirly_app
+find_library(SWIRLY_APP_LIBRARY NAMES swirly_app
              HINTS "$ENV{SWIRLY_HOME}/lib")
-FIND_LIBRARY(SWIRLY_SYS_LIBRARY NAMES swirly_sys
+find_library(SWIRLY_SYS_LIBRARY NAMES swirly_sys
              HINTS "$ENV{SWIRLY_HOME}/lib")
-FIND_LIBRARY(SWIRLY_PROF_LIBRARY NAMES swirly_prof
+find_library(SWIRLY_PROF_LIBRARY NAMES swirly_prof
              HINTS "$ENV{SWIRLY_HOME}/lib")
-FIND_LIBRARY(SWIRLY_UTIL_LIBRARY NAMES swirly_util
+find_library(SWIRLY_UTIL_LIBRARY NAMES swirly_util
              HINTS "$ENV{SWIRLY_HOME}/lib")
 
 # Handle the QUIETLY and REQUIRED arguments and set SWIRLY_FOUND to TRUE if all listed variables are TRUE. 
-INCLUDE(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(Swirly DEFAULT_MSG
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(Swirly DEFAULT_MSG
   SWIRLY_INCLUDE_DIR
   SWIRLY_DB_LIBRARY
   SWIRLY_WEB_LIBRARY
@@ -58,7 +58,7 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(Swirly DEFAULT_MSG
   SWIRLY_PROF_LIBRARY
   SWIRLY_UTIL_LIBRARY)
 
-MARK_AS_ADVANCED(
+mark_as_advanced(
   SWIRLY_INCLUDE_DIR
   SWIRLY_DB_LIBRARY
   SWIRLY_WEB_LIBRARY
@@ -71,9 +71,9 @@ MARK_AS_ADVANCED(
   SWIRLY_UTIL_LIBRARY)
 
 # Copy the results to the output variables.
-IF(SWIRLY_FOUND)
-  SET(SWIRLY_INCLUDE_DIRS ${SWIRLY_INCLUDE_DIR})
-  SET(SWIRLY_LIBRARIES
+if(SWIRLY_FOUND)
+  set(SWIRLY_INCLUDE_DIRS ${SWIRLY_INCLUDE_DIR})
+  set(SWIRLY_LIBRARIES
     ${SWIRLY_DB_LIBRARY}
     ${SWIRLY_WEB_LIBRARY}
     ${SWIRLY_LOB_LIBRARY}
@@ -83,4 +83,4 @@ IF(SWIRLY_FOUND)
     ${SWIRLY_SYS_LIBRARY}
     ${SWIRLY_PROF_LIBRARY}
     ${SWIRLY_UTIL_LIBRARY})
-ENDIF()
+endif()

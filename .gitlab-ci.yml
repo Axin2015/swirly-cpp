@@ -2,6 +2,10 @@ image: registry.gitlab.com/swirlycloud/swirly-docker/toolchain:latest
 
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
+  SWIRLY_BUILD_ARCH: haswell
+  SWIRLY_BUILD_SHARED: 'ON'
+  SWIRLY_INSTALL_PREFIX: /opt/swirlycloud/swirly-cpp
+  VERBOSE: 1
 
 stages:
   - build
@@ -11,11 +15,13 @@ build-debug-clang:
   before_script:
     - mkdir -p build
     - cd build
-    - cmake .. -G "Unix Makefiles"
+    - cmake .. -G 'Unix Makefiles'
+      -DSWIRLY_BUILD_ARCH=$SWIRLY_BUILD_ARCH
+      -DSWIRLY_BUILD_SHARED=$SWIRLY_BUILD_SHARED
       -DCMAKE_BUILD_TYPE=DEBUG
       -DCMAKE_C_COMPILER=clang
       -DCMAKE_CXX_COMPILER=clang++
-      -DSWIRLY_BUILD_SHARED=ON
+      -DCMAKE_INSTALL_PREFIX=$SWIRLY_INSTALL_PREFIX
   script:
     - make -j2 all test swift
 
@@ -24,24 +30,33 @@ build-release-clang:
   before_script:
     - mkdir -p build
     - cd build
-    - cmake .. -G "Unix Makefiles"
+    - cmake .. -G 'Unix Makefiles'
+      -DSWIRLY_BUILD_ARCH=$SWIRLY_BUILD_ARCH
+      -DSWIRLY_BUILD_SHARED=$SWIRLY_BUILD_SHARED
       -DCMAKE_BUILD_TYPE=RELEASE
       -DCMAKE_C_COMPILER=clang
       -DCMAKE_CXX_COMPILER=clang++
-      -DSWIRLY_BUILD_SHARED=ON
+      -DCMAKE_INSTALL_PREFIX=$SWIRLY_INSTALL_PREFIX
   script:
-    - make -j2 all test swift
+    - make -j2 all test swift package
+  artifacts:
+    paths:
+      - 'build/*.rpm'
+      - 'build/*.tar.gz'
+    expire_in: 2 days
 
 build-debug-gcc:
   stage: build
   before_script:
     - mkdir -p build
     - cd build
-    - cmake .. -G "Unix Makefiles"
+    - cmake .. -G 'Unix Makefiles'
+      -DSWIRLY_BUILD_ARCH=$SWIRLY_BUILD_ARCH
+      -DSWIRLY_BUILD_SHARED=$SWIRLY_BUILD_SHARED
       -DCMAKE_BUILD_TYPE=DEBUG
       -DCMAKE_C_COMPILER=gcc
       -DCMAKE_CXX_COMPILER=g++
-      -DSWIRLY_BUILD_SHARED=ON
+      -DCMAKE_INSTALL_PREFIX=$SWIRLY_INSTALL_PREFIX
   script:
     - make -j2 all test swift
 
@@ -50,10 +65,17 @@ build-release-gcc:
   before_script:
     - mkdir -p build
     - cd build
-    - cmake .. -G "Unix Makefiles"
+    - cmake .. -G 'Unix Makefiles'
+      -DSWIRLY_BUILD_ARCH=$SWIRLY_BUILD_ARCH
+      -DSWIRLY_BUILD_SHARED=$SWIRLY_BUILD_SHARED
       -DCMAKE_BUILD_TYPE=RELEASE
       -DCMAKE_C_COMPILER=gcc
       -DCMAKE_CXX_COMPILER=g++
-      -DSWIRLY_BUILD_SHARED=ON
+      -DCMAKE_INSTALL_PREFIX=$SWIRLY_INSTALL_PREFIX
   script:
-    - make -j2 all test swift
+    - make -j2 all test swift package
+  artifacts:
+    paths:
+      - 'build/*.rpm'
+      - 'build/*.tar.gz'
+    expire_in: 2 days

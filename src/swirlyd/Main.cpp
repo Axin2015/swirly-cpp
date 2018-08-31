@@ -311,6 +311,10 @@ int main(int argc, char* argv[])
         ret = 0;
     } catch (const exception& e) {
         SWIRLY_ERROR << "exception: " << e.what();
+        // Ensure that startup failures are always reported to interactive users.
+        if (get_logger() != std_logger) {
+            std::cerr << "exception: " << e.what() << std::endl;
+        }
     }
     return ret;
 }
