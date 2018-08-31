@@ -126,7 +126,7 @@ void TimerQueue::expire(Time now)
     assert(tmr.pending());
     try {
         // Notify user.
-        tmr.slot().invoke(tmr, now);
+        tmr.slot().invoke(now, tmr);
     } catch (const std::exception& e) {
         SWIRLY_ERROR << "error handling timer event: " << e.what();
     }

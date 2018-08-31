@@ -43,9 +43,9 @@ Market Market::from_json(const Instr& instr, const QJsonObject& obj)
                   instr,
                   from_json<QDate>(obj["settl_date"]),
                   from_json<MarketState>(obj["state"]),
+                  from_json<QDateTime>(obj["last_time"]),
                   from_json<Lots>(obj["last_lots"]),
-                  from_json<Ticks>(obj["last_ticks"]),
-                  from_json<QDateTime>(obj["last_time"])};
+                  from_json<Ticks>(obj["last_ticks"])};
 
     const auto bid_ticks = obj["bid_ticks"].toArray();
     const auto bid_lots = obj["bid_lots"].toArray();
@@ -66,9 +66,9 @@ QDebug operator<<(QDebug debug, const Market& market)
                     << ",instr=" << market.instr().symbol()      //
                     << ",settl_date=" << market.settl_date()     //
                     << ",state=" << market.state()               //
+                    << ",last_time=" << market.last_time()       //
                     << ",last_lots=" << market.last_lots()       //
                     << ",last_ticks=" << market.last_ticks()     //
-                    << ",last_time=" << market.last_time()       //
                     << ",best_bid=" << market.bids().front()     //
                     << ",best_offer=" << market.offers().front() //
                     << '}';

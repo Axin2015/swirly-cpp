@@ -37,11 +37,12 @@ class SWIRLY_API Order
 , public Request
 , public MemAlloc {
   public:
-    Order(Symbol accnt, Id64 market_id, Symbol instr, JDay settl_day, Id64 id, std::string_view ref,
-          State state, Side side, Lots lots, Ticks ticks, Lots resd_lots, Lots exec_lots,
-          Cost exec_cost, Lots last_lots, Ticks last_ticks, Lots min_lots, Time created,
-          Time modified) noexcept
-    : Request{accnt, market_id, instr, settl_day, id, ref, side, lots, created}
+    Order(Time created, Time modified, Symbol accnt, Id64 market_id, Symbol instr, JDay settl_day,
+          Id64 id, std::string_view ref, State state, Side side, Lots lots, Ticks ticks,
+          Lots resd_lots, Lots exec_lots, Cost exec_cost, Lots last_lots, Ticks last_ticks,
+          Lots min_lots) noexcept
+    : Request{created, accnt, market_id, instr, settl_day, id, ref, side, lots}
+    , modified_{modified}
     , state_{state}
     , ticks_{ticks}
     , resd_lots_{resd_lots}
@@ -50,13 +51,12 @@ class SWIRLY_API Order
     , last_lots_{last_lots}
     , last_ticks_{last_ticks}
     , min_lots_{min_lots}
-    , modified_{modified}
     {
     }
-    Order(Symbol accnt, Id64 market_id, Symbol instr, JDay settl_day, Id64 id, std::string_view ref,
-          Side side, Lots lots, Ticks ticks, Lots min_lots, Time created) noexcept
-    : Order{accnt, market_id, instr, settl_day, id,    ref,   State::New, side,    lots,
-            ticks, lots,      0_lts, 0_cst,     0_lts, 0_tks, min_lots,   created, created}
+    Order(Time created, Symbol accnt, Id64 market_id, Symbol instr, JDay settl_day, Id64 id,
+          std::string_view ref, Side side, Lots lots, Ticks ticks, Lots min_lots) noexcept
+    : Order{created, created, accnt, market_id, instr, settl_day, id,    ref,   State::New,
+            side,    lots,    ticks, lots,      0_lts, 0_cst,     0_lts, 0_tks, min_lots}
     {
     }
     ~Order();
@@ -79,6 +79,7 @@ class SWIRLY_API Order
     void to_json(std::ostream& os) const;
 
     auto* level() const noexcept { return level_; }
+    auto modified() const noexcept { return modified_; }
     auto state() const noexcept { return state_; }
     auto ticks() const noexcept { return ticks_; }
     auto resd_lots() const noexcept { return resd_lots_; }
@@ -88,19 +89,18 @@ class SWIRLY_API Order
     auto last_ticks() const noexcept { return last_ticks_; }
     auto min_lots() const noexcept { return min_lots_; }
     auto done() const noexcept { return resd_lots_ == 0_lts; }
-    auto modified() const noexcept { return modified_; }
     void set_level(Level* level) const noexcept { level_ = level; }
     void create(Time now) noexcept
     {
         assert(lots_ > 0_lts);
         assert(lots_ >= min_lots_);
+        modified_ = now;
         state_ = State::New;
         resd_lots_ = lots_;
         exec_lots_ = 0_lts;
         exec_cost_ = 0_cst;
-        modified_ = now;
     }
-    void revise(Lots lots, Time now) noexcept
+    void revise(Time now, Lots lots) noexcept
     {
         assert(lots > 0_lts);
         assert(lots >= exec_lots_);
@@ -108,32 +108,32 @@ class SWIRLY_API Order
         assert(lots <= lots_);
         const auto delta = lots_ - lots;
         assert(delta >= 0_lts);
+        modified_ = now;
         state_ = State::Revise;
         lots_ = lots;
         resd_lots_ -= delta;
-        modified_ = now;
     }
     void cancel(Time now) noexcept
     {
+        modified_ = now;
         state_ = State::Cancel;
         // Note that executed lots is not affected.
         resd_lots_ = 0_lts;
-        modified_ = now;
     }
-    void trade(Lots taken_lots, Cost taken_cost, Lots last_lots, Ticks last_ticks,
-               Time now) noexcept
+    void trade(Time now, Lots taken_lots, Cost taken_cost, Lots last_lots,
+               Ticks last_ticks) noexcept
     {
+        modified_ = now;
         state_ = State::Trade;
         resd_lots_ -= taken_lots;
         exec_lots_ += taken_lots;
         exec_cost_ += taken_cost;
         last_lots_ = last_lots;
         last_ticks_ = last_ticks;
-        modified_ = now;
     }
-    void trade(Lots last_lots, Ticks last_ticks, Time now) noexcept
+    void trade(Time now, Lots last_lots, Ticks last_ticks) noexcept
     {
-        trade(last_lots, swirly::cost(last_lots, last_ticks), last_lots, last_ticks, now);
+        trade(now, last_lots, swirly::cost(last_lots, last_ticks), last_lots, last_ticks);
     }
     boost::intrusive::set_member_hook<> id_hook;
     boost::intrusive::set_member_hook<> ref_hook;
@@ -143,6 +143,7 @@ class SWIRLY_API Order
     // Internals.
     mutable Level* level_{nullptr};
 
+    Time modified_;
     State state_;
     const Ticks ticks_;
     /**
@@ -160,7 +161,6 @@ class SWIRLY_API Order
      * Minimum to be filled by this order.
      */
     const Lots min_lots_;
-    Time modified_;
 };
 
 static_assert(sizeof(Order) <= 5 * 64, "no greater than specified cache-lines");

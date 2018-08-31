@@ -27,7 +27,7 @@ class Foo
 , public Request {
   public:
     Foo(Id64 market_id, Id64 id, int& alive) noexcept
-    : Request{{}, market_id, {}, 0_jd, id, {}, Side::Buy, 0_lts, {}}
+    : Request{{}, {}, market_id, {}, 0_jd, id, {}, Side::Buy, 0_lts}
     , alive_{alive}
     {
         ++alive;

@@ -52,19 +52,19 @@ class RestServ {
   private:
     bool reset(const HttpRequest& req) noexcept;
 
-    void rest_request(const HttpRequest& req, Time now, HttpStream& os);
+    void rest_request(Time now, const HttpRequest& req, HttpStream& os);
 
-    void ref_data_request(const HttpRequest& req, Time now, HttpStream& os);
-    void asset_request(const HttpRequest& req, Time now, HttpStream& os);
-    void instr_request(const HttpRequest& req, Time now, HttpStream& os);
+    void ref_data_request(Time now, const HttpRequest& req, HttpStream& os);
+    void asset_request(Time now, const HttpRequest& req, HttpStream& os);
+    void instr_request(Time now, const HttpRequest& req, HttpStream& os);
 
-    void sess_request(const HttpRequest& req, Time now, HttpStream& os);
-    void market_request(const HttpRequest& req, Time now, HttpStream& os);
+    void sess_request(Time now, const HttpRequest& req, HttpStream& os);
+    void market_request(Time now, const HttpRequest& req, HttpStream& os);
 
-    void order_request(const HttpRequest& req, Time now, HttpStream& os);
-    void exec_request(const HttpRequest& req, Time now, HttpStream& os);
-    void trade_request(const HttpRequest& req, Time now, HttpStream& os);
-    void posn_request(const HttpRequest& req, Time now, HttpStream& os);
+    void order_request(Time now, const HttpRequest& req, HttpStream& os);
+    void exec_request(Time now, const HttpRequest& req, HttpStream& os);
+    void trade_request(Time now, const HttpRequest& req, HttpStream& os);
+    void posn_request(Time now, const HttpRequest& req, HttpStream& os);
 
     RestApp& app_;
     bool match_method_{false};

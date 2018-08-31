@@ -25,6 +25,8 @@ OrderModel::OrderModel(QObject* parent)
 : TableModel{parent}
 {
     header_[unbox(Column::CheckState)] = tr("");
+    header_[unbox(Column::Created)] = tr("Created");
+    header_[unbox(Column::Modified)] = tr("Modified");
     header_[unbox(Column::Accnt)] = tr("Accnt");
     header_[unbox(Column::MarketId)] = tr("Market Id");
     header_[unbox(Column::Instr)] = tr("Instr");
@@ -41,8 +43,6 @@ OrderModel::OrderModel(QObject* parent)
     header_[unbox(Column::LastLots)] = tr("Last Lots");
     header_[unbox(Column::LastPrice)] = tr("Last Price");
     header_[unbox(Column::MinLots)] = tr("Min Lots");
-    header_[unbox(Column::Created)] = tr("Created");
-    header_[unbox(Column::Modified)] = tr("Modified");
 }
 
 OrderModel::~OrderModel() = default;
@@ -65,6 +65,12 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
         const auto& order = value_at(index.row());
         switch (box<Column>(index.column())) {
         case Column::CheckState:
+            break;
+        case Column::Created:
+            var = order.created();
+            break;
+        case Column::Modified:
+            var = order.modified();
             break;
         case Column::Accnt:
             var = order.accnt();
@@ -118,24 +124,13 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
         case Column::MinLots:
             var = to_variant(order.min_lots());
             break;
-        case Column::Created:
-            var = order.created();
-            break;
-        case Column::Modified:
-            var = order.modified();
-            break;
         }
     } else if (role == Qt::TextAlignmentRole) {
         switch (box<Column>(index.column())) {
         case Column::CheckState:
             break;
-        case Column::Accnt:
-        case Column::Instr:
-        case Column::Ref:
-        case Column::State:
-        case Column::Side:
-            var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
-            break;
+        case Column::Created:
+        case Column::Modified:
         case Column::MarketId:
         case Column::SettlDate:
         case Column::Id:
@@ -147,9 +142,14 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
         case Column::LastLots:
         case Column::LastPrice:
         case Column::MinLots:
-        case Column::Created:
-        case Column::Modified:
             var = QVariant{Qt::AlignRight | Qt::AlignVCenter};
+            break;
+        case Column::Accnt:
+        case Column::Instr:
+        case Column::Ref:
+        case Column::State:
+        case Column::Side:
+            var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
             break;
         }
     } else if (role == Qt::UserRole) {

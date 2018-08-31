@@ -20,8 +20,8 @@ namespace swirly {
 inline namespace fix {
 using namespace std;
 
-FixAcceptor::FixAcceptor(Reactor& r, const Endpoint& ep, const FixConfig& config, FixApp& app,
-                         Time now)
+FixAcceptor::FixAcceptor(Time now, Reactor& r, const Endpoint& ep, const FixConfig& config,
+                         FixApp& app)
 : TcpAcceptor{r, ep}
 , reactor_(r)
 , config_(config)
@@ -34,12 +34,12 @@ FixAcceptor::~FixAcceptor()
     sess_list_.clear_and_dispose([](auto* sess) { delete sess; });
 }
 
-void FixAcceptor::do_accept(IoSocket&& sock, const Endpoint& ep, Time now)
+void FixAcceptor::do_accept(Time now, IoSocket&& sock, const Endpoint& ep)
 {
     sock.set_non_block();
     sock.set_tcp_no_delay(true);
     // High performance TCP servers could use a custom allocator.
-    auto* const sess = new FixSess{reactor_, move(sock), ep, config_, app_, now};
+    auto* const sess = new FixSess{now, reactor_, move(sock), ep, config_, app_};
     sess_list_.push_back(*sess);
 }
 

@@ -168,11 +168,12 @@ BOOST_AUTO_TEST_CASE(RangeCase)
 
 BOOST_FIXTURE_TEST_CASE(MsgQueueCreateMarket, MsgQueueFixture)
 {
-    mq.create_market(MarketId, "EURUSD"sv, SettlDay, 0x1);
+    mq.create_market(Now, MarketId, "EURUSD"sv, SettlDay, 0x1);
 
     Msg msg;
     BOOST_TEST(mq.pop(msg));
     BOOST_CHECK_EQUAL(msg.type, MsgType::CreateMarket);
+    BOOST_CHECK_EQUAL(msg.time, ns_since_epoch(Now));
     const auto& body = msg.create_market;
 
     BOOST_CHECK_EQUAL(body.id, MarketId);
@@ -183,11 +184,12 @@ BOOST_FIXTURE_TEST_CASE(MsgQueueCreateMarket, MsgQueueFixture)
 
 BOOST_FIXTURE_TEST_CASE(MsgQueueUpdateMarket, MsgQueueFixture)
 {
-    mq.update_market(MarketId, 0x1);
+    mq.update_market(Now, MarketId, 0x1);
 
     Msg msg;
     BOOST_TEST(mq.pop(msg));
     BOOST_CHECK_EQUAL(msg.type, MsgType::UpdateMarket);
+    BOOST_CHECK_EQUAL(msg.time, ns_since_epoch(Now));
     const auto& body = msg.update_market;
 
     BOOST_CHECK_EQUAL(body.id, MarketId);
@@ -197,19 +199,20 @@ BOOST_FIXTURE_TEST_CASE(MsgQueueUpdateMarket, MsgQueueFixture)
 BOOST_FIXTURE_TEST_CASE(MsgQueueCreateExec, MsgQueueFixture)
 {
     ConstExecPtr execs[2];
-    execs[0] = make_intrusive<Exec>("MARAYL"sv, MarketId, "EURUSD"sv, SettlDay, 1_id64, 2_id64,
+    execs[0] = make_intrusive<Exec>(Now, "MARAYL"sv, MarketId, "EURUSD"sv, SettlDay, 1_id64, 2_id64,
                                     "REF"sv, State::New, Side::Buy, 10_lts, 12345_tks, 10_lts,
                                     0_lts, 0_cst, 0_lts, 0_tks, 1_lts, 0_id64, 0_lts, 0_cst,
-                                    LiqInd::None, Symbol{}, Now);
-    execs[1] = make_intrusive<Exec>("MARAYL"sv, MarketId, "EURUSD"sv, SettlDay, 3_id64, 2_id64,
-                                    "REF"sv, State::Trade, Side::Buy, 10_lts, 12345_tks, 5_lts,
-                                    5_lts, 61725_cst, 5_lts, 12345_tks, 1_lts, 4_id64, 0_lts, 0_cst,
-                                    LiqInd::Maker, "GOSAYL"sv, Now + 1ms);
+                                    LiqInd::None, Symbol{});
+    execs[1] = make_intrusive<Exec>(Now + 1ms, "MARAYL"sv, MarketId, "EURUSD"sv, SettlDay, 3_id64,
+                                    2_id64, "REF"sv, State::Trade, Side::Buy, 10_lts, 12345_tks,
+                                    5_lts, 5_lts, 61725_cst, 5_lts, 12345_tks, 1_lts, 4_id64, 0_lts,
+                                    0_cst, LiqInd::Maker, "GOSAYL"sv);
     mq.create_exec(execs);
     {
         Msg msg;
         BOOST_TEST(mq.pop(msg));
         BOOST_CHECK_EQUAL(msg.type, MsgType::CreateExec);
+        BOOST_CHECK_EQUAL(msg.time, ns_since_epoch(Now));
         const auto& body = msg.create_exec;
 
         BOOST_CHECK_EQUAL(strncmp(body.accnt, "MARAYL", sizeof(body.accnt)), 0);
@@ -234,12 +237,12 @@ BOOST_FIXTURE_TEST_CASE(MsgQueueCreateExec, MsgQueueFixture)
         BOOST_CHECK_EQUAL(body.posn_cost, 0_cst);
         BOOST_CHECK_EQUAL(body.liq_ind, LiqInd::None);
         BOOST_CHECK_EQUAL(strncmp(body.cpty, "", sizeof(body.cpty)), 0);
-        BOOST_CHECK_EQUAL(body.created, ms_since_epoch(Now));
     }
     {
         Msg msg;
         BOOST_TEST(mq.pop(msg));
         BOOST_CHECK_EQUAL(msg.type, MsgType::CreateExec);
+        BOOST_CHECK_EQUAL(msg.time, ns_since_epoch(Now + 1ms));
         const auto& body = msg.create_exec;
 
         BOOST_CHECK_EQUAL(body.market_id, MarketId);
@@ -264,7 +267,6 @@ BOOST_FIXTURE_TEST_CASE(MsgQueueCreateExec, MsgQueueFixture)
         BOOST_CHECK_EQUAL(body.posn_cost, 0_cst);
         BOOST_CHECK_EQUAL(body.liq_ind, LiqInd::Maker);
         BOOST_CHECK_EQUAL(strncmp(body.cpty, "GOSAYL", sizeof(body.cpty)), 0);
-        BOOST_CHECK_EQUAL(body.created, ms_since_epoch(Now + 1ms));
     }
 }
 
@@ -275,16 +277,16 @@ BOOST_FIXTURE_TEST_CASE(MsgQueueArchiveTrade, MsgQueueFixture)
 
     Id64 id{};
     generate_n(back_insert_iterator<decltype(ids)>(ids), ids.capacity(), [&id]() { return ++id; });
-    mq.archive_trade(MarketId, ids, Now);
+    mq.archive_trade(Now, MarketId, ids);
 
     auto it = ids.begin();
     while (it != ids.end()) {
         Msg msg;
         BOOST_TEST(mq.pop(msg));
         BOOST_CHECK_EQUAL(msg.type, MsgType::ArchiveTrade);
+        BOOST_CHECK_EQUAL(msg.time, ns_since_epoch(Now));
         const auto& body = msg.archive_trade;
         BOOST_CHECK_EQUAL(body.market_id, MarketId);
-        BOOST_CHECK_EQUAL(body.modified, ms_since_epoch(Now));
         for (const auto id : body.ids) {
             if (it != ids.end()) {
                 BOOST_CHECK_EQUAL(id, *it++);

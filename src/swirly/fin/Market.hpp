@@ -32,15 +32,15 @@ class SWIRLY_API Market
 : public RefCount<Market, ThreadUnsafePolicy>
 , public Comparable<Market> {
   public:
-    Market(Id64 id, Symbol instr, JDay settl_day, MarketState state, Lots last_lots = 0_lts,
-           Ticks last_ticks = 0_tks, Time last_time = {}, Id64 max_id = 0_id64) noexcept
+    Market(Id64 id, Symbol instr, JDay settl_day, MarketState state, Time last_time = {},
+           Lots last_lots = 0_lts, Ticks last_ticks = 0_tks, Id64 max_id = 0_id64) noexcept
     : id_{id}
     , instr_{instr}
     , settl_day_{settl_day}
     , state_{state}
+    , last_time_{last_time}
     , last_lots_{last_lots}
     , last_ticks_{last_ticks}
-    , last_time_{last_time}
     , max_id_{max_id}
     {
     }
@@ -68,9 +68,9 @@ class SWIRLY_API Market
     auto instr() const noexcept { return instr_; }
     auto settl_day() const noexcept { return settl_day_; }
     auto state() const noexcept { return state_; }
+    Time last_time() const noexcept { return last_time_; }
     Lots last_lots() const noexcept { return last_lots_; }
     Ticks last_ticks() const noexcept { return last_ticks_; }
-    Time last_time() const noexcept { return last_time_; }
     const MarketSide& bid_side() const noexcept { return bid_side_; }
     const MarketSide& offer_side() const noexcept { return offer_side_; }
     Id64 max_id() const noexcept { return max_id_; }
@@ -86,24 +86,24 @@ class SWIRLY_API Market
     /**
      * Throws std::bad_alloc.
      */
-    void create_order(const OrderPtr& order, Time now)
+    void create_order(Time now, const OrderPtr& order)
     {
-        side(order->side()).create_order(order, now);
+        side(order->side()).create_order(now, order);
     }
-    void revise_order(Order& order, Lots lots, Time now) noexcept
+    void revise_order(Time now, Order& order, Lots lots) noexcept
     {
-        side(order.side()).revise_order(order, lots, now);
+        side(order.side()).revise_order(now, order, lots);
     }
-    void cancel_order(Order& order, Time now) noexcept
+    void cancel_order(Time now, Order& order) noexcept
     {
-        side(order.side()).cancel_order(order, now);
+        side(order.side()).cancel_order(now, order);
     }
-    void take_order(Order& order, Lots lots, Time now) noexcept
+    void take_order(Time now, Order& order, Lots lots) noexcept
     {
-        side(order.side()).take_order(order, lots, now);
+        side(order.side()).take_order(now, order, lots);
+        last_time_ = now;
         last_lots_ = lots;
         last_ticks_ = order.ticks();
-        last_time_ = now;
     }
     Id64 alloc_id() noexcept { return ++max_id_; }
     boost::intrusive::set_member_hook<> id_hook;
@@ -119,9 +119,9 @@ class SWIRLY_API Market
     const Symbol instr_;
     const JDay settl_day_;
     MarketState state_;
+    Time last_time_;
     Lots last_lots_;
     Ticks last_ticks_;
-    Time last_time_;
     // Two sides constitute the market.
     MarketSide bid_side_;
     MarketSide offer_side_;

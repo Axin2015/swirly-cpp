@@ -24,7 +24,7 @@ inline namespace sys {
 
 enum class Priority { High = 0, Low = 1 };
 
-using IoSlot = BasicSlot<int, unsigned, Time>;
+using IoSlot = BasicSlot<Time, int, unsigned>;
 
 class SWIRLY_API Reactor {
   public:

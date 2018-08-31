@@ -38,7 +38,7 @@ class EchoSess {
     using AutoUnlinkOption = boost::intrusive::link_mode<boost::intrusive::auto_unlink>;
 
   public:
-    EchoSess(Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, Time now)
+    EchoSess(Time now, Reactor& r, IoSocket&& sock, const TcpEndpoint& ep)
     : reactor_(r)
     , sock_{move(sock)}
     , ep_{ep}
@@ -54,7 +54,7 @@ class EchoSess {
         SWIRLY_INFO << "session closed";
         delete this;
     }
-    void on_input(int fd, unsigned events, Time now)
+    void on_input(Time now, int fd, unsigned events)
     {
         try {
             if (events & (EventIn | EventHup)) {
@@ -65,7 +65,7 @@ class EchoSess {
                     buf_.commit(size);
 
                     // Parse each buffered line.
-                    auto fn = [fd](std::string_view line, Time now) {
+                    auto fn = [fd](Time now, std::string_view line) {
                         // Echo bytes back to client.
                         std::string buf{line};
                         buf += '\n';
@@ -73,7 +73,7 @@ class EchoSess {
                             throw runtime_error{"partial write"};
                         }
                     };
-                    buf_.consume(parseLine(buf_.str(), now, fn));
+                    buf_.consume(parseLine(now, buf_.str(), fn));
 
                     // Reset timer.
                     tmr_.cancel();
@@ -88,7 +88,7 @@ class EchoSess {
             dispose(now);
         }
     }
-    void on_timer(Timer& tmr, Time now)
+    void on_timer(Time now, Timer& tmr)
     {
         SWIRLY_INFO << "timeout";
         dispose(now);
@@ -110,7 +110,7 @@ class EchoServ : public TcpAcceptor<EchoServ> {
     using SessList = boost::intrusive::list<EchoSess, ConstantTimeSizeOption, MemberHookOption>;
 
   public:
-    EchoServ(Reactor& r, const Endpoint& ep, Time now)
+    EchoServ(Time now, Reactor& r, const Endpoint& ep)
     : TcpAcceptor{r, ep}
     , reactor_(r)
     {
@@ -121,13 +121,13 @@ class EchoServ : public TcpAcceptor<EchoServ> {
     }
 
   private:
-    void do_accept(IoSocket&& sock, const Endpoint& ep, Time now)
+    void do_accept(Time now, IoSocket&& sock, const Endpoint& ep)
     {
         SWIRLY_INFO << "session opened: " << ep;
         sock.set_non_block();
         sock.set_tcp_no_delay(true);
         // High performance TCP servers could use a custom allocator.
-        auto* const sess = new EchoSess{reactor_, move(sock), ep, now};
+        auto* const sess = new EchoSess{now, reactor_, move(sock), ep};
         sess_list_.push_back(*sess);
     }
     Reactor& reactor_;
@@ -145,7 +145,7 @@ int main(int argc, char* argv[])
 
         EpollReactor reactor{1024};
         const TcpEndpoint ep{Tcp::v4(), 7777};
-        EchoServ echo_serv{reactor, ep, start_time};
+        EchoServ echo_serv{start_time, reactor, ep};
 
         // Start service threads.
         ReactorThread reactor_thread{reactor, ThreadConfig{"reactor"s}};

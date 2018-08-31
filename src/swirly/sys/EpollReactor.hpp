@@ -63,7 +63,7 @@ class SWIRLY_API EpollReactor : public Reactor {
     int do_poll(Time now, Millis timeout) override;
 
   private:
-    int dispatch(Event* buf, int size, Time now);
+    int dispatch(Time now, Event* buf, int size);
 
     struct Data {
         int sid{};

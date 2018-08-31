@@ -61,9 +61,9 @@ void Market::to_dsv(ostream& os, char delim) const
     }
     osj << state_;
     if (last_lots_ != 0_lts) {
-        osj << last_lots_  //
-            << last_ticks_ //
-            << last_time_;
+        osj << last_time_ //
+            << last_lots_ //
+            << last_ticks_;
     } else {
         osj << ""
             << ""
@@ -84,11 +84,11 @@ void Market::to_json(ostream& os) const
     }
     os << ",\"state\":" << state_;
     if (last_lots_ != 0_lts) {
-        os << ",\"last_lots\":" << last_lots_   //
-           << ",\"last_ticks\":" << last_ticks_ //
-           << ",\"last_time\":" << last_time_;
+        os << ",\"last_time\":" << last_time_ //
+           << ",\"last_lots\":" << last_lots_ //
+           << ",\"last_ticks\":" << last_ticks_;
     } else {
-        os << ",\"last_lots\":null,\"last_ticks\":null,\"last_time\":null";
+        os << ",\"last_time\":null,\"last_lots\":null,\"last_ticks\":null";
     }
 
     const auto& bid_levels = bid_side_.levels();

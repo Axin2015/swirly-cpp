@@ -25,6 +25,7 @@ namespace exec {
 
 enum class Column : int { //
     CheckState,           //
+    Created,              //
     Accnt,                //
     MarketId,             //
     Instr,                //
@@ -44,26 +45,25 @@ enum class Column : int { //
     MinLots,              //
     MatchId,              //
     LiqInd,               //
-    Cpty,                 //
-    Created
+    Cpty
 };
-constexpr int ColumnCount{unbox(Column::Created) + 1};
+constexpr int ColumnCount{unbox(Column::Cpty) + 1};
 
 } // namespace exec
 
 class Exec {
   public:
-    Exec(const QString& accnt, Id64 market_id, const Instr& instr, QDate settl_date, Id64 id,
-         Id64 order_id, const QString& ref, State state, Side side, Lots lots, Ticks ticks,
-         Lots resd_lots, Lots exec_lots, Cost exec_cost, Lots last_lots, Ticks last_ticks,
-         Lots min_lots, Id64 match_id, LiqInd liq_ind, const QString& cpty,
-         const QDateTime& created);
+    Exec(const QDateTime& created, const QString& accnt, Id64 market_id, const Instr& instr,
+         QDate settl_date, Id64 id, Id64 order_id, const QString& ref, State state, Side side,
+         Lots lots, Ticks ticks, Lots resd_lots, Lots exec_lots, Cost exec_cost, Lots last_lots,
+         Ticks last_ticks, Lots min_lots, Id64 match_id, LiqInd liq_ind, const QString& cpty);
     Exec() = default;
     ~Exec() = default;
 
     static Exec from_json(const Instr& instr, const QJsonObject& obj);
 
     ExecKey key() const noexcept { return {market_id_, id_}; }
+    const QDateTime& created() const noexcept { return created_; }
     const QString& accnt() const noexcept { return accnt_; }
     Id64 market_id() const noexcept { return market_id_; }
     const Instr& instr() const noexcept { return instr_; }
@@ -84,9 +84,9 @@ class Exec {
     Id64 match_id() const noexcept { return match_id_; }
     LiqInd liq_ind() const noexcept { return liq_ind_; }
     const QString& cpty() const noexcept { return cpty_; }
-    const QDateTime& created() const noexcept { return created_; }
 
   private:
+    QDateTime created_{};
     QString accnt_{};
     Id64 market_id_{};
     Instr instr_{};
@@ -107,7 +107,6 @@ class Exec {
     Id64 match_id_{};
     LiqInd liq_ind_{};
     QString cpty_{};
-    QDateTime created_{};
 };
 
 QDebug operator<<(QDebug debug, const Exec& exec);

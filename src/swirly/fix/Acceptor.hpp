@@ -33,11 +33,11 @@ class SWIRLY_API FixAcceptor : public TcpAcceptor<FixAcceptor> {
     using SessList = boost::intrusive::list<FixSess, ConstantTimeSizeOption, MemberHookOption>;
 
   public:
-    FixAcceptor(Reactor& r, const Endpoint& ep, const FixConfig& config, FixApp& app, Time now);
+    FixAcceptor(Time now, Reactor& r, const Endpoint& ep, const FixConfig& config, FixApp& app);
     ~FixAcceptor();
 
   private:
-    void do_accept(IoSocket&& sock, const Endpoint& ep, Time now);
+    void do_accept(Time now, IoSocket&& sock, const Endpoint& ep);
     Reactor& reactor_;
     const FixConfig& config_;
     FixApp& app_;

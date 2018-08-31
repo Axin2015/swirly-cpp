@@ -41,11 +41,11 @@ class SWIRLY_API FixSess final : BasicFixParser<FixSess> {
     using Transport = Tcp;
     using Endpoint = TcpEndpoint;
 
-    FixSess(Reactor& r, IoSocket&& sock, const Endpoint& ep, const FixConfig& config, FixApp& app,
-            Time now);
+    FixSess(Time now, Reactor& r, IoSocket&& sock, const Endpoint& ep, const FixConfig& config,
+            FixApp& app);
     const Endpoint& endpoint() const noexcept { return ep_; }
     int seq_num() const noexcept { return seq_num_; }
-    void logon(const FixSessId& sess_id, Time now);
+    void logon(Time now, const FixSessId& sess_id);
     void logout(Time now);
     boost::intrusive::list_member_hook<AutoUnlinkOption> list_hook;
 
@@ -55,12 +55,12 @@ class SWIRLY_API FixSess final : BasicFixParser<FixSess> {
     void read_only(Time now);
     void send_logon(Time now);
     void send_logout(Time now);
-    void on_io_event(int fd, unsigned events, Time now);
+    void on_io_event(Time now, int fd, unsigned events);
     void schedule_timeout(Time now);
-    void on_timeout(Timer& tmr, Time now);
+    void on_timeout(Time now, Timer& tmr);
     void schedule_heartbeat(Time now);
-    void on_heartbeat(Timer& tmr, Time now);
-    void on_message(std::string_view msg, std::size_t msg_type_off, Version ver, Time now);
+    void on_heartbeat(Time now, Timer& tmr);
+    void on_message(Time now, std::string_view msg, std::size_t msg_type_off, Version ver);
     Reactor& reactor_;
     IoSocket sock_;
     const Endpoint ep_;

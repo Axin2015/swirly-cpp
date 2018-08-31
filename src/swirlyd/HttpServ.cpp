@@ -33,9 +33,9 @@ HttpServ::~HttpServ()
     list_.clear_and_dispose([](auto* sess) { delete sess; });
 }
 
-void HttpServ::do_accept(IoSocket&& sock, const Endpoint& ep, Time now)
+void HttpServ::do_accept(Time now, IoSocket&& sock, const Endpoint& ep)
 {
-    auto* const sess = new HttpSess{reactor_, move(sock), ep, rest_serv_, now};
+    auto* const sess = new HttpSess{now, reactor_, move(sock), ep, rest_serv_};
     list_.push_back(*sess);
 }
 

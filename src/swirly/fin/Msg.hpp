@@ -66,8 +66,6 @@ struct SWIRLY_PACKED CreateExec {
     Cost posn_cost;
     LiqInd liq_ind;
     char cpty[MaxSymbol];
-    // std::chrono::time_point is not pod.
-    int64_t created;
 };
 static_assert(std::is_pod_v<CreateExec>);
 
@@ -75,13 +73,13 @@ constexpr std::size_t MaxIds{(sizeof(CreateExec) - sizeof(Id64) - sizeof(int64_t
 struct SWIRLY_PACKED ArchiveTrade {
     Id64 market_id;
     Id64 ids[MaxIds];
-    // std::chrono::time_point is not pod.
-    int64_t modified;
 };
 static_assert(std::is_pod_v<ArchiveTrade>);
 
 struct SWIRLY_PACKED Msg {
     MsgType type;
+    // std::chrono::time_point is not pod.
+    int64_t time;
     union SWIRLY_PACKED {
         CreateMarket create_market;
         UpdateMarket update_market;

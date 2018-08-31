@@ -131,12 +131,12 @@ int EpollReactor::do_poll(Time now, Millis timeout)
         return 0;
     }
     now = UnixClock::now();
-    const auto n = tqs_[High].dispatch(now) + dispatch(buf, ret, now);
+    const auto n = tqs_[High].dispatch(now) + dispatch(now, buf, ret);
     // Low priority timers are only dispatched during empty cycles.
     return n == 0 ? tqs_[Low].dispatch(now) : n;
 }
 
-int EpollReactor::dispatch(Event* buf, int size, Time now)
+int EpollReactor::dispatch(Time now, Event* buf, int size)
 {
     int n{0};
     for (int i{0}; i < size; ++i) {
@@ -165,7 +165,7 @@ int EpollReactor::dispatch(Event* buf, int size, Time now)
         }
 
         try {
-            ref.slot(fd, events, now);
+            ref.slot(now, fd, events);
         } catch (const std::exception& e) {
             SWIRLY_ERROR << "error handling io event: " << e.what();
         }

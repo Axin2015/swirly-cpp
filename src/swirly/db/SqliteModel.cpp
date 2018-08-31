@@ -91,9 +91,9 @@ void SqliteModel::do_read_market(const ModelCallback<MarketPtr>& cb) const
                         column<string_view>(*stmt, Instr), //
                         column<JDay>(*stmt, SettlDay),     //
                         column<MarketState>(*stmt, State), //
+                        column<Time>(*stmt, LastTime),     //
                         column<Lots>(*stmt, LastLots),     //
                         column<Ticks>(*stmt, LastTicks),   //
-                        column<Time>(*stmt, LastTime),     //
                         column<Id64>(*stmt, MaxId)));
     }
 }
@@ -103,7 +103,9 @@ void SqliteModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
     using namespace order;
     StmtPtr stmt{prepare(*db_, SelectSql)};
     while (step(*stmt)) {
-        cb(Order::make(column<string_view>(*stmt, Accnt),       //
+        cb(Order::make(column<Time>(*stmt, Created),            //
+                       column<Time>(*stmt, Modified),           //
+                       column<string_view>(*stmt, Accnt),       //
                        column<Id64>(*stmt, MarketId),           //
                        column<string_view>(*stmt, Instr),       //
                        column<JDay>(*stmt, SettlDay),           //
@@ -118,9 +120,7 @@ void SqliteModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
                        column<swirly::Cost>(*stmt, ExecCost),   //
                        column<swirly::Lots>(*stmt, LastLots),   //
                        column<swirly::Ticks>(*stmt, LastTicks), //
-                       column<swirly::Lots>(*stmt, MinLots),    //
-                       column<Time>(*stmt, Created),            //
-                       column<Time>(*stmt, Modified)));
+                       column<swirly::Lots>(*stmt, MinLots)));
     }
 }
 
@@ -131,7 +131,8 @@ void SqliteModel::do_read_exec(Time since, const ModelCallback<ExecPtr>& cb) con
     ScopedBind bind{*stmt};
     bind(since);
     while (step(*stmt)) {
-        cb(Exec::make(column<string_view>(*stmt, Accnt),       //
+        cb(Exec::make(column<Time>(*stmt, Created),            //
+                      column<string_view>(*stmt, Accnt),       //
                       column<Id64>(*stmt, MarketId),           //
                       column<string_view>(*stmt, Instr),       //
                       column<JDay>(*stmt, SettlDay),           //
@@ -152,8 +153,7 @@ void SqliteModel::do_read_exec(Time since, const ModelCallback<ExecPtr>& cb) con
                       column<swirly::Lots>(*stmt, PosnLots),   //
                       column<swirly::Cost>(*stmt, PosnCost),   //
                       column<swirly::LiqInd>(*stmt, LiqInd),   //
-                      column<string_view>(*stmt, Cpty),        //
-                      column<Time>(*stmt, Created)));
+                      column<string_view>(*stmt, Cpty)));
     }
 }
 
@@ -162,7 +162,8 @@ void SqliteModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
     using namespace trade;
     StmtPtr stmt{prepare(*db_, SelectSql)};
     while (step(*stmt)) {
-        cb(Exec::make(column<string_view>(*stmt, Accnt),       //
+        cb(Exec::make(column<Time>(*stmt, Created),            //
+                      column<string_view>(*stmt, Accnt),       //
                       column<Id64>(*stmt, MarketId),           //
                       column<string_view>(*stmt, Instr),       //
                       column<JDay>(*stmt, SettlDay),           //
@@ -183,8 +184,7 @@ void SqliteModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
                       column<swirly::Lots>(*stmt, PosnLots),   //
                       column<swirly::Cost>(*stmt, PosnCost),   //
                       column<swirly::LiqInd>(*stmt, LiqInd),   //
-                      column<string_view>(*stmt, Cpty),        //
-                      column<Time>(*stmt, Created)));
+                      column<string_view>(*stmt, Cpty)));
     }
 }
 

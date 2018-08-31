@@ -135,17 +135,19 @@ void DsvModel::do_read_market(const ModelCallback<MarketPtr>& cb) const
         const auto instr = from_string<swirly::Symbol>(row[Instr]);
         const auto settl_day = from_string<JDay>(row[SettlDay]);
         const auto state = from_string<MarketState>(row[State]);
+        const auto last_time = from_string<Time>(row[LastTime]);
         const auto last_lots = from_string<Lots>(row[LastLots]);
         const auto last_ticks = from_string<Ticks>(row[LastTicks]);
-        const auto last_time = from_string<Time>(row[LastTime]);
         const auto max_id = from_string<Id64>(row[MaxId]);
-        cb(Market::make(id, instr, settl_day, state, last_lots, last_ticks, last_time, max_id));
+        cb(Market::make(id, instr, settl_day, state, last_time, last_lots, last_ticks, max_id));
     }
 }
 
 void DsvModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
 {
     enum {         //
+        Created,   //
+        Modified,  //
         Accnt,     //
         MarketId,  //
         Instr,     //
@@ -161,9 +163,7 @@ void DsvModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
         ExecCost,  //
         LastLots,  //
         LastTicks, //
-        MinLots,   //
-        Created,   //
-        Modified   //
+        MinLots    //
     };
 
     ifstream is{"order.txt"};
@@ -177,6 +177,8 @@ void DsvModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
     while (getline(is, line)) {
         Row<Modified + 1> row;
         split(line, "\t"sv, row);
+        const auto created = from_string<Time>(row[Created]);
+        const auto modified = from_string<Time>(row[Modified]);
         const auto accnt = from_string<Symbol>(row[Accnt]);
         const auto market_id = from_string<Id64>(row[MarketId]);
         const auto instr = from_string<Symbol>(row[Instr]);
@@ -193,17 +195,16 @@ void DsvModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
         const auto last_lots = from_string<swirly::Lots>(row[LastLots]);
         const auto last_ticks = from_string<swirly::Ticks>(row[LastTicks]);
         const auto min_lots = from_string<swirly::Lots>(row[MinLots]);
-        const auto created = from_string<Time>(row[Created]);
-        const auto modified = from_string<Time>(row[Modified]);
-        cb(Order::make(accnt, market_id, instr, settl_day, id, ref, state, side, lots, ticks,
-                       resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots, created,
-                       modified));
+        cb(Order::make(created, modified, accnt, market_id, instr, settl_day, id, ref, state, side,
+                       lots, ticks, resd_lots, exec_lots, exec_cost, last_lots, last_ticks,
+                       min_lots));
     }
 }
 
 void DsvModel::do_read_exec(Time since, const ModelCallback<ExecPtr>& cb) const
 {
     enum {         //
+        Created,   //
         Accnt,     //
         MarketId,  //
         Instr,     //
@@ -225,8 +226,7 @@ void DsvModel::do_read_exec(Time since, const ModelCallback<ExecPtr>& cb) const
         PosnLots,  //
         PosnCost,  //
         LiqInd,    //
-        Cpty,      //
-        Created    //
+        Cpty       //
     };
 
     ifstream is{"exec.txt"};
@@ -240,6 +240,7 @@ void DsvModel::do_read_exec(Time since, const ModelCallback<ExecPtr>& cb) const
     while (getline(is, line)) {
         Row<Created + 1> row;
         split(line, "\t"sv, row);
+        const auto created = from_string<Time>(row[Created]);
         const auto accnt = from_string<swirly::Symbol>(row[Accnt]);
         const auto market_id = from_string<Id64>(row[MarketId]);
         const auto instr = from_string<Symbol>(row[Instr]);
@@ -262,16 +263,16 @@ void DsvModel::do_read_exec(Time since, const ModelCallback<ExecPtr>& cb) const
         const auto posn_cost = from_string<Cost>(row[PosnCost]);
         const auto liq_ind = from_string<swirly::LiqInd>(row[LiqInd]);
         const auto cpty = from_string<Symbol>(row[Cpty]);
-        const auto created = from_string<Time>(row[Created]);
-        cb(Exec::make(accnt, market_id, instr, settl_day, id, order_id, ref, state, side, lots,
-                      ticks, resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots,
-                      match_id, posn_lots, posn_cost, liq_ind, cpty, created));
+        cb(Exec::make(created, accnt, market_id, instr, settl_day, id, order_id, ref, state, side,
+                      lots, ticks, resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots,
+                      match_id, posn_lots, posn_cost, liq_ind, cpty));
     }
 }
 
 void DsvModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
 {
     enum {         //
+        Created,   //
         Accnt,     //
         MarketId,  //
         Instr,     //
@@ -292,8 +293,7 @@ void DsvModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
         PosnLots,  //
         PosnCost,  //
         LiqInd,    //
-        Cpty,      //
-        Created    //
+        Cpty       //
     };
 
     ifstream is{"trade.txt"};
@@ -307,6 +307,7 @@ void DsvModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
     while (getline(is, line)) {
         Row<Created + 1> row;
         split(line, "\t"sv, row);
+        const auto created = from_string<Time>(row[Created]);
         const auto accnt = from_string<swirly::Symbol>(row[Accnt]);
         const auto market_id = from_string<Id64>(row[MarketId]);
         const auto instr = from_string<Symbol>(row[Instr]);
@@ -328,10 +329,9 @@ void DsvModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
         const auto posn_cost = from_string<Cost>(row[PosnCost]);
         const auto liq_ind = from_string<swirly::LiqInd>(row[LiqInd]);
         const auto cpty = from_string<Symbol>(row[Cpty]);
-        const auto created = from_string<Time>(row[Created]);
-        cb(Exec::make(accnt, market_id, instr, settl_day, id, order_id, ref, State::Trade, side,
-                      lots, ticks, resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots,
-                      match_id, posn_lots, posn_cost, liq_ind, cpty, created));
+        cb(Exec::make(created, accnt, market_id, instr, settl_day, id, order_id, ref, State::Trade,
+                      side, lots, ticks, resd_lots, exec_lots, exec_cost, last_lots, last_ticks,
+                      min_lots, match_id, posn_lots, posn_cost, liq_ind, cpty));
     }
 }
 

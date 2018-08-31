@@ -118,12 +118,12 @@ CREATE TABLE instr_t (
 ;
 
 CREATE TABLE accnt_t (
+  created BIGINT NOT NULL DEFAULT 0,
+  modified BIGINT NOT NULL DEFAULT 0,
   symbol CHAR(16) NOT NULL PRIMARY KEY,
   display VARCHAR(64) NULL,
   email VARCHAR(64) NULL,
-  max_id BIGINT NOT NULL DEFAULT 0,
-  created BIGINT NOT NULL DEFAULT 0,
-  modified BIGINT NOT NULL DEFAULT 0
+  max_id BIGINT NOT NULL DEFAULT 0
 )
 ;
 
@@ -134,15 +134,17 @@ CREATE TABLE market_t (
   instr CHAR(16) NOT NULL,
   settl_day INT NULL DEFAULT NULL,
   state INT NOT NULL DEFAULT 0,
+  last_time BIGINT NULL DEFAULT NULL,
   last_lots BIGINT NULL DEFAULT NULL,
   last_ticks BIGINT NULL DEFAULT NULL,
-  last_time BIGINT NULL DEFAULT NULL,
 
   FOREIGN KEY (instr) REFERENCES instr_t (symbol)
 )
 ;
 
 CREATE TABLE order_t (
+  created BIGINT NOT NULL,
+  modified BIGINT NOT NULL,
   accnt CHAR(16) NOT NULL,
   market_id BIGINT NOT NULL,
   instr CHAR(16) NOT NULL,
@@ -159,8 +161,6 @@ CREATE TABLE order_t (
   last_lots BIGINT NULL DEFAULT NULL,
   last_ticks BIGINT NULL DEFAULT NULL,
   min_lots BIGINT NOT NULL DEFAULT 1,
-  created BIGINT NOT NULL,
-  modified BIGINT NOT NULL,
 
   PRIMARY KEY (market_id, id),
 
@@ -174,6 +174,8 @@ CREATE TABLE order_t (
 CREATE INDEX order_resd_idx ON order_t (resd_lots);
 
 CREATE TABLE exec_t (
+  created BIGINT NOT NULL,
+  archive BIGINT NULL DEFAULT NULL,
   accnt CHAR(16) NOT NULL,
   market_id BIGINT NOT NULL,
   instr CHAR(16) NOT NULL,
@@ -197,8 +199,6 @@ CREATE TABLE exec_t (
   posn_cost BIGINT NOT NULL,
   liq_ind_id INT NULL DEFAULT NULL,
   cpty CHAR(16) NULL DEFAULT NULL,
-  created BIGINT NOT NULL,
-  archive BIGINT NULL DEFAULT NULL,
 
   PRIMARY KEY (market_id, id),
 
@@ -220,9 +220,9 @@ CREATE TRIGGER before_insert_on_exec1
   BEGIN
     UPDATE market_t
     SET
+      last_time = NEW.created,
       last_lots = NEW.last_lots,
-      last_ticks = NEW.last_ticks,
-      last_time = NEW.created
+      last_ticks = NEW.last_ticks
     WHERE id = NEW.market_id;
   END
 ;
@@ -233,6 +233,8 @@ CREATE TRIGGER before_insert_on_exec2
   AND NEW.state_id = 1
   BEGIN
     INSERT INTO order_t (
+      created,
+      modified,
       accnt,
       market_id,
       instr,
@@ -248,10 +250,10 @@ CREATE TRIGGER before_insert_on_exec2
       exec_cost,
       last_lots,
       last_ticks,
-      min_lots,
-      created,
-      modified
+      min_lots
     ) VALUES (
+      NEW.created,
+      NEW.created,
       NEW.accnt,
       NEW.market_id,
       NEW.instr,
@@ -267,9 +269,7 @@ CREATE TRIGGER before_insert_on_exec2
       NEW.exec_cost,
       NEW.last_lots,
       NEW.last_ticks,
-      NEW.min_lots,
-      NEW.created,
-      NEW.created
+      NEW.min_lots
     );
   END
 ;
@@ -281,14 +281,14 @@ CREATE TRIGGER before_insert_on_exec3
   BEGIN
     UPDATE order_t
     SET
+      modified = NEW.created,
       state_id = NEW.state_id,
       lots = NEW.lots,
       resd_lots = NEW.resd_lots,
       exec_lots = NEW.exec_lots,
       exec_cost = NEW.exec_cost,
       last_lots = NEW.last_lots,
-      last_ticks = NEW.last_ticks,
-      modified = NEW.created
+      last_ticks = NEW.last_ticks
     WHERE id = NEW.order_id;
   END
 ;
@@ -297,18 +297,18 @@ CREATE TRIGGER after_insert_on_exec1
   AFTER INSERT ON exec_t
   BEGIN
     INSERT OR IGNORE INTO accnt_t (
-      symbol,
       created,
-      modified
+      modified,
+      symbol
     ) VALUES (
-      NEW.accnt,
       NEW.created,
-      NEW.created
+      NEW.created,
+      NEW.accnt
     );
     UPDATE accnt_t
     SET
-      max_id = max_id + 1,
-      modified = NEW.created
+      modified = NEW.created,
+      max_id = max_id + 1
     WHERE symbol = NEW.accnt;
     UPDATE exec_t
     SET
@@ -355,9 +355,9 @@ CREATE VIEW market_v AS
     m.instr,
     m.settl_day,
     m.state,
+    m.last_time,
     m.last_lots,
     m.last_ticks,
-    m.last_time,
     MAX(e.id) max_id
   FROM market_t m
   LEFT OUTER JOIN exec_t e
@@ -367,6 +367,8 @@ CREATE VIEW market_v AS
 
 CREATE VIEW order_v AS
   SELECT
+    o.created,
+    o.modified,
     o.accnt,
     o.market_id,
     o.instr,
@@ -382,9 +384,7 @@ CREATE VIEW order_v AS
     o.exec_cost,
     o.last_lots,
     o.last_ticks,
-    o.min_lots,
-    o.created,
-    o.modified
+    o.min_lots
   FROM order_t o
   LEFT OUTER JOIN state_t s
   ON o.state_id = s.id
@@ -394,6 +394,8 @@ CREATE VIEW order_v AS
 
 CREATE VIEW exec_v AS
   SELECT
+    e.created,
+    e.archive,
     e.accnt,
     e.market_id,
     e.instr,
@@ -416,9 +418,7 @@ CREATE VIEW exec_v AS
     e.posn_lots,
     e.posn_cost,
     r.symbol liq_ind,
-    e.cpty,
-    e.created,
-    e.archive
+    e.cpty
   FROM exec_t e
   LEFT OUTER JOIN state_t s
   ON e.state_id = s.id

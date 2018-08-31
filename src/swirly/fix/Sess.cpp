@@ -31,8 +31,8 @@ namespace swirly {
 inline namespace fix {
 using namespace std;
 
-FixSess::FixSess(Reactor& r, IoSocket&& sock, const Endpoint& ep, const FixConfig& config,
-                 FixApp& app, Time now)
+FixSess::FixSess(Time now, Reactor& r, IoSocket&& sock, const Endpoint& ep, const FixConfig& config,
+                 FixApp& app)
 : reactor_(r)
 , sock_{move(sock)}
 , ep_{ep}
@@ -41,10 +41,10 @@ FixSess::FixSess(Reactor& r, IoSocket&& sock, const Endpoint& ep, const FixConfi
 {
     sub_ = r.subscribe(sock_.get(), EventIn, bind<&FixSess::on_io_event>(this));
     schedule_timeout(now);
-    app.on_connect(*this, now);
+    app.on_connect(now, *this);
 }
 
-void FixSess::logon(const FixSessId& sess_id, Time now)
+void FixSess::logon(Time now, const FixSessId& sess_id)
 {
     if (state_ == LoggedOut) {
         sess_id_ = sess_id;
@@ -122,7 +122,7 @@ void FixSess::send_logout(Time now)
     read_and_write(now);
 }
 
-void FixSess::on_io_event(int fd, unsigned events, Time now)
+void FixSess::on_io_event(Time now, int fd, unsigned events)
 {
     try {
         if (events & EventOut) {
@@ -137,10 +137,10 @@ void FixSess::on_io_event(int fd, unsigned events, Time now)
             if (size > 0) {
                 // Commit actual bytes read.
                 in_.buf.commit(size);
-                in_.buf.consume(parse(in_.buf.data(), now));
+                in_.buf.consume(parse(now, in_.buf.data()));
                 schedule_timeout(now);
             } else {
-                app_.on_disconnect(*this, now);
+                app_.on_disconnect(now, *this);
                 dispose(now);
             }
         }
@@ -155,7 +155,7 @@ void FixSess::schedule_timeout(Time now)
     in_.tmr = reactor_.timer(now + hb_int_ + 1s, Priority::Low, bind<&FixSess::on_timeout>(this));
 }
 
-void FixSess::on_timeout(Timer& tmr, Time now)
+void FixSess::on_timeout(Time now, Timer& tmr)
 {
     SWIRLY_WARNING << "session timeout";
     dispose(now);
@@ -166,7 +166,7 @@ void FixSess::schedule_heartbeat(Time now)
     out_.tmr = reactor_.timer(now + hb_int_, Priority::Low, bind<&FixSess::on_heartbeat>(this));
 }
 
-void FixSess::on_heartbeat(Timer& tmr, Time now)
+void FixSess::on_heartbeat(Time now, Timer& tmr)
 {
     FixHdr hdr;
     hdr.msg_type = "0"sv;
@@ -183,7 +183,7 @@ void FixSess::on_heartbeat(Timer& tmr, Time now)
     read_and_write(now);
 }
 
-void FixSess::on_message(string_view msg, size_t msg_type_off, Version ver, Time now)
+void FixSess::on_message(Time now, std::string_view msg, std::size_t msg_type_off, Version ver)
 {
     FixHdr hdr;
     const size_t body_off = parse_hdr(msg, msg_type_off, hdr);
@@ -205,19 +205,19 @@ void FixSess::on_message(string_view msg, size_t msg_type_off, Version ver, Time
         // Logout.
         if (state_ == LogoutSent) {
             // Process logout reply.
-            app_.on_logout(*this, now);
+            app_.on_logout(now, *this);
             state_ = LoggedOut;
         } else if (state_ == LoggedOn) {
             // Send logout response.
             send_logout(now);
-            app_.on_logout(*this, now);
+            app_.on_logout(now, *this);
             state_ = LoggedOut;
         }
     } else if (msg_type == "A"sv) {
         // Logon.
         if (state_ == LogonSent) {
             // Process logon reply.
-            app_.on_logon(*this, now);
+            app_.on_logon(now, *this);
             state_ = LoggedOn;
             schedule_heartbeat(now);
         } else if (state_ == LoggedOut) {
@@ -227,11 +227,11 @@ void FixSess::on_message(string_view msg, size_t msg_type_off, Version ver, Time
             sess_id_ = ~get_sess_id<string>(ver, hdr);
             hb_int_ = Seconds{body.heart_bt_int.value};
             send_logon(now);
-            app_.on_logon(*this, now);
+            app_.on_logon(now, *this);
             state_ = LoggedOn;
         }
     }
-    app_.on_message(*this, msg, body_off, ver, hdr, now);
+    app_.on_message(now, *this, msg, body_off, ver, hdr);
 }
 
 } // namespace fix

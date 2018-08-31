@@ -54,13 +54,13 @@ class SWIRLY_API SqliteJourn
     void do_write(const Msg& msg) override;
 
   private:
-    void on_create_market(const CreateMarket& body);
+    void on_create_market(Time now, const CreateMarket& body);
 
-    void on_update_market(const UpdateMarket& body);
+    void on_update_market(Time now, const UpdateMarket& body);
 
-    void on_create_exec(const CreateExec& body);
+    void on_create_exec(Time now, const CreateExec& body);
 
-    void on_archive_trade(const ArchiveTrade& body);
+    void on_archive_trade(Time now, const ArchiveTrade& body);
 
     sqlite::DbPtr db_;
     sqlite::StmtPtr begin_stmt_;

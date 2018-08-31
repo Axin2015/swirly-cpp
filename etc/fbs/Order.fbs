@@ -18,6 +18,8 @@ include "Types.fbs";
 namespace swirly.fbs;
 
 table Order {
+  created:long;
+  modified:long;
   accnt:string (required);
   market_id:long;
   instr:string (required);
@@ -34,6 +36,4 @@ table Order {
   last_lots:long;
   last_ticks:long;
   min_lots:long = 1;
-  created:long;
-  modified:long;
 }

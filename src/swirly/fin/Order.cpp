@@ -32,7 +32,9 @@ Order::Order(Order&&) = default;
 void Order::to_dsv(ostream& os, char delim) const
 {
     OStreamJoiner osj{os, delim};
-    osj << accnt_     //
+    osj << created_   //
+        << modified_  //
+        << accnt_     //
         << market_id_ //
         << instr_;
     if (settl_day_ != 0_jd) {
@@ -65,13 +67,13 @@ void Order::to_dsv(ostream& os, char delim) const
     } else {
         osj << "";
     }
-    osj << created_ //
-        << modified_;
 }
 
 void Order::to_json(ostream& os) const
 {
-    os << "{\"accnt\":\"" << accnt_         //
+    os << "{\"created\":" << created_       //
+       << ",\"modified\":" << modified_     //
+       << ",\"accnt\":\"" << accnt_         //
        << "\",\"market_id\":" << market_id_ //
        << ",\"instr\":\"" << instr_         //
        << "\",\"settl_date\":";
@@ -106,9 +108,7 @@ void Order::to_json(ostream& os) const
     } else {
         os << "null";
     }
-    os << ",\"created\":" << created_   //
-       << ",\"modified\":" << modified_ //
-       << '}';
+    os << '}';
 }
 
 OrderRefSet::~OrderRefSet()

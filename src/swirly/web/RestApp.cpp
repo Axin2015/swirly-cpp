@@ -85,7 +85,7 @@ RestApp::RestApp(RestApp&&) = default;
 
 RestApp& RestApp::operator=(RestApp&&) = default;
 
-void RestApp::get_ref_data(EntitySet es, Time now, ostream& out) const
+void RestApp::get_ref_data(Time now, EntitySet es, ostream& out) const
 {
     int i{0};
     out << '{';
@@ -122,7 +122,7 @@ void RestApp::get_asset(Time now, ostream& out) const
     out << ']';
 }
 
-void RestApp::get_asset(Symbol symbol, Time now, ostream& out) const
+void RestApp::get_asset(Time now, Symbol symbol, ostream& out) const
 {
     const auto& assets = app_.assets();
     auto it = assets.find(symbol);
@@ -140,7 +140,7 @@ void RestApp::get_instr(Time now, ostream& out) const
     out << ']';
 }
 
-void RestApp::get_instr(Symbol symbol, Time now, ostream& out) const
+void RestApp::get_instr(Time now, Symbol symbol, ostream& out) const
 {
     const auto& instrs = app_.instrs();
     auto it = instrs.find(symbol);
@@ -150,7 +150,7 @@ void RestApp::get_instr(Symbol symbol, Time now, ostream& out) const
     out << *it;
 }
 
-void RestApp::get_sess(Symbol accnt, EntitySet es, Page page, Time now, ostream& out) const
+void RestApp::get_sess(Time now, Symbol accnt, EntitySet es, Page page, ostream& out) const
 {
     const auto& sess = app_.sess(accnt);
     int i{0};
@@ -203,7 +203,7 @@ void RestApp::get_market(Time now, std::ostream& out) const
     out << ']';
 }
 
-void RestApp::get_market(Symbol instr, Time now, std::ostream& out) const
+void RestApp::get_market(Time now, Symbol instr, std::ostream& out) const
 {
     const auto& markets = app_.markets();
     out << '[';
@@ -212,18 +212,18 @@ void RestApp::get_market(Symbol instr, Time now, std::ostream& out) const
     out << ']';
 }
 
-void RestApp::get_market(Symbol instr, IsoDate settl_date, Time now, std::ostream& out) const
+void RestApp::get_market(Time now, Symbol instr, IsoDate settl_date, std::ostream& out) const
 {
     const auto id = to_market_id(app_.instr(instr).id(), settl_date);
     out << app_.market(id);
 }
 
-void RestApp::get_order(Symbol accnt, Time now, ostream& out) const
+void RestApp::get_order(Time now, Symbol accnt, std::ostream& out) const
 {
     detail::get_order(app_.sess(accnt), out);
 }
 
-void RestApp::get_order(Symbol accnt, Symbol instr, Time now, ostream& out) const
+void RestApp::get_order(Time now, Symbol accnt, Symbol instr, ostream& out) const
 {
     const auto& sess = app_.sess(accnt);
     const auto& orders = sess.orders();
@@ -233,7 +233,7 @@ void RestApp::get_order(Symbol accnt, Symbol instr, Time now, ostream& out) cons
     out << ']';
 }
 
-void RestApp::get_order(Symbol accnt, Symbol instr_symbol, IsoDate settl_date, Time now,
+void RestApp::get_order(Time now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
                         ostream& out) const
 {
     const auto& sess = app_.sess(accnt);
@@ -246,7 +246,7 @@ void RestApp::get_order(Symbol accnt, Symbol instr_symbol, IsoDate settl_date, T
     out << ']';
 }
 
-void RestApp::get_order(Symbol accnt, Symbol instr_symbol, IsoDate settl_date, Id64 id, Time now,
+void RestApp::get_order(Time now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date, Id64 id,
                         ostream& out) const
 {
     const auto& sess = app_.sess(accnt);
@@ -260,17 +260,17 @@ void RestApp::get_order(Symbol accnt, Symbol instr_symbol, IsoDate settl_date, I
     out << *it;
 }
 
-void RestApp::get_exec(Symbol accnt, Page page, Time now, ostream& out) const
+void RestApp::get_exec(Time now, Symbol accnt, Page page, std::ostream& out) const
 {
     detail::get_exec(app_.sess(accnt), page, out);
 }
 
-void RestApp::get_trade(Symbol accnt, Time now, ostream& out) const
+void RestApp::get_trade(Time now, Symbol accnt, std::ostream& out) const
 {
     detail::get_trade(app_.sess(accnt), out);
 }
 
-void RestApp::get_trade(Symbol accnt, Symbol instr, Time now, std::ostream& out) const
+void RestApp::get_trade(Time now, Symbol accnt, Symbol instr, std::ostream& out) const
 {
     const auto& sess = app_.sess(accnt);
     const auto& trades = sess.trades();
@@ -280,8 +280,8 @@ void RestApp::get_trade(Symbol accnt, Symbol instr, Time now, std::ostream& out)
     out << ']';
 }
 
-void RestApp::get_trade(Symbol accnt, Symbol instr_symbol, IsoDate settl_date, Time now,
-                        ostream& out) const
+void RestApp::get_trade(Time now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
+                        std::ostream& out) const
 {
     const auto& sess = app_.sess(accnt);
     const auto& instr = app_.instr(instr_symbol);
@@ -293,8 +293,8 @@ void RestApp::get_trade(Symbol accnt, Symbol instr_symbol, IsoDate settl_date, T
     out << ']';
 }
 
-void RestApp::get_trade(Symbol accnt, Symbol instr_symbol, IsoDate settl_date, Id64 id, Time now,
-                        ostream& out) const
+void RestApp::get_trade(Time now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date, Id64 id,
+                        std::ostream& out) const
 {
     const auto& sess = app_.sess(accnt);
     const auto& instr = app_.instr(instr_symbol);
@@ -307,12 +307,12 @@ void RestApp::get_trade(Symbol accnt, Symbol instr_symbol, IsoDate settl_date, I
     out << *it;
 }
 
-void RestApp::get_posn(Symbol accnt, Time now, ostream& out) const
+void RestApp::get_posn(Time now, Symbol accnt, std::ostream& out) const
 {
     detail::get_posn(app_.sess(accnt), out);
 }
 
-void RestApp::get_posn(Symbol accnt, Symbol instr, Time now, ostream& out) const
+void RestApp::get_posn(Time now, Symbol accnt, Symbol instr, std::ostream& out) const
 {
     const auto& sess = app_.sess(accnt);
     const auto& posns = sess.posns();
@@ -322,8 +322,8 @@ void RestApp::get_posn(Symbol accnt, Symbol instr, Time now, ostream& out) const
     out << ']';
 }
 
-void RestApp::get_posn(Symbol accnt, Symbol instr_symbol, IsoDate settl_date, Time now,
-                       ostream& out) const
+void RestApp::get_posn(Time now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
+                       std::ostream& out) const
 {
     const auto& sess = app_.sess(accnt);
     const auto& instr = app_.instr(instr_symbol);
@@ -337,39 +337,40 @@ void RestApp::get_posn(Symbol accnt, Symbol instr_symbol, IsoDate settl_date, Ti
     out << *it;
 }
 
-void RestApp::post_market(Symbol instr_symbol, IsoDate settl_date, MarketState state, Time now,
-                          ostream& out)
+void RestApp::post_market(Time now, Symbol instr_symbol, IsoDate settl_date, MarketState state,
+                          std::ostream& out)
 {
     const auto& instr = app_.instr(instr_symbol);
     const auto settl_day = maybe_iso_to_jd(settl_date);
-    const auto& market = app_.create_market(instr, settl_day, state, now);
+    const auto& market = app_.create_market(now, instr, settl_day, state);
     out << market;
 }
 
-void RestApp::put_market(Symbol instr_symbol, IsoDate settl_date, MarketState state, Time now,
-                         ostream& out)
+void RestApp::put_market(Time now, Symbol instr_symbol, IsoDate settl_date, MarketState state,
+                         std::ostream& out)
 {
     const auto& instr = app_.instr(instr_symbol);
     const auto id = to_market_id(instr.id(), settl_date);
     const auto& market = app_.market(id);
-    app_.update_market(market, state, now);
+    app_.update_market(now, market, state);
     out << market;
 }
 
-void RestApp::post_order(Symbol accnt, Symbol instr_symbol, IsoDate settl_date, string_view ref,
-                         Side side, Lots lots, Ticks ticks, Lots min_lots, Time now, ostream& out)
+void RestApp::post_order(Time now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
+                         std::string_view ref, Side side, Lots lots, Ticks ticks, Lots min_lots,
+                         std::ostream& out)
 {
     const auto& sess = app_.sess(accnt);
     const auto& instr = app_.instr(instr_symbol);
     const auto market_id = to_market_id(instr.id(), settl_date);
     const auto& market = app_.market(market_id);
     Response resp;
-    app_.create_order(sess, market, ref, side, lots, ticks, min_lots, now, resp);
+    app_.create_order(now, sess, market, ref, side, lots, ticks, min_lots, resp);
     out << resp;
 }
 
-void RestApp::put_order(Symbol accnt, Symbol instr_symbol, IsoDate settl_date, ArrayView<Id64> ids,
-                        Lots lots, Time now, ostream& out)
+void RestApp::put_order(Time now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
+                        ArrayView<Id64> ids, Lots lots, std::ostream& out)
 {
     const auto& sess = app_.sess(accnt);
     const auto& instr = app_.instr(instr_symbol);
@@ -378,29 +379,29 @@ void RestApp::put_order(Symbol accnt, Symbol instr_symbol, IsoDate settl_date, A
     Response resp;
     if (lots > 0_lts) {
         if (ids.size() == 1) {
-            app_.revise_order(sess, market, ids[0], lots, now, resp);
+            app_.revise_order(now, sess, market, ids[0], lots, resp);
         } else {
-            app_.revise_order(sess, market, ids, lots, now, resp);
+            app_.revise_order(now, sess, market, ids, lots, resp);
         }
     } else {
         if (ids.size() == 1) {
-            app_.cancel_order(sess, market, ids[0], now, resp);
+            app_.cancel_order(now, sess, market, ids[0], resp);
         } else {
-            app_.cancel_order(sess, market, ids, now, resp);
+            app_.cancel_order(now, sess, market, ids, resp);
         }
     }
     out << resp;
 }
 
-void RestApp::post_trade(Symbol accnt, Symbol instr_symbol, IsoDate settl_date, string_view ref,
-                         Side side, Lots lots, Ticks ticks, LiqInd liq_ind, Symbol cpty, Time now,
-                         ostream& out)
+void RestApp::post_trade(Time now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
+                         std::string_view ref, Side side, Lots lots, Ticks ticks, LiqInd liq_ind,
+                         Symbol cpty, std::ostream& out)
 {
     const auto& sess = app_.sess(accnt);
     const auto& instr = app_.instr(instr_symbol);
     const auto market_id = to_market_id(instr.id(), settl_date);
     const auto& market = app_.market(market_id);
-    auto trades = app_.create_trade(sess, market, ref, side, lots, ticks, liq_ind, cpty, now);
+    auto trades = app_.create_trade(now, sess, market, ref, side, lots, ticks, liq_ind, cpty);
     out << '[' << *trades.first;
     if (trades.second) {
         out << ',' << *trades.second;
@@ -408,13 +409,13 @@ void RestApp::post_trade(Symbol accnt, Symbol instr_symbol, IsoDate settl_date, 
     out << ']';
 }
 
-void RestApp::delete_trade(Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
-                           ArrayView<Id64> ids, Time now)
+void RestApp::delete_trade(Time now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
+                           ArrayView<Id64> ids)
 {
     const auto& sess = app_.sess(accnt);
     const auto& instr = app_.instr(instr_symbol);
     const auto market_id = to_market_id(instr.id(), settl_date);
-    app_.archive_trade(sess, market_id, ids, now);
+    app_.archive_trade(now, sess, market_id, ids);
 }
 
 } // namespace web

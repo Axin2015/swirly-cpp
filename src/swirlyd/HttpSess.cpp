@@ -28,7 +28,7 @@ enum { MaxData = 2048 };
 
 } // namespace
 
-HttpSess::HttpSess(Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, RestServ& rs, Time now)
+HttpSess::HttpSess(Time now, Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, RestServ& rs)
 : BasicHttpParser<HttpSess>{HttpType::Request}
 , reactor_(r)
 , sock_{move(sock)}
@@ -125,7 +125,7 @@ bool HttpSess::on_message_end() noexcept
     return ret;
 }
 
-void HttpSess::on_io_event(int fd, unsigned events, Time now)
+void HttpSess::on_io_event(Time now, int fd, unsigned events)
 {
     try {
         if (events & EventOut) {
@@ -157,7 +157,7 @@ void HttpSess::on_io_event(int fd, unsigned events, Time now)
     }
 }
 
-void HttpSess::on_timer(Timer& tmr, Time now)
+void HttpSess::on_timer(Time now, Timer& tmr)
 {
     SWIRLY_WARNING << "session timeout";
     dispose();
