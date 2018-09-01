@@ -21,14 +21,14 @@
 #  MYSQL_FOUND        - True if MySQL found.
 
 # Look for the header file.
-FIND_PATH(MYSQL_INCLUDE_DIR NAMES mysql.h
+find_path(MYSQL_INCLUDE_DIR NAMES mysql.h
   HINTS "$ENV{MYSQL_HOME}/include"
   PATHS
   "/usr/include/mysql"
   "/usr/local/include/mysql")
 
 # Look for the library.
-FIND_LIBRARY(MYSQL_LIBRARY NAMES mysqlclient
+find_library(MYSQL_LIBRARY NAMES mariadb mysqlclient
   HINTS "$ENV{MYSQL_HOME}/lib"
   PATHS
   "/usr/lib/mysql"
@@ -37,22 +37,22 @@ FIND_LIBRARY(MYSQL_LIBRARY NAMES mysqlclient
   "/usr/local/lib64/mysql")
 
 # Look for the program.
-FIND_PROGRAM(MYSQL_EXECUTABLE NAMES mysql_config
+find_program(MYSQL_EXECUTABLE NAMES mysql_config
   HINTS "$ENV{MYSQL_HOME}/bin")
 
 # Handle the QUIETLY and REQUIRED arguments and set MYSQL_FOUND to TRUE if all listed variables are TRUE.
-INCLUDE(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(MySQL
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(MySQL
   FOUND_VAR     MYSQL_FOUND
   REQUIRED_VARS MYSQL_INCLUDE_DIR
   MYSQL_LIBRARY
   MYSQL_EXECUTABLE
   FAIL_MESSAGE  "Failed to find MySQL")
 
-MARK_AS_ADVANCED(MYSQL_INCLUDE_DIR MYSQL_LIBRARY MYSQL_EXECUTABLE)
+mark_as_advanced(MYSQL_INCLUDE_DIR MYSQL_LIBRARY MYSQL_EXECUTABLE)
 
 # Copy the results to the output variables.
-IF(MYSQL_FOUND)
-  SET(MYSQL_INCLUDE_DIRS ${MYSQL_INCLUDE_DIR})
-  SET(MYSQL_LIBRARIES ${MYSQL_LIBRARY})
-ENDIF()
+if(MYSQL_FOUND)
+  set(MYSQL_INCLUDE_DIRS ${MYSQL_INCLUDE_DIR})
+  set(MYSQL_LIBRARIES ${MYSQL_LIBRARY})
+endif()

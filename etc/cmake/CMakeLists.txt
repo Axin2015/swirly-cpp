@@ -13,6 +13,8 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
+install(FILES BuildFlatBuffers.cmake DESTINATION etc/cmake COMPONENT config)
+install(FILES FindFlatBuffers.cmake DESTINATION etc/cmake COMPONENT config)
 install(FILES FindMySQL.cmake DESTINATION etc/cmake COMPONENT config)
 install(FILES FindSQLite3.cmake DESTINATION etc/cmake COMPONENT config)
 install(FILES FindSwirly.cmake DESTINATION etc/cmake COMPONENT config)
