@@ -43,7 +43,7 @@ db_type = sqlite
 db_host =
 db_user =
 db_pass =
-db_name = ${CMAKE_INSTALL_PREFIX}/var/forex.db
+db_name = ${CMAKE_INSTALL_PREFIX}/var/db/forex.db
 db_port =
 
 # Enable SQL tracing.

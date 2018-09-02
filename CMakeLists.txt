@@ -129,6 +129,9 @@ function(install_libraries)
   endforeach()
 endfunction()
 
+install(DIRECTORY DESTINATION var/log)
+install(DIRECTORY DESTINATION var/run)
+
 set(Boost_USE_STATIC_LIBS OFF)
 find_package(Boost 1.67 REQUIRED COMPONENTS date_time unit_test_framework)
 install_libraries("${Boost_DATE_TIME_LIBRARY}")

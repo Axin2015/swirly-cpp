@@ -21,18 +21,18 @@ file_mode = 0027
 
 # Set the run directory. The default is the root directory ('/') unless the no-daemon (-n) option is
 # specified.
-run_dir = ${CMAKE_INSTALL_PREFIX}
+run_dir = ${CMAKE_INSTALL_PREFIX}/var/run
 
 # Log-file location. The log-file's parent directory will be created if it does not exist. Relative
 # paths are interpreted relative to the run directory. Stdin and stderr are used if single dash
 # ('-') is specified. The syslog facility is used by default if no log-file is specified.
-log_file = ${CMAKE_INSTALL_PREFIX}/log/swirlyd.log
+log_file = ${CMAKE_INSTALL_PREFIX}/var/log/swirlyd.log
 
 # Message-queue location.
-mq_file=${CMAKE_INSTALL_PREFIX}/var/mq.dat
+mq_file=${CMAKE_INSTALL_PREFIX}/var/run/mq.dat
 
 # Pid-file location.
-pid_file = ${CMAKE_INSTALL_PREFIX}/var/swirlyd.pid
+pid_file = ${CMAKE_INSTALL_PREFIX}/var/run/swirlyd.pid
 
 # Set the log-level. Valid range is from 0 to 5 inclusive, where 0=Crit, 1=Error, 2=Warning,
 # 3=Notice, 4=Info and 5=Debug. The default is 4 (Info).
@@ -52,7 +52,7 @@ db_type = sqlite
 db_host =
 db_user =
 db_pass =
-db_name = ${CMAKE_INSTALL_PREFIX}/var/forex.db
+db_name = ${CMAKE_INSTALL_PREFIX}/var/db/forex.db
 db_port =
 
 # MySQL example.
