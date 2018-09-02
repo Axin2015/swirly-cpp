@@ -25,7 +25,8 @@ using namespace std;
 
 void close_all() noexcept
 {
-    const int fds{getdtablesize()};
+    // Impose upper bound because Docker containers may have a very large default.
+    const int fds{min(getdtablesize(), 1024)};
     for (int fd{STDERR_FILENO + 1}; fd < fds; ++fd) {
         close(fd);
     }
