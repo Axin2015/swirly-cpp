@@ -52,8 +52,7 @@ constexpr ValueT ston(std::string_view sv) noexcept
         }
     }
 
-    // ValueT type must be signed.
-    ValueT n{0};
+    std::uint64_t n{0};
     if (isdigit(*it)) {
         n = *it++ - '0';
         while (it != end && isdigit(*it)) {
