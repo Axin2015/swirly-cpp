@@ -43,7 +43,7 @@ class SWIRLY_API HttpServ : public TcpAcceptor<HttpServ> {
     HttpServ(HttpServ&&) = delete;
     HttpServ& operator=(HttpServ&&) = delete;
 
-    void do_accept(IoSocket&& sock, const Endpoint& ep, Time now);
+    void do_accept(Time now, IoSocket&& sock, const Endpoint& ep);
 
   private:
     Reactor& reactor_;

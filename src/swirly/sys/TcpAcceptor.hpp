@@ -51,11 +51,11 @@ class TcpAcceptor {
     ~TcpAcceptor() = default;
 
   private:
-    void on_io_event(int fd, unsigned events, Time now)
+    void on_io_event(Time now, int fd, unsigned events)
     {
         Endpoint ep;
         IoSocket sock{os::accept(fd, ep), serv_.family()};
-        static_cast<DerivedT*>(this)->do_accept(std::move(sock), ep, now);
+        static_cast<DerivedT*>(this)->do_accept(now, std::move(sock), ep);
     }
 
     TcpServSocket serv_;

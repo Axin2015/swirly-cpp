@@ -48,15 +48,15 @@ class Market {
   public:
     using Levels = std::array<Level, MaxLevels>;
 
-    Market(Id64 id, const Instr& instr, QDate settl_date, MarketState state, Lots last_lots,
-           Ticks last_ticks, const QDateTime& last_time)
+    Market(Id64 id, const Instr& instr, QDate settl_date, MarketState state,
+           const QDateTime& last_time, Lots last_lots, Ticks last_ticks)
     : id_{id}
     , instr_{instr}
     , settl_date_{settl_date}
     , state_{state}
+    , last_time_{last_time}
     , last_lots_{last_lots}
     , last_ticks_{last_ticks}
-    , last_time_{last_time}
     {
     }
     Market() = default;
@@ -68,9 +68,9 @@ class Market {
     const Instr& instr() const noexcept { return instr_; }
     QDate settl_date() const noexcept { return settl_date_; }
     MarketState state() const noexcept { return state_; }
+    const QDateTime& last_time() const noexcept { return last_time_; }
     Lots last_lots() const noexcept { return last_lots_; }
     Ticks last_ticks() const noexcept { return last_ticks_; }
-    const QDateTime& last_time() const noexcept { return last_time_; }
     const Levels& bids() const noexcept { return bids_; }
     const Levels& offers() const noexcept { return offers_; }
     const Level& best_bid() const noexcept { return bids_.front(); }
@@ -81,9 +81,9 @@ class Market {
     Instr instr_{};
     QDate settl_date_{};
     MarketState state_{};
+    QDateTime last_time_{};
     Lots last_lots_{};
     Ticks last_ticks_{};
-    QDateTime last_time_{};
     Levels bids_{};
     Levels offers_{};
 };

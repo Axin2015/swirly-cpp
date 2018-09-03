@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
         }
         {
             ofstream os{"market.txt"};
-            os << "id\tinstr\tsettl_day\tstate\tlast_lots\tlast_ticks\tlast_time\tmax_id\n";
+            os << "id\tinstr\tsettl_day\tstate\tlast_time\tlast_lots\tlast_ticks\tmax_id\n";
             model.read_market([&os](auto ptr) {
                 ptr->to_dsv(os, '\t');
                 os << '\n';
@@ -76,9 +76,8 @@ int main(int argc, char* argv[])
         }
         {
             ofstream os{"order.txt"};
-            os << "accnt\tmarket_id\tinstr\tsettl_date\tid\tref\tstate\tside\tlots\tticks\t"
-                  "resd_lots\texec_lots\texec_cost\tlast_lots\tlast_ticks\tmin_lots\tcreated\t"
-                  "modified\n";
+            os << "created\tmodified\taccnt\tmarket_id\tinstr\tsettl_date\tid\tref\tstate\tside\t"
+                  "lots\tticks\tresd_lots\texec_lots\texec_cost\tlast_lots\tlast_ticks\tmin_lots\n";
             model.read_order([&os](auto ptr) {
                 ptr->to_dsv(os, '\t');
                 os << '\n';
@@ -86,9 +85,9 @@ int main(int argc, char* argv[])
         }
         {
             ofstream os{"exec.txt"};
-            os << "accnt\tmarket_id\tinstr\tsettl_date\tid\torder_id\tref\tstate\tside\tlots\t"
-                  "ticks\tresd_lots\texec_lots\texec_cost\tlast_lots\tlast_ticks\tmin_lots\t"
-                  "match_id\tposn_lots\tposn_cost\tliq_ind\tcpty\tcreated\n";
+            os << "created\taccnt\tmarket_id\tinstr\tsettl_date\tid\torder_id\tref\tstate\tside\t"
+                  "lots\tticks\tresd_lots\texec_lots\texec_cost\tlast_lots\tlast_ticks\tmin_lots\t"
+                  "match_id\tposn_lots\tposn_cost\tliq_ind\tcpty\n";
             // One week ago.
             model.read_exec(now - 604800000ms, [&os](auto ptr) {
                 ptr->to_dsv(os, '\t');
@@ -97,9 +96,9 @@ int main(int argc, char* argv[])
         }
         {
             ofstream os{"trade.txt"};
-            os << "accnt\tmarket_id\tinstr\tsettl_date\tid\torder_id\tref\tstate\tside\tlots\t"
-                  "ticks\tresd_lots\texec_lots\texec_cost\tlast_lots\tlast_ticks\tmin_lots\t"
-                  "match_id\tposn_lots\tposn_cost\tliq_ind\tcpty\tcreated\n";
+            os << "created\taccnt\tmarket_id\tinstr\tsettl_date\tid\torder_id\tref\tstate\tside\t"
+                  "lots\tticks\tresd_lots\texec_lots\texec_cost\tlast_lots\tlast_ticks\tmin_lots\t"
+                  "match_id\tposn_lots\tposn_cost\tliq_ind\tcpty\n";
             model.read_trade([&os](auto ptr) {
                 ptr->to_dsv(os, '\t');
                 os << '\n';

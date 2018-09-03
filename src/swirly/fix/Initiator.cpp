@@ -22,8 +22,8 @@ namespace swirly {
 inline namespace fix {
 using namespace std;
 
-FixInitiator::FixInitiator(Reactor& r, const Endpoint& ep, const FixConfig& config,
-                           const FixSessId& sess_id, FixApp& app, Time now)
+FixInitiator::FixInitiator(Time now, Reactor& r, const Endpoint& ep, const FixConfig& config,
+                           const FixSessId& sess_id, FixApp& app)
 : reactor_(r)
 , ep_{ep}
 , config_(config)
@@ -39,27 +39,27 @@ FixInitiator::~FixInitiator()
     sess_list_.clear_and_dispose([](auto* sess) { delete sess; });
 }
 
-void FixInitiator::do_connect(IoSocket&& sock, const Endpoint& ep, Time now)
+void FixInitiator::do_connect(Time now, IoSocket&& sock, const Endpoint& ep)
 {
     inprogress_ = false;
 
     // High performance TCP servers could use a custom allocator.
-    auto* const sess = new FixSess{reactor_, move(sock), ep, config_, app_, now};
+    auto* const sess = new FixSess{now, reactor_, move(sock), ep, config_, app_};
     sess_list_.push_back(*sess);
-    sess->logon(sess_id_, now);
+    sess->logon(now, sess_id_);
 }
 
-void FixInitiator::do_connect_error(const std::exception& e, Time now)
+void FixInitiator::do_connect_error(Time now, const std::exception& e)
 {
     SWIRLY_ERROR << "failed to connect: " << e.what();
     inprogress_ = false;
 }
 
-void FixInitiator::on_timer(Timer& tmr, Time now)
+void FixInitiator::on_timer(Time now, Timer& tmr)
 {
     if (sess_list_.empty() && !inprogress_) {
         SWIRLY_INFO << "reconnecting";
-        if (!connect(reactor_, ep_, now)) {
+        if (!connect(now, reactor_, ep_)) {
             inprogress_ = true;
         }
     }

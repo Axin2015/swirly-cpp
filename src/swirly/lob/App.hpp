@@ -58,7 +58,7 @@ class SWIRLY_API App {
     App(App&&);
     App& operator=(App&&);
 
-    void load(const Model& model, Time now);
+    void load(Time now, const Model& model);
 
     const AssetSet& assets() const noexcept;
 
@@ -72,34 +72,34 @@ class SWIRLY_API App {
 
     const MarketSet& markets() const noexcept;
 
-    const Market& create_market(const Instr& instr, JDay settl_day, MarketState state, Time now);
+    const Market& create_market(Time now, const Instr& instr, JDay settl_day, MarketState state);
 
-    void update_market(const Market& market, MarketState state, Time now);
+    void update_market(Time now, const Market& market, MarketState state);
 
-    void create_order(const Sess& sess, const Market& market, std::string_view ref, Side side,
-                      Lots lots, Ticks ticks, Lots min_lots, Time now, Response& resp);
+    void create_order(Time now, const Sess& sess, const Market& market, std::string_view ref,
+                      Side side, Lots lots, Ticks ticks, Lots min_lots, Response& resp);
 
-    void revise_order(const Sess& sess, const Market& market, const Order& order, Lots lots,
-                      Time now, Response& resp);
+    void revise_order(Time now, const Sess& sess, const Market& market, const Order& order,
+                      Lots lots, Response& resp);
 
-    void revise_order(const Sess& sess, const Market& market, Id64 id, Lots lots, Time now,
+    void revise_order(Time now, const Sess& sess, const Market& market, Id64 id, Lots lots,
                       Response& resp);
 
-    void revise_order(const Sess& sess, const Market& market, std::string_view ref, Lots lots,
-                      Time now, Response& resp);
+    void revise_order(Time now, const Sess& sess, const Market& market, std::string_view ref,
+                      Lots lots, Response& resp);
 
-    void revise_order(const Sess& sess, const Market& market, ArrayView<Id64> ids, Lots lots,
-                      Time now, Response& resp);
+    void revise_order(Time now, const Sess& sess, const Market& market, ArrayView<Id64> ids,
+                      Lots lots, Response& resp);
 
-    void cancel_order(const Sess& sess, const Market& market, const Order& order, Time now,
+    void cancel_order(Time now, const Sess& sess, const Market& market, const Order& order,
                       Response& resp);
 
-    void cancel_order(const Sess& sess, const Market& market, Id64 id, Time now, Response& resp);
+    void cancel_order(Time now, const Sess& sess, const Market& market, Id64 id, Response& resp);
 
-    void cancel_order(const Sess& sess, const Market& market, std::string_view ref, Time now,
+    void cancel_order(Time now, const Sess& sess, const Market& market, std::string_view ref,
                       Response& resp);
 
-    void cancel_order(const Sess& sess, const Market& market, ArrayView<Id64> ids, Time now,
+    void cancel_order(Time now, const Sess& sess, const Market& market, ArrayView<Id64> ids,
                       Response& resp);
 
     /**
@@ -110,18 +110,18 @@ class SWIRLY_API App {
      * @param now
      *            The current time.
      */
-    void cancel_order(const Sess& sess, Time now);
+    void cancel_order(Time now, const Sess& sess);
 
-    void cancel_order(const Market& market, Time now);
+    void cancel_order(Time now, const Market& market);
 
-    TradePair create_trade(const Sess& sess, const Market& market, std::string_view ref, Side side,
-                           Lots lots, Ticks ticks, LiqInd liq_ind, Symbol cpty, Time created);
+    TradePair create_trade(Time now, const Sess& sess, const Market& market, std::string_view ref,
+                           Side side, Lots lots, Ticks ticks, LiqInd liq_ind, Symbol cpty);
 
-    void archive_trade(const Sess& sess, const Exec& trade, Time now);
+    void archive_trade(Time now, const Sess& sess, const Exec& trade);
 
-    void archive_trade(const Sess& sess, Id64 market_id, Id64 id, Time now);
+    void archive_trade(Time now, const Sess& sess, Id64 market_id, Id64 id);
 
-    void archive_trade(const Sess& sess, Id64 market_id, ArrayView<Id64> ids, Time now);
+    void archive_trade(Time now, const Sess& sess, Id64 market_id, ArrayView<Id64> ids);
 
     /**
      * This method may partially fail.

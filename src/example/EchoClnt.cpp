@@ -38,7 +38,7 @@ class EchoSess {
     using AutoUnlinkOption = boost::intrusive::link_mode<boost::intrusive::auto_unlink>;
 
   public:
-    EchoSess(Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, Time now)
+    EchoSess(Time now, Reactor& r, IoSocket&& sock, const TcpEndpoint& ep)
     : sock_{move(sock)}
     , ep_{ep}
     {
@@ -53,7 +53,7 @@ class EchoSess {
         SWIRLY_INFO << "session closed";
         delete this;
     }
-    void on_input(int fd, unsigned events, Time now)
+    void on_input(Time now, int fd, unsigned events)
     {
         try {
             if (events & (EventIn | EventHup)) {
@@ -63,12 +63,12 @@ class EchoSess {
                     buf_.commit(size);
 
                     // Parse each buffered line.
-                    auto fn = [this](std::string_view line, Time now) {
+                    auto fn = [this](Time now, std::string_view line) {
                         ++count_;
                         // Echo bytes back to client.
                         SWIRLY_INFO << "received: " << line;
                     };
-                    buf_.consume(parseLine(buf_.str(), now, fn));
+                    buf_.consume(parseLine(now, buf_.str(), fn));
                     if (count_ == 5) {
                         dispose(now);
                     }
@@ -81,7 +81,7 @@ class EchoSess {
             dispose(now);
         }
     }
-    void on_timer(Timer& tmr, Time now)
+    void on_timer(Time now, Timer& tmr)
     {
         try {
             if (sock_.send("ping\n", 5, 0) < 5) {
@@ -109,7 +109,7 @@ class EchoClnt : public TcpConnector<EchoClnt> {
     using SessList = boost::intrusive::list<EchoSess, ConstantTimeSizeOption, MemberHookOption>;
 
   public:
-    EchoClnt(Reactor& r, const Endpoint& ep, Time now)
+    EchoClnt(Time now, Reactor& r, const Endpoint& ep)
     : reactor_(r)
     , ep_(ep)
     {
@@ -122,25 +122,25 @@ class EchoClnt : public TcpConnector<EchoClnt> {
     }
 
   private:
-    void do_connect(IoSocket&& sock, const Endpoint& ep, Time now)
+    void do_connect(Time now, IoSocket&& sock, const Endpoint& ep)
     {
         SWIRLY_INFO << "session opened: " << ep;
         inprogress_ = false;
 
         // High performance TCP servers could use a custom allocator.
-        auto* const sess = new EchoSess{reactor_, move(sock), ep, now};
+        auto* const sess = new EchoSess{now, reactor_, move(sock), ep};
         sess_list_.push_back(*sess);
     }
-    void do_connect_error(const std::exception& e, Time now)
+    void do_connect_error(Time now, const std::exception& e)
     {
         SWIRLY_ERROR << "failed to connect: " << e.what();
         inprogress_ = false;
     }
-    void on_timer(Timer& tmr, Time now)
+    void on_timer(Time now, Timer& tmr)
     {
         if (sess_list_.empty() && !inprogress_) {
             SWIRLY_INFO << "reconnecting";
-            if (!connect(reactor_, ep_, now)) {
+            if (!connect(now, reactor_, ep_)) {
                 inprogress_ = true;
             }
         }
@@ -162,7 +162,7 @@ int main(int argc, char* argv[])
         const auto start_time = UnixClock::now();
 
         EpollReactor reactor{1024};
-        EchoClnt echo_clnt{reactor, parse_endpoint<Tcp>("127.0.0.1:7777"), start_time};
+        EchoClnt echo_clnt{start_time, reactor, parse_endpoint<Tcp>("127.0.0.1:7777")};
 
         // Start service threads.
         ReactorThread reactor_thread{reactor, ThreadConfig{"reactor"s}};

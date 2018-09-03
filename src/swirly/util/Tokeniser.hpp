@@ -84,11 +84,11 @@ class Tokeniser {
 };
 
 template <typename FnT>
-std::size_t parseLine(std::string_view buf, Time now, FnT fn)
+std::size_t parseLine(Time now, std::string_view buf, FnT fn)
 {
     Tokeniser lines{buf, "\n"sv};
     while (lines.has_delim()) {
-        fn(lines.top(), now);
+        fn(now, lines.top());
         lines.pop();
     }
     return lines.consumed();

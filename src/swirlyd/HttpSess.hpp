@@ -40,7 +40,7 @@ class SWIRLY_API HttpSess
     using AutoUnlinkOption = boost::intrusive::link_mode<boost::intrusive::auto_unlink>;
 
   public:
-    HttpSess(Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, RestServ& rs, Time now);
+    HttpSess(Time now, Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, RestServ& rs);
     ~HttpSess();
 
     // Copy.
@@ -75,8 +75,8 @@ class SWIRLY_API HttpSess
     bool on_chunk_header(size_t len) noexcept { return true; }
     bool on_chunk_end() noexcept { return true; }
 
-    void on_io_event(int fd, unsigned events, Time now);
-    void on_timer(Timer& tmr, Time now);
+    void on_io_event(Time now, int fd, unsigned events);
+    void on_timer(Time now, Timer& tmr);
 
     LogMsg& log_msg() const noexcept
     {

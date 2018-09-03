@@ -81,7 +81,7 @@ void SqliteJourn::do_write(const Msg& msg)
     dispatch(msg);
 }
 
-void SqliteJourn::on_create_market(const CreateMarket& body)
+void SqliteJourn::on_create_market(Time now, const CreateMarket& body)
 {
     auto& stmt = *insert_market_stmt_;
 
@@ -94,7 +94,7 @@ void SqliteJourn::on_create_market(const CreateMarket& body)
     step_once(stmt);
 }
 
-void SqliteJourn::on_update_market(const UpdateMarket& body)
+void SqliteJourn::on_update_market(Time now, const UpdateMarket& body)
 {
     auto& stmt = *update_market_stmt_;
 
@@ -105,11 +105,12 @@ void SqliteJourn::on_update_market(const UpdateMarket& body)
     step_once(stmt);
 }
 
-void SqliteJourn::on_create_exec(const CreateExec& body)
+void SqliteJourn::on_create_exec(Time now, const CreateExec& body)
 {
     auto& stmt = *insert_exec_stmt_;
 
     ScopedBind bind{stmt};
+    bind(now);
     bind(to_string_view(body.accnt));
     bind(body.market_id);
     bind(to_string_view(body.instr));
@@ -137,12 +138,11 @@ void SqliteJourn::on_create_exec(const CreateExec& body)
     bind(body.posn_cost);
     bind(body.liq_ind, MaybeNull);
     bind(to_string_view(body.cpty), MaybeNull);
-    bind(body.created); // Created.
 
     step_once(stmt);
 }
 
-void SqliteJourn::on_archive_trade(const ArchiveTrade& body)
+void SqliteJourn::on_archive_trade(Time now, const ArchiveTrade& body)
 {
     Transaction trans{*this};
     auto& stmt = *update_exec_stmt_;
@@ -153,7 +153,7 @@ void SqliteJourn::on_archive_trade(const ArchiveTrade& body)
             break;
         }
         ScopedBind bind{stmt};
-        bind(body.modified);
+        bind(now);
         bind(body.market_id);
         bind(id);
 

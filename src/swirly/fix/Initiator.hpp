@@ -33,14 +33,14 @@ class SWIRLY_API FixInitiator : public TcpConnector<FixInitiator> {
     using SessList = boost::intrusive::list<FixSess, ConstantTimeSizeOption, MemberHookOption>;
 
   public:
-    FixInitiator(Reactor& r, const Endpoint& ep, const FixConfig& config, const FixSessId& sess_id,
-                 FixApp& app, Time now);
+    FixInitiator(Time now, Reactor& r, const Endpoint& ep, const FixConfig& config,
+                 const FixSessId& sess_id, FixApp& app);
     ~FixInitiator();
 
   private:
-    void do_connect(IoSocket&& sock, const Endpoint& ep, Time now);
-    void do_connect_error(const std::exception& e, Time now);
-    void on_timer(Timer& tmr, Time now);
+    void do_connect(Time now, IoSocket&& sock, const Endpoint& ep);
+    void do_connect_error(Time now, const std::exception& e);
+    void on_timer(Time now, Timer& tmr);
 
     Reactor& reactor_;
     const Endpoint ep_;

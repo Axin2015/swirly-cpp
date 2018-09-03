@@ -73,6 +73,9 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
         case Column::State:
             var = market.state();
             break;
+        case Column::LastTime:
+            var = market.last_time();
+            break;
         case Column::LastLots:
             var = to_variant(market.last_lots());
             break;
@@ -80,9 +83,6 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
             if (market.last_lots() != 0_lts) {
                 var = ticks_to_price_string(market.last_ticks(), market.instr());
             }
-            break;
-        case Column::LastTime:
-            var = market.last_time();
             break;
         case Column::BidPrice:
             if (market.best_bid().lots() != 0_lts) {

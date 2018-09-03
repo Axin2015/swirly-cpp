@@ -87,14 +87,14 @@ class SWIRLY_API MsgQueue {
     /**
      * Create Market.
      */
-    void create_market(Id64 id, Symbol instr, JDay settl_day, MarketState state)
+    void create_market(Time now, Id64 id, Symbol instr, JDay settl_day, MarketState state)
     {
-        do_create_market(id, instr, settl_day, state);
+        do_create_market(now, id, instr, settl_day, state);
     }
     /**
      * Update Market.
      */
-    void update_market(Id64 id, MarketState state) { do_update_market(id, state); }
+    void update_market(Time now, Id64 id, MarketState state) { do_update_market(now, id, state); }
     /**
      * Create Execution.
      */
@@ -106,27 +106,27 @@ class SWIRLY_API MsgQueue {
     /**
      * Archive Trade.
      */
-    void archive_trade(Id64 market_id, Id64 id, Time modified)
+    void archive_trade(Time now, Id64 market_id, Id64 id)
     {
-        do_archive_trade(market_id, {&id, 1}, modified);
+        do_archive_trade(now, market_id, {&id, 1});
     }
     /**
      * Archive Trades.
      */
-    void archive_trade(Id64 market_id, ArrayView<Id64> ids, Time modified);
+    void archive_trade(Time now, Id64 market_id, ArrayView<Id64> ids);
     /**
      * Returns false if queue is empty.
      */
     bool pop(Msg& msg) noexcept { return mq_.pop(msg); }
 
   private:
-    void do_create_market(Id64 id, Symbol instr, JDay settl_day, MarketState state);
+    void do_create_market(Time now, Id64 id, Symbol instr, JDay settl_day, MarketState state);
 
-    void do_update_market(Id64 id, MarketState state);
+    void do_update_market(Time now, Id64 id, MarketState state);
 
     void do_create_exec(const Exec& exec);
 
-    void do_archive_trade(Id64 market_id, ArrayView<Id64> ids, Time modified);
+    void do_archive_trade(Time now, Id64 market_id, ArrayView<Id64> ids);
 
     MemQueue<Msg> mq_{nullptr};
 };

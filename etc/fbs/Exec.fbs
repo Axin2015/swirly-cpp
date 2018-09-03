@@ -18,6 +18,7 @@ include "Types.fbs";
 namespace swirly.fbs;
 
 table Exec {
+  created:long;
   accnt:string (required);
   market_id:long;
   instr:string (required);
@@ -40,5 +41,4 @@ table Exec {
   posn_ticks:long;
   liqind:LiqInd;
   cpty:string;
-  created:long;
 }

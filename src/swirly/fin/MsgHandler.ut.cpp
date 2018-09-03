@@ -25,15 +25,32 @@ namespace {
 
 struct MsgHandler : BasicMsgHandler<MsgHandler> {
 
+    Time time{};
     int create_market_calls{0};
     int update_market_calls{0};
     int create_exec_calls{0};
     int archive_trade_calls{0};
 
-    void on_create_market(const CreateMarket& body) { ++create_market_calls; }
-    void on_update_market(const UpdateMarket& body) { ++update_market_calls; }
-    void on_create_exec(const CreateExec& body) { ++create_exec_calls; }
-    void on_archive_trade(const ArchiveTrade& body) { ++archive_trade_calls; }
+    void on_create_market(Time time, const CreateMarket& body)
+    {
+        this->time = time;
+        ++create_market_calls;
+    }
+    void on_update_market(Time time, const UpdateMarket& body)
+    {
+        this->time = time;
+        ++update_market_calls;
+    }
+    void on_create_exec(Time time, const CreateExec& body)
+    {
+        this->time = time;
+        ++create_exec_calls;
+    }
+    void on_archive_trade(Time time, const ArchiveTrade& body)
+    {
+        this->time = time;
+        ++archive_trade_calls;
+    }
 };
 
 } // namespace
@@ -46,24 +63,33 @@ BOOST_AUTO_TEST_CASE(BasicMsgHandlerCase)
     Msg m;
     memset(&m, 0, sizeof(m));
 
+    const auto now = UnixClock::now();
     m.type = MsgType::CreateMarket;
+    m.time = ns_since_epoch(now + 1ms);
     BOOST_TEST(h.create_market_calls == 0);
     h.dispatch(m);
+    BOOST_TEST(h.time == now + 1ms);
     BOOST_TEST(h.create_market_calls == 1);
 
     m.type = MsgType::UpdateMarket;
+    m.time = ns_since_epoch(now + 2ms);
     BOOST_TEST(h.update_market_calls == 0);
     h.dispatch(m);
+    BOOST_TEST(h.time == now + 2ms);
     BOOST_TEST(h.update_market_calls == 1);
 
     m.type = MsgType::CreateExec;
+    m.time = ns_since_epoch(now + 3ms);
     BOOST_TEST(h.create_exec_calls == 0);
     h.dispatch(m);
+    BOOST_TEST(h.time == now + 3ms);
     BOOST_TEST(h.create_exec_calls == 1);
 
     m.type = MsgType::ArchiveTrade;
+    m.time = ns_since_epoch(now + 4ms);
     BOOST_TEST(h.archive_trade_calls == 0);
     h.dispatch(m);
+    BOOST_TEST(h.time == now + 4ms);
     BOOST_TEST(h.archive_trade_calls == 1);
 }
 

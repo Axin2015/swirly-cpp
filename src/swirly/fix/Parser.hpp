@@ -45,7 +45,7 @@ class BasicFixParser {
     BasicFixParser(BasicFixParser&&) = default;
     BasicFixParser& operator=(BasicFixParser&&) = default;
 
-    std::size_t parse(ConstBuffer buf, Time now)
+    std::size_t parse(Time now, ConstBuffer buf)
     {
         // If body length has not been read.
         if (msg_type_off_ == 0) {
@@ -63,7 +63,7 @@ class BasicFixParser {
             }
             const auto* const begin = buffer_cast<const char*>(buf);
             const Version ver{begin[6] - '0', begin[8] - '0'};
-            static_cast<DerivedT*>(this)->on_message({begin, len}, msg_type_off_, ver, now);
+            static_cast<DerivedT*>(this)->on_message(now, {begin, len}, msg_type_off_, ver);
             // Skip to next message.
             buf = advance(buf, len);
             sum += len;

@@ -22,7 +22,7 @@ table Market {
   symbol:string (required);
   settl_day:int;
   state:uint;
+  last_time:long;
   last_lots:long;
   last_ticks:long;
-  last_time:long;
 }

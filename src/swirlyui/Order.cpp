@@ -21,11 +21,13 @@
 namespace swirly {
 namespace ui {
 
-Order::Order(const QString& accnt, Id64 market_id, const Instr& instr, QDate settl_date, Id64 id,
-             const QString& ref, State state, Side side, Lots lots, Ticks ticks, Lots resd_lots,
-             Lots exec_lots, Cost exec_cost, Lots last_lots, Ticks last_ticks, Lots min_lots,
-             const QDateTime& created, const QDateTime& modified)
-: accnt_{accnt}
+Order::Order(const QDateTime& created, const QDateTime& modified, const QString& accnt,
+             Id64 market_id, const Instr& instr, QDate settl_date, Id64 id, const QString& ref,
+             State state, Side side, Lots lots, Ticks ticks, Lots resd_lots, Lots exec_lots,
+             Cost exec_cost, Lots last_lots, Ticks last_ticks, Lots min_lots)
+: created_{created}
+, modified_{modified}
+, accnt_{accnt}
 , market_id_{market_id}
 , instr_{instr}
 , settl_date_{settl_date}
@@ -41,15 +43,15 @@ Order::Order(const QString& accnt, Id64 market_id, const Instr& instr, QDate set
 , last_lots_{last_lots}
 , last_ticks_{last_ticks}
 , min_lots_{min_lots}
-, created_{created}
-, modified_{modified}
 {
 }
 
 Order Order::from_json(const Instr& instr, const QJsonObject& obj)
 {
     using swirly::ui::from_json;
-    return Order{from_json<QString>(obj["accnt"]),
+    return Order{from_json<QDateTime>(obj["created"]),
+                 from_json<QDateTime>(obj["modified"]),
+                 from_json<QString>(obj["accnt"]),
                  from_json<Id64>(obj["market_id"]),
                  instr,
                  from_json<QDate>(obj["settl_date"]),
@@ -64,14 +66,13 @@ Order Order::from_json(const Instr& instr, const QJsonObject& obj)
                  from_json<Cost>(obj["exec_cost"]),
                  from_json<Lots>(obj["last_lots"]),
                  from_json<Ticks>(obj["last_ticks"]),
-                 from_json<Lots>(obj["min_lots"]),
-                 from_json<QDateTime>(obj["created"]),
-                 from_json<QDateTime>(obj["modified"])};
+                 from_json<Lots>(obj["min_lots"])};
 }
 
 QDebug operator<<(QDebug debug, const Order& order)
 {
-    debug.nospace() << "Order{accnt=" << order.accnt()      //
+    debug.nospace() << "Order{created=" << order.created()  //
+                    << ",modified=" << order.modified()     //
                     << ",market_id=" << order.market_id()   //
                     << ",instr=" << order.instr()           //
                     << ",settl_date=" << order.settl_date() //
@@ -87,8 +88,7 @@ QDebug operator<<(QDebug debug, const Order& order)
                     << ",last_lots=" << order.last_lots()   //
                     << ",last_ticks=" << order.last_ticks() //
                     << ",min_lots=" << order.min_lots()     //
-                    << ",created=" << order.created()       //
-                    << ",modified=" << order.modified()     //
+                    << ",accnt=" << order.accnt()           //
                     << '}';
     return debug;
 }

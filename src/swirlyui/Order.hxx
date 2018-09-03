@@ -25,6 +25,8 @@ namespace order {
 
 enum class Column : int { //
     CheckState,           //
+    Created,              //
+    Modified,             //
     Accnt,                //
     MarketId,             //
     Instr,                //
@@ -40,26 +42,26 @@ enum class Column : int { //
     AvgPrice,             //
     LastLots,             //
     LastPrice,            //
-    MinLots,              //
-    Created,              //
-    Modified
+    MinLots
 };
-constexpr int ColumnCount{unbox(Column::Modified) + 1};
+constexpr int ColumnCount{unbox(Column::MinLots) + 1};
 
 } // namespace order
 
 class Order {
   public:
-    Order(const QString& accnt, Id64 market_id, const Instr& instr, QDate settl_date, Id64 id,
-          const QString& ref, State state, Side side, Lots lots, Ticks ticks, Lots resd_lots,
-          Lots exec_lots, Cost exec_cost, Lots last_lots, Ticks last_ticks, Lots min_lots,
-          const QDateTime& created, const QDateTime& modified);
+    Order(const QDateTime& created, const QDateTime& modified, const QString& accnt, Id64 market_id,
+          const Instr& instr, QDate settl_date, Id64 id, const QString& ref, State state, Side side,
+          Lots lots, Ticks ticks, Lots resd_lots, Lots exec_lots, Cost exec_cost, Lots last_lots,
+          Ticks last_ticks, Lots min_lots);
     Order() = default;
     ~Order() = default;
 
     static Order from_json(const Instr& instr, const QJsonObject& obj);
 
     OrderKey key() const noexcept { return {market_id_, id_}; }
+    const QDateTime& created() const noexcept { return created_; }
+    const QDateTime& modified() const noexcept { return modified_; }
     const QString& accnt() const noexcept { return accnt_; }
     Id64 market_id() const noexcept { return market_id_; }
     const Instr& instr() const noexcept { return instr_; }
@@ -77,10 +79,10 @@ class Order {
     Ticks last_ticks() const noexcept { return last_ticks_; }
     Lots min_lots() const noexcept { return min_lots_; }
     bool done() const noexcept { return resd_lots_ == 0_lts; }
-    const QDateTime& created() const noexcept { return created_; }
-    const QDateTime& modified() const noexcept { return modified_; }
 
   private:
+    QDateTime created_{};
+    QDateTime modified_{};
     QString accnt_{};
     Id64 market_id_{};
     Instr instr_{};
@@ -97,24 +99,21 @@ class Order {
     Lots last_lots_{};
     Ticks last_ticks_{};
     Lots min_lots_{};
-    QDateTime created_{};
-    QDateTime modified_{};
 };
 
 QDebug operator<<(QDebug debug, const Order& order);
 
 inline bool is_modified(const Order& prev, const Order& next) noexcept
 {
-    return prev.state() != next.state()           //
-        || prev.lots() != next.lots()             //
-        || prev.resd_lots() != next.resd_lots()   //
-        || prev.exec_lots() != next.exec_lots()   //
-        || prev.exec_cost() != next.exec_cost()   //
-        || prev.last_lots() != next.last_lots()   //
-        || prev.last_ticks() != next.last_ticks() //
-        || prev.modified() != next.modified();
+    return prev.modified() != next.modified()   //
+        || prev.state() != next.state()         //
+        || prev.lots() != next.lots()           //
+        || prev.resd_lots() != next.resd_lots() //
+        || prev.exec_lots() != next.exec_lots() //
+        || prev.exec_cost() != next.exec_cost() //
+        || prev.last_lots() != next.last_lots() //
+        || prev.last_ticks() != next.last_ticks();
 }
-
 } // namespace ui
 } // namespace swirly
 

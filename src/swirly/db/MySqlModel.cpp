@@ -122,9 +122,9 @@ void MySqlModel::do_read_market(const ModelCallback<MarketPtr>& cb) const
     field::Symbol instr{result[Instr]};
     field::JDay settl_day{result[SettlDay]};
     field::MarketState state{result[State]};
+    field::Time last_time{result[LastTime]};
     field::Lots last_lots{result[LastLots]};
     field::Ticks last_ticks{result[LastTicks]};
-    field::Time last_time{result[LastTime]};
     field::Id64 max_id{result[MaxId]};
 
     bind_result(*stmt, &result[0]);
@@ -133,9 +133,9 @@ void MySqlModel::do_read_market(const ModelCallback<MarketPtr>& cb) const
                         instr.value(),                           //
                         JDay{settl_day.value()},                 //
                         static_cast<MarketState>(state.value()), //
+                        to_time(Millis{last_time.value()}),      //
                         Lots{last_lots.value()},                 //
                         Ticks{last_ticks.value()},               //
-                        to_time(Millis{last_time.value()}),      //
                         Id64{max_id.value()}));
     }
 }
@@ -149,6 +149,8 @@ void MySqlModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
     auto res = result_metadata(*stmt);
 
     BindArray<18> result;
+    field::Time created{result[Created]};
+    field::Time modified{result[Modified]};
     field::Symbol accnt{result[Accnt]};
     field::Id64 market_id{result[MarketId]};
     field::Symbol instr{result[Instr]};
@@ -165,12 +167,12 @@ void MySqlModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
     field::Lots last_lots{result[LastLots]};
     field::Ticks last_ticks{result[LastTicks]};
     field::Lots min_lots{result[MinLots]};
-    field::Time created{result[Created]};
-    field::Time modified{result[Modified]};
 
     bind_result(*stmt, &result[0]);
     while (fetch(*stmt)) {
-        cb(Order::make(accnt.value(),                     //
+        cb(Order::make(to_time(Millis{created.value()}),  //
+                       to_time(Millis{modified.value()}), //
+                       accnt.value(),                     //
                        Id64{market_id.value()},           //
                        instr.value(),                     //
                        JDay{settl_day.value()},           //
@@ -185,9 +187,7 @@ void MySqlModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
                        swirly::Cost{exec_cost.value()},   //
                        swirly::Lots{last_lots.value()},   //
                        swirly::Ticks{last_ticks.value()}, //
-                       swirly::Lots{min_lots.value()},    //
-                       to_time(Millis{created.value()}),  //
-                       to_time(Millis{modified.value()})));
+                       swirly::Lots{min_lots.value()}));
     }
 }
 
@@ -206,6 +206,7 @@ void MySqlModel::do_read_exec(Time since, const ModelCallback<ExecPtr>& cb) cons
     auto res = result_metadata(*stmt);
 
     BindArray<23> result;
+    field::Time created{result[Created]};
     field::Symbol accnt{result[Accnt]};
     field::Id64 market_id{result[MarketId]};
     field::Symbol instr{result[Instr]};
@@ -228,11 +229,11 @@ void MySqlModel::do_read_exec(Time since, const ModelCallback<ExecPtr>& cb) cons
     field::Cost posn_cost{result[PosnCost]};
     field::LiqInd liq_ind{result[LiqInd]};
     field::Symbol cpty{result[Cpty]};
-    field::Time created{result[Created]};
 
     bind_result(*stmt, &result[0]);
     while (fetch(*stmt)) {
-        cb(Exec::make(accnt.value(),                     //
+        cb(Exec::make(to_time(Millis{created.value()}),  //
+                      accnt.value(),                     //
                       Id64{market_id.value()},           //
                       instr.value(),                     //
                       JDay{settl_day.value()},           //
@@ -253,8 +254,7 @@ void MySqlModel::do_read_exec(Time since, const ModelCallback<ExecPtr>& cb) cons
                       swirly::Lots{posn_lots.value()},   //
                       swirly::Cost{posn_cost.value()},   //
                       swirly::LiqInd{liq_ind.value()},   //
-                      cpty.value(),                      //
-                      to_time(Millis{created.value()})));
+                      cpty.value()));
     }
 }
 
@@ -267,6 +267,7 @@ void MySqlModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
     auto res = result_metadata(*stmt);
 
     BindArray<22> result;
+    field::Time created{result[Created]};
     field::Symbol accnt{result[Accnt]};
     field::Id64 market_id{result[MarketId]};
     field::Symbol instr{result[Instr]};
@@ -288,11 +289,11 @@ void MySqlModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
     field::Cost posn_cost{result[PosnCost]};
     field::LiqInd liq_ind{result[LiqInd]};
     field::Symbol cpty{result[Cpty]};
-    field::Time created{result[Created]};
 
     bind_result(*stmt, &result[0]);
     while (fetch(*stmt)) {
-        cb(Exec::make(accnt.value(),                     //
+        cb(Exec::make(to_time(Millis{created.value()}),  //
+                      accnt.value(),                     //
                       Id64{market_id.value()},           //
                       instr.value(),                     //
                       JDay{settl_day.value()},           //
@@ -313,8 +314,7 @@ void MySqlModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
                       swirly::Lots{posn_lots.value()},   //
                       swirly::Cost{posn_cost.value()},   //
                       swirly::LiqInd{liq_ind.value()},   //
-                      cpty.value(),                      //
-                      to_time(Millis{created.value()})));
+                      cpty.value()));
     }
 }
 

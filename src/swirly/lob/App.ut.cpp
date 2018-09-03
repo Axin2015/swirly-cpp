@@ -47,7 +47,7 @@ class SWIRLY_API TestModel : public swirly::TestModel {
 };
 
 struct AppFixture {
-    AppFixture() { app.load(TestModel{}, Now); }
+    AppFixture() { app.load(Now, TestModel{}); }
     MsgQueue mq{1 << 10};
     App app{mq, 1 << 4};
 };
@@ -127,9 +127,9 @@ BOOST_FIXTURE_TEST_CASE(AppCreateMarket, AppFixture)
     const auto market_id = to_market_id(instr.id(), SettlDay);
 
     // Settl-day before bus-day.
-    BOOST_CHECK_THROW(app.create_market(instr, Today - 1_jd, 0x1, Now), InvalidException);
+    BOOST_CHECK_THROW(app.create_market(Now, instr, Today - 1_jd, 0x1), InvalidException);
 
-    auto& market = app.create_market(instr, SettlDay, 0x1, Now);
+    auto& market = app.create_market(Now, instr, SettlDay, 0x1);
 
     BOOST_TEST(market.id() == market_id);
 
@@ -143,16 +143,16 @@ BOOST_FIXTURE_TEST_CASE(AppCreateMarket, AppFixture)
     BOOST_TEST(&*it == &market);
 
     // Already exists.
-    BOOST_CHECK_THROW(app.create_market(instr, SettlDay, 0x1, Now), AlreadyExistsException);
+    BOOST_CHECK_THROW(app.create_market(Now, instr, SettlDay, 0x1), AlreadyExistsException);
 }
 
 BOOST_FIXTURE_TEST_CASE(AppUpdateMarket, AppFixture)
 {
     const Instr& instr = app.instr("USDJPY"sv);
     const auto market_id = to_market_id(instr.id(), SettlDay);
-    auto& market = app.create_market(instr, SettlDay, 0x1, Now);
+    auto& market = app.create_market(Now, instr, SettlDay, 0x1);
 
-    app.update_market(market, 0x2, Now);
+    app.update_market(Now, market, 0x2);
 
     BOOST_TEST(market.id() == market_id);
 
@@ -169,7 +169,7 @@ BOOST_FIXTURE_TEST_CASE(AppCreateOrder, AppFixture)
     auto& market = app.market(market_id);
 
     Response resp;
-    app.create_order(sess, market, ""sv, Side::Buy, 5_lts, 12345_tks, 1_lts, Now, resp);
+    app.create_order(Now, sess, market, ""sv, Side::Buy, 5_lts, 12345_tks, 1_lts, resp);
 
     BOOST_TEST(resp.orders().size() == 1U);
     BOOST_TEST(resp.execs().size() == 1U);

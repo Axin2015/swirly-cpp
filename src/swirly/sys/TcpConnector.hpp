@@ -44,7 +44,7 @@ class TcpConnector {
      * Returns true if connection was established synchronously or false if connection is pending
      * asynchronous completion.
      */
-    bool connect(Reactor& r, const Endpoint& ep, Time now)
+    bool connect(Time now, Reactor& r, const Endpoint& ep)
     {
         TcpClntSocket sock{ep.protocol()};
         sock.set_non_block();
@@ -61,7 +61,7 @@ class TcpConnector {
             sock_ = std::move(sock);
             return false;
         }
-        static_cast<DerivedT*>(this)->do_connect(std::move(sock), ep, now);
+        static_cast<DerivedT*>(this)->do_connect(now, std::move(sock), ep);
         return true;
     }
 
@@ -69,7 +69,7 @@ class TcpConnector {
     ~TcpConnector() = default;
 
   private:
-    void on_io_event(int fd, unsigned events, Time now)
+    void on_io_event(Time now, int fd, unsigned events)
     {
         assert(events == EventOut);
         IoSocket sock{std::move(sock_)};
@@ -79,9 +79,9 @@ class TcpConnector {
             if (ec) {
                 throw std::system_error{ec, "connect"};
             }
-            static_cast<DerivedT*>(this)->do_connect(std::move(sock), ep_, now);
+            static_cast<DerivedT*>(this)->do_connect(now, std::move(sock), ep_);
         } catch (const std::exception& e) {
-            static_cast<DerivedT*>(this)->do_connect_error(e, now);
+            static_cast<DerivedT*>(this)->do_connect_error(now, e);
         }
     }
 

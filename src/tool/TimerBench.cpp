@@ -28,7 +28,7 @@ using namespace swirly;
 namespace {
 
 struct TimerHandler : RefCount<TimerHandler, ThreadUnsafePolicy> {
-    void on_timer(Timer& tmr, Time now) {}
+    void on_timer(Time now, Timer& tmr) {}
 };
 
 } // namespace

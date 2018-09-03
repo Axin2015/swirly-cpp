@@ -32,7 +32,7 @@ inline namespace sys {
 
 class Timer;
 class TimerQueue;
-using TimerSlot = BasicSlot<Timer&, Time>;
+using TimerSlot = BasicSlot<Time, Timer&>;
 
 class SWIRLY_API Timer {
 

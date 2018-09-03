@@ -262,7 +262,7 @@ int main(int argc, char* argv[])
         RestApp rest_app{mq, max_execs};
         {
             Model& model = db_ctx.model();
-            rest_app.load(model, opts.start_time);
+            rest_app.load(opts.start_time, model);
         }
         RestServ rest_serv{rest_app};
         Journ& journ = db_ctx.journ();

@@ -27,6 +27,7 @@ ExecModel::ExecModel(QObject* parent)
 : QAbstractTableModel{parent}
 {
     header_[unbox(Column::CheckState)] = tr("");
+    header_[unbox(Column::Created)] = tr("Created");
     header_[unbox(Column::Accnt)] = tr("Accnt");
     header_[unbox(Column::MarketId)] = tr("Market Id");
     header_[unbox(Column::Instr)] = tr("Instr");
@@ -47,7 +48,6 @@ ExecModel::ExecModel(QObject* parent)
     header_[unbox(Column::MatchId)] = tr("Match Id");
     header_[unbox(Column::LiqInd)] = tr("Liq Ind");
     header_[unbox(Column::Cpty)] = tr("Cpty");
-    header_[unbox(Column::Created)] = tr("Created");
 }
 
 ExecModel::~ExecModel() = default;
@@ -80,6 +80,9 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
         const auto& exec = value_at(index.row());
         switch (box<Column>(index.column())) {
         case Column::CheckState:
+            break;
+        case Column::Created:
+            var = exec.created();
             break;
         case Column::Accnt:
             var = exec.accnt();
@@ -151,23 +154,12 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
                 var = exec.cpty();
             }
             break;
-        case Column::Created:
-            var = exec.created();
-            break;
         }
     } else if (role == Qt::TextAlignmentRole) {
         switch (box<Column>(index.column())) {
         case Column::CheckState:
             break;
-        case Column::Accnt:
-        case Column::Instr:
-        case Column::Ref:
-        case Column::State:
-        case Column::Side:
-        case Column::LiqInd:
-        case Column::Cpty:
-            var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
-            break;
+        case Column::Created:
         case Column::MarketId:
         case Column::SettlDate:
         case Column::Id:
@@ -181,8 +173,16 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
         case Column::LastPrice:
         case Column::MinLots:
         case Column::MatchId:
-        case Column::Created:
             var = QVariant{Qt::AlignRight | Qt::AlignVCenter};
+            break;
+        case Column::Accnt:
+        case Column::Instr:
+        case Column::Ref:
+        case Column::State:
+        case Column::Side:
+        case Column::LiqInd:
+        case Column::Cpty:
+            var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
             break;
         }
     } else if (role == Qt::UserRole) {

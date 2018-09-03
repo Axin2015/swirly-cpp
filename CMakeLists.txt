@@ -133,7 +133,7 @@ install(DIRECTORY DESTINATION var/log)
 install(DIRECTORY DESTINATION var/run)
 
 set(Boost_USE_STATIC_LIBS OFF)
-find_package(Boost 1.67 REQUIRED COMPONENTS date_time unit_test_framework)
+find_package(Boost 1.63 REQUIRED COMPONENTS date_time unit_test_framework)
 install_libraries("${Boost_DATE_TIME_LIBRARY}")
 
 add_definitions(-DBOOST_NO_AUTO_PTR=1 -DBOOST_NO_RTTI=1 -DBOOST_NO_TYPEID=1)

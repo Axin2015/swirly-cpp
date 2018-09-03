@@ -82,7 +82,7 @@ void MySqlJourn::do_write(const Msg& msg)
     dispatch(msg);
 }
 
-void MySqlJourn::on_create_market(const CreateMarket& body)
+void MySqlJourn::on_create_market(Time time, const CreateMarket& body)
 {
     auto& stmt = *insert_market_stmt_;
 
@@ -97,7 +97,7 @@ void MySqlJourn::on_create_market(const CreateMarket& body)
     execute(stmt);
 }
 
-void MySqlJourn::on_update_market(const UpdateMarket& body)
+void MySqlJourn::on_update_market(Time time, const UpdateMarket& body)
 {
     auto& stmt = *update_market_stmt_;
 
@@ -110,12 +110,13 @@ void MySqlJourn::on_update_market(const UpdateMarket& body)
     execute(stmt);
 }
 
-void MySqlJourn::on_create_exec(const CreateExec& body)
+void MySqlJourn::on_create_exec(Time time, const CreateExec& body)
 {
     auto& stmt = *insert_exec_stmt_;
 
     BindArray<23> param;
     auto pit = param.begin();
+    field::Time created{*pit++, ms_since_epoch(time)};
     field::Symbol::bind(*pit++, body.accnt);
     field::Id64 market_id{*pit++, body.market_id};
     field::Symbol::bind(*pit++, body.instr);
@@ -142,21 +143,20 @@ void MySqlJourn::on_create_exec(const CreateExec& body)
     field::Cost posn_cost{*pit++, body.posn_cost};
     field::LiqInd liq_ind{*pit++, unbox(body.liq_ind), MaybeNull};
     field::Symbol::bind(*pit++, body.cpty, MaybeNull);
-    field::Time created{*pit++, body.created};
     bind_param(stmt, &param[0]);
 
     execute(stmt);
     SWIRLY_DEBUG << "affected rows: " << affected_rows(stmt);
 }
 
-void MySqlJourn::on_archive_trade(const ArchiveTrade& body)
+void MySqlJourn::on_archive_trade(Time time, const ArchiveTrade& body)
 {
     Transaction trans{*this};
     auto& stmt = *update_exec_stmt_;
 
     BindArray<3> param;
     auto pit = param.begin();
-    field::Time archive{*pit++, body.modified};
+    field::Time archive{*pit++, ms_since_epoch(time)};
     field::Id64 market_id{*pit++, body.market_id};
     field::Id64 id{*pit++};
     bind_param(stmt, &param[0]);
