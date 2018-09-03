@@ -115,11 +115,11 @@ struct DbTraits<Time> {
     static constexpr bool is_null(Time val) noexcept { return val == Time{}; }
     static void bind(sqlite3_stmt& stmt, int col, Time val)
     {
-        bind64(stmt, col, ms_since_epoch(val));
+        bind64(stmt, col, ns_since_epoch(val));
     }
     static auto column(sqlite3_stmt& stmt, int col) noexcept
     {
-        return to_time(Millis{sqlite3_column_int64(&stmt, col)});
+        return to_time(Nanos{sqlite3_column_int64(&stmt, col)});
     }
 };
 
