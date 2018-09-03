@@ -116,7 +116,7 @@ void MySqlJourn::on_create_exec(Time time, const CreateExec& body)
 
     BindArray<23> param;
     auto pit = param.begin();
-    field::Time created{*pit++, ms_since_epoch(time)};
+    field::Time created{*pit++, ns_since_epoch(time)};
     field::Symbol::bind(*pit++, body.accnt);
     field::Id64 market_id{*pit++, body.market_id};
     field::Symbol::bind(*pit++, body.instr);
@@ -156,7 +156,7 @@ void MySqlJourn::on_archive_trade(Time time, const ArchiveTrade& body)
 
     BindArray<3> param;
     auto pit = param.begin();
-    field::Time archive{*pit++, ms_since_epoch(time)};
+    field::Time archive{*pit++, ns_since_epoch(time)};
     field::Id64 market_id{*pit++, body.market_id};
     field::Id64 id{*pit++};
     bind_param(stmt, &param[0]);
