@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYD_HTTPSESS_HPP
-#define SWIRLYD_HTTPSESS_HPP
+#ifndef SWIRLYD_HTTPCONN_HPP
+#define SWIRLYD_HTTPCONN_HPP
 
 #include <swirly/web/Parser.hpp>
 #include <swirly/web/Request.hpp>
@@ -33,23 +33,23 @@ namespace swirly {
 
 class RestServ;
 
-class SWIRLY_API HttpSess
+class SWIRLY_API HttpConn
 : public MemAlloc
-, BasicHttpParser<HttpSess> {
-    friend class BasicHttpParser<HttpSess>;
+, BasicHttpParser<HttpConn> {
+    friend class BasicHttpParser<HttpConn>;
     using AutoUnlinkOption = boost::intrusive::link_mode<boost::intrusive::auto_unlink>;
 
   public:
-    HttpSess(Time now, Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, RestServ& rs);
-    ~HttpSess();
+    HttpConn(Time now, Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, RestServ& rs);
+    ~HttpConn();
 
     // Copy.
-    HttpSess(const HttpSess&) = delete;
-    HttpSess& operator=(const HttpSess&) = delete;
+    HttpConn(const HttpConn&) = delete;
+    HttpConn& operator=(const HttpConn&) = delete;
 
     // Move.
-    HttpSess(HttpSess&&) = delete;
-    HttpSess& operator=(HttpSess&&) = delete;
+    HttpConn(HttpConn&&) = delete;
+    HttpConn& operator=(HttpConn&&) = delete;
 
     boost::intrusive::list_member_hook<AutoUnlinkOption> list_hook;
 
@@ -99,4 +99,4 @@ class SWIRLY_API HttpSess
 
 } // namespace swirly
 
-#endif // SWIRLYD_HTTPSESS_HPP
+#endif // SWIRLYD_HTTPCONN_HPP

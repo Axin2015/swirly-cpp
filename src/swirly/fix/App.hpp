@@ -24,7 +24,7 @@ namespace swirly {
 inline namespace fix {
 
 struct FixHdr;
-class FixSess;
+class FixConn;
 
 class SWIRLY_API FixApp {
   public:
@@ -39,22 +39,22 @@ class SWIRLY_API FixApp {
     constexpr FixApp(FixApp&&) noexcept = default;
     FixApp& operator=(FixApp&&) noexcept = default;
 
-    void on_connect(Time now, FixSess& sess) noexcept { do_on_connect(now, sess); }
-    void on_disconnect(Time now, FixSess& sess) noexcept { do_on_disconnect(now, sess); }
-    void on_logon(Time now, FixSess& sess) noexcept { do_on_logon(now, sess); }
-    void on_logout(Time now, FixSess& sess) noexcept { do_on_logout(now, sess); }
-    void on_message(Time now, FixSess& sess, std::string_view msg, std::size_t body_off,
+    void on_connect(Time now, FixConn& conn) noexcept { do_on_connect(now, conn); }
+    void on_disconnect(Time now, FixConn& conn) noexcept { do_on_disconnect(now, conn); }
+    void on_logon(Time now, FixConn& conn) noexcept { do_on_logon(now, conn); }
+    void on_logout(Time now, FixConn& conn) noexcept { do_on_logout(now, conn); }
+    void on_message(Time now, FixConn& conn, std::string_view msg, std::size_t body_off,
                     Version ver, const FixHdr& hdr) noexcept
     {
-        do_on_message(now, sess, msg, body_off, ver, hdr);
+        do_on_message(now, conn, msg, body_off, ver, hdr);
     }
 
   protected:
-    virtual void do_on_connect(Time now, FixSess& sess) noexcept = 0;
-    virtual void do_on_disconnect(Time now, FixSess& sess) noexcept = 0;
-    virtual void do_on_logon(Time now, FixSess& sess) noexcept = 0;
-    virtual void do_on_logout(Time now, FixSess& sess) noexcept = 0;
-    virtual void do_on_message(Time now, FixSess& sess, std::string_view msg, std::size_t body_off,
+    virtual void do_on_connect(Time now, FixConn& conn) noexcept = 0;
+    virtual void do_on_disconnect(Time now, FixConn& conn) noexcept = 0;
+    virtual void do_on_logon(Time now, FixConn& conn) noexcept = 0;
+    virtual void do_on_logout(Time now, FixConn& conn) noexcept = 0;
+    virtual void do_on_message(Time now, FixConn& conn, std::string_view msg, std::size_t body_off,
                                Version ver, const FixHdr& hdr) noexcept
         = 0;
 };

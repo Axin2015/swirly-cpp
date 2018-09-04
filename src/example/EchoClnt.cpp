@@ -32,25 +32,25 @@ namespace {
 
 constexpr auto PingInterval = 100ms;
 
-class EchoSess {
+class EchoConn {
 
     // Automatically unlink when object is destroyed.
     using AutoUnlinkOption = boost::intrusive::link_mode<boost::intrusive::auto_unlink>;
 
   public:
-    EchoSess(Time now, Reactor& r, IoSocket&& sock, const TcpEndpoint& ep)
+    EchoConn(Time now, Reactor& r, IoSocket&& sock, const TcpEndpoint& ep)
     : sock_{move(sock)}
     , ep_{ep}
     {
-        sub_ = r.subscribe(sock_.get(), EventIn, bind<&EchoSess::on_input>(this));
-        tmr_ = r.timer(now, PingInterval, Priority::Low, bind<&EchoSess::on_timer>(this));
+        sub_ = r.subscribe(sock_.get(), EventIn, bind<&EchoConn::on_input>(this));
+        tmr_ = r.timer(now, PingInterval, Priority::Low, bind<&EchoConn::on_timer>(this));
     }
     boost::intrusive::list_member_hook<AutoUnlinkOption> list_hook;
 
   private:
     void dispose(Time now) noexcept
     {
-        SWIRLY_INFO << "session closed";
+        SWIRLY_INFO << "connection closed";
         delete this;
     }
     void on_input(Time now, int fd, unsigned events)
@@ -104,9 +104,9 @@ class EchoClnt : public TcpConnector<EchoClnt> {
 
     friend TcpConnector<EchoClnt>;
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
-    using MemberHookOption = boost::intrusive::member_hook<EchoSess, decltype(EchoSess::list_hook),
-                                                           &EchoSess::list_hook>;
-    using SessList = boost::intrusive::list<EchoSess, ConstantTimeSizeOption, MemberHookOption>;
+    using MemberHookOption = boost::intrusive::member_hook<EchoConn, decltype(EchoConn::list_hook),
+                                                           &EchoConn::list_hook>;
+    using ConnList = boost::intrusive::list<EchoConn, ConstantTimeSizeOption, MemberHookOption>;
 
   public:
     EchoClnt(Time now, Reactor& r, const Endpoint& ep)
@@ -118,18 +118,18 @@ class EchoClnt : public TcpConnector<EchoClnt> {
     }
     ~EchoClnt()
     {
-        sess_list_.clear_and_dispose([](auto* sess) { delete sess; });
+        conn_list_.clear_and_dispose([](auto* conn) { delete conn; });
     }
 
   private:
     void do_connect(Time now, IoSocket&& sock, const Endpoint& ep)
     {
-        SWIRLY_INFO << "session opened: " << ep;
+        SWIRLY_INFO << "connection opened: " << ep;
         inprogress_ = false;
 
         // High performance TCP servers could use a custom allocator.
-        auto* const sess = new EchoSess{now, reactor_, move(sock), ep};
-        sess_list_.push_back(*sess);
+        auto* const conn = new EchoConn{now, reactor_, move(sock), ep};
+        conn_list_.push_back(*conn);
     }
     void do_connect_error(Time now, const std::exception& e)
     {
@@ -138,7 +138,7 @@ class EchoClnt : public TcpConnector<EchoClnt> {
     }
     void on_timer(Time now, Timer& tmr)
     {
-        if (sess_list_.empty() && !inprogress_) {
+        if (conn_list_.empty() && !inprogress_) {
             SWIRLY_INFO << "reconnecting";
             if (!connect(now, reactor_, ep_)) {
                 inprogress_ = true;
@@ -149,8 +149,8 @@ class EchoClnt : public TcpConnector<EchoClnt> {
     const Endpoint ep_;
     Timer tmr_;
     bool inprogress_{false};
-    // List of active sessions.
-    SessList sess_list_;
+    // List of active connections.
+    ConnList conn_list_;
 };
 } // namespace
 

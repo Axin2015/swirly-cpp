@@ -16,7 +16,7 @@
  */
 #include "HttpServ.hpp"
 
-#include "HttpSess.hpp"
+#include "HttpConn.hpp"
 
 namespace swirly {
 using namespace std;
@@ -30,13 +30,13 @@ HttpServ::HttpServ(Reactor& r, const Endpoint& ep, RestServ& rs)
 
 HttpServ::~HttpServ()
 {
-    list_.clear_and_dispose([](auto* sess) { delete sess; });
+    conn_list_.clear_and_dispose([](auto* conn) { delete conn; });
 }
 
 void HttpServ::do_accept(Time now, IoSocket&& sock, const Endpoint& ep)
 {
-    auto* const sess = new HttpSess{now, reactor_, move(sock), ep, rest_serv_};
-    list_.push_back(*sess);
+    auto* const conn = new HttpConn{now, reactor_, move(sock), ep, rest_serv_};
+    conn_list_.push_back(*conn);
 }
 
 } // namespace swirly

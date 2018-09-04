@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "HttpSess.hpp"
+#include "HttpConn.hpp"
 
 #include "RestServ.hpp"
 
@@ -28,28 +28,28 @@ enum { MaxData = 2048 };
 
 } // namespace
 
-HttpSess::HttpSess(Time now, Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, RestServ& rs)
-: BasicHttpParser<HttpSess>{HttpType::Request}
+HttpConn::HttpConn(Time now, Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, RestServ& rs)
+: BasicHttpParser<HttpConn>{HttpType::Request}
 , reactor_(r)
 , sock_{move(sock)}
 , ep_{ep}
 , rest_serv_(rs)
 {
-    SWIRLY_DEBUG << "accept session";
+    SWIRLY_DEBUG << "accept connection";
 
-    sub_ = r.subscribe(*sock_, EventIn, bind<&HttpSess::on_io_event>(this));
-    tmr_ = r.timer(now + IdleTimeout, Priority::Low, bind<&HttpSess::on_timer>(this));
+    sub_ = r.subscribe(*sock_, EventIn, bind<&HttpConn::on_io_event>(this));
+    tmr_ = r.timer(now + IdleTimeout, Priority::Low, bind<&HttpConn::on_timer>(this));
 }
 
-HttpSess::~HttpSess() = default;
+HttpConn::~HttpConn() = default;
 
-void HttpSess::dispose() noexcept
+void HttpConn::dispose() noexcept
 {
-    SWIRLY_DEBUG << "close session";
+    SWIRLY_DEBUG << "close connection";
     delete this;
 }
 
-bool HttpSess::on_url(string_view sv) noexcept
+bool HttpConn::on_url(string_view sv) noexcept
 {
     bool ret{false};
     try {
@@ -61,7 +61,7 @@ bool HttpSess::on_url(string_view sv) noexcept
     return ret;
 }
 
-bool HttpSess::on_header_field(string_view sv, bool first) noexcept
+bool HttpConn::on_header_field(string_view sv, bool first) noexcept
 {
     bool ret{false};
     try {
@@ -73,7 +73,7 @@ bool HttpSess::on_header_field(string_view sv, bool first) noexcept
     return ret;
 }
 
-bool HttpSess::on_header_value(string_view sv, bool first) noexcept
+bool HttpConn::on_header_value(string_view sv, bool first) noexcept
 {
     bool ret{false};
     try {
@@ -85,13 +85,13 @@ bool HttpSess::on_header_value(string_view sv, bool first) noexcept
     return ret;
 }
 
-bool HttpSess::on_headers_end() noexcept
+bool HttpConn::on_headers_end() noexcept
 {
     req_.set_method(method());
     return true;
 }
 
-bool HttpSess::on_body(string_view sv) noexcept
+bool HttpConn::on_body(string_view sv) noexcept
 {
     bool ret{false};
     try {
@@ -103,7 +103,7 @@ bool HttpSess::on_body(string_view sv) noexcept
     return ret;
 }
 
-bool HttpSess::on_message_end() noexcept
+bool HttpConn::on_message_end() noexcept
 {
     bool ret{false};
     try {
@@ -125,7 +125,7 @@ bool HttpSess::on_message_end() noexcept
     return ret;
 }
 
-void HttpSess::on_io_event(Time now, int fd, unsigned events)
+void HttpConn::on_io_event(Time now, int fd, unsigned events)
 {
     try {
         if (events & EventOut) {
@@ -146,7 +146,7 @@ void HttpSess::on_io_event(Time now, int fd, unsigned events)
                 parse({in, size});
                 tmr_.cancel();
                 tmr_ = reactor_.timer(now + IdleTimeout, Priority::Low,
-                                      bind<&HttpSess::on_timer>(this));
+                                      bind<&HttpConn::on_timer>(this));
             } else {
                 dispose();
             }
@@ -157,9 +157,9 @@ void HttpSess::on_io_event(Time now, int fd, unsigned events)
     }
 }
 
-void HttpSess::on_timer(Time now, Timer& tmr)
+void HttpConn::on_timer(Time now, Timer& tmr)
 {
-    SWIRLY_WARNING << "session timeout";
+    SWIRLY_WARNING << "connection timeout";
     dispose();
 }
 

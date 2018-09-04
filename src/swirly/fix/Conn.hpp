@@ -31,8 +31,8 @@ inline namespace fix {
 class FixApp;
 struct FixConfig;
 
-class SWIRLY_API FixSess final : BasicFixParser<FixSess> {
-    friend class BasicFixParser<FixSess>;
+class SWIRLY_API FixConn final : BasicFixParser<FixConn> {
+    friend class BasicFixParser<FixConn>;
 
     // Automatically unlink when object is destroyed.
     using AutoUnlinkOption = boost::intrusive::link_mode<boost::intrusive::auto_unlink>;
@@ -41,7 +41,7 @@ class SWIRLY_API FixSess final : BasicFixParser<FixSess> {
     using Transport = Tcp;
     using Endpoint = TcpEndpoint;
 
-    FixSess(Time now, Reactor& r, IoSocket&& sock, const Endpoint& ep, const FixConfig& config,
+    FixConn(Time now, Reactor& r, IoSocket&& sock, const Endpoint& ep, const FixConfig& config,
             FixApp& app);
     const Endpoint& endpoint() const noexcept { return ep_; }
     int seq_num() const noexcept { return seq_num_; }
