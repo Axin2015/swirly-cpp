@@ -17,7 +17,7 @@
 #ifndef SWIRLYD_HTTPSERV_HPP
 #define SWIRLYD_HTTPSERV_HPP
 
-#include "HttpSess.hpp"
+#include "HttpConn.hpp"
 
 #include <swirly/sys/TcpAcceptor.hpp>
 
@@ -27,9 +27,9 @@ class RestServ;
 
 class SWIRLY_API HttpServ : public TcpAcceptor<HttpServ> {
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
-    using MemberHookOption = boost::intrusive::member_hook<HttpSess, decltype(HttpSess::list_hook),
-                                                           &HttpSess::list_hook>;
-    using List = boost::intrusive::list<HttpSess, ConstantTimeSizeOption, MemberHookOption>;
+    using MemberHookOption = boost::intrusive::member_hook<HttpConn, decltype(HttpConn::list_hook),
+                                                           &HttpConn::list_hook>;
+    using ConnList = boost::intrusive::list<HttpConn, ConstantTimeSizeOption, MemberHookOption>;
 
   public:
     HttpServ(Reactor& r, const Endpoint& ep, RestServ& rs);
@@ -48,7 +48,8 @@ class SWIRLY_API HttpServ : public TcpAcceptor<HttpServ> {
   private:
     Reactor& reactor_;
     RestServ& rest_serv_;
-    List list_;
+    // List of active connections.
+    ConnList conn_list_;
 };
 
 } // namespace swirly
