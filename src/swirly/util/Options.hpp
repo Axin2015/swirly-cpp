@@ -71,10 +71,13 @@ class Value : public Presence<Value> {
     template <typename ValueT>
     Value& default_value(const ValueT& value)
     {
-        func_(std::to_string(value));
+        if constexpr (is_string<ValueT>::value) {
+            func_(value);
+        } else {
+            func_(std::to_string(value));
+        }
         return *this;
     }
-
     Value& multitoken()
     {
         multitoken_ = true;
@@ -187,9 +190,9 @@ class SWIRLY_API Options {
     }
 
     template <typename DataT>
-    Options& operator()(DataT&& data, std::string description = "")
+    Options& operator()(DataT data, std::string description = "")
     {
-        positional_.push_back(std::forward<DataT>(data));
+        positional_.push_back(std::move(data));
         return *this;
     }
 

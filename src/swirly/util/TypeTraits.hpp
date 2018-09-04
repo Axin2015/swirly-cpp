@@ -74,6 +74,16 @@ struct TypeTraits<std::string> {
     static std::string from_string(const std::string& s) noexcept { return s; }
 };
 
+template <typename TypeT>
+struct is_string : std::is_same<char*, std::remove_cv_t<typename std::decay_t<TypeT>>>::type {
+};
+template <>
+struct is_string<std::string> : std::true_type {
+};
+template <>
+struct is_string<std::string_view> : std::true_type {
+};
+
 } // namespace util
 } // namespace swirly
 
