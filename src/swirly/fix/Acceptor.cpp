@@ -31,7 +31,7 @@ FixAcceptor::FixAcceptor(Time now, Reactor& r, const Endpoint& ep, const FixConf
 
 FixAcceptor::~FixAcceptor()
 {
-    sess_list_.clear_and_dispose([](auto* sess) { delete sess; });
+    conn_list_.clear_and_dispose([](auto* conn) { delete conn; });
 }
 
 void FixAcceptor::do_accept(Time now, IoSocket&& sock, const Endpoint& ep)
@@ -39,8 +39,8 @@ void FixAcceptor::do_accept(Time now, IoSocket&& sock, const Endpoint& ep)
     sock.set_non_block();
     sock.set_tcp_no_delay(true);
     // High performance TCP servers could use a custom allocator.
-    auto* const sess = new FixSess{now, reactor_, move(sock), ep, config_, app_};
-    sess_list_.push_back(*sess);
+    auto* const conn = new FixConn{now, reactor_, move(sock), ep, config_, app_};
+    conn_list_.push_back(*conn);
 }
 
 } // namespace fix

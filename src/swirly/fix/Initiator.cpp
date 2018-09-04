@@ -36,7 +36,7 @@ FixInitiator::FixInitiator(Time now, Reactor& r, const Endpoint& ep, const FixCo
 
 FixInitiator::~FixInitiator()
 {
-    sess_list_.clear_and_dispose([](auto* sess) { delete sess; });
+    conn_list_.clear_and_dispose([](auto* conn) { delete conn; });
 }
 
 void FixInitiator::do_connect(Time now, IoSocket&& sock, const Endpoint& ep)
@@ -44,9 +44,9 @@ void FixInitiator::do_connect(Time now, IoSocket&& sock, const Endpoint& ep)
     inprogress_ = false;
 
     // High performance TCP servers could use a custom allocator.
-    auto* const sess = new FixSess{now, reactor_, move(sock), ep, config_, app_};
-    sess_list_.push_back(*sess);
-    sess->logon(now, sess_id_);
+    auto* const conn = new FixConn{now, reactor_, move(sock), ep, config_, app_};
+    conn_list_.push_back(*conn);
+    conn->logon(now, sess_id_);
 }
 
 void FixInitiator::do_connect_error(Time now, const std::exception& e)
@@ -57,7 +57,7 @@ void FixInitiator::do_connect_error(Time now, const std::exception& e)
 
 void FixInitiator::on_timer(Time now, Timer& tmr)
 {
-    if (sess_list_.empty() && !inprogress_) {
+    if (conn_list_.empty() && !inprogress_) {
         SWIRLY_INFO << "reconnecting";
         if (!connect(now, reactor_, ep_)) {
             inprogress_ = true;

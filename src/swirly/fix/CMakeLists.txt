@@ -30,13 +30,13 @@ set(lib_SOURCES
   Acceptor.cpp
   App.cpp
   Config.cpp
+  Conn.cpp
   Field.cpp
   Hdr.cpp
   Initiator.cpp
   Lexer.cpp
   Logon.cpp
   Parser.cpp
-  Sess.cpp
   SessId.cpp
   Stream.cpp
   Types.cpp)

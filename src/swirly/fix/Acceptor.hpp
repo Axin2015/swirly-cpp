@@ -17,7 +17,7 @@
 #ifndef SWIRLY_FIX_ACCEPTOR_HPP
 #define SWIRLY_FIX_ACCEPTOR_HPP
 
-#include <swirly/fix/Sess.hpp>
+#include <swirly/fix/Conn.hpp>
 
 #include <swirly/sys/TcpAcceptor.hpp>
 
@@ -29,8 +29,8 @@ class SWIRLY_API FixAcceptor : public TcpAcceptor<FixAcceptor> {
     friend TcpAcceptor<FixAcceptor>;
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
     using MemberHookOption
-        = boost::intrusive::member_hook<FixSess, decltype(FixSess::list_hook), &FixSess::list_hook>;
-    using SessList = boost::intrusive::list<FixSess, ConstantTimeSizeOption, MemberHookOption>;
+        = boost::intrusive::member_hook<FixConn, decltype(FixConn::list_hook), &FixConn::list_hook>;
+    using ConnList = boost::intrusive::list<FixConn, ConstantTimeSizeOption, MemberHookOption>;
 
   public:
     FixAcceptor(Time now, Reactor& r, const Endpoint& ep, const FixConfig& config, FixApp& app);
@@ -41,8 +41,8 @@ class SWIRLY_API FixAcceptor : public TcpAcceptor<FixAcceptor> {
     Reactor& reactor_;
     const FixConfig& config_;
     FixApp& app_;
-    // List of active sessions.
-    SessList sess_list_;
+    // List of active connections.
+    ConnList conn_list_;
 };
 
 } // namespace fix

@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Sess.hpp"
+#include "Conn.hpp"
 
 #include "App.hpp"
 #include "Config.hpp"
@@ -31,7 +31,7 @@ namespace swirly {
 inline namespace fix {
 using namespace std;
 
-FixSess::FixSess(Time now, Reactor& r, IoSocket&& sock, const Endpoint& ep, const FixConfig& config,
+FixConn::FixConn(Time now, Reactor& r, IoSocket&& sock, const Endpoint& ep, const FixConfig& config,
                  FixApp& app)
 : reactor_(r)
 , sock_{move(sock)}
@@ -39,12 +39,12 @@ FixSess::FixSess(Time now, Reactor& r, IoSocket&& sock, const Endpoint& ep, cons
 , config_(config)
 , app_(app)
 {
-    sub_ = r.subscribe(sock_.get(), EventIn, bind<&FixSess::on_io_event>(this));
+    sub_ = r.subscribe(sock_.get(), EventIn, bind<&FixConn::on_io_event>(this));
     schedule_timeout(now);
     app.on_connect(now, *this);
 }
 
-void FixSess::logon(Time now, const FixSessId& sess_id)
+void FixConn::logon(Time now, const FixSessId& sess_id)
 {
     if (state_ == LoggedOut) {
         sess_id_ = sess_id;
@@ -58,7 +58,7 @@ void FixSess::logon(Time now, const FixSessId& sess_id)
     }
 }
 
-void FixSess::logout(Time now)
+void FixConn::logout(Time now)
 {
     if (state_ == LoggedOn) {
         // Initiate logout.
@@ -67,18 +67,18 @@ void FixSess::logout(Time now)
     }
 }
 
-void FixSess::dispose(Time now) noexcept
+void FixConn::dispose(Time now) noexcept
 {
     delete this;
 }
 
-void FixSess::read_and_write(Time now)
+void FixConn::read_and_write(Time now)
 {
     sub_.set_events(EventIn | EventOut);
     out_.tmr.reset();
 }
 
-void FixSess::read_only(Time now)
+void FixConn::read_only(Time now)
 {
     sub_.set_events(EventIn);
     if (state_ == LoggedOn) {
@@ -86,7 +86,7 @@ void FixSess::read_only(Time now)
     }
 }
 
-void FixSess::send_logon(Time now)
+void FixConn::send_logon(Time now)
 {
     FixHdr hdr;
     hdr.msg_type = "A"sv;
@@ -105,7 +105,7 @@ void FixSess::send_logon(Time now)
     read_and_write(now);
 }
 
-void FixSess::send_logout(Time now)
+void FixConn::send_logout(Time now)
 {
     FixHdr hdr;
     hdr.msg_type = "5"sv;
@@ -122,7 +122,7 @@ void FixSess::send_logout(Time now)
     read_and_write(now);
 }
 
-void FixSess::on_io_event(Time now, int fd, unsigned events)
+void FixConn::on_io_event(Time now, int fd, unsigned events)
 {
     try {
         if (events & EventOut) {
@@ -150,23 +150,23 @@ void FixSess::on_io_event(Time now, int fd, unsigned events)
     }
 }
 
-void FixSess::schedule_timeout(Time now)
+void FixConn::schedule_timeout(Time now)
 {
-    in_.tmr = reactor_.timer(now + hb_int_ + 1s, Priority::Low, bind<&FixSess::on_timeout>(this));
+    in_.tmr = reactor_.timer(now + hb_int_ + 1s, Priority::Low, bind<&FixConn::on_timeout>(this));
 }
 
-void FixSess::on_timeout(Time now, Timer& tmr)
+void FixConn::on_timeout(Time now, Timer& tmr)
 {
-    SWIRLY_WARNING << "session timeout";
+    SWIRLY_WARNING << "connection timeout";
     dispose(now);
 }
 
-void FixSess::schedule_heartbeat(Time now)
+void FixConn::schedule_heartbeat(Time now)
 {
-    out_.tmr = reactor_.timer(now + hb_int_, Priority::Low, bind<&FixSess::on_heartbeat>(this));
+    out_.tmr = reactor_.timer(now + hb_int_, Priority::Low, bind<&FixConn::on_heartbeat>(this));
 }
 
-void FixSess::on_heartbeat(Time now, Timer& tmr)
+void FixConn::on_heartbeat(Time now, Timer& tmr)
 {
     FixHdr hdr;
     hdr.msg_type = "0"sv;
@@ -183,7 +183,7 @@ void FixSess::on_heartbeat(Time now, Timer& tmr)
     read_and_write(now);
 }
 
-void FixSess::on_message(Time now, std::string_view msg, std::size_t msg_type_off, Version ver)
+void FixConn::on_message(Time now, std::string_view msg, std::size_t msg_type_off, Version ver)
 {
     FixHdr hdr;
     const size_t body_off = parse_hdr(msg, msg_type_off, hdr);
