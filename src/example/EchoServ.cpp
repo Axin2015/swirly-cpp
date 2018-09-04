@@ -32,26 +32,26 @@ namespace {
 
 constexpr auto IdleTimeout = 5s;
 
-class EchoSess {
+class EchoConn {
 
     // Automatically unlink when object is destroyed.
     using AutoUnlinkOption = boost::intrusive::link_mode<boost::intrusive::auto_unlink>;
 
   public:
-    EchoSess(Time now, Reactor& r, IoSocket&& sock, const TcpEndpoint& ep)
+    EchoConn(Time now, Reactor& r, IoSocket&& sock, const TcpEndpoint& ep)
     : reactor_(r)
     , sock_{move(sock)}
     , ep_{ep}
     {
-        sub_ = r.subscribe(sock_.get(), EventIn, bind<&EchoSess::on_input>(this));
-        tmr_ = r.timer(now + IdleTimeout, Priority::Low, bind<&EchoSess::on_timer>(this));
+        sub_ = r.subscribe(sock_.get(), EventIn, bind<&EchoConn::on_input>(this));
+        tmr_ = r.timer(now + IdleTimeout, Priority::Low, bind<&EchoConn::on_timer>(this));
     }
     boost::intrusive::list_member_hook<AutoUnlinkOption> list_hook;
 
   private:
     void dispose(Time now) noexcept
     {
-        SWIRLY_INFO << "session closed";
+        SWIRLY_INFO << "connection closed";
         delete this;
     }
     void on_input(Time now, int fd, unsigned events)
@@ -78,7 +78,7 @@ class EchoSess {
                     // Reset timer.
                     tmr_.cancel();
                     tmr_ = reactor_.timer(now + IdleTimeout, Priority::Low,
-                                          bind<&EchoSess::on_timer>(this));
+                                          bind<&EchoConn::on_timer>(this));
                 } else {
                     dispose(now);
                 }
@@ -105,9 +105,9 @@ class EchoServ : public TcpAcceptor<EchoServ> {
 
     friend TcpAcceptor<EchoServ>;
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
-    using MemberHookOption = boost::intrusive::member_hook<EchoSess, decltype(EchoSess::list_hook),
-                                                           &EchoSess::list_hook>;
-    using SessList = boost::intrusive::list<EchoSess, ConstantTimeSizeOption, MemberHookOption>;
+    using MemberHookOption = boost::intrusive::member_hook<EchoConn, decltype(EchoConn::list_hook),
+                                                           &EchoConn::list_hook>;
+    using ConnList = boost::intrusive::list<EchoConn, ConstantTimeSizeOption, MemberHookOption>;
 
   public:
     EchoServ(Time now, Reactor& r, const Endpoint& ep)
@@ -117,22 +117,22 @@ class EchoServ : public TcpAcceptor<EchoServ> {
     }
     ~EchoServ()
     {
-        sess_list_.clear_and_dispose([](auto* sess) { delete sess; });
+        conn_list_.clear_and_dispose([](auto* conn) { delete conn; });
     }
 
   private:
     void do_accept(Time now, IoSocket&& sock, const Endpoint& ep)
     {
-        SWIRLY_INFO << "session opened: " << ep;
+        SWIRLY_INFO << "connection opened: " << ep;
         sock.set_non_block();
         sock.set_tcp_no_delay(true);
         // High performance TCP servers could use a custom allocator.
-        auto* const sess = new EchoSess{now, reactor_, move(sock), ep};
-        sess_list_.push_back(*sess);
+        auto* const conn = new EchoConn{now, reactor_, move(sock), ep};
+        conn_list_.push_back(*conn);
     }
     Reactor& reactor_;
-    // List of active sessions.
-    SessList sess_list_;
+    // List of active connections.
+    ConnList conn_list_;
 };
 } // namespace
 
