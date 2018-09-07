@@ -56,7 +56,7 @@ class SWIRLY_API FixLexer {
         j_ = get_value(get_tag(i_, tv.first), tv.second);
         return tv;
     }
-    FixPair next() noexcept
+    FixPair next()
     {
         FixPair tv;
         i_ = j_ = get_value(get_tag(i_, tv.first), tv.second);
