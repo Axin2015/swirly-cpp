@@ -141,7 +141,7 @@ int main(int argc, char* argv[])
         const BusinessDay bus_day{MarketZone};
         const auto start_time = UnixClock::now();
 
-        MsgQueue mq{1 << 10};
+        MsgQueue mq{1 << 12};
         App app{mq, 1 << 4};
         app.load(start_time, *model);
         model = nullptr;
@@ -180,80 +180,80 @@ int main(int argc, char* argv[])
 
             // Maker sell-side.
             {
-                HdrRecorder tr{maker};
                 resp.clear();
+                HdrRecorder tr{maker};
                 app.create_order(start_time, gosayl, market, ""sv, Side::Sell, 10_lts, 12348_tks,
                                  1_lts, resp);
             }
             {
-                HdrRecorder tr{maker};
                 resp.clear();
+                HdrRecorder tr{maker};
                 app.create_order(start_time, marayl, market, ""sv, Side::Sell, 10_lts, 12348_tks,
                                  1_lts, resp);
             }
             {
-                HdrRecorder tr{maker};
                 resp.clear();
+                HdrRecorder tr{maker};
                 app.create_order(start_time, gosayl, market, ""sv, Side::Sell, 10_lts, 12347_tks,
                                  1_lts, resp);
             }
             {
-                HdrRecorder tr{maker};
                 resp.clear();
+                HdrRecorder tr{maker};
                 app.create_order(start_time, marayl, market, ""sv, Side::Sell, 5_lts, 12347_tks,
                                  1_lts, resp);
             }
             {
-                HdrRecorder tr{maker};
                 resp.clear();
+                HdrRecorder tr{maker};
                 app.create_order(start_time, gosayl, market, ""sv, Side::Sell, 5_lts, 12346_tks,
                                  1_lts, resp);
             }
 
             // Maker buy-side.
             {
-                HdrRecorder tr{maker};
                 resp.clear();
+                HdrRecorder tr{maker};
                 app.create_order(start_time, marayl, market, ""sv, Side::Buy, 5_lts, 12344_tks,
                                  1_lts, resp);
             }
             {
-                HdrRecorder tr{maker};
                 resp.clear();
+                HdrRecorder tr{maker};
                 app.create_order(start_time, gosayl, market, ""sv, Side::Buy, 5_lts, 12343_tks,
                                  1_lts, resp);
             }
             {
-                HdrRecorder tr{maker};
                 resp.clear();
+                HdrRecorder tr{maker};
                 app.create_order(start_time, marayl, market, ""sv, Side::Buy, 10_lts, 12343_tks,
                                  1_lts, resp);
             }
             {
-                HdrRecorder tr{maker};
                 resp.clear();
+                HdrRecorder tr{maker};
                 app.create_order(start_time, gosayl, market, ""sv, Side::Buy, 10_lts, 12342_tks,
                                  1_lts, resp);
             }
             {
-                HdrRecorder tr{maker};
                 resp.clear();
+                HdrRecorder tr{maker};
                 app.create_order(start_time, marayl, market, ""sv, Side::Buy, 10_lts, 12342_tks,
                                  1_lts, resp);
             }
 
             // Taker sell-side.
             {
-                HdrRecorder tr{taker};
                 resp.clear();
+                HdrRecorder tr{taker};
                 app.create_order(start_time, eddayl, market, ""sv, Side::Sell, 40_lts, 12342_tks,
                                  1_lts, resp);
             }
 
             // Taker buy-side.
             {
-                HdrRecorder tr{taker};
                 resp.clear();
+                HdrRecorder tr{taker};
                 app.create_order(start_time, pipayl, market, ""sv, Side::Buy, 40_lts, 12348_tks,
                                  1_lts, resp);
             }

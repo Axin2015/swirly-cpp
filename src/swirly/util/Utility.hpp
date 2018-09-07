@@ -40,6 +40,9 @@ template <typename ValueT>
 constexpr ValueT ston(std::string_view sv) noexcept
 {
     auto it = sv.begin(), end = sv.end();
+    if (it == end) {
+        return 0;
+    }
 
     bool neg{false};
     if constexpr (std::is_signed_v<ValueT>) {

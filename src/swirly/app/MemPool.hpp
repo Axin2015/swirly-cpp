@@ -82,8 +82,8 @@ struct MemPool {
         struct {
             MemStack<(1 << 6)> free1;
             MemStack<(2 << 6)> free2;
-            MemStack<(3 << 6)> free3;
             MemStack<(4 << 6)> free4;
+            MemStack<(6 << 6)> free6;
             MemStack<(8 << 6)> free8;
             MemStack<(16 << 6)> free16;
             MemStack<(32 << 6)> free32;

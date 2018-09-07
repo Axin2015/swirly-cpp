@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_FIX_SESS_HPP
-#define SWIRLY_FIX_SESS_HPP
+#ifndef SWIRLY_FIX_CONN_HPP
+#define SWIRLY_FIX_CONN_HPP
 
 #include <swirly/fix/Parser.hpp>
 #include <swirly/fix/SessId.hpp>
@@ -86,4 +86,4 @@ class SWIRLY_API FixConn final : BasicFixParser<FixConn> {
 } // namespace fix
 } // namespace swirly
 
-#endif // SWIRLY_FIX_SESS_HPP
+#endif // SWIRLY_FIX_CONN_HPP

@@ -40,7 +40,8 @@ void DsvModel::do_read_asset(const ModelCallback<AssetPtr>& cb) const
         Id,      //
         Symbol,  //
         Display, //
-        TypeId   //
+        TypeId,  //
+        ColCount //
     };
 
     ifstream is{"asset.txt"};
@@ -52,7 +53,7 @@ void DsvModel::do_read_asset(const ModelCallback<AssetPtr>& cb) const
     }
 
     while (getline(is, line)) {
-        Row<TypeId + 1> row;
+        Row<ColCount> row;
         split(line, "\t"sv, row);
         const auto id = from_string<Id32>(row[Id]);
         const auto symbol = from_string<string_view>(row[Symbol]);
@@ -76,7 +77,8 @@ void DsvModel::do_read_instr(const ModelCallback<InstrPtr>& cb) const
         LotDenom,  //
         PipDp,     //
         MinLots,   //
-        MaxLots    //
+        MaxLots,   //
+        ColCount   //
     };
 
     ifstream is{"instr.txt"};
@@ -88,7 +90,7 @@ void DsvModel::do_read_instr(const ModelCallback<InstrPtr>& cb) const
     }
 
     while (getline(is, line)) {
-        Row<MaxLots + 1> row;
+        Row<ColCount> row;
         split(line, "\t"sv, row);
         const auto id = from_string<Id32>(row[Id]);
         const auto symbol = from_string<string_view>(row[Symbol]);
@@ -117,7 +119,8 @@ void DsvModel::do_read_market(const ModelCallback<MarketPtr>& cb) const
         LastLots,  //
         LastTicks, //
         LastTime,  //
-        MaxId      //
+        MaxId,     //
+        ColCount   //
     };
 
     ifstream is{"market.txt"};
@@ -129,7 +132,7 @@ void DsvModel::do_read_market(const ModelCallback<MarketPtr>& cb) const
     }
 
     while (getline(is, line)) {
-        Row<MaxId + 1> row;
+        Row<ColCount> row;
         split(line, "\t"sv, row);
         const auto id = from_string<Id64>(row[Id]);
         const auto instr = from_string<swirly::Symbol>(row[Instr]);
@@ -163,7 +166,8 @@ void DsvModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
         ExecCost,  //
         LastLots,  //
         LastTicks, //
-        MinLots    //
+        MinLots,   //
+        ColCount   //
     };
 
     ifstream is{"order.txt"};
@@ -175,7 +179,7 @@ void DsvModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
     }
 
     while (getline(is, line)) {
-        Row<Modified + 1> row;
+        Row<ColCount> row;
         split(line, "\t"sv, row);
         const auto created = from_string<Time>(row[Created]);
         const auto modified = from_string<Time>(row[Modified]);
@@ -226,7 +230,8 @@ void DsvModel::do_read_exec(Time since, const ModelCallback<ExecPtr>& cb) const
         PosnLots,  //
         PosnCost,  //
         LiqInd,    //
-        Cpty       //
+        Cpty,      //
+        ColCount   //
     };
 
     ifstream is{"exec.txt"};
@@ -238,7 +243,7 @@ void DsvModel::do_read_exec(Time since, const ModelCallback<ExecPtr>& cb) const
     }
 
     while (getline(is, line)) {
-        Row<Created + 1> row;
+        Row<ColCount> row;
         split(line, "\t"sv, row);
         const auto created = from_string<Time>(row[Created]);
         const auto accnt = from_string<swirly::Symbol>(row[Accnt]);
@@ -293,7 +298,8 @@ void DsvModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
         PosnLots,  //
         PosnCost,  //
         LiqInd,    //
-        Cpty       //
+        Cpty,      //
+        ColCount   //
     };
 
     ifstream is{"trade.txt"};
@@ -305,7 +311,7 @@ void DsvModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
     }
 
     while (getline(is, line)) {
-        Row<Created + 1> row;
+        Row<ColCount> row;
         split(line, "\t"sv, row);
         const auto created = from_string<Time>(row[Created]);
         const auto accnt = from_string<swirly::Symbol>(row[Accnt]);
@@ -345,7 +351,8 @@ void DsvModel::do_read_posn(JDay bus_day, const ModelCallback<PosnPtr>& cb) cons
         BuyLots,  //
         BuyCost,  //
         SellLots, //
-        SellCost  //
+        SellCost, //
+        ColCount  //
     };
 
     ifstream is{"posn.txt"};
@@ -357,7 +364,7 @@ void DsvModel::do_read_posn(JDay bus_day, const ModelCallback<PosnPtr>& cb) cons
     }
 
     while (getline(is, line)) {
-        Row<SellCost + 1> row;
+        Row<ColCount> row;
         split(line, "\t"sv, row);
         const auto accnt = from_string<Symbol>(row[Accnt]);
         const auto market_id = from_string<Id64>(row[MarketId]);

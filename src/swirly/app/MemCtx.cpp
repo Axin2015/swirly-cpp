@@ -38,6 +38,7 @@ FileHandle reserve_file(const char* path, size_t size)
 } // namespace
 
 struct MemCtx::Impl {
+    enum { Max = (1 << CacheLineBits) - 1 };
     explicit Impl(size_t max_size)
     : max_size{max_size}
     , mem_map{os::mmap(nullptr, PageSize + max_size, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE,
@@ -56,7 +57,6 @@ struct MemCtx::Impl {
     void* alloc(size_t size)
     {
         void* addr;
-        enum { Max = (1 << CacheLineBits) - 1 };
         const auto cache_lines = (size + Max) >> CacheLineBits;
         switch (next_pow2(cache_lines)) {
         case 1: // 64
@@ -65,17 +65,17 @@ struct MemCtx::Impl {
         case 2: // 128
             addr = alloc_block(pool, pool.free2, max_size);
             break;
-        case 4:
-            if (cache_lines == 3) {
-                // 192
-                addr = alloc_block(pool, pool.free3, max_size);
-            } else {
-                // 256
-                addr = alloc_block(pool, pool.free4, max_size);
-            }
+        case 4: // 256
+            addr = alloc_block(pool, pool.free4, max_size);
             break;
-        case 8: // 512
-            addr = alloc_block(pool, pool.free8, max_size);
+        case 8:
+            if (cache_lines <= 6) {
+                // 384
+                addr = alloc_block(pool, pool.free6, max_size);
+            } else {
+                // 512
+                addr = alloc_block(pool, pool.free8, max_size);
+            }
             break;
         case 16: // 1024
             addr = alloc_block(pool, pool.free16, max_size);
@@ -90,7 +90,7 @@ struct MemCtx::Impl {
     }
     void dealloc(void* addr, size_t size) noexcept
     {
-        const auto cache_lines = size >> CacheLineBits;
+        const auto cache_lines = (size + Max) >> CacheLineBits;
         switch (next_pow2(cache_lines)) {
         case 1: // 64
             dealloc_block(pool, pool.free1, addr);
@@ -98,17 +98,17 @@ struct MemCtx::Impl {
         case 2: // 128
             dealloc_block(pool, pool.free2, addr);
             break;
-        case 4:
-            if (cache_lines == 3) {
-                // 192
-                dealloc_block(pool, pool.free3, addr);
-            } else {
-                // 256
-                dealloc_block(pool, pool.free4, addr);
-            }
+        case 4: // 256
+            dealloc_block(pool, pool.free4, addr);
             break;
-        case 8: // 512
-            dealloc_block(pool, pool.free8, addr);
+        case 8:
+            if (cache_lines <= 6) {
+                // 384
+                dealloc_block(pool, pool.free6, addr);
+            } else {
+                // 512
+                dealloc_block(pool, pool.free8, addr);
+            }
             break;
         case 16: // 1024
             dealloc_block(pool, pool.free16, addr);
