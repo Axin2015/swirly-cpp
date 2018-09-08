@@ -8,7 +8,17 @@ variables:
   VERBOSE: 1
 
 stages:
+  - check
   - build
+
+check-cppcheck:
+  stage: check
+  before_script:
+    - mkdir -p build
+    - cd build
+    - cmake .. -G 'Unix Makefiles'
+  script:
+    - make -j2 cppcheck
 
 build-debug-clang:
   stage: build

@@ -215,11 +215,8 @@ find_program(CPPCHECK cppcheck HINTS "${SWIRLY_TOOLSET}/bin")
 if (CPPCHECK)
   message(STATUS "Found cppcheck")
   cmake_host_system_information(RESULT CORE_COUNT QUERY NUMBER_OF_LOGICAL_CORES)
-  add_custom_target(cppcheck COMMAND "${CPPCHECK}"
-        --std=c++14
-        -j ${CORE_COUNT}
-        --quiet
-        --project="${PROJECT_BINARY_DIR}/compile_commands.json")
+  configure_file("${PROJECT_SOURCE_DIR}/cppcheck.sh.in" "${PROJECT_BINARY_DIR}/cppcheck.sh")
+  add_custom_target(cppcheck COMMAND bash "${PROJECT_BINARY_DIR}/cppcheck.sh")
 endif()
 
 # Add clang-tidy target if tool is available
