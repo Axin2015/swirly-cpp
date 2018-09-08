@@ -219,6 +219,14 @@ if (CPPCHECK)
   add_custom_target(cppcheck COMMAND bash "${PROJECT_BINARY_DIR}/cppcheck.sh")
 endif()
 
+# Add clang-format target if tool is available
+find_program(CLANG_FORMAT clang-format HINTS "${SWIRLY_TOOLSET}/bin")
+if (CLANG_FORMAT)
+  message(STATUS "Found clang-format")
+  configure_file("${PROJECT_SOURCE_DIR}/clang-format.sh.in" "${PROJECT_BINARY_DIR}/clang-format.sh")
+  add_custom_target(clang-format COMMAND bash "${PROJECT_BINARY_DIR}/clang-format.sh")
+endif()
+
 # Add clang-tidy target if tool is available
 find_program(CLANG_TIDY run-clang-tidy.py HINTS "/usr/share/clang/" "${SWIRLY_TOOLSET}/share/clang")
 if (CLANG_TIDY)

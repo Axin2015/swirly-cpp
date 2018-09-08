@@ -1,0 +1,4 @@
+#!/bin/bash
+exec find "${PROJECT_SOURCE_DIR}/src" \
+     \( ! -name "RestBody.cpp" -a -name "*.[ch]pp" -o -name "*.hxx" \) \
+     -exec "${CLANG_FORMAT}" -i --style=file {} \;
