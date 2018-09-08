@@ -4,7 +4,7 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive
   SWIRLY_BUILD_ARCH: haswell
   SWIRLY_BUILD_SHARED: 'ON'
-  SWIRLY_INSTALL_PREFIX: /opt/swirlycloud/swirly-cpp
+  SWIRLY_INSTALL_PREFIX: /opt/swirlycloud
   VERBOSE: 1
 
 stages:
