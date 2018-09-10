@@ -43,7 +43,12 @@ struct BasicFixSessId {
     BasicFixSessId(BasicFixSessId&&) = default;
     BasicFixSessId& operator=(BasicFixSessId&&) = default;
 
-    BasicFixSessId operator~() const { return {version, target_comp_id, sender_comp_id}; }
+    constexpr bool empty() const noexcept
+    {
+        return version.empty() && sender_comp_id.empty() && target_comp_id.empty();
+    }
+    constexpr explicit operator bool() const noexcept { return !empty(); }
+    constexpr BasicFixSessId operator~() const { return {version, target_comp_id, sender_comp_id}; }
 
     template <typename StringU>
     constexpr int compare(const BasicFixSessId<StringU>& rhs) const noexcept
@@ -56,6 +61,12 @@ struct BasicFixSessId {
             }
         }
         return i;
+    }
+    void clear() noexcept
+    {
+        version.clear();
+        sender_comp_id.clear();
+        target_comp_id.clear();
     }
 
     Version version;

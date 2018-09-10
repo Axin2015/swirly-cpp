@@ -24,8 +24,6 @@
 
 #include <swirly/sys/Event.hpp>
 
-#include <swirly/util/Log.hpp>
-
 namespace swirly {
 inline namespace fix {
 using namespace std;
@@ -45,13 +43,14 @@ FixConn::FixConn(Time now, Reactor& r, IoSocket&& sock, const Endpoint& ep,
 
 void FixConn::dispose(Time now) noexcept
 {
+    app_.on_disconnect(now, *this);
     delete this;
 }
 
 void FixConn::logon(Time now, const FixSessId& sess_id)
 {
     if (state_ == LoggedOut) {
-        sess_id_ = sess_id;
+        set_sess_id(sess_id);
         const auto it = sess_map_.find(sess_id);
         if (it == sess_map_.end()) {
             throw std::runtime_error{"invalid session: "s + to_string(sess_id)};
@@ -94,7 +93,7 @@ void FixConn::send_logon(Time now)
     hdr.sender_comp_id = sess_id_.sender_comp_id;
     hdr.target_comp_id = sess_id_.target_comp_id;
     hdr.msg_seq_num = ++seq_num_;
-    hdr.sending_time = UnixClock::now();
+    hdr.sending_time = now;
 
     Logon body{0, hb_int_.count()};
 
@@ -113,7 +112,7 @@ void FixConn::send_logout(Time now)
     hdr.sender_comp_id = sess_id_.sender_comp_id;
     hdr.target_comp_id = sess_id_.target_comp_id;
     hdr.msg_seq_num = ++seq_num_;
-    hdr.sending_time = UnixClock::now();
+    hdr.sending_time = now;
 
     FixStream os{out_.buf};
     os.reset(sess_id_.version);
@@ -141,12 +140,11 @@ void FixConn::on_io_event(Time now, int fd, unsigned events)
                 in_.buf.consume(parse(now, in_.buf.data()));
                 schedule_timeout(now);
             } else {
-                app_.on_disconnect(now, *this);
                 dispose(now);
             }
         }
     } catch (const std::exception& e) {
-        SWIRLY_ERROR << "error handling io event: " << e.what();
+        app_.on_error(now, *this, e);
         dispose(now);
     }
 }
@@ -158,7 +156,7 @@ void FixConn::schedule_timeout(Time now)
 
 void FixConn::on_timeout(Time now, Timer& tmr)
 {
-    SWIRLY_WARNING << "connection timeout";
+    app_.on_timeout(now, *this);
     dispose(now);
 }
 
@@ -174,7 +172,7 @@ void FixConn::on_heartbeat(Time now, Timer& tmr)
     hdr.sender_comp_id = sess_id_.sender_comp_id;
     hdr.target_comp_id = sess_id_.target_comp_id;
     hdr.msg_seq_num = ++seq_num_;
-    hdr.sending_time = UnixClock::now();
+    hdr.sending_time = now;
 
     FixStream os{out_.buf};
     os.reset(sess_id_.version);
@@ -207,11 +205,13 @@ void FixConn::on_message(Time now, std::string_view msg, std::size_t msg_type_of
         if (state_ == LogoutSent) {
             // Process logout reply.
             app_.on_logout(now, *this);
+            sess_id_.clear();
             state_ = LoggedOut;
         } else if (state_ == LoggedOn) {
             // Send logout response.
             send_logout(now);
             app_.on_logout(now, *this);
+            sess_id_.clear();
             state_ = LoggedOut;
         }
     } else if (msg_type == "A"sv) {
@@ -225,7 +225,7 @@ void FixConn::on_message(Time now, std::string_view msg, std::size_t msg_type_of
             Logon body;
             parse_body(msg, body_off, body);
             // Send logon response.
-            sess_id_ = ~get_sess_id<string>(ver, hdr);
+            set_sess_id(~get_sess_id<string>(ver, hdr));
             hb_int_ = Seconds{body.heart_bt_int.value};
             send_logon(now);
             app_.on_logon(now, *this);
@@ -233,6 +233,12 @@ void FixConn::on_message(Time now, std::string_view msg, std::size_t msg_type_of
         }
     }
     app_.on_message(now, *this, msg, body_off, ver, hdr);
+}
+
+void FixConn::set_sess_id(const FixSessId& sess_id)
+{
+    assert(!sess_id.empty());
+    sess_id_ = sess_id;
 }
 
 } // namespace fix

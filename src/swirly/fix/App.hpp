@@ -41,6 +41,10 @@ class SWIRLY_API FixApp {
 
     void on_connect(Time now, FixConn& conn) noexcept { do_on_connect(now, conn); }
     void on_disconnect(Time now, FixConn& conn) noexcept { do_on_disconnect(now, conn); }
+    void on_error(Time now, FixConn& conn, const std::exception& e) noexcept
+    {
+        do_on_error(now, conn, e);
+    }
     void on_logon(Time now, FixConn& conn) noexcept { do_on_logon(now, conn); }
     void on_logout(Time now, FixConn& conn) noexcept { do_on_logout(now, conn); }
     void on_message(Time now, FixConn& conn, std::string_view msg, std::size_t body_off,
@@ -48,15 +52,18 @@ class SWIRLY_API FixApp {
     {
         do_on_message(now, conn, msg, body_off, ver, hdr);
     }
+    void on_timeout(Time now, FixConn& conn) noexcept { do_on_timeout(now, conn); }
 
   protected:
     virtual void do_on_connect(Time now, FixConn& conn) noexcept = 0;
     virtual void do_on_disconnect(Time now, FixConn& conn) noexcept = 0;
+    virtual void do_on_error(Time now, FixConn& conn, const std::exception& e) noexcept = 0;
     virtual void do_on_logon(Time now, FixConn& conn) noexcept = 0;
     virtual void do_on_logout(Time now, FixConn& conn) noexcept = 0;
     virtual void do_on_message(Time now, FixConn& conn, std::string_view msg, std::size_t body_off,
                                Version ver, const FixHdr& hdr) noexcept
         = 0;
+    virtual void do_on_timeout(Time now, FixConn& conn) noexcept = 0;
 };
 
 } // namespace fix
