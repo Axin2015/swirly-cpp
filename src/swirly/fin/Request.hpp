@@ -90,7 +90,8 @@ class SWIRLY_API Request {
 template <typename RequestT>
 class RequestIdSet {
     using Key = std::tuple<Id64, Id64>;
-    struct ValueCompare {
+    struct Compare {
+        using is_transparent = void;
         int compare(const Request& lhs, const Request& rhs) const noexcept
         {
             int result{swirly::compare(lhs.market_id(), rhs.market_id())};
@@ -103,8 +104,6 @@ class RequestIdSet {
         {
             return compare(lhs, rhs) < 0;
         }
-    };
-    struct KeyValueCompare {
         bool operator()(const Key& lhs, const Request& rhs) const noexcept
         {
             int result{swirly::compare(std::get<0>(lhs), rhs.market_id())};
@@ -123,7 +122,7 @@ class RequestIdSet {
         }
     };
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
-    using CompareOption = boost::intrusive::compare<ValueCompare>;
+    using CompareOption = boost::intrusive::compare<Compare>;
     using MemberHookOption
         = boost::intrusive::member_hook<RequestT, decltype(RequestT::id_hook), &RequestT::id_hook>;
     using Set
@@ -162,23 +161,23 @@ class RequestIdSet {
     // Find.
     ConstIterator find(Id64 market_id, Id64 id) const noexcept
     {
-        return set_.find(std::make_tuple(market_id, id), KeyValueCompare());
+        return set_.find(std::make_tuple(market_id, id), Compare{});
     }
     Iterator find(Id64 market_id, Id64 id) noexcept
     {
-        return set_.find(std::make_tuple(market_id, id), KeyValueCompare());
+        return set_.find(std::make_tuple(market_id, id), Compare{});
     }
     std::pair<ConstIterator, bool> find_hint(Id64 market_id, Id64 id) const noexcept
     {
         const auto key = std::make_tuple(market_id, id);
-        const auto comp = KeyValueCompare();
+        const auto comp = Compare{};
         auto it = set_.lower_bound(key, comp);
         return std::make_pair(it, it != set_.end() && !comp(key, *it));
     }
     std::pair<Iterator, bool> find_hint(Id64 market_id, Id64 id) noexcept
     {
         const auto key = std::make_tuple(market_id, id);
-        const auto comp = KeyValueCompare();
+        const auto comp = Compare{};
         auto it = set_.lower_bound(key, comp);
         return std::make_pair(it, it != set_.end() && !comp(key, *it));
     }

@@ -91,18 +91,18 @@ class SWIRLY_API Level
 };
 
 class SWIRLY_API LevelSet {
-    struct ValueCompare {
+    using Key = LevelKey;
+    struct Compare {
+        using is_transparent = void;
         bool operator()(const Level& lhs, const Level& rhs) const noexcept
         {
             return lhs.key() < rhs.key();
         }
-    };
-    struct KeyValueCompare {
-        bool operator()(LevelKey lhs, const Level& rhs) const noexcept { return lhs < rhs.key(); }
-        bool operator()(const Level& lhs, LevelKey rhs) const noexcept { return lhs.key() < rhs; }
+        bool operator()(Key lhs, const Level& rhs) const noexcept { return lhs < rhs.key(); }
+        bool operator()(const Level& lhs, Key rhs) const noexcept { return lhs.key() < rhs; }
     };
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
-    using CompareOption = boost::intrusive::compare<ValueCompare>;
+    using CompareOption = boost::intrusive::compare<Compare>;
     using MemberHookOption
         = boost::intrusive::member_hook<Level, decltype(Level::key_hook), &Level::key_hook>;
     using Set
@@ -137,23 +137,23 @@ class SWIRLY_API LevelSet {
     // Find.
     ConstIterator find(Side side, Ticks ticks) const noexcept
     {
-        return set_.find(detail::compose_key(side, ticks), KeyValueCompare());
+        return set_.find(detail::compose_key(side, ticks), Compare{});
     }
     Iterator find(Side side, Ticks ticks) noexcept
     {
-        return set_.find(detail::compose_key(side, ticks), KeyValueCompare());
+        return set_.find(detail::compose_key(side, ticks), Compare{});
     }
     std::pair<ConstIterator, bool> find_hint(Side side, Ticks ticks) const noexcept
     {
         const auto key = detail::compose_key(side, ticks);
-        const auto comp = KeyValueCompare();
+        const auto comp = Compare{};
         auto it = set_.lower_bound(key, comp);
         return std::make_pair(it, it != set_.end() && !comp(key, *it));
     }
     std::pair<Iterator, bool> find_hint(Side side, Ticks ticks) noexcept
     {
         const auto key = detail::compose_key(side, ticks);
-        const auto comp = KeyValueCompare();
+        const auto comp = Compare{};
         auto it = set_.lower_bound(key, comp);
         return std::make_pair(it, it != set_.end() && !comp(key, *it));
     }

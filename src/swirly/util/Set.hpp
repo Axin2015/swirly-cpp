@@ -38,18 +38,18 @@ struct IdTraits {
 template <typename ValueT, typename TraitsT = IdTraits<ValueT>>
 class IdSet {
     using Id = typename TraitsT::Id;
-    struct ValueCompare {
+    using Key = Id;
+    struct Compare {
+        using is_transparent = void;
         bool operator()(const ValueT& lhs, const ValueT& rhs) const noexcept
         {
             return TraitsT::id(lhs) < TraitsT::id(rhs);
         }
-    };
-    struct KeyValueCompare {
         bool operator()(Id lhs, const ValueT& rhs) const noexcept { return lhs < TraitsT::id(rhs); }
         bool operator()(const ValueT& lhs, Id rhs) const noexcept { return TraitsT::id(lhs) < rhs; }
     };
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
-    using CompareOption = boost::intrusive::compare<ValueCompare>;
+    using CompareOption = boost::intrusive::compare<Compare>;
     using MemberHookOption
         = boost::intrusive::member_hook<ValueT, decltype(ValueT::id_hook), &ValueT::id_hook>;
     using Set
@@ -85,17 +85,17 @@ class IdSet {
     Iterator end() noexcept { return set_.end(); }
 
     // Find.
-    ConstIterator find(Id id) const noexcept { return set_.find(id, KeyValueCompare()); }
-    Iterator find(Id id) noexcept { return set_.find(id, KeyValueCompare()); }
+    ConstIterator find(Id id) const noexcept { return set_.find(id, Compare{}); }
+    Iterator find(Id id) noexcept { return set_.find(id, Compare{}); }
     std::pair<ConstIterator, bool> find_hint(Id id) const noexcept
     {
-        const auto comp = KeyValueCompare();
+        const auto comp = Compare{};
         auto it = set_.lower_bound(id, comp);
         return std::make_pair(it, it != set_.end() && !comp(id, *it));
     }
     std::pair<Iterator, bool> find_hint(Id id) noexcept
     {
-        const auto comp = KeyValueCompare();
+        const auto comp = Compare{};
         auto it = set_.lower_bound(id, comp);
         return std::make_pair(it, it != set_.end() && !comp(id, *it));
     }
@@ -168,13 +168,13 @@ struct SymbolTraits {
  */
 template <typename ValueT, typename TraitsT = SymbolTraits<ValueT>>
 class SymbolSet {
-    struct ValueCompare {
+    using Key = Symbol;
+    struct Compare {
+        using is_transparent = void;
         bool operator()(const ValueT& lhs, const ValueT& rhs) const noexcept
         {
             return TraitsT::symbol(lhs) < TraitsT::symbol(rhs);
         }
-    };
-    struct KeyValueCompare {
         bool operator()(Symbol lhs, const ValueT& rhs) const noexcept
         {
             return lhs < TraitsT::symbol(rhs);
@@ -185,7 +185,7 @@ class SymbolSet {
         }
     };
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
-    using CompareOption = boost::intrusive::compare<ValueCompare>;
+    using CompareOption = boost::intrusive::compare<Compare>;
     using MemberHookOption = boost::intrusive::member_hook<ValueT, decltype(ValueT::symbol_hook),
                                                            &ValueT::symbol_hook>;
     using Set
@@ -221,20 +221,17 @@ class SymbolSet {
     Iterator end() noexcept { return set_.end(); }
 
     // Find.
-    ConstIterator find(Symbol symbol) const noexcept
-    {
-        return set_.find(symbol, KeyValueCompare());
-    }
-    Iterator find(Symbol symbol) noexcept { return set_.find(symbol, KeyValueCompare()); }
+    ConstIterator find(Symbol symbol) const noexcept { return set_.find(symbol, Compare{}); }
+    Iterator find(Symbol symbol) noexcept { return set_.find(symbol, Compare{}); }
     std::pair<ConstIterator, bool> find_hint(Symbol symbol) const noexcept
     {
-        const auto comp = KeyValueCompare();
+        const auto comp = Compare{};
         auto it = set_.lower_bound(symbol, comp);
         return std::make_pair(it, it != set_.end() && !comp(symbol, *it));
     }
     std::pair<Iterator, bool> find_hint(Symbol symbol) noexcept
     {
-        const auto comp = KeyValueCompare();
+        const auto comp = Compare{};
         auto it = set_.lower_bound(symbol, comp);
         return std::make_pair(it, it != set_.end() && !comp(symbol, *it));
     }

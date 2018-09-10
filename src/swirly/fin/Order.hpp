@@ -168,7 +168,9 @@ static_assert(sizeof(Order) <= 5 * 64, "no greater than specified cache-lines");
 using OrderIdSet = RequestIdSet<Order>;
 
 class SWIRLY_API OrderRefSet {
-    struct ValueCompare {
+    using Key = std::string_view;
+    struct Compare {
+        using is_transparent = void;
         int compare(const Order& lhs, const Order& rhs) const noexcept
         {
             return lhs.ref().compare(rhs.ref());
@@ -177,19 +179,11 @@ class SWIRLY_API OrderRefSet {
         {
             return compare(lhs, rhs) < 0;
         }
-    };
-    struct KeyValueCompare {
-        bool operator()(std::string_view lhs, const Order& rhs) const noexcept
-        {
-            return lhs.compare(rhs.ref()) < 0;
-        }
-        bool operator()(const Order& lhs, std::string_view rhs) const noexcept
-        {
-            return lhs.ref().compare(rhs) < 0;
-        }
+        bool operator()(Key lhs, const Order& rhs) const noexcept { return lhs.compare(rhs.ref()) < 0; }
+        bool operator()(const Order& lhs, Key rhs) const noexcept { return lhs.ref().compare(rhs) < 0; }
     };
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
-    using CompareOption = boost::intrusive::compare<ValueCompare>;
+    using CompareOption = boost::intrusive::compare<Compare>;
     using MemberHookOption
         = boost::intrusive::member_hook<Order, decltype(Order::ref_hook), &Order::ref_hook>;
     using Set
@@ -223,20 +217,17 @@ class SWIRLY_API OrderRefSet {
     Iterator end() noexcept { return set_.end(); }
 
     // Find.
-    ConstIterator find(std::string_view ref) const noexcept
-    {
-        return set_.find(ref, KeyValueCompare());
-    }
-    Iterator find(std::string_view ref) noexcept { return set_.find(ref, KeyValueCompare()); }
+    ConstIterator find(std::string_view ref) const noexcept { return set_.find(ref, Compare{}); }
+    Iterator find(std::string_view ref) noexcept { return set_.find(ref, Compare{}); }
     std::pair<ConstIterator, bool> find_hint(std::string_view ref) const noexcept
     {
-        const auto comp = KeyValueCompare();
+        const auto comp = Compare{};
         auto it = set_.lower_bound(ref, comp);
         return std::make_pair(it, it != set_.end() && !comp(ref, *it));
     }
     std::pair<Iterator, bool> find_hint(std::string_view ref) noexcept
     {
-        const auto comp = KeyValueCompare();
+        const auto comp = Compare{};
         auto it = set_.lower_bound(ref, comp);
         return std::make_pair(it, it != set_.end() && !comp(ref, *it));
     }
