@@ -43,6 +43,10 @@ class TestApp : public FixApp {
     {
         SWIRLY_INFO << "session disconnected: " << conn.endpoint();
     }
+    void do_on_error(Time now, FixConn& conn, const std::exception& e) noexcept override
+    {
+        SWIRLY_ERROR << "session error: " << conn.endpoint() << ": " << e.what();
+    }
     void do_on_logon(Time now, FixConn& conn) noexcept override
     {
         SWIRLY_INFO << "session logged-on: " << conn.endpoint();
@@ -60,6 +64,10 @@ class TestApp : public FixApp {
             cout << t << '=' << v << '^';
         }
         cout << endl;
+    }
+    void do_on_timeout(Time now, FixConn& conn) noexcept override
+    {
+        SWIRLY_WARNING << "session timeout: " << conn.endpoint();
     }
 };
 

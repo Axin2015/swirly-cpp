@@ -41,6 +41,9 @@ struct Version : protected Comparable<Version> {
     constexpr Version(Version&&) noexcept = default;
     constexpr Version& operator=(Version&&) noexcept = default;
 
+    constexpr bool empty() const noexcept { return major == 0 && minor == 0; }
+    constexpr explicit operator bool() const noexcept { return !empty(); }
+
     constexpr int compare(const Version& rhs) const noexcept
     {
         auto i = swirly::compare(major, rhs.major);
@@ -49,7 +52,8 @@ struct Version : protected Comparable<Version> {
         }
         return i;
     }
-    int major{}, minor{};
+    void clear() noexcept { major = minor = 0; }
+    int major{0}, minor{0};
 };
 static_assert(Version{1, 2} == Version{1, 2});
 static_assert(Version{1, 2} < Version{1, 3});

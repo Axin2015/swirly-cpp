@@ -44,6 +44,7 @@ class SWIRLY_API FixConn final : BasicFixParser<FixConn> {
     FixConn(Time now, Reactor& r, IoSocket&& sock, const Endpoint& ep, const FixSessMap& sess_map,
             FixApp& app);
     const Endpoint& endpoint() const noexcept { return ep_; }
+    const FixSessId& sess_id() const noexcept { return sess_id_; }
     int seq_num() const noexcept { return seq_num_; }
     void dispose(Time now) noexcept;
     void logon(Time now, const FixSessId& sess_id);
@@ -62,6 +63,7 @@ class SWIRLY_API FixConn final : BasicFixParser<FixConn> {
     void schedule_heartbeat(Time now);
     void on_heartbeat(Time now, Timer& tmr);
     void on_message(Time now, std::string_view msg, std::size_t msg_type_off, Version ver);
+    void set_sess_id(const FixSessId& sess_id);
     Reactor& reactor_;
     IoSocket sock_;
     const Endpoint ep_;
