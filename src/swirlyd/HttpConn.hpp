@@ -41,7 +41,6 @@ class SWIRLY_API HttpConn
 
   public:
     HttpConn(Time now, Reactor& r, IoSocket&& sock, const TcpEndpoint& ep, RestServ& rs);
-    ~HttpConn();
 
     // Copy.
     HttpConn(const HttpConn&) = delete;
@@ -51,11 +50,12 @@ class SWIRLY_API HttpConn
     HttpConn(HttpConn&&) = delete;
     HttpConn& operator=(HttpConn&&) = delete;
 
+    void dispose(Time now) noexcept;
+
     boost::intrusive::list_member_hook<AutoUnlinkOption> list_hook;
 
   private:
-    void dispose() noexcept;
-
+    ~HttpConn();
     bool on_message_begin() noexcept
     {
         ++pending_;

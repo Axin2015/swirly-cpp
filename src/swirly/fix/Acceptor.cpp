@@ -29,7 +29,8 @@ FixAcceptor::FixAcceptor(Time now, Reactor& r, const Endpoint& ep, FixApp& app)
 
 FixAcceptor::~FixAcceptor()
 {
-    conn_list_.clear_and_dispose([](auto* conn) { delete conn; });
+    const auto now = UnixClock::now();
+    conn_list_.clear_and_dispose([now](auto* conn) { conn->dispose(now); });
 }
 
 void FixAcceptor::insert(FixSessMap::node_type&& node)

@@ -45,12 +45,13 @@ class SWIRLY_API FixConn final : BasicFixParser<FixConn> {
             FixApp& app);
     const Endpoint& endpoint() const noexcept { return ep_; }
     int seq_num() const noexcept { return seq_num_; }
+    void dispose(Time now) noexcept;
     void logon(Time now, const FixSessId& sess_id);
     void logout(Time now);
     boost::intrusive::list_member_hook<AutoUnlinkOption> list_hook;
 
   private:
-    void dispose(Time now) noexcept;
+    ~FixConn();
     void read_and_write(Time now);
     void read_only(Time now);
     void send_logon(Time now);

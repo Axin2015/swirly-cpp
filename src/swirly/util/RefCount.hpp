@@ -58,7 +58,6 @@ template <typename DerivedT, typename PolicyT>
 class RefCount {
   public:
     constexpr RefCount() noexcept = default;
-    ~RefCount() = default;
 
     // Copy.
     constexpr RefCount(const RefCount&) noexcept = default;
@@ -77,6 +76,9 @@ class RefCount {
         }
     }
     int ref_count() const noexcept { return PolicyT::load(refs_); }
+
+  protected:
+    ~RefCount() = default;
 
   private:
     mutable typename PolicyT::Type refs_{1};
