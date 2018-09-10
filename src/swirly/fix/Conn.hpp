@@ -17,8 +17,8 @@
 #ifndef SWIRLY_FIX_CONN_HPP
 #define SWIRLY_FIX_CONN_HPP
 
+#include <swirly/fix/Config.hpp>
 #include <swirly/fix/Parser.hpp>
-#include <swirly/fix/SessId.hpp>
 
 #include <swirly/sys/IoSocket.hpp>
 #include <swirly/sys/Reactor.hpp>
@@ -41,7 +41,7 @@ class SWIRLY_API FixConn final : BasicFixParser<FixConn> {
     using Transport = Tcp;
     using Endpoint = TcpEndpoint;
 
-    FixConn(Time now, Reactor& r, IoSocket&& sock, const Endpoint& ep, const FixConfig& config,
+    FixConn(Time now, Reactor& r, IoSocket&& sock, const Endpoint& ep, const FixSessMap& sess_map,
             FixApp& app);
     const Endpoint& endpoint() const noexcept { return ep_; }
     int seq_num() const noexcept { return seq_num_; }
@@ -64,7 +64,7 @@ class SWIRLY_API FixConn final : BasicFixParser<FixConn> {
     Reactor& reactor_;
     IoSocket sock_;
     const Endpoint ep_;
-    const FixConfig& config_;
+    const FixSessMap& sess_map_;
     FixSessId sess_id_;
     // Agreed upon by the two firms and specified by the Logon initiator and echoed back by the
     // Logon acceptor.

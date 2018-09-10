@@ -65,7 +65,7 @@ struct TypeTraits<std::string_view> {
      * Disable conversion from std::string to std::string_view due to possible danger of dangling
      * reference to temporary.
      */
-    static std::string_view from_string(const std::string& s) noexcept = delete;
+    static std::string_view from_string(const std::string& s) = delete;
 };
 
 template <>

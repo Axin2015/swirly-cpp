@@ -105,19 +105,6 @@ constexpr bool operator>=(const BasicFixSessId<StringT>& lhs,
     return lhs.compare(rhs) >= 0;
 }
 
-/**
- * Comparator for transparent key search.
- */
-struct FixSessIdCompare {
-    using is_transparent = void;
-    template <typename StringT, typename StringU>
-    constexpr bool operator()(const BasicFixSessId<StringT>& lhs,
-                              const BasicFixSessId<StringU>& rhs) const noexcept
-    {
-        return lhs < rhs;
-    }
-};
-
 template <typename StringT>
 std::ostream& operator<<(std::ostream& os, const BasicFixSessId<StringT>& sess_id)
 {
@@ -140,6 +127,19 @@ using FixSessId = BasicFixSessId<std::string>;
 using FixSessIdView = BasicFixSessId<std::string_view>;
 static_assert(FixSessIdView{Version{1, 2}, "foo"sv, "bar"sv}
               == FixSessIdView{Version{1, 2}, "foo"sv, "bar"sv});
+
+/**
+ * Comparator for transparent key search.
+ */
+struct FixSessIdCompare {
+    using is_transparent = void;
+    template <typename StringT, typename StringU>
+    constexpr bool operator()(const BasicFixSessId<StringT>& lhs,
+                              const BasicFixSessId<StringU>& rhs) const noexcept
+    {
+        return lhs < rhs;
+    }
+};
 
 } // namespace fix
 } // namespace swirly

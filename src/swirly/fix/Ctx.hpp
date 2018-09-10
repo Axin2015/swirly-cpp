@@ -14,50 +14,40 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_FIX_CONFIG_HPP
-#define SWIRLY_FIX_CONFIG_HPP
+#ifndef SWIRLY_FIX_CTX_HPP
+#define SWIRLY_FIX_CTX_HPP
 
-#include <swirly/fix/SessId.hpp>
-
-#include <swirly/util/Config.hpp>
-
-#include <map>
+#include <swirly/fix/Acceptor.hpp>
+#include <swirly/fix/Initiator.hpp>
 
 namespace swirly {
 inline namespace fix {
 
-using FixSessMap = std::map<FixSessId, Config, FixSessIdCompare>;
-
-struct SWIRLY_API FixConfig {
-
-    FixConfig();
-    ~FixConfig();
+class SWIRLY_API FixCtx {
+  public:
+    FixCtx(Time now, Reactor& r, std::istream& config, FixApp& app);
+    FixCtx(Time now, Reactor& r, std::istream&& config, FixApp& app)
+    : FixCtx{now, r, config, app}
+    {
+    }
+    FixCtx(Time now, Reactor& r, const char* config, FixApp& app);
+    ~FixCtx();
 
     // Copy.
-    FixConfig(const FixConfig&) = delete;
-    FixConfig& operator=(const FixConfig&) = delete;
+    FixCtx(const FixCtx&) = delete;
+    FixCtx& operator=(const FixCtx&) = delete;
 
     // Move.
-    FixConfig(FixConfig&&);
-    FixConfig& operator=(FixConfig&&);
+    FixCtx(FixCtx&&) noexcept;
+    FixCtx& operator=(FixCtx&&) noexcept;
 
-    void clear() noexcept;
-    void read(std::istream& is);
-
-    std::unique_ptr<Config> root;
-    FixSessMap sess_map;
+  private:
+    std::unique_ptr<Config> root_config_;
+    std::map<TcpEndpoint, FixAcceptor> acceptors_;
+    std::list<FixInitiator> initiators_;
 };
-
-template <typename StringT>
-BasicFixSessId<StringT> get_sess_id(const Config& config)
-{
-    auto ver = config.get<Version>("version");
-    auto sender_comp_id = config.get("sender_comp_id");
-    auto target_comp_id = config.get("target_comp_id");
-    return {ver, move(sender_comp_id), move(target_comp_id)};
-}
 
 } // namespace fix
 } // namespace swirly
 
-#endif // SWIRLY_FIX_CONFIG_HPP
+#endif // SWIRLY_FIX_CTX_HPP

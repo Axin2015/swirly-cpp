@@ -16,6 +16,8 @@
 add_custom_target(swirly-example DEPENDS
   swirly-echo-clnt
   swirly-echo-serv
+  swirly-fix-app
+  swirly-fix-parse
   swirly-scratch
 )
 
@@ -24,6 +26,14 @@ target_link_libraries(swirly-echo-clnt ${swirly_fix_LIBRARY})
 
 add_executable(swirly-echo-serv EchoServ.cpp)
 target_link_libraries(swirly-echo-serv ${swirly_fix_LIBRARY})
+
+add_executable(swirly-fix-app FixApp.cpp)
+target_link_libraries(swirly-fix-app ${swirly_fix_LIBRARY})
+install(TARGETS swirly-fix-app DESTINATION bin COMPONENT program)
+
+add_executable(swirly-fix-parse FixParse.cpp)
+target_link_libraries(swirly-fix-parse ${swirly_fix_LIBRARY})
+install(TARGETS swirly-fix-parse DESTINATION bin COMPONENT program)
 
 # Reserved as an ad-hoc scratch pad.
 add_executable(swirly-scratch Scratch.cpp)

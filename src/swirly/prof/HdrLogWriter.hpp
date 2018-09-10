@@ -36,8 +36,8 @@ class SWIRLY_API HdrLogWriter {
     HdrLogWriter& operator=(const HdrLogWriter& rhs) = delete;
 
     // Move.
-    HdrLogWriter(HdrLogWriter&&) noexcept = delete;
-    HdrLogWriter& operator=(HdrLogWriter&&) noexcept = delete;
+    HdrLogWriter(HdrLogWriter&&) = delete;
+    HdrLogWriter& operator=(HdrLogWriter&&) = delete;
 
     void write(Time start_time, Time end_time, hdr_histogram& hist);
 

@@ -22,14 +22,14 @@ namespace swirly {
 inline namespace fix {
 using namespace std;
 
-FixInitiator::FixInitiator(Time now, Reactor& r, const Endpoint& ep, const FixConfig& config,
-                           const FixSessId& sess_id, FixApp& app)
+FixInitiator::FixInitiator(Time now, Reactor& r, const Endpoint& ep, FixSessMap::node_type&& node,
+                           FixApp& app)
 : reactor_(r)
 , ep_{ep}
-, config_(config)
-, sess_id_{sess_id}
 , app_(app)
 {
+    sess_map_.insert(move(node));
+
     // Immediate and then at 2s intervals.
     tmr_ = reactor_.timer(now, 2s, Priority::Low, bind<&FixInitiator::on_timer>(this));
 }
@@ -44,9 +44,9 @@ void FixInitiator::do_connect(Time now, IoSocket&& sock, const Endpoint& ep)
     inprogress_ = false;
 
     // High performance TCP servers could use a custom allocator.
-    auto* const conn = new FixConn{now, reactor_, move(sock), ep, config_, app_};
+    auto* const conn = new FixConn{now, reactor_, move(sock), ep, sess_map_, app_};
     conn_list_.push_back(*conn);
-    conn->logon(now, sess_id_);
+    conn->logon(now, sess_map_.begin()->first);
 }
 
 void FixInitiator::do_connect_error(Time now, const std::exception& e)

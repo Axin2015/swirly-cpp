@@ -41,9 +41,10 @@ class SWIRLY_API MemCtx {
     ~MemCtx();
 
     // Copy.
-    MemCtx(const MemCtx& rhs) noexcept = delete;
-    MemCtx& operator=(const MemCtx& rhs) noexcept = delete;
+    MemCtx(const MemCtx&) = delete;
+    MemCtx& operator=(const MemCtx&) = delete;
 
+    // Move.
     MemCtx(MemCtx&&) noexcept;
     MemCtx& operator=(MemCtx&&) noexcept;
 

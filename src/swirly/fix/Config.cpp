@@ -20,24 +20,26 @@ namespace swirly {
 inline namespace fix {
 using namespace std;
 
-FixConfig::~FixConfig() = default;
+FixConfig::FixConfig()
+: root{new Config}
+{
+}
 
-FixConfig::FixConfig(const FixConfig& rhs) = default;
-FixConfig& FixConfig::operator=(const FixConfig& rhs) = default;
+FixConfig::~FixConfig() = default;
 
 FixConfig::FixConfig(FixConfig&&) = default;
 FixConfig& FixConfig::operator=(FixConfig&&) = default;
 
 void FixConfig::clear() noexcept
 {
-    root.clear();
+    root->clear();
     sess_map.clear();
 }
 
 void FixConfig::read(istream& is)
 {
     string next;
-    if (root.read_section(is, next).eof()) {
+    if (root->read_section(is, next).eof()) {
         return;
     }
     do {
@@ -45,7 +47,7 @@ void FixConfig::read(istream& is)
             throw runtime_error{"invalid config section: "s + next};
         }
         Config config;
-        config.set_parent(root);
+        config.set_parent(*root);
         config.read_section(is, next);
         sess_map.emplace(get_sess_id<string>(config), move(config));
         if (is.eof()) {
