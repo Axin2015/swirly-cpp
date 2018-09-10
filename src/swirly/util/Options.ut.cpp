@@ -28,6 +28,7 @@ BOOST_AUTO_TEST_CASE(OptionsNormalCase)
     int var{-1};
     bool flag{false};
     std::string command;
+    int factor{-1};
 
     Options opts{"Unit Test options [OPTIONS] [COMMAND]"};
     // clang-format off
@@ -35,10 +36,12 @@ BOOST_AUTO_TEST_CASE(OptionsNormalCase)
         ('s', NoOp{}, "ShortOption Description")
         ("long_opt", NoOp{}, "LongOption Description")
         ('x', Switch{flag}, "Switch Description")
-        (Value{command}, "Positional Command");
+        (Value{command}.default_value("init").required(), "Positional Command")
+        (Value{factor}.required(), "Positional Command");
     // clang-format on
 
     BOOST_CHECK_EQUAL(var, 3);
+    BOOST_CHECK_EQUAL(command, "init");
 
     stringstream ss;
     ss << opts;
@@ -51,13 +54,14 @@ BOOST_AUTO_TEST_CASE(OptionsNormalCase)
     BOOST_CHECK_EQUAL(ss.str(), expected);
 
     {
-        const char* argv[] = {"executable_name", "-o", "123", "print"};
-        int argc = 4;
+        const char* argv[] = {"executable_name", "-o", "123", "print", "456"};
+        int argc = 5;
 
         opts.parse(argc, argv);
         BOOST_CHECK_EQUAL(var, 123);
         BOOST_CHECK_EQUAL(flag, false);
         BOOST_CHECK_EQUAL(command, "print");
+        BOOST_CHECK_EQUAL(factor, 456);
     }
     {
         const char* argv[] = {"executable_name", "-x"};
