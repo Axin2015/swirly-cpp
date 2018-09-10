@@ -30,7 +30,8 @@ HttpServ::HttpServ(Reactor& r, const Endpoint& ep, RestServ& rs)
 
 HttpServ::~HttpServ()
 {
-    conn_list_.clear_and_dispose([](auto* conn) { delete conn; });
+    const auto now = UnixClock::now();
+    conn_list_.clear_and_dispose([now](auto* conn) { conn->dispose(now); });
 }
 
 void HttpServ::do_accept(Time now, IoSocket&& sock, const Endpoint& ep)

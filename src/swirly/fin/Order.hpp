@@ -179,8 +179,14 @@ class SWIRLY_API OrderRefSet {
         {
             return compare(lhs, rhs) < 0;
         }
-        bool operator()(Key lhs, const Order& rhs) const noexcept { return lhs.compare(rhs.ref()) < 0; }
-        bool operator()(const Order& lhs, Key rhs) const noexcept { return lhs.ref().compare(rhs) < 0; }
+        bool operator()(Key lhs, const Order& rhs) const noexcept
+        {
+            return lhs.compare(rhs.ref()) < 0;
+        }
+        bool operator()(const Order& lhs, Key rhs) const noexcept
+        {
+            return lhs.ref().compare(rhs) < 0;
+        }
     };
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
     using CompareOption = boost::intrusive::compare<Compare>;

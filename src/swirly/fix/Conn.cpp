@@ -43,6 +43,11 @@ FixConn::FixConn(Time now, Reactor& r, IoSocket&& sock, const Endpoint& ep,
     app.on_connect(now, *this);
 }
 
+void FixConn::dispose(Time now) noexcept
+{
+    delete this;
+}
+
 void FixConn::logon(Time now, const FixSessId& sess_id)
 {
     if (state_ == LoggedOut) {
@@ -66,10 +71,7 @@ void FixConn::logout(Time now)
     }
 }
 
-void FixConn::dispose(Time now) noexcept
-{
-    delete this;
-}
+FixConn::~FixConn() = default;
 
 void FixConn::read_and_write(Time now)
 {

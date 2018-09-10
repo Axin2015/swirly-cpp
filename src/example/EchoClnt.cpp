@@ -45,14 +45,15 @@ class EchoConn {
         sub_ = r.subscribe(sock_.get(), EventIn, bind<&EchoConn::on_input>(this));
         tmr_ = r.timer(now, PingInterval, Priority::Low, bind<&EchoConn::on_timer>(this));
     }
-    boost::intrusive::list_member_hook<AutoUnlinkOption> list_hook;
-
-  private:
     void dispose(Time now) noexcept
     {
         SWIRLY_INFO << "connection closed";
         delete this;
     }
+    boost::intrusive::list_member_hook<AutoUnlinkOption> list_hook;
+
+  private:
+    ~EchoConn() = default;
     void on_input(Time now, int fd, unsigned events)
     {
         try {
@@ -118,7 +119,8 @@ class EchoClnt : public TcpConnector<EchoClnt> {
     }
     ~EchoClnt()
     {
-        conn_list_.clear_and_dispose([](auto* conn) { delete conn; });
+        const auto now = UnixClock::now();
+        conn_list_.clear_and_dispose([now](auto* conn) { conn->dispose(now); });
     }
 
   private:

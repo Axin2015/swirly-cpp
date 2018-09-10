@@ -36,7 +36,8 @@ FixInitiator::FixInitiator(Time now, Reactor& r, const Endpoint& ep, FixSessMap:
 
 FixInitiator::~FixInitiator()
 {
-    conn_list_.clear_and_dispose([](auto* conn) { delete conn; });
+    const auto now = UnixClock::now();
+    conn_list_.clear_and_dispose([now](auto* conn) { conn->dispose(now); });
 }
 
 void FixInitiator::do_connect(Time now, IoSocket&& sock, const Endpoint& ep)

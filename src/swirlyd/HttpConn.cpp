@@ -43,7 +43,7 @@ HttpConn::HttpConn(Time now, Reactor& r, IoSocket&& sock, const TcpEndpoint& ep,
 
 HttpConn::~HttpConn() = default;
 
-void HttpConn::dispose() noexcept
+void HttpConn::dispose(Time now) noexcept
 {
     SWIRLY_DEBUG << "close connection";
     delete this;
@@ -135,7 +135,7 @@ void HttpConn::on_io_event(Time now, int fd, unsigned events)
                     // May throw.
                     sub_.set_events(EventIn);
                 } else {
-                    dispose();
+                    dispose(now);
                 }
             }
         }
@@ -148,19 +148,19 @@ void HttpConn::on_io_event(Time now, int fd, unsigned events)
                 tmr_ = reactor_.timer(now + IdleTimeout, Priority::Low,
                                       bind<&HttpConn::on_timer>(this));
             } else {
-                dispose();
+                dispose(now);
             }
         }
     } catch (const std::exception& e) {
         SWIRLY_ERROR << "error handling io event: " << e.what();
-        dispose();
+        dispose(now);
     }
 }
 
 void HttpConn::on_timer(Time now, Timer& tmr)
 {
     SWIRLY_WARNING << "connection timeout";
-    dispose();
+    dispose(now);
 }
 
 } // namespace swirly
