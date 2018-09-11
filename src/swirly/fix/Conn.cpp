@@ -17,7 +17,7 @@
 #include "Conn.hpp"
 
 #include "App.hpp"
-#include "Hdr.hpp"
+#include "Header.hpp"
 #include "Lexer.hpp"
 #include "Logon.hpp"
 #include "Stream.hpp"
@@ -50,14 +50,14 @@ void FixConn::dispose(Time now) noexcept
 void FixConn::logon(Time now, const FixSessId& sess_id)
 {
     if (state_ == LoggedOut) {
-        set_sess_id(sess_id);
         const auto it = sess_map_.find(sess_id);
         if (it == sess_map_.end()) {
             throw std::runtime_error{"invalid session: "s + to_string(sess_id)};
         }
+        state_ = LogonSent;
+        sess_id_ = sess_id;
         hb_int_ = Seconds{it->second.get<int>("heart_bt_int")};
         send_logon(now);
-        state_ = LogonSent;
     }
 }
 
@@ -88,7 +88,7 @@ void FixConn::read_only(Time now)
 
 void FixConn::send_logon(Time now)
 {
-    FixHdr hdr;
+    FixHeader hdr;
     hdr.msg_type = "A"sv;
     hdr.sender_comp_id = sess_id_.sender_comp_id;
     hdr.target_comp_id = sess_id_.target_comp_id;
@@ -107,7 +107,7 @@ void FixConn::send_logon(Time now)
 
 void FixConn::send_logout(Time now)
 {
-    FixHdr hdr;
+    FixHeader hdr;
     hdr.msg_type = "5"sv;
     hdr.sender_comp_id = sess_id_.sender_comp_id;
     hdr.target_comp_id = sess_id_.target_comp_id;
@@ -167,7 +167,7 @@ void FixConn::schedule_heartbeat(Time now)
 
 void FixConn::on_heartbeat(Time now, Timer& tmr)
 {
-    FixHdr hdr;
+    FixHeader hdr;
     hdr.msg_type = "0"sv;
     hdr.sender_comp_id = sess_id_.sender_comp_id;
     hdr.target_comp_id = sess_id_.target_comp_id;
@@ -184,8 +184,8 @@ void FixConn::on_heartbeat(Time now, Timer& tmr)
 
 void FixConn::on_message(Time now, std::string_view msg, std::size_t msg_type_off, Version ver)
 {
-    FixHdr hdr;
-    const size_t body_off = parse_hdr(msg, msg_type_off, hdr);
+    FixHeader hdr;
+    const size_t body_off = parse_header(msg, msg_type_off, hdr);
     const auto& msg_type = hdr.msg_type.value;
     if (msg_type.empty()) {
         throw domain_error{"invalid FIX header"};
@@ -203,42 +203,38 @@ void FixConn::on_message(Time now, std::string_view msg, std::size_t msg_type_of
     } else if (msg_type == "5"sv) {
         // Logout.
         if (state_ == LogoutSent) {
-            // Process logout reply.
-            app_.on_logout(now, *this);
-            sess_id_.clear();
             state_ = LoggedOut;
+            // Process logout reply.
+            FixSessId sess_id;
+            sess_id_.swap(sess_id);
+            app_.on_logout(now, *this, sess_id);
         } else if (state_ == LoggedOn) {
+            state_ = LoggedOut;
+            FixSessId sess_id;
+            sess_id_.swap(sess_id);
             // Send logout response.
             send_logout(now);
-            app_.on_logout(now, *this);
-            sess_id_.clear();
-            state_ = LoggedOut;
+            app_.on_logout(now, *this, sess_id);
         }
     } else if (msg_type == "A"sv) {
         // Logon.
         if (state_ == LogonSent) {
             // Process logon reply.
-            app_.on_logon(now, *this);
             state_ = LoggedOn;
             schedule_heartbeat(now);
+            app_.on_logon(now, *this, sess_id_);
         } else if (state_ == LoggedOut) {
+            state_ = LoggedOn;
             Logon body;
             parse_body(msg, body_off, body);
             // Send logon response.
-            set_sess_id(~get_sess_id<string>(ver, hdr));
+            sess_id_ = ~get_sess_id<string>(ver, hdr);
             hb_int_ = Seconds{body.heart_bt_int.value};
             send_logon(now);
-            app_.on_logon(now, *this);
-            state_ = LoggedOn;
+            app_.on_logon(now, *this, sess_id_);
         }
     }
     app_.on_message(now, *this, msg, body_off, ver, hdr);
-}
-
-void FixConn::set_sess_id(const FixSessId& sess_id)
-{
-    assert(!sess_id.empty());
-    sess_id_ = sess_id;
 }
 
 } // namespace fix

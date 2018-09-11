@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Hdr.hpp"
+#include "Header.hpp"
 
 #include "Lexer.hpp"
 
@@ -31,19 +31,19 @@ namespace {
 
 // Sorted array of FIX header tags.
 // See https://www.onixs.biz/fix-dictionary/5.0/compBlock_StandardHeader.html
-constexpr std::array<int, 32> HdrTags{8,   9,   34,  35,  43,  49,  50,  52,  56,   57,  90,
-                                      91,  97,  115, 116, 122, 128, 129, 142, 143,  144, 145,
-                                      212, 213, 347, 369, 627, 628, 629, 630, 1128, 1129};
-static_assert(!HdrTags.empty());
+constexpr std::array<int, 32> HeaderTags{8,   9,   34,  35,  43,  49,  50,  52,  56,   57,  90,
+                                         91,  97,  115, 116, 122, 128, 129, 142, 143,  144, 145,
+                                         212, 213, 347, 369, 627, 628, 629, 630, 1128, 1129};
+static_assert(!HeaderTags.empty());
 
-inline bool is_hdr_tag(int tag) noexcept
+inline bool is_header_tag(int tag) noexcept
 {
-    return binary_search(HdrTags.begin(), HdrTags.end(), tag);
+    return binary_search(HeaderTags.begin(), HeaderTags.end(), tag);
 }
 
 } // namespace
 
-ostream& operator<<(ostream& os, const FixHdr& hdr)
+ostream& operator<<(ostream& os, const FixHeader& hdr)
 {
     os << hdr.msg_type << hdr.sender_comp_id << hdr.target_comp_id << hdr.msg_seq_num
        << hdr.sending_time;
@@ -56,7 +56,7 @@ ostream& operator<<(ostream& os, const FixHdr& hdr)
     return os;
 }
 
-size_t parse_hdr(string_view msg, size_t msg_type_off, FixHdr& hdr)
+size_t parse_header(string_view msg, size_t msg_type_off, FixHeader& hdr)
 {
     FixLexer lex{msg, msg_type_off};
     assert(!lex.empty());
@@ -89,7 +89,7 @@ size_t parse_hdr(string_view msg, size_t msg_type_off, FixHdr& hdr)
             hdr.poss_resend = from_string<PossResend::Type>(v);
             break;
         default:
-            if (!is_hdr_tag(t)) {
+            if (!is_header_tag(t)) {
                 return lex.offset();
             }
         }

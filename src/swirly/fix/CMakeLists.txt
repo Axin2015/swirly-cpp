@@ -33,7 +33,7 @@ set(lib_SOURCES
   Conn.cpp
   Ctx.cpp
   Field.cpp
-  Hdr.cpp
+  Header.cpp
   Initiator.cpp
   Lexer.cpp
   Logon.cpp

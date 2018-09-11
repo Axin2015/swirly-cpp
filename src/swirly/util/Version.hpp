@@ -53,8 +53,15 @@ struct Version : protected Comparable<Version> {
         return i;
     }
     void clear() noexcept { major = minor = 0; }
+    void swap(Version& rhs) noexcept
+    {
+        std::swap(major, rhs.major);
+        std::swap(minor, rhs.minor);
+    }
+
     int major{0}, minor{0};
 };
+
 static_assert(Version{1, 2} == Version{1, 2});
 static_assert(Version{1, 2} < Version{1, 3});
 static_assert(Version{1, 2} < Version{2, 2});
