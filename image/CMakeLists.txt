@@ -24,10 +24,10 @@ if(DOT_EXECUTABLE)
     util
     sys
     app
-    fin
+    http
     fix
+    fin
     lob
-    web
   )
 
   foreach(name ${names})

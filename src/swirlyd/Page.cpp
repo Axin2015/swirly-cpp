@@ -14,12 +14,30 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Request.hpp"
+#include "Page.hpp"
+
+#include <swirly/util/Tokeniser.hpp>
+
+#include <tuple>
 
 namespace swirly {
-inline namespace web {
+using namespace std;
 
-HttpRequest::~HttpRequest() = default;
+Page parse_query(string_view query) noexcept
+{
+    Page page;
+    Tokeniser toks{query, "&;"sv};
+    while (!toks.empty()) {
+        string_view key, val;
+        tie(key, val) = split_pair(toks.top(), '=');
+        if (key == "offset"sv) {
+            page.offset = from_string<uint64_t>(val);
+        } else if (key == "limit"sv) {
+            page.limit = from_string<uint64_t>(val);
+        }
+        toks.pop();
+    }
+    return page;
+}
 
-} // namespace web
 } // namespace swirly

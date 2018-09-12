@@ -14,16 +14,16 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_WEB_REQUEST_HPP
-#define SWIRLY_WEB_REQUEST_HPP
+#ifndef SWIRLYD_HTTPREQUEST_HPP
+#define SWIRLYD_HTTPREQUEST_HPP
 
-#include <swirly/web/RestBody.hpp>
-#include <swirly/web/Types.hpp>
-#include <swirly/web/Url.hpp>
+#include "RestBody.hpp"
+
+#include <swirly/http/Types.hpp>
+#include <swirly/http/Url.hpp>
 
 namespace swirly {
 using namespace std::literals::string_view_literals;
-inline namespace web {
 
 class SWIRLY_API HttpRequest : public BasicUrl<HttpRequest> {
   public:
@@ -102,7 +102,6 @@ class SWIRLY_API HttpRequest : public BasicUrl<HttpRequest> {
     bool partial_{false};
 };
 
-} // namespace web
 } // namespace swirly
 
-#endif // SWIRLY_WEB_REQUEST_HPP
+#endif // SWIRLYD_HTTPREQUEST_HPP

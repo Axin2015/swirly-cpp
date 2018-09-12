@@ -16,7 +16,7 @@
  */
 #include "RestBody.hpp"
 
-#include <swirly/fin/Exception.hpp>
+#include <swirly/app/Exception.hpp>
 
 #include <boost/test/unit_test.hpp>
 

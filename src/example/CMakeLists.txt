@@ -18,14 +18,15 @@ add_custom_target(swirly-example DEPENDS
   swirly-echo-serv
   swirly-fix-app
   swirly-fix-parse
+  swirly-http-serv
   swirly-scratch
 )
 
 add_executable(swirly-echo-clnt EchoClnt.cpp)
-target_link_libraries(swirly-echo-clnt ${swirly_fix_LIBRARY})
+target_link_libraries(swirly-echo-clnt ${swirly_app_LIBRARY})
 
 add_executable(swirly-echo-serv EchoServ.cpp)
-target_link_libraries(swirly-echo-serv ${swirly_fix_LIBRARY})
+target_link_libraries(swirly-echo-serv ${swirly_app_LIBRARY})
 
 add_executable(swirly-fix-app FixApp.cpp)
 target_link_libraries(swirly-fix-app ${swirly_fix_LIBRARY})
@@ -34,6 +35,9 @@ install(TARGETS swirly-fix-app DESTINATION bin COMPONENT program)
 add_executable(swirly-fix-parse FixParse.cpp)
 target_link_libraries(swirly-fix-parse ${swirly_fix_LIBRARY})
 install(TARGETS swirly-fix-parse DESTINATION bin COMPONENT program)
+
+add_executable(swirly-http-serv HttpServ.cpp)
+target_link_libraries(swirly-http-serv ${swirly_http_LIBRARY})
 
 # Reserved as an ad-hoc scratch pad.
 add_executable(swirly-scratch Scratch.cpp)

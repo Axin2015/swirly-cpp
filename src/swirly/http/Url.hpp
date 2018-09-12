@@ -14,15 +14,15 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_WEB_URL_HPP
-#define SWIRLY_WEB_URL_HPP
+#ifndef SWIRLY_HTTP_URL_HPP
+#define SWIRLY_HTTP_URL_HPP
 
-#include <swirly/fin/Exception.hpp>
+#include <swirly/app/Exception.hpp>
 
 #include <swirly/contrib/http_parser.h>
 
 namespace swirly {
-inline namespace web {
+inline namespace http {
 
 template <typename DerivedT>
 class BasicUrl {
@@ -135,7 +135,7 @@ class UrlView : public BasicUrl<UrlView> {
     std::string_view url_;
 };
 
-} // namespace web
+} // namespace http
 } // namespace swirly
 
-#endif // SWIRLY_WEB_URL_HPP
+#endif // SWIRLY_HTTP_URL_HPP

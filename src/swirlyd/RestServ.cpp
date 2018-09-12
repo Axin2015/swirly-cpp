@@ -16,11 +16,12 @@
  */
 #include "RestServ.hpp"
 
-#include <swirly/web/Request.hpp>
-#include <swirly/web/RestApp.hpp>
-#include <swirly/web/Stream.hpp>
+#include "HttpRequest.hpp"
+#include "RestApp.hpp"
 
-#include <swirly/fin/Exception.hpp>
+#include <swirly/http/Stream.hpp>
+
+#include <swirly/app/Exception.hpp>
 
 #include <swirly/util/Finally.hpp>
 #include <swirly/util/Log.hpp>
@@ -62,10 +63,10 @@ uint32_t get_perm(const HttpRequest& req)
     return from_string<uint32_t>(req.perm());
 }
 
-Time get_time(const HttpRequest& req) noexcept
+Time get_time(Time now, const HttpRequest& req) noexcept
 {
     const string_view val{req.time()};
-    return val.empty() ? UnixClock::now() : to_time(from_string<Millis>(val));
+    return val.empty() ? now : to_time(from_string<Millis>(val));
 }
 
 string_view get_admin(const HttpRequest& req)
@@ -92,15 +93,15 @@ string_view get_trader(const HttpRequest& req)
 
 RestServ::~RestServ() = default;
 
-void RestServ::handle_request(const HttpRequest& req, HttpStream& os) noexcept
+void RestServ::handle_request(Time now, const HttpRequest& req, HttpStream& os) noexcept
 {
-    const auto cache = reset(req);  // noexcept
-    const auto now = get_time(req); // noexcept
+    const auto cache = reset(req); // noexcept
+    now = get_time(now, req);      // noexcept
 
     if (req.method() != HttpMethod::Delete) {
-        os.reset(HttpStatus::Ok, cache); // noexcept
+        os.reset(HttpStatus::Ok, ApplicationJson, cache); // noexcept
     } else {
-        os.reset(HttpStatus::NoContent); // noexcept
+        os.reset(HttpStatus::NoContent, nullptr); // noexcept
     }
     try {
         const auto& body = req.body();

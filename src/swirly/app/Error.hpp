@@ -14,15 +14,15 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_FIN_ERROR_HPP
-#define SWIRLY_FIN_ERROR_HPP
+#ifndef SWIRLY_APP_ERROR_HPP
+#define SWIRLY_APP_ERROR_HPP
 
 #include <swirly/Config.h>
 
 #include <system_error>
 
 namespace swirly {
-inline namespace fin {
+inline namespace app {
 
 enum class Error : int {
     BadRequest = 40000,
@@ -49,13 +49,13 @@ enum class Error : int {
 SWIRLY_API const std::error_category& error_category() noexcept;
 SWIRLY_API std::error_code make_error_code(Error err);
 
-} // namespace fin
+} // namespace app
 } // namespace swirly
 
 namespace std {
 template <>
-struct is_error_code_enum<swirly::fin::Error> : true_type {
+struct is_error_code_enum<swirly::app::Error> : true_type {
 };
 } // namespace std
 
-#endif // SWIRLY_FIN_ERROR_HPP
+#endif // SWIRLY_APP_ERROR_HPP

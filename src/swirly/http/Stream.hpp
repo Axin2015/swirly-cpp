@@ -14,17 +14,21 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_WEB_STREAM_HPP
-#define SWIRLY_WEB_STREAM_HPP
+#ifndef SWIRLY_HTTP_STREAM_HPP
+#define SWIRLY_HTTP_STREAM_HPP
 
-#include <swirly/web/Types.hpp>
+#include <swirly/http/Types.hpp>
 
 #include <swirly/sys/Buffer.hpp>
 
 #include <swirly/util/Stream.hpp>
 
 namespace swirly {
-inline namespace web {
+inline namespace http {
+
+constexpr char ApplicationJson[]{"application/json"};
+constexpr char TextHtml[]{"text/html"};
+constexpr char TextPlain[]{"text/plain"};
 
 class SWIRLY_API HttpBuf : public std::streambuf {
   public:
@@ -87,8 +91,7 @@ class SWIRLY_API HttpStream : public std::ostream {
         swirly::reset(*this);
         cloff_ = hcount_ = 0;
     }
-    void reset(HttpStatus status, const char* reason, bool cache = false);
-    void reset(HttpStatus status, bool cache = false) { reset(status, http_reason(status), cache); }
+    void reset(HttpStatus status, const char* content_type, bool no_cache = true);
 
   private:
     HttpBuf buf_;
@@ -102,7 +105,7 @@ class SWIRLY_API HttpStream : public std::ostream {
     std::streamsize hcount_{0};
 };
 
-} // namespace web
+} // namespace http
 } // namespace swirly
 
-#endif // SWIRLY_WEB_STREAM_HPP
+#endif // SWIRLY_HTTP_STREAM_HPP

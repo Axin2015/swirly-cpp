@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_WEB_RESTBODY_HPP
-#define SWIRLY_WEB_RESTBODY_HPP
+#ifndef SWIRLYD_RESTBODY_HPP
+#define SWIRLYD_RESTBODY_HPP
 
 #include <swirly/fin/Types.hpp>
 
@@ -23,7 +23,6 @@
 #include <swirly/util/Symbol.hpp>
 
 namespace swirly {
-inline namespace web {
 
 template <std::size_t MaxN>
 struct StringData {
@@ -129,7 +128,6 @@ class SWIRLY_API RestBody {
     long num() const noexcept { return num_.sign * num_.digits; }
 };
 
-} // namespace web
 } // namespace swirly
 
-#endif // SWIRLY_WEB_RESTBODY_HPP
+#endif // SWIRLYD_RESTBODY_HPP

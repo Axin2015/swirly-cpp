@@ -14,15 +14,15 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_FIN_EXCEPTION_HPP
-#define SWIRLY_FIN_EXCEPTION_HPP
+#ifndef SWIRLY_APP_EXCEPTION_HPP
+#define SWIRLY_APP_EXCEPTION_HPP
 
-#include <swirly/fin/Error.hpp>
+#include <swirly/app/Error.hpp>
 
 #include <swirly/util/Exception.hpp>
 
 namespace swirly {
-inline namespace fin {
+inline namespace app {
 
 /**
  * The request could not be understood by the server due to malformed syntax. The client SHOULD NOT
@@ -354,7 +354,7 @@ struct SWIRLY_API MarketClosedException : ServiceUnavailableException {
     using ServiceUnavailableException::ServiceUnavailableException;
 };
 
-} // namespace fin
+} // namespace app
 } // namespace swirly
 
-#endif // SWIRLY_FIN_EXCEPTION_HPP
+#endif // SWIRLY_APP_EXCEPTION_HPP

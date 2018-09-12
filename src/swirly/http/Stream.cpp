@@ -17,19 +17,8 @@
 #include "Stream.hpp"
 
 namespace swirly {
-inline namespace web {
+inline namespace http {
 using namespace std;
-namespace {
-
-// All 1xx (informational), 204 (no content), and 304 (not modified) responses must not include a
-// body.
-constexpr bool with_body(HttpStatus status) noexcept
-{
-    const auto n = static_cast<int>(status);
-    return !((n >= 100 && n < 200) || n == 204 || n == 304);
-}
-
-} // namespace
 
 void HttpBuf::set_content_length(std::streamsize pos, std::streamsize len) noexcept
 {
@@ -72,22 +61,21 @@ void HttpStream::commit() noexcept
     buf_.commit();
 }
 
-void HttpStream::reset(HttpStatus status, const char* reason, bool cache)
+void HttpStream::reset(HttpStatus status, const char* content_type, bool no_cache)
 {
     buf_.reset();
     swirly::reset(*this);
 
-    *this << "HTTP/1.1 " << status << ' ' << reason;
-    if (!cache) {
+    *this << "HTTP/1.1 " << status << ' ' << http_reason(status);
+    if (no_cache) {
         *this << "\r\nCache-Control: no-cache";
     }
-    if (with_body(status)) {
+    if (content_type) {
         // Status-Line = HTTP-Version SP Status-Code SP Reason-Phrase CRLF. Use 10 space
         // place-holder for content length. RFC2616 states that field value MAY be preceded by any
         // amount of LWS, though a single SP is preferred.
-        *this <<                                 //
-            "\r\nContent-Type: application/json" //
-            "\r\nContent-Length:          0";
+        *this << "\r\nContent-Type: " << content_type //
+              << "\r\nContent-Length:          0";
         cloff_ = pcount();
     } else {
         cloff_ = 0;
@@ -96,5 +84,5 @@ void HttpStream::reset(HttpStatus status, const char* reason, bool cache)
     hcount_ = pcount();
 }
 
-} // namespace web
+} // namespace http
 } // namespace swirly

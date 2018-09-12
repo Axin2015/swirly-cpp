@@ -14,27 +14,12 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_WEB_PAGE_HPP
-#define SWIRLY_WEB_PAGE_HPP
-
-#include <swirly/Config.h>
-
-#include <optional>
-#include <string_view>
+#include "App.hpp"
 
 namespace swirly {
-inline namespace web {
+inline namespace http {
 
-struct Page {
-    std::size_t offset{0};
-    std::optional<std::size_t> limit;
-};
+HttpApp::~HttpApp() = default;
 
-// Parse Page arguments from URL Query String. Note that special characters and percent encodings
-// are not supported for simplicity.
-SWIRLY_API Page parse_query(std::string_view query) noexcept;
-
-} // namespace web
+} // namespace http
 } // namespace swirly
-
-#endif // SWIRLY_WEB_PAGE_HPP

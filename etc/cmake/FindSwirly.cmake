@@ -20,39 +20,41 @@
 #  SWIRLY_LIBRARIES    - List of Swirly libraries.
 #  SWIRLY_FOUND        - True if Swirly found.
 
+include(GNUInstallDirs)
+
 # Look for the header file.
 find_path(SWIRLY_INCLUDE_DIR NAMES swirly/Config.h
           HINTS "$ENV{SWIRLY_HOME}/include")
 
 # Look for the libraries.
 find_library(SWIRLY_DB_LIBRARY NAMES swirly_db
-             HINTS "$ENV{SWIRLY_HOME}/lib")
-find_library(SWIRLY_WEB_LIBRARY NAMES swirly_web
-             HINTS "$ENV{SWIRLY_HOME}/lib")
+             HINTS "$ENV{SWIRLY_HOME}/${CMAKE_INSTALL_LIBDIR}")
 find_library(SWIRLY_LOB_LIBRARY NAMES swirly_lob
-             HINTS "$ENV{SWIRLY_HOME}/lib")
+             HINTS "$ENV{SWIRLY_HOME}/${CMAKE_INSTALL_LIBDIR}")
 find_library(SWIRLY_FIN_LIBRARY NAMES swirly_fin
-             HINTS "$ENV{SWIRLY_HOME}/lib")
+             HINTS "$ENV{SWIRLY_HOME}/${CMAKE_INSTALL_LIBDIR}")
 find_library(SWIRLY_FIX_LIBRARY NAMES swirly_fix
-             HINTS "$ENV{SWIRLY_HOME}/lib")
+             HINTS "$ENV{SWIRLY_HOME}/${CMAKE_INSTALL_LIBDIR}")
+find_library(SWIRLY_HTTP_LIBRARY NAMES swirly_http
+             HINTS "$ENV{SWIRLY_HOME}/${CMAKE_INSTALL_LIBDIR}")
 find_library(SWIRLY_APP_LIBRARY NAMES swirly_app
-             HINTS "$ENV{SWIRLY_HOME}/lib")
+             HINTS "$ENV{SWIRLY_HOME}/${CMAKE_INSTALL_LIBDIR}")
 find_library(SWIRLY_SYS_LIBRARY NAMES swirly_sys
-             HINTS "$ENV{SWIRLY_HOME}/lib")
+             HINTS "$ENV{SWIRLY_HOME}/${CMAKE_INSTALL_LIBDIR}")
 find_library(SWIRLY_PROF_LIBRARY NAMES swirly_prof
-             HINTS "$ENV{SWIRLY_HOME}/lib")
+             HINTS "$ENV{SWIRLY_HOME}/${CMAKE_INSTALL_LIBDIR}")
 find_library(SWIRLY_UTIL_LIBRARY NAMES swirly_util
-             HINTS "$ENV{SWIRLY_HOME}/lib")
+             HINTS "$ENV{SWIRLY_HOME}/${CMAKE_INSTALL_LIBDIR}")
 
 # Handle the QUIETLY and REQUIRED arguments and set SWIRLY_FOUND to TRUE if all listed variables are TRUE. 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(Swirly DEFAULT_MSG
   SWIRLY_INCLUDE_DIR
   SWIRLY_DB_LIBRARY
-  SWIRLY_WEB_LIBRARY
   SWIRLY_LOB_LIBRARY
   SWIRLY_FIN_LIBRARY
   SWIRLY_FIX_LIBRARY
+  SWIRLY_HTTP_LIBRARY
   SWIRLY_APP_LIBRARY
   SWIRLY_SYS_LIBRARY
   SWIRLY_PROF_LIBRARY
@@ -61,10 +63,10 @@ find_package_handle_standard_args(Swirly DEFAULT_MSG
 mark_as_advanced(
   SWIRLY_INCLUDE_DIR
   SWIRLY_DB_LIBRARY
-  SWIRLY_WEB_LIBRARY
   SWIRLY_LOB_LIBRARY
   SWIRLY_FIN_LIBRARY
   SWIRLY_FIX_LIBRARY
+  SWIRLY_HTTP_LIBRARY
   SWIRLY_APP_LIBRARY
   SWIRLY_SYS_LIBRARY
   SWIRLY_PROF_LIBRARY
@@ -75,10 +77,10 @@ if(SWIRLY_FOUND)
   set(SWIRLY_INCLUDE_DIRS ${SWIRLY_INCLUDE_DIR})
   set(SWIRLY_LIBRARIES
     ${SWIRLY_DB_LIBRARY}
-    ${SWIRLY_WEB_LIBRARY}
     ${SWIRLY_LOB_LIBRARY}
     ${SWIRLY_FIN_LIBRARY}
     ${SWIRLY_FIX_LIBRARY}
+    ${SWIRLY_HTTP_LIBRARY}
     ${SWIRLY_APP_LIBRARY}
     ${SWIRLY_SYS_LIBRARY}
     ${SWIRLY_PROF_LIBRARY}

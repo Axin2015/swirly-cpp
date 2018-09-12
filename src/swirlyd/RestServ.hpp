@@ -25,11 +25,12 @@
 #include <vector>
 
 namespace swirly {
-inline namespace web {
-class HttpRequest;
+inline namespace http {
 class HttpStream;
+} // namespace http
+
+class HttpRequest;
 class RestApp;
-} // namespace web
 
 class RestServ {
   public:
@@ -47,7 +48,7 @@ class RestServ {
     RestServ(RestServ&&) = delete;
     RestServ& operator=(RestServ&&) = delete;
 
-    void handle_request(const HttpRequest& req, HttpStream& os) noexcept;
+    void handle_request(Time now, const HttpRequest& req, HttpStream& os) noexcept;
 
   private:
     bool reset(const HttpRequest& req) noexcept;

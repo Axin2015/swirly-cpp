@@ -14,38 +14,43 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "HttpConn.hpp"
+#include "Conn.hpp"
 
-#include "RestServ.hpp"
+#include "App.hpp"
 
 #include <swirly/sys/Event.hpp>
 
 namespace swirly {
+inline namespace http {
 using namespace std;
 namespace {
 constexpr auto IdleTimeout = 5s;
 } // namespace
 
-HttpConn::HttpConn(Time now, Reactor& r, IoSocket&& sock, const Endpoint& ep, RestServ& rs)
+HttpConn::HttpConn(Time now, Reactor& r, IoSocket&& sock, const Endpoint& ep, HttpApp& app)
 : BasicHttpParser<HttpConn>{HttpType::Request}
 , reactor_(r)
 , sock_{move(sock)}
 , ep_{ep}
-, rest_serv_(rs)
+, app_(app)
 {
-    SWIRLY_DEBUG << "accept connection";
-
     sub_ = r.subscribe(*sock_, EventIn, bind<&HttpConn::on_io_event>(this));
     tmr_ = r.timer(now + IdleTimeout, Priority::Low, bind<&HttpConn::on_timer>(this));
+    app.on_connect(now, *this);
 }
 
-HttpConn::~HttpConn() = default;
+void HttpConn::clear() noexcept
+{
+    req_.clear();
+}
 
 void HttpConn::dispose(Time now) noexcept
 {
-    SWIRLY_DEBUG << "close connection";
+    app_.on_disconnect(now, *this);
     delete this;
 }
+
+HttpConn::~HttpConn() = default;
 
 bool HttpConn::on_url(string_view sv) noexcept
 {
@@ -54,7 +59,7 @@ bool HttpConn::on_url(string_view sv) noexcept
         req_.append_url(sv);
         ret = true;
     } catch (const std::exception& e) {
-        SWIRLY_ERROR << "error handling url: " << e.what();
+        app_.on_error(now_, *this, e);
     }
     return ret;
 }
@@ -66,7 +71,7 @@ bool HttpConn::on_header_field(string_view sv, bool first) noexcept
         req_.append_header_field(sv, first);
         ret = true;
     } catch (const std::exception& e) {
-        SWIRLY_ERROR << "error handling header field: " << e.what();
+        app_.on_error(now_, *this, e);
     }
     return ret;
 }
@@ -78,7 +83,7 @@ bool HttpConn::on_header_value(string_view sv, bool first) noexcept
         req_.append_header_value(sv, first);
         ret = true;
     } catch (const std::exception& e) {
-        SWIRLY_ERROR << "error handling header value: " << e.what();
+        app_.on_error(now_, *this, e);
     }
     return ret;
 }
@@ -96,7 +101,7 @@ bool HttpConn::on_body(string_view sv) noexcept
         req_.append_body(sv);
         ret = true;
     } catch (const std::exception& e) {
-        SWIRLY_ERROR << "error handling body: " << e.what();
+        app_.on_error(now_, *this, e);
     }
     return ret;
 }
@@ -109,7 +114,7 @@ bool HttpConn::on_message_end() noexcept
         req_.flush(); // May throw.
 
         const auto was_empty = out_.empty();
-        rest_serv_.handle_request(now_, req_, os_);
+        app_.on_message(now_, *this, req_, os_);
 
         if (was_empty) {
             // May throw.
@@ -117,7 +122,7 @@ bool HttpConn::on_message_end() noexcept
         }
         ret = true;
     } catch (const std::exception& e) {
-        SWIRLY_ERROR << "error handling message: " << e.what();
+        app_.on_error(now_, *this, e);
     }
     req_.clear();
     return ret;
@@ -159,15 +164,16 @@ void HttpConn::on_io_event(Time now, int fd, unsigned events)
         // noexcept parser callback functions.
         dispose(now);
     } catch (const std::exception& e) {
-        SWIRLY_ERROR << "error handling io event: " << e.what();
+        app_.on_error(now_, *this, e);
         dispose(now);
     }
 }
 
 void HttpConn::on_timer(Time now, Timer& tmr)
 {
-    SWIRLY_WARNING << "connection timeout";
+    app_.on_timeout(now, *this);
     dispose(now);
 }
 
+} // namespace http
 } // namespace swirly

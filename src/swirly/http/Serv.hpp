@@ -14,17 +14,15 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYD_HTTPSERV_HPP
-#define SWIRLYD_HTTPSERV_HPP
+#ifndef SWIRLY_HTTP_SERV_HPP
+#define SWIRLY_HTTP_SERV_HPP
 
-#include "HttpConn.hpp"
+#include <swirly/http/Conn.hpp>
 
 #include <swirly/sys/TcpAcceptor.hpp>
 
 namespace swirly {
-
-class RestServ;
-
+inline namespace http {
 class SWIRLY_API HttpServ : public TcpAcceptor<HttpServ> {
 
     friend TcpAcceptor<HttpServ>;
@@ -34,7 +32,7 @@ class SWIRLY_API HttpServ : public TcpAcceptor<HttpServ> {
     using ConnList = boost::intrusive::list<HttpConn, ConstantTimeSizeOption, MemberHookOption>;
 
   public:
-    HttpServ(Time now, Reactor& r, const Endpoint& ep, RestServ& rs);
+    HttpServ(Time now, Reactor& r, const Endpoint& ep, HttpApp& app);
     ~HttpServ();
 
     // Copy.
@@ -49,11 +47,11 @@ class SWIRLY_API HttpServ : public TcpAcceptor<HttpServ> {
     void do_accept(Time now, IoSocket&& sock, const Endpoint& ep);
 
     Reactor& reactor_;
-    RestServ& rest_serv_;
+    HttpApp& app_;
     // List of active connections.
     ConnList conn_list_;
 };
-
+} // namespace http
 } // namespace swirly
 
-#endif // SWIRLYD_HTTPSERV_HPP
+#endif // SWIRLY_HTTP_SERV_HPP

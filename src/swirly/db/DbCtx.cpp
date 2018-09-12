@@ -26,7 +26,7 @@
 #include "MySqlModel.hpp"
 #endif
 
-#include <swirly/fin/Exception.hpp>
+#include <swirly/app/Exception.hpp>
 
 #include <swirly/util/Config.hpp>
 #include <swirly/util/Log.hpp>

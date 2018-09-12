@@ -1,0 +1,67 @@
+/*
+ * The Restful Matching-Engine.
+ * Copyright (C) 2013, 2018 Swirly Cloud Limited.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program; if
+ * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
+ */
+#ifndef SWIRLY_HTTP_APP_HPP
+#define SWIRLY_HTTP_APP_HPP
+
+#include <swirly/util/Time.hpp>
+#include <swirly/util/Version.hpp>
+
+namespace swirly {
+inline namespace http {
+
+class HttpConn;
+class HttpRequest;
+class HttpStream;
+
+class SWIRLY_API HttpApp {
+  public:
+    HttpApp() noexcept = default;
+    virtual ~HttpApp();
+
+    // Copy.
+    constexpr HttpApp(const HttpApp&) noexcept = default;
+    HttpApp& operator=(const HttpApp&) noexcept = default;
+
+    // Move.
+    constexpr HttpApp(HttpApp&&) noexcept = default;
+    HttpApp& operator=(HttpApp&&) noexcept = default;
+
+    void on_connect(Time now, HttpConn& conn) { do_on_connect(now, conn); }
+    void on_disconnect(Time now, HttpConn& conn) noexcept { do_on_disconnect(now, conn); }
+    void on_error(Time now, HttpConn& conn, const std::exception& e) noexcept
+    {
+        do_on_error(now, conn, e);
+    }
+    void on_message(Time now, HttpConn& conn, const HttpRequest& req, HttpStream& os)
+    {
+        do_on_message(now, conn, req, os);
+    }
+    void on_timeout(Time now, HttpConn& conn) noexcept { do_on_timeout(now, conn); }
+
+  protected:
+    virtual void do_on_connect(Time now, HttpConn& conn) = 0;
+    virtual void do_on_disconnect(Time now, HttpConn& conn) noexcept = 0;
+    virtual void do_on_error(Time now, HttpConn& conn, const std::exception& e) noexcept = 0;
+    virtual void do_on_message(Time now, HttpConn& conn, const HttpRequest& req, HttpStream& os)
+        = 0;
+    virtual void do_on_timeout(Time now, HttpConn& conn) noexcept = 0;
+};
+
+} // namespace http
+} // namespace swirly
+
+#endif // SWIRLY_HTTP_APP_HPP

@@ -14,16 +14,15 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_WEB_RESTAPP_HPP
-#define SWIRLY_WEB_RESTAPP_HPP
+#ifndef SWIRLYD_RESTAPP_HPP
+#define SWIRLYD_RESTAPP_HPP
 
-#include <swirly/web/EntitySet.hpp>
-#include <swirly/web/Page.hpp>
+#include "EntitySet.hpp"
+#include "Page.hpp"
 
 #include <swirly/lob/App.hpp>
 
 namespace swirly {
-inline namespace web {
 
 class SWIRLY_API RestApp {
   public:
@@ -113,7 +112,6 @@ class SWIRLY_API RestApp {
     App app_;
 };
 
-} // namespace web
 } // namespace swirly
 
-#endif // SWIRLY_WEB_RESTAPP_HPP
+#endif // SWIRLYD_RESTAPP_HPP

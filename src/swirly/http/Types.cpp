@@ -16,10 +16,10 @@
  */
 #include "Types.hpp"
 
-#include <swirly/fin/Error.hpp>
+#include <swirly/app/Error.hpp>
 
 namespace swirly {
-inline namespace web {
+inline namespace http {
 
 const char* enum_string(HttpStatus status) noexcept
 {
@@ -80,5 +80,5 @@ HttpStatus http_status(const std::error_code& ec)
     return status;
 }
 
-} // namespace web
+} // namespace http
 } // namespace swirly

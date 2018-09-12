@@ -20,10 +20,11 @@
 #include <swirly/lob/Sess.hpp>
 
 #include <swirly/fin/Date.hpp>
-#include <swirly/fin/Exception.hpp>
 #include <swirly/fin/Journ.hpp>
 #include <swirly/fin/Model.hpp>
 #include <swirly/fin/MsgQueue.hpp>
+
+#include <swirly/app/Exception.hpp>
 
 #include <swirly/util/Date.hpp>
 #include <swirly/util/Finally.hpp>

@@ -20,8 +20,9 @@
 #include <swirly/lob/Sess.hpp>
 #include <swirly/lob/Test.hpp>
 
-#include <swirly/fin/Exception.hpp>
 #include <swirly/fin/MsgQueue.hpp>
+
+#include <swirly/app/Exception.hpp>
 
 #include <swirly/util/Date.hpp>
 #include <swirly/util/Time.hpp>

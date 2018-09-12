@@ -16,7 +16,7 @@
  */
 #include "EntitySet.hpp"
 
-#include <swirly/fin/Exception.hpp>
+#include <swirly/app/Exception.hpp>
 
 #include <swirly/util/String.hpp>
 

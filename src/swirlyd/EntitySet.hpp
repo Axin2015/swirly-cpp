@@ -14,15 +14,14 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_WEB_ENTITYSET_HPP
-#define SWIRLY_WEB_ENTITYSET_HPP
+#ifndef SWIRLYD_ENTITYSET_HPP
+#define SWIRLYD_ENTITYSET_HPP
 
 #include <swirly/Config.h>
 
 #include <string_view>
 
 namespace swirly {
-inline namespace web {
 
 class SWIRLY_API EntitySet {
   public:
@@ -82,7 +81,6 @@ class SWIRLY_API EntitySet {
     int bs_;
 };
 
-} // namespace web
 } // namespace swirly
 
-#endif // SWIRLY_WEB_ENTITYSET_HPP
+#endif // SWIRLYD_ENTITYSET_HPP

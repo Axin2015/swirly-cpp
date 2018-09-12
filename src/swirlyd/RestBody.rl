@@ -15,12 +15,11 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/web/RestBody.hpp>
+#include "RestBody.hpp"
 
-#include <swirly/fin/Exception.hpp>
+#include <swirly/app/Exception.hpp>
 
 namespace swirly {
-inline namespace web {
 using namespace std;
 namespace {
 
@@ -311,5 +310,4 @@ bool RestBody::parse(string_view buf)
   return true;
 }
 
-} // namespace web
 } // namespace swirly

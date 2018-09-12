@@ -16,7 +16,7 @@
  */
 #include "Parser.hpp"
 
-#include <swirly/web/Url.hpp>
+#include <swirly/http/Url.hpp>
 
 #include <swirly/util/String.hpp>
 
