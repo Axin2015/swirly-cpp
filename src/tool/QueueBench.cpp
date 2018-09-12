@@ -14,6 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
+#include <swirly/prof/File.hpp>
 #include <swirly/prof/HdrHistogram.hpp>
 
 #include <swirly/app/Backoff.hpp>
@@ -77,11 +78,8 @@ int main(int argc, char* argv[])
         t1.join();
         t2.join();
 
-        fprintf(stderr, "Percentile Report\n");
-        fprintf(stderr, "-----------------\n");
-        hist.print(stderr, 5, 1000);
-
-        fflush(stderr);
+        auto file = open_file("queue.hdr", "w");
+        hist.print(file.get(), 5, 1000);
         ret = 0;
 
     } catch (const exception& e) {

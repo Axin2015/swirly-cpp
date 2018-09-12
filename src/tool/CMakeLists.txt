@@ -41,3 +41,23 @@ install(TARGETS swirly-queue-bench DESTINATION bin COMPONENT program)
 add_executable(swirly-timer-bench TimerBench.cpp)
 target_link_libraries(swirly-timer-bench ${swirly_sys_LIBRARY})
 install(TARGETS swirly-timer-bench DESTINATION bin COMPONENT program)
+
+add_custom_target(queue-benchmark DEPENDS
+swirly-queue-bench
+WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+COMMAND bash -c "${CMAKE_INSTALL_BINDIR}/swirly-queue-bench && \"${CMAKE_SOURCE_DIR}/script/hist-plot.sh\" queue.hdr > queue_benchmark.png"
+VERBATIM
+)
+
+add_custom_target(app-benchmark DEPENDS
+swirly-app-bench
+WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+COMMAND bash -c "${CMAKE_INSTALL_BINDIR}/swirly-app-bench && \"${CMAKE_SOURCE_DIR}/script/hist-plot.sh\" maker.hdr taker.hdr > app_benchmark.png"
+VERBATIM
+)
+
+add_custom_target(benchmark DEPENDS
+queue-benchmark
+app-benchmark
+)
+
