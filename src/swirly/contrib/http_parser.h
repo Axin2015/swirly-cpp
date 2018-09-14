@@ -29,7 +29,7 @@ extern "C" {
 
 /* Also update SONAME in the Makefile whenever you change these. */
 #define HTTP_PARSER_VERSION_MAJOR 2
-#define HTTP_PARSER_VERSION_MINOR 7
+#define HTTP_PARSER_VERSION_MINOR 8
 #define HTTP_PARSER_VERSION_PATCH 1
 
 #include <stddef.h>
@@ -409,6 +409,9 @@ SWIRLY_API int http_should_keep_alive(const http_parser *parser);
 
 /* Returns a string version of the HTTP method. */
 SWIRLY_API const char *http_method_str(enum http_method m);
+
+/* Returns a string version of the HTTP status code. */
+SWIRLY_API const char *http_status_str(enum http_status s);
 
 /* Return a string name of the given error */
 SWIRLY_API const char *http_errno_name(enum http_errno err);
