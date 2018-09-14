@@ -17,40 +17,64 @@
 #ifndef SWIRLY_HTTP_SERV_HPP
 #define SWIRLY_HTTP_SERV_HPP
 
+#include <swirly/http/App.hpp>
 #include <swirly/http/Conn.hpp>
 
 #include <swirly/sys/TcpAcceptor.hpp>
 
 namespace swirly {
 inline namespace http {
-class SWIRLY_API HttpServ : public TcpAcceptor<HttpServ> {
 
-    friend TcpAcceptor<HttpServ>;
+template <typename ConnT, typename AppT>
+class BasicHttpServ : public TcpAcceptor<BasicHttpServ<ConnT, AppT>> {
+
+    friend TcpAcceptor<BasicHttpServ<ConnT, AppT>>;
+
+    using Conn = ConnT;
+    using App = AppT;
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
-    using MemberHookOption = boost::intrusive::member_hook<HttpConn, decltype(HttpConn::list_hook),
-                                                           &HttpConn::list_hook>;
-    using ConnList = boost::intrusive::list<HttpConn, ConstantTimeSizeOption, MemberHookOption>;
+    using MemberHookOption
+        = boost::intrusive::member_hook<Conn, decltype(Conn::list_hook), &Conn::list_hook>;
+    using ConnList = boost::intrusive::list<Conn, ConstantTimeSizeOption, MemberHookOption>;
+
+    using typename TcpAcceptor<BasicHttpServ<ConnT, AppT>>::Endpoint;
 
   public:
-    HttpServ(Time now, Reactor& r, const Endpoint& ep, HttpApp& app);
-    ~HttpServ();
+    BasicHttpServ(Time now, Reactor& r, const Endpoint& ep, App& app)
+    : TcpAcceptor<BasicHttpServ<ConnT, AppT>>{r, ep}
+    , reactor_(r)
+    , app_(app)
+    {
+    }
+    ~BasicHttpServ()
+    {
+        const auto now = UnixClock::now();
+        conn_list_.clear_and_dispose([now](auto* conn) { conn->dispose(now); });
+    }
 
     // Copy.
-    HttpServ(const HttpServ&) = delete;
-    HttpServ& operator=(const HttpServ&) = delete;
+    BasicHttpServ(const BasicHttpServ&) = delete;
+    BasicHttpServ& operator=(const BasicHttpServ&) = delete;
 
     // Move.
-    HttpServ(HttpServ&&) = delete;
-    HttpServ& operator=(HttpServ&&) = delete;
+    BasicHttpServ(BasicHttpServ&&) = delete;
+    BasicHttpServ& operator=(BasicHttpServ&&) = delete;
 
   private:
-    void do_accept(Time now, IoSocket&& sock, const Endpoint& ep);
+    void do_accept(Time now, IoSocket&& sock, const Endpoint& ep)
+    {
+        auto* const conn = new Conn{now, reactor_, std::move(sock), ep, app_};
+        conn_list_.push_back(*conn);
+    }
 
     Reactor& reactor_;
-    HttpApp& app_;
+    App& app_;
     // List of active connections.
     ConnList conn_list_;
 };
+
+using HttpServ = BasicHttpServ<HttpConn, HttpApp>;
+
 } // namespace http
 } // namespace swirly
 

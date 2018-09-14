@@ -14,15 +14,17 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "HttpServ.hpp"
 #include "RestApp.hpp"
 #include "RestImpl.hpp"
+#include "RestRequest.hpp"
 
 #include <swirly/db/DbCtx.hpp>
 
 #include <swirly/fin/Journ.hpp>
 #include <swirly/fin/Model.hpp>
 #include <swirly/fin/MsgQueue.hpp>
+
+#include <swirly/http/Serv.hpp>
 
 #include <swirly/app/MemCtx.hpp>
 #include <swirly/app/Thread.hpp>
@@ -124,6 +126,9 @@ void dealloc(void* ptr, size_t size, align_val_t al) noexcept
 {
     return mem_ctx.dealloc(ptr, size, al);
 }
+
+using RestConn = BasicHttpConn<RestRequest, RestApp>;
+using RestServ = BasicHttpServ<RestConn, RestApp>;
 
 } // namespace app
 } // namespace swirly
@@ -268,7 +273,7 @@ int main(int argc, char* argv[])
 
         EpollReactor reactor{1024};
         const TcpEndpoint ep{Tcp::v4(), from_string<uint16_t>(http_port)};
-        HttpServ http_serv{opts.start_time, reactor, ep, rest_app};
+        RestServ rest_serv{opts.start_time, reactor, ep, rest_app};
 
         ReactorThread reactor_thread{reactor, ThreadConfig{"reactor"s}};
         auto journ_agent = [&mq, &journ]() {

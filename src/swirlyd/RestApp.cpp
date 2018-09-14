@@ -16,8 +16,8 @@
  */
 #include "RestApp.hpp"
 
-#include "HttpRequest.hpp"
 #include "RestImpl.hpp"
+#include "RestRequest.hpp"
 
 #include <swirly/http/Stream.hpp>
 
@@ -49,7 +49,7 @@ class ScopedIds {
     vector<Id64>& ids_;
 };
 
-string_view get_accnt(const HttpRequest& req)
+string_view get_accnt(const RestRequest& req)
 {
     const string_view accnt{req.accnt()};
     if (accnt.empty()) {
@@ -58,18 +58,18 @@ string_view get_accnt(const HttpRequest& req)
     return accnt;
 }
 
-uint32_t get_perm(const HttpRequest& req)
+uint32_t get_perm(const RestRequest& req)
 {
     return from_string<uint32_t>(req.perm());
 }
 
-Time get_time(Time now, const HttpRequest& req) noexcept
+Time get_time(Time now, const RestRequest& req) noexcept
 {
     const string_view val{req.time()};
     return val.empty() ? now : to_time(from_string<Millis>(val));
 }
 
-string_view get_admin(const HttpRequest& req)
+string_view get_admin(const RestRequest& req)
 {
     const auto accnt = get_accnt(req);
     const auto perm = get_perm(req);
@@ -79,7 +79,7 @@ string_view get_admin(const HttpRequest& req)
     return accnt;
 }
 
-string_view get_trader(const HttpRequest& req)
+string_view get_trader(const RestRequest& req)
 {
     const auto accnt = get_accnt(req);
     const auto perm = get_perm(req);
@@ -93,7 +93,23 @@ string_view get_trader(const HttpRequest& req)
 
 RestApp::~RestApp() = default;
 
-void RestApp::on_message(Time now, const HttpRequest& req, HttpStream& os) noexcept
+void RestApp::on_connect(Time now, const Endpoint& ep)
+{
+    SWIRLY_INFO << "session connected: " << ep;
+}
+
+void RestApp::on_disconnect(Time now, const Endpoint& ep) noexcept
+{
+    SWIRLY_INFO << "session disconnected: " << ep;
+}
+
+void RestApp::on_error(Time now, const Endpoint& ep, const std::exception& e) noexcept
+{
+    SWIRLY_ERROR << "session error: " << ep << ": " << e.what();
+}
+
+void RestApp::on_message(Time now, const Endpoint& ep, const RestRequest& req,
+                         HttpStream& os) noexcept
 {
     const auto cache = reset(req); // noexcept
     now = get_time(now, req);      // noexcept
@@ -134,7 +150,12 @@ void RestApp::on_message(Time now, const HttpRequest& req, HttpStream& os) noexc
     os.commit(); // noexcept
 }
 
-bool RestApp::reset(const HttpRequest& req) noexcept
+void RestApp::on_timeout(Time now, const Endpoint& ep) noexcept
+{
+    SWIRLY_WARNING << "session timeout: " << ep;
+}
+
+bool RestApp::reset(const RestRequest& req) noexcept
 {
     match_method_ = false;
     match_path_ = false;
@@ -154,7 +175,7 @@ bool RestApp::reset(const HttpRequest& req) noexcept
     return !path.empty() && path_.top() == "refdata"sv;
 }
 
-void RestApp::rest_request(Time now, const HttpRequest& req, HttpStream& os)
+void RestApp::rest_request(Time now, const RestRequest& req, HttpStream& os)
 {
     if (path_.empty()) {
         return;
@@ -186,7 +207,7 @@ void RestApp::rest_request(Time now, const HttpRequest& req, HttpStream& os)
     }
 }
 
-void RestApp::ref_data_request(Time now, const HttpRequest& req, HttpStream& os)
+void RestApp::ref_data_request(Time now, const RestRequest& req, HttpStream& os)
 {
     if (path_.empty()) {
 
@@ -232,7 +253,7 @@ void RestApp::ref_data_request(Time now, const HttpRequest& req, HttpStream& os)
     }
 }
 
-void RestApp::asset_request(Time now, const HttpRequest& req, HttpStream& os)
+void RestApp::asset_request(Time now, const RestRequest& req, HttpStream& os)
 {
     if (path_.empty()) {
 
@@ -264,7 +285,7 @@ void RestApp::asset_request(Time now, const HttpRequest& req, HttpStream& os)
     }
 }
 
-void RestApp::instr_request(Time now, const HttpRequest& req, HttpStream& os)
+void RestApp::instr_request(Time now, const RestRequest& req, HttpStream& os)
 {
     if (path_.empty()) {
 
@@ -296,7 +317,7 @@ void RestApp::instr_request(Time now, const HttpRequest& req, HttpStream& os)
     }
 }
 
-void RestApp::sess_request(Time now, const HttpRequest& req, HttpStream& os)
+void RestApp::sess_request(Time now, const RestRequest& req, HttpStream& os)
 {
     if (path_.empty()) {
 
@@ -352,7 +373,7 @@ void RestApp::sess_request(Time now, const HttpRequest& req, HttpStream& os)
     }
 }
 
-void RestApp::market_request(Time now, const HttpRequest& req, HttpStream& os)
+void RestApp::market_request(Time now, const RestRequest& req, HttpStream& os)
 {
     if (path_.empty()) {
 
@@ -464,7 +485,7 @@ void RestApp::market_request(Time now, const HttpRequest& req, HttpStream& os)
     }
 }
 
-void RestApp::order_request(Time now, const HttpRequest& req, HttpStream& os)
+void RestApp::order_request(Time now, const RestRequest& req, HttpStream& os)
 {
     if (path_.empty()) {
 
@@ -606,7 +627,7 @@ void RestApp::order_request(Time now, const HttpRequest& req, HttpStream& os)
     }
 }
 
-void RestApp::exec_request(Time now, const HttpRequest& req, HttpStream& os)
+void RestApp::exec_request(Time now, const RestRequest& req, HttpStream& os)
 {
     if (path_.empty()) {
 
@@ -622,7 +643,7 @@ void RestApp::exec_request(Time now, const HttpRequest& req, HttpStream& os)
     }
 }
 
-void RestApp::trade_request(Time now, const HttpRequest& req, HttpStream& os)
+void RestApp::trade_request(Time now, const RestRequest& req, HttpStream& os)
 {
     if (path_.empty()) {
 
@@ -758,7 +779,7 @@ void RestApp::trade_request(Time now, const HttpRequest& req, HttpStream& os)
     }
 }
 
-void RestApp::posn_request(Time now, const HttpRequest& req, HttpStream& os)
+void RestApp::posn_request(Time now, const RestRequest& req, HttpStream& os)
 {
     if (path_.empty()) {
 

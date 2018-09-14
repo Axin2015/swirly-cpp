@@ -14,10 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "HttpRequest.hpp"
+#include "RestRequest.hpp"
 
 namespace swirly {
 
-HttpRequest::~HttpRequest() = default;
+RestRequest::~RestRequest() = default;
 
 } // namespace swirly

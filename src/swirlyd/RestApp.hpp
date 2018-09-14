@@ -17,6 +17,8 @@
 #ifndef SWIRLYD_RESTAPP_HPP
 #define SWIRLYD_RESTAPP_HPP
 
+#include <swirly/sys/IpAddress.hpp>
+
 #include <swirly/util/IntTypes.hpp>
 #include <swirly/util/Symbol.hpp>
 #include <swirly/util/Time.hpp>
@@ -29,11 +31,14 @@ inline namespace http {
 class HttpStream;
 } // namespace http
 
-class HttpRequest;
 class RestImpl;
+class RestRequest;
 
 class RestApp {
   public:
+    using Transport = Tcp;
+    using Endpoint = TcpEndpoint;
+
     explicit RestApp(RestImpl& impl) noexcept
     : impl_(impl)
     {
@@ -48,24 +53,28 @@ class RestApp {
     RestApp(RestApp&&) = delete;
     RestApp& operator=(RestApp&&) = delete;
 
-    void on_message(Time now, const HttpRequest& req, HttpStream& os) noexcept;
+    void on_connect(Time now, const Endpoint& ep);
+    void on_disconnect(Time now, const Endpoint& ep) noexcept;
+    void on_error(Time now, const Endpoint& ep, const std::exception& e) noexcept;
+    void on_message(Time now, const Endpoint& ep, const RestRequest& req, HttpStream& os) noexcept;
+    void on_timeout(Time now, const Endpoint& ep) noexcept;
 
   private:
-    bool reset(const HttpRequest& req) noexcept;
+    bool reset(const RestRequest& req) noexcept;
 
-    void rest_request(Time now, const HttpRequest& req, HttpStream& os);
+    void rest_request(Time now, const RestRequest& req, HttpStream& os);
 
-    void ref_data_request(Time now, const HttpRequest& req, HttpStream& os);
-    void asset_request(Time now, const HttpRequest& req, HttpStream& os);
-    void instr_request(Time now, const HttpRequest& req, HttpStream& os);
+    void ref_data_request(Time now, const RestRequest& req, HttpStream& os);
+    void asset_request(Time now, const RestRequest& req, HttpStream& os);
+    void instr_request(Time now, const RestRequest& req, HttpStream& os);
 
-    void sess_request(Time now, const HttpRequest& req, HttpStream& os);
-    void market_request(Time now, const HttpRequest& req, HttpStream& os);
+    void sess_request(Time now, const RestRequest& req, HttpStream& os);
+    void market_request(Time now, const RestRequest& req, HttpStream& os);
 
-    void order_request(Time now, const HttpRequest& req, HttpStream& os);
-    void exec_request(Time now, const HttpRequest& req, HttpStream& os);
-    void trade_request(Time now, const HttpRequest& req, HttpStream& os);
-    void posn_request(Time now, const HttpRequest& req, HttpStream& os);
+    void order_request(Time now, const RestRequest& req, HttpStream& os);
+    void exec_request(Time now, const RestRequest& req, HttpStream& os);
+    void trade_request(Time now, const RestRequest& req, HttpStream& os);
+    void posn_request(Time now, const RestRequest& req, HttpStream& os);
 
     RestImpl& impl_;
     bool match_method_{false};
