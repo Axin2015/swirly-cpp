@@ -23,7 +23,7 @@
 namespace swirly {
 inline namespace fix {
 
-struct FixHdr {
+struct FixHeader {
     MsgType::View msg_type;
     SenderCompId::View sender_comp_id;
     TargetCompId::View target_comp_id;
@@ -33,12 +33,12 @@ struct FixHdr {
     std::optional<PossResend> poss_resend;
 };
 
-SWIRLY_API std::ostream& operator<<(std::ostream& os, const FixHdr& hdr);
+SWIRLY_API std::ostream& operator<<(std::ostream& os, const FixHeader& hdr);
 
-SWIRLY_API std::size_t parse_hdr(std::string_view msg, std::size_t msg_type_off, FixHdr& hdr);
+SWIRLY_API std::size_t parse_header(std::string_view msg, std::size_t msg_type_off, FixHeader& hdr);
 
 template <typename StringT>
-BasicFixSessId<StringT> get_sess_id(Version ver, const FixHdr& hdr) noexcept
+BasicFixSessId<StringT> get_sess_id(Version ver, const FixHeader& hdr) noexcept
 {
     return {ver, StringT{hdr.sender_comp_id.value}, StringT{hdr.target_comp_id.value}};
 }

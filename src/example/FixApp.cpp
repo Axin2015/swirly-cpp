@@ -35,28 +35,20 @@ namespace {
 class TestApp : public FixApp {
   public:
   protected:
-    void do_on_connect(Time now, FixConn& conn) noexcept override
+    void do_on_connect(Time now, FixConn& conn) override
     {
         SWIRLY_INFO << "session connected: " << conn.endpoint();
     }
-    void do_on_disconnect(Time now, FixConn& conn) noexcept override
-    {
-        SWIRLY_INFO << "session disconnected: " << conn.endpoint();
-    }
-    void do_on_error(Time now, FixConn& conn, const std::exception& e) noexcept override
-    {
-        SWIRLY_ERROR << "session error: " << conn.endpoint() << ": " << e.what();
-    }
-    void do_on_logon(Time now, FixConn& conn) noexcept override
+    void do_on_logon(Time now, FixConn& conn, const FixSessId& sess_id) override
     {
         SWIRLY_INFO << "session logged-on: " << conn.endpoint();
     }
-    void do_on_logout(Time now, FixConn& conn) noexcept override
+    void do_on_logout(Time now, FixConn& conn, const FixSessId& sess_id) noexcept override
     {
         SWIRLY_INFO << "session logged-out: " << conn.endpoint();
     }
     void do_on_message(Time now, FixConn& conn, string_view msg, size_t body_off, Version ver,
-                       const FixHdr& hdr) noexcept override
+                       const FixHeader& hdr) override
     {
         FixLexer lex{msg};
         while (!lex.empty()) {
@@ -65,7 +57,15 @@ class TestApp : public FixApp {
         }
         cout << endl;
     }
-    void do_on_timeout(Time now, FixConn& conn) noexcept override
+    void do_on_disconnect(Time now, const FixConn& conn) noexcept override
+    {
+        SWIRLY_INFO << "session disconnected: " << conn.endpoint();
+    }
+    void do_on_error(Time now, const FixConn& conn, const std::exception& e) noexcept override
+    {
+        SWIRLY_ERROR << "session error: " << conn.endpoint() << ": " << e.what();
+    }
+    void do_on_timeout(Time now, const FixConn& conn) noexcept override
     {
         SWIRLY_WARNING << "session timeout: " << conn.endpoint();
     }

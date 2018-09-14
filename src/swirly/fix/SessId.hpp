@@ -68,6 +68,12 @@ struct BasicFixSessId {
         sender_comp_id.clear();
         target_comp_id.clear();
     }
+    void swap(BasicFixSessId& rhs) noexcept
+    {
+        version.swap(rhs.version);
+        sender_comp_id.swap(rhs.sender_comp_id);
+        target_comp_id.swap(rhs.target_comp_id);
+    }
 
     Version version;
     StringT sender_comp_id;

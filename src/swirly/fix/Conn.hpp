@@ -63,17 +63,18 @@ class SWIRLY_API FixConn final : BasicFixParser<FixConn> {
     void schedule_heartbeat(Time now);
     void on_heartbeat(Time now, Timer& tmr);
     void on_message(Time now, std::string_view msg, std::size_t msg_type_off, Version ver);
-    void set_sess_id(const FixSessId& sess_id);
+
     Reactor& reactor_;
     IoSocket sock_;
     const Endpoint ep_;
     const FixSessMap& sess_map_;
+    FixApp& app_;
+    enum { LoggedOut, LogonSent, LoggedOn, LogoutSent } state_{LoggedOut};
+
     FixSessId sess_id_;
     // Agreed upon by the two firms and specified by the Logon initiator and echoed back by the
     // Logon acceptor.
     Seconds hb_int_{2s};
-    FixApp& app_;
-    enum { LoggedOut, LogonSent, LoggedOn, LogoutSent } state_{LoggedOut};
     Reactor::Handle sub_;
     struct {
         Buffer buf;
