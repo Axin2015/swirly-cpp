@@ -19,19 +19,17 @@
 #include <swirly/lob/Response.hpp>
 #include <swirly/lob/Sess.hpp>
 
-#include <swirly/fin/Exception.hpp>
+#include <swirly/app/Exception.hpp>
 
 #include <swirly/util/Date.hpp>
 
 #include <algorithm>
 
 namespace swirly {
-inline namespace web {
 using namespace std;
-namespace detail {
 namespace {
 
-void get_order(const Sess& sess, ostream& out)
+void do_get_order(const Sess& sess, ostream& out)
 {
     const auto& orders = sess.orders();
     out << '[';
@@ -39,7 +37,7 @@ void get_order(const Sess& sess, ostream& out)
     out << ']';
 }
 
-void get_exec(const Sess& sess, Page page, ostream& out)
+void do_get_exec(const Sess& sess, Page page, ostream& out)
 {
     const auto& execs = sess.execs();
     out << '[';
@@ -60,7 +58,7 @@ void get_exec(const Sess& sess, Page page, ostream& out)
     out << ']';
 }
 
-void get_trade(const Sess& sess, ostream& out)
+void do_get_trade(const Sess& sess, ostream& out)
 {
     const auto& trades = sess.trades();
     out << '[';
@@ -68,7 +66,7 @@ void get_trade(const Sess& sess, ostream& out)
     out << ']';
 }
 
-void get_posn(const Sess& sess, ostream& out)
+void do_get_posn(const Sess& sess, ostream& out)
 {
     const auto& posns = sess.posns();
     out << '[';
@@ -77,7 +75,6 @@ void get_posn(const Sess& sess, ostream& out)
 }
 
 } // namespace
-} // namespace detail
 
 RestApp::~RestApp() = default;
 
@@ -165,7 +162,7 @@ void RestApp::get_sess(Time now, Symbol accnt, EntitySet es, Page page, ostream&
             out << ',';
         }
         out << "\"orders\":";
-        detail::get_order(sess, out);
+        do_get_order(sess, out);
         ++i;
     }
     if (es.exec()) {
@@ -173,7 +170,7 @@ void RestApp::get_sess(Time now, Symbol accnt, EntitySet es, Page page, ostream&
             out << ',';
         }
         out << "\"execs\":";
-        detail::get_exec(sess, page, out);
+        do_get_exec(sess, page, out);
         ++i;
     }
     if (es.trade()) {
@@ -181,7 +178,7 @@ void RestApp::get_sess(Time now, Symbol accnt, EntitySet es, Page page, ostream&
             out << ',';
         }
         out << "\"trades\":";
-        detail::get_trade(sess, out);
+        do_get_trade(sess, out);
         ++i;
     }
     if (es.posn()) {
@@ -189,7 +186,7 @@ void RestApp::get_sess(Time now, Symbol accnt, EntitySet es, Page page, ostream&
             out << ',';
         }
         out << "\"posns\":";
-        detail::get_posn(sess, out);
+        do_get_posn(sess, out);
         ++i;
     }
     out << '}';
@@ -220,7 +217,7 @@ void RestApp::get_market(Time now, Symbol instr, IsoDate settl_date, std::ostrea
 
 void RestApp::get_order(Time now, Symbol accnt, std::ostream& out) const
 {
-    detail::get_order(app_.sess(accnt), out);
+    do_get_order(app_.sess(accnt), out);
 }
 
 void RestApp::get_order(Time now, Symbol accnt, Symbol instr, ostream& out) const
@@ -262,12 +259,12 @@ void RestApp::get_order(Time now, Symbol accnt, Symbol instr_symbol, IsoDate set
 
 void RestApp::get_exec(Time now, Symbol accnt, Page page, std::ostream& out) const
 {
-    detail::get_exec(app_.sess(accnt), page, out);
+    do_get_exec(app_.sess(accnt), page, out);
 }
 
 void RestApp::get_trade(Time now, Symbol accnt, std::ostream& out) const
 {
-    detail::get_trade(app_.sess(accnt), out);
+    do_get_trade(app_.sess(accnt), out);
 }
 
 void RestApp::get_trade(Time now, Symbol accnt, Symbol instr, std::ostream& out) const
@@ -309,7 +306,7 @@ void RestApp::get_trade(Time now, Symbol accnt, Symbol instr_symbol, IsoDate set
 
 void RestApp::get_posn(Time now, Symbol accnt, std::ostream& out) const
 {
-    detail::get_posn(app_.sess(accnt), out);
+    do_get_posn(app_.sess(accnt), out);
 }
 
 void RestApp::get_posn(Time now, Symbol accnt, Symbol instr, std::ostream& out) const
@@ -418,5 +415,4 @@ void RestApp::delete_trade(Time now, Symbol accnt, Symbol instr_symbol, IsoDate 
     app_.archive_trade(now, sess, market_id, ids);
 }
 
-} // namespace web
 } // namespace swirly

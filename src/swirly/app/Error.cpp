@@ -18,7 +18,7 @@
 
 namespace swirly {
 using namespace std::string_literals;
-inline namespace fin {
+inline namespace app {
 namespace {
 class ErrorCategory : public std::error_category {
   public:
@@ -117,5 +117,5 @@ std::error_code make_error_code(Error err)
     return {static_cast<int>(err), ecat_};
 }
 
-} // namespace fin
+} // namespace app
 } // namespace swirly

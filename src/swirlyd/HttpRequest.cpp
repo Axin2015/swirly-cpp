@@ -14,30 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "HttpServ.hpp"
-
-#include "HttpConn.hpp"
+#include "HttpRequest.hpp"
 
 namespace swirly {
-using namespace std;
 
-HttpServ::HttpServ(Time now, Reactor& r, const Endpoint& ep, RestServ& rs)
-: TcpAcceptor{r, ep}
-, reactor_(r)
-, rest_serv_(rs)
-{
-}
-
-HttpServ::~HttpServ()
-{
-    const auto now = UnixClock::now();
-    conn_list_.clear_and_dispose([now](auto* conn) { conn->dispose(now); });
-}
-
-void HttpServ::do_accept(Time now, IoSocket&& sock, const Endpoint& ep)
-{
-    auto* const conn = new HttpConn{now, reactor_, move(sock), ep, rest_serv_};
-    conn_list_.push_back(*conn);
-}
+HttpRequest::~HttpRequest() = default;
 
 } // namespace swirly

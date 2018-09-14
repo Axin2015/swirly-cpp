@@ -17,7 +17,7 @@
 #include "Exception.hpp"
 
 namespace swirly {
-inline namespace fin {
+inline namespace app {
 using namespace std;
 
 BadRequestException::~BadRequestException() = default;
@@ -58,5 +58,5 @@ ServiceUnavailableException::~ServiceUnavailableException() = default;
 
 MarketClosedException::~MarketClosedException() = default;
 
-} // namespace fin
+} // namespace app
 } // namespace swirly

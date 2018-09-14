@@ -31,8 +31,6 @@ set(lib_SOURCES
   Conv.cpp
   Date.cpp
   DsvModel.cpp
-  Error.cpp
-  Exception.cpp
   Exec.cpp
   Instr.cpp
   IntTypes.cpp
@@ -79,7 +77,6 @@ endforeach()
 set(test_SOURCES
   Asset.ut.cpp
   Date.ut.cpp
-  Exception.ut.cpp
   Instr.ut.cpp
   IntTypes.ut.cpp
   Level.ut.cpp

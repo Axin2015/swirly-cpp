@@ -17,11 +17,12 @@
 #ifndef SWIRLY_LOB_SESS_HPP
 #define SWIRLY_LOB_SESS_HPP
 
-#include <swirly/fin/Exception.hpp>
 #include <swirly/fin/Exec.hpp>
 #include <swirly/fin/MarketId.hpp>
 #include <swirly/fin/Order.hpp>
 #include <swirly/fin/Posn.hpp>
+
+#include <swirly/app/Exception.hpp>
 
 #include <swirly/util/Set.hpp>
 

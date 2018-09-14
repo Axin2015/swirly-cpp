@@ -16,12 +16,11 @@
  */
 #include "EntitySet.hpp"
 
-#include <swirly/fin/Exception.hpp>
+#include <swirly/app/Exception.hpp>
 
 #include <swirly/util/Tokeniser.hpp>
 
 namespace swirly {
-inline namespace web {
 using namespace std;
 namespace {
 
@@ -67,5 +66,4 @@ EntitySet EntitySet::parse(string_view sv)
     return {bs};
 }
 
-} // namespace web
 } // namespace swirly

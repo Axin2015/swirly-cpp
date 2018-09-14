@@ -16,7 +16,7 @@
  */
 #include "Lexer.hpp"
 
-#include <swirly/fin/Exception.hpp>
+#include <swirly/app/Exception.hpp>
 
 #include <cassert>
 #include <cctype>

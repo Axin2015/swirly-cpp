@@ -14,15 +14,15 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_WEB_TYPES_HPP
-#define SWIRLY_WEB_TYPES_HPP
+#ifndef SWIRLY_HTTP_TYPES_HPP
+#define SWIRLY_HTTP_TYPES_HPP
 
 #include <swirly/contrib/http_parser.h>
 
 #include <iostream>
 
 namespace swirly {
-inline namespace web {
+inline namespace http {
 
 enum class HttpMethod : int {
     Delete = HTTP_DELETE,
@@ -99,7 +99,7 @@ inline std::ostream& operator<<(std::ostream& os, HttpStatus status)
 
 enum class HttpType : int { Request = HTTP_REQUEST, Response = HTTP_RESPONSE };
 
-} // namespace web
+} // namespace http
 } // namespace swirly
 
-#endif // SWIRLY_WEB_TYPES_HPP
+#endif // SWIRLY_HTTP_TYPES_HPP

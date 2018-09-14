@@ -15,11 +15,10 @@
  * 02110-1301, USA.
  */
 #include "HttpServ.hpp"
+#include "RestApp.hpp"
 #include "RestServ.hpp"
 
 #include <swirly/db/DbCtx.hpp>
-
-#include <swirly/web/RestApp.hpp>
 
 #include <swirly/fin/Journ.hpp>
 #include <swirly/fin/Model.hpp>
@@ -269,7 +268,7 @@ int main(int argc, char* argv[])
 
         EpollReactor reactor{1024};
         const TcpEndpoint ep{Tcp::v4(), from_string<uint16_t>(http_port)};
-        HttpServ http_serv{reactor, ep, rest_serv};
+        HttpServ http_serv{opts.start_time, reactor, ep, rest_serv};
 
         ReactorThread reactor_thread{reactor, ThreadConfig{"reactor"s}};
         auto journ_agent = [&mq, &journ]() {

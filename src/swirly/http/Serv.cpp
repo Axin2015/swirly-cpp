@@ -14,32 +14,30 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Page.hpp"
-
-#include <swirly/util/Tokeniser.hpp>
-
-#include <tuple>
+#include "Serv.hpp"
 
 namespace swirly {
-inline namespace web {
+inline namespace http {
 using namespace std;
 
-Page parse_query(string_view query) noexcept
+HttpServ::HttpServ(Time now, Reactor& r, const Endpoint& ep, HttpApp& app)
+: TcpAcceptor{r, ep}
+, reactor_(r)
+, app_(app)
 {
-    Page page;
-    Tokeniser toks{query, "&;"sv};
-    while (!toks.empty()) {
-        string_view key, val;
-        tie(key, val) = split_pair(toks.top(), '=');
-        if (key == "offset"sv) {
-            page.offset = from_string<uint64_t>(val);
-        } else if (key == "limit"sv) {
-            page.limit = from_string<uint64_t>(val);
-        }
-        toks.pop();
-    }
-    return page;
 }
 
-} // namespace web
+HttpServ::~HttpServ()
+{
+    const auto now = UnixClock::now();
+    conn_list_.clear_and_dispose([now](auto* conn) { conn->dispose(now); });
+}
+
+void HttpServ::do_accept(Time now, IoSocket&& sock, const Endpoint& ep)
+{
+    auto* const conn = new HttpConn{now, reactor_, move(sock), ep, app_};
+    conn_list_.push_back(*conn);
+}
+
+} // namespace http
 } // namespace swirly

@@ -1,5 +1,5 @@
 
-#line 1 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 1 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 // -*- C++ -*-
 /*
  * The Restful Matching-Engine.
@@ -17,21 +17,20 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/web/RestBody.hpp>
+#include "RestBody.hpp"
 
-#include <swirly/fin/Exception.hpp>
+#include <swirly/app/Exception.hpp>
 
 namespace swirly {
-inline namespace web {
 using namespace std;
 namespace {
 
 
-#line 262 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 261 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 
 
 
-#line 35 "/home/marayl/repo/swirly/src/swirly/web/RestBody.cpp"
+#line 34 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.cpp"
 static const char _json_actions[] = {
 	0, 1, 0, 1, 2, 1, 4, 1, 
 	5, 1, 7, 1, 8, 1, 10, 1, 
@@ -388,7 +387,7 @@ static const int json_error = 0;
 static const int json_en_main = 1;
 
 
-#line 265 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 264 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 
 } // anonymous
 
@@ -398,12 +397,12 @@ void RestBody::reset(bool clear) noexcept
 {
   decltype(cs_) cs;
   
-#line 402 "/home/marayl/repo/swirly/src/swirly/web/RestBody.cpp"
+#line 401 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.cpp"
 	{
 	cs = json_start;
 	}
 
-#line 274 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 273 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
   cs_ = cs;
 
   if (!clear) {
@@ -433,7 +432,7 @@ bool RestBody::parse(string_view buf)
 
   auto cs = cs_;
   
-#line 437 "/home/marayl/repo/swirly/src/swirly/web/RestBody.cpp"
+#line 436 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.cpp"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -507,32 +506,32 @@ _match:
 		switch ( *_acts++ )
 		{
 	case 0:
-#line 30 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 29 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     num_.sign = 1;
     num_.digits = 0;
   }
 	break;
 	case 1:
-#line 34 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 33 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     num_.sign = -1;
   }
 	break;
 	case 2:
-#line 37 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 36 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     num_.digits = num_.digits * 10 + ((*p) - '0');
   }
 	break;
 	case 3:
-#line 56 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 55 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     *str_.len = 0;
   }
 	break;
 	case 4:
-#line 59 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 58 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     auto& len = *str_.len;
     if (len < str_.max) {
@@ -544,14 +543,14 @@ _match:
   }
 	break;
 	case 5:
-#line 79 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 78 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     fields_ &= ~Symbol;
     symbol_.len = 0;
   }
 	break;
 	case 6:
-#line 83 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 82 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     str_.len = &symbol_.len;
     str_.buf = symbol_.buf;
@@ -559,20 +558,20 @@ _match:
   }
 	break;
 	case 7:
-#line 88 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 87 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     fields_ |= Symbol;
   }
 	break;
 	case 8:
-#line 94 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 93 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     fields_ &= ~Accnt;
     accnt_.len = 0;
   }
 	break;
 	case 9:
-#line 98 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 97 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     str_.len = &accnt_.len;
     str_.buf = accnt_.buf;
@@ -580,20 +579,20 @@ _match:
   }
 	break;
 	case 10:
-#line 103 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 102 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     fields_ |= Accnt;
   }
 	break;
 	case 11:
-#line 109 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 108 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     fields_ &= ~Instr;
     instr_.len = 0;
   }
 	break;
 	case 12:
-#line 113 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 112 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     str_.len = &instr_.len;
     str_.buf = instr_.buf;
@@ -601,34 +600,34 @@ _match:
   }
 	break;
 	case 13:
-#line 118 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 117 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     fields_ |= Instr;
   }
 	break;
 	case 14:
-#line 124 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 123 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     fields_ &= ~SettlDate;
     settl_date_ = 0_ymd;
   }
 	break;
 	case 15:
-#line 128 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 127 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     fields_ |= SettlDate;
     settl_date_ = IsoDate{num()};
   }
 	break;
 	case 16:
-#line 135 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 134 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     fields_ &= ~Ref;
     ref_.len = 0;
   }
 	break;
 	case 17:
-#line 139 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 138 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     str_.len = &ref_.len;
     str_.buf = ref_.buf;
@@ -636,20 +635,20 @@ _match:
   }
 	break;
 	case 18:
-#line 144 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 143 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     fields_ |= Ref;
   }
 	break;
 	case 19:
-#line 150 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 149 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     fields_ &= ~State;
     state_ = 0;
   }
 	break;
 	case 20:
-#line 154 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 153 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     if (num_.sign >= 0) {
       fields_ |= State;
@@ -660,91 +659,91 @@ _match:
   }
 	break;
 	case 21:
-#line 165 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 164 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     fields_ &= ~Ticks;
     ticks_ = 0_tks;
   }
 	break;
 	case 22:
-#line 169 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 168 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     fields_ |= Ticks;
     ticks_ = swirly::Ticks{num()};
   }
 	break;
 	case 23:
-#line 176 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 175 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     fields_ |= Side;
     side_ = swirly::Side::Buy;
   }
 	break;
 	case 24:
-#line 180 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 179 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     fields_ |= Side;
     side_ = swirly::Side::Sell;
   }
 	break;
 	case 25:
-#line 187 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 186 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     fields_ &= ~Lots;
     lots_ = 0_lts;
   }
 	break;
 	case 26:
-#line 191 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 190 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     fields_ |= Lots;
     lots_ = swirly::Lots{num()};
   }
 	break;
 	case 27:
-#line 198 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 197 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     fields_ &= ~MinLots;
     min_lots_ = 0_lts;
   }
 	break;
 	case 28:
-#line 202 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 201 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     fields_ |= MinLots;
     min_lots_ = swirly::Lots{num()};
   }
 	break;
 	case 29:
-#line 209 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 208 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     fields_ &= ~LiqInd;
     liq_ind_ = swirly::LiqInd::None;
   }
 	break;
 	case 30:
-#line 213 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 212 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     fields_ |= LiqInd;
     liq_ind_ = swirly::LiqInd::Maker;
   }
 	break;
 	case 31:
-#line 217 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 216 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     fields_ |= LiqInd;
     liq_ind_ = swirly::LiqInd::Taker;
   }
 	break;
 	case 32:
-#line 225 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 224 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     fields_ &= ~Cpty;
     cpty_.len = 0;
   }
 	break;
 	case 33:
-#line 229 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 228 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     str_.len = &cpty_.len;
     str_.buf = cpty_.buf;
@@ -752,12 +751,12 @@ _match:
   }
 	break;
 	case 34:
-#line 234 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 233 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
 	{
     fields_ |= Cpty;
   }
 	break;
-#line 761 "/home/marayl/repo/swirly/src/swirly/web/RestBody.cpp"
+#line 760 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.cpp"
 		}
 	}
 
@@ -770,7 +769,7 @@ _again:
 	_out: {}
 	}
 
-#line 303 "/home/marayl/repo/swirly/src/swirly/web/RestBody.rl"
+#line 302 "/home/marayl/repo/swirly-cpp/src/swirlyd/RestBody.rl"
   cs_ = cs;
 
   if (cs == json_error) {
@@ -782,5 +781,4 @@ _again:
   return true;
 }
 
-} // namespace web
 } // namespace swirly

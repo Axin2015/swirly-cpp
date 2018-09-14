@@ -14,30 +14,25 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "HttpServ.hpp"
+#ifndef SWIRLYD_PAGE_HPP
+#define SWIRLYD_PAGE_HPP
 
-#include "HttpConn.hpp"
+#include <swirly/Config.h>
+
+#include <optional>
+#include <string_view>
 
 namespace swirly {
-using namespace std;
 
-HttpServ::HttpServ(Time now, Reactor& r, const Endpoint& ep, RestServ& rs)
-: TcpAcceptor{r, ep}
-, reactor_(r)
-, rest_serv_(rs)
-{
-}
+struct Page {
+    std::size_t offset{0};
+    std::optional<std::size_t> limit;
+};
 
-HttpServ::~HttpServ()
-{
-    const auto now = UnixClock::now();
-    conn_list_.clear_and_dispose([now](auto* conn) { conn->dispose(now); });
-}
-
-void HttpServ::do_accept(Time now, IoSocket&& sock, const Endpoint& ep)
-{
-    auto* const conn = new HttpConn{now, reactor_, move(sock), ep, rest_serv_};
-    conn_list_.push_back(*conn);
-}
+// Parse Page arguments from URL Query String. Note that special characters and percent encodings
+// are not supported for simplicity.
+SWIRLY_API Page parse_query(std::string_view query) noexcept;
 
 } // namespace swirly
+
+#endif // SWIRLYD_PAGE_HPP

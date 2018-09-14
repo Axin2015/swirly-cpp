@@ -19,7 +19,7 @@
 
 #include <swirly/fix/Types.hpp>
 
-#include <swirly/fin/Exception.hpp>
+#include <swirly/app/Exception.hpp>
 
 #include <swirly/sys/Buffer.hpp>
 

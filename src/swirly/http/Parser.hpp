@@ -14,19 +14,19 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_WEB_PARSER_HPP
-#define SWIRLY_WEB_PARSER_HPP
+#ifndef SWIRLY_HTTP_PARSER_HPP
+#define SWIRLY_HTTP_PARSER_HPP
 
-#include <swirly/web/Types.hpp>
+#include <swirly/http/Types.hpp>
 
-#include <swirly/fin/Exception.hpp>
+#include <swirly/app/Exception.hpp>
 
 #include <swirly/sys/Buffer.hpp>
 
 #include <string_view>
 
 namespace swirly {
-inline namespace web {
+inline namespace http {
 
 template <typename DerivedT>
 class BasicHttpParser {
@@ -88,6 +88,8 @@ class BasicHttpParser {
   private:
     static http_parser_settings make_settings() noexcept
     {
+        // Important: callbacks must return 0 on success. Returning a non-zero value indicates error
+        // to the parser, making it exit immediately.
         http_parser_settings settings{};
         settings.on_message_begin = on_message_begin;
         settings.on_url = on_url;
@@ -164,7 +166,7 @@ class BasicHttpParser {
     enum { None = 0, Field, Value } last_header_elem_;
 };
 
-} // namespace web
+} // namespace http
 } // namespace swirly
 
-#endif // SWIRLY_WEB_PARSER_HPP
+#endif // SWIRLY_HTTP_PARSER_HPP

@@ -14,12 +14,11 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYD_HTTPCONN_HPP
-#define SWIRLYD_HTTPCONN_HPP
-
-#include "HttpRequest.hpp"
+#ifndef SWIRLY_HTTP_CONN_HPP
+#define SWIRLY_HTTP_CONN_HPP
 
 #include <swirly/http/Parser.hpp>
+#include <swirly/http/Request.hpp>
 #include <swirly/http/Stream.hpp>
 
 #include <swirly/app/MemAlloc.hpp>
@@ -28,12 +27,11 @@
 #include <swirly/sys/IpAddress.hpp>
 #include <swirly/sys/Reactor.hpp>
 
-#include <swirly/util/Log.hpp>
-
 #include <boost/intrusive/list.hpp>
 
 namespace swirly {
-class RestServ;
+inline namespace http {
+class HttpApp;
 
 class SWIRLY_API HttpConn
 : public MemAlloc
@@ -48,7 +46,7 @@ class SWIRLY_API HttpConn
     using Transport = Tcp;
     using Endpoint = TcpEndpoint;
 
-    HttpConn(Time now, Reactor& r, IoSocket&& sock, const Endpoint& ep, RestServ& rs);
+    HttpConn(Time now, Reactor& r, IoSocket&& sock, const Endpoint& ep, HttpApp& app);
 
     // Copy.
     HttpConn(const HttpConn&) = delete;
@@ -59,6 +57,7 @@ class SWIRLY_API HttpConn
     HttpConn& operator=(HttpConn&&) = delete;
 
     const Endpoint& endpoint() const noexcept { return ep_; }
+    void clear() noexcept;
     void dispose(Time now) noexcept;
 
     boost::intrusive::list_member_hook<AutoUnlinkOption> list_hook;
@@ -87,17 +86,10 @@ class SWIRLY_API HttpConn
     void on_io_event(Time now, int fd, unsigned events);
     void on_timer(Time now, Timer& tmr);
 
-    LogMsg& log_msg() const noexcept
-    {
-        auto& ref = swirly::log_msg();
-        ref << '<' << ep_ << "> ";
-        return ref;
-    }
-
     Reactor& reactor_;
     IoSocket sock_;
     Endpoint ep_;
-    RestServ& rest_serv_;
+    HttpApp& app_;
     Reactor::Handle sub_;
     Timer tmr_;
     Time now_{};
@@ -106,7 +98,7 @@ class SWIRLY_API HttpConn
     HttpRequest req_;
     HttpStream os_{out_};
 };
-
+} // namespace http
 } // namespace swirly
 
-#endif // SWIRLYD_HTTPCONN_HPP
+#endif // SWIRLY_HTTP_CONN_HPP

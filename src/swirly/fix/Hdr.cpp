@@ -18,7 +18,7 @@
 
 #include "Lexer.hpp"
 
-#include <swirly/fin/Exception.hpp>
+#include <swirly/app/Exception.hpp>
 
 #include <swirly/util/Date.hpp>
 

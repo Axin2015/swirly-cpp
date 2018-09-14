@@ -14,61 +14,62 @@
 # 02110-1301, USA.
 
 if(SWIRLY_BUILD_SHARED)
-  add_custom_target(swirly-app DEPENDS
-    swirly-app-static
-    swirly-app-shared
-    swirly-app-test
+  add_custom_target(swirly-http DEPENDS
+    swirly-http-static
+    swirly-http-shared
+    swirly-http-test
   )
 else()
-  add_custom_target(swirly-app DEPENDS
-    swirly-app-static
-    swirly-app-test
+  add_custom_target(swirly-http DEPENDS
+    swirly-http-static
+    swirly-http-test
   )
 endif()
 
 set(lib_SOURCES
-  Backoff.cpp
-  Error.cpp
-  Exception.cpp
-  MemAlloc.cpp
-  MemCtx.cpp
-  MemPool.cpp
-  MemQueue.cpp
-  Thread.cpp)
+  App.cpp
+  Conn.cpp
+  Parser.cpp
+  Request.cpp
+  Serv.cpp
+  Stream.cpp
+  Types.cpp
+  Url.cpp
+  "${PROJECT_SOURCE_DIR}/src/swirly/contrib/http_parser.c")
 
-add_library(swirly-app-static STATIC ${lib_SOURCES})
-set_target_properties(swirly-app-static PROPERTIES OUTPUT_NAME swirly-app)
-target_link_libraries(swirly-app-static swirly-sys-static)
-install(TARGETS swirly-app-static DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT static)
+add_library(swirly-http-static STATIC ${lib_SOURCES})
+set_target_properties(swirly-http-static PROPERTIES OUTPUT_NAME swirly-http)
+target_link_libraries(swirly-http-static swirly-app-static)
+install(TARGETS swirly-http-static DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT static)
 
 if(SWIRLY_BUILD_SHARED)
-  add_library(swirly-app-shared SHARED ${lib_SOURCES})
-  set_target_properties(swirly-app-shared PROPERTIES OUTPUT_NAME swirly-app)
-  target_link_libraries(swirly-app-shared swirly-sys-shared)
-  install(TARGETS swirly-app-shared DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT shared)
+  add_library(swirly-http-shared SHARED ${lib_SOURCES})
+  set_target_properties(swirly-http-shared PROPERTIES OUTPUT_NAME swirly-http)
+  target_link_libraries(swirly-http-shared swirly-app-shared)
+  install(TARGETS swirly-http-shared DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT shared)
 endif()
 
 foreach(file ${lib_SOURCES})
   get_filename_component (name "${file}" NAME_WE)
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${name}.hpp")
     install(FILES "${name}.hpp"
-      DESTINATION include/swirly/app
+      DESTINATION include/swirly/http
       COMPONENT header
     )
   endif()
 endforeach()
 
 set(test_SOURCES
-  Exception.ut.cpp
-  MemAlloc.ut.cpp
-  MemCtx.ut.cpp)
+  Parser.ut.cpp
+  Types.ut.cpp
+  Url.ut.cpp)
 
-add_executable(swirly-app-test
+add_executable(swirly-http-test
   ${test_SOURCES}
   Main.ut.cpp)
-target_link_libraries(swirly-app-test ${swirly_app_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+target_link_libraries(swirly-http-test ${swirly_http_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
 foreach(file ${test_SOURCES})
   get_filename_component (name "${file}" NAME_WE)
-  add_test(NAME app::${name}Suite COMMAND swirly-app-test -l error -t ${name}Suite)
+  add_test(NAME http::${name}Suite COMMAND swirly-http-test -l error -t ${name}Suite)
 endforeach()
