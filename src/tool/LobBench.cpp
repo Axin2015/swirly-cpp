@@ -46,7 +46,7 @@ using namespace swirly;
 
 namespace {
 
-const Market& create_market(App& app, Symbol instr_symbol, JDay settl_day, MarketState state,
+const Market& create_market(LobApp& app, Symbol instr_symbol, JDay settl_day, MarketState state,
                             Time now)
 {
     const auto& instr = app.instr(instr_symbol);
@@ -60,7 +60,7 @@ const Market& create_market(App& app, Symbol instr_symbol, JDay settl_day, Marke
 
 class Archiver {
   public:
-    explicit Archiver(App& app) noexcept
+    explicit Archiver(LobApp& app) noexcept
     : app_(app)
     {
     }
@@ -76,7 +76,7 @@ class Archiver {
     }
 
   private:
-    App& app_;
+    LobApp& app_;
     vector<Id64> ids_;
 };
 
@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
         const auto start_time = UnixClock::now();
 
         MsgQueue mq{1 << 12};
-        App app{mq, 1 << 4};
+        LobApp app{mq, 1 << 4};
         app.load(start_time, *model);
         model = nullptr;
 

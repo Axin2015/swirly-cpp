@@ -34,7 +34,7 @@ class SWIRLY_API HttpServ : public TcpAcceptor<HttpServ> {
     using ConnList = boost::intrusive::list<HttpConn, ConstantTimeSizeOption, MemberHookOption>;
 
   public:
-    HttpServ(Time now, Reactor& r, const Endpoint& ep, RestServ& rs);
+    HttpServ(Time now, Reactor& r, const Endpoint& ep, RestApp& app);
     ~HttpServ();
 
     // Copy.
@@ -49,7 +49,7 @@ class SWIRLY_API HttpServ : public TcpAcceptor<HttpServ> {
     void do_accept(Time now, IoSocket&& sock, const Endpoint& ep);
 
     Reactor& reactor_;
-    RestServ& rest_serv_;
+    RestApp& app_;
     // List of active connections.
     ConnList conn_list_;
 };

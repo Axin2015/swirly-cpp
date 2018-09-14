@@ -44,19 +44,19 @@ class Sess;
 
 using TradePair = std::pair<ConstExecPtr, ConstExecPtr>;
 
-class SWIRLY_API App {
+class SWIRLY_API LobApp {
   public:
-    App(MsgQueue& mq, std::size_t max_execs);
+    LobApp(MsgQueue& mq, std::size_t max_execs);
 
-    ~App();
+    ~LobApp();
 
     // Copy.
-    App(const App&) = delete;
-    App& operator=(const App&) = delete;
+    LobApp(const LobApp&) = delete;
+    LobApp& operator=(const LobApp&) = delete;
 
     // Move.
-    App(App&&);
-    App& operator=(App&&);
+    LobApp(LobApp&&);
+    LobApp& operator=(LobApp&&);
 
     void load(Time now, const Model& model);
 

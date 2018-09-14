@@ -16,7 +16,7 @@
  */
 #include "HttpServ.hpp"
 #include "RestApp.hpp"
-#include "RestServ.hpp"
+#include "RestImpl.hpp"
 
 #include <swirly/db/DbCtx.hpp>
 
@@ -258,17 +258,17 @@ int main(int argc, char* argv[])
         } else {
             mq = MsgQueue{1 << 10};
         }
-        RestApp rest_app{mq, max_execs};
+        RestImpl rest_impl{mq, max_execs};
         {
             Model& model = db_ctx.model();
-            rest_app.load(opts.start_time, model);
+            rest_impl.load(opts.start_time, model);
         }
-        RestServ rest_serv{rest_app};
+        RestApp rest_app{rest_impl};
         Journ& journ = db_ctx.journ();
 
         EpollReactor reactor{1024};
         const TcpEndpoint ep{Tcp::v4(), from_string<uint16_t>(http_port)};
-        HttpServ http_serv{opts.start_time, reactor, ep, rest_serv};
+        HttpServ http_serv{opts.start_time, reactor, ep, rest_app};
 
         ReactorThread reactor_thread{reactor, ThreadConfig{"reactor"s}};
         auto journ_agent = [&mq, &journ]() {

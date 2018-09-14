@@ -21,10 +21,10 @@
 namespace swirly {
 using namespace std;
 
-HttpServ::HttpServ(Time now, Reactor& r, const Endpoint& ep, RestServ& rs)
+HttpServ::HttpServ(Time now, Reactor& r, const Endpoint& ep, RestApp& app)
 : TcpAcceptor{r, ep}
 , reactor_(r)
-, rest_serv_(rs)
+, app_(app)
 {
 }
 
@@ -36,7 +36,7 @@ HttpServ::~HttpServ()
 
 void HttpServ::do_accept(Time now, IoSocket&& sock, const Endpoint& ep)
 {
-    auto* const conn = new HttpConn{now, reactor_, move(sock), ep, rest_serv_};
+    auto* const conn = new HttpConn{now, reactor_, move(sock), ep, app_};
     conn_list_.push_back(*conn);
 }
 

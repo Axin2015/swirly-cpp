@@ -16,403 +16,794 @@
  */
 #include "RestApp.hpp"
 
-#include <swirly/lob/Response.hpp>
-#include <swirly/lob/Sess.hpp>
+#include "HttpRequest.hpp"
+#include "RestImpl.hpp"
+
+#include <swirly/http/Stream.hpp>
 
 #include <swirly/app/Exception.hpp>
 
-#include <swirly/util/Date.hpp>
+#include <swirly/util/Finally.hpp>
+#include <swirly/util/Log.hpp>
 
-#include <algorithm>
+#include <chrono>
 
 namespace swirly {
 using namespace std;
 namespace {
 
-void do_get_order(const Sess& sess, ostream& out)
-{
-    const auto& orders = sess.orders();
-    out << '[';
-    copy(orders.begin(), orders.end(), OStreamJoiner{out, ','});
-    out << ']';
-}
-
-void do_get_exec(const Sess& sess, Page page, ostream& out)
-{
-    const auto& execs = sess.execs();
-    out << '[';
-    const auto size = execs.size();
-    if (page.offset < size) {
-        auto first = execs.begin();
-        advance(first, page.offset);
-        decltype(first) last;
-        if (page.limit && *page.limit < size - page.offset) {
-            last = first;
-            advance(last, *page.limit);
-        } else {
-            last = execs.end();
+class ScopedIds {
+  public:
+    ScopedIds(string_view sv, vector<Id64>& ids) noexcept
+    : ids_{ids}
+    {
+        Tokeniser toks{sv, ","sv};
+        while (!toks.empty()) {
+            ids.push_back(static_cast<Id64>(from_string<int64_t>(toks.top())));
+            toks.pop();
         }
-        transform(first, last,
-                  OStreamJoiner{out, ','}, [](const auto& ptr) -> const auto& { return *ptr; });
     }
-    out << ']';
+    ~ScopedIds() { ids_.clear(); }
+
+  private:
+    vector<Id64>& ids_;
+};
+
+string_view get_accnt(const HttpRequest& req)
+{
+    const string_view accnt{req.accnt()};
+    if (accnt.empty()) {
+        throw UnauthorizedException{"user account not specified"sv};
+    }
+    return accnt;
 }
 
-void do_get_trade(const Sess& sess, ostream& out)
+uint32_t get_perm(const HttpRequest& req)
 {
-    const auto& trades = sess.trades();
-    out << '[';
-    copy(trades.begin(), trades.end(), OStreamJoiner{out, ','});
-    out << ']';
+    return from_string<uint32_t>(req.perm());
 }
 
-void do_get_posn(const Sess& sess, ostream& out)
+Time get_time(Time now, const HttpRequest& req) noexcept
 {
-    const auto& posns = sess.posns();
-    out << '[';
-    copy(posns.begin(), posns.end(), OStreamJoiner{out, ','});
-    out << ']';
+    const string_view val{req.time()};
+    return val.empty() ? now : to_time(from_string<Millis>(val));
+}
+
+string_view get_admin(const HttpRequest& req)
+{
+    const auto accnt = get_accnt(req);
+    const auto perm = get_perm(req);
+    if (!(perm & 0x1)) {
+        throw ForbiddenException{"user account does not have admin permission "sv};
+    }
+    return accnt;
+}
+
+string_view get_trader(const HttpRequest& req)
+{
+    const auto accnt = get_accnt(req);
+    const auto perm = get_perm(req);
+    if (!(perm & 0x2)) {
+        throw ForbiddenException{"user account does not have trade permission "sv};
+    }
+    return accnt;
 }
 
 } // namespace
 
 RestApp::~RestApp() = default;
 
-RestApp::RestApp(RestApp&&) = default;
-
-RestApp& RestApp::operator=(RestApp&&) = default;
-
-void RestApp::get_ref_data(Time now, EntitySet es, ostream& out) const
+void RestApp::on_message(Time now, const HttpRequest& req, HttpStream& os) noexcept
 {
-    int i{0};
-    out << '{';
-    // FIXME: validate entities.
-    if (es.asset()) {
-        out << "\"assets\":";
-        get_asset(now, out);
-        ++i;
-    }
-    if (es.instr()) {
-        if (i > 0) {
-            out << ',';
-        }
-        out << "\"instrs\":";
-        get_instr(now, out);
-        ++i;
-    }
-    if (es.market()) {
-        if (i > 0) {
-            out << ',';
-        }
-        out << "\"markets\":";
-        get_market(now, out);
-        ++i;
-    }
-    out << '}';
-}
+    const auto cache = reset(req); // noexcept
+    now = get_time(now, req);      // noexcept
 
-void RestApp::get_asset(Time now, ostream& out) const
-{
-    const auto& assets = app_.assets();
-    out << '[';
-    copy(assets.begin(), assets.end(), OStreamJoiner{out, ','});
-    out << ']';
-}
-
-void RestApp::get_asset(Time now, Symbol symbol, ostream& out) const
-{
-    const auto& assets = app_.assets();
-    auto it = assets.find(symbol);
-    if (it == assets.end()) {
-        throw NotFoundException{err_msg() << "asset '" << symbol << "' does not exist"};
-    }
-    out << *it;
-}
-
-void RestApp::get_instr(Time now, ostream& out) const
-{
-    const auto& instrs = app_.instrs();
-    out << '[';
-    copy(instrs.begin(), instrs.end(), OStreamJoiner{out, ','});
-    out << ']';
-}
-
-void RestApp::get_instr(Time now, Symbol symbol, ostream& out) const
-{
-    const auto& instrs = app_.instrs();
-    auto it = instrs.find(symbol);
-    if (it == instrs.end()) {
-        throw NotFoundException{err_msg() << "instr '" << symbol << "' does not exist"};
-    }
-    out << *it;
-}
-
-void RestApp::get_sess(Time now, Symbol accnt, EntitySet es, Page page, ostream& out) const
-{
-    const auto& sess = app_.sess(accnt);
-    int i{0};
-    out << '{';
-    if (es.market()) {
-        out << "\"markets\":";
-        get_market(now, out);
-        ++i;
-    }
-    if (es.order()) {
-        if (i > 0) {
-            out << ',';
-        }
-        out << "\"orders\":";
-        do_get_order(sess, out);
-        ++i;
-    }
-    if (es.exec()) {
-        if (i > 0) {
-            out << ',';
-        }
-        out << "\"execs\":";
-        do_get_exec(sess, page, out);
-        ++i;
-    }
-    if (es.trade()) {
-        if (i > 0) {
-            out << ',';
-        }
-        out << "\"trades\":";
-        do_get_trade(sess, out);
-        ++i;
-    }
-    if (es.posn()) {
-        if (i > 0) {
-            out << ',';
-        }
-        out << "\"posns\":";
-        do_get_posn(sess, out);
-        ++i;
-    }
-    out << '}';
-}
-
-void RestApp::get_market(Time now, std::ostream& out) const
-{
-    const auto& markets = app_.markets();
-    out << '[';
-    copy(markets.begin(), markets.end(), OStreamJoiner{out, ','});
-    out << ']';
-}
-
-void RestApp::get_market(Time now, Symbol instr, std::ostream& out) const
-{
-    const auto& markets = app_.markets();
-    out << '[';
-    copy_if(markets.begin(), markets.end(), OStreamJoiner{out, ','},
-            [instr](const auto& market) { return market.instr() == instr; });
-    out << ']';
-}
-
-void RestApp::get_market(Time now, Symbol instr, IsoDate settl_date, std::ostream& out) const
-{
-    const auto id = to_market_id(app_.instr(instr).id(), settl_date);
-    out << app_.market(id);
-}
-
-void RestApp::get_order(Time now, Symbol accnt, std::ostream& out) const
-{
-    do_get_order(app_.sess(accnt), out);
-}
-
-void RestApp::get_order(Time now, Symbol accnt, Symbol instr, ostream& out) const
-{
-    const auto& sess = app_.sess(accnt);
-    const auto& orders = sess.orders();
-    out << '[';
-    copy_if(orders.begin(), orders.end(), OStreamJoiner{out, ','},
-            [instr](const auto& order) { return order.instr() == instr; });
-    out << ']';
-}
-
-void RestApp::get_order(Time now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
-                        ostream& out) const
-{
-    const auto& sess = app_.sess(accnt);
-    const auto& instr = app_.instr(instr_symbol);
-    const auto market_id = to_market_id(instr.id(), settl_date);
-    const auto& orders = sess.orders();
-    out << '[';
-    copy_if(orders.begin(), orders.end(), OStreamJoiner{out, ','},
-            [market_id](const auto& order) { return order.market_id() == market_id; });
-    out << ']';
-}
-
-void RestApp::get_order(Time now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date, Id64 id,
-                        ostream& out) const
-{
-    const auto& sess = app_.sess(accnt);
-    const auto& instr = app_.instr(instr_symbol);
-    const auto market_id = to_market_id(instr.id(), settl_date);
-    const auto& orders = sess.orders();
-    auto it = orders.find(market_id, id);
-    if (it == orders.end()) {
-        throw OrderNotFoundException{err_msg() << "order '" << id << "' does not exist"};
-    }
-    out << *it;
-}
-
-void RestApp::get_exec(Time now, Symbol accnt, Page page, std::ostream& out) const
-{
-    do_get_exec(app_.sess(accnt), page, out);
-}
-
-void RestApp::get_trade(Time now, Symbol accnt, std::ostream& out) const
-{
-    do_get_trade(app_.sess(accnt), out);
-}
-
-void RestApp::get_trade(Time now, Symbol accnt, Symbol instr, std::ostream& out) const
-{
-    const auto& sess = app_.sess(accnt);
-    const auto& trades = sess.trades();
-    out << '[';
-    copy_if(trades.begin(), trades.end(), OStreamJoiner{out, ','},
-            [instr](const auto& trade) { return trade.instr() == instr; });
-    out << ']';
-}
-
-void RestApp::get_trade(Time now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
-                        std::ostream& out) const
-{
-    const auto& sess = app_.sess(accnt);
-    const auto& instr = app_.instr(instr_symbol);
-    const auto market_id = to_market_id(instr.id(), settl_date);
-    const auto& trades = sess.trades();
-    out << '[';
-    copy_if(trades.begin(), trades.end(), OStreamJoiner{out, ','},
-            [market_id](const auto& trade) { return trade.market_id() == market_id; });
-    out << ']';
-}
-
-void RestApp::get_trade(Time now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date, Id64 id,
-                        std::ostream& out) const
-{
-    const auto& sess = app_.sess(accnt);
-    const auto& instr = app_.instr(instr_symbol);
-    const auto market_id = to_market_id(instr.id(), settl_date);
-    const auto& trades = sess.trades();
-    auto it = trades.find(market_id, id);
-    if (it == trades.end()) {
-        throw NotFoundException{err_msg() << "trade '" << id << "' does not exist"};
-    }
-    out << *it;
-}
-
-void RestApp::get_posn(Time now, Symbol accnt, std::ostream& out) const
-{
-    do_get_posn(app_.sess(accnt), out);
-}
-
-void RestApp::get_posn(Time now, Symbol accnt, Symbol instr, std::ostream& out) const
-{
-    const auto& sess = app_.sess(accnt);
-    const auto& posns = sess.posns();
-    out << '[';
-    copy_if(posns.begin(), posns.end(), OStreamJoiner{out, ','},
-            [instr](const auto& posn) { return posn.instr() == instr; });
-    out << ']';
-}
-
-void RestApp::get_posn(Time now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
-                       std::ostream& out) const
-{
-    const auto& sess = app_.sess(accnt);
-    const auto& instr = app_.instr(instr_symbol);
-    const auto market_id = to_market_id(instr.id(), settl_date);
-    const auto& posns = sess.posns();
-    auto it = posns.find(market_id);
-    if (it == posns.end()) {
-        throw NotFoundException{err_msg() << "posn for '" << instr << "' on " << settl_date
-                                          << " does not exist"};
-    }
-    out << *it;
-}
-
-void RestApp::post_market(Time now, Symbol instr_symbol, IsoDate settl_date, MarketState state,
-                          std::ostream& out)
-{
-    const auto& instr = app_.instr(instr_symbol);
-    const auto settl_day = maybe_iso_to_jd(settl_date);
-    const auto& market = app_.create_market(now, instr, settl_day, state);
-    out << market;
-}
-
-void RestApp::put_market(Time now, Symbol instr_symbol, IsoDate settl_date, MarketState state,
-                         std::ostream& out)
-{
-    const auto& instr = app_.instr(instr_symbol);
-    const auto id = to_market_id(instr.id(), settl_date);
-    const auto& market = app_.market(id);
-    app_.update_market(now, market, state);
-    out << market;
-}
-
-void RestApp::post_order(Time now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
-                         std::string_view ref, Side side, Lots lots, Ticks ticks, Lots min_lots,
-                         std::ostream& out)
-{
-    const auto& sess = app_.sess(accnt);
-    const auto& instr = app_.instr(instr_symbol);
-    const auto market_id = to_market_id(instr.id(), settl_date);
-    const auto& market = app_.market(market_id);
-    Response resp;
-    app_.create_order(now, sess, market, ref, side, lots, ticks, min_lots, resp);
-    out << resp;
-}
-
-void RestApp::put_order(Time now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
-                        ArrayView<Id64> ids, Lots lots, std::ostream& out)
-{
-    const auto& sess = app_.sess(accnt);
-    const auto& instr = app_.instr(instr_symbol);
-    const auto market_id = to_market_id(instr.id(), settl_date);
-    const auto& market = app_.market(market_id);
-    Response resp;
-    if (lots > 0_lts) {
-        if (ids.size() == 1) {
-            app_.revise_order(now, sess, market, ids[0], lots, resp);
-        } else {
-            app_.revise_order(now, sess, market, ids, lots, resp);
-        }
+    if (req.method() != HttpMethod::Delete) {
+        os.reset(HttpStatus::Ok, ApplicationJson, cache); // noexcept
     } else {
-        if (ids.size() == 1) {
-            app_.cancel_order(now, sess, market, ids[0], resp);
-        } else {
-            app_.cancel_order(now, sess, market, ids, resp);
+        os.reset(HttpStatus::NoContent, nullptr); // noexcept
+    }
+    try {
+        const auto& body = req.body();
+        if (req.partial()) {
+            throw BadRequestException{"request body is incomplete"sv};
+        }
+        rest_request(now, req, os);
+        if (!match_path_) {
+            throw NotFoundException{err_msg() << "resource '" << req.path() << "' does not exist"};
+        }
+        if (!match_method_) {
+            throw MethodNotAllowedException{err_msg()
+                                            << "method '" << req.method() << "' is not allowed"};
+        }
+    } catch (const Exception& e) {
+        const auto status = http_status(e.code());
+        const char* const reason = http_reason(status);
+        SWIRLY_ERROR << "exception: status=" << status << ", reason=" << reason
+                     << ", detail=" << e.what();
+        os.reset(status, reason);
+        Exception::to_json(os, static_cast<int>(status), reason, e.what());
+    } catch (const exception& e) {
+        const auto status = HttpStatus::InternalServerError;
+        const char* const reason = http_reason(status);
+        SWIRLY_ERROR << "exception: status=" << status << ", reason=" << reason
+                     << ", detail=" << e.what();
+        os.reset(status, reason);
+        Exception::to_json(os, static_cast<int>(status), reason, e.what());
+    }
+    os.commit(); // noexcept
+}
+
+bool RestApp::reset(const HttpRequest& req) noexcept
+{
+    match_method_ = false;
+    match_path_ = false;
+
+    auto path = req.path();
+    // Remove leading slash.
+    if (path.front() == '/') {
+        path.remove_prefix(1);
+    }
+    path_.reset(path, "/"sv);
+
+    if (req.method() != HttpMethod::Get) {
+        // No cache.
+        return false;
+    }
+    // Cache if GET for refdata.
+    return !path.empty() && path_.top() == "refdata"sv;
+}
+
+void RestApp::rest_request(Time now, const HttpRequest& req, HttpStream& os)
+{
+    if (path_.empty()) {
+        return;
+    }
+
+    auto tok = path_.top();
+    path_.pop();
+    if (tok != "api"sv) {
+        return;
+    }
+    tok = path_.top();
+    path_.pop();
+
+    if (tok == "refdata"sv) {
+        // /api/refdata
+        ref_data_request(now, req, os);
+    } else if (tok == "sess"sv) {
+        // /api/sess
+        sess_request(now, req, os);
+    } else {
+        // Support both plural and singular forms.
+        if (!tok.empty() && tok.back() == 's') {
+            tok.remove_suffix(1);
+        }
+        if (tok == "market"sv) {
+            // /api/market
+            market_request(now, req, os);
         }
     }
-    out << resp;
 }
 
-void RestApp::post_trade(Time now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
-                         std::string_view ref, Side side, Lots lots, Ticks ticks, LiqInd liq_ind,
-                         Symbol cpty, std::ostream& out)
+void RestApp::ref_data_request(Time now, const HttpRequest& req, HttpStream& os)
 {
-    const auto& sess = app_.sess(accnt);
-    const auto& instr = app_.instr(instr_symbol);
-    const auto market_id = to_market_id(instr.id(), settl_date);
-    const auto& market = app_.market(market_id);
-    auto trades = app_.create_trade(now, sess, market, ref, side, lots, ticks, liq_ind, cpty);
-    out << '[' << *trades.first;
-    if (trades.second) {
-        out << ',' << *trades.second;
+    if (path_.empty()) {
+
+        // /api/refdata
+        match_path_ = true;
+
+        if (req.method() == HttpMethod::Get) {
+            // GET /api/refdata
+            match_method_ = true;
+            const int bs{EntitySet::Asset | EntitySet::Instr};
+            impl_.get_ref_data(now, bs, os);
+        }
+        return;
     }
-    out << ']';
+
+    const auto tok = path_.top();
+    path_.pop();
+
+    const auto es = EntitySet::parse(tok);
+    if (es.many()) {
+
+        if (path_.empty()) {
+
+            // /api/refdata/entity,entity...
+            match_path_ = true;
+
+            if (req.method() == HttpMethod::Get) {
+                // GET /api/refdata/entity,entity...
+                match_method_ = true;
+                impl_.get_ref_data(now, es, os);
+            }
+        }
+        return;
+    }
+
+    switch (es.get()) {
+    case EntitySet::Asset:
+        asset_request(now, req, os);
+        break;
+    case EntitySet::Instr:
+        instr_request(now, req, os);
+        break;
+    }
 }
 
-void RestApp::delete_trade(Time now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
-                           ArrayView<Id64> ids)
+void RestApp::asset_request(Time now, const HttpRequest& req, HttpStream& os)
 {
-    const auto& sess = app_.sess(accnt);
-    const auto& instr = app_.instr(instr_symbol);
-    const auto market_id = to_market_id(instr.id(), settl_date);
-    app_.archive_trade(now, sess, market_id, ids);
+    if (path_.empty()) {
+
+        // /api/refdata/asset
+        match_path_ = true;
+
+        if (req.method() == HttpMethod::Get) {
+            // GET /api/refdata/asset
+            match_method_ = true;
+            impl_.get_asset(now, os);
+        }
+        return;
+    }
+
+    const auto symbol = path_.top();
+    path_.pop();
+
+    if (path_.empty()) {
+
+        // /api/refdata/asset/SYMBOL
+        match_path_ = true;
+
+        if (req.method() == HttpMethod::Get) {
+            // GET /api/refdata/asset/SYMBOL
+            match_method_ = true;
+            impl_.get_asset(now, symbol, os);
+        }
+        return;
+    }
+}
+
+void RestApp::instr_request(Time now, const HttpRequest& req, HttpStream& os)
+{
+    if (path_.empty()) {
+
+        // /api/refdata/instr
+        match_path_ = true;
+
+        if (req.method() == HttpMethod::Get) {
+            // GET /api/refdata/instr
+            match_method_ = true;
+            impl_.get_instr(now, os);
+        }
+        return;
+    }
+
+    const auto symbol = path_.top();
+    path_.pop();
+
+    if (path_.empty()) {
+
+        // /api/refdata/instr/SYMBOL
+        match_path_ = true;
+
+        if (req.method() == HttpMethod::Get) {
+            // GET /api/refdata/instr/SYMBOL
+            match_method_ = true;
+            impl_.get_instr(now, symbol, os);
+        }
+        return;
+    }
+}
+
+void RestApp::sess_request(Time now, const HttpRequest& req, HttpStream& os)
+{
+    if (path_.empty()) {
+
+        // /api/sess
+        match_path_ = true;
+
+        if (req.method() == HttpMethod::Get) {
+            // GET /api/sess
+            match_method_ = true;
+            const auto es = EntitySet::Market | EntitySet::Order | EntitySet::Exec
+                | EntitySet::Trade | EntitySet::Posn;
+            impl_.get_sess(now, get_trader(req), es, parse_query(req.query()), os);
+        }
+        return;
+    }
+
+    const auto tok = path_.top();
+    path_.pop();
+
+    const auto es = EntitySet::parse(tok);
+    if (es.many()) {
+
+        if (path_.empty()) {
+
+            // /api/sess/entity,entity...
+            match_path_ = true;
+
+            if (req.method() == HttpMethod::Get) {
+                // GET /api/sess/entity,entity...
+                match_method_ = true;
+                impl_.get_sess(now, get_trader(req), es, parse_query(req.query()), os);
+            }
+        }
+        return;
+    }
+
+    switch (es.get()) {
+    case EntitySet::Market:
+        market_request(now, req, os);
+        break;
+    case EntitySet::Order:
+        order_request(now, req, os);
+        break;
+    case EntitySet::Exec:
+        exec_request(now, req, os);
+        break;
+    case EntitySet::Trade:
+        trade_request(now, req, os);
+        break;
+    case EntitySet::Posn:
+        posn_request(now, req, os);
+        break;
+    }
+}
+
+void RestApp::market_request(Time now, const HttpRequest& req, HttpStream& os)
+{
+    if (path_.empty()) {
+
+        // /api/market
+        match_path_ = true;
+
+        switch (req.method()) {
+        case HttpMethod::Get:
+            // GET /api/market
+            match_method_ = true;
+            impl_.get_market(now, os);
+            break;
+        case HttpMethod::Post:
+            // POST /api/market
+            match_method_ = true;
+            get_admin(req);
+            {
+                constexpr auto ReqFields = RestBody::Instr | RestBody::SettlDate;
+                constexpr auto OptFields = RestBody::State;
+                if (!req.body().valid(ReqFields, OptFields)) {
+                    throw InvalidException{"request fields are invalid"sv};
+                }
+                impl_.post_market(now, req.body().instr(), req.body().settl_date(),
+                                  req.body().state(), os);
+            }
+            break;
+        default:
+            break;
+        }
+        return;
+    }
+
+    const auto instr = path_.top();
+    path_.pop();
+
+    if (path_.empty()) {
+
+        // /api/market/INSTR
+        match_path_ = true;
+
+        switch (req.method()) {
+        case HttpMethod::Get:
+            // GET /api/market/INSTR
+            match_method_ = true;
+            impl_.get_market(now, instr, os);
+            break;
+        case HttpMethod::Post:
+            // POST /api/market/INSTR
+            match_method_ = true;
+            get_admin(req);
+            {
+                constexpr auto ReqFields = RestBody::SettlDate;
+                constexpr auto OptFields = RestBody::State;
+                if (!req.body().valid(ReqFields, OptFields)) {
+                    throw InvalidException{"request fields are invalid"sv};
+                }
+                impl_.post_market(now, instr, req.body().settl_date(), req.body().state(), os);
+            }
+            break;
+        default:
+            break;
+        }
+        return;
+    }
+
+    const auto settl_date = from_string<IsoDate>(path_.top());
+    path_.pop();
+
+    if (path_.empty()) {
+
+        // /api/market/INSTR/SETTL_DATE
+        match_path_ = true;
+
+        switch (req.method()) {
+        case HttpMethod::Get:
+            // GET /api/market/INSTR/SETTL_DATE
+            match_method_ = true;
+            impl_.get_market(now, instr, settl_date, os);
+            break;
+        case HttpMethod::Post:
+            // POST /api/market/INSTR/SETTL_DATE
+            match_method_ = true;
+            get_admin(req);
+            {
+                constexpr auto ReqFields = 0;
+                constexpr auto OptFields = RestBody::State;
+                if (!req.body().valid(ReqFields, OptFields)) {
+                    throw InvalidException{"request fields are invalid"sv};
+                }
+                impl_.post_market(now, instr, settl_date, req.body().state(), os);
+            }
+            break;
+        case HttpMethod::Put:
+            // PUT /api/market/INSTR/SETTL_DATE
+            match_method_ = true;
+            get_admin(req);
+            {
+                constexpr auto ReqFields = RestBody::State;
+                if (!req.body().valid(ReqFields)) {
+                    throw InvalidException{"request fields are invalid"sv};
+                }
+                impl_.put_market(now, instr, settl_date, req.body().state(), os);
+            }
+            break;
+        default:
+            break;
+        }
+        return;
+    }
+}
+
+void RestApp::order_request(Time now, const HttpRequest& req, HttpStream& os)
+{
+    if (path_.empty()) {
+
+        // /api/sess/orders
+        match_path_ = true;
+
+        switch (req.method()) {
+        case HttpMethod::Get:
+            // GET /api/sess/orders
+            match_method_ = true;
+            impl_.get_order(now, get_trader(req), os);
+            break;
+        case HttpMethod::Post:
+            // POST /api/sess/orders
+            match_method_ = true;
+            {
+                // Validate account before request.
+                const auto accnt = get_trader(req);
+                constexpr auto ReqFields = RestBody::Instr | RestBody::SettlDate | RestBody::Side
+                    | RestBody::Lots | RestBody::Ticks;
+                constexpr auto OptFields = RestBody::Ref | RestBody::MinLots;
+                if (!req.body().valid(ReqFields, OptFields)) {
+                    throw InvalidException{"request fields are invalid"sv};
+                }
+                impl_.post_order(now, accnt, req.body().instr(), req.body().settl_date(),
+                                 req.body().ref(), req.body().side(), req.body().lots(),
+                                 req.body().ticks(), req.body().min_lots(), os);
+            }
+            break;
+        default:
+            break;
+        }
+        return;
+    }
+
+    const auto instr = path_.top();
+    path_.pop();
+
+    if (path_.empty()) {
+
+        // /api/sess/order/INSTR
+        match_path_ = true;
+
+        switch (req.method()) {
+        case HttpMethod::Get:
+            // GET /api/sess/order/INSTR
+            match_method_ = true;
+            impl_.get_order(now, get_trader(req), instr, os);
+            break;
+        case HttpMethod::Post:
+            // POST /api/sess/order/INSTR
+            match_method_ = true;
+            {
+                // Validate account before request.
+                const auto accnt = get_trader(req);
+                constexpr auto ReqFields
+                    = RestBody::SettlDate | RestBody::Side | RestBody::Lots | RestBody::Ticks;
+                constexpr auto OptFields = RestBody::Ref | RestBody::MinLots;
+                if (!req.body().valid(ReqFields, OptFields)) {
+                    throw InvalidException{"request fields are invalid"sv};
+                }
+                impl_.post_order(now, accnt, instr, req.body().settl_date(), req.body().ref(),
+                                 req.body().side(), req.body().lots(), req.body().ticks(),
+                                 req.body().min_lots(), os);
+            }
+            break;
+        default:
+            break;
+        }
+        return;
+    }
+
+    const auto settl_date = from_string<IsoDate>(path_.top());
+    path_.pop();
+
+    if (path_.empty()) {
+
+        // /api/sess/order/INSTR/SETTL_DATE
+        match_path_ = true;
+
+        switch (req.method()) {
+        case HttpMethod::Get:
+            // GET /api/sess/order/INSTR/SETTL_DATE
+            match_method_ = true;
+            impl_.get_order(now, get_trader(req), instr, settl_date, os);
+            break;
+        case HttpMethod::Post:
+            // POST /api/sess/order/INSTR/SETTL_DATE
+            match_method_ = true;
+            {
+                // Validate account before request.
+                const auto accnt = get_trader(req);
+                constexpr auto ReqFields = RestBody::Side | RestBody::Lots | RestBody::Ticks;
+                constexpr auto OptFields = RestBody::Ref | RestBody::MinLots;
+                if (!req.body().valid(ReqFields, OptFields)) {
+                    throw InvalidException{"request fields are invalid"sv};
+                }
+                impl_.post_order(now, accnt, instr, settl_date, req.body().ref(), req.body().side(),
+                                 req.body().lots(), req.body().ticks(), req.body().min_lots(), os);
+            }
+            break;
+        default:
+            break;
+        }
+        return;
+    }
+
+    ScopedIds ids{path_.top(), ids_};
+    path_.pop();
+
+    if (path_.empty()) {
+
+        // /api/sess/order/INSTR/SETTL_DATE/ID,ID...
+        match_path_ = true;
+
+        switch (req.method()) {
+        case HttpMethod::Get:
+            // GET /api/sess/order/INSTR/SETTL_DATE/ID
+            match_method_ = true;
+            impl_.get_order(now, get_trader(req), instr, settl_date, ids_[0], os);
+            break;
+        case HttpMethod::Put:
+            // PUT /api/sess/order/INSTR/SETTL_DATE/ID,ID...
+            match_method_ = true;
+            {
+                // Validate account before request.
+                const auto accnt = get_trader(req);
+                constexpr auto ReqFields = RestBody::Lots;
+                if (req.body().fields() != ReqFields) {
+                    throw InvalidException{"request fields are invalid"sv};
+                }
+                impl_.put_order(now, accnt, instr, settl_date, ids_, req.body().lots(), os);
+            }
+            break;
+        default:
+            break;
+        }
+        return;
+    }
+}
+
+void RestApp::exec_request(Time now, const HttpRequest& req, HttpStream& os)
+{
+    if (path_.empty()) {
+
+        // /api/sess/exec
+        match_path_ = true;
+
+        if (req.method() == HttpMethod::Get) {
+            // GET /api/sess/exec
+            match_method_ = true;
+            impl_.get_exec(now, get_trader(req), parse_query(req.query()), os);
+        }
+        return;
+    }
+}
+
+void RestApp::trade_request(Time now, const HttpRequest& req, HttpStream& os)
+{
+    if (path_.empty()) {
+
+        // /api/sess/trade
+        match_path_ = true;
+
+        switch (req.method()) {
+        case HttpMethod::Get:
+            // GET /api/sess/trade
+            match_method_ = true;
+            impl_.get_trade(now, get_trader(req), os);
+            break;
+        case HttpMethod::Post:
+            // POST /api/sess/trade
+            match_method_ = true;
+            get_admin(req);
+            {
+                constexpr auto ReqFields = RestBody::Instr | RestBody::SettlDate | RestBody::Accnt
+                    | RestBody::Side | RestBody::Lots;
+                constexpr auto OptFields
+                    = RestBody::Ref | RestBody::Ticks | RestBody::LiqInd | RestBody::Cpty;
+                if (!req.body().valid(ReqFields, OptFields)) {
+                    throw InvalidException{"request fields are invalid"sv};
+                }
+                impl_.post_trade(now, req.body().accnt(), req.body().instr(),
+                                 req.body().settl_date(), req.body().ref(), req.body().side(),
+                                 req.body().lots(), req.body().ticks(), req.body().liq_ind(),
+                                 req.body().cpty(), os);
+            }
+            break;
+        default:
+            break;
+        }
+        return;
+    }
+
+    const auto instr = path_.top();
+    path_.pop();
+
+    if (path_.empty()) {
+
+        // /api/sess/trade/INSTR
+        match_path_ = true;
+
+        switch (req.method()) {
+        case HttpMethod::Get:
+            // GET /api/sess/trade/INSTR
+            match_method_ = true;
+            impl_.get_trade(now, get_trader(req), instr, os);
+            break;
+        case HttpMethod::Post:
+            // POST /api/sess/trade/INSTR
+            match_method_ = true;
+            get_admin(req);
+            {
+                constexpr auto ReqFields
+                    = RestBody::SettlDate | RestBody::Accnt | RestBody::Side | RestBody::Lots;
+                constexpr auto OptFields
+                    = RestBody::Ref | RestBody::Ticks | RestBody::LiqInd | RestBody::Cpty;
+                if (!req.body().valid(ReqFields, OptFields)) {
+                    throw InvalidException{"request fields are invalid"sv};
+                }
+                impl_.post_trade(now, req.body().accnt(), instr, req.body().settl_date(),
+                                 req.body().ref(), req.body().side(), req.body().lots(),
+                                 req.body().ticks(), req.body().liq_ind(), req.body().cpty(), os);
+            }
+            break;
+        default:
+            break;
+        }
+        return;
+    }
+
+    const auto settl_date = from_string<IsoDate>(path_.top());
+    path_.pop();
+
+    if (path_.empty()) {
+
+        // /api/sess/trade/INSTR/SETTL_DATE
+        match_path_ = true;
+
+        switch (req.method()) {
+        case HttpMethod::Get:
+            // GET /api/sess/trade/INSTR/SETTL_DATE
+            match_method_ = true;
+            impl_.get_trade(now, get_trader(req), instr, settl_date, os);
+            break;
+        case HttpMethod::Post:
+            // POST /api/sess/trade/INSTR/SETTL_DATE
+            match_method_ = true;
+            get_admin(req);
+            {
+                constexpr auto ReqFields = RestBody::Accnt | RestBody::Side | RestBody::Lots;
+                constexpr auto OptFields
+                    = RestBody::Ref | RestBody::Ticks | RestBody::LiqInd | RestBody::Cpty;
+                if (!req.body().valid(ReqFields, OptFields)) {
+                    throw InvalidException{"request fields are invalid"sv};
+                }
+                impl_.post_trade(now, req.body().accnt(), instr, settl_date, req.body().ref(),
+                                 req.body().side(), req.body().lots(), req.body().ticks(),
+                                 req.body().liq_ind(), req.body().cpty(), os);
+            }
+            break;
+        default:
+            break;
+        }
+        return;
+    }
+
+    ScopedIds ids{path_.top(), ids_};
+    path_.pop();
+
+    if (path_.empty()) {
+
+        // /api/sess/trade/INSTR/SETTL_DATE/ID,ID...
+        match_path_ = true;
+
+        switch (req.method()) {
+        case HttpMethod::Get:
+            // GET /api/sess/trade/INSTR/SETTL_DATE/ID
+            match_method_ = true;
+            impl_.get_trade(now, get_trader(req), instr, settl_date, ids_[0], os);
+            break;
+        case HttpMethod::Delete:
+            // DELETE /api/sess/trade/INSTR/SETTL_DATE/ID,ID...
+            match_method_ = true;
+            impl_.delete_trade(now, get_trader(req), instr, settl_date, ids_);
+            break;
+        default:
+            break;
+        }
+        return;
+    }
+}
+
+void RestApp::posn_request(Time now, const HttpRequest& req, HttpStream& os)
+{
+    if (path_.empty()) {
+
+        // /api/sess/posn
+        match_path_ = true;
+
+        if (req.method() == HttpMethod::Get) {
+            // GET /api/sess/posn
+            match_method_ = true;
+            impl_.get_posn(now, get_trader(req), os);
+        }
+        return;
+    }
+
+    const auto instr = path_.top();
+    path_.pop();
+
+    if (path_.empty()) {
+
+        // /api/sess/posn/INSTR
+        match_path_ = true;
+
+        if (req.method() == HttpMethod::Get) {
+            // GET /api/sess/posn/INSTR
+            match_method_ = true;
+            impl_.get_posn(now, get_trader(req), instr, os);
+        }
+        return;
+    }
+
+    const auto settl_date = from_string<IsoDate>(path_.top());
+    path_.pop();
+
+    if (path_.empty()) {
+
+        // /api/sess/posn/INSTR/SETTL_DATE
+        match_path_ = true;
+
+        if (req.method() == HttpMethod::Get) {
+            // GET /api/sess/posn/INSTR/SETTL_DATE
+            match_method_ = true;
+            impl_.get_posn(now, get_trader(req), instr, settl_date, os);
+        }
+        return;
+    }
 }
 
 } // namespace swirly

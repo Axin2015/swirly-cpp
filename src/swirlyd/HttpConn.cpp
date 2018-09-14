@@ -16,7 +16,7 @@
  */
 #include "HttpConn.hpp"
 
-#include "RestServ.hpp"
+#include "RestApp.hpp"
 
 #include <swirly/sys/Event.hpp>
 
@@ -26,12 +26,12 @@ namespace {
 constexpr auto IdleTimeout = 5s;
 } // namespace
 
-HttpConn::HttpConn(Time now, Reactor& r, IoSocket&& sock, const Endpoint& ep, RestServ& rs)
+HttpConn::HttpConn(Time now, Reactor& r, IoSocket&& sock, const Endpoint& ep, RestApp& app)
 : BasicHttpParser<HttpConn>{HttpType::Request}
 , reactor_(r)
 , sock_{move(sock)}
 , ep_{ep}
-, rest_serv_(rs)
+, app_(app)
 {
     SWIRLY_DEBUG << "accept connection";
 
@@ -109,7 +109,7 @@ bool HttpConn::on_message_end() noexcept
         req_.flush(); // May throw.
 
         const auto was_empty = out_.empty();
-        rest_serv_.handle_request(now_, req_, os_);
+        app_.on_message(now_, req_, os_);
 
         if (was_empty) {
             // May throw.

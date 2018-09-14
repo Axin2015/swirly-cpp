@@ -17,99 +17,62 @@
 #ifndef SWIRLYD_RESTAPP_HPP
 #define SWIRLYD_RESTAPP_HPP
 
-#include "EntitySet.hpp"
-#include "Page.hpp"
+#include <swirly/util/IntTypes.hpp>
+#include <swirly/util/Symbol.hpp>
+#include <swirly/util/Time.hpp>
+#include <swirly/util/Tokeniser.hpp>
 
-#include <swirly/lob/App.hpp>
+#include <vector>
 
 namespace swirly {
+inline namespace http {
+class HttpStream;
+} // namespace http
 
-class SWIRLY_API RestApp {
+class HttpRequest;
+class RestImpl;
+
+class RestApp {
   public:
-    RestApp(MsgQueue& mq, std::size_t max_execs)
-    : app_{mq, max_execs}
+    explicit RestApp(RestImpl& impl) noexcept
+    : impl_(impl)
     {
     }
     ~RestApp();
 
     // Copy.
-    RestApp(const RestApp&) = delete;
-    RestApp& operator=(const RestApp&) = delete;
+    RestApp(const RestApp& rhs) = delete;
+    RestApp& operator=(const RestApp& rhs) = delete;
 
     // Move.
-    RestApp(RestApp&&);
-    RestApp& operator=(RestApp&&);
+    RestApp(RestApp&&) = delete;
+    RestApp& operator=(RestApp&&) = delete;
 
-    void load(Time now, const Model& model) { app_.load(now, model); }
-
-    void get_ref_data(Time now, EntitySet es, std::ostream& out) const;
-
-    void get_asset(Time now, std::ostream& out) const;
-
-    void get_asset(Time now, Symbol symbol, std::ostream& out) const;
-
-    void get_instr(Time now, std::ostream& out) const;
-
-    void get_instr(Time now, Symbol symbol, std::ostream& out) const;
-
-    void get_sess(Time now, Symbol accnt, EntitySet es, Page page, std::ostream& out) const;
-
-    void get_market(Time now, std::ostream& out) const;
-
-    void get_market(Time now, Symbol instr, std::ostream& out) const;
-
-    void get_market(Time now, Symbol instr, IsoDate settl_date, std::ostream& out) const;
-
-    void get_order(Time now, Symbol accnt, std::ostream& out) const;
-
-    void get_order(Time now, Symbol accnt, Symbol instr, std::ostream& out) const;
-
-    void get_order(Time now, Symbol accnt, Symbol instr, IsoDate settl_date,
-                   std::ostream& out) const;
-
-    void get_order(Time now, Symbol accnt, Symbol instr, IsoDate settl_date, Id64 id,
-                   std::ostream& out) const;
-
-    void get_exec(Time now, Symbol accnt, Page page, std::ostream& out) const;
-
-    void get_trade(Time now, Symbol accnt, std::ostream& out) const;
-
-    void get_trade(Time now, Symbol accnt, Symbol instr, std::ostream& out) const;
-
-    void get_trade(Time now, Symbol accnt, Symbol instr, IsoDate settl_date,
-                   std::ostream& out) const;
-
-    void get_trade(Time now, Symbol accnt, Symbol instr, IsoDate settl_date, Id64 id,
-                   std::ostream& out) const;
-
-    void get_posn(Time now, Symbol accnt, std::ostream& out) const;
-
-    void get_posn(Time now, Symbol accnt, Symbol instr, std::ostream& out) const;
-
-    void get_posn(Time now, Symbol accnt, Symbol instr, IsoDate settl_date,
-                  std::ostream& out) const;
-
-    void post_market(Time now, Symbol instr, IsoDate settl_date, MarketState state,
-                     std::ostream& out);
-
-    void put_market(Time now, Symbol instr, IsoDate settl_date, MarketState state,
-                    std::ostream& out);
-
-    void post_order(Time now, Symbol accnt, Symbol instr, IsoDate settl_date, std::string_view ref,
-                    Side side, Lots lots, Ticks ticks, Lots min_lots, std::ostream& out);
-
-    void put_order(Time now, Symbol accnt, Symbol instr, IsoDate settl_date, ArrayView<Id64> ids,
-                   Lots lots, std::ostream& out);
-
-    void post_trade(Time now, Symbol accnt, Symbol instr, IsoDate settl_date, std::string_view ref,
-                    Side side, Lots lots, Ticks ticks, LiqInd liq_ind, Symbol cpty,
-                    std::ostream& out);
-
-    void delete_trade(Time now, Symbol accnt, Symbol instr, IsoDate settl_date,
-                      ArrayView<Id64> ids);
+    void on_message(Time now, const HttpRequest& req, HttpStream& os) noexcept;
 
   private:
-    App app_;
+    bool reset(const HttpRequest& req) noexcept;
+
+    void rest_request(Time now, const HttpRequest& req, HttpStream& os);
+
+    void ref_data_request(Time now, const HttpRequest& req, HttpStream& os);
+    void asset_request(Time now, const HttpRequest& req, HttpStream& os);
+    void instr_request(Time now, const HttpRequest& req, HttpStream& os);
+
+    void sess_request(Time now, const HttpRequest& req, HttpStream& os);
+    void market_request(Time now, const HttpRequest& req, HttpStream& os);
+
+    void order_request(Time now, const HttpRequest& req, HttpStream& os);
+    void exec_request(Time now, const HttpRequest& req, HttpStream& os);
+    void trade_request(Time now, const HttpRequest& req, HttpStream& os);
+    void posn_request(Time now, const HttpRequest& req, HttpStream& os);
+
+    RestImpl& impl_;
+    bool match_method_{false};
+    bool match_path_{false};
+    Tokeniser path_;
+    std::vector<Id64> ids_;
+    std::vector<Symbol> symbols_;
 };
 
 } // namespace swirly

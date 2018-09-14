@@ -33,7 +33,7 @@
 #include <boost/intrusive/list.hpp>
 
 namespace swirly {
-class RestServ;
+class RestApp;
 
 class SWIRLY_API HttpConn
 : public MemAlloc
@@ -48,7 +48,7 @@ class SWIRLY_API HttpConn
     using Transport = Tcp;
     using Endpoint = TcpEndpoint;
 
-    HttpConn(Time now, Reactor& r, IoSocket&& sock, const Endpoint& ep, RestServ& rs);
+    HttpConn(Time now, Reactor& r, IoSocket&& sock, const Endpoint& ep, RestApp& app);
 
     // Copy.
     HttpConn(const HttpConn&) = delete;
@@ -97,7 +97,7 @@ class SWIRLY_API HttpConn
     Reactor& reactor_;
     IoSocket sock_;
     Endpoint ep_;
-    RestServ& rest_serv_;
+    RestApp& app_;
     Reactor::Handle sub_;
     Timer tmr_;
     Time now_{};

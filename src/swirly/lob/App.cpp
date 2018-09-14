@@ -57,7 +57,7 @@ inline auto& remove_const(const ValueT& ref)
 
 } // namespace
 
-struct App::Impl {
+struct LobApp::Impl {
 
     Impl(MsgQueue& mq, size_t max_execs)
     : mq_(mq)
@@ -723,155 +723,156 @@ struct App::Impl {
     vector<ConstExecPtr> execs_;
 };
 
-App::App(MsgQueue& mq, size_t max_execs)
+LobApp::LobApp(MsgQueue& mq, size_t max_execs)
 : impl_{make_unique<Impl>(mq, max_execs)}
 {
 }
 
-App::~App() = default;
+LobApp::~LobApp() = default;
 
-App::App(App&&) = default;
+LobApp::LobApp(LobApp&&) = default;
 
-App& App::operator=(App&&) = default;
+LobApp& LobApp::operator=(LobApp&&) = default;
 
-void App::load(Time now, const Model& model)
+void LobApp::load(Time now, const Model& model)
 {
     impl_->load(now, model);
 }
 
-const AssetSet& App::assets() const noexcept
+const AssetSet& LobApp::assets() const noexcept
 {
     return impl_->assets();
 }
 
-const InstrSet& App::instrs() const noexcept
+const InstrSet& LobApp::instrs() const noexcept
 {
     return impl_->instrs();
 }
 
-const MarketSet& App::markets() const noexcept
+const MarketSet& LobApp::markets() const noexcept
 {
     return impl_->markets();
 }
 
-const Instr& App::instr(Symbol symbol) const
+const Instr& LobApp::instr(Symbol symbol) const
 {
     return impl_->instr(symbol);
 }
 
-const Market& App::market(Id64 id) const
+const Market& LobApp::market(Id64 id) const
 {
     return impl_->market(id);
 }
 
-const Sess& App::sess(Symbol accnt) const
+const Sess& LobApp::sess(Symbol accnt) const
 {
     return impl_->sess(accnt);
 }
 
-const Market& App::create_market(Time now, const Instr& instr, JDay settl_day, MarketState state)
+const Market& LobApp::create_market(Time now, const Instr& instr, JDay settl_day, MarketState state)
 {
     return impl_->create_market(now, instr, settl_day, state);
 }
 
-void App::update_market(Time now, const Market& market, MarketState state)
+void LobApp::update_market(Time now, const Market& market, MarketState state)
 {
     return impl_->update_market(now, remove_const(market), state);
 }
 
-void App::create_order(Time now, const Sess& sess, const Market& market, std::string_view ref,
-                       Side side, Lots lots, Ticks ticks, Lots min_lots, Response& resp)
+void LobApp::create_order(Time now, const Sess& sess, const Market& market, std::string_view ref,
+                          Side side, Lots lots, Ticks ticks, Lots min_lots, Response& resp)
 {
     impl_->create_order(now, remove_const(sess), remove_const(market), ref, side, lots, ticks,
                         min_lots, resp);
 }
 
-void App::revise_order(Time now, const Sess& sess, const Market& market, const Order& order,
-                       Lots lots, Response& resp)
+void LobApp::revise_order(Time now, const Sess& sess, const Market& market, const Order& order,
+                          Lots lots, Response& resp)
 {
     impl_->revise_order(now, remove_const(sess), remove_const(market), remove_const(order), lots,
                         resp);
 }
 
-void App::revise_order(Time now, const Sess& sess, const Market& market, Id64 id, Lots lots,
-                       Response& resp)
+void LobApp::revise_order(Time now, const Sess& sess, const Market& market, Id64 id, Lots lots,
+                          Response& resp)
 {
     impl_->revise_order(now, remove_const(sess), remove_const(market), id, lots, resp);
 }
 
-void App::revise_order(Time now, const Sess& sess, const Market& market, std::string_view ref,
-                       Lots lots, Response& resp)
+void LobApp::revise_order(Time now, const Sess& sess, const Market& market, std::string_view ref,
+                          Lots lots, Response& resp)
 {
     impl_->revise_order(now, remove_const(sess), remove_const(market), ref, lots, resp);
 }
 
-void App::revise_order(Time now, const Sess& sess, const Market& market, ArrayView<Id64> ids,
-                       Lots lots, Response& resp)
+void LobApp::revise_order(Time now, const Sess& sess, const Market& market, ArrayView<Id64> ids,
+                          Lots lots, Response& resp)
 {
     impl_->revise_order(now, remove_const(sess), remove_const(market), ids, lots, resp);
 }
 
-void App::cancel_order(Time now, const Sess& sess, const Market& market, const Order& order,
-                       Response& resp)
+void LobApp::cancel_order(Time now, const Sess& sess, const Market& market, const Order& order,
+                          Response& resp)
 {
     impl_->cancel_order(now, remove_const(sess), remove_const(market), remove_const(order), resp);
 }
 
-void App::cancel_order(Time now, const Sess& sess, const Market& market, Id64 id, Response& resp)
+void LobApp::cancel_order(Time now, const Sess& sess, const Market& market, Id64 id, Response& resp)
 {
     impl_->cancel_order(now, remove_const(sess), remove_const(market), id, resp);
 }
 
-void App::cancel_order(Time now, const Sess& sess, const Market& market, std::string_view ref,
-                       Response& resp)
+void LobApp::cancel_order(Time now, const Sess& sess, const Market& market, std::string_view ref,
+                          Response& resp)
 {
     impl_->cancel_order(now, remove_const(sess), remove_const(market), ref, resp);
 }
 
-void App::cancel_order(Time now, const Sess& sess, const Market& market, ArrayView<Id64> ids,
-                       Response& resp)
+void LobApp::cancel_order(Time now, const Sess& sess, const Market& market, ArrayView<Id64> ids,
+                          Response& resp)
 {
     impl_->cancel_order(now, remove_const(sess), remove_const(market), ids, resp);
 }
 
-void App::cancel_order(Time now, const Sess& sess)
+void LobApp::cancel_order(Time now, const Sess& sess)
 {
     impl_->cancel_order(now, remove_const(sess));
 }
 
-void App::cancel_order(Time now, const Market& market)
+void LobApp::cancel_order(Time now, const Market& market)
 {
     impl_->cancel_order(now, remove_const(market));
 }
 
-TradePair App::create_trade(Time now, const Sess& sess, const Market& market, std::string_view ref,
-                            Side side, Lots lots, Ticks ticks, LiqInd liq_ind, Symbol cpty)
+TradePair LobApp::create_trade(Time now, const Sess& sess, const Market& market,
+                               std::string_view ref, Side side, Lots lots, Ticks ticks,
+                               LiqInd liq_ind, Symbol cpty)
 {
     return impl_->create_trade(now, remove_const(sess), remove_const(market), ref, side, lots,
                                ticks, liq_ind, cpty);
 }
 
-void App::archive_trade(Time now, const Sess& sess, const Exec& trade)
+void LobApp::archive_trade(Time now, const Sess& sess, const Exec& trade)
 {
     impl_->archive_trade(now, remove_const(sess), trade);
 }
 
-void App::archive_trade(Time now, const Sess& sess, Id64 market_id, Id64 id)
+void LobApp::archive_trade(Time now, const Sess& sess, Id64 market_id, Id64 id)
 {
     impl_->archive_trade(now, remove_const(sess), market_id, id);
 }
 
-void App::archive_trade(Time now, const Sess& sess, Id64 market_id, ArrayView<Id64> ids)
+void LobApp::archive_trade(Time now, const Sess& sess, Id64 market_id, ArrayView<Id64> ids)
 {
     impl_->archive_trade(now, remove_const(sess), market_id, ids);
 }
 
-void App::expire_end_of_day(Time now)
+void LobApp::expire_end_of_day(Time now)
 {
     impl_->expire_end_of_day(now);
 }
 
-void App::settl_end_of_day(Time now)
+void LobApp::settl_end_of_day(Time now)
 {
     impl_->settl_end_of_day(now);
 }
