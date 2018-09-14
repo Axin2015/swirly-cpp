@@ -17,18 +17,22 @@
 #ifndef SWIRLY_HTTP_APP_HPP
 #define SWIRLY_HTTP_APP_HPP
 
+#include <swirly/http/Conn.hpp>
+
 #include <swirly/util/Time.hpp>
 #include <swirly/util/Version.hpp>
 
 namespace swirly {
 inline namespace http {
 
-class HttpConn;
 class HttpRequest;
 class HttpStream;
 
 class SWIRLY_API HttpApp {
   public:
+    using Transport = Tcp;
+    using Endpoint = TcpEndpoint;
+
     HttpApp() noexcept = default;
     virtual ~HttpApp();
 
@@ -40,25 +44,25 @@ class SWIRLY_API HttpApp {
     constexpr HttpApp(HttpApp&&) noexcept = default;
     HttpApp& operator=(HttpApp&&) noexcept = default;
 
-    void on_connect(Time now, HttpConn& conn) { do_on_connect(now, conn); }
-    void on_disconnect(Time now, HttpConn& conn) noexcept { do_on_disconnect(now, conn); }
-    void on_error(Time now, HttpConn& conn, const std::exception& e) noexcept
+    void on_connect(Time now, const Endpoint& ep) { do_on_connect(now, ep); }
+    void on_disconnect(Time now, const Endpoint& ep) noexcept { do_on_disconnect(now, ep); }
+    void on_error(Time now, const Endpoint& ep, const std::exception& e) noexcept
     {
-        do_on_error(now, conn, e);
+        do_on_error(now, ep, e);
     }
-    void on_message(Time now, HttpConn& conn, const HttpRequest& req, HttpStream& os)
+    void on_message(Time now, const Endpoint& ep, const HttpRequest& req, HttpStream& os)
     {
-        do_on_message(now, conn, req, os);
+        do_on_message(now, ep, req, os);
     }
-    void on_timeout(Time now, HttpConn& conn) noexcept { do_on_timeout(now, conn); }
+    void on_timeout(Time now, const Endpoint& ep) noexcept { do_on_timeout(now, ep); }
 
   protected:
-    virtual void do_on_connect(Time now, HttpConn& conn) = 0;
-    virtual void do_on_disconnect(Time now, HttpConn& conn) noexcept = 0;
-    virtual void do_on_error(Time now, HttpConn& conn, const std::exception& e) noexcept = 0;
-    virtual void do_on_message(Time now, HttpConn& conn, const HttpRequest& req, HttpStream& os)
+    virtual void do_on_connect(Time now, const Endpoint& ep) = 0;
+    virtual void do_on_disconnect(Time now, const Endpoint& ep) noexcept = 0;
+    virtual void do_on_error(Time now, const Endpoint& ep, const std::exception& e) noexcept = 0;
+    virtual void do_on_message(Time now, const Endpoint& ep, const HttpRequest& req, HttpStream& os)
         = 0;
-    virtual void do_on_timeout(Time now, HttpConn& conn) noexcept = 0;
+    virtual void do_on_timeout(Time now, const Endpoint& ep) noexcept = 0;
 };
 
 } // namespace http

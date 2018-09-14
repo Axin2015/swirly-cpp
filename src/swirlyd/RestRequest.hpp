@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYD_HTTPREQUEST_HPP
-#define SWIRLYD_HTTPREQUEST_HPP
+#ifndef SWIRLYD_RESTREQUEST_HPP
+#define SWIRLYD_RESTREQUEST_HPP
 
 #include "RestBody.hpp"
 
@@ -25,18 +25,18 @@
 namespace swirly {
 using namespace std::literals::string_view_literals;
 
-class SWIRLY_API HttpRequest : public BasicUrl<HttpRequest> {
+class SWIRLY_API RestRequest : public BasicUrl<RestRequest> {
   public:
-    HttpRequest() noexcept = default;
-    ~HttpRequest();
+    RestRequest() noexcept = default;
+    ~RestRequest();
 
     // Copy.
-    HttpRequest(const HttpRequest&) = delete;
-    HttpRequest& operator=(const HttpRequest&) = delete;
+    RestRequest(const RestRequest&) = delete;
+    RestRequest& operator=(const RestRequest&) = delete;
 
     // Move.
-    HttpRequest(HttpRequest&&) = delete;
-    HttpRequest& operator=(HttpRequest&&) = delete;
+    RestRequest(RestRequest&&) = delete;
+    RestRequest& operator=(RestRequest&&) = delete;
 
     auto method() const noexcept { return method_; }
     auto url() const noexcept { return +url_; }
@@ -47,7 +47,7 @@ class SWIRLY_API HttpRequest : public BasicUrl<HttpRequest> {
     auto partial() const noexcept { return partial_; }
     void clear() noexcept
     {
-        BasicUrl<HttpRequest>::reset();
+        BasicUrl<RestRequest>::reset();
         method_ = HttpMethod::Get;
         url_.clear();
         field_.clear();
@@ -59,7 +59,7 @@ class SWIRLY_API HttpRequest : public BasicUrl<HttpRequest> {
         body_.reset();
         partial_ = false;
     }
-    void flush() { BasicUrl<HttpRequest>::parse(); }
+    void flush() { BasicUrl<RestRequest>::parse(); }
     void set_method(HttpMethod method) noexcept { method_ = method; }
     void append_url(std::string_view sv) { url_ += sv; }
     void append_header_field(std::string_view sv, bool first)
@@ -104,4 +104,4 @@ class SWIRLY_API HttpRequest : public BasicUrl<HttpRequest> {
 
 } // namespace swirly
 
-#endif // SWIRLYD_HTTPREQUEST_HPP
+#endif // SWIRLYD_RESTREQUEST_HPP

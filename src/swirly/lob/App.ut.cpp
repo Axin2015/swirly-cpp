@@ -47,10 +47,10 @@ class SWIRLY_API TestModel : public swirly::TestModel {
     }
 };
 
-struct AppFixture {
-    AppFixture() { app.load(Now, TestModel{}); }
+struct Fixture {
+    Fixture() { app.load(Now, TestModel{}); }
     MsgQueue mq{1 << 10};
-    App app{mq, 1 << 4};
+    LobApp app{mq, 1 << 4};
 };
 
 } // namespace
@@ -59,7 +59,7 @@ namespace utf = boost::unit_test;
 
 BOOST_AUTO_TEST_SUITE(AppSuite)
 
-BOOST_FIXTURE_TEST_CASE(AppAssets, AppFixture)
+BOOST_FIXTURE_TEST_CASE(AppAssets, Fixture)
 {
     BOOST_TEST(distance(app.assets().begin(), app.assets().end()) == 24);
 
@@ -72,7 +72,7 @@ BOOST_FIXTURE_TEST_CASE(AppAssets, AppFixture)
     BOOST_TEST(it->type() == AssetType::Ccy);
 }
 
-BOOST_FIXTURE_TEST_CASE(AppInstrs, AppFixture, *utf::tolerance(0.0000001))
+BOOST_FIXTURE_TEST_CASE(AppInstrs, Fixture, *utf::tolerance(0.0000001))
 {
     BOOST_TEST(distance(app.instrs().begin(), app.instrs().end()) == 21);
 
@@ -96,7 +96,7 @@ BOOST_FIXTURE_TEST_CASE(AppInstrs, AppFixture, *utf::tolerance(0.0000001))
     BOOST_TEST(it->max_lots() == 10_lts);
 }
 
-BOOST_FIXTURE_TEST_CASE(AppMarkets, AppFixture)
+BOOST_FIXTURE_TEST_CASE(AppMarkets, Fixture)
 {
     BOOST_TEST(distance(app.markets().begin(), app.markets().end()) == 1);
 
@@ -109,7 +109,7 @@ BOOST_FIXTURE_TEST_CASE(AppMarkets, AppFixture)
     BOOST_TEST(it->state() == 0x1U);
 }
 
-BOOST_FIXTURE_TEST_CASE(AppMarket, AppFixture)
+BOOST_FIXTURE_TEST_CASE(AppMarket, Fixture)
 {
     // Not found.
     BOOST_CHECK_THROW(app.market(1_id64), MarketNotFoundException);
@@ -122,7 +122,7 @@ BOOST_FIXTURE_TEST_CASE(AppMarket, AppFixture)
     BOOST_TEST(market.state() == 0x1U);
 }
 
-BOOST_FIXTURE_TEST_CASE(AppCreateMarket, AppFixture)
+BOOST_FIXTURE_TEST_CASE(AppCreateMarket, Fixture)
 {
     const Instr& instr = app.instr("USDJPY"sv);
     const auto market_id = to_market_id(instr.id(), SettlDay);
@@ -147,7 +147,7 @@ BOOST_FIXTURE_TEST_CASE(AppCreateMarket, AppFixture)
     BOOST_CHECK_THROW(app.create_market(Now, instr, SettlDay, 0x1), AlreadyExistsException);
 }
 
-BOOST_FIXTURE_TEST_CASE(AppUpdateMarket, AppFixture)
+BOOST_FIXTURE_TEST_CASE(AppUpdateMarket, Fixture)
 {
     const Instr& instr = app.instr("USDJPY"sv);
     const auto market_id = to_market_id(instr.id(), SettlDay);
@@ -162,7 +162,7 @@ BOOST_FIXTURE_TEST_CASE(AppUpdateMarket, AppFixture)
     BOOST_TEST(market.state() == 0x2U);
 }
 
-BOOST_FIXTURE_TEST_CASE(AppCreateOrder, AppFixture)
+BOOST_FIXTURE_TEST_CASE(AppCreateOrder, Fixture)
 {
     auto& sess = app.sess("MARAYL"sv);
     const Instr& instr = app.instr("EURUSD"sv);

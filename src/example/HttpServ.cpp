@@ -42,22 +42,24 @@ class TestApp : public HttpApp {
     using Slot = BasicSlot<const HttpRequest&, HttpStream&>;
     using SlotMap = std::unordered_map<std::string, Slot>;
 
+    ~TestApp() override = default;
     void bind(const std::string& path, Slot slot) { slot_map_[path] = slot; }
 
   protected:
-    void do_on_connect(Time now, HttpConn& conn) noexcept override
+    void do_on_connect(Time now, const Endpoint& ep) noexcept override
     {
-        SWIRLY_INFO << "session connected: " << conn.endpoint();
+        SWIRLY_INFO << "session connected: " << ep;
     }
-    void do_on_disconnect(Time now, HttpConn& conn) noexcept override
+    void do_on_disconnect(Time now, const Endpoint& ep) noexcept override
     {
-        SWIRLY_INFO << "session disconnected: " << conn.endpoint();
+        SWIRLY_INFO << "session disconnected: " << ep;
     }
-    void do_on_error(Time now, HttpConn& conn, const std::exception& e) noexcept override
+    void do_on_error(Time now, const Endpoint& ep, const std::exception& e) noexcept override
     {
-        SWIRLY_ERROR << "session error: " << conn.endpoint() << ": " << e.what();
+        SWIRLY_ERROR << "session error: " << ep << ": " << e.what();
     }
-    void do_on_message(Time now, HttpConn& conn, const HttpRequest& req, HttpStream& os) override
+    void do_on_message(Time now, const Endpoint& ep, const HttpRequest& req,
+                       HttpStream& os) override
     {
         const auto it = slot_map_.find(string{req.path()});
         if (it != slot_map_.end()) {
@@ -69,9 +71,9 @@ class TestApp : public HttpApp {
         }
         os.commit();
     }
-    void do_on_timeout(Time now, HttpConn& conn) noexcept override
+    void do_on_timeout(Time now, const Endpoint& ep) noexcept override
     {
-        SWIRLY_WARNING << "session timeout: " << conn.endpoint();
+        SWIRLY_WARNING << "session timeout: " << ep;
     }
 
   private:

@@ -14,17 +14,12 @@
 # 02110-1301, USA.
 
 add_custom_target(swirly-tool DEPENDS
-  swirly-app-bench
   swirly-db-to-dsv
   swirly-db-to-json
+  swirly-lob-bench
   swirly-queue-bench
   swirly-timer-bench
 )
-
-add_executable(swirly-app-bench AppBench.cpp)
-target_link_libraries(swirly-app-bench ${swirly_prof_LIBRARY} ${swirly_lob_LIBRARY}
-  ${swirly_db_LIBRARY})
-install(TARGETS swirly-app-bench DESTINATION bin COMPONENT program)
 
 add_executable(swirly-db-to-dsv DbToDsv.cpp)
 target_link_libraries(swirly-db-to-dsv ${swirly_db_LIBRARY})
@@ -33,6 +28,11 @@ install(TARGETS swirly-db-to-dsv DESTINATION bin COMPONENT program)
 add_executable(swirly-db-to-json DbToJson.cpp)
 target_link_libraries(swirly-db-to-json ${swirly_db_LIBRARY})
 install(TARGETS swirly-db-to-json DESTINATION bin COMPONENT program)
+
+add_executable(swirly-lob-bench LobBench.cpp)
+target_link_libraries(swirly-lob-bench ${swirly_prof_LIBRARY} ${swirly_lob_LIBRARY}
+  ${swirly_db_LIBRARY})
+install(TARGETS swirly-lob-bench DESTINATION bin COMPONENT program)
 
 add_executable(swirly-queue-bench QueueBench.cpp)
 target_link_libraries(swirly-queue-bench ${swirly_prof_LIBRARY} ${swirly_app_LIBRARY})
@@ -49,15 +49,14 @@ COMMAND bash -c "${CMAKE_INSTALL_BINDIR}/swirly-queue-bench && \"${CMAKE_SOURCE_
 VERBATIM
 )
 
-add_custom_target(app-benchmark DEPENDS
-swirly-app-bench
+add_custom_target(lob-benchmark DEPENDS
+swirly-lob-bench
 WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-COMMAND bash -c "${CMAKE_INSTALL_BINDIR}/swirly-app-bench && \"${CMAKE_SOURCE_DIR}/script/hist-plot.sh\" maker.hdr taker.hdr > app_benchmark.png"
+COMMAND bash -c "${CMAKE_INSTALL_BINDIR}/swirly-lob-bench && \"${CMAKE_SOURCE_DIR}/script/hist-plot.sh\" maker.hdr taker.hdr > lob_benchmark.png"
 VERBATIM
 )
 
 add_custom_target(benchmark DEPENDS
 queue-benchmark
-app-benchmark
+lob-benchmark
 )
-

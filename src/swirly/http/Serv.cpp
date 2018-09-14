@@ -15,29 +15,3 @@
  * 02110-1301, USA.
  */
 #include "Serv.hpp"
-
-namespace swirly {
-inline namespace http {
-using namespace std;
-
-HttpServ::HttpServ(Time now, Reactor& r, const Endpoint& ep, HttpApp& app)
-: TcpAcceptor{r, ep}
-, reactor_(r)
-, app_(app)
-{
-}
-
-HttpServ::~HttpServ()
-{
-    const auto now = UnixClock::now();
-    conn_list_.clear_and_dispose([now](auto* conn) { conn->dispose(now); });
-}
-
-void HttpServ::do_accept(Time now, IoSocket&& sock, const Endpoint& ep)
-{
-    auto* const conn = new HttpConn{now, reactor_, move(sock), ep, app_};
-    conn_list_.push_back(*conn);
-}
-
-} // namespace http
-} // namespace swirly

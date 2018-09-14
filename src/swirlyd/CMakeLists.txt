@@ -24,13 +24,11 @@ endif(RAGEL_EXECUTABLE)
 
 set(lib_SOURCES
   EntitySet.cpp
-  HttpConn.cpp
-  HttpRequest.cpp
-  HttpServ.cpp
   Page.cpp
   RestApp.cpp
   RestBody.cpp
-  RestServ.cpp)
+  RestImpl.cpp
+  RestRequest.cpp)
 
 add_library(swirlyd-static STATIC ${lib_SOURCES})
 set_target_properties(swirlyd-static PROPERTIES OUTPUT_NAME swirlyd)

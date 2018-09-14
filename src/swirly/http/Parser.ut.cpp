@@ -101,8 +101,16 @@ class HttpParser
     }
     bool on_message_end() noexcept
     {
-        BasicUrl<HttpParser>::parse();
-        return true;
+        bool ret{false};
+        try {
+            if (!url_.empty()) {
+                BasicUrl<HttpParser>::parse();
+            }
+            ret = true;
+        } catch (const std::exception& e) {
+            cerr << "exception: " << e.what() << endl;
+        }
+        return ret;
     }
     bool on_chunk_header(size_t len) noexcept { return true; }
     bool on_chunk_end() noexcept { return true; }

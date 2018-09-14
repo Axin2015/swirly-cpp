@@ -73,7 +73,7 @@ struct JournState {
     int total{0};
 };
 
-struct MsgQueueFixture {
+struct Fixture {
     MsgQueue mq{1 << 10};
 };
 
@@ -166,7 +166,7 @@ BOOST_AUTO_TEST_CASE(RangeCase)
     }
 }
 
-BOOST_FIXTURE_TEST_CASE(MsgQueueCreateMarket, MsgQueueFixture)
+BOOST_FIXTURE_TEST_CASE(MsgQueueCreateMarket, Fixture)
 {
     mq.create_market(Now, MarketId, "EURUSD"sv, SettlDay, 0x1);
 
@@ -182,7 +182,7 @@ BOOST_FIXTURE_TEST_CASE(MsgQueueCreateMarket, MsgQueueFixture)
     BOOST_CHECK_EQUAL(body.state, 0x1U);
 }
 
-BOOST_FIXTURE_TEST_CASE(MsgQueueUpdateMarket, MsgQueueFixture)
+BOOST_FIXTURE_TEST_CASE(MsgQueueUpdateMarket, Fixture)
 {
     mq.update_market(Now, MarketId, 0x1);
 
@@ -196,7 +196,7 @@ BOOST_FIXTURE_TEST_CASE(MsgQueueUpdateMarket, MsgQueueFixture)
     BOOST_CHECK_EQUAL(body.state, 0x1U);
 }
 
-BOOST_FIXTURE_TEST_CASE(MsgQueueCreateExec, MsgQueueFixture)
+BOOST_FIXTURE_TEST_CASE(MsgQueueCreateExec, Fixture)
 {
     ConstExecPtr execs[2];
     execs[0] = make_intrusive<Exec>(Now, "MARAYL"sv, MarketId, "EURUSD"sv, SettlDay, 1_id64, 2_id64,
@@ -270,7 +270,7 @@ BOOST_FIXTURE_TEST_CASE(MsgQueueCreateExec, MsgQueueFixture)
     }
 }
 
-BOOST_FIXTURE_TEST_CASE(MsgQueueArchiveTrade, MsgQueueFixture)
+BOOST_FIXTURE_TEST_CASE(MsgQueueArchiveTrade, Fixture)
 {
     vector<Id64> ids;
     ids.reserve(101);
