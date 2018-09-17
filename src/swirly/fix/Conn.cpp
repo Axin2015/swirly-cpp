@@ -17,10 +17,8 @@
 #include "Conn.hpp"
 
 #include "App.hpp"
-#include "Header.hpp"
 #include "Lexer.hpp"
-#include "Logon.hpp"
-#include "Stream.hpp"
+#include "Msg.hpp"
 
 #include <swirly/sys/Event.hpp>
 
@@ -43,12 +41,17 @@ FixConn::FixConn(CyclTime now, Reactor& r, IoSocket&& sock, const Endpoint& ep,
 
 void FixConn::dispose(CyclTime now) noexcept
 {
+    if (!sess_id_.empty()) {
+        app_.on_logout(now, *this, sess_id_, true);
+        sess_id_.clear();
+    }
     app_.on_disconnect(now, *this);
     delete this;
 }
 
 void FixConn::logon(CyclTime now, const FixSessId& sess_id)
 {
+    assert(!sess_id.empty());
     if (state_ == LoggedOut) {
         const auto it = sess_map_.find(sess_id);
         if (it == sess_map_.end()) {
@@ -72,6 +75,18 @@ void FixConn::logout(CyclTime now)
 
 FixConn::~FixConn() = default;
 
+FixHeader FixConn::make_header(CyclTime now, string_view msg_type) const noexcept
+{
+    assert(!sess_id_.empty());
+    FixHeader hdr;
+    hdr.msg_type = msg_type;
+    hdr.sender_comp_id = sess_id_.sender_comp_id;
+    hdr.target_comp_id = sess_id_.target_comp_id;
+    hdr.msg_seq_num = seq_num_ + 1;
+    hdr.sending_time = now.wall_time();
+    return hdr;
+}
+
 void FixConn::read_and_write(CyclTime now)
 {
     sub_.set_events(EventIn | EventOut);
@@ -88,38 +103,13 @@ void FixConn::read_only(CyclTime now)
 
 void FixConn::send_logon(CyclTime now)
 {
-    FixHeader hdr;
-    hdr.msg_type = "A"sv;
-    hdr.sender_comp_id = sess_id_.sender_comp_id;
-    hdr.target_comp_id = sess_id_.target_comp_id;
-    hdr.msg_seq_num = ++seq_num_;
-    hdr.sending_time = now.wall_time();
-
     Logon body{0, hb_int_.count()};
-
-    FixStream os{out_.buf};
-    os.reset(sess_id_.version);
-    os << hdr << body;
-    os.commit();
-
-    read_and_write(now);
+    send(now, "A"sv, [&body](CyclTime now, ostream& os) { os << body; });
 }
 
 void FixConn::send_logout(CyclTime now)
 {
-    FixHeader hdr;
-    hdr.msg_type = "5"sv;
-    hdr.sender_comp_id = sess_id_.sender_comp_id;
-    hdr.target_comp_id = sess_id_.target_comp_id;
-    hdr.msg_seq_num = ++seq_num_;
-    hdr.sending_time = now.wall_time();
-
-    FixStream os{out_.buf};
-    os.reset(sess_id_.version);
-    os << hdr;
-    os.commit();
-
-    read_and_write(now);
+    send(now, "5"sv, [](CyclTime now, ostream& os) {});
 }
 
 void FixConn::on_io_event(CyclTime now, int fd, unsigned events)
@@ -169,19 +159,7 @@ void FixConn::schedule_heartbeat(CyclTime now)
 
 void FixConn::on_heartbeat(CyclTime now, Timer& tmr)
 {
-    FixHeader hdr;
-    hdr.msg_type = "0"sv;
-    hdr.sender_comp_id = sess_id_.sender_comp_id;
-    hdr.target_comp_id = sess_id_.target_comp_id;
-    hdr.msg_seq_num = ++seq_num_;
-    hdr.sending_time = now.wall_time();
-
-    FixStream os{out_.buf};
-    os.reset(sess_id_.version);
-    os << hdr;
-    os.commit();
-
-    read_and_write(now);
+    send(now, "0"sv, [](CyclTime now, ostream& os) {});
 }
 
 void FixConn::on_message(CyclTime now, std::string_view msg, std::size_t msg_type_off, Version ver)
@@ -209,14 +187,14 @@ void FixConn::on_message(CyclTime now, std::string_view msg, std::size_t msg_typ
             // Process logout reply.
             FixSessId sess_id;
             sess_id_.swap(sess_id);
-            app_.on_logout(now, *this, sess_id);
+            app_.on_logout(now, *this, sess_id, false);
         } else if (state_ == LoggedOn) {
             state_ = LoggedOut;
-            FixSessId sess_id;
-            sess_id_.swap(sess_id);
             // Send logout response.
             send_logout(now);
-            app_.on_logout(now, *this, sess_id);
+            FixSessId sess_id;
+            sess_id_.swap(sess_id);
+            app_.on_logout(now, *this, sess_id, false);
         }
     } else if (msg_type == "A"sv) {
         // Logon.

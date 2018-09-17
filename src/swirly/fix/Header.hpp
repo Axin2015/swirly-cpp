@@ -33,7 +33,19 @@ struct FixHeader {
     std::optional<PossResend> poss_resend;
 };
 
-SWIRLY_API std::ostream& operator<<(std::ostream& os, const FixHeader& hdr);
+template <typename StreamT>
+StreamT& operator<<(StreamT& os, const FixHeader& hdr)
+{
+    os << hdr.msg_type << hdr.sender_comp_id << hdr.target_comp_id << hdr.msg_seq_num
+       << hdr.sending_time;
+    if (hdr.poss_dup) {
+        os << *hdr.poss_dup;
+    }
+    if (hdr.poss_resend) {
+        os << *hdr.poss_resend;
+    }
+    return os;
+}
 
 SWIRLY_API std::size_t parse_header(std::string_view msg, std::size_t msg_type_off, FixHeader& hdr);
 

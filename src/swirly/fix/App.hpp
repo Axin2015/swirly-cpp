@@ -17,20 +17,21 @@
 #ifndef SWIRLY_FIX_APP_HPP
 #define SWIRLY_FIX_APP_HPP
 
-#include <swirly/fix/SessId.hpp>
-
-#include <swirly/util/Time.hpp>
+#include <swirly/fix/Handler.hpp>
 
 namespace swirly {
+inline namespace util {
+class Config;
+} // namespace util
 inline namespace fix {
 
 class FixConn;
 struct FixHeader;
 
-class SWIRLY_API FixApp {
+class SWIRLY_API FixApp : public FixHandler {
   public:
     FixApp() noexcept = default;
-    virtual ~FixApp();
+    ~FixApp() override;
 
     // Copy.
     constexpr FixApp(const FixApp&) noexcept = default;
@@ -40,52 +41,24 @@ class SWIRLY_API FixApp {
     constexpr FixApp(FixApp&&) noexcept = default;
     FixApp& operator=(FixApp&&) noexcept = default;
 
+    void config(CyclTime now, const FixSessId& sess_id, const Config& config)
+    {
+        do_config(now, sess_id, config);
+    }
+    void prepare(CyclTime now) { do_prepare(now); }
     void on_connect(CyclTime now, FixConn& conn) { do_on_connect(now, conn); }
-    void on_logon(CyclTime now, FixConn& conn, const FixSessId& sess_id)
-    {
-        do_on_logon(now, conn, sess_id);
-    }
-    void on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_id) noexcept
-    {
-        do_on_logout(now, conn, sess_id);
-    }
-    void on_message(CyclTime now, FixConn& conn, std::string_view msg, std::size_t body_off,
-                    Version ver, const FixHeader& hdr)
-    {
-        do_on_message(now, conn, msg, body_off, ver, hdr);
-    }
-    // Terminal conditions follow.
     /**
-     * Called on passive disconnect by peer. The connection is disposed immediately after the
-     * callback returns.
-     */
-    void on_disconnect(CyclTime now, const FixConn& conn) noexcept { do_on_disconnect(now, conn); }
-    /**
-     * Called when an error occurs. The connection is disposed immediately after the callback
+     * Called when a disconnect occurs. The connection is disposed immediately after the callback
      * returns.
      */
-    void on_error(CyclTime now, const FixConn& conn, const std::exception& e) noexcept
-    {
-        do_on_error(now, conn, e);
-    }
-    /**
-     * Called when no data is received from peer for timeout period. The connection is disposed
-     * immediately after the callback returns.
-     */
-    void on_timeout(CyclTime now, const FixConn& conn) noexcept { do_on_timeout(now, conn); }
+
+    void on_disconnect(CyclTime now, const FixConn& conn) noexcept { do_on_disconnect(now, conn); }
 
   protected:
+    virtual void do_config(CyclTime now, const FixSessId& sess_id, const Config& config) = 0;
+    virtual void do_prepare(CyclTime now) = 0;
     virtual void do_on_connect(CyclTime now, FixConn& conn) = 0;
-    virtual void do_on_logon(CyclTime now, FixConn& conn, const FixSessId& sess_id) = 0;
-    virtual void do_on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_id) noexcept = 0;
-    virtual void do_on_message(CyclTime now, FixConn& conn, std::string_view msg,
-                               std::size_t body_off, Version ver, const FixHeader& hdr)
-        = 0;
-
     virtual void do_on_disconnect(CyclTime now, const FixConn& conn) noexcept = 0;
-    virtual void do_on_error(CyclTime now, const FixConn& conn, const std::exception& e) noexcept
-        = 0;
-    virtual void do_on_timeout(CyclTime now, const FixConn& conn) noexcept = 0;
 };
 
 } // namespace fix

@@ -33,11 +33,13 @@ set(lib_SOURCES
   Conn.cpp
   Ctx.cpp
   Field.cpp
+  Handler.cpp
   Header.cpp
   Initiator.cpp
   Lexer.cpp
-  Logon.cpp
+  Msg.cpp
   Parser.cpp
+  Random.cpp
   SessId.cpp
   Stream.cpp
   Types.cpp)
@@ -65,6 +67,7 @@ foreach(file ${lib_SOURCES})
 endforeach()
 
 set(test_SOURCES
+  Header.ut.cpp
   Lexer.ut.cpp
   SessId.ut.cpp
   Stream.ut.cpp)

@@ -37,8 +37,8 @@ BusinessDay::BusinessDay(const char* time_zone)
 BusinessDay::~BusinessDay() = default;
 
 // Copy.
-BusinessDay::BusinessDay(const BusinessDay& rhs) noexcept = default;
-BusinessDay& BusinessDay::operator=(const BusinessDay& rhs) = default;
+BusinessDay::BusinessDay(const BusinessDay&) noexcept = default;
+BusinessDay& BusinessDay::operator=(const BusinessDay&) = default;
 
 // Move.
 BusinessDay::BusinessDay(BusinessDay&&) noexcept = default;

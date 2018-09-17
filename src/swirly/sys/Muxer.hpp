@@ -77,8 +77,8 @@ class EpollMuxer {
     EpollMuxer& operator=(const EpollMuxer&) = delete;
 
     // Move.
-    EpollMuxer(EpollMuxer&& rhs) = default;
-    EpollMuxer& operator=(EpollMuxer&& rhs) = default;
+    EpollMuxer(EpollMuxer&&) = default;
+    EpollMuxer& operator=(EpollMuxer&&) = default;
 
     void swap(EpollMuxer& rhs) noexcept { std::swap(mux_, rhs.mux_); }
     /**

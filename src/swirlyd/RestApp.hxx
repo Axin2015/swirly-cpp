@@ -46,8 +46,8 @@ class RestApp {
     ~RestApp();
 
     // Copy.
-    RestApp(const RestApp& rhs) = delete;
-    RestApp& operator=(const RestApp& rhs) = delete;
+    RestApp(const RestApp&) = delete;
+    RestApp& operator=(const RestApp&) = delete;
 
     // Move.
     RestApp(RestApp&&) = delete;

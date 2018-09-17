@@ -39,8 +39,8 @@ class ArgvSequence {
     ~ArgvSequence() = default;
 
     // Copy.
-    constexpr ArgvSequence(const ArgvSequence& rhs) noexcept = default;
-    constexpr ArgvSequence& operator=(const ArgvSequence& rhs) noexcept = default;
+    constexpr ArgvSequence(const ArgvSequence&) noexcept = default;
+    constexpr ArgvSequence& operator=(const ArgvSequence&) noexcept = default;
 
     // Move.
     constexpr ArgvSequence(ArgvSequence&&) noexcept = default;
@@ -73,8 +73,8 @@ class SWIRLY_API ArgvLexer {
     ~ArgvLexer();
 
     // Copy.
-    ArgvLexer(const ArgvLexer& rhs) noexcept = default;
-    ArgvLexer& operator=(const ArgvLexer& rhs) noexcept = default;
+    ArgvLexer(const ArgvLexer&) noexcept = default;
+    ArgvLexer& operator=(const ArgvLexer&) noexcept = default;
 
     // Move.
     ArgvLexer(ArgvLexer&&) noexcept = default;

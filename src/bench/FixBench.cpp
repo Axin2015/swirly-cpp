@@ -14,60 +14,56 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
+#include <swirly/fix/Field.hpp>
+#include <swirly/fix/Random.hpp>
+#include <swirly/fix/Stream.hpp>
+
 #include <swirly/hdr/Histogram.hpp>
 #include <swirly/hdr/Recorder.hpp>
 
-#include <swirly/sys/EpollReactor.hpp>
-
 #include <swirly/util/Log.hpp>
-#include <swirly/util/RefCount.hpp>
-
-#include <iostream>
-#include <random>
 
 using namespace std;
 using namespace swirly;
-
-namespace {
-
-struct TimerHandler : RefCount<TimerHandler, ThreadUnsafePolicy> {
-    void on_timer(CyclTime now, Timer& tmr) {}
-};
-
-} // namespace
 
 int main(int argc, char* argv[])
 {
     int ret = 1;
     try {
 
-        random_device rd;
-        mt19937 gen{rd()};
-        uniform_int_distribution<> dis;
+        RandomBbo bbo;
+        Buffer buf{1024};
+        FixStream os{buf};
 
-        EpollReactor r{1024};
-        Timer ts[128];
+        Histogram hist{1, 1'000'000, 5};
 
-        Histogram replace_hist{1, 1'000'000, 5};
-        Histogram reset_hist{1, 1'000'000, 5};
-
-        auto h = make_intrusive<TimerHandler>();
         for (int i{0}; i < 5'000'000; ++i) {
-            const auto now = CyclTime::set();
-            auto& t = ts[dis(gen) % 128];
-            if (t && dis(gen) % 2 == 0) {
-                Recorder tr{reset_hist};
-                t = {};
-            } else {
-                const auto expiry = now.mono_time() + Micros{dis(gen) % 100};
-                Recorder tr{replace_hist};
-                t = r.timer(expiry, Priority::High, bind<&TimerHandler::on_timer>(h.get()));
+            const auto [bid, offer] = bbo(12345);
+            {
+                Recorder tr{hist};
+                os.reset({4, 3});
+                // clang-format off
+                os << MsgType::View{"W"}
+                   << NoMdEntries{4}
+                   << MdEntryType{byte{0}}
+                   << MdEntryPx{bid - 1}
+                   << MdEntrySize{2000}
+                   << MdEntryType{byte{0}}
+                   << MdEntryPx{bid}
+                   << MdEntrySize{1000}
+                   << MdEntryType{byte{1}}
+                   << MdEntryPx{offer}
+                   << MdEntrySize{1000}
+                   << MdEntryType{byte{1}}
+                   << MdEntryPx{offer + 1}
+                   << MdEntrySize{2000};
+                // clang-format on
+                os.commit();
             }
-            r.poll(now, 0ms);
+            buf.clear();
         }
 
-        replace_hist.percentiles_print("timer-replace.hdr", 5, 1000);
-        reset_hist.percentiles_print("timer-reset.hdr", 5, 1000);
+        hist.percentiles_print("fix.hdr", 5, 1000);
         ret = 0;
 
     } catch (const exception& e) {

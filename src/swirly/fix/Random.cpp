@@ -14,24 +14,21 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_FIX_LOGON_HPP
-#define SWIRLY_FIX_LOGON_HPP
-
-#include <swirly/fix/Field.hpp>
+#include "Random.hpp"
 
 namespace swirly {
 inline namespace fix {
+using namespace std;
 
-struct Logon {
-    EncryptMethod encrypt_method;
-    HeartBtInt heart_bt_int;
-};
-
-SWIRLY_API std::ostream& operator<<(std::ostream& os, const Logon& body);
-
-SWIRLY_API void parse_body(std::string_view msg, std::size_t body_off, Logon& body);
+pair<int64_t, int64_t> RandomBbo::operator()(int64_t open)
+{
+    if ((gen_() & 0x7) == 0) {
+        offset_ += dist_(gen_) - 2;
+    }
+    const auto delta = offset_ + dist_(gen_) - 2;
+    const auto spread = dist_(gen_) / 2 + 1;
+    return {open + delta - spread, open + delta + spread};
+}
 
 } // namespace fix
 } // namespace swirly
-
-#endif // SWIRLY_FIX_LOGON_HPP

@@ -58,7 +58,7 @@ void FixBuf::set_body_length(std::streamsize pos, std::streamsize len) noexcept
     } while (len > 0);
 }
 
-FixBuf::int_type FixBuf::overflow(int_type c) noexcept
+FixBuf::int_type FixBuf::overflow(int_type c)
 {
     if (c != traits_type::eof()) {
         auto buf = buf_.prepare(pcount_ + 1 + CheckSumLen);
@@ -69,7 +69,7 @@ FixBuf::int_type FixBuf::overflow(int_type c) noexcept
     return c;
 }
 
-streamsize FixBuf::xsputn(const char_type* s, streamsize count) noexcept
+streamsize FixBuf::xsputn(const char_type* s, streamsize count)
 {
     auto buf = buf_.prepare(pcount_ + count + CheckSumLen);
     pbase_ = buffer_cast<char*>(buf);

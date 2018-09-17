@@ -39,8 +39,8 @@ class SWIRLY_API HttpBuf : public std::streambuf {
     ~HttpBuf() override;
 
     // Copy.
-    HttpBuf(const HttpBuf& rhs) = delete;
-    HttpBuf& operator=(const HttpBuf& rhs) = delete;
+    HttpBuf(const HttpBuf&) = delete;
+    HttpBuf& operator=(const HttpBuf&) = delete;
 
     // Move.
     HttpBuf(HttpBuf&&) = delete;
@@ -76,8 +76,8 @@ class SWIRLY_API HttpStream : public std::ostream {
     ~HttpStream() override;
 
     // Copy.
-    HttpStream(const HttpStream& rhs) = delete;
-    HttpStream& operator=(const HttpStream& rhs) = delete;
+    HttpStream(const HttpStream&) = delete;
+    HttpStream& operator=(const HttpStream&) = delete;
 
     // Move.
     HttpStream(HttpStream&&) = delete;

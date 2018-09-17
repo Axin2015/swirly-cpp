@@ -64,8 +64,8 @@ class SWIRLY_API VarAccum {
     ~VarAccum() = default;
 
     // Copy.
-    constexpr VarAccum(const VarAccum& rhs) noexcept = default;
-    VarAccum& operator=(const VarAccum& rhs) noexcept = default;
+    constexpr VarAccum(const VarAccum&) noexcept = default;
+    VarAccum& operator=(const VarAccum&) noexcept = default;
 
     // Move.
     constexpr VarAccum(VarAccum&&) noexcept = default;

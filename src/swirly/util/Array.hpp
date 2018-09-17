@@ -64,8 +64,8 @@ class ArrayView {
     ~ArrayView() = default;
 
     // Copy.
-    constexpr ArrayView(const ArrayView& rhs) noexcept = default;
-    constexpr ArrayView& operator=(const ArrayView& rhs) noexcept = default;
+    constexpr ArrayView(const ArrayView&) noexcept = default;
+    constexpr ArrayView& operator=(const ArrayView&) noexcept = default;
 
     // Move.
     constexpr ArrayView(ArrayView&&) noexcept = default;

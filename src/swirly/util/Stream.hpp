@@ -36,8 +36,8 @@ class StaticBuf : public std::streambuf {
     ~StaticBuf() override = default;
 
     // Copy.
-    StaticBuf(const StaticBuf& rhs) = delete;
-    StaticBuf& operator=(const StaticBuf& rhs) = delete;
+    StaticBuf(const StaticBuf&) = delete;
+    StaticBuf& operator=(const StaticBuf&) = delete;
 
     // Move.
     StaticBuf(StaticBuf&&) = delete;
@@ -64,8 +64,8 @@ class StaticStream : public std::ostream {
     ~StaticStream() override = default;
 
     // Copy.
-    StaticStream(const StaticStream& rhs) = delete;
-    StaticStream& operator=(const StaticStream& rhs) = delete;
+    StaticStream(const StaticStream&) = delete;
+    StaticStream& operator=(const StaticStream&) = delete;
 
     // Move.
     StaticStream(StaticStream&&) = delete;

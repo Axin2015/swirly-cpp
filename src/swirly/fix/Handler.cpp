@@ -14,40 +14,12 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_HDR_RECORDER_HPP
-#define SWIRLY_HDR_RECORDER_HPP
-
-#include <swirly/Config.h>
-
-#include <chrono>
+#include "Handler.hpp"
 
 namespace swirly {
-inline namespace hdr {
-class Histogram;
-/**
- * Record time elapsed during object lifetime, i.e., between constructor and destructor calls. The
- * elapsed time is recorded in the Histogram object during destruction.
- */
-class SWIRLY_API Recorder {
-  public:
-    explicit Recorder(Histogram& hist, int count = 1) noexcept;
-    ~Recorder();
+inline namespace fix {
 
-    // Copy.
-    Recorder(const Recorder&) = delete;
-    Recorder& operator=(const Recorder&) = delete;
+FixHandler::~FixHandler() = default;
 
-    // Move.
-    Recorder(Recorder&&) = delete;
-    Recorder& operator=(Recorder&&) = delete;
-
-  private:
-    Histogram& hist_;
-    const int count_{1};
-    std::chrono::time_point<std::chrono::high_resolution_clock> start_;
-};
-
-} // namespace hdr
+} // namespace fix
 } // namespace swirly
-
-#endif // SWIRLY_HDR_RECORDER_HPP

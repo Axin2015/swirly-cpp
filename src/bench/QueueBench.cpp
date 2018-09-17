@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
         Histogram hist{1, 1'000'000, 5};
         MemQueue<Clock::duration> q{1 << 14};
 
-        enum { Iters = 50000000 };
+        enum { Iters = 50'000'000 };
         auto t1 = thread([&q]() {
             for (int i{}; i < Iters;) {
                 if (q.push(Clock::now().time_since_epoch())) {
