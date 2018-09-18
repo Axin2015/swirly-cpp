@@ -74,7 +74,7 @@ class EchoConn {
                             throw runtime_error{"partial write"};
                         }
                     };
-                    buf_.consume(parseLine(now, buf_.str(), fn));
+                    buf_.consume(parse_line(now, buf_.str(), fn));
 
                     // Reset timer.
                     tmr_.cancel();

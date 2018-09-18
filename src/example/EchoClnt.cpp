@@ -69,7 +69,7 @@ class EchoConn {
                         // Echo bytes back to client.
                         SWIRLY_INFO << "received: " << line;
                     };
-                    buf_.consume(parseLine(now, buf_.str(), fn));
+                    buf_.consume(parse_line(now, buf_.str(), fn));
                     if (count_ == 5) {
                         dispose(now);
                     }
