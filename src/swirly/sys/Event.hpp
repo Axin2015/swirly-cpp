@@ -17,7 +17,7 @@
 #ifndef SWIRLY_SYS_EVENT_HPP
 #define SWIRLY_SYS_EVENT_HPP
 
-#include "File.hpp"
+#include <swirly/sys/File.hpp>
 
 namespace swirly {
 inline namespace sys {
