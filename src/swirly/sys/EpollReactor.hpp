@@ -17,6 +17,7 @@
 #ifndef SWIRLY_SYS_EPOLLREACTOR_HPP
 #define SWIRLY_SYS_EPOLLREACTOR_HPP
 
+#include <swirly/sys/EventFd.hpp>
 #include <swirly/sys/Muxer.hpp>
 #include <swirly/sys/Reactor.hpp>
 

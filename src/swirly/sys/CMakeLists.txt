@@ -33,6 +33,7 @@ set(lib_SOURCES
   EpollReactor.cpp
   Error.cpp
   Event.cpp
+  EventFd.cpp
   File.cpp
   Handle.cpp
   IoSocket.cpp
