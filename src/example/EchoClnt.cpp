@@ -171,8 +171,8 @@ int main(int argc, char* argv[])
 
         // Wait for termination.
         SigWait sig_wait;
-        while (const auto sig = sig_wait()) {
-            switch (sig) {
+        for (;;) {
+            switch (const auto sig = sig_wait()) {
             case SIGHUP:
                 SWIRLY_INFO << "received SIGHUP";
                 continue;

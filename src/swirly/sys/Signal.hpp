@@ -17,7 +17,7 @@
 #ifndef SWIRLY_SYS_SIGNAL_HPP
 #define SWIRLY_SYS_SIGNAL_HPP
 
-#include <swirly/Config.h>
+#include <swirly/util/Time.hpp>
 
 #include <csignal>
 
@@ -26,7 +26,7 @@ inline namespace sys {
 
 class SWIRLY_API SigWait {
   public:
-    SigWait();
+    SigWait(std::initializer_list<int> mask = {SIGHUP, SIGINT, SIGUSR1, SIGUSR2, SIGTERM});
     ~SigWait();
 
     // Copy.
@@ -38,6 +38,7 @@ class SWIRLY_API SigWait {
     SigWait& operator=(SigWait&&) = delete;
 
     int operator()() const;
+    int operator()(Millis timeout) const;
 
   private:
     sigset_t new_mask_, old_mask_;
