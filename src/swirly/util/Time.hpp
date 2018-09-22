@@ -77,25 +77,6 @@ constexpr bool is_zero(Time time) noexcept
     return time == Time{};
 }
 
-template <typename RepT, typename PeriodT>
-constexpr Time to_time(std::chrono::duration<RepT, PeriodT> d) noexcept
-{
-    using namespace std::chrono;
-    return Time{duration_cast<Duration>(d)};
-}
-
-constexpr Time to_time(timeval tv) noexcept
-{
-    using namespace std::chrono;
-    return to_time(seconds{tv.tv_sec} + microseconds{tv.tv_usec});
-}
-
-constexpr Time to_time(timespec ts) noexcept
-{
-    using namespace std::chrono;
-    return to_time(seconds{ts.tv_sec} + nanoseconds{ts.tv_nsec});
-}
-
 template <typename DurationT>
 constexpr DurationT time_since_epoch(Time time) noexcept
 {
@@ -121,6 +102,37 @@ constexpr std::int64_t ns_since_epoch(Time time) noexcept
     using namespace std::chrono;
     const nanoseconds ns{time.time_since_epoch()};
     return ns.count();
+}
+
+template <typename RepT, typename PeriodT>
+constexpr Time to_time(std::chrono::duration<RepT, PeriodT> d) noexcept
+{
+    using namespace std::chrono;
+    return Time{duration_cast<Duration>(d)};
+}
+
+constexpr Time to_time(timeval tv) noexcept
+{
+    using namespace std::chrono;
+    return to_time(seconds{tv.tv_sec} + microseconds{tv.tv_usec});
+}
+
+constexpr Time to_time(timespec ts) noexcept
+{
+    using namespace std::chrono;
+    return to_time(seconds{ts.tv_sec} + nanoseconds{ts.tv_nsec});
+}
+
+constexpr timeval to_timeval(Time t) noexcept
+{
+    const auto us = us_since_epoch(t);
+    return {us / 1'000'000L, us % 1'000'000L};
+}
+
+constexpr timespec to_timespec(Time t) noexcept
+{
+    const auto ns = ns_since_epoch(t);
+    return {ns / 1'000'000'000L, ns % 1'000'000'000L};
 }
 
 template <typename DurationT>
