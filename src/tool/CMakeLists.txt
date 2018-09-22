@@ -16,6 +16,8 @@
 add_custom_target(swirly-tool DEPENDS
   swirly-db-to-dsv
   swirly-db-to-json
+  swirly-hdr-decoder
+  swirly-hiccup
   swirly-lob-bench
   swirly-queue-bench
   swirly-timer-bench
@@ -29,13 +31,21 @@ add_executable(swirly-db-to-json DbToJson.cpp)
 target_link_libraries(swirly-db-to-json ${swirly_db_LIBRARY})
 install(TARGETS swirly-db-to-json DESTINATION bin COMPONENT program)
 
+add_executable(swirly-hdr-decoder HdrDecoder.cpp)
+target_link_libraries(swirly-hdr-decoder ${swirly_hdr_LIBRARY} ${swirly_sys_LIBRARY})
+install(TARGETS swirly-hdr-decoder DESTINATION bin COMPONENT program)
+
+add_executable(swirly-hiccup Hiccup.cpp)
+target_link_libraries(swirly-hiccup ${swirly_hdr_LIBRARY} ${swirly_sys_LIBRARY})
+install(TARGETS swirly-hiccup DESTINATION bin COMPONENT program)
+
 add_executable(swirly-lob-bench LobBench.cpp)
-target_link_libraries(swirly-lob-bench ${swirly_prof_LIBRARY} ${swirly_lob_LIBRARY}
+target_link_libraries(swirly-lob-bench ${swirly_hdr_LIBRARY} ${swirly_lob_LIBRARY}
   ${swirly_db_LIBRARY})
 install(TARGETS swirly-lob-bench DESTINATION bin COMPONENT program)
 
 add_executable(swirly-queue-bench QueueBench.cpp)
-target_link_libraries(swirly-queue-bench ${swirly_prof_LIBRARY} ${swirly_app_LIBRARY})
+target_link_libraries(swirly-queue-bench ${swirly_hdr_LIBRARY} ${swirly_app_LIBRARY})
 install(TARGETS swirly-queue-bench DESTINATION bin COMPONENT program)
 
 add_executable(swirly-timer-bench TimerBench.cpp)

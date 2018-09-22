@@ -14,48 +14,43 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_PROF_HDRRECORDER_HPP
-#define SWIRLY_PROF_HDRRECORDER_HPP
+#ifndef SWIRLY_HDR_RECORDER_HPP
+#define SWIRLY_HDR_RECORDER_HPP
 
 #include <swirly/Config.h>
 
-#include <hdr_histogram.h>
-
-#include <system_error>
-
 #include <chrono>
-#include <cstdio>
 
 namespace swirly {
-inline namespace prof {
-class HdrHistogram;
+inline namespace hdr {
+class Histogram;
 /**
  * Record time elapsed during object lifetime, i.e., between constructor and destructor calls. The
- * elapsed time is recorded in the HdrHistogram object during destruction.
+ * elapsed time is recorded in the Histogram object during destruction.
  */
-class SWIRLY_API HdrRecorder {
+class SWIRLY_API Recorder {
   public:
-    explicit HdrRecorder(HdrHistogram& hdr_hist) noexcept
-    : hdr_hist_(hdr_hist)
+    explicit Recorder(Histogram& hist) noexcept
+    : hist_(hist)
     , start_{std::chrono::high_resolution_clock::now()}
     {
     }
-    ~HdrRecorder();
+    ~Recorder();
 
     // Copy.
-    HdrRecorder(const HdrRecorder& rhs) = delete;
-    HdrRecorder& operator=(const HdrRecorder& rhs) = delete;
+    Recorder(const Recorder& rhs) = delete;
+    Recorder& operator=(const Recorder& rhs) = delete;
 
     // Move.
-    HdrRecorder(HdrRecorder&&) = delete;
-    HdrRecorder& operator=(HdrRecorder&&) = delete;
+    Recorder(Recorder&&) = delete;
+    Recorder& operator=(Recorder&&) = delete;
 
   private:
-    HdrHistogram& hdr_hist_;
+    Histogram& hist_;
     std::chrono::time_point<std::chrono::high_resolution_clock> start_;
 };
 
-} // namespace prof
+} // namespace hdr
 } // namespace swirly
 
-#endif // SWIRLY_PROF_HDRRECORDER_HPP
+#endif // SWIRLY_HDR_RECORDER_HPP

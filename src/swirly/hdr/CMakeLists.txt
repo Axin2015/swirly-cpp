@@ -14,41 +14,43 @@
 # 02110-1301, USA.
 
 if(SWIRLY_BUILD_SHARED)
-  add_custom_target(swirly-prof DEPENDS
-    swirly-prof-static
-    swirly-prof-shared
-    swirly-prof-test
+  add_custom_target(swirly-hdr DEPENDS
+    swirly-hdr-static
+    swirly-hdr-shared
+    swirly-hdr-test
   )
 else()
-  add_custom_target(swirly-prof DEPENDS
-    swirly-prof-static
-    swirly-prof-test
+  add_custom_target(swirly-hdr DEPENDS
+    swirly-hdr-static
+    swirly-hdr-test
   )
 endif()
 
 set(lib_SOURCES
   File.cpp
-  HdrHistogram.cpp
-  HdrLogWriter.cpp
-  HdrRecorder.cpp)
+  Histogram.cpp
+  IntervalRecorder.cpp
+  LogReader.cpp
+  LogWriter.cpp
+  Recorder.cpp)
 
-add_library(swirly-prof-static STATIC ${lib_SOURCES})
-set_target_properties(swirly-prof-static PROPERTIES OUTPUT_NAME swirly-prof)
-target_link_libraries(swirly-prof-static swirly-util-static hdr_histogram_static pthread)
-install(TARGETS swirly-prof-static DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT static)
+add_library(swirly-hdr-static STATIC ${lib_SOURCES})
+set_target_properties(swirly-hdr-static PROPERTIES OUTPUT_NAME swirly-hdr)
+target_link_libraries(swirly-hdr-static swirly-util-static hdr_histogram_static pthread)
+install(TARGETS swirly-hdr-static DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT static)
 
 if(SWIRLY_BUILD_SHARED)
-  add_library(swirly-prof-shared SHARED ${lib_SOURCES})
-  set_target_properties(swirly-prof-shared PROPERTIES OUTPUT_NAME swirly-prof)
-  target_link_libraries(swirly-prof-shared swirly-util-shared hdr_histogram pthread)
-  install(TARGETS swirly-prof-shared DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT shared)
+  add_library(swirly-hdr-shared SHARED ${lib_SOURCES})
+  set_target_properties(swirly-hdr-shared PROPERTIES OUTPUT_NAME swirly-hdr)
+  target_link_libraries(swirly-hdr-shared swirly-util-shared hdr_histogram pthread)
+  install(TARGETS swirly-hdr-shared DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT shared)
 endif()
 
 foreach(file ${lib_SOURCES})
   get_filename_component (name "${file}" NAME_WE)
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${name}.hpp")
     install(FILES "${name}.hpp"
-      DESTINATION include/swirly/prof
+      DESTINATION include/swirly/hdr
       COMPONENT header
     )
   endif()
@@ -57,12 +59,12 @@ endforeach()
 set(test_SOURCES
   )
 
-add_executable(swirly-prof-test
+add_executable(swirly-hdr-test
   ${test_SOURCES}
   Main.ut.cpp)
-target_link_libraries(swirly-prof-test ${swirly_prof_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+target_link_libraries(swirly-hdr-test ${swirly_hdr_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 
 foreach(file ${test_SOURCES})
   get_filename_component (name "${file}" NAME_WE)
-  add_test(NAME prof::${name}Suite COMMAND swirly-prof-test -l error -t ${name}Suite)
+  add_test(NAME hdr::${name}Suite COMMAND swirly-hdr-test -l error -t ${name}Suite)
 endforeach()
