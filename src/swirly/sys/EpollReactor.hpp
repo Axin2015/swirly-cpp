@@ -60,9 +60,10 @@ class SWIRLY_API EpollReactor : public Reactor {
      */
     Timer do_timer(Time expiry, Priority priority, TimerSlot slot) override;
 
-    int do_poll(Time now, Millis timeout) override;
+    int do_poll(Time now, Duration timeout) override;
 
   private:
+    Time next_expiry(Time next) const;
     int dispatch(Time now, Event* buf, int size);
 
     struct Data {
