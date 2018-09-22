@@ -51,6 +51,7 @@ set(lib_SOURCES
   TcpConnector.cpp
   TcpSocket.cpp
   Timer.cpp
+  TimerFd.cpp
   UdpSocket.cpp)
 
 add_library(swirly-sys-static STATIC ${lib_SOURCES})
