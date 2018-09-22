@@ -21,14 +21,12 @@
 namespace swirly {
 inline namespace sys {
 
-SigWait::SigWait()
+SigWait::SigWait(std::initializer_list<int> mask)
 {
     sigemptyset(&new_mask_);
-    sigaddset(&new_mask_, SIGHUP);
-    sigaddset(&new_mask_, SIGINT);
-    sigaddset(&new_mask_, SIGUSR1);
-    sigaddset(&new_mask_, SIGUSR2);
-    sigaddset(&new_mask_, SIGTERM);
+    for (auto sig : mask) {
+        sigaddset(&new_mask_, sig);
+    }
 
     const auto err = pthread_sigmask(SIG_BLOCK, &new_mask_, &old_mask_);
     if (err != 0) {
@@ -44,12 +42,26 @@ SigWait::~SigWait()
 
 int SigWait::operator()() const
 {
-    int sig;
-    const auto err = sigwait(&new_mask_, &sig);
-    if (err != 0) {
-        throw std::system_error{os::make_error(err), "sigwait"};
+    siginfo_t info;
+    if (sigwaitinfo(&new_mask_, &info) < 0) {
+        throw std::system_error{os::make_error(errno), "sigwaitinfo"};
     }
-    return sig;
+    return info.si_signo;
+}
+
+int SigWait::operator()(Millis timeout) const
+{
+    siginfo_t info;
+    const auto ms = timeout.count();
+    const timespec ts{ms / 1'000L, (ms % 1'000L) * 1'000'000L};
+    if (sigtimedwait(&new_mask_, &info, &ts) < 0) {
+        if (errno == EAGAIN) {
+            // Timeout.
+            return 0;
+        }
+        throw std::system_error{os::make_error(errno), "sigtimedwait"};
+    }
+    return info.si_signo;
 }
 
 void sig_block_all()

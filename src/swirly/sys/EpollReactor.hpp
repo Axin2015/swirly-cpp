@@ -17,9 +17,8 @@
 #ifndef SWIRLY_SYS_EPOLLREACTOR_HPP
 #define SWIRLY_SYS_EPOLLREACTOR_HPP
 
-#include "Reactor.hpp"
-
 #include <swirly/sys/Muxer.hpp>
+#include <swirly/sys/Reactor.hpp>
 
 namespace swirly {
 inline namespace sys {

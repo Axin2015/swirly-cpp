@@ -37,7 +37,6 @@
 #include <swirly/util/Config.hpp>
 #include <swirly/util/Finally.hpp>
 #include <swirly/util/Log.hpp>
-#include <swirly/util/Time.hpp>
 
 #include <thread>
 

@@ -69,7 +69,7 @@ class EchoConn {
                         // Echo bytes back to client.
                         SWIRLY_INFO << "received: " << line;
                     };
-                    buf_.consume(parseLine(now, buf_.str(), fn));
+                    buf_.consume(parse_line(now, buf_.str(), fn));
                     if (count_ == 5) {
                         dispose(now);
                     }
@@ -171,8 +171,8 @@ int main(int argc, char* argv[])
 
         // Wait for termination.
         SigWait sig_wait;
-        while (const auto sig = sig_wait()) {
-            switch (sig) {
+        for (;;) {
+            switch (const auto sig = sig_wait()) {
             case SIGHUP:
                 SWIRLY_INFO << "received SIGHUP";
                 continue;

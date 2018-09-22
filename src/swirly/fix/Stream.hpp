@@ -17,7 +17,7 @@
 #ifndef SWIRLY_FIX_STREAM_HPP
 #define SWIRLY_FIX_STREAM_HPP
 
-#include "Types.hpp"
+#include <swirly/fix/Types.hpp>
 
 #include <swirly/sys/Buffer.hpp>
 

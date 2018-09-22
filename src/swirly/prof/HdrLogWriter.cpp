@@ -26,15 +26,6 @@ inline error_code make_error(int err)
 {
     return error_code{err, system_category()};
 }
-
-inline hdr_timespec to_time_spec(Time t) noexcept
-{
-    const auto ns = ns_since_epoch(t);
-    hdr_timespec ts;
-    ts.tv_sec = ns / 1'000'000'000L;
-    ts.tv_nsec = ns % 1'000'000'000L;
-    return ts;
-}
 } // namespace
 
 HdrLogWriter::HdrLogWriter(const char* path, const char* user_prefix)
@@ -47,7 +38,7 @@ HdrLogWriter::HdrLogWriter(const char* path, const char* user_prefix)
     if (ftell(file_.get()) > 0) {
         return;
     }
-    auto ts = to_time_spec(UnixClock::now());
+    auto ts = to_timespec(UnixClock::now());
     err = hdr_log_write_header(&writer_, file_.get(), user_prefix, &ts);
     if (err != 0) {
         throw runtime_error{"hdr_log_write_header: "s + hdr_strerror(err)};
@@ -58,8 +49,8 @@ HdrLogWriter::~HdrLogWriter() = default;
 
 void HdrLogWriter::write(Time start_time, Time end_time, hdr_histogram& hist)
 {
-    auto start_ts = to_time_spec(start_time);
-    auto end_ts = to_time_spec(end_time);
+    auto start_ts = to_timespec(start_time);
+    auto end_ts = to_timespec(end_time);
     const auto err = hdr_log_write(&writer_, file_.get(), &start_ts, &end_ts, &hist);
     if (err != 0) {
         throw runtime_error{"hdr_log_write: "s + hdr_strerror(err)};

@@ -74,7 +74,7 @@ class EchoConn {
                             throw runtime_error{"partial write"};
                         }
                     };
-                    buf_.consume(parseLine(now, buf_.str(), fn));
+                    buf_.consume(parse_line(now, buf_.str(), fn));
 
                     // Reset timer.
                     tmr_.cancel();
@@ -154,8 +154,8 @@ int main(int argc, char* argv[])
 
         // Wait for termination.
         SigWait sig_wait;
-        while (const auto sig = sig_wait()) {
-            switch (sig) {
+        for (;;) {
+            switch (const auto sig = sig_wait()) {
             case SIGHUP:
                 SWIRLY_INFO << "received SIGHUP";
                 continue;
