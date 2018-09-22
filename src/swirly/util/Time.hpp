@@ -126,13 +126,13 @@ constexpr Time to_time(timespec ts) noexcept
 constexpr timeval to_timeval(Time t) noexcept
 {
     const auto us = us_since_epoch(t);
-    return {us / 1'000'000L, us % 1'000'000L};
+    return {static_cast<time_t>(us / 1'000'000L), static_cast<suseconds_t>(us % 1'000'000L)};
 }
 
 constexpr timespec to_timespec(Time t) noexcept
 {
     const auto ns = ns_since_epoch(t);
-    return {ns / 1'000'000'000L, ns % 1'000'000'000L};
+    return {static_cast<time_t>(ns / 1'000'000'000L), static_cast<long>(ns % 1'000'000'000L)};
 }
 
 template <typename DurationT>
