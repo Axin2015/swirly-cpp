@@ -16,6 +16,8 @@
  */
 #include "EpollReactor.hpp"
 
+#include <swirly/sys/TimerFd.hpp>
+
 #include <swirly/util/Log.hpp>
 
 namespace swirly {
@@ -30,14 +32,9 @@ constexpr size_t MaxEvents{16};
 EpollReactor::EpollReactor(size_t size_hint)
 : mux_{size_hint}
 {
-    const auto fd = efd_.fd();
-    data_.resize(max<size_t>(fd + 1, size_hint));
-    mux_.subscribe(fd, 0, EventIn);
-
-    auto& ref = data_[fd];
-    ref.sid = 0;
-    ref.events = EventIn;
-    ref.slot = {};
+    const auto efd = efd_.fd();
+    data_.resize(max<size_t>(efd + 1, size_hint));
+    mux_.subscribe(efd, 0, EventIn);
 }
 
 EpollReactor::~EpollReactor()
@@ -107,23 +104,30 @@ Timer EpollReactor::do_timer(Time expiry, Priority priority, TimerSlot slot)
     return tqs_[static_cast<size_t>(priority)].insert(expiry, slot);
 }
 
-int EpollReactor::do_poll(Time now, Millis timeout)
+int EpollReactor::do_poll(Time now, Duration timeout)
 {
     enum { High = 0, Low = 1 };
     using namespace chrono;
 
-    for (const auto& tq : tqs_) {
-        if (!tq.empty()) {
-            // Millis until next expiry.
-            const auto expiry = duration_cast<Millis>(tq.front().expiry() - now);
-            if (expiry < timeout) {
-                timeout = max(expiry, 0ms);
-            }
+    // If timeout is zero then the wait_until time should also be zero to signify no wait.
+    Time wait_until{};
+    if (!is_zero(timeout)) {
+        const Time next = next_expiry(timeout == NoTimeout ? UnixClock::max() : now + timeout);
+        if (next > now) {
+            wait_until = next;
         }
     }
+
     Event buf[MaxEvents];
     error_code ec;
-    const auto ret = mux_.wait(buf, MaxEvents, timeout, ec);
+    int ret;
+    if (wait_until == UnixClock::max()) {
+        // Block indefinitely.
+        ret = mux_.wait(buf, MaxEvents, ec);
+    } else {
+        // The wait function will not block if time is zero.
+        ret = mux_.wait(buf, MaxEvents, wait_until, ec);
+    }
     if (ret < 0) {
         if (ec.value() != EINTR) {
             throw system_error{ec};
@@ -134,6 +138,28 @@ int EpollReactor::do_poll(Time now, Millis timeout)
     const auto n = tqs_[High].dispatch(now) + dispatch(now, buf, ret);
     // Low priority timers are only dispatched during empty cycles.
     return n == 0 ? tqs_[Low].dispatch(now) : n;
+}
+
+Time EpollReactor::next_expiry(Time next) const
+{
+    enum { High = 0, Low = 1 };
+    using namespace chrono;
+    {
+        auto& tq = tqs_[High];
+        if (!tq.empty()) {
+            // Duration until next expiry. Mitigate scheduler latency by preempting the
+            // high-priority timer and busy-waiting for 200us ahead of timer expiry.
+            next = min(next, tq.front().expiry() - 200us);
+        }
+    }
+    {
+        auto& tq = tqs_[Low];
+        if (!tq.empty()) {
+            // Duration until next expiry.
+            next = min(next, tq.front().expiry());
+        }
+    }
+    return next;
 }
 
 int EpollReactor::dispatch(Time now, Event* buf, int size)
@@ -149,6 +175,10 @@ int EpollReactor::dispatch(Time now, Event* buf, int size)
             continue;
         }
         const auto& ref = data_[fd];
+        if (!ref.slot) {
+            // Ignore timerfd.
+            continue;
+        }
 
         const auto sid = mux_.sid(ev);
         // Skip this socket if it was modified after the call to wait().

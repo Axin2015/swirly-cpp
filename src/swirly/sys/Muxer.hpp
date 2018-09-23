@@ -19,10 +19,9 @@
 
 #include <swirly/sys/Epoll.hpp>
 #include <swirly/sys/Event.hpp>
+#include <swirly/sys/TimerFd.hpp>
 
 #include <swirly/Config.h>
-
-#include <chrono>
 
 #include <unistd.h>
 
@@ -66,9 +65,12 @@ class EpollMuxer {
     }
 
     explicit EpollMuxer(std::size_t size_hint)
-    : fh_{os::epoll_create(size_hint)}
+    : mux_{os::epoll_create(size_hint)}
+    , tfd_{os::timerfd_create(CLOCK_REALTIME, TFD_NONBLOCK)}
     {
+        subscribe(*tfd_, 0, EventIn);
     }
+    ~EpollMuxer() { unsubscribe(*tfd_); }
 
     // Copy.
     EpollMuxer(const EpollMuxer&) = delete;
@@ -78,23 +80,25 @@ class EpollMuxer {
     EpollMuxer(EpollMuxer&& rhs) = default;
     EpollMuxer& operator=(EpollMuxer&& rhs) = default;
 
-    void swap(EpollMuxer& rhs) noexcept { std::swap(fh_, rhs.fh_); }
-    int wait(Event buf[], std::size_t size, std::chrono::milliseconds timeout,
-             std::error_code& ec) const
-    {
-        return os::epoll_wait(*fh_, buf, size,
-                              timeout == std::chrono::milliseconds::max() ? -1 : timeout.count(),
-                              ec);
-    }
+    void swap(EpollMuxer& rhs) noexcept { std::swap(mux_, rhs.mux_); }
     int wait(Event buf[], std::size_t size, std::error_code& ec) const
     {
-        return wait(buf, size, std::chrono::milliseconds::max(), ec);
+        // A zero timeout will disarm the timer.
+        os::timerfd_settime(*tfd_, 0, Time{});
+        return os::epoll_wait(*mux_, buf, size, -1, ec);
+    }
+    int wait(Event buf[], std::size_t size, Time timeout, std::error_code& ec) const
+    {
+        // A zero timeout will disarm the timer.
+        os::timerfd_settime(*tfd_, 0, timeout);
+        // Do not block if timer is zero.
+        return os::epoll_wait(*mux_, buf, size, is_zero(timeout) ? 0 : -1, ec);
     }
     void subscribe(int fd, int sid, unsigned events)
     {
         Event ev;
         set_events(ev, fd, sid, events);
-        os::epoll_ctl(*fh_, EPOLL_CTL_ADD, fd, ev);
+        os::epoll_ctl(*mux_, EPOLL_CTL_ADD, fd, ev);
     }
     void unsubscribe(int fd) noexcept
     {
@@ -102,13 +106,13 @@ class EpollMuxer {
         // in event, even though this argument is ignored.
         Event ev{};
         std::error_code ec;
-        os::epoll_ctl(*fh_, EPOLL_CTL_DEL, fd, ev, ec);
+        os::epoll_ctl(*mux_, EPOLL_CTL_DEL, fd, ev, ec);
     }
     void set_events(int fd, int sid, unsigned events)
     {
         Event ev;
         set_events(ev, fd, sid, events);
-        os::epoll_ctl(*fh_, EPOLL_CTL_MOD, fd, ev);
+        os::epoll_ctl(*mux_, EPOLL_CTL_MOD, fd, ev);
     }
 
   private:
@@ -136,7 +140,7 @@ class EpollMuxer {
         ev.events = n;
         ev.data.u64 = static_cast<std::uint64_t>(sid) << 32 | fd;
     }
-    FileHandle fh_;
+    FileHandle mux_, tfd_;
 };
 
 } // namespace sys

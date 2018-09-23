@@ -55,6 +55,11 @@ struct SWIRLY_API UnixClock {
         using FromPoint = std::chrono::time_point<UnixClock, seconds>;
         return time_point_cast<UnixClock::duration>(FromPoint{seconds{t}});
     }
+
+    static constexpr time_point max() noexcept
+    {
+        return from_time_t(std::numeric_limits<int>::max());
+    }
 };
 
 using Duration = UnixClock::duration;
@@ -70,6 +75,12 @@ SWIRLY_API std::ostream& operator<<(std::ostream& os, Time time);
 inline UnixClock::time_point UnixClock::now() noexcept
 {
     return get_time();
+}
+
+template <typename RepT, typename PeriodT>
+constexpr bool is_zero(std::chrono::duration<RepT, PeriodT> d) noexcept
+{
+    return d == decltype(d){};
 }
 
 constexpr bool is_zero(Time time) noexcept
@@ -123,16 +134,32 @@ constexpr Time to_time(timespec ts) noexcept
     return to_time(seconds{ts.tv_sec} + nanoseconds{ts.tv_nsec});
 }
 
+template <typename RepT, typename PeriodT>
+constexpr timeval to_timeval(std::chrono::duration<RepT, PeriodT> d) noexcept
+{
+    using namespace std::chrono;
+    const auto us = duration_cast<microseconds>(d).count();
+    return {static_cast<time_t>(us / 1'000'000L), static_cast<suseconds_t>(us % 1'000'000L)};
+}
+
 constexpr timeval to_timeval(Time t) noexcept
 {
-    const auto us = us_since_epoch(t);
-    return {us / 1'000'000L, us % 1'000'000L};
+    using namespace std::chrono;
+    return to_timeval(time_since_epoch<microseconds>(t));
+}
+
+template <typename RepT, typename PeriodT>
+constexpr timespec to_timespec(std::chrono::duration<RepT, PeriodT> d) noexcept
+{
+    using namespace std::chrono;
+    const auto ns = duration_cast<nanoseconds>(d).count();
+    return {static_cast<time_t>(ns / 1'000'000'000L), static_cast<long>(ns % 1'000'000'000L)};
 }
 
 constexpr timespec to_timespec(Time t) noexcept
 {
-    const auto ns = ns_since_epoch(t);
-    return {ns / 1'000'000'000L, ns % 1'000'000'000L};
+    using namespace std::chrono;
+    return to_timespec(time_since_epoch<nanoseconds>(t));
 }
 
 template <typename DurationT>

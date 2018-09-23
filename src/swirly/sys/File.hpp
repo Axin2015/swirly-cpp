@@ -23,7 +23,6 @@
 
 #include <fcntl.h>
 
-#include <sys/eventfd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -76,30 +75,6 @@ inline FileHandle open(const char* path, int flags)
     const auto fd = ::open(path, flags);
     if (fd < 0) {
         throw std::system_error{make_error(errno), "open"};
-    }
-    return fd;
-}
-
-/**
- * Create a file descriptor for event notification.
- */
-inline FileHandle eventfd(unsigned intval, int flags, std::error_code& ec) noexcept
-{
-    const auto fd = ::eventfd(intval, flags);
-    if (fd < 0) {
-        ec = make_error(errno);
-    }
-    return fd;
-}
-
-/**
- * Create a file descriptor for event notification.
- */
-inline FileHandle eventfd(unsigned intval, int flags)
-{
-    const auto fd = ::eventfd(intval, flags);
-    if (fd < 0) {
-        throw std::system_error{make_error(errno), "eventfd"};
     }
     return fd;
 }

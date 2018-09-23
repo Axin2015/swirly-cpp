@@ -17,7 +17,9 @@
 #ifndef SWIRLY_SYS_EVENT_HPP
 #define SWIRLY_SYS_EVENT_HPP
 
-#include <swirly/sys/File.hpp>
+#include <cstdint>
+#include <type_traits>
+#include <utility>
 
 namespace swirly {
 inline namespace sys {
@@ -69,57 +71,6 @@ DataT& data(MsgEvent& ev) noexcept
 {
     return *reinterpret_cast<DataT*>(ev.data);
 }
-
-class EventFd {
-  public:
-    EventFd(unsigned intval, int flags)
-    : fh_{os::eventfd(intval, flags)}
-    {
-    }
-    ~EventFd() = default;
-
-    // Copy.
-    EventFd(const EventFd&) = delete;
-    EventFd& operator=(const EventFd&) = delete;
-
-    // Move.
-    EventFd(EventFd&&) = default;
-    EventFd& operator=(EventFd&&) = default;
-
-    int fd() const noexcept { return fh_.get(); }
-    std::int64_t read()
-    {
-        union {
-            char buf[sizeof(std::int64_t)];
-            std::int64_t val;
-        } u;
-        os::read(*fh_, u.buf, sizeof(u.buf));
-        return u.val;
-    }
-    void write(std::int64_t val, std::error_code& ec) noexcept
-    {
-        // Adds the 8-byte integer value supplied in its buffer to the counter.
-        union {
-            char buf[sizeof(std::int64_t)];
-            std::int64_t val;
-        } u;
-        u.val = val;
-        os::write(*fh_, u.buf, sizeof(u.buf), ec);
-    }
-    void write(std::int64_t val)
-    {
-        // Adds the 8-byte integer value supplied in its buffer to the counter.
-        union {
-            char buf[sizeof(std::int64_t)];
-            std::int64_t val;
-        } u;
-        u.val = val;
-        os::write(*fh_, u.buf, sizeof(u.buf));
-    }
-
-  private:
-    FileHandle fh_;
-};
 
 } // namespace sys
 } // namespace swirly

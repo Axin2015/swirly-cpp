@@ -33,6 +33,7 @@ set(lib_SOURCES
   EpollReactor.cpp
   Error.cpp
   Event.cpp
+  EventFd.cpp
   File.cpp
   Handle.cpp
   IoSocket.cpp
@@ -50,6 +51,7 @@ set(lib_SOURCES
   TcpConnector.cpp
   TcpSocket.cpp
   Timer.cpp
+  TimerFd.cpp
   UdpSocket.cpp)
 
 add_library(swirly-sys-static STATIC ${lib_SOURCES})
