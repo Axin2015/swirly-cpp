@@ -36,8 +36,8 @@ inline namespace db {
 namespace sqlite {
 namespace detail {
 
-void bind32(sqlite3_stmt& stmt, int col, int32_t val);
-void bind64(sqlite3_stmt& stmt, int col, int64_t val);
+void bind32(sqlite3_stmt& stmt, int col, std::int32_t val);
+void bind64(sqlite3_stmt& stmt, int col, std::int64_t val);
 void bindsv(sqlite3_stmt& stmt, int col, std::string_view val);
 
 template <typename ValueT, typename EnableT = void>

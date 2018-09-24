@@ -14,39 +14,18 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_PROF_HDRLOGWRITER_HPP
-#define SWIRLY_PROF_HDRLOGWRITER_HPP
+#include "Recorder.hpp"
 
-#include <swirly/prof/File.hpp>
-
-#include <swirly/util/Time.hpp>
-
-#include <hdr_histogram_log.h>
+#include "Histogram.hpp"
 
 namespace swirly {
-inline namespace prof {
-
-class SWIRLY_API HdrLogWriter {
-  public:
-    HdrLogWriter(const char* path, const char* user_prefix);
-    ~HdrLogWriter();
-
-    // Copy.
-    HdrLogWriter(const HdrLogWriter& rhs) = delete;
-    HdrLogWriter& operator=(const HdrLogWriter& rhs) = delete;
-
-    // Move.
-    HdrLogWriter(HdrLogWriter&&) = delete;
-    HdrLogWriter& operator=(HdrLogWriter&&) = delete;
-
-    void write(Time start_time, Time end_time, hdr_histogram& hist);
-
-  private:
-    hdr_log_writer writer_{};
-    FilePtr file_;
-};
-
-} // namespace prof
+inline namespace hdr {
+using namespace std;
+Recorder::~Recorder()
+{
+    const auto end = chrono::high_resolution_clock::now();
+    const auto diff = chrono::duration_cast<chrono::nanoseconds>(end - start_);
+    hist_.record_value(diff.count());
+}
+} // namespace hdr
 } // namespace swirly
-
-#endif // SWIRLY_PROF_HDRLOGWRITER_HPP

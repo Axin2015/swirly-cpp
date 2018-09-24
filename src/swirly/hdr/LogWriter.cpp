@@ -14,48 +14,46 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "HdrLogWriter.hpp"
+#include "LogWriter.hpp"
 
-#include <system_error>
+#include <cassert>
 
 namespace swirly {
-inline namespace prof {
+inline namespace hdr {
 using namespace std;
 namespace {
-inline error_code make_error(int err)
-{
-    return error_code{err, system_category()};
-}
 } // namespace
 
-HdrLogWriter::HdrLogWriter(const char* path, const char* user_prefix)
-: file_{open_file(path, "a")}
+LogWriter::LogWriter(std::FILE* stream)
+: stream_{stream}
 {
-    auto err = hdr_log_writer_init(&writer_);
+    assert(stream);
+    const auto err = hdr_log_writer_init(&writer_);
     if (err != 0) {
-        throw system_error{make_error(err), "hdr_log_writer_init"};
+        throw runtime_error{"hdr_log_writer_init: "s + hdr_strerror(err)};
     }
-    if (ftell(file_.get()) > 0) {
-        return;
-    }
-    auto ts = to_timespec(UnixClock::now());
-    err = hdr_log_write_header(&writer_, file_.get(), user_prefix, &ts);
+}
+
+LogWriter::~LogWriter() = default;
+
+void LogWriter::write_header(Time now, const char* user_prefix)
+{
+    auto ts = to_timespec(now);
+    const auto err = hdr_log_write_header(&writer_, stream_, user_prefix, &ts);
     if (err != 0) {
         throw runtime_error{"hdr_log_write_header: "s + hdr_strerror(err)};
     }
 }
 
-HdrLogWriter::~HdrLogWriter() = default;
-
-void HdrLogWriter::write(Time start_time, Time end_time, hdr_histogram& hist)
+void LogWriter::write(Time start_time, Time end_time, hdr_histogram& hist)
 {
     auto start_ts = to_timespec(start_time);
     auto end_ts = to_timespec(end_time);
-    const auto err = hdr_log_write(&writer_, file_.get(), &start_ts, &end_ts, &hist);
+    const auto err = hdr_log_write(&writer_, stream_, &start_ts, &end_ts, &hist);
     if (err != 0) {
         throw runtime_error{"hdr_log_write: "s + hdr_strerror(err)};
     }
 }
 
-} // namespace prof
+} // namespace hdr
 } // namespace swirly

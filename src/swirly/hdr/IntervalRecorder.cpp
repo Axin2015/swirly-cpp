@@ -14,28 +14,38 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "File.hpp"
+#include "IntervalRecorder.hpp"
 
-#include <system_error>
+extern "C" const char* hdr_strerror(int errnum);
 
 namespace swirly {
-inline namespace prof {
+inline namespace hdr {
 using namespace std;
 namespace {
-inline error_code make_error(int err)
-{
-    return error_code{err, system_category()};
-}
 } // namespace
 
-FilePtr open_file(const char* path, const char* mode)
+IntervalRecorder::IntervalRecorder(int64_t lowest_trackable_value, int64_t highest_trackable_value,
+                                   int significant_figures)
 {
-    FilePtr fp{fopen(path, mode), fclose};
-    if (!fp) {
-        throw system_error{make_error(errno), "fopen"};
+    const auto err = hdr_interval_recorder_init_all(&recorder_, lowest_trackable_value,
+                                                    highest_trackable_value, significant_figures);
+    if (err != 0) {
+        throw runtime_error{"hdr_interval_recorder_init_all: "s + hdr_strerror(err)};
     }
-    return fp;
 }
 
-} // namespace prof
+IntervalRecorder::IntervalRecorder()
+{
+    const auto err = hdr_interval_recorder_init(&recorder_);
+    if (err != 0) {
+        throw runtime_error{"hdr_interval_recorder_init: "s + hdr_strerror(err)};
+    }
+}
+
+IntervalRecorder::~IntervalRecorder()
+{
+    hdr_interval_recorder_destroy(&recorder_);
+}
+
+} // namespace hdr
 } // namespace swirly

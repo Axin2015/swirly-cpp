@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_PROF_HDRHISTOGRAM_HPP
-#define SWIRLY_PROF_HDRHISTOGRAM_HPP
+#ifndef SWIRLY_HDR_HISTOGRAM_HPP
+#define SWIRLY_HDR_HISTOGRAM_HPP
 
 #include <swirly/util/Time.hpp>
 
@@ -24,10 +24,17 @@
 #include <cstdio>
 
 namespace swirly {
-inline namespace prof {
-class HdrLogWriter;
+inline namespace hdr {
+class LogWriter;
 
-class SWIRLY_API HdrHistogram {
+using HistogramPtr = std::unique_ptr<hdr_histogram, void (*)(hdr_histogram*)>;
+
+inline void clear(hdr_histogram& hist) noexcept
+{
+    hdr_reset(&hist);
+}
+
+class SWIRLY_API Histogram {
   public:
     /**
      * Construct the histogram.
@@ -40,20 +47,27 @@ class SWIRLY_API HdrHistogram {
      * figures in a decimal number that will be maintained. For example, a value of 3 will mean the
      * results from the histogram will be accurate up to the first three digits. Must be a value
      * between 1 and 5 (inclusive).
-     *
-     * @param result Output parameter to capture allocated histogram.
      */
-    HdrHistogram(std::int64_t lowest_trackable_value, std::int64_t highest_trackable_value,
-                 int significant_figures);
-    ~HdrHistogram();
+    explicit Histogram(hdr_histogram* hist = nullptr)
+    : ptr_{hist, hdr_close}
+    {
+    }
+    Histogram(std::int64_t lowest_trackable_value, std::int64_t highest_trackable_value,
+              int significant_figures);
+    ~Histogram();
 
     // Copy.
-    HdrHistogram(const HdrHistogram& rhs) = delete;
-    HdrHistogram& operator=(const HdrHistogram& rhs) = delete;
+    Histogram(const Histogram& rhs) = delete;
+    Histogram& operator=(const Histogram& rhs) = delete;
 
     // Move.
-    HdrHistogram(HdrHistogram&&) = delete;
-    HdrHistogram& operator=(HdrHistogram&&) = delete;
+    Histogram(Histogram&&) = default;
+    Histogram& operator=(Histogram&&) = default;
+
+    explicit operator bool() const noexcept { return bool{ptr_}; }
+    hdr_histogram* get() const noexcept { return ptr_.get(); }
+    void reset(hdr_histogram* hist = nullptr) noexcept { ptr_.reset(hist); }
+    void swap(Histogram& rhs) noexcept { ptr_.swap(rhs.ptr_); }
 
     /**
      * Print out a percentile based histogram to the supplied stream. Note that this call will not
@@ -67,8 +81,8 @@ class SWIRLY_API HdrHistogram {
      *
      * @param format CLASSIC or CSV.
      */
-    void print(std::FILE* stream, std::int32_t ticks_per_half_distance, double value_scale,
-               format_type format = CLASSIC) const;
+    void percentiles_print(std::FILE* stream, std::int32_t ticks_per_half_distance,
+                           double value_scale, format_type format = CLASSIC) const;
 
     /**
      * Print out a percentile based histogram to the supplied stream.
@@ -81,13 +95,18 @@ class SWIRLY_API HdrHistogram {
      *
      * @param format CLASSIC or CSV.
      */
-    void print(const char* path, int32_t ticks_per_half_distance, double value_scale,
-               format_type format = CLASSIC) const;
+    void percentiles_print(const char* path, std::int32_t ticks_per_half_distance,
+                           double value_scale, format_type format = CLASSIC) const;
 
     /**
-     * Reset histogram.
+     * Clear histogram.
      */
-    void reset() noexcept { hdr_reset(hist_); }
+    void clear() noexcept
+    {
+        if (ptr_) {
+            hdr_reset(ptr_.get());
+        }
+    }
 
     /**
      * Records a value in the histogram, will round this value of to a precision at or better than
@@ -98,15 +117,15 @@ class SWIRLY_API HdrHistogram {
      * @return false if the value is larger than the "highest trackable value" and can't be
      * recorded.
      */
-    bool record(std::int64_t value) noexcept { return hdr_record_value(hist_, value); }
+    bool record_value(std::int64_t value) noexcept { return hdr_record_value(ptr_.get(), value); }
 
-    void write(Time start_time, Time end_time, HdrLogWriter& writer);
+    void write(Time start_time, Time end_time, LogWriter& writer);
 
   private:
-    hdr_histogram* hist_{nullptr};
+    HistogramPtr ptr_{nullptr, hdr_close};
 };
 
-} // namespace prof
+} // namespace hdr
 } // namespace swirly
 
-#endif // SWIRLY_PROF_HDRHISTOGRAM_HPP
+#endif // SWIRLY_HDR_HISTOGRAM_HPP

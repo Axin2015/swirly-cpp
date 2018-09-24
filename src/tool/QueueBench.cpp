@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/prof/File.hpp>
-#include <swirly/prof/HdrHistogram.hpp>
+#include <swirly/hdr/File.hpp>
+#include <swirly/hdr/Histogram.hpp>
 
 #include <swirly/app/Backoff.hpp>
 #include <swirly/app/MemQueue.hpp>
@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 
     int ret = 1;
     try {
-        HdrHistogram hist{1, 1'000'000, 5};
+        Histogram hist{1, 1'000'000, 5};
         MemQueue<Clock::duration> q{1 << 14};
 
         enum { Iters = 50000000 };
@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
                 const auto end = Clock::now().time_since_epoch();
                 const chrono::duration<double, micro> diff{end - start};
                 const auto usec = diff.count();
-                hist.record(usec);
+                hist.record_value(usec);
             } else {
                 cpu_relax();
             }
@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
         t2.join();
 
         auto file = open_file("queue.hdr", "w");
-        hist.print(file.get(), 5, 1000);
+        hist.percentiles_print(file.get(), 5, 1000);
         ret = 0;
 
     } catch (const exception& e) {

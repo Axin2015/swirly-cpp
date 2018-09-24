@@ -14,22 +14,28 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_PROF_FILE_HPP
-#define SWIRLY_PROF_FILE_HPP
+#include "File.hpp"
 
-#include <swirly/util/Config.hpp>
-
-#include <cstdio>
-#include <memory>
+#include <system_error>
 
 namespace swirly {
-inline namespace prof {
+inline namespace hdr {
+using namespace std;
+namespace {
+inline error_code make_error(int err)
+{
+    return error_code{err, system_category()};
+}
+} // namespace
 
-using FilePtr = std::unique_ptr<std::FILE, decltype(&std::fclose)>;
+FilePtr open_file(const char* path, const char* mode)
+{
+    FilePtr fp{fopen(path, mode), fclose};
+    if (!fp) {
+        throw system_error{make_error(errno), "fopen"};
+    }
+    return fp;
+}
 
-SWIRLY_API FilePtr open_file(const char* path, const char* mode);
-
-} // namespace prof
+} // namespace hdr
 } // namespace swirly
-
-#endif // SWIRLY_PROF_FILE_HPP

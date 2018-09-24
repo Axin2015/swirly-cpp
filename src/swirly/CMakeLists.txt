@@ -21,7 +21,7 @@ install(FILES "${PROJECT_BINARY_DIR}/include/swirly/Config.h"
 
 add_subdirectory(contrib)
 add_subdirectory(util)
-add_subdirectory(prof)
+add_subdirectory(hdr)
 add_subdirectory(sys)
 add_subdirectory(app)
 add_subdirectory(http)

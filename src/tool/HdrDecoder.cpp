@@ -14,18 +14,30 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "HdrRecorder.hpp"
 
-#include "HdrHistogram.hpp"
+#include <swirly/hdr/Histogram.hpp>
+#include <swirly/hdr/LogReader.hpp>
 
-namespace swirly {
-inline namespace prof {
+#include <iostream>
+
 using namespace std;
-HdrRecorder::~HdrRecorder()
+using namespace swirly;
+
+int main(int argc, char* argv[])
 {
-    const auto end = chrono::high_resolution_clock::now();
-    const auto diff = chrono::duration_cast<chrono::nanoseconds>(end - start_);
-    hdr_hist_.record(diff.count());
+    int ret = 1;
+    try {
+        LogReader reader{stdin};
+        reader.read_header();
+
+        Histogram hist;
+        Time timestamp{}, interval{};
+        while (reader.read(hist, timestamp, interval)) {
+            hist.percentiles_print(stdout, 5, 1000, CLASSIC);
+        }
+        ret = 0;
+    } catch (const exception& e) {
+        cerr << "exception: " << e.what();
+    }
+    return ret;
 }
-} // namespace prof
-} // namespace swirly
