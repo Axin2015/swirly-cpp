@@ -38,7 +38,13 @@ class SWIRLY_API SigWait {
     SigWait& operator=(SigWait&&) = delete;
 
     int operator()() const;
-    int operator()(Millis timeout) const;
+    int operator()(Duration timeout) const;
+
+    template <typename RepT, typename PeriodT>
+    int operator()(std::chrono::duration<RepT, PeriodT> timeout) const
+    {
+        return this->operator()(std::chrono::duration_cast<Duration>(timeout));
+    }
 
   private:
     sigset_t new_mask_, old_mask_;

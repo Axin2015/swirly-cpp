@@ -49,11 +49,10 @@ int SigWait::operator()() const
     return info.si_signo;
 }
 
-int SigWait::operator()(Millis timeout) const
+int SigWait::operator()(Duration timeout) const
 {
     siginfo_t info;
-    const auto ms = timeout.count();
-    const timespec ts{ms / 1'000L, (ms % 1'000L) * 1'000'000L};
+    const auto ts = to_timespec(timeout);
     if (sigtimedwait(&new_mask_, &info, &ts) < 0) {
         if (errno == EAGAIN) {
             // Timeout.
