@@ -37,7 +37,7 @@ bool is_after(const Timer& lhs, const Timer& rhs)
 
 } // namespace
 
-Timer TimerQueue::insert(Time expiry, Duration interval, TimerSlot slot)
+Timer TimerQueue::insert(WallTime expiry, Duration interval, TimerSlot slot)
 {
     assert(slot);
 
@@ -51,7 +51,7 @@ Timer TimerQueue::insert(Time expiry, Duration interval, TimerSlot slot)
     return tmr;
 }
 
-int TimerQueue::dispatch(Time now)
+int TimerQueue::dispatch(WallTime now)
 {
     int n{};
     while (!heap_.empty()) {
@@ -72,7 +72,7 @@ int TimerQueue::dispatch(Time now)
     return n;
 }
 
-Timer TimerQueue::alloc(Time expiry, Duration interval, TimerSlot slot)
+Timer TimerQueue::alloc(WallTime expiry, Duration interval, TimerSlot slot)
 {
     Timer::Impl* impl;
 
@@ -119,7 +119,7 @@ void TimerQueue::cancel() noexcept
     gc();
 }
 
-void TimerQueue::expire(Time now)
+void TimerQueue::expire(WallTime now)
 {
     // Pop timer.
     auto tmr = pop();

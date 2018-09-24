@@ -138,7 +138,7 @@ void DsvModel::do_read_market(const ModelCallback<MarketPtr>& cb) const
         const auto instr = from_string<swirly::Symbol>(row[Instr]);
         const auto settl_day = from_string<JDay>(row[SettlDay]);
         const auto state = from_string<MarketState>(row[State]);
-        const auto last_time = from_string<Time>(row[LastTime]);
+        const auto last_time = from_string<WallTime>(row[LastTime]);
         const auto last_lots = from_string<Lots>(row[LastLots]);
         const auto last_ticks = from_string<Ticks>(row[LastTicks]);
         const auto max_id = from_string<Id64>(row[MaxId]);
@@ -181,8 +181,8 @@ void DsvModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
     while (getline(is, line)) {
         Row<ColCount> row;
         split(line, "\t"sv, row);
-        const auto created = from_string<Time>(row[Created]);
-        const auto modified = from_string<Time>(row[Modified]);
+        const auto created = from_string<WallTime>(row[Created]);
+        const auto modified = from_string<WallTime>(row[Modified]);
         const auto accnt = from_string<Symbol>(row[Accnt]);
         const auto market_id = from_string<Id64>(row[MarketId]);
         const auto instr = from_string<Symbol>(row[Instr]);
@@ -205,7 +205,7 @@ void DsvModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
     }
 }
 
-void DsvModel::do_read_exec(Time since, const ModelCallback<ExecPtr>& cb) const
+void DsvModel::do_read_exec(WallTime since, const ModelCallback<ExecPtr>& cb) const
 {
     enum {         //
         Created,   //
@@ -245,7 +245,7 @@ void DsvModel::do_read_exec(Time since, const ModelCallback<ExecPtr>& cb) const
     while (getline(is, line)) {
         Row<ColCount> row;
         split(line, "\t"sv, row);
-        const auto created = from_string<Time>(row[Created]);
+        const auto created = from_string<WallTime>(row[Created]);
         const auto accnt = from_string<swirly::Symbol>(row[Accnt]);
         const auto market_id = from_string<Id64>(row[MarketId]);
         const auto instr = from_string<Symbol>(row[Instr]);
@@ -313,7 +313,7 @@ void DsvModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
     while (getline(is, line)) {
         Row<ColCount> row;
         split(line, "\t"sv, row);
-        const auto created = from_string<Time>(row[Created]);
+        const auto created = from_string<WallTime>(row[Created]);
         const auto accnt = from_string<swirly::Symbol>(row[Accnt]);
         const auto market_id = from_string<Id64>(row[MarketId]);
         const auto instr = from_string<Symbol>(row[Instr]);

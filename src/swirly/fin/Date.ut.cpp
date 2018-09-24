@@ -36,10 +36,10 @@ BOOST_AUTO_TEST_CASE(GetBusDayCase)
     // 17.00 EDT (UTC-4 hours)
 
     // 20.59 UTC
-    BOOST_TEST(bus_day(Time{1394830799000ms}) == ymd_to_jd(2014, 3, 14));
+    BOOST_TEST(bus_day(WallTime{1394830799000ms}) == ymd_to_jd(2014, 3, 14));
 
     // 21.00 UTC
-    BOOST_TEST(bus_day(Time{1394830800000ms}) == ymd_to_jd(2014, 3, 15));
+    BOOST_TEST(bus_day(WallTime{1394830800000ms}) == ymd_to_jd(2014, 3, 15));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

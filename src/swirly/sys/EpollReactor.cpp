@@ -94,25 +94,25 @@ void EpollReactor::do_set_events(int fd, int sid, unsigned events)
     }
 }
 
-Timer EpollReactor::do_timer(Time expiry, Duration interval, Priority priority, TimerSlot slot)
+Timer EpollReactor::do_timer(WallTime expiry, Duration interval, Priority priority, TimerSlot slot)
 {
     return tqs_[static_cast<size_t>(priority)].insert(expiry, interval, slot);
 }
 
-Timer EpollReactor::do_timer(Time expiry, Priority priority, TimerSlot slot)
+Timer EpollReactor::do_timer(WallTime expiry, Priority priority, TimerSlot slot)
 {
     return tqs_[static_cast<size_t>(priority)].insert(expiry, slot);
 }
 
-int EpollReactor::do_poll(Time now, Duration timeout)
+int EpollReactor::do_poll(WallTime now, Duration timeout)
 {
     enum { High = 0, Low = 1 };
     using namespace chrono;
 
     // If timeout is zero then the wait_until time should also be zero to signify no wait.
-    Time wait_until{};
+    WallTime wait_until{};
     if (!is_zero(timeout)) {
-        const Time next = next_expiry(timeout == NoTimeout ? UnixClock::max() : now + timeout);
+        const WallTime next = next_expiry(timeout == NoTimeout ? WallClock::max() : now + timeout);
         if (next > now) {
             wait_until = next;
         }
@@ -121,7 +121,7 @@ int EpollReactor::do_poll(Time now, Duration timeout)
     Event buf[MaxEvents];
     error_code ec;
     int ret;
-    if (wait_until == UnixClock::max()) {
+    if (wait_until == WallClock::max()) {
         // Block indefinitely.
         ret = mux_.wait(buf, MaxEvents, ec);
     } else {
@@ -134,13 +134,13 @@ int EpollReactor::do_poll(Time now, Duration timeout)
         }
         return 0;
     }
-    now = UnixClock::now();
+    now = WallClock::now();
     const auto n = tqs_[High].dispatch(now) + dispatch(now, buf, ret);
     // Low priority timers are only dispatched during empty cycles.
     return n == 0 ? tqs_[Low].dispatch(now) : n;
 }
 
-Time EpollReactor::next_expiry(Time next) const
+WallTime EpollReactor::next_expiry(WallTime next) const
 {
     enum { High = 0, Low = 1 };
     using namespace chrono;
@@ -162,7 +162,7 @@ Time EpollReactor::next_expiry(Time next) const
     return next;
 }
 
-int EpollReactor::dispatch(Time now, Event* buf, int size)
+int EpollReactor::dispatch(WallTime now, Event* buf, int size)
 {
     int n{0};
     for (int i{0}; i < size; ++i) {

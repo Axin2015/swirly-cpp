@@ -82,7 +82,7 @@ void MySqlJourn::do_write(const Msg& msg)
     dispatch(msg);
 }
 
-void MySqlJourn::on_create_market(Time time, const CreateMarket& body)
+void MySqlJourn::on_create_market(WallTime time, const CreateMarket& body)
 {
     auto& stmt = *insert_market_stmt_;
 
@@ -97,7 +97,7 @@ void MySqlJourn::on_create_market(Time time, const CreateMarket& body)
     execute(stmt);
 }
 
-void MySqlJourn::on_update_market(Time time, const UpdateMarket& body)
+void MySqlJourn::on_update_market(WallTime time, const UpdateMarket& body)
 {
     auto& stmt = *update_market_stmt_;
 
@@ -110,7 +110,7 @@ void MySqlJourn::on_update_market(Time time, const UpdateMarket& body)
     execute(stmt);
 }
 
-void MySqlJourn::on_create_exec(Time time, const CreateExec& body)
+void MySqlJourn::on_create_exec(WallTime time, const CreateExec& body)
 {
     auto& stmt = *insert_exec_stmt_;
 
@@ -149,7 +149,7 @@ void MySqlJourn::on_create_exec(Time time, const CreateExec& body)
     SWIRLY_DEBUG << "affected rows: " << affected_rows(stmt);
 }
 
-void MySqlJourn::on_archive_trade(Time time, const ArchiveTrade& body)
+void MySqlJourn::on_archive_trade(WallTime time, const ArchiveTrade& body)
 {
     Transaction trans{*this};
     auto& stmt = *update_exec_stmt_;

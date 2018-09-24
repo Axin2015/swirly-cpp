@@ -54,17 +54,17 @@ class SWIRLY_API EpollReactor : public Reactor {
     /**
      * Throws std::bad_alloc only.
      */
-    Timer do_timer(Time expiry, Duration interval, Priority priority, TimerSlot slot) override;
+    Timer do_timer(WallTime expiry, Duration interval, Priority priority, TimerSlot slot) override;
     /**
      * Throws std::bad_alloc only.
      */
-    Timer do_timer(Time expiry, Priority priority, TimerSlot slot) override;
+    Timer do_timer(WallTime expiry, Priority priority, TimerSlot slot) override;
 
-    int do_poll(Time now, Duration timeout) override;
+    int do_poll(WallTime now, Duration timeout) override;
 
   private:
-    Time next_expiry(Time next) const;
-    int dispatch(Time now, Event* buf, int size);
+    WallTime next_expiry(WallTime next) const;
+    int dispatch(WallTime now, Event* buf, int size);
 
     struct Data {
         int sid{};

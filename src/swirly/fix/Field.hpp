@@ -89,7 +89,7 @@ std::ostream& operator<<(std::ostream& os, const FixField<TagN, ValueT>& field)
     os << field.Tag << '=';
     if constexpr (std::is_same_v<ValueT, bool>) {
         os << (field.value ? 'Y' : 'N');
-    } else if constexpr (std::is_same_v<ValueT, Time>) {
+    } else if constexpr (std::is_same_v<ValueT, WallTime>) {
         os << put_time<Millis>(field.value, "%Y%m%d-%T");
     } else {
         os << field.value;
@@ -113,7 +113,7 @@ template <int TagN>
 using StringViewField = FixField<TagN, std::string_view>;
 
 template <int TagN>
-using TimeField = FixField<TagN, Time>;
+using TimeField = FixField<TagN, WallTime>;
 
 using BeginString = StringField<8, 7>;
 using BodyLength = IntField<9>;

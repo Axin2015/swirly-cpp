@@ -22,8 +22,8 @@ namespace swirly {
 inline namespace fix {
 using namespace std;
 
-FixInitiator::FixInitiator(Time now, Reactor& r, const Endpoint& ep, FixSessMap::node_type&& node,
-                           FixApp& app)
+FixInitiator::FixInitiator(WallTime now, Reactor& r, const Endpoint& ep,
+                           FixSessMap::node_type&& node, FixApp& app)
 : reactor_(r)
 , ep_{ep}
 , app_(app)
@@ -36,11 +36,11 @@ FixInitiator::FixInitiator(Time now, Reactor& r, const Endpoint& ep, FixSessMap:
 
 FixInitiator::~FixInitiator()
 {
-    const auto now = UnixClock::now();
+    const auto now = WallClock::now();
     conn_list_.clear_and_dispose([now](auto* conn) { conn->dispose(now); });
 }
 
-void FixInitiator::do_connect(Time now, IoSocket&& sock, const Endpoint& ep)
+void FixInitiator::do_connect(WallTime now, IoSocket&& sock, const Endpoint& ep)
 {
     inprogress_ = false;
 
@@ -50,13 +50,13 @@ void FixInitiator::do_connect(Time now, IoSocket&& sock, const Endpoint& ep)
     conn->logon(now, sess_map_.begin()->first);
 }
 
-void FixInitiator::do_connect_error(Time now, const std::exception& e)
+void FixInitiator::do_connect_error(WallTime now, const std::exception& e)
 {
     SWIRLY_ERROR << "failed to connect: " << e.what();
     inprogress_ = false;
 }
 
-void FixInitiator::on_timer(Time now, Timer& tmr)
+void FixInitiator::on_timer(WallTime now, Timer& tmr)
 {
     if (conn_list_.empty() && !inprogress_) {
         SWIRLY_INFO << "reconnecting";

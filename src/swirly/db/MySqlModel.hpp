@@ -47,7 +47,7 @@ class SWIRLY_API MySqlModel : public Model {
 
     void do_read_order(const ModelCallback<OrderPtr>& cb) const override;
 
-    void do_read_exec(Time since, const ModelCallback<ExecPtr>& cb) const override;
+    void do_read_exec(WallTime since, const ModelCallback<ExecPtr>& cb) const override;
 
     void do_read_trade(const ModelCallback<ExecPtr>& cb) const override;
 

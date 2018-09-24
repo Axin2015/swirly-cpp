@@ -30,9 +30,9 @@ namespace os {
 /**
  * Create a file descriptor for timer notification.
  */
-inline FileHandle timerfd_create(int clockid, int flags, std::error_code& ec) noexcept
+inline FileHandle timerfd_create(int clock_id, int flags, std::error_code& ec) noexcept
 {
-    const auto fd = ::timerfd_create(clockid, flags);
+    const auto fd = ::timerfd_create(clock_id, flags);
     if (fd < 0) {
         ec = make_error(errno);
     }
@@ -42,9 +42,9 @@ inline FileHandle timerfd_create(int clockid, int flags, std::error_code& ec) no
 /**
  * Create a file descriptor for timer notification.
  */
-inline FileHandle timerfd_create(int clockid, int flags)
+inline FileHandle timerfd_create(int clock_id, int flags)
 {
-    const auto fd = ::timerfd_create(clockid, flags);
+    const auto fd = ::timerfd_create(clock_id, flags);
     if (fd < 0) {
         throw std::system_error{make_error(errno), "timerfd_create"};
     }
@@ -100,7 +100,7 @@ inline void timerfd_settime(int fd, int flags, const itimerspec& new_value)
 /**
  * Arm or disarm timer.
  */
-inline void timerfd_settime(int fd, int flags, Time expiry, Duration interval)
+inline void timerfd_settime(int fd, int flags, WallTime expiry, Duration interval)
 {
     return timerfd_settime(fd, flags | TFD_TIMER_ABSTIME,
                            {to_timespec(interval), to_timespec(expiry)});
@@ -109,7 +109,7 @@ inline void timerfd_settime(int fd, int flags, Time expiry, Duration interval)
 /**
  * Arm or disarm timer.
  */
-inline void timerfd_settime(int fd, int flags, Time expiry)
+inline void timerfd_settime(int fd, int flags, WallTime expiry)
 {
     return timerfd_settime(fd, flags | TFD_TIMER_ABSTIME, {{}, to_timespec(expiry)});
 }

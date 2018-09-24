@@ -20,20 +20,19 @@ namespace swirly {
 inline namespace util {
 using namespace std;
 
-SWIRLY_WEAK Time get_time() noexcept;
+SWIRLY_WEAK Nanos get_time(clockid_t clock_id) noexcept;
 
-Time get_time() noexcept
+Nanos get_time(clockid_t clock_id) noexcept
 {
-    using chrono::nanoseconds;
     timespec ts;
-    clock_gettime(CLOCK_REALTIME, &ts);
-    return Time{nanoseconds{ts.tv_sec * 1'000'000'000L + ts.tv_nsec}};
+    clock_gettime(clock_id, &ts);
+    return Nanos{ts.tv_sec * 1'000'000'000L + ts.tv_nsec};
 }
 
-ostream& operator<<(ostream& os, Time time)
+ostream& operator<<(ostream& os, WallTime t)
 {
     // TODO: change to a higher resolution.
-    return os << ms_since_epoch(time);
+    return os << ms_since_epoch(t);
 }
 
 } // namespace util

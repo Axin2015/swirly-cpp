@@ -62,7 +62,7 @@ void Histogram::percentiles_print(const char* path, int32_t ticks_per_half_dista
     percentiles_print(fp.get(), ticks_per_half_distance, value_scale, format);
 }
 
-void Histogram::write(Time start_time, Time end_time, LogWriter& writer)
+void Histogram::write(WallTime start_time, WallTime end_time, LogWriter& writer)
 {
     assert(ptr_);
     writer.write(start_time, end_time, *ptr_);

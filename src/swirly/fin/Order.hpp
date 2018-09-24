@@ -37,10 +37,10 @@ class SWIRLY_API Order
 , public Request
 , public MemAlloc {
   public:
-    Order(Time created, Time modified, Symbol accnt, Id64 market_id, Symbol instr, JDay settl_day,
-          Id64 id, std::string_view ref, State state, Side side, Lots lots, Ticks ticks,
-          Lots resd_lots, Lots exec_lots, Cost exec_cost, Lots last_lots, Ticks last_ticks,
-          Lots min_lots) noexcept
+    Order(WallTime created, WallTime modified, Symbol accnt, Id64 market_id, Symbol instr,
+          JDay settl_day, Id64 id, std::string_view ref, State state, Side side, Lots lots,
+          Ticks ticks, Lots resd_lots, Lots exec_lots, Cost exec_cost, Lots last_lots,
+          Ticks last_ticks, Lots min_lots) noexcept
     : Request{created, accnt, market_id, instr, settl_day, id, ref, side, lots}
     , modified_{modified}
     , state_{state}
@@ -53,7 +53,7 @@ class SWIRLY_API Order
     , min_lots_{min_lots}
     {
     }
-    Order(Time created, Symbol accnt, Id64 market_id, Symbol instr, JDay settl_day, Id64 id,
+    Order(WallTime created, Symbol accnt, Id64 market_id, Symbol instr, JDay settl_day, Id64 id,
           std::string_view ref, Side side, Lots lots, Ticks ticks, Lots min_lots) noexcept
     : Order{created, created, accnt, market_id, instr, settl_day, id,    ref,   State::New,
             side,    lots,    ticks, lots,      0_lts, 0_cst,     0_lts, 0_tks, min_lots}
@@ -90,7 +90,7 @@ class SWIRLY_API Order
     auto min_lots() const noexcept { return min_lots_; }
     auto done() const noexcept { return resd_lots_ == 0_lts; }
     void set_level(Level* level) const noexcept { level_ = level; }
-    void create(Time now) noexcept
+    void create(WallTime now) noexcept
     {
         assert(lots_ > 0_lts);
         assert(lots_ >= min_lots_);
@@ -100,7 +100,7 @@ class SWIRLY_API Order
         exec_lots_ = 0_lts;
         exec_cost_ = 0_cst;
     }
-    void revise(Time now, Lots lots) noexcept
+    void revise(WallTime now, Lots lots) noexcept
     {
         assert(lots > 0_lts);
         assert(lots >= exec_lots_);
@@ -113,14 +113,14 @@ class SWIRLY_API Order
         lots_ = lots;
         resd_lots_ -= delta;
     }
-    void cancel(Time now) noexcept
+    void cancel(WallTime now) noexcept
     {
         modified_ = now;
         state_ = State::Cancel;
         // Note that executed lots is not affected.
         resd_lots_ = 0_lts;
     }
-    void trade(Time now, Lots taken_lots, Cost taken_cost, Lots last_lots,
+    void trade(WallTime now, Lots taken_lots, Cost taken_cost, Lots last_lots,
                Ticks last_ticks) noexcept
     {
         modified_ = now;
@@ -131,7 +131,7 @@ class SWIRLY_API Order
         last_lots_ = last_lots;
         last_ticks_ = last_ticks;
     }
-    void trade(Time now, Lots last_lots, Ticks last_ticks) noexcept
+    void trade(WallTime now, Lots last_lots, Ticks last_ticks) noexcept
     {
         trade(now, last_lots, swirly::cost(last_lots, last_ticks), last_lots, last_ticks);
     }
@@ -143,7 +143,7 @@ class SWIRLY_API Order
     // Internals.
     mutable Level* level_{nullptr};
 
-    Time modified_;
+    WallTime modified_;
     State state_;
     const Ticks ticks_;
     /**

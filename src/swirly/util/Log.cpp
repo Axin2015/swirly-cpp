@@ -104,8 +104,8 @@ void null_logger(int level, string_view msg) noexcept {}
 
 void std_logger(int level, string_view msg) noexcept
 {
-    const auto now = UnixClock::now();
-    const auto t = UnixClock::to_time_t(now);
+    const auto now = WallClock::now();
+    const auto t = WallClock::to_time_t(now);
     const auto ms = ms_since_epoch(now);
 
     struct tm tm;

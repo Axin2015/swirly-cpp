@@ -46,7 +46,7 @@ void LogReader::read_header()
     }
 }
 
-bool LogReader::read(Histogram& hist, Time& timestamp, Time& interval)
+bool LogReader::read(Histogram& hist, WallTime& timestamp, WallTime& interval)
 {
     // Merge if histogram is non-null.
     hdr_histogram* h{hist.get()};
@@ -62,8 +62,8 @@ bool LogReader::read(Histogram& hist, Time& timestamp, Time& interval)
     if (!hist) {
         hist.reset(h);
     }
-    timestamp = to_time(timestamp_ts);
-    interval = to_time(interval_ts);
+    timestamp = to_time<WallClock>(timestamp_ts);
+    interval = to_time<WallClock>(interval_ts);
     return true;
 }
 

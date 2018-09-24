@@ -50,7 +50,7 @@ class SWIRLY_API LogWriter {
      *
      * @param user_prefix User defined string to include in the header.
      */
-    void write_header(Time now, const char* user_prefix);
+    void write_header(WallTime now, const char* user_prefix);
 
     /**
      * Write an hdr_histogram entry to the log. It will be encoded in a similar fashion to the
@@ -68,7 +68,7 @@ class SWIRLY_API LogWriter {
      *
      * @param hist The histogram to encode and log.
      */
-    void write(Time start_time, Time end_time, hdr_histogram& hist);
+    void write(WallTime start_time, WallTime end_time, hdr_histogram& hist);
 
     void flush() noexcept { fflush(stream_); }
 

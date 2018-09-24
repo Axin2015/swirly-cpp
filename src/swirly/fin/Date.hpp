@@ -63,7 +63,7 @@ class SWIRLY_API BusinessDay {
      *
      * @return the business day.
      */
-    JDay operator()(Time time) const;
+    JDay operator()(WallTime time) const;
 
   private:
     boost::local_time::time_zone_ptr time_zone_;

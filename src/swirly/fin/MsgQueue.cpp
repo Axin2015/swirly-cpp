@@ -29,7 +29,7 @@ using namespace std;
 
 MsgQueue::~MsgQueue() = default;
 
-void MsgQueue::archive_trade(Time now, Id64 market_id, ArrayView<Id64> ids)
+void MsgQueue::archive_trade(WallTime now, Id64 market_id, ArrayView<Id64> ids)
 {
     detail::Range<MaxIds> r{ids.size()};
     if (mq_.reserve() < r.steps()) {
@@ -40,7 +40,8 @@ void MsgQueue::archive_trade(Time now, Id64 market_id, ArrayView<Id64> ids)
     } while (r.next());
 }
 
-void MsgQueue::do_create_market(Time now, Id64 id, Symbol instr, JDay settl_day, MarketState state)
+void MsgQueue::do_create_market(WallTime now, Id64 id, Symbol instr, JDay settl_day,
+                                MarketState state)
 {
     const auto fn = [ now, id, &instr, settl_day, state ](Msg & msg) noexcept
     {
@@ -57,7 +58,7 @@ void MsgQueue::do_create_market(Time now, Id64 id, Symbol instr, JDay settl_day,
     }
 }
 
-void MsgQueue::do_update_market(Time now, Id64 id, MarketState state)
+void MsgQueue::do_update_market(WallTime now, Id64 id, MarketState state)
 {
     const auto fn = [ now, id, state ](Msg & msg) noexcept
     {
@@ -117,7 +118,7 @@ void MsgQueue::create_exec(ArrayView<ConstExecPtr> execs)
     }
 }
 
-void MsgQueue::do_archive_trade(Time now, Id64 market_id, ArrayView<Id64> ids)
+void MsgQueue::do_archive_trade(WallTime now, Id64 market_id, ArrayView<Id64> ids)
 {
     assert(ids.size() <= MaxIds);
     const auto fn = [ now, market_id, ids ](Msg & msg) noexcept

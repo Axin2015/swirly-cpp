@@ -35,19 +35,19 @@ namespace {
 class TestApp : public FixApp {
   public:
   protected:
-    void do_on_connect(Time now, FixConn& conn) override
+    void do_on_connect(WallTime now, FixConn& conn) override
     {
         SWIRLY_INFO << "session connected: " << conn.endpoint();
     }
-    void do_on_logon(Time now, FixConn& conn, const FixSessId& sess_id) override
+    void do_on_logon(WallTime now, FixConn& conn, const FixSessId& sess_id) override
     {
         SWIRLY_INFO << "session logged-on: " << conn.endpoint();
     }
-    void do_on_logout(Time now, FixConn& conn, const FixSessId& sess_id) noexcept override
+    void do_on_logout(WallTime now, FixConn& conn, const FixSessId& sess_id) noexcept override
     {
         SWIRLY_INFO << "session logged-out: " << conn.endpoint();
     }
-    void do_on_message(Time now, FixConn& conn, string_view msg, size_t body_off, Version ver,
+    void do_on_message(WallTime now, FixConn& conn, string_view msg, size_t body_off, Version ver,
                        const FixHeader& hdr) override
     {
         FixLexer lex{msg};
@@ -57,15 +57,15 @@ class TestApp : public FixApp {
         }
         cout << endl;
     }
-    void do_on_disconnect(Time now, const FixConn& conn) noexcept override
+    void do_on_disconnect(WallTime now, const FixConn& conn) noexcept override
     {
         SWIRLY_INFO << "session disconnected: " << conn.endpoint();
     }
-    void do_on_error(Time now, const FixConn& conn, const std::exception& e) noexcept override
+    void do_on_error(WallTime now, const FixConn& conn, const std::exception& e) noexcept override
     {
         SWIRLY_ERROR << "session error: " << conn.endpoint() << ": " << e.what();
     }
-    void do_on_timeout(Time now, const FixConn& conn) noexcept override
+    void do_on_timeout(WallTime now, const FixConn& conn) noexcept override
     {
         SWIRLY_WARNING << "session timeout: " << conn.endpoint();
     }
@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
         istringstream is{ConfigData};
         TestApp app;
 
-        const auto start_time = UnixClock::now();
+        const auto start_time = WallClock::now();
         FixCtx fix_ctx{start_time, reactor, is, app};
 
         // Start service/worker threads.

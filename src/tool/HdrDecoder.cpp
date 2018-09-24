@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
         reader.read_header();
 
         Histogram hist;
-        Time timestamp{}, interval{};
+        WallTime timestamp{}, interval{};
         while (reader.read(hist, timestamp, interval)) {
             hist.percentiles_print(stdout, 5, 1000, CLASSIC);
         }

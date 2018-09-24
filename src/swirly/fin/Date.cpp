@@ -44,9 +44,9 @@ BusinessDay& BusinessDay::operator=(const BusinessDay& rhs) = default;
 BusinessDay::BusinessDay(BusinessDay&&) noexcept = default;
 BusinessDay& BusinessDay::operator=(BusinessDay&&) noexcept = default;
 
-JDay BusinessDay::operator()(Time time) const
+JDay BusinessDay::operator()(WallTime time) const
 {
-    const auto t = UnixClock::to_time_t(time);
+    const auto t = WallClock::to_time_t(time);
 
     // Returned cached value if it exists.
     const auto i = t & 1;

@@ -40,16 +40,16 @@ struct BasicMsgHandler {
         auto* const derived = static_cast<DerivedT*>(this);
         switch (msg.type) {
         case MsgType::CreateMarket:
-            derived->on_create_market(to_time(Nanos{msg.time}), msg.create_market);
+            derived->on_create_market(to_time<WallClock>(Nanos{msg.time}), msg.create_market);
             break;
         case MsgType::UpdateMarket:
-            derived->on_update_market(to_time(Nanos{msg.time}), msg.update_market);
+            derived->on_update_market(to_time<WallClock>(Nanos{msg.time}), msg.update_market);
             break;
         case MsgType::CreateExec:
-            derived->on_create_exec(to_time(Nanos{msg.time}), msg.create_exec);
+            derived->on_create_exec(to_time<WallClock>(Nanos{msg.time}), msg.create_exec);
             break;
         case MsgType::ArchiveTrade:
-            derived->on_archive_trade(to_time(Nanos{msg.time}), msg.archive_trade);
+            derived->on_archive_trade(to_time<WallClock>(Nanos{msg.time}), msg.archive_trade);
             break;
         }
     }

@@ -36,7 +36,7 @@ LogWriter::LogWriter(std::FILE* stream)
 
 LogWriter::~LogWriter() = default;
 
-void LogWriter::write_header(Time now, const char* user_prefix)
+void LogWriter::write_header(WallTime now, const char* user_prefix)
 {
     auto ts = to_timespec(now);
     const auto err = hdr_log_write_header(&writer_, stream_, user_prefix, &ts);
@@ -45,7 +45,7 @@ void LogWriter::write_header(Time now, const char* user_prefix)
     }
 }
 
-void LogWriter::write(Time start_time, Time end_time, hdr_histogram& hist)
+void LogWriter::write(WallTime start_time, WallTime end_time, hdr_histogram& hist)
 {
     auto start_ts = to_timespec(start_time);
     auto end_ts = to_timespec(end_time);

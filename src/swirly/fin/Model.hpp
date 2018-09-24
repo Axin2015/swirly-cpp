@@ -49,7 +49,10 @@ class SWIRLY_API Model {
     void read_instr(const ModelCallback<InstrPtr>& cb) const { do_read_instr(cb); }
     void read_market(const ModelCallback<MarketPtr>& cb) const { do_read_market(cb); }
     void read_order(const ModelCallback<OrderPtr>& cb) const { do_read_order(cb); }
-    void read_exec(Time since, const ModelCallback<ExecPtr>& cb) const { do_read_exec(since, cb); }
+    void read_exec(WallTime since, const ModelCallback<ExecPtr>& cb) const
+    {
+        do_read_exec(since, cb);
+    }
     void read_trade(const ModelCallback<ExecPtr>& cb) const { do_read_trade(cb); }
     void read_posn(JDay bus_day, const ModelCallback<PosnPtr>& cb) const
     {
@@ -65,7 +68,7 @@ class SWIRLY_API Model {
 
     virtual void do_read_order(const ModelCallback<OrderPtr>& cb) const = 0;
 
-    virtual void do_read_exec(Time since, const ModelCallback<ExecPtr>& cb) const = 0;
+    virtual void do_read_exec(WallTime since, const ModelCallback<ExecPtr>& cb) const = 0;
 
     virtual void do_read_trade(const ModelCallback<ExecPtr>& cb) const = 0;
 

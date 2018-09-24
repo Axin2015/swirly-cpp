@@ -66,6 +66,7 @@ class EpollMuxer {
 
     explicit EpollMuxer(std::size_t size_hint)
     : mux_{os::epoll_create(size_hint)}
+    // FIXME: it's not entirely clear whether realtime or monotonic is the better choice here.
     , tfd_{os::timerfd_create(CLOCK_REALTIME, TFD_NONBLOCK)}
     {
         subscribe(*tfd_, 0, EventIn);
@@ -84,10 +85,10 @@ class EpollMuxer {
     int wait(Event buf[], std::size_t size, std::error_code& ec) const
     {
         // A zero timeout will disarm the timer.
-        os::timerfd_settime(*tfd_, 0, Time{});
+        os::timerfd_settime(*tfd_, 0, WallTime{});
         return os::epoll_wait(*mux_, buf, size, -1, ec);
     }
-    int wait(Event buf[], std::size_t size, Time timeout, std::error_code& ec) const
+    int wait(Event buf[], std::size_t size, WallTime timeout, std::error_code& ec) const
     {
         // A zero timeout will disarm the timer.
         os::timerfd_settime(*tfd_, 0, timeout);

@@ -65,7 +65,7 @@ class SWIRLY_API LogReader {
      *
      * @return false indicates that there are no more histograms left to be read from 'file'.
      */
-    bool read(Histogram& hist, Time& timestamp, Time& interval);
+    bool read(Histogram& hist, WallTime& timestamp, WallTime& interval);
 
   private:
     std::FILE* stream_;

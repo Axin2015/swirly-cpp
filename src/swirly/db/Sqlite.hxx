@@ -108,18 +108,18 @@ struct DbTraits<ValueT, std::enable_if_t<std::is_enum_v<ValueT>>> {
 };
 
 /**
- * Time.
+ * WallTime.
  */
 template <>
-struct DbTraits<Time> {
-    static constexpr bool is_null(Time val) noexcept { return val == Time{}; }
-    static void bind(sqlite3_stmt& stmt, int col, Time val)
+struct DbTraits<WallTime> {
+    static constexpr bool is_null(WallTime val) noexcept { return val == WallTime{}; }
+    static void bind(sqlite3_stmt& stmt, int col, WallTime val)
     {
         bind64(stmt, col, ns_since_epoch(val));
     }
     static auto column(sqlite3_stmt& stmt, int col) noexcept
     {
-        return to_time(Nanos{sqlite3_column_int64(&stmt, col)});
+        return to_time<WallClock>(Nanos{sqlite3_column_int64(&stmt, col)});
     }
 };
 

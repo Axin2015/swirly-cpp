@@ -53,28 +53,29 @@ class RestApp {
     RestApp(RestApp&&) = delete;
     RestApp& operator=(RestApp&&) = delete;
 
-    void on_connect(Time now, const Endpoint& ep);
-    void on_disconnect(Time now, const Endpoint& ep) noexcept;
-    void on_error(Time now, const Endpoint& ep, const std::exception& e) noexcept;
-    void on_message(Time now, const Endpoint& ep, const RestRequest& req, HttpStream& os) noexcept;
-    void on_timeout(Time now, const Endpoint& ep) noexcept;
+    void on_connect(WallTime now, const Endpoint& ep);
+    void on_disconnect(WallTime now, const Endpoint& ep) noexcept;
+    void on_error(WallTime now, const Endpoint& ep, const std::exception& e) noexcept;
+    void on_message(WallTime now, const Endpoint& ep, const RestRequest& req,
+                    HttpStream& os) noexcept;
+    void on_timeout(WallTime now, const Endpoint& ep) noexcept;
 
   private:
     bool reset(const RestRequest& req) noexcept;
 
-    void rest_request(Time now, const RestRequest& req, HttpStream& os);
+    void rest_request(WallTime now, const RestRequest& req, HttpStream& os);
 
-    void ref_data_request(Time now, const RestRequest& req, HttpStream& os);
-    void asset_request(Time now, const RestRequest& req, HttpStream& os);
-    void instr_request(Time now, const RestRequest& req, HttpStream& os);
+    void ref_data_request(WallTime now, const RestRequest& req, HttpStream& os);
+    void asset_request(WallTime now, const RestRequest& req, HttpStream& os);
+    void instr_request(WallTime now, const RestRequest& req, HttpStream& os);
 
-    void sess_request(Time now, const RestRequest& req, HttpStream& os);
-    void market_request(Time now, const RestRequest& req, HttpStream& os);
+    void sess_request(WallTime now, const RestRequest& req, HttpStream& os);
+    void market_request(WallTime now, const RestRequest& req, HttpStream& os);
 
-    void order_request(Time now, const RestRequest& req, HttpStream& os);
-    void exec_request(Time now, const RestRequest& req, HttpStream& os);
-    void trade_request(Time now, const RestRequest& req, HttpStream& os);
-    void posn_request(Time now, const RestRequest& req, HttpStream& os);
+    void order_request(WallTime now, const RestRequest& req, HttpStream& os);
+    void exec_request(WallTime now, const RestRequest& req, HttpStream& os);
+    void trade_request(WallTime now, const RestRequest& req, HttpStream& os);
+    void posn_request(WallTime now, const RestRequest& req, HttpStream& os);
 
     RestImpl& impl_;
     bool match_method_{false};

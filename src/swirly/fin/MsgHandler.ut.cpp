@@ -25,28 +25,28 @@ namespace {
 
 struct MsgHandler : BasicMsgHandler<MsgHandler> {
 
-    Time time{};
+    WallTime time{};
     int create_market_calls{0};
     int update_market_calls{0};
     int create_exec_calls{0};
     int archive_trade_calls{0};
 
-    void on_create_market(Time time, const CreateMarket& body)
+    void on_create_market(WallTime time, const CreateMarket& body)
     {
         this->time = time;
         ++create_market_calls;
     }
-    void on_update_market(Time time, const UpdateMarket& body)
+    void on_update_market(WallTime time, const UpdateMarket& body)
     {
         this->time = time;
         ++update_market_calls;
     }
-    void on_create_exec(Time time, const CreateExec& body)
+    void on_create_exec(WallTime time, const CreateExec& body)
     {
         this->time = time;
         ++create_exec_calls;
     }
-    void on_archive_trade(Time time, const ArchiveTrade& body)
+    void on_archive_trade(WallTime time, const ArchiveTrade& body)
     {
         this->time = time;
         ++archive_trade_calls;
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(BasicMsgHandlerCase)
     Msg m;
     memset(&m, 0, sizeof(m));
 
-    const auto now = UnixClock::now();
+    const auto now = WallClock::now();
     m.type = MsgType::CreateMarket;
     m.time = ns_since_epoch(now + 1ms);
     BOOST_TEST(h.create_market_calls == 0);

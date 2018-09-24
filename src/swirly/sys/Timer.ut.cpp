@@ -51,10 +51,10 @@ BOOST_AUTO_TEST_CASE(TimerEmptyCase)
 
 BOOST_AUTO_TEST_CASE(TimerInsertCase)
 {
-    const auto now = UnixClock::now();
+    const auto now = WallClock::now();
     TimerQueue tq;
 
-    auto fn = [](Time now, Timer& tmr) {};
+    auto fn = [](WallTime now, Timer& tmr) {};
     Timer t = tq.insert(now + 2s, bind(&fn));
     BOOST_TEST(!t.empty());
     BOOST_TEST(t);

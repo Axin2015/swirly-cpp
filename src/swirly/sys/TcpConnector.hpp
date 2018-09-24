@@ -44,7 +44,7 @@ class TcpConnector {
      * Returns true if connection was established synchronously or false if connection is pending
      * asynchronous completion.
      */
-    bool connect(Time now, Reactor& r, const Endpoint& ep)
+    bool connect(WallTime now, Reactor& r, const Endpoint& ep)
     {
         TcpClntSocket sock{ep.protocol()};
         sock.set_non_block();
@@ -69,7 +69,7 @@ class TcpConnector {
     ~TcpConnector() = default;
 
   private:
-    void on_io_event(Time now, int fd, unsigned events)
+    void on_io_event(WallTime now, int fd, unsigned events)
     {
         assert(events == EventOut);
         IoSocket sock{std::move(sock_)};

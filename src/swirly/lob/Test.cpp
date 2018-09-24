@@ -118,7 +118,7 @@ void TestModel::do_read_market(const ModelCallback<MarketPtr>& cb) const {}
 
 void TestModel::do_read_order(const ModelCallback<OrderPtr>& cb) const {}
 
-void TestModel::do_read_exec(Time since, const ModelCallback<ExecPtr>& cb) const {}
+void TestModel::do_read_exec(WallTime since, const ModelCallback<ExecPtr>& cb) const {}
 
 void TestModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const {}
 
