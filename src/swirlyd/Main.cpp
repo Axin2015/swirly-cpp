@@ -79,7 +79,7 @@ void open_log_file(const char* path)
 struct Opts {
     fs::path conf_file;
     bool daemon{false};
-    Time start_time{};
+    WallTime start_time{};
 };
 
 void get_opts(int argc, char* argv[], Opts& opts)
@@ -143,8 +143,8 @@ int main(int argc, char* argv[])
         Opts opts;
         get_opts(argc, argv, opts);
 
-        if (opts.start_time == Time{}) {
-            opts.start_time = UnixClock::now();
+        if (opts.start_time == WallTime{}) {
+            opts.start_time = WallClock::now();
         }
 
         Config config;

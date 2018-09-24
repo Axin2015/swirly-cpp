@@ -119,7 +119,7 @@ class SWIRLY_API Histogram {
      */
     bool record_value(std::int64_t value) noexcept { return hdr_record_value(ptr_.get(), value); }
 
-    void write(Time start_time, Time end_time, LogWriter& writer);
+    void write(WallTime start_time, WallTime end_time, LogWriter& writer);
 
   private:
     HistogramPtr ptr_{nullptr, hdr_close};

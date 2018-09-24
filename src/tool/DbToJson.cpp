@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
         }
         const BusinessDay bus_day{MarketZone};
 
-        const auto now = UnixClock::now();
+        const auto now = WallClock::now();
         SqliteModel model{config};
 
         cout << "{\"assets\":[";

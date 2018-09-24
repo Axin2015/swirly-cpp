@@ -56,7 +56,7 @@ class BasicHttpConn
     using Transport = Tcp;
     using Endpoint = TcpEndpoint;
 
-    BasicHttpConn(Time now, Reactor& r, IoSocket&& sock, const Endpoint& ep, App& app)
+    BasicHttpConn(WallTime now, Reactor& r, IoSocket&& sock, const Endpoint& ep, App& app)
     : BasicHttpParser<BasicHttpConn<RequestT, AppT>>{HttpType::Request}
     , reactor_(r)
     , sock_{std::move(sock)}
@@ -78,7 +78,7 @@ class BasicHttpConn
 
     const Endpoint& endpoint() const noexcept { return ep_; }
     void clear() noexcept { req_.clear(); }
-    void dispose(Time now) noexcept
+    void dispose(WallTime now) noexcept
     {
         app_.on_disconnect(now, ep_);
         delete this;
@@ -170,7 +170,7 @@ class BasicHttpConn
     }
     bool on_chunk_header(std::size_t len) noexcept { return true; }
     bool on_chunk_end() noexcept { return true; }
-    void on_io_event(Time now, int fd, unsigned events)
+    void on_io_event(WallTime now, int fd, unsigned events)
     {
         try {
             if (events & EventOut) {
@@ -210,7 +210,7 @@ class BasicHttpConn
             dispose(now);
         }
     }
-    void on_timer(Time now, Timer& tmr)
+    void on_timer(WallTime now, Timer& tmr)
     {
         app_.on_timeout(now, ep_);
         dispose(now);
@@ -222,7 +222,7 @@ class BasicHttpConn
     App& app_;
     Reactor::Handle sub_;
     Timer tmr_;
-    Time now_{};
+    WallTime now_{};
     int pending_{0};
     Buffer in_, out_;
     Request req_;

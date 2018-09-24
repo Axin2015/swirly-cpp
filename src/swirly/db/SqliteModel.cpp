@@ -91,7 +91,7 @@ void SqliteModel::do_read_market(const ModelCallback<MarketPtr>& cb) const
                         column<string_view>(*stmt, Instr), //
                         column<JDay>(*stmt, SettlDay),     //
                         column<MarketState>(*stmt, State), //
-                        column<Time>(*stmt, LastTime),     //
+                        column<WallTime>(*stmt, LastTime),     //
                         column<Lots>(*stmt, LastLots),     //
                         column<Ticks>(*stmt, LastTicks),   //
                         column<Id64>(*stmt, MaxId)));
@@ -103,8 +103,8 @@ void SqliteModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
     using namespace order;
     StmtPtr stmt{prepare(*db_, SelectSql)};
     while (step(*stmt)) {
-        cb(Order::make(column<Time>(*stmt, Created),            //
-                       column<Time>(*stmt, Modified),           //
+        cb(Order::make(column<WallTime>(*stmt, Created),            //
+                       column<WallTime>(*stmt, Modified),           //
                        column<string_view>(*stmt, Accnt),       //
                        column<Id64>(*stmt, MarketId),           //
                        column<string_view>(*stmt, Instr),       //
@@ -124,14 +124,14 @@ void SqliteModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
     }
 }
 
-void SqliteModel::do_read_exec(Time since, const ModelCallback<ExecPtr>& cb) const
+void SqliteModel::do_read_exec(WallTime since, const ModelCallback<ExecPtr>& cb) const
 {
     using namespace exec;
     StmtPtr stmt{prepare(*db_, SelectSql)};
     ScopedBind bind{*stmt};
     bind(since);
     while (step(*stmt)) {
-        cb(Exec::make(column<Time>(*stmt, Created),            //
+        cb(Exec::make(column<WallTime>(*stmt, Created),            //
                       column<string_view>(*stmt, Accnt),       //
                       column<Id64>(*stmt, MarketId),           //
                       column<string_view>(*stmt, Instr),       //
@@ -162,7 +162,7 @@ void SqliteModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
     using namespace trade;
     StmtPtr stmt{prepare(*db_, SelectSql)};
     while (step(*stmt)) {
-        cb(Exec::make(column<Time>(*stmt, Created),            //
+        cb(Exec::make(column<WallTime>(*stmt, Created),            //
                       column<string_view>(*stmt, Accnt),       //
                       column<Id64>(*stmt, MarketId),           //
                       column<string_view>(*stmt, Instr),       //

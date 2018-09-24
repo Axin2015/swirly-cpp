@@ -46,7 +46,7 @@ using namespace swirly;
 namespace {
 
 const Market& create_market(LobApp& app, Symbol instr_symbol, JDay settl_day, MarketState state,
-                            Time now)
+                            WallTime now)
 {
     const auto& instr = app.instr(instr_symbol);
     const auto market_id = to_market_id(instr.id(), settl_day);
@@ -63,7 +63,7 @@ class Archiver {
     : app_(app)
     {
     }
-    void operator()(Time now, const Sess& sess, Id64 market_id)
+    void operator()(WallTime now, const Sess& sess, Id64 market_id)
     {
         ids_.clear();
         for (const auto& trade : sess.trades()) {
@@ -139,7 +139,7 @@ int main(int argc, char* argv[])
         }
 
         const BusinessDay bus_day{MarketZone};
-        const auto start_time = UnixClock::now();
+        const auto start_time = WallClock::now();
 
         MsgQueue mq{1 << 12};
         LobApp app{mq, 1 << 4};

@@ -44,25 +44,27 @@ class SWIRLY_API HttpApp {
     constexpr HttpApp(HttpApp&&) noexcept = default;
     HttpApp& operator=(HttpApp&&) noexcept = default;
 
-    void on_connect(Time now, const Endpoint& ep) { do_on_connect(now, ep); }
-    void on_disconnect(Time now, const Endpoint& ep) noexcept { do_on_disconnect(now, ep); }
-    void on_error(Time now, const Endpoint& ep, const std::exception& e) noexcept
+    void on_connect(WallTime now, const Endpoint& ep) { do_on_connect(now, ep); }
+    void on_disconnect(WallTime now, const Endpoint& ep) noexcept { do_on_disconnect(now, ep); }
+    void on_error(WallTime now, const Endpoint& ep, const std::exception& e) noexcept
     {
         do_on_error(now, ep, e);
     }
-    void on_message(Time now, const Endpoint& ep, const HttpRequest& req, HttpStream& os)
+    void on_message(WallTime now, const Endpoint& ep, const HttpRequest& req, HttpStream& os)
     {
         do_on_message(now, ep, req, os);
     }
-    void on_timeout(Time now, const Endpoint& ep) noexcept { do_on_timeout(now, ep); }
+    void on_timeout(WallTime now, const Endpoint& ep) noexcept { do_on_timeout(now, ep); }
 
   protected:
-    virtual void do_on_connect(Time now, const Endpoint& ep) = 0;
-    virtual void do_on_disconnect(Time now, const Endpoint& ep) noexcept = 0;
-    virtual void do_on_error(Time now, const Endpoint& ep, const std::exception& e) noexcept = 0;
-    virtual void do_on_message(Time now, const Endpoint& ep, const HttpRequest& req, HttpStream& os)
+    virtual void do_on_connect(WallTime now, const Endpoint& ep) = 0;
+    virtual void do_on_disconnect(WallTime now, const Endpoint& ep) noexcept = 0;
+    virtual void do_on_error(WallTime now, const Endpoint& ep, const std::exception& e) noexcept
         = 0;
-    virtual void do_on_timeout(Time now, const Endpoint& ep) noexcept = 0;
+    virtual void do_on_message(WallTime now, const Endpoint& ep, const HttpRequest& req,
+                               HttpStream& os)
+        = 0;
+    virtual void do_on_timeout(WallTime now, const Endpoint& ep) noexcept = 0;
 };
 
 } // namespace http

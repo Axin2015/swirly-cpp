@@ -32,7 +32,7 @@ class SWIRLY_API Market
 : public RefCount<Market, ThreadUnsafePolicy>
 , public Comparable<Market> {
   public:
-    Market(Id64 id, Symbol instr, JDay settl_day, MarketState state, Time last_time = {},
+    Market(Id64 id, Symbol instr, JDay settl_day, MarketState state, WallTime last_time = {},
            Lots last_lots = 0_lts, Ticks last_ticks = 0_tks, Id64 max_id = 0_id64) noexcept
     : id_{id}
     , instr_{instr}
@@ -68,7 +68,7 @@ class SWIRLY_API Market
     auto instr() const noexcept { return instr_; }
     auto settl_day() const noexcept { return settl_day_; }
     auto state() const noexcept { return state_; }
-    Time last_time() const noexcept { return last_time_; }
+    WallTime last_time() const noexcept { return last_time_; }
     Lots last_lots() const noexcept { return last_lots_; }
     Ticks last_ticks() const noexcept { return last_ticks_; }
     const MarketSide& bid_side() const noexcept { return bid_side_; }
@@ -86,19 +86,19 @@ class SWIRLY_API Market
     /**
      * Throws std::bad_alloc.
      */
-    void create_order(Time now, const OrderPtr& order)
+    void create_order(WallTime now, const OrderPtr& order)
     {
         side(order->side()).create_order(now, order);
     }
-    void revise_order(Time now, Order& order, Lots lots) noexcept
+    void revise_order(WallTime now, Order& order, Lots lots) noexcept
     {
         side(order.side()).revise_order(now, order, lots);
     }
-    void cancel_order(Time now, Order& order) noexcept
+    void cancel_order(WallTime now, Order& order) noexcept
     {
         side(order.side()).cancel_order(now, order);
     }
-    void take_order(Time now, Order& order, Lots lots) noexcept
+    void take_order(WallTime now, Order& order, Lots lots) noexcept
     {
         side(order.side()).take_order(now, order, lots);
         last_time_ = now;
@@ -119,7 +119,7 @@ class SWIRLY_API Market
     const Symbol instr_;
     const JDay settl_day_;
     MarketState state_;
-    Time last_time_;
+    WallTime last_time_;
     Lots last_lots_;
     Ticks last_ticks_;
     // Two sides constitute the market.

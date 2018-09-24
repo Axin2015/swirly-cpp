@@ -28,7 +28,7 @@ using namespace swirly;
 namespace {
 
 struct TimerHandler : RefCount<TimerHandler, ThreadUnsafePolicy> {
-    void on_timer(Time now, Timer& tmr) {}
+    void on_timer(WallTime now, Timer& tmr) {}
 };
 
 } // namespace
@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
 
         auto h = make_intrusive<TimerHandler>();
         for (int i{0}; i < 5000000; ++i) {
-            const auto now = UnixClock::now();
+            const auto now = WallClock::now();
             auto& t = ts[dis(gen) % 128];
             if (t && dis(gen) % 2 == 0) {
                 t = {};

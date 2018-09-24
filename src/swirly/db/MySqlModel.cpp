@@ -133,7 +133,7 @@ void MySqlModel::do_read_market(const ModelCallback<MarketPtr>& cb) const
                         instr.value(),                           //
                         JDay{settl_day.value()},                 //
                         static_cast<MarketState>(state.value()), //
-                        to_time(Nanos{last_time.value()}),       //
+                        to_time<WallClock>(Nanos{last_time.value()}),       //
                         Lots{last_lots.value()},                 //
                         Ticks{last_ticks.value()},               //
                         Id64{max_id.value()}));
@@ -170,8 +170,8 @@ void MySqlModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
 
     bind_result(*stmt, &result[0]);
     while (fetch(*stmt)) {
-        cb(Order::make(to_time(Nanos{created.value()}),   //
-                       to_time(Nanos{modified.value()}),  //
+        cb(Order::make(to_time<WallClock>(Nanos{created.value()}),   //
+                       to_time<WallClock>(Nanos{modified.value()}),  //
                        accnt.value(),                     //
                        Id64{market_id.value()},           //
                        instr.value(),                     //
@@ -191,7 +191,7 @@ void MySqlModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
     }
 }
 
-void MySqlModel::do_read_exec(Time since, const ModelCallback<ExecPtr>& cb) const
+void MySqlModel::do_read_exec(WallTime since, const ModelCallback<ExecPtr>& cb) const
 {
     using namespace exec;
 
@@ -232,7 +232,7 @@ void MySqlModel::do_read_exec(Time since, const ModelCallback<ExecPtr>& cb) cons
 
     bind_result(*stmt, &result[0]);
     while (fetch(*stmt)) {
-        cb(Exec::make(to_time(Nanos{created.value()}),   //
+        cb(Exec::make(to_time<WallClock>(Nanos{created.value()}),   //
                       accnt.value(),                     //
                       Id64{market_id.value()},           //
                       instr.value(),                     //
@@ -292,7 +292,7 @@ void MySqlModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
 
     bind_result(*stmt, &result[0]);
     while (fetch(*stmt)) {
-        cb(Exec::make(to_time(Nanos{created.value()}),   //
+        cb(Exec::make(to_time<WallClock>(Nanos{created.value()}),   //
                       accnt.value(),                     //
                       Id64{market_id.value()},           //
                       instr.value(),                     //

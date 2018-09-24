@@ -81,7 +81,7 @@ void SqliteJourn::do_write(const Msg& msg)
     dispatch(msg);
 }
 
-void SqliteJourn::on_create_market(Time now, const CreateMarket& body)
+void SqliteJourn::on_create_market(WallTime now, const CreateMarket& body)
 {
     auto& stmt = *insert_market_stmt_;
 
@@ -94,7 +94,7 @@ void SqliteJourn::on_create_market(Time now, const CreateMarket& body)
     step_once(stmt);
 }
 
-void SqliteJourn::on_update_market(Time now, const UpdateMarket& body)
+void SqliteJourn::on_update_market(WallTime now, const UpdateMarket& body)
 {
     auto& stmt = *update_market_stmt_;
 
@@ -105,7 +105,7 @@ void SqliteJourn::on_update_market(Time now, const UpdateMarket& body)
     step_once(stmt);
 }
 
-void SqliteJourn::on_create_exec(Time now, const CreateExec& body)
+void SqliteJourn::on_create_exec(WallTime now, const CreateExec& body)
 {
     auto& stmt = *insert_exec_stmt_;
 
@@ -142,7 +142,7 @@ void SqliteJourn::on_create_exec(Time now, const CreateExec& body)
     step_once(stmt);
 }
 
-void SqliteJourn::on_archive_trade(Time now, const ArchiveTrade& body)
+void SqliteJourn::on_archive_trade(WallTime now, const ArchiveTrade& body)
 {
     Transaction trans{*this};
     auto& stmt = *update_exec_stmt_;

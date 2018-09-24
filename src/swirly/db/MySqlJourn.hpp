@@ -54,13 +54,13 @@ class SWIRLY_API MySqlJourn
     void do_write(const Msg& msg) override;
 
   private:
-    void on_create_market(Time now, const CreateMarket& body);
+    void on_create_market(WallTime now, const CreateMarket& body);
 
-    void on_update_market(Time now, const UpdateMarket& body);
+    void on_update_market(WallTime now, const UpdateMarket& body);
 
-    void on_create_exec(Time now, const CreateExec& body);
+    void on_create_exec(WallTime now, const CreateExec& body);
 
-    void on_archive_trade(Time now, const ArchiveTrade& body);
+    void on_archive_trade(WallTime now, const ArchiveTrade& body);
 
     mysql::DbPtr db_;
     mysql::StmtPtr insert_market_stmt_;

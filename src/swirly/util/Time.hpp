@@ -33,15 +33,52 @@ using namespace std::literals::chrono_literals;
 using namespace std::literals::string_view_literals;
 inline namespace util {
 
-struct SWIRLY_API UnixClock {
-    using duration = std::chrono::nanoseconds;
-    using rep = duration::rep;
-    using period = duration::period;
-    using time_point = std::chrono::time_point<UnixClock, duration>;
+using Seconds = std::chrono::seconds;
+using Millis = std::chrono::milliseconds;
+using Micros = std::chrono::microseconds;
+using Nanos = std::chrono::nanoseconds;
+using Duration = Nanos;
 
-    static constexpr bool is_steady = false;
+SWIRLY_API Nanos get_time(clockid_t clock_id) noexcept;
 
-    static time_point now() noexcept;
+struct MonoClock {
+    using duration = Duration;
+    using period = Duration::period;
+    using rep = Duration::rep;
+    using time_point = std::chrono::time_point<MonoClock, Duration>;
+
+    static constexpr int clock_id{CLOCK_MONOTONIC};
+    static constexpr bool is_steady{true};
+
+    static constexpr time_point max() noexcept
+    {
+        using namespace std::chrono;
+        using FromPoint = std::chrono::time_point<MonoClock, seconds>;
+        constexpr seconds secs{std::numeric_limits<int>::max()};
+        return time_point_cast<Duration>(FromPoint{secs});
+    }
+
+    static time_point now() noexcept { return time_point{get_time(clock_id)}; }
+};
+
+struct WallClock {
+    using duration = Duration;
+    using period = Duration::period;
+    using rep = Duration::rep;
+    using time_point = std::chrono::time_point<WallClock, Duration>;
+
+    static constexpr int clock_id{CLOCK_REALTIME};
+    static constexpr bool is_steady{false};
+
+    static constexpr time_point max() noexcept
+    {
+        using namespace std::chrono;
+        using FromPoint = std::chrono::time_point<WallClock, seconds>;
+        constexpr seconds secs{std::numeric_limits<int>::max()};
+        return time_point_cast<Duration>(FromPoint{secs});
+    }
+
+    static time_point now() noexcept { return time_point{get_time(clock_id)}; }
 
     static constexpr std::time_t to_time_t(const time_point& tp) noexcept
     {
@@ -52,30 +89,15 @@ struct SWIRLY_API UnixClock {
     static constexpr time_point from_time_t(std::time_t t) noexcept
     {
         using namespace std::chrono;
-        using FromPoint = std::chrono::time_point<UnixClock, seconds>;
-        return time_point_cast<UnixClock::duration>(FromPoint{seconds{t}});
-    }
-
-    static constexpr time_point max() noexcept
-    {
-        return from_time_t(std::numeric_limits<int>::max());
+        using FromPoint = std::chrono::time_point<WallClock, seconds>;
+        return time_point_cast<Duration>(FromPoint{seconds{t}});
     }
 };
 
-using Duration = UnixClock::duration;
-using Time = UnixClock::time_point;
-using Seconds = std::chrono::seconds;
-using Millis = std::chrono::milliseconds;
-using Micros = std::chrono::microseconds;
-using Nanos = std::chrono::nanoseconds;
+using MonoTime = MonoClock::time_point;
+using WallTime = WallClock::time_point;
 
-SWIRLY_API Time get_time() noexcept;
-SWIRLY_API std::ostream& operator<<(std::ostream& os, Time time);
-
-inline UnixClock::time_point UnixClock::now() noexcept
-{
-    return get_time();
-}
+SWIRLY_API std::ostream& operator<<(std::ostream& os, WallTime t);
 
 template <typename RepT, typename PeriodT>
 constexpr bool is_zero(std::chrono::duration<RepT, PeriodT> d) noexcept
@@ -83,55 +105,61 @@ constexpr bool is_zero(std::chrono::duration<RepT, PeriodT> d) noexcept
     return d == decltype(d){};
 }
 
-constexpr bool is_zero(Time time) noexcept
+template <typename ClockT>
+constexpr bool is_zero(std::chrono::time_point<ClockT, Duration> t) noexcept
 {
-    return time == Time{};
+    return t == decltype(t){};
 }
 
-template <typename DurationT>
-constexpr DurationT time_since_epoch(Time time) noexcept
+template <typename ClockT, typename DurationT>
+constexpr DurationT time_since_epoch(std::chrono::time_point<ClockT, Duration> t) noexcept
 {
     using namespace std::chrono;
-    const Duration d{time.time_since_epoch()};
+    const Duration d{t.time_since_epoch()};
     return duration_cast<DurationT>(d);
 }
 
-constexpr std::int64_t ms_since_epoch(Time time) noexcept
+template <typename ClockT>
+constexpr std::int64_t ms_since_epoch(std::chrono::time_point<ClockT, Duration> t) noexcept
 {
     using namespace std::chrono;
-    return time_since_epoch<milliseconds>(time).count();
+    return time_since_epoch<ClockT, milliseconds>(t).count();
 }
 
-constexpr std::int64_t us_since_epoch(Time time) noexcept
+template <typename ClockT>
+constexpr std::int64_t us_since_epoch(std::chrono::time_point<ClockT, Duration> t) noexcept
 {
     using namespace std::chrono;
-    return time_since_epoch<microseconds>(time).count();
+    return time_since_epoch<ClockT, microseconds>(t).count();
 }
 
-constexpr std::int64_t ns_since_epoch(Time time) noexcept
+template <typename ClockT>
+constexpr std::int64_t ns_since_epoch(std::chrono::time_point<ClockT, Duration> t) noexcept
 {
     using namespace std::chrono;
-    const nanoseconds ns{time.time_since_epoch()};
+    const nanoseconds ns{t.time_since_epoch()};
     return ns.count();
 }
 
-template <typename RepT, typename PeriodT>
-constexpr Time to_time(std::chrono::duration<RepT, PeriodT> d) noexcept
+template <typename ClockT, typename RepT, typename PeriodT>
+constexpr auto to_time(std::chrono::duration<RepT, PeriodT> d) noexcept
 {
     using namespace std::chrono;
-    return Time{duration_cast<Duration>(d)};
+    return std::chrono::time_point<ClockT, Duration>{duration_cast<Duration>(d)};
 }
 
-constexpr Time to_time(timeval tv) noexcept
+template <typename ClockT>
+constexpr auto to_time(timeval tv) noexcept
 {
     using namespace std::chrono;
-    return to_time(seconds{tv.tv_sec} + microseconds{tv.tv_usec});
+    return to_time<ClockT>(seconds{tv.tv_sec} + microseconds{tv.tv_usec});
 }
 
-constexpr Time to_time(timespec ts) noexcept
+template <typename ClockT>
+constexpr auto to_time(timespec ts) noexcept
 {
     using namespace std::chrono;
-    return to_time(seconds{ts.tv_sec} + nanoseconds{ts.tv_nsec});
+    return to_time<ClockT>(seconds{ts.tv_sec} + nanoseconds{ts.tv_nsec});
 }
 
 template <typename RepT, typename PeriodT>
@@ -142,10 +170,11 @@ constexpr timeval to_timeval(std::chrono::duration<RepT, PeriodT> d) noexcept
     return {static_cast<time_t>(us / 1'000'000L), static_cast<suseconds_t>(us % 1'000'000L)};
 }
 
-constexpr timeval to_timeval(Time t) noexcept
+template <typename ClockT>
+constexpr timeval to_timeval(std::chrono::time_point<ClockT, Duration> t) noexcept
 {
     using namespace std::chrono;
-    return to_timeval(time_since_epoch<microseconds>(t));
+    return to_timeval(time_since_epoch<ClockT, microseconds>(t));
 }
 
 template <typename RepT, typename PeriodT>
@@ -156,43 +185,44 @@ constexpr timespec to_timespec(std::chrono::duration<RepT, PeriodT> d) noexcept
     return {static_cast<time_t>(ns / 1'000'000'000L), static_cast<long>(ns % 1'000'000'000L)};
 }
 
-constexpr timespec to_timespec(Time t) noexcept
+template <typename ClockT>
+constexpr timespec to_timespec(std::chrono::time_point<ClockT, Duration> t) noexcept
 {
     using namespace std::chrono;
-    return to_timespec(time_since_epoch<nanoseconds>(t));
+    return to_timespec(time_since_epoch<ClockT, nanoseconds>(t));
 }
 
 template <typename DurationT>
 struct PutTime {
-    Time time;
+    WallTime time;
     const char* fmt;
 };
 
 template <typename DurationT = Seconds>
-auto put_time(Time time, const char* fmt)
+auto put_time(WallTime t, const char* fmt)
 {
-    return PutTime<DurationT>{time, fmt};
+    return PutTime<DurationT>{t, fmt};
 }
 
 template <typename DurationT>
 std::ostream& operator<<(std::ostream& os, PutTime<DurationT> pt)
 {
-    const auto t = UnixClock::to_time_t(pt.time);
+    const auto t = WallClock::to_time_t(pt.time);
     struct tm gmt;
     os << std::put_time(gmtime_r(&t, &gmt), pt.fmt);
 
     if constexpr (std::is_same_v<DurationT, Nanos>) {
-        const auto ns = ns_since_epoch(pt.time);
+        const auto ns = ns_since_epoch<WallClock>(pt.time);
         boost::io::ios_fill_saver ifs{os};
         boost::io::ios_width_saver iws{os};
         os << '.' << std::setfill('0') << std::setw(9) << (ns % 1'000'000'000L);
     } else if constexpr (std::is_same_v<DurationT, Micros>) {
-        const auto us = us_since_epoch(pt.time);
+        const auto us = us_since_epoch<WallClock>(pt.time);
         boost::io::ios_fill_saver ifs{os};
         boost::io::ios_width_saver iws{os};
         os << '.' << std::setfill('0') << std::setw(6) << (us % 1'000'000L);
     } else if constexpr (std::is_same_v<DurationT, Millis>) {
-        const auto ms = ms_since_epoch(pt.time);
+        const auto ms = ms_since_epoch<WallClock>(pt.time);
         boost::io::ios_fill_saver ifs{os};
         boost::io::ios_width_saver iws{os};
         os << '.' << std::setfill('0') << std::setw(3) << (ms % 1'000L);
@@ -287,10 +317,10 @@ struct TypeTraits<std::chrono::duration<RepT, PeriodT>> {
 };
 
 template <>
-struct TypeTraits<Time> {
+struct TypeTraits<WallTime> {
     static auto from_string(std::string_view sv) noexcept
     {
-        return to_time(TypeTraits<Millis>::from_string(sv));
+        return to_time<WallClock>(TypeTraits<Millis>::from_string(sv));
     }
     static auto from_string(const std::string& s) noexcept
     {

@@ -30,7 +30,7 @@ inline namespace fin {
 
 class SWIRLY_API Request {
   public:
-    Request(Time created, Symbol accnt, Id64 market_id, Symbol instr, JDay settl_day, Id64 id,
+    Request(WallTime created, Symbol accnt, Id64 market_id, Symbol instr, JDay settl_day, Id64 id,
             std::string_view ref, Side side, Lots lots) noexcept
     : created_{created}
     , accnt_{accnt}
@@ -65,7 +65,7 @@ class SWIRLY_API Request {
   protected:
     ~Request();
 
-    const Time created_;
+    const WallTime created_;
     /**
      * The executing accnt.
      */

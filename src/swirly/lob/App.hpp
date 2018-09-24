@@ -58,7 +58,7 @@ class SWIRLY_API LobApp {
     LobApp(LobApp&&);
     LobApp& operator=(LobApp&&);
 
-    void load(Time now, const Model& model);
+    void load(WallTime now, const Model& model);
 
     const AssetSet& assets() const noexcept;
 
@@ -72,34 +72,36 @@ class SWIRLY_API LobApp {
 
     const MarketSet& markets() const noexcept;
 
-    const Market& create_market(Time now, const Instr& instr, JDay settl_day, MarketState state);
+    const Market& create_market(WallTime now, const Instr& instr, JDay settl_day,
+                                MarketState state);
 
-    void update_market(Time now, const Market& market, MarketState state);
+    void update_market(WallTime now, const Market& market, MarketState state);
 
-    void create_order(Time now, const Sess& sess, const Market& market, std::string_view ref,
+    void create_order(WallTime now, const Sess& sess, const Market& market, std::string_view ref,
                       Side side, Lots lots, Ticks ticks, Lots min_lots, Response& resp);
 
-    void revise_order(Time now, const Sess& sess, const Market& market, const Order& order,
+    void revise_order(WallTime now, const Sess& sess, const Market& market, const Order& order,
                       Lots lots, Response& resp);
 
-    void revise_order(Time now, const Sess& sess, const Market& market, Id64 id, Lots lots,
+    void revise_order(WallTime now, const Sess& sess, const Market& market, Id64 id, Lots lots,
                       Response& resp);
 
-    void revise_order(Time now, const Sess& sess, const Market& market, std::string_view ref,
+    void revise_order(WallTime now, const Sess& sess, const Market& market, std::string_view ref,
                       Lots lots, Response& resp);
 
-    void revise_order(Time now, const Sess& sess, const Market& market, ArrayView<Id64> ids,
+    void revise_order(WallTime now, const Sess& sess, const Market& market, ArrayView<Id64> ids,
                       Lots lots, Response& resp);
 
-    void cancel_order(Time now, const Sess& sess, const Market& market, const Order& order,
+    void cancel_order(WallTime now, const Sess& sess, const Market& market, const Order& order,
                       Response& resp);
 
-    void cancel_order(Time now, const Sess& sess, const Market& market, Id64 id, Response& resp);
-
-    void cancel_order(Time now, const Sess& sess, const Market& market, std::string_view ref,
+    void cancel_order(WallTime now, const Sess& sess, const Market& market, Id64 id,
                       Response& resp);
 
-    void cancel_order(Time now, const Sess& sess, const Market& market, ArrayView<Id64> ids,
+    void cancel_order(WallTime now, const Sess& sess, const Market& market, std::string_view ref,
+                      Response& resp);
+
+    void cancel_order(WallTime now, const Sess& sess, const Market& market, ArrayView<Id64> ids,
                       Response& resp);
 
     /**
@@ -110,18 +112,19 @@ class SWIRLY_API LobApp {
      * @param now
      *            The current time.
      */
-    void cancel_order(Time now, const Sess& sess);
+    void cancel_order(WallTime now, const Sess& sess);
 
-    void cancel_order(Time now, const Market& market);
+    void cancel_order(WallTime now, const Market& market);
 
-    TradePair create_trade(Time now, const Sess& sess, const Market& market, std::string_view ref,
-                           Side side, Lots lots, Ticks ticks, LiqInd liq_ind, Symbol cpty);
+    TradePair create_trade(WallTime now, const Sess& sess, const Market& market,
+                           std::string_view ref, Side side, Lots lots, Ticks ticks, LiqInd liq_ind,
+                           Symbol cpty);
 
-    void archive_trade(Time now, const Sess& sess, const Exec& trade);
+    void archive_trade(WallTime now, const Sess& sess, const Exec& trade);
 
-    void archive_trade(Time now, const Sess& sess, Id64 market_id, Id64 id);
+    void archive_trade(WallTime now, const Sess& sess, Id64 market_id, Id64 id);
 
-    void archive_trade(Time now, const Sess& sess, Id64 market_id, ArrayView<Id64> ids);
+    void archive_trade(WallTime now, const Sess& sess, Id64 market_id, ArrayView<Id64> ids);
 
     /**
      * This method may partially fail.
@@ -129,9 +132,9 @@ class SWIRLY_API LobApp {
      * @param now
      *            The current time.
      */
-    void expire_end_of_day(Time now);
+    void expire_end_of_day(WallTime now);
 
-    void settl_end_of_day(Time now);
+    void settl_end_of_day(WallTime now);
 
   private:
     struct Impl;

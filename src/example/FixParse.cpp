@@ -32,7 +32,7 @@ namespace {
 
 class FixParser : public BasicFixParser<FixParser> {
   public:
-    void on_message(Time now, string_view msg, size_t msg_type_off, Version ver)
+    void on_message(WallTime now, string_view msg, size_t msg_type_off, Version ver)
     {
         FixLexer lex{msg};
         while (!lex.empty()) {
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
                 break;
             }
             buf.commit(n);
-            buf.consume(p.parse(UnixClock::now(), buf.data()));
+            buf.consume(p.parse(WallClock::now(), buf.data()));
         }
 
         ret = 0;

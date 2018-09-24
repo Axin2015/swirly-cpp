@@ -147,13 +147,13 @@ constexpr JDay tjd_to_jd(std::int32_t tjd) noexcept
 /**
  * Julian day to Unix time.
  */
-constexpr Time jd_to_time(JDay jd) noexcept
+constexpr WallTime jd_to_time(JDay jd) noexcept
 {
     // Julian day for January 1st, 1970.
     const JDay jd_unix_epoc = 2440588_jd;
     const std::int64_t ms_in_day = 24 * 60 * 60 * 1000;
     // Add half day for 12pm.
-    return to_time(Millis{(jd - jd_unix_epoc).count() * ms_in_day + (ms_in_day >> 1)});
+    return to_time<WallClock>(Millis{(jd - jd_unix_epoc).count() * ms_in_day + (ms_in_day >> 1)});
 }
 
 /**
@@ -201,14 +201,14 @@ static_assert(parse_date("20180117") == 20180117_ymd);
  * 01-12, DD = 01-31, HH = 00-23, MM = 00-59, SS = 00-5960 (60 only if UTC leap second), sss=000-999
  * (indicating milliseconds).
  */
-constexpr Result<Time> parse_time(std::string_view sv) noexcept
+constexpr Result<WallTime> parse_time(std::string_view sv) noexcept
 {
     if (sv.size() < 8) {
         // Date part is too short.
         return {};
     }
     const IsoDate d{parse_date(sv.substr(0, 8))};
-    Time dt{};
+    WallTime dt{};
     if (d != 0_ymd) {
         // Julian days start at noon.
         dt = jd_to_time(iso_to_jd(d)) - 12h;

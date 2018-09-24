@@ -32,7 +32,7 @@ inline namespace sys {
 
 class Timer;
 class TimerQueue;
-using TimerSlot = BasicSlot<Time, Timer&>;
+using TimerSlot = BasicSlot<WallTime, Timer&>;
 
 class SWIRLY_API Timer {
 
@@ -46,7 +46,7 @@ class SWIRLY_API Timer {
         };
         int ref_count;
         long id;
-        Time expiry;
+        WallTime expiry;
         Duration interval;
         TimerSlot slot;
     };
@@ -76,7 +76,7 @@ class SWIRLY_API Timer {
     long id() const noexcept { return impl_ ? impl_->id : 0; }
     bool pending() const noexcept { return impl_ != nullptr && bool{impl_->slot}; }
 
-    Time expiry() const noexcept { return impl_->expiry; }
+    WallTime expiry() const noexcept { return impl_->expiry; }
     Duration interval() const noexcept { return impl_->interval; }
     /**
      * Setting the interval will not reschedule any pending timer.
@@ -92,7 +92,7 @@ class SWIRLY_API Timer {
     void cancel() noexcept;
 
   private:
-    void set_expiry(Time expiry) noexcept { impl_->expiry = expiry; }
+    void set_expiry(WallTime expiry) noexcept { impl_->expiry = expiry; }
     TimerSlot& slot() noexcept { return impl_->slot; }
 
     boost::intrusive_ptr<Timer::Impl> impl_;
@@ -172,22 +172,22 @@ class SWIRLY_API TimerQueue {
     /**
      * Throws std::bad_alloc only.
      */
-    [[nodiscard]] Timer insert(Time expiry, Duration interval, TimerSlot slot);
+    [[nodiscard]] Timer insert(WallTime expiry, Duration interval, TimerSlot slot);
     /**
      * Throws std::bad_alloc only.
      */
-    [[nodiscard]] Timer insert(Time expiry, TimerSlot slot)
+    [[nodiscard]] Timer insert(WallTime expiry, TimerSlot slot)
     {
         return insert(expiry, Duration::zero(), slot);
     }
     // clang-format on
 
-    int dispatch(Time now);
+    int dispatch(WallTime now);
 
   private:
-    Timer alloc(Time expiry, Duration interval, TimerSlot slot);
+    Timer alloc(WallTime expiry, Duration interval, TimerSlot slot);
     void cancel() noexcept;
-    void expire(Time now);
+    void expire(WallTime now);
     void gc() noexcept;
     Timer pop() noexcept;
 
