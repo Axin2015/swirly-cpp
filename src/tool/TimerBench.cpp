@@ -14,6 +14,9 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
+#include <swirly/hdr/Histogram.hpp>
+#include <swirly/hdr/Recorder.hpp>
+
 #include <swirly/sys/EpollReactor.hpp>
 
 #include <swirly/util/Log.hpp>
@@ -45,19 +48,28 @@ int main(int argc, char* argv[])
         EpollReactor r{1024};
         Timer ts[128];
 
+        Histogram replace_hist{1, 1'000'000, 5};
+        Histogram reset_hist{1, 1'000'000, 5};
+
         auto h = make_intrusive<TimerHandler>();
         for (int i{0}; i < 5000000; ++i) {
             const auto now = WallClock::now();
             auto& t = ts[dis(gen) % 128];
             if (t && dis(gen) % 2 == 0) {
+                Recorder tr{reset_hist};
                 t = {};
             } else {
-                t = r.timer(now + Micros{dis(gen) % 100}, Priority::High,
-                            bind<&TimerHandler::on_timer>(h.get()));
+                const auto expiry = now + Micros{dis(gen) % 100};
+                Recorder tr{replace_hist};
+                t = r.timer(expiry, Priority::High, bind<&TimerHandler::on_timer>(h.get()));
             }
             r.poll(0ms);
         }
+
+        replace_hist.percentiles_print("timer-replace.hdr", 5, 1000);
+        reset_hist.percentiles_print("timer-reset.hdr", 5, 1000);
         ret = 0;
+
     } catch (const exception& e) {
         SWIRLY_ERROR << "exception: " << e.what();
     }

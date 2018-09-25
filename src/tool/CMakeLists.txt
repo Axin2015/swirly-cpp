@@ -49,7 +49,7 @@ target_link_libraries(swirly-queue-bench ${swirly_hdr_LIBRARY} ${swirly_app_LIBR
 install(TARGETS swirly-queue-bench DESTINATION bin COMPONENT program)
 
 add_executable(swirly-timer-bench TimerBench.cpp)
-target_link_libraries(swirly-timer-bench ${swirly_sys_LIBRARY})
+target_link_libraries(swirly-timer-bench ${swirly_hdr_LIBRARY} ${swirly_sys_LIBRARY})
 install(TARGETS swirly-timer-bench DESTINATION bin COMPONENT program)
 
 add_custom_target(queue-benchmark DEPENDS

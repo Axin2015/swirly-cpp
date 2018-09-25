@@ -1,3 +1,4 @@
 *:*/HdrHistogram_c/src/*
 cppcheckError:*/src/swirly/util/IntTypes.ut.cpp
 preprocessorErrorDirective:*/src/swirlyui/swirlyui_autogen/*/moc_AssetView.cpp
+returnAddressOfAutoVariable:*/src/swirly/sys/Timer.cpp

@@ -150,7 +150,8 @@ class SWIRLY_API Reactor {
     /**
      * Throws std::bad_alloc only.
      */
-    virtual Timer do_timer(WallTime expiry, Duration interval, Priority priority, TimerSlot slot) = 0;
+    virtual Timer do_timer(WallTime expiry, Duration interval, Priority priority, TimerSlot slot)
+        = 0;
     /**
      * Throws std::bad_alloc only.
      */

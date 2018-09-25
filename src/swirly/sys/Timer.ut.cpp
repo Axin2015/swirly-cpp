@@ -52,7 +52,8 @@ BOOST_AUTO_TEST_CASE(TimerEmptyCase)
 BOOST_AUTO_TEST_CASE(TimerInsertCase)
 {
     const auto now = WallClock::now();
-    TimerQueue tq;
+    TimerPool tp;
+    TimerQueue tq{tp};
 
     auto fn = [](WallTime now, Timer& tmr) {};
     Timer t = tq.insert(now + 2s, bind(&fn));

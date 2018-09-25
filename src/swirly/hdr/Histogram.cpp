@@ -58,7 +58,7 @@ void Histogram::percentiles_print(FILE* stream, int32_t ticks_per_half_distance,
 void Histogram::percentiles_print(const char* path, int32_t ticks_per_half_distance,
                                   double value_scale, format_type format) const
 {
-    auto fp = open_file(path, "w");
+    const auto fp = open_file(path, "w");
     percentiles_print(fp.get(), ticks_per_half_distance, value_scale, format);
 }
 

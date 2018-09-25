@@ -76,7 +76,8 @@ class SWIRLY_API EpollReactor : public Reactor {
     EventFd efd_{0, EFD_NONBLOCK};
     static_assert(static_cast<int>(Priority::High) == 0);
     static_assert(static_cast<int>(Priority::Low) == 1);
-    std::array<TimerQueue, 2> tqs_;
+    TimerPool tp_;
+    std::array<TimerQueue, 2> tqs_{tp_, tp_};
 };
 
 } // namespace sys
