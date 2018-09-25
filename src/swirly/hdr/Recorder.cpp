@@ -21,11 +21,24 @@
 namespace swirly {
 inline namespace hdr {
 using namespace std;
+
+Recorder::Recorder(Histogram& hist, int count) noexcept
+: hist_(hist)
+, count_{count}
+, start_{std::chrono::high_resolution_clock::now()}
+{
+    assert(count >= 1);
+}
+
 Recorder::~Recorder()
 {
     const auto end = chrono::high_resolution_clock::now();
     const auto diff = chrono::duration_cast<chrono::nanoseconds>(end - start_);
-    hist_.record_value(diff.count());
+    if (count_ > 1) {
+        hist_.record_values(diff.count() / count_, count_);
+    } else {
+        hist_.record_value(diff.count());
+    }
 }
 } // namespace hdr
 } // namespace swirly

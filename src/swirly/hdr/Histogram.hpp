@@ -21,6 +21,7 @@
 
 #include <hdr_histogram.h>
 
+#include <cassert>
 #include <cstdio>
 
 namespace swirly {
@@ -70,6 +71,66 @@ class SWIRLY_API Histogram {
     void swap(Histogram& rhs) noexcept { ptr_.swap(rhs.ptr_); }
 
     /**
+     * Get minimum value from the histogram. Will return 2^63-1 if the histogram is empty.
+     */
+    std::int64_t min() const noexcept
+    {
+        assert(ptr_);
+        return hdr_min(ptr_.get());
+    }
+
+    /**
+     * Get maximum value from the histogram. Will return 0 if the histogram is empty.
+     */
+    std::int64_t max() const noexcept
+    {
+        assert(ptr_);
+        return hdr_max(ptr_.get());
+    }
+
+    /**
+     * Get the value at a specific percentile.
+     */
+    std::int64_t value_at_percentile(double percentile) const noexcept
+    {
+        assert(ptr_);
+        return hdr_value_at_percentile(ptr_.get(), percentile);
+    }
+
+    /**
+     * Gets the standard deviation for the values in the histogram.
+     */
+    double stddev() const noexcept
+    {
+        assert(ptr_);
+        return hdr_stddev(ptr_.get());
+    }
+
+    /**
+     * Gets the mean for the values in the histogram.
+     */
+    double mean() const noexcept
+    {
+        assert(ptr_);
+        return hdr_mean(ptr_.get());
+    }
+
+    /**
+     * Get the count of recorded values at a specific value (to within the histogram resolution at
+     * the value level).
+     *
+     * @param value The value for which to provide the recorded count.
+     *
+     * @return The total count of values recorded in the histogram within the value range that is
+     * lowestEquivalentValue <= value <= highestEquivalentValue.
+     */
+    std::int64_t count_at_value(std::int64_t value) const noexcept
+    {
+        assert(ptr_);
+        return hdr_count_at_value(ptr_.get(), value);
+    }
+
+    /**
      * Print out a percentile based histogram to the supplied stream. Note that this call will not
      * flush the FILE, this is left up to the user.
      *
@@ -110,14 +171,35 @@ class SWIRLY_API Histogram {
 
     /**
      * Records a value in the histogram, will round this value of to a precision at or better than
-     * the "significant figures" specified at construction time.
+     * the significant_figure specified at construction time.
      *
      * @param value Value to add to the histogram.
      *
-     * @return false if the value is larger than the "highest trackable value" and can't be
-     * recorded.
+     * @return false if the value is larger than the highest_trackable_value and can't be recorded,
+     * true otherwise.
      */
-    bool record_value(std::int64_t value) noexcept { return hdr_record_value(ptr_.get(), value); }
+    bool record_value(std::int64_t value) noexcept
+    {
+        assert(ptr_);
+        return hdr_record_value(ptr_.get(), value);
+    }
+
+    /**
+     * Records count values in the histogram, will round this value of to a precision at or better
+     * than the significant_figure specified at construction time.
+     *
+     * @param value Value to add to the histogram.
+     *
+     * @param count Number of 'value's to add to the histogram.
+     *
+     * @return false if any value is larger than the highest_trackable_value and can't be recorded,
+     * true otherwise.
+     */
+    bool record_values(std::int64_t value, std::int64_t count) noexcept
+    {
+        assert(ptr_);
+        return hdr_record_values(ptr_.get(), value, count);
+    }
 
     void write(WallTime start_time, WallTime end_time, LogWriter& writer);
 
