@@ -134,7 +134,10 @@ int EpollReactor::do_poll(WallTime now, Duration timeout)
         }
         return 0;
     }
-    now = WallClock::now();
+    // If the muxer call was a blocking call, then acquire the current time.
+    if (!is_zero(wait_until)) {
+        now = WallClock::now();
+    }
     const auto n = tqs_[High].dispatch(now) + dispatch(now, buf, ret);
     // Low priority timers are only dispatched during empty cycles.
     return n == 0 ? tqs_[Low].dispatch(now) : n;
