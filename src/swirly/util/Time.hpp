@@ -37,9 +37,11 @@ using Seconds = std::chrono::seconds;
 using Millis = std::chrono::milliseconds;
 using Micros = std::chrono::microseconds;
 using Nanos = std::chrono::nanoseconds;
+
+using NanoTime = Nanos;
 using Duration = Nanos;
 
-SWIRLY_API Nanos get_time(clockid_t clock_id) noexcept;
+SWIRLY_API NanoTime get_time(clockid_t clock_id) noexcept;
 
 struct MonoClock {
     using duration = Duration;

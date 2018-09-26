@@ -22,11 +22,11 @@ using namespace std;
 
 SWIRLY_WEAK Nanos get_time(clockid_t clock_id) noexcept;
 
-Nanos get_time(clockid_t clock_id) noexcept
+NanoTime get_time(clockid_t clock_id) noexcept
 {
     timespec ts;
     clock_gettime(clock_id, &ts);
-    return Nanos{ts.tv_sec * 1'000'000'000L + ts.tv_nsec};
+    return NanoTime{ts.tv_sec * 1'000'000'000L + ts.tv_nsec};
 }
 
 ostream& operator<<(ostream& os, WallTime t)

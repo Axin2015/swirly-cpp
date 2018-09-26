@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
         Opts opts;
         get_opts(argc, argv, opts);
 
-        if (opts.start_time == WallTime{}) {
+        if (is_zero(opts.start_time)) {
             opts.start_time = WallClock::now();
         }
 
