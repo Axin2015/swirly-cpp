@@ -37,6 +37,32 @@ bool is_after(const Timer& lhs, const Timer& rhs)
 
 } // namespace
 
+Timer::Impl* TimerPool::alloc(WallTime expiry, Duration interval, TimerSlot slot)
+{
+    Timer::Impl* impl;
+
+    if (free_) {
+
+        // Pop next free timer from stack.
+        impl = free_;
+        free_ = free_->next;
+
+    } else {
+
+        // Add new slab of timers to stack.
+        SlabPtr slab{new Timer::Impl[SlabSize]};
+        impl = &slab[0];
+
+        for (size_t i{1}; i < SlabSize; ++i) {
+            slab[i].next = free_;
+            free_ = &slab[i];
+        }
+        slabs_.push_back(move(slab));
+    }
+
+    return impl;
+}
+
 Timer TimerQueue::insert(WallTime expiry, Duration interval, TimerSlot slot)
 {
     assert(slot);
@@ -74,26 +100,7 @@ int TimerQueue::dispatch(WallTime now)
 
 Timer TimerQueue::alloc(WallTime expiry, Duration interval, TimerSlot slot)
 {
-    Timer::Impl* impl;
-
-    if (free_) {
-
-        // Pop next free timer from stack.
-        impl = free_;
-        free_ = free_->next;
-
-    } else {
-
-        // Add new slab of timers to stack.
-        SlabPtr slab{new Timer::Impl[SlabSize]};
-        impl = &slab[0];
-
-        for (size_t i{1}; i < SlabSize; ++i) {
-            slab[i].next = free_;
-            free_ = &slab[i];
-        }
-        slabs_.push_back(move(slab));
-    }
+    Timer::Impl* impl{pool_.alloc(expiry, interval, slot)};
 
     impl->tq = this;
     impl->ref_count = 1;
@@ -185,9 +192,7 @@ void intrusive_ptr_release(Timer::Impl* impl) noexcept
             impl->tq->cancel();
         }
     } else if (impl->ref_count == 0) {
-        auto& tq = *impl->tq;
-        impl->next = tq.free_;
-        tq.free_ = impl;
+        impl->tq->pool_.dealloc(impl);
     }
 }
 

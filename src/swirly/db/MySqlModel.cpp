@@ -129,13 +129,13 @@ void MySqlModel::do_read_market(const ModelCallback<MarketPtr>& cb) const
 
     bind_result(*stmt, &result[0]);
     while (fetch(*stmt)) {
-        cb(Market::make(Id64{id.value()},                        //
-                        instr.value(),                           //
-                        JDay{settl_day.value()},                 //
-                        static_cast<MarketState>(state.value()), //
-                        to_time<WallClock>(Nanos{last_time.value()}),       //
-                        Lots{last_lots.value()},                 //
-                        Ticks{last_ticks.value()},               //
+        cb(Market::make(Id64{id.value()},                             //
+                        instr.value(),                                //
+                        JDay{settl_day.value()},                      //
+                        static_cast<MarketState>(state.value()),      //
+                        to_time<WallClock>(Nanos{last_time.value()}), //
+                        Lots{last_lots.value()},                      //
+                        Ticks{last_ticks.value()},                    //
                         Id64{max_id.value()}));
     }
 }
@@ -170,23 +170,23 @@ void MySqlModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
 
     bind_result(*stmt, &result[0]);
     while (fetch(*stmt)) {
-        cb(Order::make(to_time<WallClock>(Nanos{created.value()}),   //
-                       to_time<WallClock>(Nanos{modified.value()}),  //
-                       accnt.value(),                     //
-                       Id64{market_id.value()},           //
-                       instr.value(),                     //
-                       JDay{settl_day.value()},           //
-                       Id64{id.value()},                  //
-                       ref.value(),                       //
-                       swirly::State{state.value()},      //
-                       swirly::Side{side.value()},        //
-                       swirly::Lots{lots.value()},        //
-                       swirly::Ticks{ticks.value()},      //
-                       swirly::Lots{resd_lots.value()},   //
-                       swirly::Lots{exec_lots.value()},   //
-                       swirly::Cost{exec_cost.value()},   //
-                       swirly::Lots{last_lots.value()},   //
-                       swirly::Ticks{last_ticks.value()}, //
+        cb(Order::make(to_time<WallClock>(Nanos{created.value()}),  //
+                       to_time<WallClock>(Nanos{modified.value()}), //
+                       accnt.value(),                               //
+                       Id64{market_id.value()},                     //
+                       instr.value(),                               //
+                       JDay{settl_day.value()},                     //
+                       Id64{id.value()},                            //
+                       ref.value(),                                 //
+                       swirly::State{state.value()},                //
+                       swirly::Side{side.value()},                  //
+                       swirly::Lots{lots.value()},                  //
+                       swirly::Ticks{ticks.value()},                //
+                       swirly::Lots{resd_lots.value()},             //
+                       swirly::Lots{exec_lots.value()},             //
+                       swirly::Cost{exec_cost.value()},             //
+                       swirly::Lots{last_lots.value()},             //
+                       swirly::Ticks{last_ticks.value()},           //
                        swirly::Lots{min_lots.value()}));
     }
 }
@@ -232,28 +232,28 @@ void MySqlModel::do_read_exec(WallTime since, const ModelCallback<ExecPtr>& cb) 
 
     bind_result(*stmt, &result[0]);
     while (fetch(*stmt)) {
-        cb(Exec::make(to_time<WallClock>(Nanos{created.value()}),   //
-                      accnt.value(),                     //
-                      Id64{market_id.value()},           //
-                      instr.value(),                     //
-                      JDay{settl_day.value()},           //
-                      Id64{id.value()},                  //
-                      Id64{order_id.value()},            //
-                      ref.value(),                       //
-                      swirly::State{state.value()},      //
-                      swirly::Side{side.value()},        //
-                      swirly::Lots{lots.value()},        //
-                      swirly::Ticks{ticks.value()},      //
-                      swirly::Lots{resd_lots.value()},   //
-                      swirly::Lots{exec_lots.value()},   //
-                      swirly::Cost{exec_cost.value()},   //
-                      swirly::Lots{last_lots.value()},   //
-                      swirly::Ticks{last_ticks.value()}, //
-                      swirly::Lots{min_lots.value()},    //
-                      Id64{match_id.value()},            //
-                      swirly::Lots{posn_lots.value()},   //
-                      swirly::Cost{posn_cost.value()},   //
-                      swirly::LiqInd{liq_ind.value()},   //
+        cb(Exec::make(to_time<WallClock>(Nanos{created.value()}), //
+                      accnt.value(),                              //
+                      Id64{market_id.value()},                    //
+                      instr.value(),                              //
+                      JDay{settl_day.value()},                    //
+                      Id64{id.value()},                           //
+                      Id64{order_id.value()},                     //
+                      ref.value(),                                //
+                      swirly::State{state.value()},               //
+                      swirly::Side{side.value()},                 //
+                      swirly::Lots{lots.value()},                 //
+                      swirly::Ticks{ticks.value()},               //
+                      swirly::Lots{resd_lots.value()},            //
+                      swirly::Lots{exec_lots.value()},            //
+                      swirly::Cost{exec_cost.value()},            //
+                      swirly::Lots{last_lots.value()},            //
+                      swirly::Ticks{last_ticks.value()},          //
+                      swirly::Lots{min_lots.value()},             //
+                      Id64{match_id.value()},                     //
+                      swirly::Lots{posn_lots.value()},            //
+                      swirly::Cost{posn_cost.value()},            //
+                      swirly::LiqInd{liq_ind.value()},            //
                       cpty.value()));
     }
 }
@@ -292,28 +292,28 @@ void MySqlModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
 
     bind_result(*stmt, &result[0]);
     while (fetch(*stmt)) {
-        cb(Exec::make(to_time<WallClock>(Nanos{created.value()}),   //
-                      accnt.value(),                     //
-                      Id64{market_id.value()},           //
-                      instr.value(),                     //
-                      JDay{settl_day.value()},           //
-                      Id64{id.value()},                  //
-                      Id64{order_id.value()},            //
-                      ref.value(),                       //
-                      State::Trade,                      //
-                      swirly::Side{side.value()},        //
-                      swirly::Lots{lots.value()},        //
-                      swirly::Ticks{ticks.value()},      //
-                      swirly::Lots{resd_lots.value()},   //
-                      swirly::Lots{exec_lots.value()},   //
-                      swirly::Cost{exec_cost.value()},   //
-                      swirly::Lots{last_lots.value()},   //
-                      swirly::Ticks{last_ticks.value()}, //
-                      swirly::Lots{min_lots.value()},    //
-                      Id64{match_id.value()},            //
-                      swirly::Lots{posn_lots.value()},   //
-                      swirly::Cost{posn_cost.value()},   //
-                      swirly::LiqInd{liq_ind.value()},   //
+        cb(Exec::make(to_time<WallClock>(Nanos{created.value()}), //
+                      accnt.value(),                              //
+                      Id64{market_id.value()},                    //
+                      instr.value(),                              //
+                      JDay{settl_day.value()},                    //
+                      Id64{id.value()},                           //
+                      Id64{order_id.value()},                     //
+                      ref.value(),                                //
+                      State::Trade,                               //
+                      swirly::Side{side.value()},                 //
+                      swirly::Lots{lots.value()},                 //
+                      swirly::Ticks{ticks.value()},               //
+                      swirly::Lots{resd_lots.value()},            //
+                      swirly::Lots{exec_lots.value()},            //
+                      swirly::Cost{exec_cost.value()},            //
+                      swirly::Lots{last_lots.value()},            //
+                      swirly::Ticks{last_ticks.value()},          //
+                      swirly::Lots{min_lots.value()},             //
+                      Id64{match_id.value()},                     //
+                      swirly::Lots{posn_lots.value()},            //
+                      swirly::Cost{posn_cost.value()},            //
+                      swirly::LiqInd{liq_ind.value()},            //
                       cpty.value()));
     }
 }

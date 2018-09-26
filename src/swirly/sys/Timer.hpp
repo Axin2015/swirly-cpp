@@ -35,7 +35,9 @@ class TimerQueue;
 using TimerSlot = BasicSlot<WallTime, Timer&>;
 
 class SWIRLY_API Timer {
+    friend class TimerQueue;
 
+  public:
     struct Impl {
         union {
             /**
@@ -50,16 +52,11 @@ class SWIRLY_API Timer {
         Duration interval;
         TimerSlot slot;
     };
-    friend class TimerQueue;
-    friend void intrusive_ptr_add_ref(Impl* impl) noexcept;
-    friend void intrusive_ptr_release(Impl* impl) noexcept;
 
     explicit Timer(Impl* impl)
     : impl_{impl, false}
     {
     }
-
-  public:
     Timer(std::nullptr_t = nullptr) noexcept {}
     ~Timer() = default;
 
@@ -146,6 +143,40 @@ inline bool operator>=(const Timer& lhs, const Timer& rhs) noexcept
     return lhs.id() >= rhs.id();
 }
 
+class SWIRLY_API TimerPool {
+    using SlabPtr = std::unique_ptr<Timer::Impl[]>;
+
+  public:
+    TimerPool() = default;
+
+    // Copy.
+    TimerPool(const TimerPool&) = delete;
+    TimerPool& operator=(const TimerPool&) = delete;
+
+    // Move.
+    TimerPool(TimerPool&&) = delete;
+    TimerPool& operator=(TimerPool&&) = delete;
+
+    Timer::Impl* alloc(WallTime expiry, Duration interval, TimerSlot slot);
+    void dealloc(Timer::Impl* impl) noexcept
+    {
+        assert(impl);
+        impl->next = free_;
+        free_ = impl;
+    }
+
+  private:
+    std::vector<SlabPtr> slabs_;
+    /**
+     * Head of free-list.
+     */
+    Timer::Impl* free_{nullptr};
+    /**
+     * Heap of timers ordered by expiry time.
+     */
+    std::vector<Timer> heap_;
+};
+
 class SWIRLY_API TimerQueue {
     friend class Timer;
     friend void intrusive_ptr_add_ref(Timer::Impl*) noexcept;
@@ -154,7 +185,14 @@ class SWIRLY_API TimerQueue {
     using SlabPtr = std::unique_ptr<Timer::Impl[]>;
 
   public:
-    TimerQueue() = default;
+    /**
+     * Implicit conversion from pool is allowed, so that TimerQueue arrays can be aggregate
+     * initialised.
+     */
+    TimerQueue(TimerPool& pool)
+    : pool_(pool)
+    {
+    }
 
     // Copy.
     TimerQueue(const TimerQueue&) = delete;
@@ -191,13 +229,9 @@ class SWIRLY_API TimerQueue {
     void gc() noexcept;
     Timer pop() noexcept;
 
+    TimerPool& pool_;
     long max_id_{};
     int cancelled_{};
-    std::vector<SlabPtr> slabs_;
-    /**
-     * Head of free-list.
-     */
-    Timer::Impl* free_{nullptr};
     /**
      * Heap of timers ordered by expiry time.
      */

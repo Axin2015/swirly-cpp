@@ -14,7 +14,6 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/hdr/File.hpp>
 #include <swirly/hdr/Histogram.hpp>
 #include <swirly/hdr/Recorder.hpp>
 
@@ -165,51 +164,48 @@ int main(int argc, char* argv[])
         auto& marayl = app.sess("MARAYL"sv);
         auto& pipayl = app.sess("PIPAYL"sv);
 
-        Histogram maker{1, 1'000'000, 5};
-        Histogram taker{1, 1'000'000, 5};
+        Histogram maker_hist{1, 1'000'000, 5};
+        Histogram taker_hist{1, 1'000'000, 5};
 
         Archiver arch{app};
         Response resp;
-
-        auto maker_fh = open_file("maker.hdr", "w+");
-        auto taker_fh = open_file("taker.hdr", "w+");
 
         for (int i = 0; i < 1'001'000; ++i) {
 
             // Reset profiles after warmup period.
             if (i == 1000) {
-                maker.clear();
-                taker.clear();
+                maker_hist.clear();
+                taker_hist.clear();
             }
 
             // Maker sell-side.
             {
                 resp.clear();
-                Recorder tr{maker};
+                Recorder tr{maker_hist};
                 app.create_order(start_time, gosayl, market, ""sv, Side::Sell, 10_lts, 12348_tks,
                                  1_lts, resp);
             }
             {
                 resp.clear();
-                Recorder tr{maker};
+                Recorder tr{maker_hist};
                 app.create_order(start_time, marayl, market, ""sv, Side::Sell, 10_lts, 12348_tks,
                                  1_lts, resp);
             }
             {
                 resp.clear();
-                Recorder tr{maker};
+                Recorder tr{maker_hist};
                 app.create_order(start_time, gosayl, market, ""sv, Side::Sell, 10_lts, 12347_tks,
                                  1_lts, resp);
             }
             {
                 resp.clear();
-                Recorder tr{maker};
+                Recorder tr{maker_hist};
                 app.create_order(start_time, marayl, market, ""sv, Side::Sell, 5_lts, 12347_tks,
                                  1_lts, resp);
             }
             {
                 resp.clear();
-                Recorder tr{maker};
+                Recorder tr{maker_hist};
                 app.create_order(start_time, gosayl, market, ""sv, Side::Sell, 5_lts, 12346_tks,
                                  1_lts, resp);
             }
@@ -217,31 +213,31 @@ int main(int argc, char* argv[])
             // Maker buy-side.
             {
                 resp.clear();
-                Recorder tr{maker};
+                Recorder tr{maker_hist};
                 app.create_order(start_time, marayl, market, ""sv, Side::Buy, 5_lts, 12344_tks,
                                  1_lts, resp);
             }
             {
                 resp.clear();
-                Recorder tr{maker};
+                Recorder tr{maker_hist};
                 app.create_order(start_time, gosayl, market, ""sv, Side::Buy, 5_lts, 12343_tks,
                                  1_lts, resp);
             }
             {
                 resp.clear();
-                Recorder tr{maker};
+                Recorder tr{maker_hist};
                 app.create_order(start_time, marayl, market, ""sv, Side::Buy, 10_lts, 12343_tks,
                                  1_lts, resp);
             }
             {
                 resp.clear();
-                Recorder tr{maker};
+                Recorder tr{maker_hist};
                 app.create_order(start_time, gosayl, market, ""sv, Side::Buy, 10_lts, 12342_tks,
                                  1_lts, resp);
             }
             {
                 resp.clear();
-                Recorder tr{maker};
+                Recorder tr{maker_hist};
                 app.create_order(start_time, marayl, market, ""sv, Side::Buy, 10_lts, 12342_tks,
                                  1_lts, resp);
             }
@@ -249,7 +245,7 @@ int main(int argc, char* argv[])
             // Taker sell-side.
             {
                 resp.clear();
-                Recorder tr{taker};
+                Recorder tr{taker_hist};
                 app.create_order(start_time, eddayl, market, ""sv, Side::Sell, 40_lts, 12342_tks,
                                  1_lts, resp);
             }
@@ -257,7 +253,7 @@ int main(int argc, char* argv[])
             // Taker buy-side.
             {
                 resp.clear();
-                Recorder tr{taker};
+                Recorder tr{taker_hist};
                 app.create_order(start_time, pipayl, market, ""sv, Side::Buy, 40_lts, 12348_tks,
                                  1_lts, resp);
             }
@@ -268,13 +264,10 @@ int main(int argc, char* argv[])
             arch(start_time, pipayl, market.id());
         }
 
-        fprintf(maker_fh.get(), "# Maker Percentile Report\n");
-        maker.percentiles_print(maker_fh.get(), 5, 1000);
-
-        fprintf(taker_fh.get(), "# Taker Percentile Report\n");
-        taker.percentiles_print(taker_fh.get(), 5, 1000);
-
+        maker_hist.percentiles_print("lob-maker.hdr", 5, 1000);
+        taker_hist.percentiles_print("lob-taker.hdr", 5, 1000);
         ret = 0;
+
     } catch (const exception& e) {
         SWIRLY_ERROR << "exception: " << e.what();
     }
