@@ -20,7 +20,7 @@ namespace swirly {
 inline namespace fix {
 using namespace std;
 
-FixAcceptor::FixAcceptor(WallTime now, Reactor& r, const Endpoint& ep, FixApp& app)
+FixAcceptor::FixAcceptor(CyclTime now, Reactor& r, const Endpoint& ep, FixApp& app)
 : TcpAcceptor{r, ep}
 , reactor_(r)
 , app_(app)
@@ -29,7 +29,7 @@ FixAcceptor::FixAcceptor(WallTime now, Reactor& r, const Endpoint& ep, FixApp& a
 
 FixAcceptor::~FixAcceptor()
 {
-    const auto now = WallClock::now();
+    const auto now = CyclTime::current();
     conn_list_.clear_and_dispose([now](auto* conn) { conn->dispose(now); });
 }
 
@@ -38,7 +38,7 @@ void FixAcceptor::insert(FixSessMap::node_type&& node)
     sess_map_.insert(move(node));
 }
 
-void FixAcceptor::do_accept(WallTime now, IoSocket&& sock, const Endpoint& ep)
+void FixAcceptor::do_accept(CyclTime now, IoSocket&& sock, const Endpoint& ep)
 {
     sock.set_non_block();
     sock.set_tcp_no_delay(true);

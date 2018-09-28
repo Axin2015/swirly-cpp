@@ -101,6 +101,48 @@ using WallTime = WallClock::time_point;
 
 SWIRLY_API std::ostream& operator<<(std::ostream& os, WallTime t);
 
+/**
+ * The "cycle-time" represents the start of a processing cycle. This could be, for example, when a
+ * thread wakes from a call to epoll_wait().
+ *
+ * Application cycles often require both wall-clock and monotonic time. (Monotonic is primarily used
+ * for interval timers.) Rather than pass wall-clock _and_ monotonic time as a parameter down
+ * through the function call-tree, these times are cached in a thread-local object.
+ *
+ * The CyclTime tag type (empty class) is designed to make the thread-local programming contract
+ * more explicit, without consuming extra registers required for parameter passing - assuming that
+ * the optimiser will optimise-away empty tag parameters.
+ */
+class SWIRLY_API CyclTime {
+  public:
+    static CyclTime current() noexcept { return {}; }
+    static CyclTime set() noexcept
+    {
+        time_ = Time::now();
+        return {}; // Empty tag.
+    }
+    /**
+     * This overload allows users to override wall-clock time.
+     */
+    static CyclTime set(WallTime wall_time) noexcept
+    {
+        time_ = Time::now(wall_time);
+        return {}; // Empty tag.
+    }
+    MonoTime mono_time() const noexcept { return time_.mono_time; }
+    WallTime wall_time() const noexcept { return time_.wall_time; }
+
+  private:
+    CyclTime() = default;
+    struct Time {
+        static Time now() noexcept { return {MonoClock::now(), WallClock::now()}; };
+        static Time now(WallTime wall_time) noexcept { return {MonoClock::now(), wall_time}; };
+        MonoTime mono_time{};
+        WallTime wall_time{};
+    };
+    static thread_local Time time_;
+};
+
 template <typename RepT, typename PeriodT>
 constexpr bool is_zero(std::chrono::duration<RepT, PeriodT> d) noexcept
 {

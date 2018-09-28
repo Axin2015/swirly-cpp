@@ -77,7 +77,7 @@ Timer TimerQueue::insert(WallTime expiry, Duration interval, TimerSlot slot)
     return tmr;
 }
 
-int TimerQueue::dispatch(WallTime now)
+int TimerQueue::dispatch(CyclTime now)
 {
     int n{};
     while (!heap_.empty()) {
@@ -87,7 +87,7 @@ int TimerQueue::dispatch(WallTime now)
             pop();
             --cancelled_;
             assert(cancelled_ >= 0);
-        } else if (heap_.front().expiry() <= now) {
+        } else if (heap_.front().expiry() <= now.wall_time()) {
             expire(now);
             ++n;
         } else {
@@ -126,7 +126,7 @@ void TimerQueue::cancel() noexcept
     gc();
 }
 
-void TimerQueue::expire(WallTime now)
+void TimerQueue::expire(CyclTime now)
 {
     // Pop timer.
     auto tmr = pop();
@@ -145,7 +145,7 @@ void TimerQueue::expire(WallTime now)
         if (tmr.interval().count() > 0) {
 
             // Add interval to expiry, while ensuring that next expiry is always in the future.
-            tmr.set_expiry(max(tmr.expiry() + tmr.interval(), now + 1ns));
+            tmr.set_expiry(max(tmr.expiry() + tmr.interval(), now.wall_time() + 1ns));
 
             // Reschedule popped timer.
             heap_.push_back(tmr);

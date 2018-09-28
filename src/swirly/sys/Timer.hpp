@@ -32,7 +32,7 @@ inline namespace sys {
 
 class Timer;
 class TimerQueue;
-using TimerSlot = BasicSlot<WallTime, Timer&>;
+using TimerSlot = BasicSlot<CyclTime, Timer&>;
 
 class SWIRLY_API Timer {
     friend class TimerQueue;
@@ -220,12 +220,12 @@ class SWIRLY_API TimerQueue {
     }
     // clang-format on
 
-    int dispatch(WallTime now);
+    int dispatch(CyclTime now);
 
   private:
     Timer alloc(WallTime expiry, Duration interval, TimerSlot slot);
     void cancel() noexcept;
-    void expire(WallTime now);
+    void expire(CyclTime now);
     void gc() noexcept;
     Timer pop() noexcept;
 

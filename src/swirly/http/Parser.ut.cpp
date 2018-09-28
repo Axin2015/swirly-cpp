@@ -63,23 +63,23 @@ class HttpParser
     using BasicHttpParser<HttpParser>::parse;
 
   private:
-    bool on_message_begin() noexcept
+    bool on_message_begin(CyclTime now) noexcept
     {
         BasicUrl<HttpParser>::reset();
         clear();
         return true;
     }
-    bool on_url(string_view sv) noexcept
+    bool on_url(CyclTime now, string_view sv) noexcept
     {
         url_.append(sv.data(), sv.size());
         return true;
     }
-    bool on_status(string_view sv) noexcept
+    bool on_status(CyclTime now, string_view sv) noexcept
     {
         status_.append(sv.data(), sv.size());
         return true;
     }
-    bool on_header_field(string_view sv, bool first) noexcept
+    bool on_header_field(CyclTime now, string_view sv, bool first) noexcept
     {
         if (first) {
             headers_.emplace_back(string{sv.data(), sv.size()}, "");
@@ -88,18 +88,18 @@ class HttpParser
         }
         return true;
     }
-    bool on_header_value(string_view sv, bool first) noexcept
+    bool on_header_value(CyclTime now, string_view sv, bool first) noexcept
     {
         headers_.back().second.append(sv.data(), sv.size());
         return true;
     }
-    bool on_headers_end() noexcept { return true; }
-    bool on_body(string_view sv) noexcept
+    bool on_headers_end(CyclTime now) noexcept { return true; }
+    bool on_body(CyclTime now, string_view sv) noexcept
     {
         body_.append(sv.data(), sv.size());
         return true;
     }
-    bool on_message_end() noexcept
+    bool on_message_end(CyclTime now) noexcept
     {
         bool ret{false};
         try {
@@ -112,8 +112,8 @@ class HttpParser
         }
         return ret;
     }
-    bool on_chunk_header(size_t len) noexcept { return true; }
-    bool on_chunk_end() noexcept { return true; }
+    bool on_chunk_header(CyclTime now, size_t len) noexcept { return true; }
+    bool on_chunk_end(CyclTime now) noexcept { return true; }
 
     string url_;
     string status_;
@@ -132,7 +132,8 @@ BOOST_AUTO_TEST_CASE(HttpInitialRequestLineCase)
         "\r\n"sv;
 
     HttpParser h{HttpType::Request};
-    BOOST_TEST(h.parse({Message.data(), Message.size()}) == Message.size());
+    const auto now = CyclTime::set();
+    BOOST_TEST(h.parse(now, {Message.data(), Message.size()}) == Message.size());
     BOOST_TEST(!h.should_keep_alive());
     BOOST_TEST(h.http_major() == 1);
     BOOST_TEST(h.http_minor() == 0);
@@ -151,7 +152,8 @@ BOOST_AUTO_TEST_CASE(HttpInitialResponseLineCase)
         "\r\n"sv;
 
     HttpParser h{HttpType::Response};
-    BOOST_TEST(h.parse({Message.data(), Message.size()}) == Message.size());
+    const auto now = CyclTime::set();
+    BOOST_TEST(h.parse(now, {Message.data(), Message.size()}) == Message.size());
     BOOST_TEST(!h.should_keep_alive());
     BOOST_TEST(h.http_major() == 1);
     BOOST_TEST(h.http_minor() == 0);
@@ -172,7 +174,8 @@ BOOST_AUTO_TEST_CASE(HttpBasicRequestCase)
         "\r\n"sv;
 
     HttpParser h{HttpType::Request};
-    BOOST_TEST(h.parse({Message.data(), Message.size()}) == Message.size());
+    const auto now = CyclTime::set();
+    BOOST_TEST(h.parse(now, {Message.data(), Message.size()}) == Message.size());
     BOOST_TEST(!h.should_keep_alive());
     BOOST_TEST(h.http_major() == 1);
     BOOST_TEST(h.http_minor() == 0);
@@ -198,7 +201,8 @@ BOOST_AUTO_TEST_CASE(HttpBasicResponseCase)
         "Hello, World!"sv;
 
     HttpParser h{HttpType::Response};
-    BOOST_TEST(h.parse({Message.data(), Message.size()}) == Message.size());
+    const auto now = CyclTime::set();
+    BOOST_TEST(h.parse(now, {Message.data(), Message.size()}) == Message.size());
     BOOST_TEST(!h.should_keep_alive());
     BOOST_TEST(h.http_major() == 1);
     BOOST_TEST(h.http_minor() == 0);
@@ -226,7 +230,8 @@ BOOST_AUTO_TEST_CASE(HttpPostRequestCase)
         "home=Cosby&favorite+flavor=flies"sv;
 
     HttpParser h{HttpType::Request};
-    BOOST_TEST(h.parse({Message.data(), Message.size()}) == Message.size());
+    const auto now = CyclTime::set();
+    BOOST_TEST(h.parse(now, {Message.data(), Message.size()}) == Message.size());
     BOOST_TEST(!h.should_keep_alive());
     BOOST_TEST(h.http_major() == 1);
     BOOST_TEST(h.http_minor() == 0);
@@ -251,7 +256,8 @@ BOOST_AUTO_TEST_CASE(HttpKeepAliveRequestCase)
         "\r\n"sv;
 
     HttpParser h{HttpType::Request};
-    BOOST_TEST(h.parse({Message.data(), Message.size()}) == Message.size());
+    const auto now = CyclTime::set();
+    BOOST_TEST(h.parse(now, {Message.data(), Message.size()}) == Message.size());
     BOOST_TEST(h.should_keep_alive());
     BOOST_TEST(h.http_major() == 1);
     BOOST_TEST(h.http_minor() == 1);
@@ -283,7 +289,8 @@ BOOST_AUTO_TEST_CASE(HttpChunkedResponseCase)
         "\r\n"sv;
 
     HttpParser h{HttpType::Response};
-    BOOST_TEST(h.parse({Message.data(), Message.size()}) == Message.size());
+    const auto now = CyclTime::set();
+    BOOST_TEST(h.parse(now, {Message.data(), Message.size()}) == Message.size());
     BOOST_TEST(h.should_keep_alive());
     BOOST_TEST(h.http_major() == 1);
     BOOST_TEST(h.http_minor() == 1);
@@ -316,7 +323,8 @@ BOOST_AUTO_TEST_CASE(HttpMultiResponseCase)
         "second"sv;
 
     HttpParser h{HttpType::Request};
-    BOOST_TEST(h.parse({Message.data(), Message.size()}) == Message.size());
+    const auto now = CyclTime::set();
+    BOOST_TEST(h.parse(now, {Message.data(), Message.size()}) == Message.size());
     BOOST_TEST(h.should_keep_alive());
     BOOST_TEST(h.http_major() == 1);
     BOOST_TEST(h.http_minor() == 1);

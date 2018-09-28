@@ -18,6 +18,8 @@
 
 #include <swirly/sys/Error.hpp>
 
+#include <swirly/util/Finally.hpp>
+
 namespace swirly {
 inline namespace sys {
 
@@ -42,6 +44,8 @@ SigWait::~SigWait()
 
 int SigWait::operator()() const
 {
+    const auto finally = make_finally([&]() noexcept { CyclTime::set(); });
+
     siginfo_t info;
     if (sigwaitinfo(&new_mask_, &info) < 0) {
         throw std::system_error{os::make_error(errno), "sigwaitinfo"};
@@ -51,6 +55,8 @@ int SigWait::operator()() const
 
 int SigWait::operator()(Duration timeout) const
 {
+    const auto finally = make_finally([&]() noexcept { CyclTime::set(); });
+
     siginfo_t info;
     const auto ts = to_timespec(timeout);
     if (sigtimedwait(&new_mask_, &info, &ts) < 0) {

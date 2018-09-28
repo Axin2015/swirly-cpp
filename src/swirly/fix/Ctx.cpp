@@ -32,7 +32,7 @@ ifstream open_config(const char* path)
 }
 } // namespace
 
-FixCtx::FixCtx(WallTime now, Reactor& r, std::istream& config, FixApp& app)
+FixCtx::FixCtx(CyclTime now, Reactor& r, std::istream& config, FixApp& app)
 {
     FixConfig fix_config;
     fix_config.read(config);
@@ -64,7 +64,7 @@ FixCtx::FixCtx(WallTime now, Reactor& r, std::istream& config, FixApp& app)
     root_config_ = move(fix_config.root);
 }
 
-FixCtx::FixCtx(WallTime now, Reactor& r, const char* config, FixApp& app)
+FixCtx::FixCtx(CyclTime now, Reactor& r, const char* config, FixApp& app)
 : FixCtx{now, r, open_config(config), app}
 {
 }

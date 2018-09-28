@@ -40,16 +40,16 @@ class SWIRLY_API FixApp {
     constexpr FixApp(FixApp&&) noexcept = default;
     FixApp& operator=(FixApp&&) noexcept = default;
 
-    void on_connect(WallTime now, FixConn& conn) { do_on_connect(now, conn); }
-    void on_logon(WallTime now, FixConn& conn, const FixSessId& sess_id)
+    void on_connect(CyclTime now, FixConn& conn) { do_on_connect(now, conn); }
+    void on_logon(CyclTime now, FixConn& conn, const FixSessId& sess_id)
     {
         do_on_logon(now, conn, sess_id);
     }
-    void on_logout(WallTime now, FixConn& conn, const FixSessId& sess_id) noexcept
+    void on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_id) noexcept
     {
         do_on_logout(now, conn, sess_id);
     }
-    void on_message(WallTime now, FixConn& conn, std::string_view msg, std::size_t body_off,
+    void on_message(CyclTime now, FixConn& conn, std::string_view msg, std::size_t body_off,
                     Version ver, const FixHeader& hdr)
     {
         do_on_message(now, conn, msg, body_off, ver, hdr);
@@ -59,12 +59,12 @@ class SWIRLY_API FixApp {
      * Called on passive disconnect by peer. The connection is disposed immediately after the
      * callback returns.
      */
-    void on_disconnect(WallTime now, const FixConn& conn) noexcept { do_on_disconnect(now, conn); }
+    void on_disconnect(CyclTime now, const FixConn& conn) noexcept { do_on_disconnect(now, conn); }
     /**
      * Called when an error occurs. The connection is disposed immediately after the callback
      * returns.
      */
-    void on_error(WallTime now, const FixConn& conn, const std::exception& e) noexcept
+    void on_error(CyclTime now, const FixConn& conn, const std::exception& e) noexcept
     {
         do_on_error(now, conn, e);
     }
@@ -72,20 +72,20 @@ class SWIRLY_API FixApp {
      * Called when no data is received from peer for timeout period. The connection is disposed
      * immediately after the callback returns.
      */
-    void on_timeout(WallTime now, const FixConn& conn) noexcept { do_on_timeout(now, conn); }
+    void on_timeout(CyclTime now, const FixConn& conn) noexcept { do_on_timeout(now, conn); }
 
   protected:
-    virtual void do_on_connect(WallTime now, FixConn& conn) = 0;
-    virtual void do_on_logon(WallTime now, FixConn& conn, const FixSessId& sess_id) = 0;
-    virtual void do_on_logout(WallTime now, FixConn& conn, const FixSessId& sess_id) noexcept = 0;
-    virtual void do_on_message(WallTime now, FixConn& conn, std::string_view msg,
+    virtual void do_on_connect(CyclTime now, FixConn& conn) = 0;
+    virtual void do_on_logon(CyclTime now, FixConn& conn, const FixSessId& sess_id) = 0;
+    virtual void do_on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_id) noexcept = 0;
+    virtual void do_on_message(CyclTime now, FixConn& conn, std::string_view msg,
                                std::size_t body_off, Version ver, const FixHeader& hdr)
         = 0;
 
-    virtual void do_on_disconnect(WallTime now, const FixConn& conn) noexcept = 0;
-    virtual void do_on_error(WallTime now, const FixConn& conn, const std::exception& e) noexcept
+    virtual void do_on_disconnect(CyclTime now, const FixConn& conn) noexcept = 0;
+    virtual void do_on_error(CyclTime now, const FixConn& conn, const std::exception& e) noexcept
         = 0;
-    virtual void do_on_timeout(WallTime now, const FixConn& conn) noexcept = 0;
+    virtual void do_on_timeout(CyclTime now, const FixConn& conn) noexcept = 0;
 };
 
 } // namespace fix

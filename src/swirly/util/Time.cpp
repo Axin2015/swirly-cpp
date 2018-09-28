@@ -35,5 +35,7 @@ ostream& operator<<(ostream& os, WallTime t)
     return os << ms_since_epoch(t);
 }
 
+thread_local CyclTime::Time CyclTime::time_;
+
 } // namespace util
 } // namespace swirly

@@ -143,9 +143,8 @@ int main(int argc, char* argv[])
         Opts opts;
         get_opts(argc, argv, opts);
 
-        if (is_zero(opts.start_time)) {
-            opts.start_time = WallClock::now();
-        }
+        const auto start_time
+            = is_zero(opts.start_time) ? CyclTime::set() : CyclTime::set(opts.start_time);
 
         Config config;
         if (!opts.conf_file.empty()) {
@@ -244,7 +243,7 @@ int main(int argc, char* argv[])
         SWIRLY_NOTICE << "initialising daemon";
         SWIRLY_INFO << "conf_file:  " << opts.conf_file;
         SWIRLY_INFO << "daemon:     " << (opts.daemon ? "yes" : "no");
-        SWIRLY_INFO << "start_time: " << opts.start_time;
+        SWIRLY_INFO << "start_time: " << start_time.wall_time();
 
         SWIRLY_INFO << "file_mode:  " << setfill('0') << setw(3) << oct << swirly::file_mode();
         SWIRLY_INFO << "http_port:  " << http_port;
@@ -266,14 +265,14 @@ int main(int argc, char* argv[])
         RestImpl rest_impl{mq, max_execs};
         {
             Model& model = db_ctx.model();
-            rest_impl.load(opts.start_time, model);
+            rest_impl.load(start_time.wall_time(), model);
         }
         RestApp rest_app{rest_impl};
         Journ& journ = db_ctx.journ();
 
         EpollReactor reactor{1024};
         const TcpEndpoint ep{Tcp::v4(), from_string<uint16_t>(http_port)};
-        RestServ rest_serv{opts.start_time, reactor, ep, rest_app};
+        RestServ rest_serv{start_time, reactor, ep, rest_app};
 
         ReactorThread reactor_thread{reactor, ThreadConfig{"reactor"s}};
         auto journ_agent = [&mq, &journ]() {

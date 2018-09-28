@@ -25,7 +25,7 @@ inline namespace sys {
 constexpr Duration NoTimeout{-1};
 enum class Priority { High = 0, Low = 1 };
 
-using IoSlot = BasicSlot<WallTime, int, unsigned>;
+using IoSlot = BasicSlot<CyclTime, int, unsigned>;
 
 class SWIRLY_API Reactor {
   public:
@@ -132,11 +132,10 @@ class SWIRLY_API Reactor {
         return do_timer(expiry, priority, slot);
     }
     // clang-format on
-    int poll(WallTime now, Duration timeout = NoTimeout)
+    int poll(CyclTime now, Duration timeout = NoTimeout)
     {
         return do_poll(now, timeout);
     }
-    int poll(Duration timeout = NoTimeout) { return do_poll(WallClock::now(), timeout); }
 
   protected:
     virtual void do_interrupt() noexcept = 0;
@@ -157,7 +156,7 @@ class SWIRLY_API Reactor {
      */
     virtual Timer do_timer(WallTime expiry, Priority priority, TimerSlot slot) = 0;
 
-    virtual int do_poll(WallTime now, Duration timeout) = 0;
+    virtual int do_poll(CyclTime now, Duration timeout) = 0;
 };
 
 } // namespace sys

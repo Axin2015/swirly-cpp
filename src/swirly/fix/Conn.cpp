@@ -28,7 +28,7 @@ namespace swirly {
 inline namespace fix {
 using namespace std;
 
-FixConn::FixConn(WallTime now, Reactor& r, IoSocket&& sock, const Endpoint& ep,
+FixConn::FixConn(CyclTime now, Reactor& r, IoSocket&& sock, const Endpoint& ep,
                  const FixSessMap& sess_map, FixApp& app)
 : reactor_(r)
 , sock_{move(sock)}
@@ -41,13 +41,13 @@ FixConn::FixConn(WallTime now, Reactor& r, IoSocket&& sock, const Endpoint& ep,
     app.on_connect(now, *this);
 }
 
-void FixConn::dispose(WallTime now) noexcept
+void FixConn::dispose(CyclTime now) noexcept
 {
     app_.on_disconnect(now, *this);
     delete this;
 }
 
-void FixConn::logon(WallTime now, const FixSessId& sess_id)
+void FixConn::logon(CyclTime now, const FixSessId& sess_id)
 {
     if (state_ == LoggedOut) {
         const auto it = sess_map_.find(sess_id);
@@ -61,7 +61,7 @@ void FixConn::logon(WallTime now, const FixSessId& sess_id)
     }
 }
 
-void FixConn::logout(WallTime now)
+void FixConn::logout(CyclTime now)
 {
     if (state_ == LoggedOn) {
         // Initiate logout.
@@ -72,13 +72,13 @@ void FixConn::logout(WallTime now)
 
 FixConn::~FixConn() = default;
 
-void FixConn::read_and_write(WallTime now)
+void FixConn::read_and_write(CyclTime now)
 {
     sub_.set_events(EventIn | EventOut);
     out_.tmr.reset();
 }
 
-void FixConn::read_only(WallTime now)
+void FixConn::read_only(CyclTime now)
 {
     sub_.set_events(EventIn);
     if (state_ == LoggedOn) {
@@ -86,14 +86,14 @@ void FixConn::read_only(WallTime now)
     }
 }
 
-void FixConn::send_logon(WallTime now)
+void FixConn::send_logon(CyclTime now)
 {
     FixHeader hdr;
     hdr.msg_type = "A"sv;
     hdr.sender_comp_id = sess_id_.sender_comp_id;
     hdr.target_comp_id = sess_id_.target_comp_id;
     hdr.msg_seq_num = ++seq_num_;
-    hdr.sending_time = now;
+    hdr.sending_time = now.wall_time();
 
     Logon body{0, hb_int_.count()};
 
@@ -105,14 +105,14 @@ void FixConn::send_logon(WallTime now)
     read_and_write(now);
 }
 
-void FixConn::send_logout(WallTime now)
+void FixConn::send_logout(CyclTime now)
 {
     FixHeader hdr;
     hdr.msg_type = "5"sv;
     hdr.sender_comp_id = sess_id_.sender_comp_id;
     hdr.target_comp_id = sess_id_.target_comp_id;
     hdr.msg_seq_num = ++seq_num_;
-    hdr.sending_time = now;
+    hdr.sending_time = now.wall_time();
 
     FixStream os{out_.buf};
     os.reset(sess_id_.version);
@@ -122,7 +122,7 @@ void FixConn::send_logout(WallTime now)
     read_and_write(now);
 }
 
-void FixConn::on_io_event(WallTime now, int fd, unsigned events)
+void FixConn::on_io_event(CyclTime now, int fd, unsigned events)
 {
     try {
         if (events & EventOut) {
@@ -149,30 +149,32 @@ void FixConn::on_io_event(WallTime now, int fd, unsigned events)
     }
 }
 
-void FixConn::schedule_timeout(WallTime now)
+void FixConn::schedule_timeout(CyclTime now)
 {
-    in_.tmr = reactor_.timer(now + hb_int_ + 1s, Priority::Low, bind<&FixConn::on_timeout>(this));
+    in_.tmr = reactor_.timer(now.wall_time() + hb_int_ + 1s, Priority::Low,
+                             bind<&FixConn::on_timeout>(this));
 }
 
-void FixConn::on_timeout(WallTime now, Timer& tmr)
+void FixConn::on_timeout(CyclTime now, Timer& tmr)
 {
     app_.on_timeout(now, *this);
     dispose(now);
 }
 
-void FixConn::schedule_heartbeat(WallTime now)
+void FixConn::schedule_heartbeat(CyclTime now)
 {
-    out_.tmr = reactor_.timer(now + hb_int_, Priority::Low, bind<&FixConn::on_heartbeat>(this));
+    out_.tmr = reactor_.timer(now.wall_time() + hb_int_, Priority::Low,
+                              bind<&FixConn::on_heartbeat>(this));
 }
 
-void FixConn::on_heartbeat(WallTime now, Timer& tmr)
+void FixConn::on_heartbeat(CyclTime now, Timer& tmr)
 {
     FixHeader hdr;
     hdr.msg_type = "0"sv;
     hdr.sender_comp_id = sess_id_.sender_comp_id;
     hdr.target_comp_id = sess_id_.target_comp_id;
     hdr.msg_seq_num = ++seq_num_;
-    hdr.sending_time = now;
+    hdr.sending_time = now.wall_time();
 
     FixStream os{out_.buf};
     os.reset(sess_id_.version);
@@ -182,7 +184,7 @@ void FixConn::on_heartbeat(WallTime now, Timer& tmr)
     read_and_write(now);
 }
 
-void FixConn::on_message(WallTime now, std::string_view msg, std::size_t msg_type_off, Version ver)
+void FixConn::on_message(CyclTime now, std::string_view msg, std::size_t msg_type_off, Version ver)
 {
     FixHeader hdr;
     const size_t body_off = parse_header(msg, msg_type_off, hdr);

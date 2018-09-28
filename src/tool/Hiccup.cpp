@@ -49,14 +49,14 @@ class HiccupThread {
         try {
             EpollReactor r{1};
             while (!stop.load(memory_order_relaxed)) {
-                const auto start = WallClock::now();
-                auto fn = [&recorder, start](WallTime now, Timer& tmr) {
-                    const chrono::duration<double, micro> diff{now - start};
+                const auto start = CyclTime::set();
+                auto fn = [&recorder, start](CyclTime now, Timer& tmr) {
+                    const chrono::duration<double, micro> diff{now.mono_time() - start.mono_time()};
                     const auto usec = diff.count();
                     recorder.record_value(usec);
                 };
-                auto t = r.timer(start + 1ms, Priority::Low, bind(&fn));
-                while (!r.poll())
+                auto t = r.timer(start.wall_time() + 1ms, Priority::Low, bind(&fn));
+                while (!r.poll(start))
                     ;
             }
         } catch (const std::exception& e) {
@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
 {
     int ret = 1;
     try {
-        auto start_time = WallClock::now();
+        auto start_time = CyclTime::set().wall_time();
 
         IntervalRecorder recorder{1, 1'000'000, 5};
         LogWriter writer{stdout};

@@ -104,7 +104,7 @@ Timer EpollReactor::do_timer(WallTime expiry, Priority priority, TimerSlot slot)
     return tqs_[static_cast<size_t>(priority)].insert(expiry, slot);
 }
 
-int EpollReactor::do_poll(WallTime now, Duration timeout)
+int EpollReactor::do_poll(CyclTime now, Duration timeout)
 {
     enum { High = 0, Low = 1 };
     using namespace chrono;
@@ -112,8 +112,9 @@ int EpollReactor::do_poll(WallTime now, Duration timeout)
     // If timeout is zero then the wait_until time should also be zero to signify no wait.
     WallTime wait_until{};
     if (!is_zero(timeout)) {
-        const WallTime next = next_expiry(timeout == NoTimeout ? WallClock::max() : now + timeout);
-        if (next > now) {
+        const WallTime next
+            = next_expiry(timeout == NoTimeout ? WallClock::max() : now.wall_time() + timeout);
+        if (next > now.wall_time()) {
             wait_until = next;
         }
     }
@@ -136,7 +137,7 @@ int EpollReactor::do_poll(WallTime now, Duration timeout)
     }
     // If the muxer call was a blocking call, then acquire the current time.
     if (!is_zero(wait_until)) {
-        now = WallClock::now();
+        now = CyclTime::set();
     }
     const auto n = tqs_[High].dispatch(now) + dispatch(now, buf, ret);
     // Low priority timers are only dispatched during empty cycles.
@@ -165,7 +166,7 @@ WallTime EpollReactor::next_expiry(WallTime next) const
     return next;
 }
 
-int EpollReactor::dispatch(WallTime now, Event* buf, int size)
+int EpollReactor::dispatch(CyclTime now, Event* buf, int size)
 {
     int n{0};
     for (int i{0}; i < size; ++i) {

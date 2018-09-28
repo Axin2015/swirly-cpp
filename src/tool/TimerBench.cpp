@@ -31,7 +31,7 @@ using namespace swirly;
 namespace {
 
 struct TimerHandler : RefCount<TimerHandler, ThreadUnsafePolicy> {
-    void on_timer(WallTime now, Timer& tmr) {}
+    void on_timer(CyclTime now, Timer& tmr) {}
 };
 
 } // namespace
@@ -53,17 +53,17 @@ int main(int argc, char* argv[])
 
         auto h = make_intrusive<TimerHandler>();
         for (int i{0}; i < 5000000; ++i) {
-            const auto now = WallClock::now();
+            const auto now = CyclTime::set();
             auto& t = ts[dis(gen) % 128];
             if (t && dis(gen) % 2 == 0) {
                 Recorder tr{reset_hist};
                 t = {};
             } else {
-                const auto expiry = now + Micros{dis(gen) % 100};
+                const auto expiry = now.wall_time() + Micros{dis(gen) % 100};
                 Recorder tr{replace_hist};
                 t = r.timer(expiry, Priority::High, bind<&TimerHandler::on_timer>(h.get()));
             }
-            r.poll(0ms);
+            r.poll(now, 0ms);
         }
 
         replace_hist.percentiles_print("timer-replace.hdr", 5, 1000);
