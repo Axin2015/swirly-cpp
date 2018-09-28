@@ -30,11 +30,7 @@ class Histogram;
  */
 class SWIRLY_API Recorder {
   public:
-    explicit Recorder(Histogram& hist) noexcept
-    : hist_(hist)
-    , start_{std::chrono::high_resolution_clock::now()}
-    {
-    }
+    explicit Recorder(Histogram& hist, int count = 1) noexcept;
     ~Recorder();
 
     // Copy.
@@ -47,6 +43,7 @@ class SWIRLY_API Recorder {
 
   private:
     Histogram& hist_;
+    const int count_{1};
     std::chrono::time_point<std::chrono::high_resolution_clock> start_;
 };
 

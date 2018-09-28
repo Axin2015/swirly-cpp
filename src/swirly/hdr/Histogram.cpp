@@ -19,8 +19,6 @@
 #include "File.hpp"
 #include "LogWriter.hpp"
 
-#include <cassert>
-
 extern "C" const char* hdr_strerror(int errnum);
 
 namespace swirly {

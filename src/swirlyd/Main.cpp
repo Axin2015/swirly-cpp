@@ -14,9 +14,9 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "RestApp.hpp"
-#include "RestImpl.hpp"
-#include "RestRequest.hpp"
+#include "RestApp.hxx"
+#include "RestImpl.hxx"
+#include "RestRequest.hxx"
 
 #include <swirly/db/DbCtx.hpp>
 

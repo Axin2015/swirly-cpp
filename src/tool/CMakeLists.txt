@@ -19,6 +19,7 @@ add_custom_target(swirly-tool DEPENDS
   swirly-hdr-decoder
   swirly-hiccup
   swirly-lob-bench
+  swirly-micro-bench
   swirly-queue-bench
   swirly-timer-bench
 )
@@ -43,6 +44,10 @@ add_executable(swirly-lob-bench LobBench.cpp)
 target_link_libraries(swirly-lob-bench ${swirly_hdr_LIBRARY} ${swirly_lob_LIBRARY}
   ${swirly_db_LIBRARY})
 install(TARGETS swirly-lob-bench DESTINATION bin COMPONENT program)
+
+add_executable(swirly-micro-bench MicroBench.cpp)
+target_link_libraries(swirly-micro-bench ${swirly_hdr_LIBRARY} ${swirly_sys_LIBRARY})
+install(TARGETS swirly-micro-bench DESTINATION bin COMPONENT program)
 
 add_executable(swirly-queue-bench QueueBench.cpp)
 target_link_libraries(swirly-queue-bench ${swirly_hdr_LIBRARY} ${swirly_app_LIBRARY})

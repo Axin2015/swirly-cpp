@@ -14,11 +14,11 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYD_RESTIMPL_HPP
-#define SWIRLYD_RESTIMPL_HPP
+#ifndef SWIRLYD_RESTIMPL_HXX
+#define SWIRLYD_RESTIMPL_HXX
 
-#include "EntitySet.hpp"
-#include "Page.hpp"
+#include "EntitySet.hxx"
+#include "Page.hxx"
 
 #include <swirly/lob/App.hpp>
 
@@ -115,4 +115,4 @@ class SWIRLY_API RestImpl {
 
 } // namespace swirly
 
-#endif // SWIRLYD_RESTIMPL_HPP
+#endif // SWIRLYD_RESTIMPL_HXX

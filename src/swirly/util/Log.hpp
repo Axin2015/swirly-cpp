@@ -171,7 +171,7 @@ Log& operator<<(Log&& log, const ValueT& val)
 } // namespace swirly
 
 // clang-format off
-#define SWIRLY_LOG(level) swirly::is_log_level(level) && swirly::Log{level}
+#define SWIRLY_LOG(LEVEL) swirly::is_log_level(LEVEL) && swirly::Log{LEVEL}
 
 #define SWIRLY_CRIT SWIRLY_LOG(swirly::Log::Crit)
 #define SWIRLY_ERROR SWIRLY_LOG(swirly::Log::Error)

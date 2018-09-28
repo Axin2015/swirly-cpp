@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYD_RESTBODY_HPP
-#define SWIRLYD_RESTBODY_HPP
+#ifndef SWIRLYD_RESTBODY_HXX
+#define SWIRLYD_RESTBODY_HXX
 
 #include <swirly/fin/Types.hpp>
 
@@ -130,4 +130,4 @@ class SWIRLY_API RestBody {
 
 } // namespace swirly
 
-#endif // SWIRLYD_RESTBODY_HPP
+#endif // SWIRLYD_RESTBODY_HXX
