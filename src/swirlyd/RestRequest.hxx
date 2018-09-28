@@ -14,10 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYD_RESTREQUEST_HPP
-#define SWIRLYD_RESTREQUEST_HPP
+#ifndef SWIRLYD_RESTREQUEST_HXX
+#define SWIRLYD_RESTREQUEST_HXX
 
-#include "RestBody.hpp"
+#include "RestBody.hxx"
 
 #include <swirly/http/Types.hpp>
 #include <swirly/http/Url.hpp>
@@ -104,4 +104,4 @@ class SWIRLY_API RestRequest : public BasicUrl<RestRequest> {
 
 } // namespace swirly
 
-#endif // SWIRLYD_RESTREQUEST_HPP
+#endif // SWIRLYD_RESTREQUEST_HXX

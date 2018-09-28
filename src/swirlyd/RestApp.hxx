@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYD_RESTAPP_HPP
-#define SWIRLYD_RESTAPP_HPP
+#ifndef SWIRLYD_RESTAPP_HXX
+#define SWIRLYD_RESTAPP_HXX
 
 #include <swirly/sys/IpAddress.hpp>
 
@@ -87,4 +87,4 @@ class RestApp {
 
 } // namespace swirly
 
-#endif // SWIRLYD_RESTAPP_HPP
+#endif // SWIRLYD_RESTAPP_HXX

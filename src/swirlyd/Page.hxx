@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYD_PAGE_HPP
-#define SWIRLYD_PAGE_HPP
+#ifndef SWIRLYD_PAGE_HXX
+#define SWIRLYD_PAGE_HXX
 
 #include <swirly/Config.h>
 
@@ -35,4 +35,4 @@ SWIRLY_API Page parse_query(std::string_view query) noexcept;
 
 } // namespace swirly
 
-#endif // SWIRLYD_PAGE_HPP
+#endif // SWIRLYD_PAGE_HXX

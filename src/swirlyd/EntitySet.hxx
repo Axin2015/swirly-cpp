@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYD_ENTITYSET_HPP
-#define SWIRLYD_ENTITYSET_HPP
+#ifndef SWIRLYD_ENTITYSET_HXX
+#define SWIRLYD_ENTITYSET_HXX
 
 #include <swirly/Config.h>
 
@@ -83,4 +83,4 @@ class SWIRLY_API EntitySet {
 
 } // namespace swirly
 
-#endif // SWIRLYD_ENTITYSET_HPP
+#endif // SWIRLYD_ENTITYSET_HXX
