@@ -37,7 +37,7 @@ bool is_after(const Timer& lhs, const Timer& rhs)
 
 } // namespace
 
-Timer::Impl* TimerPool::alloc(WallTime expiry, Duration interval, TimerSlot slot)
+Timer::Impl* TimerPool::alloc(MonoTime expiry, Duration interval, TimerSlot slot)
 {
     Timer::Impl* impl;
 
@@ -63,7 +63,7 @@ Timer::Impl* TimerPool::alloc(WallTime expiry, Duration interval, TimerSlot slot
     return impl;
 }
 
-Timer TimerQueue::insert(WallTime expiry, Duration interval, TimerSlot slot)
+Timer TimerQueue::insert(MonoTime expiry, Duration interval, TimerSlot slot)
 {
     assert(slot);
 
@@ -77,7 +77,7 @@ Timer TimerQueue::insert(WallTime expiry, Duration interval, TimerSlot slot)
     return tmr;
 }
 
-int TimerQueue::dispatch(WallTime now)
+int TimerQueue::dispatch(CyclTime now)
 {
     int n{};
     while (!heap_.empty()) {
@@ -87,7 +87,7 @@ int TimerQueue::dispatch(WallTime now)
             pop();
             --cancelled_;
             assert(cancelled_ >= 0);
-        } else if (heap_.front().expiry() <= now) {
+        } else if (heap_.front().expiry() <= now.mono_time()) {
             expire(now);
             ++n;
         } else {
@@ -98,7 +98,7 @@ int TimerQueue::dispatch(WallTime now)
     return n;
 }
 
-Timer TimerQueue::alloc(WallTime expiry, Duration interval, TimerSlot slot)
+Timer TimerQueue::alloc(MonoTime expiry, Duration interval, TimerSlot slot)
 {
     Timer::Impl* impl{pool_.alloc(expiry, interval, slot)};
 
@@ -126,7 +126,7 @@ void TimerQueue::cancel() noexcept
     gc();
 }
 
-void TimerQueue::expire(WallTime now)
+void TimerQueue::expire(CyclTime now)
 {
     // Pop timer.
     auto tmr = pop();
@@ -145,7 +145,7 @@ void TimerQueue::expire(WallTime now)
         if (tmr.interval().count() > 0) {
 
             // Add interval to expiry, while ensuring that next expiry is always in the future.
-            tmr.set_expiry(max(tmr.expiry() + tmr.interval(), now + 1ns));
+            tmr.set_expiry(max(tmr.expiry() + tmr.interval(), now.mono_time() + 1ns));
 
             // Reschedule popped timer.
             heap_.push_back(tmr);

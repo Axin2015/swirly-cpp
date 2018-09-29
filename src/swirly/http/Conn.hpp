@@ -56,7 +56,7 @@ class BasicHttpConn
     using Transport = Tcp;
     using Endpoint = TcpEndpoint;
 
-    BasicHttpConn(WallTime now, Reactor& r, IoSocket&& sock, const Endpoint& ep, App& app)
+    BasicHttpConn(CyclTime now, Reactor& r, IoSocket&& sock, const Endpoint& ep, App& app)
     : BasicHttpParser<BasicHttpConn<RequestT, AppT>>{HttpType::Request}
     , reactor_(r)
     , sock_{std::move(sock)}
@@ -64,7 +64,8 @@ class BasicHttpConn
     , app_(app)
     {
         sub_ = r.subscribe(*sock_, EventIn, bind<&BasicHttpConn::on_io_event>(this));
-        tmr_ = r.timer(now + IdleTimeout, Priority::Low, bind<&BasicHttpConn::on_timer>(this));
+        tmr_ = r.timer(now.mono_time() + IdleTimeout, Priority::Low,
+                       bind<&BasicHttpConn::on_timer>(this));
         app.on_connect(now, ep_);
     }
 
@@ -78,7 +79,7 @@ class BasicHttpConn
 
     const Endpoint& endpoint() const noexcept { return ep_; }
     void clear() noexcept { req_.clear(); }
-    void dispose(WallTime now) noexcept
+    void dispose(CyclTime now) noexcept
     {
         app_.on_disconnect(now, ep_);
         delete this;
@@ -88,66 +89,66 @@ class BasicHttpConn
 
   private:
     ~BasicHttpConn() = default;
-    bool on_message_begin() noexcept
+    bool on_message_begin(CyclTime now) noexcept
     {
         ++pending_;
         return true;
     }
-    bool on_url(std::string_view sv) noexcept
+    bool on_url(CyclTime now, std::string_view sv) noexcept
     {
         bool ret{false};
         try {
             req_.append_url(sv);
             ret = true;
         } catch (const std::exception& e) {
-            app_.on_error(now_, ep_, e);
+            app_.on_error(now, ep_, e);
         }
         return ret;
     }
-    bool on_status(std::string_view sv) noexcept
+    bool on_status(CyclTime now, std::string_view sv) noexcept
     {
         // Only supported for HTTP responses.
         return false;
     }
-    bool on_header_field(std::string_view sv, bool first) noexcept
+    bool on_header_field(CyclTime now, std::string_view sv, bool first) noexcept
     {
         bool ret{false};
         try {
             req_.append_header_field(sv, first);
             ret = true;
         } catch (const std::exception& e) {
-            app_.on_error(now_, ep_, e);
+            app_.on_error(now, ep_, e);
         }
         return ret;
     }
-    bool on_header_value(std::string_view sv, bool first) noexcept
+    bool on_header_value(CyclTime now, std::string_view sv, bool first) noexcept
     {
         bool ret{false};
         try {
             req_.append_header_value(sv, first);
             ret = true;
         } catch (const std::exception& e) {
-            app_.on_error(now_, ep_, e);
+            app_.on_error(now, ep_, e);
         }
         return ret;
     }
-    bool on_headers_end() noexcept
+    bool on_headers_end(CyclTime now) noexcept
     {
         req_.set_method(method());
         return true;
     }
-    bool on_body(std::string_view sv) noexcept
+    bool on_body(CyclTime now, std::string_view sv) noexcept
     {
         bool ret{false};
         try {
             req_.append_body(sv);
             ret = true;
         } catch (const std::exception& e) {
-            app_.on_error(now_, ep_, e);
+            app_.on_error(now, ep_, e);
         }
         return ret;
     }
-    bool on_message_end() noexcept
+    bool on_message_end(CyclTime now) noexcept
     {
         bool ret{false};
         try {
@@ -155,7 +156,7 @@ class BasicHttpConn
             req_.flush(); // May throw.
 
             const auto was_empty = out_.empty();
-            app_.on_message(now_, ep_, req_, os_);
+            app_.on_message(now, ep_, req_, os_);
 
             if (was_empty) {
                 // May throw.
@@ -163,14 +164,14 @@ class BasicHttpConn
             }
             ret = true;
         } catch (const std::exception& e) {
-            app_.on_error(now_, ep_, e);
+            app_.on_error(now, ep_, e);
         }
         req_.clear();
         return ret;
     }
-    bool on_chunk_header(std::size_t len) noexcept { return true; }
-    bool on_chunk_end() noexcept { return true; }
-    void on_io_event(WallTime now, int fd, unsigned events)
+    bool on_chunk_header(CyclTime now, std::size_t len) noexcept { return true; }
+    bool on_chunk_end(CyclTime now) noexcept { return true; }
+    void on_io_event(CyclTime now, int fd, unsigned events)
     {
         try {
             if (events & EventOut) {
@@ -189,13 +190,11 @@ class BasicHttpConn
                 if (size > 0) {
                     // Commit actual bytes read.
                     in_.commit(size);
-
-                    now_ = now;
-                    in_.consume(parse(in_.data()));
+                    in_.consume(parse(now, in_.data()));
 
                     // Reset timer.
                     tmr_.cancel();
-                    tmr_ = reactor_.timer(now + IdleTimeout, Priority::Low,
+                    tmr_ = reactor_.timer(now.mono_time() + IdleTimeout, Priority::Low,
                                           bind<&BasicHttpConn::on_timer>(this));
                 } else {
                     dispose(now);
@@ -206,11 +205,11 @@ class BasicHttpConn
             // noexcept parser callback functions.
             dispose(now);
         } catch (const std::exception& e) {
-            app_.on_error(now_, ep_, e);
+            app_.on_error(now, ep_, e);
             dispose(now);
         }
     }
-    void on_timer(WallTime now, Timer& tmr)
+    void on_timer(CyclTime now, Timer& tmr)
     {
         app_.on_timeout(now, ep_);
         dispose(now);
@@ -222,7 +221,6 @@ class BasicHttpConn
     App& app_;
     Reactor::Handle sub_;
     Timer tmr_;
-    WallTime now_{};
     int pending_{0};
     Buffer in_, out_;
     Request req_;

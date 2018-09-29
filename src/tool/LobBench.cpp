@@ -125,6 +125,8 @@ int main(int argc, char* argv[])
     int ret = 1;
     try {
 
+        const auto start_time = CyclTime::set();
+
         mem_ctx = MemCtx{1 << 20};
 
         unique_ptr<Model> model;
@@ -138,11 +140,10 @@ int main(int argc, char* argv[])
         }
 
         const BusinessDay bus_day{MarketZone};
-        const auto start_time = WallClock::now();
 
         MsgQueue mq{1 << 12};
         LobApp app{mq, 1 << 4};
-        app.load(start_time, *model);
+        app.load(start_time.wall_time(), *model);
         model = nullptr;
 
         NullJourn journ;
@@ -157,7 +158,8 @@ int main(int argc, char* argv[])
         };
         AgentThread journ_thread{journ_agent, ThreadConfig{"journ"s}};
 
-        auto& market = create_market(app, "EURUSD"sv, bus_day(start_time), 0, start_time);
+        auto& market = create_market(app, "EURUSD"sv, bus_day(start_time.wall_time()), 0,
+                                     start_time.wall_time());
 
         auto& eddayl = app.sess("EDDAYL"sv);
         auto& gosayl = app.sess("GOSAYL"sv);
@@ -172,6 +174,8 @@ int main(int argc, char* argv[])
 
         for (int i = 0; i < 1'001'000; ++i) {
 
+            const auto now = CyclTime::set().wall_time();
+
             // Reset profiles after warmup period.
             if (i == 1000) {
                 maker_hist.clear();
@@ -182,86 +186,86 @@ int main(int argc, char* argv[])
             {
                 resp.clear();
                 Recorder tr{maker_hist};
-                app.create_order(start_time, gosayl, market, ""sv, Side::Sell, 10_lts, 12348_tks,
-                                 1_lts, resp);
+                app.create_order(now, gosayl, market, ""sv, Side::Sell, 10_lts, 12348_tks, 1_lts,
+                                 resp);
             }
             {
                 resp.clear();
                 Recorder tr{maker_hist};
-                app.create_order(start_time, marayl, market, ""sv, Side::Sell, 10_lts, 12348_tks,
-                                 1_lts, resp);
+                app.create_order(now, marayl, market, ""sv, Side::Sell, 10_lts, 12348_tks, 1_lts,
+                                 resp);
             }
             {
                 resp.clear();
                 Recorder tr{maker_hist};
-                app.create_order(start_time, gosayl, market, ""sv, Side::Sell, 10_lts, 12347_tks,
-                                 1_lts, resp);
+                app.create_order(now, gosayl, market, ""sv, Side::Sell, 10_lts, 12347_tks, 1_lts,
+                                 resp);
             }
             {
                 resp.clear();
                 Recorder tr{maker_hist};
-                app.create_order(start_time, marayl, market, ""sv, Side::Sell, 5_lts, 12347_tks,
-                                 1_lts, resp);
+                app.create_order(now, marayl, market, ""sv, Side::Sell, 5_lts, 12347_tks, 1_lts,
+                                 resp);
             }
             {
                 resp.clear();
                 Recorder tr{maker_hist};
-                app.create_order(start_time, gosayl, market, ""sv, Side::Sell, 5_lts, 12346_tks,
-                                 1_lts, resp);
+                app.create_order(now, gosayl, market, ""sv, Side::Sell, 5_lts, 12346_tks, 1_lts,
+                                 resp);
             }
 
             // Maker buy-side.
             {
                 resp.clear();
                 Recorder tr{maker_hist};
-                app.create_order(start_time, marayl, market, ""sv, Side::Buy, 5_lts, 12344_tks,
-                                 1_lts, resp);
+                app.create_order(now, marayl, market, ""sv, Side::Buy, 5_lts, 12344_tks, 1_lts,
+                                 resp);
             }
             {
                 resp.clear();
                 Recorder tr{maker_hist};
-                app.create_order(start_time, gosayl, market, ""sv, Side::Buy, 5_lts, 12343_tks,
-                                 1_lts, resp);
+                app.create_order(now, gosayl, market, ""sv, Side::Buy, 5_lts, 12343_tks, 1_lts,
+                                 resp);
             }
             {
                 resp.clear();
                 Recorder tr{maker_hist};
-                app.create_order(start_time, marayl, market, ""sv, Side::Buy, 10_lts, 12343_tks,
-                                 1_lts, resp);
+                app.create_order(now, marayl, market, ""sv, Side::Buy, 10_lts, 12343_tks, 1_lts,
+                                 resp);
             }
             {
                 resp.clear();
                 Recorder tr{maker_hist};
-                app.create_order(start_time, gosayl, market, ""sv, Side::Buy, 10_lts, 12342_tks,
-                                 1_lts, resp);
+                app.create_order(now, gosayl, market, ""sv, Side::Buy, 10_lts, 12342_tks, 1_lts,
+                                 resp);
             }
             {
                 resp.clear();
                 Recorder tr{maker_hist};
-                app.create_order(start_time, marayl, market, ""sv, Side::Buy, 10_lts, 12342_tks,
-                                 1_lts, resp);
+                app.create_order(now, marayl, market, ""sv, Side::Buy, 10_lts, 12342_tks, 1_lts,
+                                 resp);
             }
 
             // Taker sell-side.
             {
                 resp.clear();
                 Recorder tr{taker_hist};
-                app.create_order(start_time, eddayl, market, ""sv, Side::Sell, 40_lts, 12342_tks,
-                                 1_lts, resp);
+                app.create_order(now, eddayl, market, ""sv, Side::Sell, 40_lts, 12342_tks, 1_lts,
+                                 resp);
             }
 
             // Taker buy-side.
             {
                 resp.clear();
                 Recorder tr{taker_hist};
-                app.create_order(start_time, pipayl, market, ""sv, Side::Buy, 40_lts, 12348_tks,
-                                 1_lts, resp);
+                app.create_order(now, pipayl, market, ""sv, Side::Buy, 40_lts, 12348_tks, 1_lts,
+                                 resp);
             }
 
-            arch(start_time, eddayl, market.id());
-            arch(start_time, gosayl, market.id());
-            arch(start_time, marayl, market.id());
-            arch(start_time, pipayl, market.id());
+            arch(now, eddayl, market.id());
+            arch(now, gosayl, market.id());
+            arch(now, marayl, market.id());
+            arch(now, pipayl, market.id());
         }
 
         maker_hist.percentiles_print("lob-maker.hdr", 5, 1000);

@@ -53,12 +53,12 @@ class RestApp {
     RestApp(RestApp&&) = delete;
     RestApp& operator=(RestApp&&) = delete;
 
-    void on_connect(WallTime now, const Endpoint& ep);
-    void on_disconnect(WallTime now, const Endpoint& ep) noexcept;
-    void on_error(WallTime now, const Endpoint& ep, const std::exception& e) noexcept;
-    void on_message(WallTime now, const Endpoint& ep, const RestRequest& req,
+    void on_connect(CyclTime now, const Endpoint& ep);
+    void on_disconnect(CyclTime now, const Endpoint& ep) noexcept;
+    void on_error(CyclTime now, const Endpoint& ep, const std::exception& e) noexcept;
+    void on_message(CyclTime now, const Endpoint& ep, const RestRequest& req,
                     HttpStream& os) noexcept;
-    void on_timeout(WallTime now, const Endpoint& ep) noexcept;
+    void on_timeout(CyclTime now, const Endpoint& ep) noexcept;
 
   private:
     bool reset(const RestRequest& req) noexcept;

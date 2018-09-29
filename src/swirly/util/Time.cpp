@@ -29,11 +29,19 @@ NanoTime get_time(clockid_t clock_id) noexcept
     return NanoTime{ts.tv_sec * 1'000'000'000L + ts.tv_nsec};
 }
 
+ostream& operator<<(ostream& os, MonoTime t)
+{
+    // TODO: change to a higher resolution.
+    return os << ms_since_epoch(t);
+}
+
 ostream& operator<<(ostream& os, WallTime t)
 {
     // TODO: change to a higher resolution.
     return os << ms_since_epoch(t);
 }
+
+thread_local CyclTime::Time CyclTime::time_;
 
 } // namespace util
 } // namespace swirly

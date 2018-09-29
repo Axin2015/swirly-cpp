@@ -23,32 +23,6 @@
 #include <sys/syscall.h>
 #include <unistd.h>
 
-namespace swirly {
-
-class TlsTime {
-  public:
-    static TlsTime set() noexcept
-    {
-        time_ = Time::now();
-        return {};
-    }
-    MonoTime mono_time() const noexcept { return time_.mono_time; }
-    WallTime wall_time() const noexcept { return time_.wall_time; }
-
-  private:
-    TlsTime() = default;
-    struct Time {
-        static Time now() noexcept { return {MonoClock::now(), WallClock::now()}; };
-        MonoTime mono_time{};
-        WallTime wall_time{};
-    };
-    static thread_local Time time_;
-};
-
-thread_local TlsTime::Time TlsTime::time_;
-
-} // namespace swirly
-
 using namespace std;
 using namespace swirly;
 
@@ -125,17 +99,15 @@ SWIRLY_BENCHMARK(sys_clock_gettime_mono)
     };
 }
 
-SWIRLY_BENCHMARK(tlstime_set)
+SWIRLY_BENCHMARK(cycl_time_set)
 {
-    return []() {
-        TlsTime::set();
-    };
+    return []() { CyclTime::set(); };
 }
 
-SWIRLY_BENCHMARK(tlstime_set_and_get)
+SWIRLY_BENCHMARK(cycl_time_set_and_get)
 {
     return []() {
-        auto now = TlsTime::set();
+        auto now = CyclTime::set();
         clobber_memory();
         auto t = now.mono_time();
         do_not_optimise(t);

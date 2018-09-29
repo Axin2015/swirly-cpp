@@ -28,7 +28,7 @@ using namespace swirly;
 namespace {
 
 struct TestHandler : RefCount<TestHandler, ThreadUnsafePolicy> {
-    void on_input(WallTime now, int fd, unsigned events)
+    void on_input(CyclTime now, int fd, unsigned events)
     {
         char buf[4];
         os::recv(fd, buf, 4, 0);
@@ -53,24 +53,25 @@ BOOST_AUTO_TEST_CASE(EpollReactorLevelCase)
     auto socks = socketpair(LocalStream{});
     const auto sub = r.subscribe(*socks.second, EventIn, bind<&TestHandler::on_input>(h.get()));
 
-    BOOST_TEST(r.poll(0ms) == 0);
+    const auto now = CyclTime::set();
+    BOOST_TEST(r.poll(now, 0ms) == 0);
     BOOST_TEST(h->matches == 0);
 
     socks.first.send("foo", 4, 0);
     socks.first.send("foo", 4, 0);
-    BOOST_TEST(r.poll(0ms) == 1);
+    BOOST_TEST(r.poll(now, 0ms) == 1);
     BOOST_TEST(h->matches == 1);
-    BOOST_TEST(r.poll(0ms) == 1);
+    BOOST_TEST(r.poll(now, 0ms) == 1);
     BOOST_TEST(h->matches == 2);
 
-    BOOST_TEST(r.poll(0ms) == 0);
+    BOOST_TEST(r.poll(now, 0ms) == 0);
     BOOST_TEST(h->matches == 2);
 
     socks.first.send("foo", 4, 0);
-    BOOST_TEST(r.poll(0ms) == 1);
+    BOOST_TEST(r.poll(now, 0ms) == 1);
     BOOST_TEST(h->matches == 3);
 
-    BOOST_TEST(r.poll(0ms) == 0);
+    BOOST_TEST(r.poll(now, 0ms) == 0);
     BOOST_TEST(h->matches == 3);
 }
 
@@ -84,31 +85,32 @@ BOOST_AUTO_TEST_CASE(EpollReactorEdgeCase)
     auto socks = socketpair(LocalStream{});
     auto sub = r.subscribe(*socks.second, EventIn | EventEt, bind<&TestHandler::on_input>(h.get()));
 
-    BOOST_TEST(r.poll(0ms) == 0);
+    const auto now = CyclTime::set();
+    BOOST_TEST(r.poll(now, 0ms) == 0);
     BOOST_TEST(h->matches == 0);
 
     socks.first.send("foo", 4, 0);
     socks.first.send("foo", 4, 0);
-    BOOST_TEST(r.poll(0ms) == 1);
+    BOOST_TEST(r.poll(now, 0ms) == 1);
     BOOST_TEST(h->matches == 1);
 
     // No notification for second message.
-    BOOST_TEST(r.poll(0ms) == 0);
+    BOOST_TEST(r.poll(now, 0ms) == 0);
     BOOST_TEST(h->matches == 1);
 
     // Revert to level-triggered.
     sub.set_events(EventIn);
-    BOOST_TEST(r.poll(0ms) == 1);
+    BOOST_TEST(r.poll(now, 0ms) == 1);
     BOOST_TEST(h->matches == 2);
 
-    BOOST_TEST(r.poll(0ms) == 0);
+    BOOST_TEST(r.poll(now, 0ms) == 0);
     BOOST_TEST(h->matches == 2);
 
     socks.first.send("foo", 4, 0);
-    BOOST_TEST(r.poll(0ms) == 1);
+    BOOST_TEST(r.poll(now, 0ms) == 1);
     BOOST_TEST(h->matches == 3);
 
-    BOOST_TEST(r.poll(0ms) == 0);
+    BOOST_TEST(r.poll(now, 0ms) == 0);
     BOOST_TEST(h->matches == 3);
 }
 

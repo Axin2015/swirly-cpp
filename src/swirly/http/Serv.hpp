@@ -40,7 +40,7 @@ class BasicHttpServ : public TcpAcceptor<BasicHttpServ<ConnT, AppT>> {
     using typename TcpAcceptor<BasicHttpServ<ConnT, AppT>>::Endpoint;
 
   public:
-    BasicHttpServ(WallTime now, Reactor& r, const Endpoint& ep, App& app)
+    BasicHttpServ(CyclTime now, Reactor& r, const Endpoint& ep, App& app)
     : TcpAcceptor<BasicHttpServ<ConnT, AppT>>{r, ep}
     , reactor_(r)
     , app_(app)
@@ -48,7 +48,7 @@ class BasicHttpServ : public TcpAcceptor<BasicHttpServ<ConnT, AppT>> {
     }
     ~BasicHttpServ()
     {
-        const auto now = WallClock::now();
+        const auto now = CyclTime::current();
         conn_list_.clear_and_dispose([now](auto* conn) { conn->dispose(now); });
     }
 
@@ -61,7 +61,7 @@ class BasicHttpServ : public TcpAcceptor<BasicHttpServ<ConnT, AppT>> {
     BasicHttpServ& operator=(BasicHttpServ&&) = delete;
 
   private:
-    void do_accept(WallTime now, IoSocket&& sock, const Endpoint& ep)
+    void do_accept(CyclTime now, IoSocket&& sock, const Endpoint& ep)
     {
         auto* const conn = new Conn{now, reactor_, std::move(sock), ep, app_};
         conn_list_.push_back(*conn);

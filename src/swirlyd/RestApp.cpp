@@ -93,26 +93,26 @@ string_view get_trader(const RestRequest& req)
 
 RestApp::~RestApp() = default;
 
-void RestApp::on_connect(WallTime now, const Endpoint& ep)
+void RestApp::on_connect(CyclTime now, const Endpoint& ep)
 {
     SWIRLY_INFO << "session connected: " << ep;
 }
 
-void RestApp::on_disconnect(WallTime now, const Endpoint& ep) noexcept
+void RestApp::on_disconnect(CyclTime now, const Endpoint& ep) noexcept
 {
     SWIRLY_INFO << "session disconnected: " << ep;
 }
 
-void RestApp::on_error(WallTime now, const Endpoint& ep, const std::exception& e) noexcept
+void RestApp::on_error(CyclTime now, const Endpoint& ep, const std::exception& e) noexcept
 {
     SWIRLY_ERROR << "session error: " << ep << ": " << e.what();
 }
 
-void RestApp::on_message(WallTime now, const Endpoint& ep, const RestRequest& req,
+void RestApp::on_message(CyclTime now, const Endpoint& ep, const RestRequest& req,
                          HttpStream& os) noexcept
 {
-    const auto cache = reset(req); // noexcept
-    now = get_time(now, req);      // noexcept
+    const auto cache = reset(req);                         // noexcept
+    const auto wall_time = get_time(now.wall_time(), req); // noexcept
 
     if (req.method() != HttpMethod::Delete) {
         os.reset(HttpStatus::Ok, ApplicationJson, cache); // noexcept
@@ -124,7 +124,7 @@ void RestApp::on_message(WallTime now, const Endpoint& ep, const RestRequest& re
         if (req.partial()) {
             throw BadRequestException{"request body is incomplete"sv};
         }
-        rest_request(now, req, os);
+        rest_request(wall_time, req, os);
         if (!match_path_) {
             throw NotFoundException{err_msg() << "resource '" << req.path() << "' does not exist"};
         }
@@ -150,7 +150,7 @@ void RestApp::on_message(WallTime now, const Endpoint& ep, const RestRequest& re
     os.commit(); // noexcept
 }
 
-void RestApp::on_timeout(WallTime now, const Endpoint& ep) noexcept
+void RestApp::on_timeout(CyclTime now, const Endpoint& ep) noexcept
 {
     SWIRLY_WARNING << "session timeout: " << ep;
 }

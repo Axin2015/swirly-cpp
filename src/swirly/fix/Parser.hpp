@@ -45,7 +45,7 @@ class BasicFixParser {
     BasicFixParser(BasicFixParser&&) = default;
     BasicFixParser& operator=(BasicFixParser&&) = default;
 
-    std::size_t parse(WallTime now, ConstBuffer buf)
+    std::size_t parse(CyclTime now, ConstBuffer buf)
     {
         // If body length has not been read.
         if (msg_type_off_ == 0) {

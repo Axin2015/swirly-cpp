@@ -38,15 +38,16 @@ class EchoConn {
     using AutoUnlinkOption = boost::intrusive::link_mode<boost::intrusive::auto_unlink>;
 
   public:
-    EchoConn(WallTime now, Reactor& r, IoSocket&& sock, const TcpEndpoint& ep)
+    EchoConn(CyclTime now, Reactor& r, IoSocket&& sock, const TcpEndpoint& ep)
     : reactor_(r)
     , sock_{move(sock)}
     , ep_{ep}
     {
         sub_ = r.subscribe(sock_.get(), EventIn, bind<&EchoConn::on_input>(this));
-        tmr_ = r.timer(now + IdleTimeout, Priority::Low, bind<&EchoConn::on_timer>(this));
+        tmr_ = r.timer(now.mono_time() + IdleTimeout, Priority::Low,
+                       bind<&EchoConn::on_timer>(this));
     }
-    void dispose(WallTime now) noexcept
+    void dispose(CyclTime now) noexcept
     {
         SWIRLY_INFO << "connection closed";
         delete this;
@@ -55,7 +56,7 @@ class EchoConn {
 
   private:
     ~EchoConn() = default;
-    void on_input(WallTime now, int fd, unsigned events)
+    void on_input(CyclTime now, int fd, unsigned events)
     {
         try {
             if (events & (EventIn | EventHup)) {
@@ -66,7 +67,7 @@ class EchoConn {
                     buf_.commit(size);
 
                     // Parse each buffered line.
-                    auto fn = [fd](WallTime now, std::string_view line) {
+                    auto fn = [fd](CyclTime now, std::string_view line) {
                         // Echo bytes back to client.
                         std::string buf{line};
                         buf += '\n';
@@ -78,7 +79,7 @@ class EchoConn {
 
                     // Reset timer.
                     tmr_.cancel();
-                    tmr_ = reactor_.timer(now + IdleTimeout, Priority::Low,
+                    tmr_ = reactor_.timer(now.mono_time() + IdleTimeout, Priority::Low,
                                           bind<&EchoConn::on_timer>(this));
                 } else {
                     dispose(now);
@@ -89,7 +90,7 @@ class EchoConn {
             dispose(now);
         }
     }
-    void on_timer(WallTime now, Timer& tmr)
+    void on_timer(CyclTime now, Timer& tmr)
     {
         SWIRLY_INFO << "timeout";
         dispose(now);
@@ -111,19 +112,19 @@ class EchoServ : public TcpAcceptor<EchoServ> {
     using ConnList = boost::intrusive::list<EchoConn, ConstantTimeSizeOption, MemberHookOption>;
 
   public:
-    EchoServ(WallTime now, Reactor& r, const Endpoint& ep)
+    EchoServ(CyclTime now, Reactor& r, const Endpoint& ep)
     : TcpAcceptor{r, ep}
     , reactor_(r)
     {
     }
     ~EchoServ()
     {
-        const auto now = WallClock::now();
+        const auto now = CyclTime::current();
         conn_list_.clear_and_dispose([now](auto* conn) { conn->dispose(now); });
     }
 
   private:
-    void do_accept(WallTime now, IoSocket&& sock, const Endpoint& ep)
+    void do_accept(CyclTime now, IoSocket&& sock, const Endpoint& ep)
     {
         SWIRLY_INFO << "connection opened: " << ep;
         sock.set_non_block();
@@ -143,7 +144,7 @@ int main(int argc, char* argv[])
     int ret = 1;
     try {
 
-        const auto start_time = WallClock::now();
+        const auto start_time = CyclTime::set();
 
         EpollReactor reactor{1024};
         const TcpEndpoint ep{Tcp::v4(), 7777};

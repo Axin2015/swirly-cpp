@@ -51,7 +51,7 @@ class TcpAcceptor {
     ~TcpAcceptor() = default;
 
   private:
-    void on_io_event(WallTime now, int fd, unsigned events)
+    void on_io_event(CyclTime now, int fd, unsigned events)
     {
         Endpoint ep;
         IoSocket sock{os::accept(fd, ep), serv_.family()};

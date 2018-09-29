@@ -46,19 +46,19 @@ class TestApp : public HttpApp {
     void bind(const std::string& path, Slot slot) { slot_map_[path] = slot; }
 
   protected:
-    void do_on_connect(WallTime now, const Endpoint& ep) noexcept override
+    void do_on_connect(CyclTime now, const Endpoint& ep) noexcept override
     {
         SWIRLY_INFO << "session connected: " << ep;
     }
-    void do_on_disconnect(WallTime now, const Endpoint& ep) noexcept override
+    void do_on_disconnect(CyclTime now, const Endpoint& ep) noexcept override
     {
         SWIRLY_INFO << "session disconnected: " << ep;
     }
-    void do_on_error(WallTime now, const Endpoint& ep, const std::exception& e) noexcept override
+    void do_on_error(CyclTime now, const Endpoint& ep, const std::exception& e) noexcept override
     {
         SWIRLY_ERROR << "session error: " << ep << ": " << e.what();
     }
-    void do_on_message(WallTime now, const Endpoint& ep, const HttpRequest& req,
+    void do_on_message(CyclTime now, const Endpoint& ep, const HttpRequest& req,
                        HttpStream& os) override
     {
         const auto it = slot_map_.find(string{req.path()});
@@ -71,7 +71,7 @@ class TestApp : public HttpApp {
         }
         os.commit();
     }
-    void do_on_timeout(WallTime now, const Endpoint& ep) noexcept override
+    void do_on_timeout(CyclTime now, const Endpoint& ep) noexcept override
     {
         SWIRLY_WARNING << "session timeout: " << ep;
     }
@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
     int ret = 1;
     try {
 
-        const auto start_time = WallClock::now();
+        const auto start_time = CyclTime::set();
 
         EpollReactor reactor{1024};
         TestApp app;

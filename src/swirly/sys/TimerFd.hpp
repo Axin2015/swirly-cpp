@@ -100,7 +100,20 @@ inline void timerfd_settime(int fd, int flags, const itimerspec& new_value)
 /**
  * Arm or disarm timer.
  */
-inline void timerfd_settime(int fd, int flags, WallTime expiry, Duration interval)
+template <typename ClockT>
+inline void timerfd_settime(int fd, int flags, std::chrono::time_point<ClockT, Duration> expiry,
+                            Duration interval, std::error_code& ec) noexcept
+{
+    return timerfd_settime(fd, flags | TFD_TIMER_ABSTIME,
+                           {to_timespec(interval), to_timespec(expiry)}, ec);
+}
+
+/**
+ * Arm or disarm timer.
+ */
+template <typename ClockT>
+inline void timerfd_settime(int fd, int flags, std::chrono::time_point<ClockT, Duration> expiry,
+                            Duration interval)
 {
     return timerfd_settime(fd, flags | TFD_TIMER_ABSTIME,
                            {to_timespec(interval), to_timespec(expiry)});
@@ -109,12 +122,63 @@ inline void timerfd_settime(int fd, int flags, WallTime expiry, Duration interva
 /**
  * Arm or disarm timer.
  */
-inline void timerfd_settime(int fd, int flags, WallTime expiry)
+template <typename ClockT>
+inline void timerfd_settime(int fd, int flags, std::chrono::time_point<ClockT, Duration> expiry,
+                            std::error_code& ec) noexcept
+{
+    return timerfd_settime(fd, flags | TFD_TIMER_ABSTIME, {{}, to_timespec(expiry)}, ec);
+}
+
+/**
+ * Arm or disarm timer.
+ */
+template <typename ClockT>
+inline void timerfd_settime(int fd, int flags, std::chrono::time_point<ClockT, Duration> expiry)
 {
     return timerfd_settime(fd, flags | TFD_TIMER_ABSTIME, {{}, to_timespec(expiry)});
 }
 
 } // namespace os
+
+template <typename ClockT>
+class TimerFd {
+  public:
+    using Clock = ClockT;
+    using TimePoint = std::chrono::time_point<ClockT, Duration>;
+
+    explicit TimerFd(int flags)
+    : fh_{os::timerfd_create(Clock::Id, flags)}
+    {
+    }
+    ~TimerFd() = default;
+
+    // Copy.
+    TimerFd(const TimerFd&) = delete;
+    TimerFd& operator=(const TimerFd&) = delete;
+
+    // Move.
+    TimerFd(TimerFd&&) = default;
+    TimerFd& operator=(TimerFd&&) = default;
+
+    int fd() const noexcept { return fh_.get(); }
+
+    void set_time(int flags, TimePoint expiry, Duration interval, std::error_code& ec) noexcept
+    {
+        return os::timerfd_settime(*fh_, flags, expiry, interval, ec);
+    }
+    void set_time(int flags, TimePoint expiry, Duration interval)
+    {
+        return os::timerfd_settime(*fh_, flags, expiry, interval);
+    }
+    void set_time(int flags, TimePoint expiry, std::error_code& ec) noexcept
+    {
+        return os::timerfd_settime(*fh_, flags, expiry, ec);
+    }
+    void set_time(int flags, TimePoint expiry) { return os::timerfd_settime(*fh_, flags, expiry); }
+
+  private:
+    FileHandle fh_;
+};
 
 } // namespace sys
 } // namespace swirly
