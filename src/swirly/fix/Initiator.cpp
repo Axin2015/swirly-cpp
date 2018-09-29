@@ -31,7 +31,7 @@ FixInitiator::FixInitiator(CyclTime now, Reactor& r, const Endpoint& ep,
     sess_map_.insert(move(node));
 
     // Immediate and then at 2s intervals.
-    tmr_ = reactor_.timer(now.wall_time(), 2s, Priority::Low, bind<&FixInitiator::on_timer>(this));
+    tmr_ = reactor_.timer(now.mono_time(), 2s, Priority::Low, bind<&FixInitiator::on_timer>(this));
 }
 
 FixInitiator::~FixInitiator()

@@ -43,7 +43,7 @@ class EchoConn {
     , ep_{ep}
     {
         sub_ = r.subscribe(sock_.get(), EventIn, bind<&EchoConn::on_input>(this));
-        tmr_ = r.timer(now.wall_time(), PingInterval, Priority::Low,
+        tmr_ = r.timer(now.mono_time(), PingInterval, Priority::Low,
                        bind<&EchoConn::on_timer>(this));
     }
     void dispose(CyclTime now) noexcept
@@ -116,7 +116,7 @@ class EchoClnt : public TcpConnector<EchoClnt> {
     , ep_(ep)
     {
         // Immediate and then at 2s intervals.
-        tmr_ = reactor_.timer(now.wall_time(), 2s, Priority::Low, bind<&EchoClnt::on_timer>(this));
+        tmr_ = reactor_.timer(now.mono_time(), 2s, Priority::Low, bind<&EchoClnt::on_timer>(this));
     }
     ~EchoClnt()
     {

@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
                 Recorder tr{reset_hist};
                 t = {};
             } else {
-                const auto expiry = now.wall_time() + Micros{dis(gen) % 100};
+                const auto expiry = now.mono_time() + Micros{dis(gen) % 100};
                 Recorder tr{replace_hist};
                 t = r.timer(expiry, Priority::High, bind<&TimerHandler::on_timer>(h.get()));
             }

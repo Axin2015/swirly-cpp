@@ -49,7 +49,7 @@ struct MonoClock {
     using rep = Duration::rep;
     using time_point = std::chrono::time_point<MonoClock, Duration>;
 
-    static constexpr int clock_id{CLOCK_MONOTONIC};
+    static constexpr int Id{CLOCK_MONOTONIC};
     static constexpr bool is_steady{true};
 
     static constexpr time_point max() noexcept
@@ -60,7 +60,7 @@ struct MonoClock {
         return time_point_cast<Duration>(FromPoint{secs});
     }
 
-    static time_point now() noexcept { return time_point{get_time(clock_id)}; }
+    static time_point now() noexcept { return time_point{get_time(Id)}; }
 };
 
 struct WallClock {
@@ -69,7 +69,7 @@ struct WallClock {
     using rep = Duration::rep;
     using time_point = std::chrono::time_point<WallClock, Duration>;
 
-    static constexpr int clock_id{CLOCK_REALTIME};
+    static constexpr int Id{CLOCK_REALTIME};
     static constexpr bool is_steady{false};
 
     static constexpr time_point max() noexcept
@@ -80,7 +80,7 @@ struct WallClock {
         return time_point_cast<Duration>(FromPoint{secs});
     }
 
-    static time_point now() noexcept { return time_point{get_time(clock_id)}; }
+    static time_point now() noexcept { return time_point{get_time(Id)}; }
 
     static constexpr std::time_t to_time_t(const time_point& tp) noexcept
     {
@@ -99,6 +99,7 @@ struct WallClock {
 using MonoTime = MonoClock::time_point;
 using WallTime = WallClock::time_point;
 
+SWIRLY_API std::ostream& operator<<(std::ostream& os, MonoTime t);
 SWIRLY_API std::ostream& operator<<(std::ostream& os, WallTime t);
 
 /**

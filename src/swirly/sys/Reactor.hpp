@@ -120,14 +120,14 @@ class SWIRLY_API Reactor {
     /**
      * Throws std::bad_alloc only.
      */
-    [[nodiscard]] Timer timer(WallTime expiry, Duration interval, Priority priority, TimerSlot slot)
+    [[nodiscard]] Timer timer(MonoTime expiry, Duration interval, Priority priority, TimerSlot slot)
     {
         return do_timer(expiry, interval, priority, slot);
     }
     /**
      * Throws std::bad_alloc only.
      */
-    [[nodiscard]] Timer timer(WallTime expiry, Priority priority, TimerSlot slot)
+    [[nodiscard]] Timer timer(MonoTime expiry, Priority priority, TimerSlot slot)
     {
         return do_timer(expiry, priority, slot);
     }
@@ -149,12 +149,12 @@ class SWIRLY_API Reactor {
     /**
      * Throws std::bad_alloc only.
      */
-    virtual Timer do_timer(WallTime expiry, Duration interval, Priority priority, TimerSlot slot)
+    virtual Timer do_timer(MonoTime expiry, Duration interval, Priority priority, TimerSlot slot)
         = 0;
     /**
      * Throws std::bad_alloc only.
      */
-    virtual Timer do_timer(WallTime expiry, Priority priority, TimerSlot slot) = 0;
+    virtual Timer do_timer(MonoTime expiry, Priority priority, TimerSlot slot) = 0;
 
     virtual int do_poll(CyclTime now, Duration timeout) = 0;
 };

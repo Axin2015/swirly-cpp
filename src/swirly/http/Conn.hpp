@@ -64,7 +64,7 @@ class BasicHttpConn
     , app_(app)
     {
         sub_ = r.subscribe(*sock_, EventIn, bind<&BasicHttpConn::on_io_event>(this));
-        tmr_ = r.timer(now.wall_time() + IdleTimeout, Priority::Low,
+        tmr_ = r.timer(now.mono_time() + IdleTimeout, Priority::Low,
                        bind<&BasicHttpConn::on_timer>(this));
         app.on_connect(now, ep_);
     }
@@ -194,7 +194,7 @@ class BasicHttpConn
 
                     // Reset timer.
                     tmr_.cancel();
-                    tmr_ = reactor_.timer(now.wall_time() + IdleTimeout, Priority::Low,
+                    tmr_ = reactor_.timer(now.mono_time() + IdleTimeout, Priority::Low,
                                           bind<&BasicHttpConn::on_timer>(this));
                 } else {
                     dispose(now);

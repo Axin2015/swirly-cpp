@@ -55,7 +55,7 @@ class HiccupThread {
                     const auto usec = diff.count();
                     recorder.record_value(usec);
                 };
-                auto t = r.timer(start.wall_time() + 1ms, Priority::Low, bind(&fn));
+                auto t = r.timer(start.mono_time() + 1ms, Priority::Low, bind(&fn));
                 while (!r.poll(start))
                     ;
             }

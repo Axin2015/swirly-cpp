@@ -151,7 +151,7 @@ void FixConn::on_io_event(CyclTime now, int fd, unsigned events)
 
 void FixConn::schedule_timeout(CyclTime now)
 {
-    in_.tmr = reactor_.timer(now.wall_time() + hb_int_ + 1s, Priority::Low,
+    in_.tmr = reactor_.timer(now.mono_time() + hb_int_ + 1s, Priority::Low,
                              bind<&FixConn::on_timeout>(this));
 }
 
@@ -163,7 +163,7 @@ void FixConn::on_timeout(CyclTime now, Timer& tmr)
 
 void FixConn::schedule_heartbeat(CyclTime now)
 {
-    out_.tmr = reactor_.timer(now.wall_time() + hb_int_, Priority::Low,
+    out_.tmr = reactor_.timer(now.mono_time() + hb_int_, Priority::Low,
                               bind<&FixConn::on_heartbeat>(this));
 }
 

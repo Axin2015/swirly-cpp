@@ -94,12 +94,12 @@ void EpollReactor::do_set_events(int fd, int sid, unsigned events)
     }
 }
 
-Timer EpollReactor::do_timer(WallTime expiry, Duration interval, Priority priority, TimerSlot slot)
+Timer EpollReactor::do_timer(MonoTime expiry, Duration interval, Priority priority, TimerSlot slot)
 {
     return tqs_[static_cast<size_t>(priority)].insert(expiry, interval, slot);
 }
 
-Timer EpollReactor::do_timer(WallTime expiry, Priority priority, TimerSlot slot)
+Timer EpollReactor::do_timer(MonoTime expiry, Priority priority, TimerSlot slot)
 {
     return tqs_[static_cast<size_t>(priority)].insert(expiry, slot);
 }
@@ -110,26 +110,26 @@ int EpollReactor::do_poll(CyclTime now, Duration timeout)
     using namespace chrono;
 
     // If timeout is zero then the wait_until time should also be zero to signify no wait.
-    WallTime wait_until{};
+    MonoTime wait_until{};
     if (!is_zero(timeout)) {
-        const WallTime next
-            = next_expiry(timeout == NoTimeout ? WallClock::max() : now.wall_time() + timeout);
-        if (next > now.wall_time()) {
+        const MonoTime next
+            = next_expiry(timeout == NoTimeout ? MonoClock::max() : now.mono_time() + timeout);
+        if (next > now.mono_time()) {
             wait_until = next;
         }
     }
 
+    int n;
     Event buf[MaxEvents];
     error_code ec;
-    int ret;
-    if (wait_until == WallClock::max()) {
+    if (wait_until == MonoClock::max()) {
         // Block indefinitely.
-        ret = mux_.wait(buf, MaxEvents, ec);
+        n = mux_.wait(buf, MaxEvents, ec);
     } else {
         // The wait function will not block if time is zero.
-        ret = mux_.wait(buf, MaxEvents, wait_until, ec);
+        n = mux_.wait(buf, MaxEvents, wait_until, ec);
     }
-    if (ret < 0) {
+    if (ec) {
         if (ec.value() != EINTR) {
             throw system_error{ec};
         }
@@ -139,12 +139,12 @@ int EpollReactor::do_poll(CyclTime now, Duration timeout)
     if (!is_zero(wait_until)) {
         now = CyclTime::set();
     }
-    const auto n = tqs_[High].dispatch(now) + dispatch(now, buf, ret);
+    n = tqs_[High].dispatch(now) + dispatch(now, buf, n);
     // Low priority timers are only dispatched during empty cycles.
     return n == 0 ? tqs_[Low].dispatch(now) : n;
 }
 
-WallTime EpollReactor::next_expiry(WallTime next) const
+MonoTime EpollReactor::next_expiry(MonoTime next) const
 {
     enum { High = 0, Low = 1 };
     using namespace chrono;

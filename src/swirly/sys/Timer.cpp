@@ -37,7 +37,7 @@ bool is_after(const Timer& lhs, const Timer& rhs)
 
 } // namespace
 
-Timer::Impl* TimerPool::alloc(WallTime expiry, Duration interval, TimerSlot slot)
+Timer::Impl* TimerPool::alloc(MonoTime expiry, Duration interval, TimerSlot slot)
 {
     Timer::Impl* impl;
 
@@ -63,7 +63,7 @@ Timer::Impl* TimerPool::alloc(WallTime expiry, Duration interval, TimerSlot slot
     return impl;
 }
 
-Timer TimerQueue::insert(WallTime expiry, Duration interval, TimerSlot slot)
+Timer TimerQueue::insert(MonoTime expiry, Duration interval, TimerSlot slot)
 {
     assert(slot);
 
@@ -87,7 +87,7 @@ int TimerQueue::dispatch(CyclTime now)
             pop();
             --cancelled_;
             assert(cancelled_ >= 0);
-        } else if (heap_.front().expiry() <= now.wall_time()) {
+        } else if (heap_.front().expiry() <= now.mono_time()) {
             expire(now);
             ++n;
         } else {
@@ -98,7 +98,7 @@ int TimerQueue::dispatch(CyclTime now)
     return n;
 }
 
-Timer TimerQueue::alloc(WallTime expiry, Duration interval, TimerSlot slot)
+Timer TimerQueue::alloc(MonoTime expiry, Duration interval, TimerSlot slot)
 {
     Timer::Impl* impl{pool_.alloc(expiry, interval, slot)};
 
@@ -145,7 +145,7 @@ void TimerQueue::expire(CyclTime now)
         if (tmr.interval().count() > 0) {
 
             // Add interval to expiry, while ensuring that next expiry is always in the future.
-            tmr.set_expiry(max(tmr.expiry() + tmr.interval(), now.wall_time() + 1ns));
+            tmr.set_expiry(max(tmr.expiry() + tmr.interval(), now.mono_time() + 1ns));
 
             // Reschedule popped timer.
             heap_.push_back(tmr);

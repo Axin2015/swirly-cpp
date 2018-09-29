@@ -66,12 +66,11 @@ class EpollMuxer {
 
     explicit EpollMuxer(std::size_t size_hint)
     : mux_{os::epoll_create(size_hint)}
-    // FIXME: it's not entirely clear whether realtime or monotonic is the better choice here.
-    , tfd_{os::timerfd_create(CLOCK_REALTIME, TFD_NONBLOCK)}
+    , tfd_{TFD_NONBLOCK}
     {
-        subscribe(*tfd_, 0, EventIn);
+        subscribe(tfd_.fd(), 0, EventIn);
     }
-    ~EpollMuxer() { unsubscribe(*tfd_); }
+    ~EpollMuxer() { unsubscribe(tfd_.fd()); }
 
     // Copy.
     EpollMuxer(const EpollMuxer&) = delete;
@@ -82,16 +81,29 @@ class EpollMuxer {
     EpollMuxer& operator=(EpollMuxer&& rhs) = default;
 
     void swap(EpollMuxer& rhs) noexcept { std::swap(mux_, rhs.mux_); }
-    int wait(Event buf[], std::size_t size, std::error_code& ec) const
+    /**
+     * Returns the number of file descriptors that are ready.
+     */
+    int wait(Event buf[], std::size_t size, std::error_code& ec)
     {
         // A zero timeout will disarm the timer.
-        os::timerfd_settime(*tfd_, 0, WallTime{});
+        tfd_.set_time(0, MonoTime{}, ec);
+        if (ec) {
+            return 0;
+        }
         return os::epoll_wait(*mux_, buf, size, -1, ec);
     }
-    int wait(Event buf[], std::size_t size, WallTime timeout, std::error_code& ec) const
+    /**
+     * Returns the number of file descriptors that are ready, or zero if no file descriptor became
+     * ready during before the operation timed-out.
+     */
+    int wait(Event buf[], std::size_t size, MonoTime timeout, std::error_code& ec)
     {
         // A zero timeout will disarm the timer.
-        os::timerfd_settime(*tfd_, 0, timeout);
+        tfd_.set_time(0, timeout, ec);
+        if (ec) {
+            return 0;
+        }
         // Do not block if timer is zero.
         return os::epoll_wait(*mux_, buf, size, is_zero(timeout) ? 0 : -1, ec);
     }
@@ -141,7 +153,8 @@ class EpollMuxer {
         ev.events = n;
         ev.data.u64 = static_cast<std::uint64_t>(sid) << 32 | fd;
     }
-    FileHandle mux_, tfd_;
+    FileHandle mux_;
+    TimerFd<MonoClock> tfd_;
 };
 
 } // namespace sys

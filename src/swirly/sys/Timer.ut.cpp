@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(TimerEmptyCase)
 
 BOOST_AUTO_TEST_CASE(TimerInsertCase)
 {
-    const auto now = WallClock::now();
+    const auto now = MonoClock::now();
     TimerPool tp;
     TimerQueue tq{tp};
 
