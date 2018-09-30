@@ -13,8 +13,8 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-configure_file(Config.h.in "${PROJECT_BINARY_DIR}/include/swirly/Config.h")
-install(FILES "${PROJECT_BINARY_DIR}/include/swirly/Config.h"
+configure_file(Config.h.in "${CMAKE_BINARY_DIR}/include/swirly/Config.h")
+install(FILES "${CMAKE_BINARY_DIR}/include/swirly/Config.h"
   DESTINATION include/swirly
   COMPONENT header
 )

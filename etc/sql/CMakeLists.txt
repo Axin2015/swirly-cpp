@@ -27,10 +27,10 @@ if(SQLITE3_EXECUTABLE)
     forex
   )
 
-  file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/db")
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/db")
   foreach(name ${names})
 
-    set(dbfile "${PROJECT_BINARY_DIR}/db/${name}.db")
+    set(dbfile "${CMAKE_BINARY_DIR}/db/${name}.db")
 
     add_custom_command(
       OUTPUT "${dbfile}"

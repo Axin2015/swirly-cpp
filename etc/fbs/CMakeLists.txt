@@ -27,19 +27,19 @@ build_flatbuffers(
   "${CMAKE_CURRENT_SOURCE_DIR}"
   swirly-fbs
   ""
-  "${PROJECT_BINARY_DIR}/include/swirly/fbs"
+  "${CMAKE_BINARY_DIR}/include/swirly/fbs"
   ""
   "")
 
 install(FILES ${fbs_SOURCES} DESTINATION etc/fbs COMPONENT config)
 install(FILES
-  "${PROJECT_BINARY_DIR}/include/swirly/fbs/Asset_generated.h"
-  "${PROJECT_BINARY_DIR}/include/swirly/fbs/Exec_generated.h"
-  "${PROJECT_BINARY_DIR}/include/swirly/fbs/Instr_generated.h"
-  "${PROJECT_BINARY_DIR}/include/swirly/fbs/Market_generated.h"
-  "${PROJECT_BINARY_DIR}/include/swirly/fbs/Order_generated.h"
-  "${PROJECT_BINARY_DIR}/include/swirly/fbs/Posn_generated.h"
-  "${PROJECT_BINARY_DIR}/include/swirly/fbs/Types_generated.h"
+  "${CMAKE_BINARY_DIR}/include/swirly/fbs/Asset_generated.h"
+  "${CMAKE_BINARY_DIR}/include/swirly/fbs/Exec_generated.h"
+  "${CMAKE_BINARY_DIR}/include/swirly/fbs/Instr_generated.h"
+  "${CMAKE_BINARY_DIR}/include/swirly/fbs/Market_generated.h"
+  "${CMAKE_BINARY_DIR}/include/swirly/fbs/Order_generated.h"
+  "${CMAKE_BINARY_DIR}/include/swirly/fbs/Posn_generated.h"
+  "${CMAKE_BINARY_DIR}/include/swirly/fbs/Types_generated.h"
   DESTINATION include/swirly/fbs
   COMPONENT header
 )

@@ -13,14 +13,14 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-configure_file(swirlyd.conf.in "${PROJECT_BINARY_DIR}/etc/swirlyd.conf")
-configure_file(swirlyd.service.in "${PROJECT_BINARY_DIR}/etc/swirlyd.service")
-configure_file(swirlyd.service.conf.in "${PROJECT_BINARY_DIR}/etc/swirlyd.service.conf")
+configure_file(swirlyd.conf.in "${CMAKE_BINARY_DIR}/etc/swirlyd.conf")
+configure_file(swirlyd.service.in "${CMAKE_BINARY_DIR}/etc/swirlyd.service")
+configure_file(swirlyd.service.conf.in "${CMAKE_BINARY_DIR}/etc/swirlyd.service.conf")
 
 install(FILES
-  "${PROJECT_BINARY_DIR}/etc/swirlyd.conf"
-  "${PROJECT_BINARY_DIR}/etc/swirlyd.service"
-  "${PROJECT_BINARY_DIR}/etc/swirlyd.service.conf"
+  "${CMAKE_BINARY_DIR}/etc/swirlyd.conf"
+  "${CMAKE_BINARY_DIR}/etc/swirlyd.service"
+  "${CMAKE_BINARY_DIR}/etc/swirlyd.service.conf"
   DESTINATION etc
   COMPONENT config
 )

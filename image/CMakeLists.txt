@@ -32,7 +32,7 @@ if(DOT_EXECUTABLE)
 
   foreach(name ${names})
 
-    set(outfile "${PROJECT_BINARY_DIR}/image/swirly-${name}.png")
+    set(outfile "${CMAKE_BINARY_DIR}/image/swirly-${name}.png")
 
     add_custom_command(
       OUTPUT "${outfile}"

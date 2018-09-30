@@ -2,7 +2,7 @@
 # This wrapper script is required because the --error-exitcode option
 # seems to ignore the --suppressions-list option.
 errors=$("${CPPCHECK}" -j ${CORE_COUNT} \
-                       --project="${PROJECT_BINARY_DIR}/compile_commands.json" \
+                       --project="${CMAKE_BINARY_DIR}/compile_commands.json" \
                        --quiet \
                        --std=c++14 \
                        --suppressions-list="${PROJECT_SOURCE_DIR}/etc/cppcheck-suppressions.txt" \
