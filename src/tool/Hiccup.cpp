@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
         for (;;) {
             switch (const auto sig = sig_wait(1s)) {
             case 0: {
-                inactive = recorder.sample_and_recycle(inactive);
+                inactive = recorder.sample();
                 assert(inactive);
 
                 const auto end_time = WallClock::now();

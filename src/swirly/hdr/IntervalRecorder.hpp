@@ -65,10 +65,7 @@ class SWIRLY_API IntervalRecorder {
         return hdr_interval_recorder_record_value(&recorder_, value) != 0;
     }
 
-    hdr_histogram* sample_and_recycle(hdr_histogram* inactive_histogram) noexcept
-    {
-        return hdr_interval_recorder_sample_and_recycle(&recorder_, inactive_histogram);
-    }
+    hdr_histogram* sample() noexcept { return hdr_interval_recorder_sample(&recorder_); }
 
   private:
     hdr_interval_recorder recorder_{};
