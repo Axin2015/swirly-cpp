@@ -18,6 +18,9 @@ add_subdirectory(swirlyd)
 if(Qt5Widgets_FOUND AND Qt5Network_FOUND)
   add_subdirectory(swirlyui)
 endif()
-add_subdirectory(example)
 add_subdirectory(tool)
+
+# Testing.
+add_subdirectory(bench)
+add_subdirectory(example)
 add_subdirectory(swift)

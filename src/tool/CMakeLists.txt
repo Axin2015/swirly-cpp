@@ -18,10 +18,6 @@ add_custom_target(swirly-tool DEPENDS
   swirly-db-to-json
   swirly-hdr-decoder
   swirly-hiccup
-  swirly-lob-bench
-  swirly-micro-bench
-  swirly-queue-bench
-  swirly-timer-bench
 )
 
 add_executable(swirly-db-to-dsv DbToDsv.cpp)
@@ -39,53 +35,3 @@ install(TARGETS swirly-hdr-decoder DESTINATION bin COMPONENT program)
 add_executable(swirly-hiccup Hiccup.cpp)
 target_link_libraries(swirly-hiccup ${swirly_hdr_LIBRARY} ${swirly_sys_LIBRARY})
 install(TARGETS swirly-hiccup DESTINATION bin COMPONENT program)
-
-add_executable(swirly-lob-bench LobBench.cpp)
-target_link_libraries(swirly-lob-bench ${swirly_hdr_LIBRARY} ${swirly_lob_LIBRARY}
-  ${swirly_db_LIBRARY})
-install(TARGETS swirly-lob-bench DESTINATION bin COMPONENT program)
-
-add_executable(swirly-micro-bench MicroBench.cpp)
-target_link_libraries(swirly-micro-bench ${swirly_hdr_LIBRARY} ${swirly_sys_LIBRARY})
-install(TARGETS swirly-micro-bench DESTINATION bin COMPONENT program)
-
-add_executable(swirly-queue-bench QueueBench.cpp)
-target_link_libraries(swirly-queue-bench ${swirly_hdr_LIBRARY} ${swirly_app_LIBRARY})
-install(TARGETS swirly-queue-bench DESTINATION bin COMPONENT program)
-
-add_executable(swirly-timer-bench TimerBench.cpp)
-target_link_libraries(swirly-timer-bench ${swirly_hdr_LIBRARY} ${swirly_sys_LIBRARY})
-install(TARGETS swirly-timer-bench DESTINATION bin COMPONENT program)
-
-add_custom_target(lob-benchmark DEPENDS
-swirly-lob-bench
-WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-COMMAND bash -c "${CMAKE_INSTALL_BINDIR}/swirly-lob-bench \
-  && \"${CMAKE_SOURCE_DIR}/script/hist-plot.sh\" \
-  lob-maker.hdr lob-taker.hdr> lob-benchmark.png"
-VERBATIM
-)
-
-add_custom_target(queue-benchmark DEPENDS
-swirly-queue-bench
-WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-COMMAND bash -c "${CMAKE_INSTALL_BINDIR}/swirly-queue-bench \
-  && \"${CMAKE_SOURCE_DIR}/script/hist-plot.sh\" \
-  queue.hdr> queue-benchmark.png"
-VERBATIM
-)
-
-add_custom_target(timer-benchmark DEPENDS
-swirly-timer-bench
-WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
-COMMAND bash -c "${CMAKE_INSTALL_BINDIR}/swirly-timer-bench \
-  && \"${CMAKE_SOURCE_DIR}/script/hist-plot.sh\" \
-  timer-replace.hdr timer-reset.hdr> timer-benchmark.png"
-VERBATIM
-)
-
-add_custom_target(benchmark DEPENDS
-lob-benchmark
-queue-benchmark
-timer-benchmark
-)

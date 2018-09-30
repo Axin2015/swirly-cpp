@@ -98,15 +98,15 @@ if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
   add_definitions(-DSWIRLY_BUILD_DEBUG=1)
 endif()
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}")
 
 set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
 set(CMAKE_INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")
 
-file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/share/doc/html")
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/share/doc/html")
 
 find_program(DOT_EXECUTABLE dot)
 find_program(ENV_EXECUTABLE env)
@@ -166,13 +166,13 @@ find_package(Qt5Network QUIET)
 
 if(DOXYGEN_FOUND)
   configure_file("${PROJECT_SOURCE_DIR}/Doxyfile.in"
-    "${PROJECT_BINARY_DIR}/Doxyfile")
+    "${CMAKE_BINARY_DIR}/Doxyfile")
 
   add_custom_target(doc
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
-    COMMAND "${CMAKE_COMMAND}" -E make_directory "${PROJECT_BINARY_DIR}/share"
-    COMMAND "${DOXYGEN_EXECUTABLE}" "${PROJECT_BINARY_DIR}/Doxyfile"
-    SOURCES "${PROJECT_BINARY_DIR}/Doxyfile")
+    COMMAND "${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/share"
+    COMMAND "${DOXYGEN_EXECUTABLE}" "${CMAKE_BINARY_DIR}/Doxyfile"
+    SOURCES "${CMAKE_BINARY_DIR}/Doxyfile")
 
   add_dependencies(doc image)
 endif()
@@ -184,7 +184,7 @@ include_directories(SYSTEM
 
 include_directories(
   "${PROJECT_SOURCE_DIR}/src"
-  "${PROJECT_BINARY_DIR}/include")
+  "${CMAKE_BINARY_DIR}/include")
 
 if(SWIRLY_BUILD_SHARED)
   set(swirly_util_LIBRARY swirly-util-shared)
@@ -215,16 +215,16 @@ find_program(CPPCHECK cppcheck HINTS "${SWIRLY_TOOLSET}/bin")
 if (CPPCHECK)
   message(STATUS "Found cppcheck")
   cmake_host_system_information(RESULT CORE_COUNT QUERY NUMBER_OF_LOGICAL_CORES)
-  configure_file("${PROJECT_SOURCE_DIR}/cppcheck.sh.in" "${PROJECT_BINARY_DIR}/cppcheck.sh")
-  add_custom_target(cppcheck COMMAND bash "${PROJECT_BINARY_DIR}/cppcheck.sh")
+  configure_file("${PROJECT_SOURCE_DIR}/cppcheck.sh.in" "${CMAKE_BINARY_DIR}/cppcheck.sh")
+  add_custom_target(cppcheck COMMAND bash "${CMAKE_BINARY_DIR}/cppcheck.sh")
 endif()
 
 # Add clang-format target if tool is available
 find_program(CLANG_FORMAT clang-format HINTS "${SWIRLY_TOOLSET}/bin")
 if (CLANG_FORMAT)
   message(STATUS "Found clang-format")
-  configure_file("${PROJECT_SOURCE_DIR}/clang-format.sh.in" "${PROJECT_BINARY_DIR}/clang-format.sh")
-  add_custom_target(clang-format COMMAND bash "${PROJECT_BINARY_DIR}/clang-format.sh")
+  configure_file("${PROJECT_SOURCE_DIR}/clang-format.sh.in" "${CMAKE_BINARY_DIR}/clang-format.sh")
+  add_custom_target(clang-format COMMAND bash "${CMAKE_BINARY_DIR}/clang-format.sh")
 endif()
 
 # Add clang-tidy target if tool is available
@@ -235,7 +235,7 @@ if (CLANG_TIDY)
   add_custom_target(clang-tidy COMMAND "${CLANG_TIDY}"
         -quiet
         -j ${CORE_COUNT}
-        -p "${PROJECT_BINARY_DIR}")
+        -p "${CMAKE_BINARY_DIR}")
 endif()
 
 add_subdirectory(HdrHistogram_c)
