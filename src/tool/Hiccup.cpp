@@ -49,15 +49,17 @@ class HiccupThread {
         try {
             EpollReactor r{1};
             while (!stop.load(memory_order_relaxed)) {
-                const auto start = CyclTime::set();
+                auto start = CyclTime::set();
                 auto fn = [&recorder, start](CyclTime now, Timer& tmr) {
-                    const chrono::duration<double, micro> diff{now.mono_time() - start.mono_time()};
-                    const auto usec = diff.count();
-                    recorder.record_value(usec);
+                    const auto end = MonoClock::now();
+                    const auto diff
+                        = chrono::duration_cast<chrono::nanoseconds>(end - start.mono_time());
+                    recorder.record_value(diff.count());
                 };
                 auto t = r.timer(start.mono_time() + 1ms, Priority::Low, bind(&fn));
-                while (!r.poll(start))
-                    ;
+                while (!r.poll(start)) {
+                    start = CyclTime::set();
+                }
             }
         } catch (const std::exception& e) {
             cerr << "exception: " << e.what() << endl;
