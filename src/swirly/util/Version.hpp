@@ -34,8 +34,8 @@ struct Version : protected Comparable<Version> {
     ~Version() = default;
 
     // Copy.
-    constexpr Version(const Version& rhs) noexcept = default;
-    constexpr Version& operator=(const Version& rhs) noexcept = default;
+    constexpr Version(const Version&) noexcept = default;
+    constexpr Version& operator=(const Version&) noexcept = default;
 
     // Move.
     constexpr Version(Version&&) noexcept = default;

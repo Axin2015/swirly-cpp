@@ -14,35 +14,41 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Logon.hpp"
+#ifndef SWIRLY_FIX_MSG_HPP
+#define SWIRLY_FIX_MSG_HPP
 
-#include "Lexer.hpp"
+#include <swirly/fix/Field.hpp>
 
 namespace swirly {
 inline namespace fix {
-using namespace std;
 
-ostream& operator<<(ostream& os, const Logon& body)
+struct Logon {
+    EncryptMethod encrypt_method;
+    HeartBtInt heart_bt_int;
+};
+
+template <typename StreamT>
+StreamT& operator<<(StreamT& os, const Logon& body)
 {
     return os << body.encrypt_method << body.heart_bt_int;
 }
 
-void parse_body(string_view msg, size_t body_off, Logon& body)
+SWIRLY_API void parse_body(std::string_view msg, std::size_t body_off, Logon& body);
+
+struct TradingSessionStatus {
+    TradingSessionId trading_session_id;
+    TradSesStatus trad_ses_status;
+};
+
+template <typename StreamT>
+StreamT& operator<<(StreamT& os, const TradingSessionStatus& body)
 {
-    msg.remove_suffix(CheckSumLen);
-    FixLexer lex{msg, body_off};
-    while (!lex.empty()) {
-        const auto [t, v] = lex.next();
-        switch (t) {
-        case EncryptMethod::Tag:
-            body.encrypt_method = from_string<EncryptMethod::Type>(v);
-            break;
-        case HeartBtInt::Tag:
-            body.heart_bt_int = from_string<HeartBtInt::Type>(v);
-            break;
-        }
-    }
+    return os << body.trading_session_id << body.trad_ses_status;
 }
+
+SWIRLY_API void parse_body(std::string_view msg, std::size_t body_off, TradingSessionStatus& body);
 
 } // namespace fix
 } // namespace swirly
+
+#endif // SWIRLY_FIX_MSG_HPP

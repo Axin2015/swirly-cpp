@@ -36,8 +36,8 @@ struct BasicFixSessId {
     ~BasicFixSessId() = default;
 
     // Copy.
-    BasicFixSessId(const BasicFixSessId& rhs) = default;
-    BasicFixSessId& operator=(const BasicFixSessId& rhs) = default;
+    BasicFixSessId(const BasicFixSessId&) = default;
+    BasicFixSessId& operator=(const BasicFixSessId&) = default;
 
     // Move.
     BasicFixSessId(BasicFixSessId&&) = default;

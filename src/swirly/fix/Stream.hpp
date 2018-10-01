@@ -23,6 +23,8 @@
 
 #include <swirly/util/Stream.hpp>
 
+#include <charconv>
+
 namespace swirly {
 inline namespace fix {
 
@@ -35,8 +37,8 @@ class SWIRLY_API FixBuf : public std::streambuf {
     ~FixBuf() override;
 
     // Copy.
-    FixBuf(const FixBuf& rhs) = delete;
-    FixBuf& operator=(const FixBuf& rhs) = delete;
+    FixBuf(const FixBuf&) = delete;
+    FixBuf& operator=(const FixBuf&) = delete;
 
     // Move.
     FixBuf(FixBuf&&) = delete;
@@ -52,11 +54,26 @@ class SWIRLY_API FixBuf : public std::streambuf {
     }
     void set_body_length(std::streamsize pos, std::streamsize len) noexcept;
 
+    void put_num(int val) { put_num<int, 11>(val); }
+    void put_num(long val) { put_num<long, 21>(val); }
+
   protected:
-    int_type overflow(int_type c) noexcept override;
-    std::streamsize xsputn(const char_type* s, std::streamsize count) noexcept override;
+    int_type overflow(int_type c) override;
+    std::streamsize xsputn(const char_type* s, std::streamsize count) override;
 
   private:
+    template <typename ValueT, std::size_t MaxN>
+    void put_num(ValueT val)
+    {
+        auto buf = buf_.prepare(pcount_ + MaxN + CheckSumLen);
+        pbase_ = buffer_cast<char*>(buf);
+        char* it = pbase_ + pcount_;
+        const auto [end, ec] = std::to_chars(it, it + MaxN, val);
+        pcount_ += (end - it);
+        for (; it != end; ++it) {
+            sum_ += *it;
+        }
+    }
     Buffer& buf_;
     char* pbase_{nullptr};
     std::streamsize pcount_{0};
@@ -74,8 +91,8 @@ class SWIRLY_API FixStream : public std::ostream {
     ~FixStream() override;
 
     // Copy.
-    FixStream(const FixStream& rhs) = delete;
-    FixStream& operator=(const FixStream& rhs) = delete;
+    FixStream(const FixStream&) = delete;
+    FixStream& operator=(const FixStream&) = delete;
 
     // Move.
     FixStream(FixStream&&) = delete;
@@ -90,6 +107,12 @@ class SWIRLY_API FixStream : public std::ostream {
         bloff_ = 0;
     }
     void reset(Version ver);
+
+    template <typename ValueT>
+    void put_num(ValueT val)
+    {
+        buf_.put_num(val);
+    }
 
   private:
     FixBuf buf_;

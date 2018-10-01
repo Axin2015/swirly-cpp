@@ -17,10 +17,10 @@
 #ifndef SWIRLY_FIX_FIELD_HPP
 #define SWIRLY_FIX_FIELD_HPP
 
+#include <swirly/fix/Stream.hpp>
+
 #include <swirly/util/StringBuf.hpp>
 #include <swirly/util/Time.hpp>
-
-#include <ostream>
 
 namespace swirly {
 inline namespace fix {
@@ -84,40 +84,90 @@ bool operator!=(const FixField<TagN, ValueT>& lhs, const FixField<TagN, ValueT>&
 }
 
 template <int TagN, typename ValueT>
-std::ostream& operator<<(std::ostream& os, const FixField<TagN, ValueT>& field)
+FixStream& operator<<(FixStream& os, const FixField<TagN, ValueT>& field)
 {
-    os << field.Tag << '=';
-    if constexpr (std::is_same_v<ValueT, bool>) {
-        os << (field.value ? 'Y' : 'N');
-    } else if constexpr (std::is_same_v<ValueT, WallTime>) {
+    os.put_num(field.Tag);
+    os.put('=');
+    if constexpr (std::is_same_v<ValueT, WallTime>) {
         os << put_time<Millis>(field.value, "%Y%m%d-%T");
+    } else if constexpr (std::is_same_v<ValueT, bool>) {
+        os.put(field.value ? 'Y' : 'N');
+    } else if constexpr (std::is_same_v<ValueT, std::byte>) {
+        os.put_num(static_cast<int>(field.value));
+    } else if constexpr (std::is_integral_v<ValueT>) {
+        // FIXME: switch to std::is_arithmetic_v<> once GCC and Clang have floating-point overloads
+        // for the std::to_chars() function.
+        os.put_num(field.value);
     } else {
         os << field.value;
     }
-    return os << '\1';
+    os.put('\1');
+    return os;
+}
+
+template <int TagN, typename ValueT>
+std::ostream& operator<<(std::ostream& os, const FixField<TagN, ValueT>& field)
+{
+    os << field.Tag;
+    os.put('=');
+    if constexpr (std::is_same_v<ValueT, WallTime>) {
+        os << put_time<Millis>(field.value, "%Y%m%d-%T");
+    } else if constexpr (std::is_same_v<ValueT, bool>) {
+        os.put(field.value ? 'Y' : 'N');
+    } else if constexpr (std::is_same_v<ValueT, std::byte>) {
+        os << static_cast<int>(field.value);
+    } else {
+        os << field.value;
+    }
+    os.put('\1');
+    return os;
 }
 
 template <int TagN>
 using BoolField = FixField<TagN, bool>;
 
 template <int TagN>
+using CharField = FixField<TagN, std::byte>;
+
+// Double fields should be avoided for performance reasons.
+// Ticks and lots should be used instead of price and quantity.
+template <int TagN>
 using DoubleField = FixField<TagN, double>;
 
 template <int TagN>
 using IntField = FixField<TagN, int>;
 
+template <int TagN>
+using LongField = FixField<TagN, long>;
+
 template <int TagN, std::size_t MaxN>
 using StringField = FixField<TagN, StringBuf<MaxN>>;
 
 template <int TagN>
-using StringViewField = FixField<TagN, std::string_view>;
-
-template <int TagN>
 using TimeField = FixField<TagN, WallTime>;
 
+// Int aliases.
+
+template <int TagN>
+using LengthField = IntField<TagN>;
+
+template <int TagN>
+using NumInGroupField = IntField<TagN>;
+
+template <int TagN>
+using SeqNumField = IntField<TagN>;
+
+// Long aliases.
+
+template <int TagN>
+using PriceField = LongField<TagN>;
+
+template <int TagN>
+using QtyField = LongField<TagN>;
+
 using BeginString = StringField<8, 7>;
-using BodyLength = IntField<9>;
-using MsgSeqNum = IntField<34>;
+using BodyLength = LengthField<9>;
+using MsgSeqNum = SeqNumField<34>;
 using MsgType = StringField<35, 2>;
 using SenderCompId = StringField<49, 32>;
 using PossDupFlag = BoolField<43>;
@@ -126,6 +176,12 @@ using TargetCompId = StringField<56, 32>;
 using PossResend = BoolField<97>;
 using EncryptMethod = IntField<98>;
 using HeartBtInt = IntField<108>;
+using NoMdEntries = NumInGroupField<268>;
+using MdEntryType = CharField<269>;
+using MdEntryPx = PriceField<270>;
+using MdEntrySize = QtyField<271>;
+using TradingSessionId = StringField<336, 32>;
+using TradSesStatus = IntField<340>;
 
 static_assert(FixField<8, std::string_view>{}.Tag == 8);
 static_assert(BodyLength{101}.value == BodyLength{101}.value);

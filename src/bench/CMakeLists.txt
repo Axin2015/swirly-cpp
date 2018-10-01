@@ -14,11 +14,15 @@
 # 02110-1301, USA.
 
 add_custom_target(swirly-bench DEPENDS
+  swirly-fix-bench
   swirly-lob-bench
   swirly-micro-bench
   swirly-queue-bench
   swirly-timer-bench
 )
+
+add_executable(swirly-fix-bench FixBench.cpp)
+target_link_libraries(swirly-fix-bench ${swirly_hdr_LIBRARY} ${swirly_fix_LIBRARY})
 
 add_executable(swirly-lob-bench LobBench.cpp)
 target_link_libraries(swirly-lob-bench ${swirly_hdr_LIBRARY} ${swirly_lob_LIBRARY}
@@ -32,6 +36,15 @@ target_link_libraries(swirly-queue-bench ${swirly_hdr_LIBRARY} ${swirly_app_LIBR
 
 add_executable(swirly-timer-bench TimerBench.cpp)
 target_link_libraries(swirly-timer-bench ${swirly_hdr_LIBRARY} ${swirly_sys_LIBRARY})
+
+add_custom_target(fix-benchmark DEPENDS
+swirly-fix-bench
+WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+COMMAND bash -c "${CMAKE_INSTALL_BINDIR}/swirly-fix-bench \
+  && \"${PROJECT_SOURCE_DIR}/script/hist-plot.sh\" \
+  fix.hdr> fix-benchmark.png"
+VERBATIM
+)
 
 add_custom_target(lob-benchmark DEPENDS
 swirly-lob-bench
@@ -61,6 +74,7 @@ VERBATIM
 )
 
 add_custom_target(benchmark DEPENDS
+fix-benchmark
 lob-benchmark
 queue-benchmark
 timer-benchmark

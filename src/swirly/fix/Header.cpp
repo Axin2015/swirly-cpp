@@ -43,19 +43,6 @@ inline bool is_header_tag(int tag) noexcept
 
 } // namespace
 
-ostream& operator<<(ostream& os, const FixHeader& hdr)
-{
-    os << hdr.msg_type << hdr.sender_comp_id << hdr.target_comp_id << hdr.msg_seq_num
-       << hdr.sending_time;
-    if (hdr.poss_dup) {
-        os << *hdr.poss_dup;
-    }
-    if (hdr.poss_resend) {
-        os << *hdr.poss_resend;
-    }
-    return os;
-}
-
 size_t parse_header(string_view msg, size_t msg_type_off, FixHeader& hdr)
 {
     FixLexer lex{msg, msg_type_off};

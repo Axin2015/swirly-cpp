@@ -89,8 +89,8 @@ class MemQueue {
     ~MemQueue() = default;
 
     // Copy.
-    MemQueue(const MemQueue& rhs) = delete;
-    MemQueue& operator=(const MemQueue& rhs) = delete;
+    MemQueue(const MemQueue&) = delete;
+    MemQueue& operator=(const MemQueue&) = delete;
 
     // Move.
     MemQueue(MemQueue&& rhs) noexcept

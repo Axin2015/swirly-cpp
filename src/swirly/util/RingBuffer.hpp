@@ -36,8 +36,8 @@ class RingBuffer {
     ~RingBuffer() = default;
 
     // Copy.
-    RingBuffer(const RingBuffer& rhs) = delete;
-    RingBuffer& operator=(const RingBuffer& rhs) = delete;
+    RingBuffer(const RingBuffer&) = delete;
+    RingBuffer& operator=(const RingBuffer&) = delete;
 
     // Move.
     RingBuffer(RingBuffer&&) = default;

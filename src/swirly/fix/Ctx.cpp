@@ -16,6 +16,8 @@
  */
 #include "Ctx.hpp"
 
+#include "App.hpp"
+
 #include <fstream>
 
 namespace swirly {
@@ -43,6 +45,7 @@ FixCtx::FixCtx(CyclTime now, Reactor& r, std::istream& config, FixApp& app)
 
         auto node = sess_map.extract(it++);
         const auto& config = node.mapped();
+        app.config(now, node.key(), config);
 
         const std::string& type = config.get("type");
         const auto ep = config.get<TcpEndpoint>("endpoint");
@@ -62,6 +65,7 @@ FixCtx::FixCtx(CyclTime now, Reactor& r, std::istream& config, FixApp& app)
     }
     // Session config references root config.
     root_config_ = move(fix_config.root);
+    app.prepare(now);
 }
 
 FixCtx::FixCtx(CyclTime now, Reactor& r, const char* config, FixApp& app)

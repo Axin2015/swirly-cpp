@@ -18,7 +18,9 @@
 #define SWIRLY_FIX_CONN_HPP
 
 #include <swirly/fix/Config.hpp>
+#include <swirly/fix/Header.hpp>
 #include <swirly/fix/Parser.hpp>
+#include <swirly/fix/Stream.hpp>
 
 #include <swirly/sys/IoSocket.hpp>
 #include <swirly/sys/Reactor.hpp>
@@ -49,10 +51,24 @@ class SWIRLY_API FixConn final : BasicFixParser<FixConn> {
     void dispose(CyclTime now) noexcept;
     void logon(CyclTime now, const FixSessId& sess_id);
     void logout(CyclTime now);
+    template <typename FnT>
+    void send(CyclTime now, std::string_view msg_type, FnT fn)
+    {
+        const auto hdr = make_header(now, msg_type);
+
+        FixStream os{out_.buf};
+        os.reset(sess_id_.version);
+        fn(now, os << hdr);
+        os.commit();
+
+        seq_num_ = hdr.msg_seq_num.value;
+        read_and_write(now);
+    }
     boost::intrusive::list_member_hook<AutoUnlinkOption> list_hook;
 
   private:
     ~FixConn();
+    FixHeader make_header(CyclTime now, std::string_view msg_type) const noexcept;
     void read_and_write(CyclTime now);
     void read_only(CyclTime now);
     void send_logon(CyclTime now);

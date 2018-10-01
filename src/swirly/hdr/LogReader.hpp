@@ -37,8 +37,8 @@ class SWIRLY_API LogReader {
     ~LogReader();
 
     // Copy.
-    LogReader(const LogReader& rhs) = delete;
-    LogReader& operator=(const LogReader& rhs) = delete;
+    LogReader(const LogReader&) = delete;
+    LogReader& operator=(const LogReader&) = delete;
 
     // Move.
     LogReader(LogReader&&) = delete;

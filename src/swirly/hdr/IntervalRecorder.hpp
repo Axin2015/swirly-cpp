@@ -44,8 +44,8 @@ class SWIRLY_API IntervalRecorder {
     ~IntervalRecorder();
 
     // Copy.
-    IntervalRecorder(const IntervalRecorder& rhs) = delete;
-    IntervalRecorder& operator=(const IntervalRecorder& rhs) = delete;
+    IntervalRecorder(const IntervalRecorder&) = delete;
+    IntervalRecorder& operator=(const IntervalRecorder&) = delete;
 
     // Move.
     IntervalRecorder(IntervalRecorder&&) = delete;

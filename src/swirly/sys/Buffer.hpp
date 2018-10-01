@@ -37,12 +37,12 @@ class SWIRLY_API Buffer {
     ~Buffer() = default;
 
     // Copy.
-    Buffer(const Buffer& rhs) = default;
-    Buffer& operator=(const Buffer& rhs) = default;
+    Buffer(const Buffer&) = default;
+    Buffer& operator=(const Buffer&) = default;
 
     // Move.
-    Buffer(Buffer&& rhs) noexcept = default;
-    Buffer& operator=(Buffer&& rhs) noexcept = default;
+    Buffer(Buffer&&) noexcept = default;
+    Buffer& operator=(Buffer&&) noexcept = default;
 
     /**
      * Returns available data as a buffer.

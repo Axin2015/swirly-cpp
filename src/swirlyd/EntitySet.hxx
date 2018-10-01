@@ -44,8 +44,8 @@ class SWIRLY_API EntitySet {
     ~EntitySet();
 
     // Copy.
-    EntitySet(const EntitySet& rhs) noexcept = default;
-    EntitySet& operator=(const EntitySet& rhs) noexcept = default;
+    EntitySet(const EntitySet&) noexcept = default;
+    EntitySet& operator=(const EntitySet&) noexcept = default;
 
     // Move.
     EntitySet(EntitySet&&) noexcept = default;

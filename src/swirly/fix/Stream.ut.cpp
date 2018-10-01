@@ -14,37 +14,17 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Stream.hpp"
+#include "Field.hpp"
 
 #include <boost/test/unit_test.hpp>
 
-#include <map>
-
 namespace swirly {
 inline namespace sys {
-bool operator==(const Buffer& buf, std::string_view sv)
-{
-    const auto data = buf.data();
-    return buffer_size(data) == sv.size() //
-        && memcmp(buffer_cast<const char*>(data), sv.data(), sv.size()) == 0;
-}
-bool operator!=(const Buffer& buf, std::string_view sv)
-{
-    return !(buf == sv);
-}
-bool operator==(std::string_view sv, const Buffer& buf)
-{
-    return buf == sv;
-}
-bool operator!=(std::string_view sv, const Buffer& buf)
-{
-    return buf != sv;
-}
-std::ostream& operator<<(std::ostream& os, const Buffer& buf)
-{
-    const auto data = buf.data();
-    return os.write(buffer_cast<const char*>(data), buffer_size(data));
-}
+bool operator==(const Buffer& buf, std::string_view sv);
+bool operator!=(const Buffer& buf, std::string_view sv);
+bool operator==(std::string_view sv, const Buffer& buf);
+bool operator!=(std::string_view sv, const Buffer& buf);
+std::ostream& operator<<(std::ostream& os, const Buffer& buf);
 } // namespace sys
 } // namespace swirly
 

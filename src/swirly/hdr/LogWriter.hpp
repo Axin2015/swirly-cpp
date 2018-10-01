@@ -35,8 +35,8 @@ class SWIRLY_API LogWriter {
     ~LogWriter();
 
     // Copy.
-    LogWriter(const LogWriter& rhs) = delete;
-    LogWriter& operator=(const LogWriter& rhs) = delete;
+    LogWriter(const LogWriter&) = delete;
+    LogWriter& operator=(const LogWriter&) = delete;
 
     // Move.
     LogWriter(LogWriter&&) = delete;

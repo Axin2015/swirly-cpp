@@ -14,40 +14,42 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_HDR_RECORDER_HPP
-#define SWIRLY_HDR_RECORDER_HPP
+#ifndef SWIRLY_FIX_RANDOM_HPP
+#define SWIRLY_FIX_RANDOM_HPP
 
 #include <swirly/Config.h>
 
-#include <chrono>
+#include <random>
 
 namespace swirly {
-inline namespace hdr {
-class Histogram;
+inline namespace fix {
+
 /**
- * Record time elapsed during object lifetime, i.e., between constructor and destructor calls. The
- * elapsed time is recorded in the Histogram object during destruction.
+ * Random best bid and offer based on "open" (or reference) price.
  */
-class SWIRLY_API Recorder {
+class SWIRLY_API RandomBbo {
   public:
-    explicit Recorder(Histogram& hist, int count = 1) noexcept;
-    ~Recorder();
+    RandomBbo() = default;
+    ~RandomBbo() = default;
 
     // Copy.
-    Recorder(const Recorder&) = delete;
-    Recorder& operator=(const Recorder&) = delete;
+    RandomBbo(const RandomBbo&) = default;
+    RandomBbo& operator=(const RandomBbo&) = default;
 
     // Move.
-    Recorder(Recorder&&) = delete;
-    Recorder& operator=(Recorder&&) = delete;
+    RandomBbo(RandomBbo&&) = default;
+    RandomBbo& operator=(RandomBbo&&) = default;
+
+    std::pair<std::int64_t, std::int64_t> operator()(std::int64_t open);
 
   private:
-    Histogram& hist_;
-    const int count_{1};
-    std::chrono::time_point<std::chrono::high_resolution_clock> start_;
+    std::random_device rd_{};
+    std::mt19937 gen_{rd_()};
+    std::binomial_distribution<std::int64_t> dist_{4, 0.5};
+    std::int64_t offset_{0};
 };
 
-} // namespace hdr
+} // namespace fix
 } // namespace swirly
 
-#endif // SWIRLY_HDR_RECORDER_HPP
+#endif // SWIRLY_FIX_RANDOM_HPP

@@ -33,8 +33,8 @@ class Tokeniser {
     ~Tokeniser() = default;
 
     // Copy.
-    Tokeniser(const Tokeniser& rhs) noexcept = default;
-    Tokeniser& operator=(const Tokeniser& rhs) noexcept = default;
+    Tokeniser(const Tokeniser&) noexcept = default;
+    Tokeniser& operator=(const Tokeniser&) noexcept = default;
 
     // Move.
     Tokeniser(Tokeniser&&) noexcept = default;

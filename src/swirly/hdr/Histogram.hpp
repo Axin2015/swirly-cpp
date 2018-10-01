@@ -58,8 +58,8 @@ class SWIRLY_API Histogram {
     ~Histogram();
 
     // Copy.
-    Histogram(const Histogram& rhs) = delete;
-    Histogram& operator=(const Histogram& rhs) = delete;
+    Histogram(const Histogram&) = delete;
+    Histogram& operator=(const Histogram&) = delete;
 
     // Move.
     Histogram(Histogram&&) = default;

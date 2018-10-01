@@ -17,6 +17,7 @@
 #include <swirly/fix/App.hpp>
 #include <swirly/fix/Ctx.hpp>
 #include <swirly/fix/Lexer.hpp>
+#include <swirly/fix/Random.hpp>
 
 #include <swirly/app/Thread.hpp>
 
@@ -32,20 +33,276 @@ using namespace swirly;
 
 namespace {
 
-class TestApp : public FixApp {
+class TestHandler;
+using TestHandlerPtr = unique_ptr<TestHandler>;
+using TestHandlerMap = unordered_map<FixSessId, TestHandlerPtr>;
+
+class TestHandler : public FixHandler {
   public:
-  protected:
-    void do_on_connect(CyclTime now, FixConn& conn) override
+    TestHandler() noexcept = default;
+    ~TestHandler() override = default;
+
+    // Copy.
+    constexpr TestHandler(const TestHandler&) noexcept = default;
+    TestHandler& operator=(const TestHandler&) noexcept = default;
+
+    // Move.
+    constexpr TestHandler(TestHandler&&) noexcept = default;
+    TestHandler& operator=(TestHandler&&) noexcept = default;
+
+    void prepare(CyclTime now, const FixSessId& sess_id, const TestHandlerMap& handler_map)
     {
-        SWIRLY_INFO << "session connected: " << conn.endpoint();
+        do_prepare(now, sess_id, handler_map);
     }
+    void send(CyclTime now, string_view msg_type, string_view msg) { do_send(now, msg_type, msg); }
+
+  protected:
+    virtual void do_prepare(CyclTime now, const FixSessId& sess_id,
+                            const TestHandlerMap& handler_map)
+        = 0;
+    virtual void do_send(CyclTime now, string_view msg_type, string_view msg) = 0;
+};
+
+class PingHandler : public TestHandler {
+  public:
+    PingHandler(CyclTime now, Reactor& r, const FixSessId& sess_id, const Config& config)
+    : reactor_(r)
+    {
+    }
+
+  protected:
     void do_on_logon(CyclTime now, FixConn& conn, const FixSessId& sess_id) override
     {
-        SWIRLY_INFO << "session logged-on: " << conn.endpoint();
+        SWIRLY_INFO << sess_id << " <Ping> on_logon";
+        conn_ = &conn;
+        md_tmr_ = reactor_.timer(now.mono_time() + 250ms, 250ms, Priority::Low,
+                                 bind<&PingHandler::on_market_data>(this));
+        stat_tmr_ = reactor_.timer(now.mono_time() + 1s, 1s, Priority::Low,
+                                   bind<&PingHandler::on_status>(this));
     }
-    void do_on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_id) noexcept override
+    void do_on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_id,
+                      bool disconnect) noexcept override
     {
-        SWIRLY_INFO << "session logged-out: " << conn.endpoint();
+        if (!disconnect) {
+            SWIRLY_INFO << sess_id << " <Ping> on_logout";
+        } else {
+            SWIRLY_WARNING << sess_id << " <Ping> on_logout";
+        }
+        count_ = 0;
+        stat_tmr_.cancel();
+        md_tmr_.cancel();
+        conn_ = nullptr;
+        conn.logon(now, sess_id);
+    }
+    void do_on_message(CyclTime now, FixConn& conn, string_view msg, size_t body_off, Version ver,
+                       const FixHeader& hdr) override
+    {
+        SWIRLY_INFO << conn.sess_id() << " <Ping> on_message: " << hdr.msg_type.value;
+    }
+    void do_on_error(CyclTime now, const FixConn& conn, const std::exception& e) noexcept override
+    {
+        SWIRLY_ERROR << conn.sess_id() << " <Ping> on_error: " << e.what();
+    }
+    void do_on_timeout(CyclTime now, const FixConn& conn) noexcept override
+    {
+        SWIRLY_WARNING << conn.sess_id() << " <Ping> on_timeout";
+    }
+    void do_prepare(CyclTime now, const FixSessId& sess_id,
+                    const TestHandlerMap& handler_map) override
+    {
+        SWIRLY_INFO << sess_id << " <Ping> prepare";
+    }
+    void do_send(CyclTime now, string_view msg_type, string_view msg) override {}
+
+  private:
+    void on_market_data(CyclTime now, Timer& tmr)
+    {
+        assert(conn_);
+        SWIRLY_INFO << conn_->sess_id() << " <Ping> on_market_data";
+
+        auto fn = [this](CyclTime now, ostream& os) {
+            const auto [bid, offer] = bbo_(12345);
+            // clang-format off
+            os << NoMdEntries{4}
+               << MdEntryType{byte{0}}
+               << MdEntryPx{bid - 1}
+               << MdEntrySize{2000}
+               << MdEntryType{byte{0}}
+               << MdEntryPx{bid}
+               << MdEntrySize{1000}
+               << MdEntryType{byte{1}}
+               << MdEntryPx{offer}
+               << MdEntrySize{1000}
+               << MdEntryType{byte{1}}
+               << MdEntryPx{offer + 1}
+               << MdEntrySize{2000};
+            // clang-format on
+        };
+        conn_->send(now, "W"sv, fn);
+    }
+    void on_status(CyclTime now, Timer& tmr)
+    {
+        assert(conn_);
+        SWIRLY_INFO << conn_->sess_id() << " <Ping> on_status";
+
+        if (count_++ < 10) {
+            auto fn = [](CyclTime now, ostream& os) {
+                os << TradingSessionId::View{"OPEN"} << TradSesStatus{2};
+            };
+            conn_->send(now, "h"sv, fn);
+        } else {
+            conn_->logout(now);
+        }
+    }
+    Reactor& reactor_;
+    FixConn* conn_{nullptr};
+    Timer md_tmr_, stat_tmr_;
+    int count_{0};
+    RandomBbo bbo_;
+};
+
+class PongHandler : public TestHandler {
+  public:
+    PongHandler(CyclTime now, Reactor& r, const FixSessId& sess_id, const Config& config) {}
+
+  protected:
+    void do_on_logon(CyclTime now, FixConn& conn, const FixSessId& sess_id) override
+    {
+        SWIRLY_INFO << sess_id << " <Pong> on_logon";
+        conn_ = &conn;
+    }
+    void do_on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_id,
+                      bool disconnect) noexcept override
+    {
+        if (!disconnect) {
+            SWIRLY_INFO << sess_id << " <Pong> on_logout";
+        } else {
+            SWIRLY_WARNING << sess_id << " <Pong> on_logout";
+        }
+        conn_ = nullptr;
+    }
+    void do_on_message(CyclTime now, FixConn& conn, string_view msg, size_t body_off, Version ver,
+                       const FixHeader& hdr) override
+    {
+        SWIRLY_INFO << conn.sess_id() << " <Pong> on_message: " << hdr.msg_type.value;
+    }
+    void do_on_error(CyclTime now, const FixConn& conn, const std::exception& e) noexcept override
+    {
+        SWIRLY_ERROR << conn.sess_id() << " <Pong> on_error: " << e.what();
+    }
+    void do_on_timeout(CyclTime now, const FixConn& conn) noexcept override
+    {
+        SWIRLY_WARNING << conn.sess_id() << " <Pong> on_timeout";
+    }
+    void do_prepare(CyclTime now, const FixSessId& sess_id,
+                    const TestHandlerMap& handler_map) override
+    {
+        SWIRLY_INFO << sess_id << " <Pong> prepare";
+    }
+    void do_send(CyclTime now, string_view msg_type, string_view msg) override {}
+
+  private:
+    FixConn* conn_{nullptr};
+};
+
+class ProxyHandler : public TestHandler {
+  public:
+    ProxyHandler(CyclTime now, Reactor& r, const FixSessId& sess_id, const Config& config)
+    : proxy_id_{sess_id.version, sess_id.sender_comp_id, config.get("proxy_comp_id")}
+    {
+    }
+
+  protected:
+    void do_on_logon(CyclTime now, FixConn& conn, const FixSessId& sess_id) override
+    {
+        SWIRLY_INFO << sess_id << " <Proxy> on_logon";
+        conn_ = &conn;
+    }
+    void do_on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_id,
+                      bool disconnect) noexcept override
+    {
+        if (!disconnect) {
+            SWIRLY_INFO << sess_id << " <Proxy> on_logout";
+        } else {
+            SWIRLY_WARNING << sess_id << " <Proxy> on_logout";
+        }
+        conn_ = nullptr;
+    }
+    void do_on_message(CyclTime now, FixConn& conn, string_view msg, size_t body_off, Version ver,
+                       const FixHeader& hdr) override
+    {
+        SWIRLY_INFO << conn.sess_id() << " <Proxy> on_message: " << hdr.msg_type.value;
+        if (hdr.msg_type.value == "W") {
+            assert(proxy_);
+            msg.remove_prefix(body_off);
+            msg.remove_suffix(CheckSumLen);
+            proxy_->send(now, hdr.msg_type.value, msg);
+        }
+    }
+    void do_on_error(CyclTime now, const FixConn& conn, const std::exception& e) noexcept override
+    {
+        SWIRLY_ERROR << conn.sess_id() << " <Proxy> on_error: " << e.what();
+    }
+    void do_on_timeout(CyclTime now, const FixConn& conn) noexcept override
+    {
+        SWIRLY_WARNING << conn.sess_id() << " <Proxy> on_timeout";
+    }
+    void do_prepare(CyclTime now, const FixSessId& sess_id,
+                    const TestHandlerMap& handler_map) override
+    {
+        SWIRLY_INFO << sess_id << " <Proxy> prepare";
+        proxy_ = handler_map.at(proxy_id_).get();
+    }
+    void do_send(CyclTime now, string_view msg_type, string_view msg) override
+    {
+        if (conn_) {
+            auto fn = [msg](CyclTime now, ostream& os) { os << msg; };
+            conn_->send(now, msg_type, fn);
+        }
+    }
+
+  private:
+    const FixSessId proxy_id_;
+    TestHandler* proxy_{nullptr};
+    FixConn* conn_{nullptr};
+};
+
+TestHandlerPtr make_handler(CyclTime now, const std::string& name, Reactor& r,
+                            const FixSessId& sess_id, const Config& config)
+{
+    TestHandlerPtr h;
+    if (name == "Ping") {
+        h = make_unique<PingHandler>(now, r, sess_id, config);
+    } else if (name == "Pong") {
+        h = make_unique<PongHandler>(now, r, sess_id, config);
+    } else if (name == "Proxy") {
+        h = make_unique<ProxyHandler>(now, r, sess_id, config);
+    } else {
+        throw runtime_error{"invalid handler: " + name};
+    }
+    return h;
+}
+
+class TestApp : public FixApp {
+  public:
+    explicit TestApp(Reactor& r)
+    : reactor_(r)
+    {
+    }
+
+  protected:
+    void do_on_logon(CyclTime now, FixConn& conn, const FixSessId& sess_id) override
+    {
+        assert(!sess_id.empty());
+        assert(handler_map_.count(sess_id));
+        handler_map_[sess_id]->on_logon(now, conn, sess_id);
+    }
+    void do_on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_id,
+                      bool disconnect) noexcept override
+    {
+        assert(!sess_id.empty());
+        assert(handler_map_.count(sess_id));
+        handler_map_[sess_id]->on_logout(now, conn, sess_id, disconnect);
     }
     void do_on_message(CyclTime now, FixConn& conn, string_view msg, size_t body_off, Version ver,
                        const FixHeader& hdr) override
@@ -56,48 +313,91 @@ class TestApp : public FixApp {
             cout << t << '=' << v << '^';
         }
         cout << endl;
-    }
-    void do_on_disconnect(CyclTime now, const FixConn& conn) noexcept override
-    {
-        SWIRLY_INFO << "session disconnected: " << conn.endpoint();
+        const auto& sess_id = conn.sess_id();
+        if (!sess_id.empty()) {
+            assert(handler_map_.count(sess_id));
+            handler_map_[sess_id]->on_message(now, conn, msg, body_off, ver, hdr);
+        }
     }
     void do_on_error(CyclTime now, const FixConn& conn, const std::exception& e) noexcept override
     {
-        SWIRLY_ERROR << "session error: " << conn.endpoint() << ": " << e.what();
+        const auto& sess_id = conn.sess_id();
+        if (!sess_id.empty()) {
+            assert(handler_map_.count(sess_id));
+            handler_map_[sess_id]->on_error(now, conn, e);
+        } else {
+            SWIRLY_ERROR << conn.endpoint() << " on_error: " << e.what();
+        }
     }
     void do_on_timeout(CyclTime now, const FixConn& conn) noexcept override
     {
-        SWIRLY_WARNING << "session timeout: " << conn.endpoint();
+        const auto& sess_id = conn.sess_id();
+        if (!sess_id.empty()) {
+            assert(handler_map_.count(sess_id));
+            handler_map_[sess_id]->on_timeout(now, conn);
+        } else {
+            SWIRLY_WARNING << conn.endpoint() << " on_timeout";
+        }
     }
+    void do_config(CyclTime now, const FixSessId& sess_id, const Config& config) override
+    {
+        SWIRLY_INFO << sess_id << " on_config";
+        assert(!sess_id.empty());
+        handler_map_[sess_id] = make_handler(now, config.get("handler"), reactor_, sess_id, config);
+    }
+    void do_prepare(CyclTime now) override
+    {
+        for (auto& [sess_id, handler] : handler_map_) {
+            handler->prepare(now, sess_id, handler_map_);
+        }
+    }
+    void do_on_connect(CyclTime now, FixConn& conn) override
+    {
+        SWIRLY_INFO << conn.endpoint() << " on_connect";
+    }
+    void do_on_disconnect(CyclTime now, const FixConn& conn) noexcept override
+    {
+        SWIRLY_INFO << conn.endpoint() << " on_disconnect";
+    }
+
+  private:
+    Reactor& reactor_;
+    TestHandlerMap handler_map_;
 };
 
 constexpr char ConfigData[] = R"(
 version=4.3
-heart_bt_int=2
+heart_bt_int=5
 
 [session]
 type=initiator
 endpoint=0.0.0.0:5002
 sender_comp_id=CLIENT1
 target_comp_id=SERVER1
+handler=Ping
 
 [session]
 type=initiator
 endpoint=0.0.0.0:5002
 sender_comp_id=CLIENT2
 target_comp_id=SERVER1
+handler=Pong
 
 [session]
 type=acceptor
 endpoint=127.0.0.1:5002
 sender_comp_id=SERVER1
 target_comp_id=CLIENT1
+handler=Proxy
+proxy_comp_id=CLIENT2
 
 [session]
 type=acceptor
 endpoint=127.0.0.1:5002
 sender_comp_id=SERVER1
 target_comp_id=CLIENT2
+handler=Proxy
+proxy_comp_id=CLIENT1
 )";
 
 } // namespace
@@ -110,9 +410,9 @@ int main(int argc, char* argv[])
         const auto start_time = CyclTime::set();
 
         EpollReactor reactor{1024};
-        istringstream is{ConfigData};
-        TestApp app;
+        TestApp app{reactor};
 
+        istringstream is{ConfigData};
         FixCtx fix_ctx{start_time, reactor, is, app};
 
         // Start service/worker threads.
