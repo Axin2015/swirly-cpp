@@ -36,12 +36,12 @@ class SWIRLY_API FixHandlerBase {
     virtual ~FixHandlerBase();
 
     // Copy.
-    constexpr FixHandlerBase(const FixHandlerBase&) noexcept = default;
-    FixHandlerBase& operator=(const FixHandlerBase&) noexcept = default;
+    FixHandlerBase(const FixHandlerBase&) noexcept;
+    FixHandlerBase& operator=(const FixHandlerBase&) noexcept;
 
     // Move.
-    constexpr FixHandlerBase(FixHandlerBase&&) noexcept = default;
-    FixHandlerBase& operator=(FixHandlerBase&&) noexcept = default;
+    FixHandlerBase(FixHandlerBase&&) noexcept;
+    FixHandlerBase& operator=(FixHandlerBase&&) noexcept;
 
     void on_logon(CyclTime now, FixConn& conn, const FixSessId& sess_id)
     {

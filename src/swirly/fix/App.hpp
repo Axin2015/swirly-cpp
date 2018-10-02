@@ -34,12 +34,12 @@ class SWIRLY_API FixAppBase : public FixHandlerBase {
     ~FixAppBase() override;
 
     // Copy.
-    constexpr FixAppBase(const FixAppBase&) noexcept = default;
-    FixAppBase& operator=(const FixAppBase&) noexcept = default;
+    FixAppBase(const FixAppBase&) noexcept;
+    FixAppBase& operator=(const FixAppBase&) noexcept;
 
     // Move.
-    constexpr FixAppBase(FixAppBase&&) noexcept = default;
-    FixAppBase& operator=(FixAppBase&&) noexcept = default;
+    FixAppBase(FixAppBase&&) noexcept;
+    FixAppBase& operator=(FixAppBase&&) noexcept;
 
     void config(CyclTime now, const FixSessId& sess_id, const Config& config)
     {
@@ -47,11 +47,11 @@ class SWIRLY_API FixAppBase : public FixHandlerBase {
     }
     void prepare(CyclTime now) { do_prepare(now); }
     void on_connect(CyclTime now, FixConn& conn) { do_on_connect(now, conn); }
+
     /**
      * Called when a disconnect occurs. The connection is disposed immediately after the callback
      * returns.
      */
-
     void on_disconnect(CyclTime now, const FixConn& conn) noexcept { do_on_disconnect(now, conn); }
 
   protected:

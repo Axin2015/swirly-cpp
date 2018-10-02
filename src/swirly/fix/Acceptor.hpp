@@ -36,6 +36,14 @@ class SWIRLY_API FixAcceptor : public TcpAcceptor<FixAcceptor> {
     FixAcceptor(CyclTime now, Reactor& r, const Endpoint& ep, FixAppBase& app);
     ~FixAcceptor();
 
+    // Copy.
+    FixAcceptor(const FixAcceptor&) = delete;
+    FixAcceptor& operator=(const FixAcceptor&) = delete;
+
+    // Move.
+    FixAcceptor(FixAcceptor&&) = delete;
+    FixAcceptor& operator=(FixAcceptor&&) = delete;
+
     void insert(FixSessMap::node_type&& node);
 
   private:

@@ -30,15 +30,15 @@ inline namespace fix {
 class SWIRLY_API RandomBbo {
   public:
     RandomBbo() = default;
-    ~RandomBbo() = default;
+    ~RandomBbo();
 
     // Copy.
-    RandomBbo(const RandomBbo&) = default;
-    RandomBbo& operator=(const RandomBbo&) = default;
+    RandomBbo(const RandomBbo&) = delete;
+    RandomBbo& operator=(const RandomBbo&) = delete;
 
     // Move.
-    RandomBbo(RandomBbo&&) = default;
-    RandomBbo& operator=(RandomBbo&&) = default;
+    RandomBbo(RandomBbo&&) = delete;
+    RandomBbo& operator=(RandomBbo&&) = delete;
 
     std::pair<std::int64_t, std::int64_t> operator()(std::int64_t open);
 

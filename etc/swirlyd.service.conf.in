@@ -51,3 +51,6 @@ sqlite_enable_trace = no
 
 # Enable foreign key constraints.
 sqlite_enable_fkey = no
+
+# FIX session configuration.
+#fix_config = ${CMAKE_INSTALL_PREFIX}/etc/swirlyd-fix.conf

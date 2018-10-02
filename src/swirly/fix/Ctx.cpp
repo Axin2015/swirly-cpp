@@ -76,7 +76,6 @@ FixCtx::FixCtx(CyclTime now, Reactor& r, const char* config, FixAppBase& app)
 FixCtx::~FixCtx() = default;
 
 FixCtx::FixCtx(FixCtx&&) noexcept = default;
-
 FixCtx& FixCtx::operator=(FixCtx&&) noexcept = default;
 
 } // namespace fix

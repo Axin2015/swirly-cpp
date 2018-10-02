@@ -21,5 +21,11 @@ inline namespace fix {
 
 FixHandlerBase::~FixHandlerBase() = default;
 
+FixHandlerBase::FixHandlerBase(const FixHandlerBase&) noexcept = default;
+FixHandlerBase& FixHandlerBase::operator=(const FixHandlerBase&) noexcept = default;
+
+FixHandlerBase::FixHandlerBase(FixHandlerBase&&) noexcept = default;
+FixHandlerBase& FixHandlerBase::operator=(FixHandlerBase&&) noexcept = default;
+
 } // namespace fix
 } // namespace swirly

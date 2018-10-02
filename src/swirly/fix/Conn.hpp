@@ -45,6 +45,15 @@ class SWIRLY_API FixConn final : BasicFixParser<FixConn> {
 
     FixConn(CyclTime now, Reactor& r, IoSocket&& sock, const Endpoint& ep,
             const FixSessMap& sess_map, FixAppBase& app);
+
+    // Copy.
+    FixConn(const FixConn&) = delete;
+    FixConn& operator=(const FixConn&) = delete;
+
+    // Move.
+    FixConn(FixConn&&) = delete;
+    FixConn& operator=(FixConn&&) = delete;
+
     const Endpoint& endpoint() const noexcept { return ep_; }
     const FixSessId& sess_id() const noexcept { return sess_id_; }
     int seq_num() const noexcept { return seq_num_; }

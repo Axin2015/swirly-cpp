@@ -20,6 +20,8 @@ namespace swirly {
 inline namespace fix {
 using namespace std;
 
+RandomBbo::~RandomBbo() = default;
+
 pair<int64_t, int64_t> RandomBbo::operator()(int64_t open)
 {
     if ((gen_() & 0x7) == 0) {

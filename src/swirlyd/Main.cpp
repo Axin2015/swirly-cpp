@@ -14,6 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
+#include "FixApp.hxx"
 #include "RestApp.hxx"
 #include "RestImpl.hxx"
 #include "RestRequest.hxx"
@@ -23,6 +24,8 @@
 #include <swirly/fin/Journ.hpp>
 #include <swirly/fin/Model.hpp>
 #include <swirly/fin/MsgQueue.hpp>
+
+#include <swirly/fix/Ctx.hpp>
 
 #include <swirly/http/Serv.hpp>
 
@@ -77,7 +80,7 @@ void open_log_file(const char* path)
 }
 
 struct Opts {
-    fs::path conf_file;
+    fs::path config;
     bool daemon{false};
     WallTime start_time{};
 };
@@ -91,7 +94,7 @@ void get_opts(int argc, char* argv[], Opts& opts)
 
     // clang-format off
     options('d',"daemon", Switch{opts.daemon}, "Daemonize")
-           ('f',"file", Value{opts.conf_file}, "Configuration File")
+           ('f',"file", Value{opts.config}, "Configuration File")
            ('s',"start", Value{opts.start_time}, "Start time (ms)")
            ('h',"help", Help{}, "Display help")
            ;
@@ -101,6 +104,17 @@ void get_opts(int argc, char* argv[], Opts& opts)
 }
 
 MemCtx mem_ctx;
+
+// Optional FIX extension.
+struct FixExt {
+    FixExt(CyclTime now, Reactor& r, const char* config)
+    : app{r}
+    , ctx{now, r, config, app}
+    {
+    }
+    FixApp app;
+    FixCtx ctx;
+};
 
 } // namespace
 
@@ -147,11 +161,11 @@ int main(int argc, char* argv[])
             = is_zero(opts.start_time) ? CyclTime::set() : CyclTime::set(opts.start_time);
 
         Config config;
-        if (!opts.conf_file.empty()) {
-            ifstream is{opts.conf_file};
+        if (!opts.config.empty()) {
+            ifstream is{opts.config};
             if (!is.is_open()) {
                 throw Exception{make_error_code(errc::io_error),
-                                err_msg() << "open failed: " << opts.conf_file};
+                                err_msg() << "open failed: " << opts.config};
             }
             config.read_section(is);
         }
@@ -236,24 +250,26 @@ int main(int argc, char* argv[])
             open_log_file(log_file.c_str());
         }
 
+        const fs::path fix_config{config.get("fix_config", "")};
         const fs::path mq_file{config.get("mq_file", "")};
         const char* const http_port{config.get("http_port", "8080")};
         const auto max_execs = config.get<size_t>("max_execs", 1 << 4);
 
         SWIRLY_NOTICE << "initialising daemon";
-        SWIRLY_INFO << "conf_file:  " << opts.conf_file;
-        SWIRLY_INFO << "daemon:     " << (opts.daemon ? "yes" : "no");
-        SWIRLY_INFO << "start_time: " << start_time.wall_time();
+        SWIRLY_INFO << "config:      " << opts.config;
+        SWIRLY_INFO << "daemon:      " << (opts.daemon ? "yes" : "no");
+        SWIRLY_INFO << "start_time:  " << start_time.wall_time();
 
-        SWIRLY_INFO << "file_mode:  " << setfill('0') << setw(3) << oct << swirly::file_mode();
-        SWIRLY_INFO << "http_port:  " << http_port;
-        SWIRLY_INFO << "log_file:   " << log_file;
-        SWIRLY_INFO << "log_level:  " << get_log_level();
-        SWIRLY_INFO << "max_execs:  " << max_execs;
-        SWIRLY_INFO << "mem_size:   " << (mem_ctx.max_size() >> 20) << "MiB";
-        SWIRLY_INFO << "mq_file:    " << mq_file;
-        SWIRLY_INFO << "pid_file:   " << pid_file;
-        SWIRLY_INFO << "run_dir:    " << run_dir;
+        SWIRLY_INFO << "file_mode:   " << setfill('0') << setw(3) << oct << swirly::file_mode();
+        SWIRLY_INFO << "http_port:   " << http_port;
+        SWIRLY_INFO << "log_file:    " << log_file;
+        SWIRLY_INFO << "log_level:   " << get_log_level();
+        SWIRLY_INFO << "fix_config:  " << fix_config;
+        SWIRLY_INFO << "max_execs:   " << max_execs;
+        SWIRLY_INFO << "mem_size:    " << (mem_ctx.max_size() >> 20) << "MiB";
+        SWIRLY_INFO << "mq_file:     " << mq_file;
+        SWIRLY_INFO << "pid_file:    " << pid_file;
+        SWIRLY_INFO << "run_dir:     " << run_dir;
 
         DbCtx db_ctx{config};
         MsgQueue mq;
@@ -273,6 +289,11 @@ int main(int argc, char* argv[])
         EpollReactor reactor{1024};
         const TcpEndpoint ep{Tcp::v4(), from_string<uint16_t>(http_port)};
         RestServ rest_serv{start_time, reactor, ep, rest_app};
+
+        unique_ptr<FixExt> fix_ext;
+        if (!fix_config.empty()) {
+            fix_ext.reset(new FixExt{start_time, reactor, fix_config.c_str()});
+        }
 
         ReactorThread reactor_thread{reactor, ThreadConfig{"reactor"s}};
         auto journ_agent = [&mq, &journ]() {
