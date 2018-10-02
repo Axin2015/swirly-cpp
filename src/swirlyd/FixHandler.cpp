@@ -14,18 +14,16 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "App.hpp"
+#include "FixHandler.hxx"
 
 namespace swirly {
-inline namespace fix {
 
-FixAppBase::~FixAppBase() = default;
+FixHandler::~FixHandler() = default;
 
-FixAppBase::FixAppBase(const FixAppBase&) noexcept = default;
-FixAppBase& FixAppBase::operator=(const FixAppBase&) noexcept = default;
+FixHandler::FixHandler(const FixHandler&) noexcept = default;
+FixHandler& FixHandler::operator=(const FixHandler&) noexcept = default;
 
-FixAppBase::FixAppBase(FixAppBase&&) noexcept = default;
-FixAppBase& FixAppBase::operator=(FixAppBase&&) noexcept = default;
+FixHandler::FixHandler(FixHandler&&) noexcept = default;
+FixHandler& FixHandler::operator=(FixHandler&&) noexcept = default;
 
-} // namespace fix
 } // namespace swirly

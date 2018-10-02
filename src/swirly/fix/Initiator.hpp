@@ -37,6 +37,14 @@ class SWIRLY_API FixInitiator : public TcpConnector<FixInitiator> {
                  FixAppBase& app);
     ~FixInitiator();
 
+    // Copy.
+    FixInitiator(const FixInitiator&) = delete;
+    FixInitiator& operator=(const FixInitiator&) = delete;
+
+    // Move.
+    FixInitiator(FixInitiator&&) = delete;
+    FixInitiator& operator=(FixInitiator&&) = delete;
+
   private:
     void do_connect(CyclTime now, IoSocket&& sock, const Endpoint& ep);
     void do_connect_error(CyclTime now, const std::exception& e);

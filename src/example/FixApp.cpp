@@ -43,11 +43,11 @@ class FixHandler : public FixHandlerBase {
     ~FixHandler() override = default;
 
     // Copy.
-    constexpr FixHandler(const FixHandler&) noexcept = default;
+    FixHandler(const FixHandler&) noexcept = default;
     FixHandler& operator=(const FixHandler&) noexcept = default;
 
     // Move.
-    constexpr FixHandler(FixHandler&&) noexcept = default;
+    FixHandler(FixHandler&&) noexcept = default;
     FixHandler& operator=(FixHandler&&) noexcept = default;
 
     void prepare(CyclTime now, const FixSessId& sess_id, const FixHandlerMap& handler_map)
@@ -69,6 +69,15 @@ class PingHandler : public FixHandler {
     : reactor_(r)
     {
     }
+    ~PingHandler() override = default;
+
+    // Copy.
+    PingHandler(const PingHandler&) = delete;
+    PingHandler& operator=(const PingHandler&) = delete;
+
+    // Move.
+    PingHandler(PingHandler&&) = delete;
+    PingHandler& operator=(PingHandler&&) = delete;
 
   protected:
     void do_on_logon(CyclTime now, FixConn& conn, const FixSessId& sess_id) override
@@ -164,6 +173,15 @@ class PingHandler : public FixHandler {
 class PongHandler : public FixHandler {
   public:
     PongHandler(CyclTime now, Reactor& r, const FixSessId& sess_id, const Config& config) {}
+    ~PongHandler() override = default;
+
+    // Copy.
+    PongHandler(const PongHandler&) = delete;
+    PongHandler& operator=(const PongHandler&) = delete;
+
+    // Move.
+    PongHandler(PongHandler&&) = delete;
+    PongHandler& operator=(PongHandler&&) = delete;
 
   protected:
     void do_on_logon(CyclTime now, FixConn& conn, const FixSessId& sess_id) override
@@ -211,6 +229,15 @@ class ProxyHandler : public FixHandler {
     : proxy_id_{sess_id.version, sess_id.sender_comp_id, config.get("proxy_comp_id")}
     {
     }
+    ~ProxyHandler() override = default;
+
+    // Copy.
+    ProxyHandler(const ProxyHandler&) = delete;
+    ProxyHandler& operator=(const ProxyHandler&) = delete;
+
+    // Move.
+    ProxyHandler(ProxyHandler&&) = delete;
+    ProxyHandler& operator=(ProxyHandler&&) = delete;
 
   protected:
     void do_on_logon(CyclTime now, FixConn& conn, const FixSessId& sess_id) override
@@ -289,8 +316,19 @@ class FixApp : public FixAppBase {
     : reactor_(r)
     {
     }
+    ~FixApp() override = default;
+
+    // Copy.
+    FixApp(const FixApp&) = delete;
+    FixApp& operator=(const FixApp&) = delete;
+
+    // Move.
+    FixApp(FixApp&&) = delete;
+    FixApp& operator=(FixApp&&) = delete;
 
   protected:
+    // FixHandler.
+
     void do_on_logon(CyclTime now, FixConn& conn, const FixSessId& sess_id) override
     {
         assert(!sess_id.empty());
@@ -339,6 +377,9 @@ class FixApp : public FixAppBase {
             SWIRLY_WARNING << conn.endpoint() << " on_timeout";
         }
     }
+
+    // FixApp.
+
     void do_config(CyclTime now, const FixSessId& sess_id, const Config& config) override
     {
         SWIRLY_INFO << sess_id << " on_config";
@@ -366,26 +407,26 @@ class FixApp : public FixAppBase {
 };
 
 constexpr char ConfigData[] = R"(
-version=4.3
+version=4.4
 heart_bt_int=5
 
 [session]
 type=initiator
-endpoint=0.0.0.0:5002
+endpoint=127.0.0.1:5002
 sender_comp_id=CLIENT1
 target_comp_id=SERVER1
 handler=Ping
 
 [session]
 type=initiator
-endpoint=0.0.0.0:5002
+endpoint=127.0.0.1:5002
 sender_comp_id=CLIENT2
 target_comp_id=SERVER1
 handler=Pong
 
 [session]
 type=acceptor
-endpoint=127.0.0.1:5002
+endpoint=0.0.0.0:5002
 sender_comp_id=SERVER1
 target_comp_id=CLIENT1
 handler=Proxy
@@ -393,7 +434,7 @@ proxy_comp_id=CLIENT2
 
 [session]
 type=acceptor
-endpoint=127.0.0.1:5002
+endpoint=0.0.0.0:5002
 sender_comp_id=SERVER1
 target_comp_id=CLIENT2
 handler=Proxy
@@ -410,9 +451,9 @@ int main(int argc, char* argv[])
         const auto start_time = CyclTime::set();
 
         EpollReactor reactor{1024};
-        FixApp app{reactor};
 
         istringstream is{ConfigData};
+        FixApp app{reactor};
         FixCtx fix_ctx{start_time, reactor, is, app};
 
         // Start service/worker threads.

@@ -13,20 +13,19 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-configure_file(swirlyd-fix.conf.in "${CMAKE_BINARY_DIR}/etc/swirlyd-fix.conf")
-configure_file(swirlyd.conf.in "${CMAKE_BINARY_DIR}/etc/swirlyd.conf")
-configure_file(swirlyd.service.in "${CMAKE_BINARY_DIR}/etc/swirlyd.service")
-configure_file(swirlyd.service.conf.in "${CMAKE_BINARY_DIR}/etc/swirlyd.service.conf")
+version=4.4
+heart_bt_int=5
 
-install(FILES
-  "${CMAKE_BINARY_DIR}/etc/swirlyd-fix.conf"
-  "${CMAKE_BINARY_DIR}/etc/swirlyd.conf"
-  "${CMAKE_BINARY_DIR}/etc/swirlyd.service"
-  "${CMAKE_BINARY_DIR}/etc/swirlyd.service.conf"
-  DESTINATION etc
-  COMPONENT config
-)
+[session]
+type=initiator
+endpoint=127.0.0.1:5002
+sender_comp_id=SWIRLY
+target_comp_id=MAKER1
+handler=Maker
 
-add_subdirectory(cmake)
-add_subdirectory(fbs)
-add_subdirectory(sql)
+[session]
+type=acceptor
+endpoint=0.0.0.0:5002
+sender_comp_id=MAKER1
+target_comp_id=SWIRLY
+handler=MakerBot

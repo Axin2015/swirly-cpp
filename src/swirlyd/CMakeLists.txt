@@ -24,6 +24,10 @@ endif(RAGEL_EXECUTABLE)
 
 set(lib_SOURCES
   EntitySet.cpp
+  FixApp.cpp
+  FixHandler.cpp
+  FixMaker.cpp
+  FixMakerBot.cpp
   Page.cpp
   RestApp.cpp
   RestBody.cpp
@@ -32,7 +36,7 @@ set(lib_SOURCES
 
 add_library(swirlyd-static STATIC ${lib_SOURCES})
 set_target_properties(swirlyd-static PROPERTIES OUTPUT_NAME swirlyd)
-target_link_libraries(swirlyd-static swirly-lob-static swirly-http-static)
+target_link_libraries(swirlyd-static swirly-lob-static swirly-fix-static swirly-http-static)
 
 set(test_SOURCES
   EntitySet.ut.cpp
