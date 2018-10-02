@@ -22,6 +22,7 @@ endpoint=127.0.0.1:5002
 sender_comp_id=SWIRLY
 target_comp_id=MAKER1
 handler=Maker
+accnt=BOT1
 
 [session]
 type=acceptor

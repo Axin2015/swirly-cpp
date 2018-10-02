@@ -39,7 +39,7 @@ constexpr std::string_view operator+(const StringData<MaxN>& s) noexcept
     return {s.buf, static_cast<std::size_t>(s.len)};
 }
 
-class SWIRLY_API RestBody {
+class RestBody {
   public:
     enum : unsigned {
         Symbol = 1 << 0,

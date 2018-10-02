@@ -20,14 +20,22 @@
 #include "EntitySet.hxx"
 #include "Page.hxx"
 
-#include <swirly/lob/App.hpp>
+#include <swirly/fin/IntTypes.hpp>
+
+#include <swirly/util/Array.hpp>
+#include <swirly/util/Date.hpp>
+#include <swirly/util/Symbol.hpp>
+#include <swirly/util/Time.hpp>
 
 namespace swirly {
+inline namespace lob {
+class LobApp;
+} // namespace lob
 
-class SWIRLY_API RestImpl {
+class RestImpl {
   public:
-    RestImpl(MsgQueue& mq, std::size_t max_execs)
-    : app_{mq, max_execs}
+    explicit RestImpl(LobApp& lob_app)
+    : lob_app_(lob_app)
     {
     }
     ~RestImpl();
@@ -37,10 +45,8 @@ class SWIRLY_API RestImpl {
     RestImpl& operator=(const RestImpl&) = delete;
 
     // Move.
-    RestImpl(RestImpl&&);
-    RestImpl& operator=(RestImpl&&);
-
-    void load(WallTime now, const Model& model) { app_.load(now, model); }
+    RestImpl(RestImpl&&) = delete;
+    RestImpl& operator=(RestImpl&&) = delete;
 
     void get_ref_data(WallTime now, EntitySet es, std::ostream& out) const;
 
@@ -110,7 +116,7 @@ class SWIRLY_API RestImpl {
                       ArrayView<Id64> ids);
 
   private:
-    LobApp app_;
+    LobApp& lob_app_;
 };
 
 } // namespace swirly

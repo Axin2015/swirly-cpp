@@ -19,6 +19,10 @@
 
 #include "FixHandler.hxx"
 
+#include <swirly/fix/Random.hpp>
+
+#include <swirly/sys/Timer.hpp>
+
 namespace swirly {
 inline namespace sys {
 class Reactor;
@@ -26,7 +30,10 @@ class Reactor;
 
 class FixMakerBot : public FixHandler {
   public:
-    FixMakerBot(CyclTime now, Reactor& r, const FixSessId& sess_id, const Config& config) {}
+    FixMakerBot(CyclTime now, Reactor& r, const FixSessId& sess_id, const Config& config)
+    : reactor_(r)
+    {
+    }
     ~FixMakerBot() override;
 
     // Copy.
@@ -50,7 +57,13 @@ class FixMakerBot : public FixHandler {
     void do_send(CyclTime now, std::string_view msg_type, std::string_view msg) override;
 
   private:
+    void on_market_data(CyclTime now, Timer& tmr);
+    void on_status(CyclTime now, Timer& tmr);
+
+    Reactor& reactor_;
     FixConn* conn_{nullptr};
+    Timer md_tmr_, stat_tmr_;
+    RandomBbo bbo_;
 };
 
 } // namespace swirly

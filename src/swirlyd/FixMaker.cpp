@@ -16,6 +16,8 @@
  */
 #include "FixMaker.hxx"
 
+#include <swirly/lob/App.hpp>
+
 #include <swirly/fix/Conn.hpp>
 
 #include <swirly/util/Log.hpp>
@@ -23,11 +25,18 @@
 namespace swirly {
 using namespace std;
 
+FixMaker::FixMaker(CyclTime now, Reactor& r, const FixSessId& sess_id, const Config& config,
+                   LobApp& lob_app)
+: lob_app_(lob_app)
+, sess_(lob_app_.sess(config.get<string_view>("accnt")))
+{
+}
+
 FixMaker::~FixMaker() = default;
 
 void FixMaker::do_on_logon(CyclTime now, FixConn& conn, const FixSessId& sess_id)
 {
-    SWIRLY_INFO << sess_id << " <FixMaker> on_logon";
+    SWIRLY_INFO << sess_id << " <Maker> on_logon";
     conn_ = &conn;
 }
 
@@ -35,9 +44,9 @@ void FixMaker::do_on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_i
                             bool disconnect) noexcept
 {
     if (!disconnect) {
-        SWIRLY_INFO << sess_id << " <FixMaker> on_logout";
+        SWIRLY_INFO << sess_id << " <Maker> on_logout";
     } else {
-        SWIRLY_WARNING << sess_id << " <FixMaker> on_logout";
+        SWIRLY_WARNING << sess_id << " <Maker> on_logout";
     }
     conn_ = nullptr;
 }
@@ -45,22 +54,24 @@ void FixMaker::do_on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_i
 void FixMaker::do_on_message(CyclTime now, FixConn& conn, string_view msg, size_t body_off,
                              Version ver, const FixHeader& hdr)
 {
-    SWIRLY_INFO << conn.sess_id() << " <FixMaker> on_message: " << hdr.msg_type.value;
+    if (hdr.msg_type.value != "W") {
+        SWIRLY_INFO << conn.sess_id() << " <Maker> on_message: " << hdr.msg_type.value;
+    }
 }
 
 void FixMaker::do_on_error(CyclTime now, const FixConn& conn, const std::exception& e) noexcept
 {
-    SWIRLY_ERROR << conn.sess_id() << " <FixMaker> on_error: " << e.what();
+    SWIRLY_ERROR << conn.sess_id() << " <Maker> on_error: " << e.what();
 }
 
 void FixMaker::do_on_timeout(CyclTime now, const FixConn& conn) noexcept
 {
-    SWIRLY_WARNING << conn.sess_id() << " <FixMaker> on_timeout";
+    SWIRLY_WARNING << conn.sess_id() << " <Maker> on_timeout";
 }
 
 void FixMaker::do_prepare(CyclTime now, const FixSessId& sess_id, const FixHandlerMap& handler_map)
 {
-    SWIRLY_INFO << sess_id << " <FixMaker> prepare";
+    SWIRLY_INFO << sess_id << " <Maker> prepare";
 }
 
 void FixMaker::do_send(CyclTime now, string_view msg_type, string_view msg)

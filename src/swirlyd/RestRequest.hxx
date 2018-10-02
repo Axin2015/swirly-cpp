@@ -25,7 +25,7 @@
 namespace swirly {
 using namespace std::literals::string_view_literals;
 
-class SWIRLY_API RestRequest : public BasicUrl<RestRequest> {
+class RestRequest : public BasicUrl<RestRequest> {
   public:
     RestRequest() noexcept = default;
     ~RestRequest();

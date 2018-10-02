@@ -26,11 +26,11 @@ namespace swirly {
 using namespace std;
 namespace {
 FixHandlerPtr make_handler(CyclTime now, const std::string& name, Reactor& r,
-                           const FixSessId& sess_id, const Config& config)
+                           const FixSessId& sess_id, const Config& config, LobApp& lob_app)
 {
     FixHandlerPtr h;
     if (name == "Maker") {
-        h = make_unique<FixMaker>(now, r, sess_id, config);
+        h = make_unique<FixMaker>(now, r, sess_id, config, lob_app);
     } else if (name == "MakerBot") {
         h = make_unique<FixMakerBot>(now, r, sess_id, config);
     } else {
@@ -97,7 +97,8 @@ void FixApp::do_config(CyclTime now, const FixSessId& sess_id, const Config& con
 {
     SWIRLY_INFO << sess_id << " on_config";
     assert(!sess_id.empty());
-    handler_map_[sess_id] = make_handler(now, config.get("handler"), reactor_, sess_id, config);
+    handler_map_[sess_id]
+        = make_handler(now, config.get("handler"), reactor_, sess_id, config, lob_app_);
 }
 
 void FixApp::do_prepare(CyclTime now)

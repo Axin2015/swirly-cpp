@@ -20,13 +20,18 @@
 #include "FixHandler.hxx"
 
 namespace swirly {
+inline namespace lob {
+class LobApp;
+class Sess;
+} // namespace lob
 inline namespace sys {
 class Reactor;
 } // namespace sys
 
 class FixMaker : public FixHandler {
   public:
-    FixMaker(CyclTime now, Reactor& r, const FixSessId& sess_id, const Config& config) {}
+    FixMaker(CyclTime now, Reactor& r, const FixSessId& sess_id, const Config& config,
+             LobApp& lob_app);
     ~FixMaker() override;
 
     // Copy.
@@ -50,6 +55,8 @@ class FixMaker : public FixHandler {
     void do_send(CyclTime now, std::string_view msg_type, std::string_view msg) override;
 
   private:
+    LobApp& lob_app_;
+    const Sess& sess_;
     FixConn* conn_{nullptr};
 };
 
