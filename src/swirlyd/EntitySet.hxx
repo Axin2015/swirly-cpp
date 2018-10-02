@@ -23,7 +23,7 @@
 
 namespace swirly {
 
-class SWIRLY_API EntitySet {
+class EntitySet {
   public:
     enum : int {
         Asset = 1 << 0,

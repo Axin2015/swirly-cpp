@@ -17,11 +17,10 @@
 #ifndef SWIRLYD_RESTAPP_HXX
 #define SWIRLYD_RESTAPP_HXX
 
+#include "RestImpl.hxx"
+
 #include <swirly/sys/IpAddress.hpp>
 
-#include <swirly/util/IntTypes.hpp>
-#include <swirly/util/Symbol.hpp>
-#include <swirly/util/Time.hpp>
 #include <swirly/util/Tokeniser.hpp>
 
 #include <vector>
@@ -31,7 +30,6 @@ inline namespace http {
 class HttpStream;
 } // namespace http
 
-class RestImpl;
 class RestRequest;
 
 class RestApp {
@@ -39,8 +37,8 @@ class RestApp {
     using Transport = Tcp;
     using Endpoint = TcpEndpoint;
 
-    explicit RestApp(RestImpl& impl) noexcept
-    : impl_(impl)
+    explicit RestApp(LobApp& lob_app)
+    : impl_{lob_app}
     {
     }
     ~RestApp();
@@ -77,7 +75,7 @@ class RestApp {
     void trade_request(WallTime now, const RestRequest& req, HttpStream& os);
     void posn_request(WallTime now, const RestRequest& req, HttpStream& os);
 
-    RestImpl& impl_;
+    RestImpl impl_;
     bool match_method_{false};
     bool match_path_{false};
     Tokeniser path_;

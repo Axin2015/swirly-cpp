@@ -22,15 +22,20 @@
 #include <swirly/fix/App.hpp>
 
 namespace swirly {
+inline namespace lob {
+class LobApp;
+} // namespace lob
 inline namespace sys {
 class Reactor;
 } // namespace sys
 
 class FixApp : public FixAppBase {
   public:
-    explicit FixApp(Reactor& r)
+    FixApp(Reactor& r, LobApp& lob_app)
     : reactor_(r)
+    , lob_app_(lob_app)
     {
+        (void)lob_app_;
     }
     ~FixApp() override;
 
@@ -62,6 +67,7 @@ class FixApp : public FixAppBase {
 
   private:
     Reactor& reactor_;
+    LobApp& lob_app_;
     FixHandlerMap handler_map_;
 };
 

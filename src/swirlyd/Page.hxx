@@ -31,7 +31,7 @@ struct Page {
 
 // Parse Page arguments from URL Query String. Note that special characters and percent encodings
 // are not supported for simplicity.
-SWIRLY_API Page parse_query(std::string_view query) noexcept;
+Page parse_query(std::string_view query) noexcept;
 
 } // namespace swirly
 

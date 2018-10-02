@@ -21,6 +21,8 @@
 
 #include <swirly/db/DbCtx.hpp>
 
+#include <swirly/lob/App.hpp>
+
 #include <swirly/fin/Journ.hpp>
 #include <swirly/fin/Model.hpp>
 #include <swirly/fin/MsgQueue.hpp>
@@ -107,8 +109,8 @@ MemCtx mem_ctx;
 
 // Optional FIX extension.
 struct FixExt {
-    FixExt(CyclTime now, Reactor& r, const char* config)
-    : app{r}
+    FixExt(CyclTime now, Reactor& r, const char* config, LobApp& lob_app)
+    : app{r, lob_app}
     , ctx{now, r, config, app}
     {
     }
@@ -278,24 +280,25 @@ int main(int argc, char* argv[])
         } else {
             mq = MsgQueue{1 << 10};
         }
-        RestImpl rest_impl{mq, max_execs};
+        LobApp lob_app{mq, max_execs};
         {
             Model& model = db_ctx.model();
-            rest_impl.load(start_time.wall_time(), model);
+            lob_app.load(start_time.wall_time(), model);
         }
-        RestApp rest_app{rest_impl};
-        Journ& journ = db_ctx.journ();
 
         EpollReactor reactor{1024};
         const TcpEndpoint ep{Tcp::v4(), from_string<uint16_t>(http_port)};
+
+        RestApp rest_app{lob_app};
         RestServ rest_serv{start_time, reactor, ep, rest_app};
 
         unique_ptr<FixExt> fix_ext;
         if (!fix_config.empty()) {
-            fix_ext.reset(new FixExt{start_time, reactor, fix_config.c_str()});
+            fix_ext.reset(new FixExt{start_time, reactor, fix_config.c_str(), lob_app});
         }
 
         ReactorThread reactor_thread{reactor, ThreadConfig{"reactor"s}};
+        Journ& journ = db_ctx.journ();
         auto journ_agent = [&mq, &journ]() {
             int n{0};
             Msg msg;
