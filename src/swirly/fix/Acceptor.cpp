@@ -20,7 +20,7 @@ namespace swirly {
 inline namespace fix {
 using namespace std;
 
-FixAcceptor::FixAcceptor(CyclTime now, Reactor& r, const Endpoint& ep, FixApp& app)
+FixAcceptor::FixAcceptor(CyclTime now, Reactor& r, const Endpoint& ep, FixAppBase& app)
 : TcpAcceptor{r, ep}
 , reactor_(r)
 , app_(app)

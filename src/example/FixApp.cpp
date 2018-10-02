@@ -33,24 +33,24 @@ using namespace swirly;
 
 namespace {
 
-class TestHandler;
-using TestHandlerPtr = unique_ptr<TestHandler>;
-using TestHandlerMap = unordered_map<FixSessId, TestHandlerPtr>;
+class FixHandler;
+using FixHandlerPtr = unique_ptr<FixHandler>;
+using FixHandlerMap = unordered_map<FixSessId, FixHandlerPtr>;
 
-class TestHandler : public FixHandler {
+class FixHandler : public FixHandlerBase {
   public:
-    TestHandler() noexcept = default;
-    ~TestHandler() override = default;
+    FixHandler() noexcept = default;
+    ~FixHandler() override = default;
 
     // Copy.
-    constexpr TestHandler(const TestHandler&) noexcept = default;
-    TestHandler& operator=(const TestHandler&) noexcept = default;
+    constexpr FixHandler(const FixHandler&) noexcept = default;
+    FixHandler& operator=(const FixHandler&) noexcept = default;
 
     // Move.
-    constexpr TestHandler(TestHandler&&) noexcept = default;
-    TestHandler& operator=(TestHandler&&) noexcept = default;
+    constexpr FixHandler(FixHandler&&) noexcept = default;
+    FixHandler& operator=(FixHandler&&) noexcept = default;
 
-    void prepare(CyclTime now, const FixSessId& sess_id, const TestHandlerMap& handler_map)
+    void prepare(CyclTime now, const FixSessId& sess_id, const FixHandlerMap& handler_map)
     {
         do_prepare(now, sess_id, handler_map);
     }
@@ -58,12 +58,12 @@ class TestHandler : public FixHandler {
 
   protected:
     virtual void do_prepare(CyclTime now, const FixSessId& sess_id,
-                            const TestHandlerMap& handler_map)
+                            const FixHandlerMap& handler_map)
         = 0;
     virtual void do_send(CyclTime now, string_view msg_type, string_view msg) = 0;
 };
 
-class PingHandler : public TestHandler {
+class PingHandler : public FixHandler {
   public:
     PingHandler(CyclTime now, Reactor& r, const FixSessId& sess_id, const Config& config)
     : reactor_(r)
@@ -108,7 +108,7 @@ class PingHandler : public TestHandler {
         SWIRLY_WARNING << conn.sess_id() << " <Ping> on_timeout";
     }
     void do_prepare(CyclTime now, const FixSessId& sess_id,
-                    const TestHandlerMap& handler_map) override
+                    const FixHandlerMap& handler_map) override
     {
         SWIRLY_INFO << sess_id << " <Ping> prepare";
     }
@@ -161,7 +161,7 @@ class PingHandler : public TestHandler {
     RandomBbo bbo_;
 };
 
-class PongHandler : public TestHandler {
+class PongHandler : public FixHandler {
   public:
     PongHandler(CyclTime now, Reactor& r, const FixSessId& sess_id, const Config& config) {}
 
@@ -195,7 +195,7 @@ class PongHandler : public TestHandler {
         SWIRLY_WARNING << conn.sess_id() << " <Pong> on_timeout";
     }
     void do_prepare(CyclTime now, const FixSessId& sess_id,
-                    const TestHandlerMap& handler_map) override
+                    const FixHandlerMap& handler_map) override
     {
         SWIRLY_INFO << sess_id << " <Pong> prepare";
     }
@@ -205,7 +205,7 @@ class PongHandler : public TestHandler {
     FixConn* conn_{nullptr};
 };
 
-class ProxyHandler : public TestHandler {
+class ProxyHandler : public FixHandler {
   public:
     ProxyHandler(CyclTime now, Reactor& r, const FixSessId& sess_id, const Config& config)
     : proxy_id_{sess_id.version, sess_id.sender_comp_id, config.get("proxy_comp_id")}
@@ -248,7 +248,7 @@ class ProxyHandler : public TestHandler {
         SWIRLY_WARNING << conn.sess_id() << " <Proxy> on_timeout";
     }
     void do_prepare(CyclTime now, const FixSessId& sess_id,
-                    const TestHandlerMap& handler_map) override
+                    const FixHandlerMap& handler_map) override
     {
         SWIRLY_INFO << sess_id << " <Proxy> prepare";
         proxy_ = handler_map.at(proxy_id_).get();
@@ -263,14 +263,14 @@ class ProxyHandler : public TestHandler {
 
   private:
     const FixSessId proxy_id_;
-    TestHandler* proxy_{nullptr};
+    FixHandler* proxy_{nullptr};
     FixConn* conn_{nullptr};
 };
 
-TestHandlerPtr make_handler(CyclTime now, const std::string& name, Reactor& r,
-                            const FixSessId& sess_id, const Config& config)
+FixHandlerPtr make_handler(CyclTime now, const std::string& name, Reactor& r,
+                           const FixSessId& sess_id, const Config& config)
 {
-    TestHandlerPtr h;
+    FixHandlerPtr h;
     if (name == "Ping") {
         h = make_unique<PingHandler>(now, r, sess_id, config);
     } else if (name == "Pong") {
@@ -283,9 +283,9 @@ TestHandlerPtr make_handler(CyclTime now, const std::string& name, Reactor& r,
     return h;
 }
 
-class TestApp : public FixApp {
+class FixApp : public FixAppBase {
   public:
-    explicit TestApp(Reactor& r)
+    explicit FixApp(Reactor& r)
     : reactor_(r)
     {
     }
@@ -362,7 +362,7 @@ class TestApp : public FixApp {
 
   private:
     Reactor& reactor_;
-    TestHandlerMap handler_map_;
+    FixHandlerMap handler_map_;
 };
 
 constexpr char ConfigData[] = R"(
@@ -410,7 +410,7 @@ int main(int argc, char* argv[])
         const auto start_time = CyclTime::set();
 
         EpollReactor reactor{1024};
-        TestApp app{reactor};
+        FixApp app{reactor};
 
         istringstream is{ConfigData};
         FixCtx fix_ctx{start_time, reactor, is, app};

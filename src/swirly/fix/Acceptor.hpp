@@ -33,7 +33,7 @@ class SWIRLY_API FixAcceptor : public TcpAcceptor<FixAcceptor> {
     using ConnList = boost::intrusive::list<FixConn, ConstantTimeSizeOption, MemberHookOption>;
 
   public:
-    FixAcceptor(CyclTime now, Reactor& r, const Endpoint& ep, FixApp& app);
+    FixAcceptor(CyclTime now, Reactor& r, const Endpoint& ep, FixAppBase& app);
     ~FixAcceptor();
 
     void insert(FixSessMap::node_type&& node);
@@ -41,7 +41,7 @@ class SWIRLY_API FixAcceptor : public TcpAcceptor<FixAcceptor> {
   private:
     void do_accept(CyclTime now, IoSocket&& sock, const Endpoint& ep);
     Reactor& reactor_;
-    FixApp& app_;
+    FixAppBase& app_;
     FixSessMap sess_map_;
     // List of active connections.
     ConnList conn_list_;

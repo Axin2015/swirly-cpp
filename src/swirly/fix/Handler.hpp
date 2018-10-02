@@ -30,18 +30,18 @@ inline namespace fix {
 class FixConn;
 struct FixHeader;
 
-class SWIRLY_API FixHandler {
+class SWIRLY_API FixHandlerBase {
   public:
-    FixHandler() noexcept = default;
-    virtual ~FixHandler();
+    FixHandlerBase() noexcept = default;
+    virtual ~FixHandlerBase();
 
     // Copy.
-    constexpr FixHandler(const FixHandler&) noexcept = default;
-    FixHandler& operator=(const FixHandler&) noexcept = default;
+    constexpr FixHandlerBase(const FixHandlerBase&) noexcept = default;
+    FixHandlerBase& operator=(const FixHandlerBase&) noexcept = default;
 
     // Move.
-    constexpr FixHandler(FixHandler&&) noexcept = default;
-    FixHandler& operator=(FixHandler&&) noexcept = default;
+    constexpr FixHandlerBase(FixHandlerBase&&) noexcept = default;
+    FixHandlerBase& operator=(FixHandlerBase&&) noexcept = default;
 
     void on_logon(CyclTime now, FixConn& conn, const FixSessId& sess_id)
     {
