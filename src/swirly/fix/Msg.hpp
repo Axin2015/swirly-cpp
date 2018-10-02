@@ -21,6 +21,7 @@
 
 namespace swirly {
 inline namespace fix {
+class FixLexer;
 
 struct Logon {
     EncryptMethod encrypt_method;
@@ -30,22 +31,60 @@ struct Logon {
 template <typename StreamT>
 StreamT& operator<<(StreamT& os, const Logon& body)
 {
-    return os << body.encrypt_method << body.heart_bt_int;
+    os << body.encrypt_method << body.heart_bt_int;
+    return os;
 }
 
+SWIRLY_API void parse_body(FixLexer& lex, Logon& body);
 SWIRLY_API void parse_body(std::string_view msg, std::size_t body_off, Logon& body);
 
+struct MdEntry {
+    MdEntryType type;
+    MdEntryPx px;
+    MdEntrySize size;
+};
+
+template <typename StreamT>
+StreamT& operator<<(StreamT& os, const MdEntry& grp)
+{
+    os << grp.type << grp.px << grp.size;
+    return os;
+}
+
+SWIRLY_API void parse_body(FixLexer& lex, MdEntry& grp);
+
+struct MarketDataSnapshot {
+    SymbolField::View symbol;
+    MaturityDate maturity_date;
+    std::vector<MdEntry> md_entries;
+};
+
+template <typename StreamT>
+StreamT& operator<<(StreamT& os, const MarketDataSnapshot& body)
+{
+    os << body.symbol << body.maturity_date << NoMdEntries{body.md_entries.size()};
+    for (const auto& md_entry : body.md_entries) {
+        os << md_entry;
+    }
+    return os;
+}
+
+SWIRLY_API void parse_body(FixLexer& lex, MarketDataSnapshot& body);
+SWIRLY_API void parse_body(std::string_view msg, std::size_t body_off, MarketDataSnapshot& body);
+
 struct TradingSessionStatus {
-    TradingSessionId trading_session_id;
+    TradingSessionId::View trading_session_id;
     TradSesStatus trad_ses_status;
 };
 
 template <typename StreamT>
 StreamT& operator<<(StreamT& os, const TradingSessionStatus& body)
 {
-    return os << body.trading_session_id << body.trad_ses_status;
+    os << body.trading_session_id << body.trad_ses_status;
+    return os;
 }
 
+SWIRLY_API void parse_body(FixLexer& lex, TradingSessionStatus& body);
 SWIRLY_API void parse_body(std::string_view msg, std::size_t body_off, TradingSessionStatus& body);
 
 } // namespace fix

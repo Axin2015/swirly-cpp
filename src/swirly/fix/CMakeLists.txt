@@ -69,6 +69,7 @@ endforeach()
 set(test_SOURCES
   Header.ut.cpp
   Lexer.ut.cpp
+  Msg.ut.cpp
   SessId.ut.cpp
   Stream.ut.cpp)
 

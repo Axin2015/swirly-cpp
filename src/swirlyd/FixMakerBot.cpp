@@ -83,16 +83,16 @@ void FixMakerBot::on_market_data(CyclTime now, Timer& tmr)
         const auto [bid, offer] = bbo_(12345);
         // clang-format off
             os << NoMdEntries{4}
-               << MdEntryType{byte{0}}
+               << MdEntryType{'0'}
                << MdEntryPx{bid - 1}
                << MdEntrySize{2000}
-               << MdEntryType{byte{0}}
+               << MdEntryType{'0'}
                << MdEntryPx{bid}
                << MdEntrySize{1000}
-               << MdEntryType{byte{1}}
+               << MdEntryType{'1'}
                << MdEntryPx{offer}
                << MdEntrySize{1000}
-               << MdEntryType{byte{1}}
+               << MdEntryType{'1'}
                << MdEntryPx{offer + 1}
                << MdEntrySize{2000};
         // clang-format on
