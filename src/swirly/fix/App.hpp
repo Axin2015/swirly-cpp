@@ -28,18 +28,18 @@ inline namespace fix {
 class FixConn;
 struct FixHeader;
 
-class SWIRLY_API FixApp : public FixHandler {
+class SWIRLY_API FixAppBase : public FixHandlerBase {
   public:
-    FixApp() noexcept = default;
-    ~FixApp() override;
+    FixAppBase() noexcept = default;
+    ~FixAppBase() override;
 
     // Copy.
-    constexpr FixApp(const FixApp&) noexcept = default;
-    FixApp& operator=(const FixApp&) noexcept = default;
+    constexpr FixAppBase(const FixAppBase&) noexcept = default;
+    FixAppBase& operator=(const FixAppBase&) noexcept = default;
 
     // Move.
-    constexpr FixApp(FixApp&&) noexcept = default;
-    FixApp& operator=(FixApp&&) noexcept = default;
+    constexpr FixAppBase(FixAppBase&&) noexcept = default;
+    FixAppBase& operator=(FixAppBase&&) noexcept = default;
 
     void config(CyclTime now, const FixSessId& sess_id, const Config& config)
     {

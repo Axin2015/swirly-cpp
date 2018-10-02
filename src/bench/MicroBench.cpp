@@ -29,9 +29,9 @@ using namespace swirly;
 namespace swirly {
 inline namespace tool {
 namespace {
-std::map<std::string, Benchmark*> suite;
+std::map<std::string, BenchmarkBase*> suite;
 } // namespace
-void register_benchmark(const std::string& name, Benchmark& b)
+void register_benchmark(const std::string& name, BenchmarkBase& b)
 {
     suite[name] = &b;
 }

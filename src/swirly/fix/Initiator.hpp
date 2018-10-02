@@ -34,7 +34,7 @@ class SWIRLY_API FixInitiator : public TcpConnector<FixInitiator> {
 
   public:
     FixInitiator(CyclTime now, Reactor& r, const Endpoint& ep, FixSessMap::node_type&& node,
-                 FixApp& app);
+                 FixAppBase& app);
     ~FixInitiator();
 
   private:
@@ -44,7 +44,7 @@ class SWIRLY_API FixInitiator : public TcpConnector<FixInitiator> {
 
     Reactor& reactor_;
     const Endpoint ep_;
-    FixApp& app_;
+    FixAppBase& app_;
     // Singleton map for initiator.
     FixSessMap sess_map_;
     Timer tmr_;

@@ -32,7 +32,7 @@
 
 namespace swirly {
 inline namespace http {
-class HttpApp;
+class HttpAppBase;
 
 template <typename RequestT, typename AppT>
 class BasicHttpConn
@@ -227,7 +227,7 @@ class BasicHttpConn
     HttpStream os_{out_};
 };
 
-using HttpConn = BasicHttpConn<HttpRequest, HttpApp>;
+using HttpConn = BasicHttpConn<HttpRequest, HttpAppBase>;
 
 } // namespace http
 } // namespace swirly

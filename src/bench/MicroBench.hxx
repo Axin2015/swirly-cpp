@@ -25,18 +25,18 @@
 namespace swirly {
 inline namespace tool {
 
-class Benchmark {
+class BenchmarkBase {
   public:
-    Benchmark() = default;
+    BenchmarkBase() = default;
     void run() { return do_run(); }
 
   protected:
-    virtual ~Benchmark() = default;
+    virtual ~BenchmarkBase() = default;
     virtual void do_run() = 0;
 };
 
 template <typename DerivedT>
-class BasicBenchmark : public Benchmark {
+class BasicBenchmark : public BenchmarkBase {
   public:
     explicit BasicBenchmark(const std::string& name)
     : name_{name}
@@ -144,7 +144,7 @@ inline void do_not_optimise(ValueT& val)
 #endif
 }
 
-void register_benchmark(const std::string& name, Benchmark& b);
+void register_benchmark(const std::string& name, BenchmarkBase& b);
 
 } // namespace tool
 } // namespace swirly

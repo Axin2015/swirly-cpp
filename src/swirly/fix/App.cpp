@@ -19,7 +19,7 @@
 namespace swirly {
 inline namespace fix {
 
-FixApp::~FixApp() = default;
+FixAppBase::~FixAppBase() = default;
 
 } // namespace fix
 } // namespace swirly

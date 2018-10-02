@@ -19,7 +19,7 @@
 namespace swirly {
 inline namespace fix {
 
-FixHandler::~FixHandler() = default;
+FixHandlerBase::~FixHandlerBase() = default;
 
 } // namespace fix
 } // namespace swirly

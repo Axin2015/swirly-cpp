@@ -28,21 +28,21 @@ inline namespace http {
 class HttpRequest;
 class HttpStream;
 
-class SWIRLY_API HttpApp {
+class SWIRLY_API HttpAppBase {
   public:
     using Transport = Tcp;
     using Endpoint = TcpEndpoint;
 
-    HttpApp() noexcept = default;
-    virtual ~HttpApp();
+    HttpAppBase() noexcept = default;
+    virtual ~HttpAppBase();
 
     // Copy.
-    constexpr HttpApp(const HttpApp&) noexcept = default;
-    HttpApp& operator=(const HttpApp&) noexcept = default;
+    constexpr HttpAppBase(const HttpAppBase&) noexcept = default;
+    HttpAppBase& operator=(const HttpAppBase&) noexcept = default;
 
     // Move.
-    constexpr HttpApp(HttpApp&&) noexcept = default;
-    HttpApp& operator=(HttpApp&&) noexcept = default;
+    constexpr HttpAppBase(HttpAppBase&&) noexcept = default;
+    HttpAppBase& operator=(HttpAppBase&&) noexcept = default;
 
     void on_connect(CyclTime now, const Endpoint& ep) { do_on_connect(now, ep); }
     void on_disconnect(CyclTime now, const Endpoint& ep) noexcept { do_on_disconnect(now, ep); }

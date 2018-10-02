@@ -27,7 +27,7 @@ inline namespace fix {
 using namespace std;
 
 FixConn::FixConn(CyclTime now, Reactor& r, IoSocket&& sock, const Endpoint& ep,
-                 const FixSessMap& sess_map, FixApp& app)
+                 const FixSessMap& sess_map, FixAppBase& app)
 : reactor_(r)
 , sock_{move(sock)}
 , ep_{ep}

@@ -33,7 +33,6 @@ set(lib_SOURCES
 add_library(swirlyd-static STATIC ${lib_SOURCES})
 set_target_properties(swirlyd-static PROPERTIES OUTPUT_NAME swirlyd)
 target_link_libraries(swirlyd-static swirly-lob-static swirly-http-static)
-install(TARGETS swirlyd-static DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT static)
 
 set(test_SOURCES
   EntitySet.ut.cpp

@@ -25,12 +25,12 @@ inline namespace fix {
 
 class SWIRLY_API FixCtx {
   public:
-    FixCtx(CyclTime now, Reactor& r, std::istream& config, FixApp& app);
-    FixCtx(CyclTime now, Reactor& r, std::istream&& config, FixApp& app)
+    FixCtx(CyclTime now, Reactor& r, std::istream& config, FixAppBase& app);
+    FixCtx(CyclTime now, Reactor& r, std::istream&& config, FixAppBase& app)
     : FixCtx{now, r, config, app}
     {
     }
-    FixCtx(CyclTime now, Reactor& r, const char* config, FixApp& app);
+    FixCtx(CyclTime now, Reactor& r, const char* config, FixAppBase& app);
     ~FixCtx();
 
     // Copy.

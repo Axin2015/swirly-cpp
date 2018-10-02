@@ -23,7 +23,7 @@ inline namespace fix {
 using namespace std;
 
 FixInitiator::FixInitiator(CyclTime now, Reactor& r, const Endpoint& ep,
-                           FixSessMap::node_type&& node, FixApp& app)
+                           FixSessMap::node_type&& node, FixAppBase& app)
 : reactor_(r)
 , ep_{ep}
 , app_(app)

@@ -19,7 +19,7 @@
 namespace swirly {
 inline namespace http {
 
-HttpApp::~HttpApp() = default;
+HttpAppBase::~HttpAppBase() = default;
 
 } // namespace http
 } // namespace swirly

@@ -30,7 +30,7 @@
 namespace swirly {
 inline namespace fix {
 
-class FixApp;
+class FixAppBase;
 struct FixConfig;
 
 class SWIRLY_API FixConn final : BasicFixParser<FixConn> {
@@ -44,7 +44,7 @@ class SWIRLY_API FixConn final : BasicFixParser<FixConn> {
     using Endpoint = TcpEndpoint;
 
     FixConn(CyclTime now, Reactor& r, IoSocket&& sock, const Endpoint& ep,
-            const FixSessMap& sess_map, FixApp& app);
+            const FixSessMap& sess_map, FixAppBase& app);
     const Endpoint& endpoint() const noexcept { return ep_; }
     const FixSessId& sess_id() const noexcept { return sess_id_; }
     int seq_num() const noexcept { return seq_num_; }
@@ -84,7 +84,7 @@ class SWIRLY_API FixConn final : BasicFixParser<FixConn> {
     IoSocket sock_;
     const Endpoint ep_;
     const FixSessMap& sess_map_;
-    FixApp& app_;
+    FixAppBase& app_;
     enum { LoggedOut, LogonSent, LoggedOn, LogoutSent } state_{LoggedOut};
 
     FixSessId sess_id_;
