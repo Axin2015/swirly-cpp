@@ -19,6 +19,7 @@
 
 #include <swirly/fix/Stream.hpp>
 
+#include <swirly/util/Date.hpp>
 #include <swirly/util/StringBuf.hpp>
 #include <swirly/util/Time.hpp>
 
@@ -92,8 +93,6 @@ FixStream& operator<<(FixStream& os, const FixField<TagN, ValueT>& field)
         os << put_time<Millis>(field.value, "%Y%m%d-%T");
     } else if constexpr (std::is_same_v<ValueT, bool>) {
         os.put(field.value ? 'Y' : 'N');
-    } else if constexpr (std::is_same_v<ValueT, std::byte>) {
-        os.put_num(static_cast<int>(field.value));
     } else if constexpr (std::is_integral_v<ValueT>) {
         // FIXME: switch to std::is_arithmetic_v<> once GCC and Clang have floating-point overloads
         // for the std::to_chars() function.
@@ -114,8 +113,6 @@ std::ostream& operator<<(std::ostream& os, const FixField<TagN, ValueT>& field)
         os << put_time<Millis>(field.value, "%Y%m%d-%T");
     } else if constexpr (std::is_same_v<ValueT, bool>) {
         os.put(field.value ? 'Y' : 'N');
-    } else if constexpr (std::is_same_v<ValueT, std::byte>) {
-        os << static_cast<int>(field.value);
     } else {
         os << field.value;
     }
@@ -127,7 +124,10 @@ template <int TagN>
 using BoolField = FixField<TagN, bool>;
 
 template <int TagN>
-using CharField = FixField<TagN, std::byte>;
+using CharField = FixField<TagN, char>;
+
+template <int TagN>
+using DateField = FixField<TagN, IsoDate>;
 
 // Double fields should be avoided for performance reasons.
 // Ticks and lots should be used instead of price and quantity.
@@ -145,6 +145,14 @@ using StringField = FixField<TagN, StringBuf<MaxN>>;
 
 template <int TagN>
 using TimeField = FixField<TagN, WallTime>;
+
+// Date aliases.
+
+template <int TagN>
+using LocalMktDateField = DateField<TagN>;
+
+template <int TagN>
+using UtcDateOnlyField = DateField<TagN>;
 
 // Int aliases.
 
@@ -172,6 +180,7 @@ using MsgType = StringField<35, 2>;
 using SenderCompId = StringField<49, 32>;
 using PossDupFlag = BoolField<43>;
 using SendingTime = TimeField<52>;
+using SymbolField = StringField<55, 16>;
 using TargetCompId = StringField<56, 32>;
 using PossResend = BoolField<97>;
 using EncryptMethod = IntField<98>;
@@ -182,6 +191,7 @@ using MdEntryPx = PriceField<270>;
 using MdEntrySize = QtyField<271>;
 using TradingSessionId = StringField<336, 32>;
 using TradSesStatus = IntField<340>;
+using MaturityDate = LocalMktDateField<541>;
 
 static_assert(FixField<8, std::string_view>{}.Tag == 8);
 static_assert(BodyLength{101}.value == BodyLength{101}.value);
