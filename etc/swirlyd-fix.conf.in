@@ -25,8 +25,23 @@ handler=Maker
 accnt=BOT1
 
 [session]
+type=initiator
+endpoint=127.0.0.1:5002
+sender_comp_id=SWIRLY
+target_comp_id=MAKER2
+handler=Maker
+accnt=BOT2
+
+[session]
 type=acceptor
 endpoint=0.0.0.0:5002
 sender_comp_id=MAKER1
+target_comp_id=SWIRLY
+handler=MakerBot
+
+[session]
+type=acceptor
+endpoint=0.0.0.0:5002
+sender_comp_id=MAKER2
 target_comp_id=SWIRLY
 handler=MakerBot

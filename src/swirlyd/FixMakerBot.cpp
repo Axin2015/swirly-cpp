@@ -82,19 +82,26 @@ void FixMakerBot::on_market_data(CyclTime now, Timer& tmr)
     auto fn = [this](CyclTime now, ostream& os) {
         const auto [bid, offer] = bbo_(12345);
         // clang-format off
-            os << NoMdEntries{4}
-               << MdEntryType{'0'}
-               << MdEntryPx{bid - 1}
-               << MdEntrySize{2000}
-               << MdEntryType{'0'}
-               << MdEntryPx{bid}
-               << MdEntrySize{1000}
-               << MdEntryType{'1'}
-               << MdEntryPx{offer}
-               << MdEntrySize{1000}
-               << MdEntryType{'1'}
-               << MdEntryPx{offer + 1}
-               << MdEntrySize{2000};
+        os << SymbolField{"EURUSD"sv}
+           << NoMdEntries{6}
+           << MdEntryType{'0'}
+           << MdEntryPx{bid - 2}
+           << MdEntrySize{3000}
+           << MdEntryType{'0'}
+           << MdEntryPx{bid - 1}
+           << MdEntrySize{2000}
+           << MdEntryType{'0'}
+           << MdEntryPx{bid}
+           << MdEntrySize{1000}
+           << MdEntryType{'1'}
+           << MdEntryPx{offer}
+           << MdEntrySize{1000}
+           << MdEntryType{'1'}
+           << MdEntryPx{offer + 1}
+           << MdEntrySize{2000}
+           << MdEntryType{'1'}
+           << MdEntryPx{offer + 2}
+           << MdEntrySize{3000};
         // clang-format on
     };
     conn_->send(now, "W"sv, fn);

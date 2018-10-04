@@ -85,5 +85,10 @@ INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_d
        VALUES (8, 'VZ', 'Verizon Com', 'VZ', 'USD', 1, 1, 1, 1000, 3, 1, 10);
 ;
 
+-- Example cash market.
+INSERT INTO market_t (id, instr, settl_day, state)
+       VALUES ((SELECT (id << 16) FROM instr_t WHERE symbol = 'CSCO'), 'CSCO', 0, 0)
+;
+
 COMMIT
 ;

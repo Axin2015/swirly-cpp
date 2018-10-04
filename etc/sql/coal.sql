@@ -64,5 +64,10 @@ INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_d
        VALUES (5, 'UIB', 'Uinta Basin Coal', 'UIB', 'USD', 1000, 1, 1, 20, 2, 1, 10);
 ;
 
+-- Example cash market.
+INSERT INTO market_t (id, instr, settl_day, state)
+       VALUES ((SELECT (id << 16) FROM instr_t WHERE symbol = 'CAP'), 'CAP', 0, 0)
+;
+
 COMMIT
 ;

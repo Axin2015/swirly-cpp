@@ -188,5 +188,10 @@ INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_d
        VALUES (24, 'USDZAR', 'USDZAR', 'USD', 'ZAR', 1000000, 1, 1, 1000, 3, 1, 10)
 ;
 
+-- Example cash market.
+INSERT INTO market_t (id, instr, settl_day, state)
+       VALUES ((SELECT (id << 16) FROM instr_t WHERE symbol = 'EURUSD'), 'EURUSD', 0, 0)
+;
+
 COMMIT
 ;

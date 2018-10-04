@@ -69,6 +69,22 @@ class SWIRLY_API Sess : protected Comparable<Sess> {
     }
     auto accnt() const noexcept { return accnt_; }
     const auto& orders() const noexcept { return orders_; }
+    const Order& order(Id64 market_id, Id64 id) const
+    {
+        auto it = orders_.find(market_id, id);
+        if (it == orders_.end()) {
+            throw OrderNotFoundException{err_msg() << "order '" << id << "' does not exist"};
+        }
+        return *it;
+    }
+    const Order& order(std::string_view ref) const
+    {
+        auto it = ref_idx_.find(ref);
+        if (it == ref_idx_.end()) {
+            throw OrderNotFoundException{err_msg() << "order '" << ref << "' does not exist"};
+        }
+        return *it;
+    }
     const auto& execs() const noexcept { return execs_; }
     const auto& trades() const noexcept { return trades_; }
     const Exec& trade(Id64 market_id, Id64 id) const

@@ -24,6 +24,11 @@ inline namespace fix {
 class FixLexer;
 
 struct Logon {
+    void clear()
+    {
+        encrypt_method.clear();
+        heart_bt_int.clear();
+    }
     EncryptMethod encrypt_method;
     HeartBtInt heart_bt_int;
 };
@@ -54,6 +59,12 @@ StreamT& operator<<(StreamT& os, const MdEntry& grp)
 SWIRLY_API void parse_body(FixLexer& lex, MdEntry& grp);
 
 struct MarketDataSnapshot {
+    void clear()
+    {
+        symbol.clear();
+        maturity_date.clear();
+        md_entries.clear();
+    }
     SymbolField::View symbol;
     MaturityDate maturity_date;
     std::vector<MdEntry> md_entries;
@@ -73,6 +84,11 @@ SWIRLY_API void parse_body(FixLexer& lex, MarketDataSnapshot& body);
 SWIRLY_API void parse_body(std::string_view msg, std::size_t body_off, MarketDataSnapshot& body);
 
 struct TradingSessionStatus {
+    void clear()
+    {
+        trading_session_id.clear();
+        trad_ses_status.clear();
+    }
     TradingSessionId::View trading_session_id;
     TradSesStatus trad_ses_status;
 };
