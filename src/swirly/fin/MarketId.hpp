@@ -22,6 +22,11 @@
 namespace swirly {
 inline namespace fin {
 
+constexpr Id64 to_market_id(Id32 instr_id) noexcept
+{
+    return Id64{instr_id.count() << 16};
+}
+
 constexpr Id64 to_market_id(Id32 instr_id, JDay settl_day) noexcept
 {
     return Id64{(instr_id.count() << 16) | (jd_to_tjd(settl_day) & 0xffff)};
@@ -29,8 +34,13 @@ constexpr Id64 to_market_id(Id32 instr_id, JDay settl_day) noexcept
 
 constexpr Id64 to_market_id(Id32 instr_id, IsoDate settl_date) noexcept
 {
-    return to_market_id(instr_id, maybe_iso_to_jd(settl_date));
+    std::int64_t id{instr_id.count() << 16};
+    if (settl_date != 0_ymd) {
+        id |= jd_to_tjd(iso_to_jd(settl_date)) & 0xffff;
+    }
+    return Id64{id};
 }
+static_assert(to_market_id(12_id32, 0_ymd) == 786432_id64);
 
 template <typename ValueT>
 struct MarketIdTraits {
