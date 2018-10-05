@@ -147,6 +147,12 @@ struct LobApp::Impl {
 
     const Market& create_market(WallTime now, const Instr& instr, JDay settl_day, MarketState state)
     {
+        const auto id = to_market_id(instr.id(), settl_day);
+        auto [it, found] = markets_.find_hint(id);
+        if (found) {
+            throw AlreadyExistsException{err_msg() << "market for '" << instr.symbol() << "' on "
+                                                   << jd_to_iso(settl_day) << " already exists"};
+        }
         if (settl_day != 0_jd) {
             // bus_day <= settl_day.
             const auto bus_day = bus_day_(now);
@@ -154,17 +160,9 @@ struct LobApp::Impl {
                 throw InvalidException{"settl-day before bus-day"sv};
             }
         }
-        const auto id = to_market_id(instr.id(), settl_day);
-        auto [it, found] = markets_.find_hint(id);
-        if (found) {
-            throw AlreadyExistsException{err_msg() << "market for '" << instr.symbol() << "' on "
-                                                   << jd_to_iso(settl_day) << " already exists"};
-        }
-        {
-            auto market = Market::make(id, instr.symbol(), settl_day, state);
-            mq_.create_market(now, id, instr.symbol(), settl_day, state);
-            it = markets_.insert_hint(it, market);
-        }
+        auto market = Market::make(id, instr.symbol(), settl_day, state);
+        mq_.create_market(now, id, instr.symbol(), settl_day, state);
+        it = markets_.insert_hint(it, market);
         return *it;
     }
 
@@ -177,9 +175,9 @@ struct LobApp::Impl {
     void create_order(WallTime now, Sess& sess, Market& market, string_view ref, Side side,
                       Lots lots, Ticks ticks, Lots min_lots, Response& resp)
     {
-        // N.B. we only check for duplicates in the ref_idx; no unique constraint exists in the database,
-        // and order-refs can be reused so long as only one order is live in the system at any given
-        // time.
+        // N.B. we only check for duplicates in the ref_idx; no unique constraint exists in the
+        // database, and order-refs can be reused so long as only one order is live in the system at
+        // any given time.
         if (!ref.empty() && sess.exists(ref)) {
             throw RefAlreadyExistsException{err_msg() << "order '" << ref << "' already exists"};
         }
@@ -602,8 +600,8 @@ struct LobApp::Impl {
         match_orders(now, taker_sess, market, taker_order, *market_side, direct, resp);
     }
 
-    // Assumes that maker lots have not been reduced since matching took place. N.B. this function is
-    // responsible for committing a transaction, so it is particularly important that it does not
+    // Assumes that maker lots have not been reduced since matching took place. N.B. this function
+    // is responsible for committing a transaction, so it is particularly important that it does not
     // throw.
     void commit_matches(WallTime now, Sess& taker_sess, Market& market, Posn& taker_posn) noexcept
     {
