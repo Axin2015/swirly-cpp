@@ -53,8 +53,7 @@ std::istream& parse_section(std::istream& is, FnT fn, std::string* name = nullpt
             return is;
         }
 
-        std::string key, val;
-        std::tie(key, val) = split_pair(line, '=');
+        auto [key, val] = split_pair(line, '=');
         rtrim(key);
         ltrim(val);
 

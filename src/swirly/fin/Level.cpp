@@ -60,9 +60,7 @@ LevelSet& LevelSet::operator=(LevelSet&&) = default;
 
 LevelSet::Iterator LevelSet::insert(ValuePtr value) noexcept
 {
-    Iterator it;
-    bool inserted;
-    tie(it, inserted) = set_.insert(*value);
+    auto [it, inserted] = set_.insert(*value);
     if (inserted) {
         // Take ownership if inserted.
         value.release();
@@ -80,9 +78,7 @@ LevelSet::Iterator LevelSet::insert_hint(ConstIterator hint, ValuePtr value) noe
 
 LevelSet::Iterator LevelSet::insert_or_replace(ValuePtr value) noexcept
 {
-    Iterator it;
-    bool inserted;
-    tie(it, inserted) = set_.insert(*value);
+    auto [it, inserted] = set_.insert(*value);
     if (!inserted) {
         // Replace if exists.
         ValuePtr prev{&*it};

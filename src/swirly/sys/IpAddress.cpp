@@ -38,11 +38,9 @@ BasicEndpoint<TransportT> parse_impl(const std::string& s, boost::system::error_
 {
     using Endpoint = BasicEndpoint<TransportT>;
 
-    std::string addr;
-    int port;
-    tie(addr, port) = split_pair(s, ':');
-
+    auto [addr, port] = split_pair(s, ':');
     Endpoint ep{};
+
     if (addr.size() >= 2 && addr.front() == '[' && addr.back() == ']') {
         // Strip square brackets.
         addr = addr.substr(1, addr.size() - 2);

@@ -118,9 +118,7 @@ struct LobApp::Impl {
 
     const Sess& sess(Symbol accnt) const
     {
-        SessSet::ConstIterator it;
-        bool found;
-        tie(it, found) = sesss_.find_hint(accnt);
+        auto [it, found] = sesss_.find_hint(accnt);
         if (!found) {
             it = sesss_.insert_hint(it, Sess::make(accnt, max_execs_));
         }
@@ -140,9 +138,7 @@ struct LobApp::Impl {
 
     Sess& sess(Symbol accnt)
     {
-        SessSet::Iterator it;
-        bool found;
-        tie(it, found) = sesss_.find_hint(accnt);
+        auto [it, found] = sesss_.find_hint(accnt);
         if (!found) {
             it = sesss_.insert_hint(it, Sess::make(accnt, max_execs_));
         }
@@ -159,10 +155,7 @@ struct LobApp::Impl {
             }
         }
         const auto id = to_market_id(instr.id(), settl_day);
-
-        MarketSet::Iterator it;
-        bool found;
-        tie(it, found) = markets_.find_hint(id);
+        auto [it, found] = markets_.find_hint(id);
         if (found) {
             throw AlreadyExistsException{err_msg() << "market for '" << instr.symbol() << "' on "
                                                    << jd_to_iso(settl_day) << " already exists"};

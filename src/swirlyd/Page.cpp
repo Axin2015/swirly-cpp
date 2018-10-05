@@ -28,8 +28,7 @@ Page parse_query(string_view query) noexcept
     Page page;
     Tokeniser toks{query, "&;"sv};
     while (!toks.empty()) {
-        string_view key, val;
-        tie(key, val) = split_pair(toks.top(), '=');
+        auto [key, val] = split_pair(toks.top(), '=');
         if (key == "offset"sv) {
             page.offset = from_string<uint64_t>(val);
         } else if (key == "limit"sv) {

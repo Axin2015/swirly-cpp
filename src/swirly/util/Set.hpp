@@ -101,9 +101,7 @@ class IdSet {
     }
     Iterator insert(const ValuePtr& value) noexcept
     {
-        Iterator it;
-        bool inserted;
-        std::tie(it, inserted) = set_.insert(*value);
+        auto [it, inserted] = set_.insert(*value);
         if (inserted) {
             // Take ownership if inserted.
             value->add_ref();
@@ -119,9 +117,7 @@ class IdSet {
     }
     Iterator insert_or_replace(const ValuePtr& value) noexcept
     {
-        Iterator it;
-        bool inserted;
-        std::tie(it, inserted) = set_.insert(*value);
+        auto [it, inserted] = set_.insert(*value);
         if (!inserted) {
             // Replace if exists.
             ValuePtr prev{&*it, false};
@@ -237,9 +233,7 @@ class SymbolSet {
     }
     Iterator insert(ValuePtr value) noexcept
     {
-        Iterator it;
-        bool inserted;
-        std::tie(it, inserted) = set_.insert(*value);
+        auto [it, inserted] = set_.insert(*value);
         if (inserted) {
             // Take ownership if inserted.
             value.release();
@@ -255,9 +249,7 @@ class SymbolSet {
     }
     Iterator insert_or_replace(ValuePtr value) noexcept
     {
-        Iterator it;
-        bool inserted;
-        std::tie(it, inserted) = set_.insert(*value);
+        auto [it, inserted] = set_.insert(*value);
         if (!inserted) {
             // Replace if exists.
             ValuePtr prev{&*it};
