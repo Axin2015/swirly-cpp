@@ -47,9 +47,7 @@ void MarketSide::insert_order(const OrderPtr& order)
 
 LevelSet::Iterator MarketSide::insert_level(const OrderPtr& order)
 {
-    LevelSet::Iterator it;
-    bool found;
-    tie(it, found) = levels_.find_hint(order->side(), order->ticks());
+    auto [it, found] = levels_.find_hint(order->side(), order->ticks());
     if (!found) {
         it = levels_.emplace_hint(it, *order);
     } else {

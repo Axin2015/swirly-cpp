@@ -122,9 +122,7 @@ OrderRefSet& OrderRefSet::operator=(OrderRefSet&&) = default;
 
 OrderRefSet::Iterator OrderRefSet::insert(const ValuePtr& value) noexcept
 {
-    Iterator it;
-    bool inserted;
-    tie(it, inserted) = set_.insert(*value);
+    auto [it, inserted] = set_.insert(*value);
     if (inserted) {
         // Take ownership if inserted.
         value->add_ref();
@@ -142,9 +140,7 @@ OrderRefSet::Iterator OrderRefSet::insert_hint(ConstIterator hint, const ValuePt
 
 OrderRefSet::Iterator OrderRefSet::insert_or_replace(const ValuePtr& value) noexcept
 {
-    Iterator it;
-    bool inserted;
-    tie(it, inserted) = set_.insert(*value);
+    auto [it, inserted] = set_.insert(*value);
     if (!inserted) {
         // Replace if exists.
         ValuePtr prev{&*it, false};

@@ -148,9 +148,7 @@ PosnSet& PosnSet::operator=(PosnSet&&) = default;
 
 PosnSet::Iterator PosnSet::insert(const ValuePtr& value) noexcept
 {
-    Iterator it;
-    bool inserted;
-    tie(it, inserted) = set_.insert(*value);
+    auto [it, inserted] = set_.insert(*value);
     if (inserted) {
         // Take ownership if inserted.
         value->add_ref();
@@ -168,9 +166,7 @@ PosnSet::Iterator PosnSet::insert_hint(ConstIterator hint, const ValuePtr& value
 
 PosnSet::Iterator PosnSet::insert_or_replace(const ValuePtr& value) noexcept
 {
-    Iterator it;
-    bool inserted;
-    tie(it, inserted) = set_.insert(*value);
+    auto [it, inserted] = set_.insert(*value);
     if (!inserted) {
         // Replace if exists.
         ValuePtr prev{&*it, false};
