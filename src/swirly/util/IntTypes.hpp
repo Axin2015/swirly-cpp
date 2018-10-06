@@ -19,6 +19,8 @@
 
 #include <swirly/util/TypeTraits.hpp>
 
+#include <boost/functional/hash.hpp>
+
 #include <cstdint>
 #include <iosfwd>
 #include <limits>
@@ -355,6 +357,13 @@ static_assert(sizeof(IntWrapper<Int64Policy>) == 8, "must be specific size");
 template <typename ValueT>
 constexpr bool is_int_wrapper = std::is_base_of_v<IntBase, ValueT>;
 
+template <typename PolicyT>
+std::size_t hash_value(IntWrapper<PolicyT> wrapper)
+{
+    boost::hash<typename PolicyT::ValueType> hasher;
+    return hasher(wrapper.count());
+}
+
 template <typename ValueT>
 struct TypeTraits<ValueT, std::enable_if_t<is_int_wrapper<ValueT>>> {
     static constexpr auto from_string(std::string_view sv) noexcept
@@ -391,5 +400,15 @@ constexpr Id64 operator""_id64(unsigned long long val) noexcept
 
 } // namespace util
 } // namespace swirly
+
+namespace std {
+template <typename PolicyT>
+struct hash<swirly::IntWrapper<PolicyT>> {
+    inline std::size_t operator()(swirly::IntWrapper<PolicyT> wrapper) const
+    {
+        return wrapper.count();
+    }
+};
+} // namespace std
 
 #endif // SWIRLY_UTIL_INTTYPES_HPP
