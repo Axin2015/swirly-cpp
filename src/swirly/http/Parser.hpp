@@ -123,24 +123,24 @@ class BasicHttpParser {
     static int on_header_field(http_parser* parser, const char* at, std::size_t length) noexcept
     {
         auto* const obj = static_cast<DerivedT*>(parser->data);
-        bool first;
+        First first;
         if (obj->last_header_elem_ != Field) {
             obj->last_header_elem_ = Field;
-            first = true;
+            first = First::Yes;
         } else {
-            first = false;
+            first = First::No;
         }
         return obj->on_header_field(CyclTime::current(), {at, length}, first) ? 0 : -1;
     }
     static int on_header_value(http_parser* parser, const char* at, std::size_t length) noexcept
     {
         auto* const obj = static_cast<DerivedT*>(parser->data);
-        bool first;
+        First first;
         if (obj->last_header_elem_ != Value) {
             obj->last_header_elem_ = Value;
-            first = true;
+            first = First::Yes;
         } else {
-            first = false;
+            first = First::No;
         }
         return obj->on_header_value(CyclTime::current(), {at, length}, first) ? 0 : -1;
     }

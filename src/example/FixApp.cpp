@@ -90,9 +90,9 @@ class PingHandler : public FixHandler {
                                    bind<&PingHandler::on_status>(this));
     }
     void do_on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_id,
-                      bool disconnect) noexcept override
+                      Disconnect disconnect) noexcept override
     {
-        if (!disconnect) {
+        if (disconnect == Disconnect::No) {
             SWIRLY_INFO << sess_id << " <Ping> on_logout";
         } else {
             SWIRLY_WARNING << sess_id << " <Ping> on_logout";
@@ -190,9 +190,9 @@ class PongHandler : public FixHandler {
         conn_ = &conn;
     }
     void do_on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_id,
-                      bool disconnect) noexcept override
+                      Disconnect disconnect) noexcept override
     {
-        if (!disconnect) {
+        if (disconnect == Disconnect::No) {
             SWIRLY_INFO << sess_id << " <Pong> on_logout";
         } else {
             SWIRLY_WARNING << sess_id << " <Pong> on_logout";
@@ -246,9 +246,9 @@ class ProxyHandler : public FixHandler {
         conn_ = &conn;
     }
     void do_on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_id,
-                      bool disconnect) noexcept override
+                      Disconnect disconnect) noexcept override
     {
-        if (!disconnect) {
+        if (disconnect == Disconnect::No) {
             SWIRLY_INFO << sess_id << " <Proxy> on_logout";
         } else {
             SWIRLY_WARNING << sess_id << " <Proxy> on_logout";
@@ -336,7 +336,7 @@ class FixApp : public FixAppBase {
         handler_map_[sess_id]->on_logon(now, conn, sess_id);
     }
     void do_on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_id,
-                      bool disconnect) noexcept override
+                      Disconnect disconnect) noexcept override
     {
         assert(!sess_id.empty());
         assert(handler_map_.count(sess_id));

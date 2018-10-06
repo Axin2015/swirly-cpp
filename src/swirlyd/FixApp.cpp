@@ -52,7 +52,7 @@ void FixApp::do_on_logon(CyclTime now, FixConn& conn, const FixSessId& sess_id)
 }
 
 void FixApp::do_on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_id,
-                          bool disconnect) noexcept
+                          Disconnect disconnect) noexcept
 {
     assert(!sess_id.empty());
     assert(handler_map_.count(sess_id));

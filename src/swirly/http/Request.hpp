@@ -55,15 +55,15 @@ class SWIRLY_API HttpRequest : public BasicUrl<HttpRequest> {
     void flush() { parse(); }
     void set_method(HttpMethod method) noexcept { method_ = method; }
     void append_url(std::string_view sv) { url_.append(sv.data(), sv.size()); }
-    void append_header_field(std::string_view sv, bool first)
+    void append_header_field(std::string_view sv, First first)
     {
-        if (first) {
+        if (first == First::Yes) {
             headers_.emplace_back(std::string{sv.data(), sv.size()}, "");
         } else {
             headers_.back().first.append(sv.data(), sv.size());
         }
     }
-    void append_header_value(std::string_view sv, bool first)
+    void append_header_value(std::string_view sv, First first)
     {
         headers_.back().second.append(sv.data(), sv.size());
     }

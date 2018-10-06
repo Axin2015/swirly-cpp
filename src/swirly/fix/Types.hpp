@@ -22,6 +22,8 @@
 namespace swirly {
 inline namespace fix {
 
+enum class Disconnect : bool { No = false, Yes = true };
+
 /**
  * Assumption: begin-string is always FIX.x.y format.
  */

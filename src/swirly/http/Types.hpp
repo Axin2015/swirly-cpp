@@ -24,6 +24,10 @@
 namespace swirly {
 inline namespace http {
 
+enum class First : bool { No = false, Yes = true };
+
+enum class NoCache : bool { No = false, Yes = true };
+
 enum class HttpMethod : int {
     Delete = HTTP_DELETE,
     Get = HTTP_GET,

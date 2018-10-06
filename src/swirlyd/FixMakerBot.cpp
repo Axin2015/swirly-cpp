@@ -36,9 +36,9 @@ void FixMakerBot::do_on_logon(CyclTime now, FixConn& conn, const FixSessId& sess
 }
 
 void FixMakerBot::do_on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_id,
-                               bool disconnect) noexcept
+                               Disconnect disconnect) noexcept
 {
-    if (!disconnect) {
+    if (disconnect == Disconnect::No) {
         SWIRLY_INFO << sess_id << " <MakerBot> on_logout";
     } else {
         SWIRLY_WARNING << sess_id << " <MakerBot> on_logout";

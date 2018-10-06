@@ -61,13 +61,13 @@ void HttpStream::commit() noexcept
     buf_.commit();
 }
 
-void HttpStream::reset(HttpStatus status, const char* content_type, bool no_cache)
+void HttpStream::reset(HttpStatus status, const char* content_type, NoCache no_cache)
 {
     buf_.reset();
     swirly::reset(*this);
 
     *this << "HTTP/1.1 " << status << ' ' << http_reason(status);
-    if (no_cache) {
+    if (no_cache == NoCache::Yes) {
         *this << "\r\nCache-Control: no-cache";
     }
     if (content_type) {

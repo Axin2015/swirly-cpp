@@ -62,17 +62,17 @@ class RestRequest : public BasicUrl<RestRequest> {
     void flush() { BasicUrl<RestRequest>::parse(); }
     void set_method(HttpMethod method) noexcept { method_ = method; }
     void append_url(std::string_view sv) { url_ += sv; }
-    void append_header_field(std::string_view sv, bool first)
+    void append_header_field(std::string_view sv, First first)
     {
-        if (first) {
+        if (first == First::Yes) {
             field_ = sv;
         } else {
             field_ += sv;
         }
     }
-    void append_header_value(std::string_view sv, bool first)
+    void append_header_value(std::string_view sv, First first)
     {
-        if (first) {
+        if (first == First::Yes) {
             if (field_ == "Swirly-Accnt"sv) {
                 value_ = &accnt_;
             } else if (field_ == "Swirly-Perm"sv) {

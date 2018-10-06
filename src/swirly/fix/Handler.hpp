@@ -47,7 +47,8 @@ class SWIRLY_API FixHandlerBase {
     {
         do_on_logon(now, conn, sess_id);
     }
-    void on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_id, bool disconnect) noexcept
+    void on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_id,
+                   Disconnect disconnect) noexcept
     {
         do_on_logout(now, conn, sess_id, disconnect);
     }
@@ -73,7 +74,7 @@ class SWIRLY_API FixHandlerBase {
   protected:
     virtual void do_on_logon(CyclTime now, FixConn& conn, const FixSessId& sess_id) = 0;
     virtual void do_on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_id,
-                              bool disconnect) noexcept
+                              Disconnect disconnect) noexcept
         = 0;
     virtual void do_on_message(CyclTime now, FixConn& conn, std::string_view msg,
                                std::size_t body_off, Version ver, const FixHeader& hdr)

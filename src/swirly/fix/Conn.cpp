@@ -42,7 +42,7 @@ FixConn::FixConn(CyclTime now, Reactor& r, IoSocket&& sock, const Endpoint& ep,
 void FixConn::dispose(CyclTime now) noexcept
 {
     if (!sess_id_.empty()) {
-        app_.on_logout(now, *this, sess_id_, true);
+        app_.on_logout(now, *this, sess_id_, Disconnect::Yes);
         sess_id_.clear();
     }
     app_.on_disconnect(now, *this);
@@ -187,14 +187,14 @@ void FixConn::on_message(CyclTime now, std::string_view msg, std::size_t msg_typ
             // Process logout reply.
             FixSessId sess_id;
             sess_id_.swap(sess_id);
-            app_.on_logout(now, *this, sess_id, false);
+            app_.on_logout(now, *this, sess_id, Disconnect::No);
         } else if (state_ == LoggedOn) {
             state_ = LoggedOut;
             // Send logout response.
             send_logout(now);
             FixSessId sess_id;
             sess_id_.swap(sess_id);
-            app_.on_logout(now, *this, sess_id, false);
+            app_.on_logout(now, *this, sess_id, Disconnect::No);
         }
     } else if (msg_type == "A"sv) {
         // Logon.
