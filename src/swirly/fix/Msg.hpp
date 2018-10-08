@@ -17,11 +17,28 @@
 #ifndef SWIRLY_FIX_MSG_HPP
 #define SWIRLY_FIX_MSG_HPP
 
-#include <swirly/fix/Field.hpp>
+#include <swirly/fix/Group.hpp>
+#include <swirly/fix/Lexer.hpp>
 
 namespace swirly {
 inline namespace fix {
-class FixLexer;
+
+struct ExecutionReport {
+    void clear() { order_id.clear(); }
+    SymbolField symbol;
+    MaturityDate maturity_date;
+    ExecId exec_id;
+    OrderId order_id;
+};
+
+template <typename StreamT>
+StreamT& operator<<(StreamT& os, const ExecutionReport& body)
+{
+    os << body.symbol << body.maturity_date << body.exec_id << body.order_id;
+    return os;
+}
+
+SWIRLY_API void parse_body(FixLexer& lex, ExecutionReport& body);
 
 struct Logon {
     void clear()
@@ -41,22 +58,6 @@ StreamT& operator<<(StreamT& os, const Logon& body)
 }
 
 SWIRLY_API void parse_body(FixLexer& lex, Logon& body);
-SWIRLY_API void parse_body(std::string_view msg, std::size_t body_off, Logon& body);
-
-struct MdEntry {
-    MdEntryType type;
-    MdEntryPx px;
-    MdEntrySize size;
-};
-
-template <typename StreamT>
-StreamT& operator<<(StreamT& os, const MdEntry& grp)
-{
-    os << grp.type << grp.px << grp.size;
-    return os;
-}
-
-SWIRLY_API void parse_body(FixLexer& lex, MdEntry& grp);
 
 struct MarketDataSnapshot {
     void clear()
@@ -65,7 +66,7 @@ struct MarketDataSnapshot {
         maturity_date.clear();
         md_entries.clear();
     }
-    SymbolField::View symbol;
+    SymbolField symbol;
     MaturityDate maturity_date;
     std::vector<MdEntry> md_entries;
 };
@@ -81,7 +82,6 @@ StreamT& operator<<(StreamT& os, const MarketDataSnapshot& body)
 }
 
 SWIRLY_API void parse_body(FixLexer& lex, MarketDataSnapshot& body);
-SWIRLY_API void parse_body(std::string_view msg, std::size_t body_off, MarketDataSnapshot& body);
 
 struct TradingSessionStatus {
     void clear()
@@ -101,7 +101,14 @@ StreamT& operator<<(StreamT& os, const TradingSessionStatus& body)
 }
 
 SWIRLY_API void parse_body(FixLexer& lex, TradingSessionStatus& body);
-SWIRLY_API void parse_body(std::string_view msg, std::size_t body_off, TradingSessionStatus& body);
+
+template <typename BodyT>
+void parse_body(std::string_view msg, std::size_t body_off, BodyT& body)
+{
+    msg.remove_suffix(CheckSumLen);
+    FixLexer lex{msg, body_off};
+    parse_body(lex, body);
+}
 
 } // namespace fix
 } // namespace swirly

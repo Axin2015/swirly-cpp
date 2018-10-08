@@ -132,10 +132,7 @@ class SWIRLY_API Reactor {
         return do_timer(expiry, priority, slot);
     }
     // clang-format on
-    int poll(CyclTime now, Duration timeout = NoTimeout)
-    {
-        return do_poll(now, timeout);
-    }
+    int poll(CyclTime now, Duration timeout = NoTimeout) { return do_poll(now, timeout); }
 
   protected:
     virtual void do_interrupt() noexcept = 0;

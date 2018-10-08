@@ -29,9 +29,11 @@ void FixMakerBot::do_on_logon(CyclTime now, FixConn& conn, const FixSessId& sess
 {
     SWIRLY_INFO << sess_id << " <MakerBot> on_logon";
     conn_ = &conn;
-    md_tmr_ = reactor_.timer(now.mono_time() + 1s, 1s, Priority::Low,
+
+    std::uniform_int_distribution<int> dist{0, 10};
+    md_tmr_ = reactor_.timer(now.mono_time() + Millis{dist(rd_) * 100}, 1s, Priority::Low,
                              bind<&FixMakerBot::on_market_data>(this));
-    stat_tmr_ = reactor_.timer(now.mono_time() + 10s, 10s, Priority::Low,
+    stat_tmr_ = reactor_.timer(now.mono_time() + Seconds{dist(rd_)}, 10s, Priority::Low,
                                bind<&FixMakerBot::on_status>(this));
 }
 
@@ -43,13 +45,22 @@ void FixMakerBot::do_on_logout(CyclTime now, FixConn& conn, const FixSessId& ses
     } else {
         SWIRLY_WARNING << sess_id << " <MakerBot> on_logout";
     }
+    count_ = 0;
+    stat_tmr_.cancel();
+    md_tmr_.cancel();
     conn_ = nullptr;
+    conn.logon(now, sess_id);
 }
 
 void FixMakerBot::do_on_message(CyclTime now, FixConn& conn, string_view msg, size_t body_off,
                                 Version ver, const FixHeader& hdr)
 {
     SWIRLY_INFO << conn.sess_id() << " <MakerBot> on_message: " << hdr.msg_type.value;
+    if (hdr.msg_type.value == "8") {
+        msg.remove_prefix(body_off);
+        msg.remove_suffix(CheckSumLen);
+        conn_->send(now, "8"sv, msg);
+    }
 }
 
 void FixMakerBot::do_on_error(CyclTime now, const FixConn& conn, const std::exception& e) noexcept
@@ -71,8 +82,7 @@ void FixMakerBot::do_prepare(CyclTime now, const FixSessId& sess_id,
 void FixMakerBot::do_send(CyclTime now, string_view msg_type, string_view msg)
 {
     if (conn_) {
-        auto fn = [msg](CyclTime now, ostream& os) { os << msg; };
-        conn_->send(now, msg_type, fn);
+        conn_->send(now, msg_type, msg);
     }
 }
 
@@ -110,10 +120,14 @@ void FixMakerBot::on_market_data(CyclTime now, Timer& tmr)
 void FixMakerBot::on_status(CyclTime now, Timer& tmr)
 {
     assert(conn_);
-    auto fn = [](CyclTime now, ostream& os) {
-        os << TradingSessionId::View{"OPEN"} << TradSesStatus{2};
-    };
-    conn_->send(now, "h"sv, fn);
+    if (count_++ < 3) {
+        auto fn = [](CyclTime now, ostream& os) {
+            os << TradingSessionId::View{"OPEN"} << TradSesStatus{2};
+        };
+        conn_->send(now, "h"sv, fn);
+    } else {
+        conn_->logout(now);
+    }
 }
 
 } // namespace swirly

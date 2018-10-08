@@ -17,13 +17,13 @@ Http Library
 ------------
 ![Http Depends](@ref swirly-http.png)
 
-Fix Library
------------
-![Fix Depends](@ref swirly-fix.png)
-
 Fin Library
 -----------
 ![Fin Depends](@ref swirly-fin.png)
+
+Fix Library
+-----------
+![Fix Depends](@ref swirly-fix.png)
 
 Lob Library
 -----------

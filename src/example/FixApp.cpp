@@ -166,8 +166,9 @@ class PingHandler : public FixHandler {
     Reactor& reactor_;
     FixConn* conn_{nullptr};
     Timer md_tmr_, stat_tmr_;
+    std::random_device rd_;
+    RandomBbo bbo_{rd_};
     int count_{0};
-    RandomBbo bbo_;
 };
 
 class PongHandler : public FixHandler {
@@ -283,8 +284,7 @@ class ProxyHandler : public FixHandler {
     void do_send(CyclTime now, string_view msg_type, string_view msg) override
     {
         if (conn_) {
-            auto fn = [msg](CyclTime now, ostream& os) { os << msg; };
-            conn_->send(now, msg_type, fn);
+            conn_->send(now, msg_type, msg);
         }
     }
 

@@ -31,7 +31,8 @@ int main(int argc, char* argv[])
     int ret = 1;
     try {
 
-        RandomBbo bbo;
+        std::random_device rd;
+        RandomBbo bbo{rd};
         Buffer buf{1024};
         FixStream os{buf};
 

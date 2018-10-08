@@ -16,6 +16,7 @@
  * 02110-1301, USA.
  */
 #include "RestBody.hxx"
+
 #include <swirly/app/Exception.hpp>
 
 namespace swirly {

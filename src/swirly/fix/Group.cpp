@@ -14,45 +14,43 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_FIX_RANDOM_HPP
-#define SWIRLY_FIX_RANDOM_HPP
+#include "Group.hpp"
 
-#include <swirly/Config.h>
+#include "Lexer.hpp"
 
-#include <random>
+#include <swirly/app/Exception.hpp>
 
 namespace swirly {
 inline namespace fix {
+using namespace std;
 
-/**
- * Random best bid and offer based on "open" (or reference) price.
- */
-class SWIRLY_API RandomBbo {
-  public:
-    explicit RandomBbo(std::random_device& rd)
-    : rd_(rd)
-    {
+void parse_group(FixLexer& lex, MdEntry& grp)
+{
+    constexpr string_view ErrMsg{"missing MdEntryType(269)"};
+    if (lex.empty()) {
+        throw ProtocolException{ErrMsg};
     }
-    ~RandomBbo();
-
-    // Copy.
-    RandomBbo(const RandomBbo&) = delete;
-    RandomBbo& operator=(const RandomBbo&) = delete;
-
-    // Move.
-    RandomBbo(RandomBbo&&) = delete;
-    RandomBbo& operator=(RandomBbo&&) = delete;
-
-    std::pair<std::int64_t, std::int64_t> operator()(std::int64_t open);
-
-  private:
-    std::random_device& rd_;
-    std::mt19937 gen_{rd_()};
-    std::binomial_distribution<std::int64_t> dist_{4, 0.5};
-    std::int64_t offset_{0};
-};
+    const auto [t, v] = lex.next();
+    if (t != MdEntryType::Tag) {
+        throw ProtocolException{ErrMsg};
+    }
+    grp.type = v[0];
+    while (!lex.empty()) {
+        const auto [t, v] = lex.top();
+        switch (t) {
+        case MdEntryPx::Tag:
+            grp.px = from_string<MdEntryPx::Type>(v);
+            break;
+        case MdEntrySize::Tag:
+            grp.size = from_string<MdEntrySize::Type>(v);
+            break;
+        default:
+            // End of group.
+            return;
+        }
+        lex.pop();
+    }
+}
 
 } // namespace fix
 } // namespace swirly
-
-#endif // SWIRLY_FIX_RANDOM_HPP

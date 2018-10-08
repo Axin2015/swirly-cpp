@@ -90,6 +90,8 @@ class SWIRLY_API Order
     auto min_lots() const noexcept { return min_lots_; }
     auto done() const noexcept { return resd_lots_ == 0_lts; }
     void set_level(Level* level) const noexcept { level_ = level; }
+    auto transient() const noexcept { return transient_; }
+    void set_transient(bool transient = true) noexcept { transient_ = transient; }
     void create(WallTime now) noexcept
     {
         assert(lots_ > 0_lts);
@@ -161,6 +163,7 @@ class SWIRLY_API Order
      * Minimum to be filled by this order.
      */
     const Lots min_lots_;
+    bool transient_{false};
 };
 
 static_assert(sizeof(Order) <= 5 * 64, "no greater than specified cache-lines");

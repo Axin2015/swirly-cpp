@@ -25,8 +25,8 @@ if(DOT_EXECUTABLE)
     sys
     app
     http
-    fix
     fin
+    fix
     lob
   )
 

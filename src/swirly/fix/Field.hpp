@@ -19,8 +19,11 @@
 
 #include <swirly/fix/Stream.hpp>
 
+#include <swirly/fin/IntTypes.hpp>
+
 #include <swirly/util/Date.hpp>
 #include <swirly/util/StringBuf.hpp>
+#include <swirly/util/Symbol.hpp>
 #include <swirly/util/Time.hpp>
 
 namespace swirly {
@@ -62,7 +65,7 @@ struct FixField {
     : value(std::forward<ArgT>(arg))
     {
     }
-    void clear() { value = {}; }
+    void clear() { value = ValueT{}; }
     template <typename ArgT>
     constexpr FixField& operator=(ArgT&& arg)
     {
@@ -139,7 +142,7 @@ template <int TagN>
 using IntField = FixField<TagN, int>;
 
 template <int TagN>
-using LongField = FixField<TagN, long>;
+using Id64Field = FixField<TagN, Id64>;
 
 template <int TagN, std::size_t MaxN>
 using StringField = FixField<TagN, StringBuf<MaxN>>;
@@ -169,19 +172,21 @@ using SeqNumField = IntField<TagN>;
 // Long aliases.
 
 template <int TagN>
-using PriceField = LongField<TagN>;
+using PriceField = FixField<TagN, Ticks>;
 
 template <int TagN>
-using QtyField = LongField<TagN>;
+using QtyField = FixField<TagN, Lots>;
 
 using BeginString = StringField<8, 7>;
 using BodyLength = LengthField<9>;
+using ExecId = Id64Field<17>;
 using MsgSeqNum = SeqNumField<34>;
 using MsgType = StringField<35, 2>;
+using OrderId = Id64Field<37>;
 using SenderCompId = StringField<49, 32>;
 using PossDupFlag = BoolField<43>;
 using SendingTime = TimeField<52>;
-using SymbolField = StringField<55, 16>;
+using SymbolField = FixField<55, Symbol>;
 using TargetCompId = StringField<56, 32>;
 using PossResend = BoolField<97>;
 using EncryptMethod = IntField<98>;

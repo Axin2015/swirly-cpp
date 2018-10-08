@@ -50,11 +50,11 @@ void Response::to_json(ostream& os) const
         os << "null";
     }
     os << ",\"orders\":[";
-    transform(orders_.begin(), orders_.end(),
-              OStreamJoiner{os, ','}, [](const auto& ptr) -> const auto& { return *ptr; });
+    transform(orders_.begin(), orders_.end(), OStreamJoiner{os, ','},
+              [](const auto& ptr) -> const auto& { return *ptr; });
     os << "],\"execs\":[";
-    transform(execs_.rbegin(), execs_.rend(),
-              OStreamJoiner{os, ','}, [](const auto& ptr) -> const auto& { return *ptr; });
+    transform(execs_.rbegin(), execs_.rend(), OStreamJoiner{os, ','},
+              [](const auto& ptr) -> const auto& { return *ptr; });
     os << "],\"posn\":";
     if (posn_) {
         os << *posn_;
