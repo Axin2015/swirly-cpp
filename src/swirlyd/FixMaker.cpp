@@ -18,6 +18,8 @@
 
 #include <swirly/lob/App.hpp>
 
+#include <swirly/fin/MarketId.hpp>
+
 #include <swirly/fix/Conn.hpp>
 
 #include <swirly/util/Log.hpp>
@@ -41,9 +43,9 @@ void FixMaker::do_on_logon(CyclTime now, FixConn& conn, const FixSessId& sess_id
 }
 
 void FixMaker::do_on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_id,
-                            bool disconnect) noexcept
+                            Disconnect disconnect) noexcept
 {
-    if (!disconnect) {
+    if (disconnect == Disconnect::No) {
         SWIRLY_INFO << sess_id << " <Maker> on_logout";
     } else {
         SWIRLY_WARNING << sess_id << " <Maker> on_logout";
@@ -54,7 +56,9 @@ void FixMaker::do_on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_i
 void FixMaker::do_on_message(CyclTime now, FixConn& conn, string_view msg, size_t body_off,
                              Version ver, const FixHeader& hdr)
 {
-    if (hdr.msg_type.value != "W") {
+    if (hdr.msg_type.value == "W") {
+        on_market_data_snapshot(now, conn, msg, body_off, ver, hdr);
+    } else {
         SWIRLY_INFO << conn.sess_id() << " <Maker> on_message: " << hdr.msg_type.value;
     }
 }
@@ -79,6 +83,41 @@ void FixMaker::do_send(CyclTime now, string_view msg_type, string_view msg)
     if (conn_) {
         auto fn = [msg](CyclTime now, ostream& os) { os << msg; };
         conn_->send(now, msg_type, fn);
+    }
+}
+
+void FixMaker::on_market_data_snapshot(CyclTime now, FixConn& conn, string_view msg,
+                                       size_t body_off, Version ver, const FixHeader& hdr)
+{
+    mds_.clear();
+
+    parse_body(msg, body_off, mds_);
+
+    const auto& instr = lob_app_.instr(mds_.symbol.value);
+    const auto market_id = to_market_id(instr.id(), mds_.maturity_date.value);
+    const auto& market = lob_app_.market(market_id);
+    auto& orders = order_map_[market_id];
+
+    for (const auto& order : orders) {
+        lob_app_.try_cancel_quote(now.wall_time(), sess_, market, *order);
+    }
+    orders.clear();
+    for (const auto& md_entry : mds_.md_entries) {
+        Side side;
+        switch (md_entry.type.value) {
+        case '0':
+            side = Side::Buy;
+            break;
+        case '1':
+            side = Side::Sell;
+            break;
+        default:
+            continue;
+        }
+        const Lots lots{md_entry.size.value};
+        const Ticks ticks{md_entry.px.value};
+        orders.push_back(
+            lob_app_.create_quote(now.wall_time(), sess_, market, ""sv, side, lots, ticks, 1_lts));
     }
 }
 

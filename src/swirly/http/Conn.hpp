@@ -110,7 +110,7 @@ class BasicHttpConn
         // Only supported for HTTP responses.
         return false;
     }
-    bool on_header_field(CyclTime now, std::string_view sv, bool first) noexcept
+    bool on_header_field(CyclTime now, std::string_view sv, First first) noexcept
     {
         bool ret{false};
         try {
@@ -121,7 +121,7 @@ class BasicHttpConn
         }
         return ret;
     }
-    bool on_header_value(CyclTime now, std::string_view sv, bool first) noexcept
+    bool on_header_value(CyclTime now, std::string_view sv, First first) noexcept
     {
         bool ret{false};
         try {

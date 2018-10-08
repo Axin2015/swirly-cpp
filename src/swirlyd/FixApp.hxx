@@ -52,7 +52,7 @@ class FixApp : public FixAppBase {
 
     void do_on_logon(CyclTime now, FixConn& conn, const FixSessId& sess_id) override;
     void do_on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_id,
-                      bool disconnect) noexcept override;
+                      Disconnect disconnect) noexcept override;
     void do_on_message(CyclTime now, FixConn& conn, std::string_view msg, std::size_t body_off,
                        Version ver, const FixHeader& hdr) override;
     void do_on_error(CyclTime now, const FixConn& conn, const std::exception& e) noexcept override;

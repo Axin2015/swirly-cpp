@@ -77,8 +77,12 @@ class SWIRLY_API LobApp {
 
     void update_market(WallTime now, const Market& market, MarketState state);
 
-    void create_order(WallTime now, const Sess& sess, const Market& market, std::string_view ref,
-                      Side side, Lots lots, Ticks ticks, Lots min_lots, Response& resp);
+    OrderPtr create_order(WallTime now, const Sess& sess, const Market& market,
+                          std::string_view ref, Side side, Lots lots, Ticks ticks, Lots min_lots,
+                          Response& resp);
+
+    OrderPtr create_quote(WallTime now, const Sess& sess, const Market& market,
+                          std::string_view ref, Side side, Lots lots, Ticks ticks, Lots min_lots);
 
     void revise_order(WallTime now, const Sess& sess, const Market& market, const Order& order,
                       Lots lots, Response& resp);
@@ -115,6 +119,18 @@ class SWIRLY_API LobApp {
     void cancel_order(WallTime now, const Sess& sess);
 
     void cancel_order(WallTime now, const Market& market);
+
+    bool try_cancel_order(WallTime now, const Sess& sess, const Market& market, const Order& order,
+                          Response& resp);
+
+    bool try_cancel_order(WallTime now, const Sess& sess, const Market& market, Id64 id,
+                          Response& resp);
+
+    bool try_cancel_order(WallTime now, const Sess& sess, const Market& market,
+                          std::string_view ref, Response& resp);
+
+    bool try_cancel_quote(WallTime now, const Sess& sess, const Market& market,
+                          const Order& order) noexcept;
 
     TradePair create_trade(WallTime now, const Sess& sess, const Market& market,
                            std::string_view ref, Side side, Lots lots, Ticks ticks, LiqInd liq_ind,

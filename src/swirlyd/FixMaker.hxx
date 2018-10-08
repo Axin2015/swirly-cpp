@@ -19,6 +19,10 @@
 
 #include "FixHandler.hxx"
 
+#include <swirly/fin/Order.hpp>
+
+#include <swirly/fix/Msg.hpp>
+
 namespace swirly {
 inline namespace lob {
 class LobApp;
@@ -29,6 +33,8 @@ class Reactor;
 } // namespace sys
 
 class FixMaker : public FixHandler {
+    using OrderMap = std::unordered_map<Id64, std::vector<OrderPtr>>;
+
   public:
     FixMaker(CyclTime now, Reactor& r, const FixSessId& sess_id, const Config& config,
              LobApp& lob_app);
@@ -45,7 +51,7 @@ class FixMaker : public FixHandler {
   protected:
     void do_on_logon(CyclTime now, FixConn& conn, const FixSessId& sess_id) override;
     void do_on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_id,
-                      bool disconnect) noexcept override;
+                      Disconnect disconnect) noexcept override;
     void do_on_message(CyclTime now, FixConn& conn, std::string_view msg, std::size_t body_off,
                        Version ver, const FixHeader& hdr) override;
     void do_on_error(CyclTime now, const FixConn& conn, const std::exception& e) noexcept override;
@@ -55,9 +61,13 @@ class FixMaker : public FixHandler {
     void do_send(CyclTime now, std::string_view msg_type, std::string_view msg) override;
 
   private:
+    void on_market_data_snapshot(CyclTime now, FixConn& conn, std::string_view msg,
+                                 std::size_t body_off, Version ver, const FixHeader& hdr);
     LobApp& lob_app_;
     const Sess& sess_;
     FixConn* conn_{nullptr};
+    MarketDataSnapshot mds_;
+    OrderMap order_map_;
 };
 
 } // namespace swirly

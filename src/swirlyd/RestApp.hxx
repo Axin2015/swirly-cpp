@@ -19,6 +19,8 @@
 
 #include "RestImpl.hxx"
 
+#include <swirly/http/Types.hpp>
+
 #include <swirly/sys/IpAddress.hpp>
 
 #include <swirly/util/Tokeniser.hpp>
@@ -59,7 +61,7 @@ class RestApp {
     void on_timeout(CyclTime now, const Endpoint& ep) noexcept;
 
   private:
-    bool reset(const RestRequest& req) noexcept;
+    NoCache reset(const RestRequest& req) noexcept;
 
     void rest_request(WallTime now, const RestRequest& req, HttpStream& os);
 

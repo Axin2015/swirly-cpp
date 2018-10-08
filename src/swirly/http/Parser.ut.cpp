@@ -79,16 +79,16 @@ class HttpParser
         status_.append(sv.data(), sv.size());
         return true;
     }
-    bool on_header_field(CyclTime now, string_view sv, bool first) noexcept
+    bool on_header_field(CyclTime now, string_view sv, First first) noexcept
     {
-        if (first) {
+        if (first == First::Yes) {
             headers_.emplace_back(string{sv.data(), sv.size()}, "");
         } else {
             headers_.back().first.append(sv.data(), sv.size());
         }
         return true;
     }
-    bool on_header_value(CyclTime now, string_view sv, bool first) noexcept
+    bool on_header_value(CyclTime now, string_view sv, First first) noexcept
     {
         headers_.back().second.append(sv.data(), sv.size());
         return true;

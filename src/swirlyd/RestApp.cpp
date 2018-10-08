@@ -155,7 +155,7 @@ void RestApp::on_timeout(CyclTime now, const Endpoint& ep) noexcept
     SWIRLY_WARNING << "session timeout: " << ep;
 }
 
-bool RestApp::reset(const RestRequest& req) noexcept
+NoCache RestApp::reset(const RestRequest& req) noexcept
 {
     match_method_ = false;
     match_path_ = false;
@@ -168,11 +168,10 @@ bool RestApp::reset(const RestRequest& req) noexcept
     path_.reset(path, "/"sv);
 
     if (req.method() != HttpMethod::Get) {
-        // No cache.
-        return false;
+        return NoCache::No;
     }
     // Cache if GET for refdata.
-    return !path.empty() && path_.top() == "refdata"sv;
+    return !path.empty() && path_.top() == "refdata"sv ? NoCache::Yes : NoCache::No;
 }
 
 void RestApp::rest_request(WallTime now, const RestRequest& req, HttpStream& os)

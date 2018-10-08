@@ -62,6 +62,7 @@ struct FixField {
     : value(std::forward<ArgT>(arg))
     {
     }
+    void clear() { value = {}; }
     template <typename ArgT>
     constexpr FixField& operator=(ArgT&& arg)
     {

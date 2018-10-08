@@ -91,7 +91,7 @@ class SWIRLY_API HttpStream : public std::ostream {
         swirly::reset(*this);
         cloff_ = hcount_ = 0;
     }
-    void reset(HttpStatus status, const char* content_type, bool no_cache = true);
+    void reset(HttpStatus status, const char* content_type, NoCache no_cache = NoCache::Yes);
 
   private:
     HttpBuf buf_;
