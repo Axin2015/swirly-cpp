@@ -31,7 +31,8 @@ set(lib_SOURCES
   Match.cpp
   Response.cpp
   Sess.cpp
-  Test.cpp)
+  Test.cpp
+  Types.cpp)
 
 add_library(swirly-lob-static STATIC ${lib_SOURCES})
 set_target_properties(swirly-lob-static PROPERTIES OUTPUT_NAME swirly-lob)

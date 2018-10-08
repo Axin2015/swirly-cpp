@@ -63,10 +63,12 @@ uint32_t get_perm(const RestRequest& req)
     return from_string<uint32_t>(req.perm());
 }
 
-WallTime get_time(WallTime now, const RestRequest& req) noexcept
+void set_wall_time(CyclTime now, const RestRequest& req) noexcept
 {
     const string_view val{req.time()};
-    return val.empty() ? now : to_time<WallClock>(from_string<Millis>(val));
+    if (!val.empty()) {
+        now.set_wall_time(to_time<WallClock>(from_string<Millis>(val)));
+    }
 }
 
 string_view get_admin(const RestRequest& req)
@@ -111,8 +113,8 @@ void RestApp::on_error(CyclTime now, const Endpoint& ep, const std::exception& e
 void RestApp::on_message(CyclTime now, const Endpoint& ep, const RestRequest& req,
                          HttpStream& os) noexcept
 {
-    const auto cache = reset(req);                         // noexcept
-    const auto wall_time = get_time(now.wall_time(), req); // noexcept
+    const auto cache = reset(req); // noexcept
+    set_wall_time(now, req);       // noexcept
 
     if (req.method() != HttpMethod::Delete) {
         os.reset(HttpStatus::Ok, ApplicationJson, cache); // noexcept
@@ -124,7 +126,7 @@ void RestApp::on_message(CyclTime now, const Endpoint& ep, const RestRequest& re
         if (req.partial()) {
             throw BadRequestException{"request body is incomplete"sv};
         }
-        rest_request(wall_time, req, os);
+        rest_request(now, req, os);
         if (!match_path_) {
             throw NotFoundException{err_msg() << "resource '" << req.path() << "' does not exist"};
         }
@@ -174,7 +176,7 @@ NoCache RestApp::reset(const RestRequest& req) noexcept
     return !path.empty() && path_.top() == "refdata"sv ? NoCache::Yes : NoCache::No;
 }
 
-void RestApp::rest_request(WallTime now, const RestRequest& req, HttpStream& os)
+void RestApp::rest_request(CyclTime now, const RestRequest& req, HttpStream& os)
 {
     if (path_.empty()) {
         return;
@@ -206,7 +208,7 @@ void RestApp::rest_request(WallTime now, const RestRequest& req, HttpStream& os)
     }
 }
 
-void RestApp::ref_data_request(WallTime now, const RestRequest& req, HttpStream& os)
+void RestApp::ref_data_request(CyclTime now, const RestRequest& req, HttpStream& os)
 {
     if (path_.empty()) {
 
@@ -252,7 +254,7 @@ void RestApp::ref_data_request(WallTime now, const RestRequest& req, HttpStream&
     }
 }
 
-void RestApp::asset_request(WallTime now, const RestRequest& req, HttpStream& os)
+void RestApp::asset_request(CyclTime now, const RestRequest& req, HttpStream& os)
 {
     if (path_.empty()) {
 
@@ -284,7 +286,7 @@ void RestApp::asset_request(WallTime now, const RestRequest& req, HttpStream& os
     }
 }
 
-void RestApp::instr_request(WallTime now, const RestRequest& req, HttpStream& os)
+void RestApp::instr_request(CyclTime now, const RestRequest& req, HttpStream& os)
 {
     if (path_.empty()) {
 
@@ -316,7 +318,7 @@ void RestApp::instr_request(WallTime now, const RestRequest& req, HttpStream& os
     }
 }
 
-void RestApp::sess_request(WallTime now, const RestRequest& req, HttpStream& os)
+void RestApp::sess_request(CyclTime now, const RestRequest& req, HttpStream& os)
 {
     if (path_.empty()) {
 
@@ -372,7 +374,7 @@ void RestApp::sess_request(WallTime now, const RestRequest& req, HttpStream& os)
     }
 }
 
-void RestApp::market_request(WallTime now, const RestRequest& req, HttpStream& os)
+void RestApp::market_request(CyclTime now, const RestRequest& req, HttpStream& os)
 {
     if (path_.empty()) {
 
@@ -484,7 +486,7 @@ void RestApp::market_request(WallTime now, const RestRequest& req, HttpStream& o
     }
 }
 
-void RestApp::order_request(WallTime now, const RestRequest& req, HttpStream& os)
+void RestApp::order_request(CyclTime now, const RestRequest& req, HttpStream& os)
 {
     if (path_.empty()) {
 
@@ -626,7 +628,7 @@ void RestApp::order_request(WallTime now, const RestRequest& req, HttpStream& os
     }
 }
 
-void RestApp::exec_request(WallTime now, const RestRequest& req, HttpStream& os)
+void RestApp::exec_request(CyclTime now, const RestRequest& req, HttpStream& os)
 {
     if (path_.empty()) {
 
@@ -642,7 +644,7 @@ void RestApp::exec_request(WallTime now, const RestRequest& req, HttpStream& os)
     }
 }
 
-void RestApp::trade_request(WallTime now, const RestRequest& req, HttpStream& os)
+void RestApp::trade_request(CyclTime now, const RestRequest& req, HttpStream& os)
 {
     if (path_.empty()) {
 
@@ -778,7 +780,7 @@ void RestApp::trade_request(WallTime now, const RestRequest& req, HttpStream& os
     }
 }
 
-void RestApp::posn_request(WallTime now, const RestRequest& req, HttpStream& os)
+void RestApp::posn_request(CyclTime now, const RestRequest& req, HttpStream& os)
 {
     if (path_.empty()) {
 

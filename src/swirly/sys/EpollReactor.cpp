@@ -137,7 +137,7 @@ int EpollReactor::do_poll(CyclTime now, Duration timeout)
     }
     // If the muxer call was a blocking call, then acquire the current time.
     if (!is_zero(wait_until)) {
-        now = CyclTime::set();
+        now = CyclTime::now();
     }
     n = tqs_[High].dispatch(now) + dispatch(now, buf, n);
     // Low priority timers are only dispatched during empty cycles.

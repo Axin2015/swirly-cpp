@@ -101,13 +101,13 @@ SWIRLY_BENCHMARK(sys_clock_gettime_mono)
 
 SWIRLY_BENCHMARK(cycl_time_set)
 {
-    return []() { CyclTime::set(); };
+    return []() { CyclTime::now(); };
 }
 
 SWIRLY_BENCHMARK(cycl_time_set_and_get)
 {
     return []() {
-        auto now = CyclTime::set();
+        auto now = CyclTime::now();
         clobber_memory();
         auto t = now.mono_time();
         do_not_optimise(t);

@@ -16,9 +16,9 @@
  */
 #include "App.hpp"
 
-#include <swirly/lob/Response.hpp>
-#include <swirly/lob/Sess.hpp>
-#include <swirly/lob/Test.hpp>
+#include "Response.hpp"
+#include "Sess.hpp"
+#include "Test.hpp"
 
 #include <swirly/fin/MsgQueue.hpp>
 
@@ -37,7 +37,7 @@ constexpr auto Today = ymd_to_jd(2014, 3, 11);
 constexpr auto SettlDay = Today + 2_jd;
 constexpr auto MarketId = to_market_id(1_id32, SettlDay);
 
-constexpr auto Now = jd_to_time(Today);
+constexpr auto WallNow = jd_to_time(Today);
 
 class SWIRLY_API TestModel : public swirly::TestModel {
   protected:
@@ -48,7 +48,12 @@ class SWIRLY_API TestModel : public swirly::TestModel {
 };
 
 struct Fixture {
-    Fixture() { app.load(Now, TestModel{}); }
+    Fixture()
+    : now{CyclTime::now(WallNow)}
+    {
+        app.load(now, TestModel{});
+    }
+    const CyclTime now;
     MsgQueue mq{1 << 10};
     LobApp app{mq, 1 << 4};
 };
@@ -128,9 +133,9 @@ BOOST_FIXTURE_TEST_CASE(AppCreateMarket, Fixture)
     const auto market_id = to_market_id(instr.id(), SettlDay);
 
     // Settl-day before bus-day.
-    BOOST_CHECK_THROW(app.create_market(Now, instr, Today - 1_jd, 0x1), InvalidException);
+    BOOST_CHECK_THROW(app.create_market(now, instr, Today - 1_jd, 0x1), InvalidException);
 
-    auto& market = app.create_market(Now, instr, SettlDay, 0x1);
+    auto& market = app.create_market(now, instr, SettlDay, 0x1);
 
     BOOST_TEST(market.id() == market_id);
 
@@ -144,16 +149,16 @@ BOOST_FIXTURE_TEST_CASE(AppCreateMarket, Fixture)
     BOOST_TEST(&*it == &market);
 
     // Already exists.
-    BOOST_CHECK_THROW(app.create_market(Now, instr, SettlDay, 0x1), AlreadyExistsException);
+    BOOST_CHECK_THROW(app.create_market(now, instr, SettlDay, 0x1), AlreadyExistsException);
 }
 
 BOOST_FIXTURE_TEST_CASE(AppUpdateMarket, Fixture)
 {
     const Instr& instr = app.instr("USDJPY"sv);
     const auto market_id = to_market_id(instr.id(), SettlDay);
-    auto& market = app.create_market(Now, instr, SettlDay, 0x1);
+    auto& market = app.create_market(now, instr, SettlDay, 0x1);
 
-    app.update_market(Now, market, 0x2);
+    app.update_market(now, market, 0x2);
 
     BOOST_TEST(market.id() == market_id);
 
@@ -170,7 +175,7 @@ BOOST_FIXTURE_TEST_CASE(AppCreateOrder, Fixture)
     auto& market = app.market(market_id);
 
     Response resp;
-    app.create_order(Now, sess, market, ""sv, Side::Buy, 5_lts, 12345_tks, 1_lts, resp);
+    app.create_order(now, sess, market, ""sv, Side::Buy, 5_lts, 12345_tks, 1_lts, resp);
 
     BOOST_TEST(resp.orders().size() == 1U);
     BOOST_TEST(resp.execs().size() == 1U);
@@ -192,8 +197,8 @@ BOOST_FIXTURE_TEST_CASE(AppCreateOrder, Fixture)
     BOOST_TEST(order->last_lots() == 0_lts);
     BOOST_TEST(order->last_ticks() == 0_tks);
     BOOST_TEST(order->min_lots() == 1_lts);
-    BOOST_TEST(order->created() == Now);
-    BOOST_TEST(order->modified() == Now);
+    BOOST_TEST(order->created() == WallNow);
+    BOOST_TEST(order->modified() == WallNow);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

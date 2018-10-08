@@ -63,6 +63,8 @@ class FixMaker : public FixHandler {
   private:
     void on_market_data_snapshot(CyclTime now, FixConn& conn, std::string_view msg,
                                  std::size_t body_off, Version ver, const FixHeader& hdr);
+    void on_trade(CyclTime now, const Sess& sess, const ExecPtr& exec);
+
     LobApp& lob_app_;
     const Sess& sess_;
     FixConn* conn_{nullptr};

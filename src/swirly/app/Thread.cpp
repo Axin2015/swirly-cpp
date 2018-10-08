@@ -29,7 +29,7 @@ void run_reactor(Reactor& r, ThreadConfig config, const std::atomic<bool>& stop)
     SWIRLY_NOTICE << "started " << config.name << " thread";
     try {
         while (!stop.load(std::memory_order_acquire)) {
-            r.poll(CyclTime::set());
+            r.poll(CyclTime::now());
         }
     } catch (const std::exception& e) {
         SWIRLY_ERROR << "exception: " << e.what();

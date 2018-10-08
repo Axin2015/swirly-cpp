@@ -44,7 +44,7 @@ SigWait::~SigWait()
 
 int SigWait::operator()() const
 {
-    const auto finally = make_finally([&]() noexcept { CyclTime::set(); });
+    const auto finally = make_finally([&]() noexcept { CyclTime::now(); });
 
     siginfo_t info;
     if (sigwaitinfo(&new_mask_, &info) < 0) {
@@ -55,7 +55,7 @@ int SigWait::operator()() const
 
 int SigWait::operator()(Duration timeout) const
 {
-    const auto finally = make_finally([&]() noexcept { CyclTime::set(); });
+    const auto finally = make_finally([&]() noexcept { CyclTime::now(); });
 
     siginfo_t info;
     const auto ts = to_timespec(timeout);

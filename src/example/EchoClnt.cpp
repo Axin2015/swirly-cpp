@@ -162,7 +162,7 @@ int main(int argc, char* argv[])
     int ret = 1;
     try {
 
-        const auto start_time = CyclTime::set();
+        const auto start_time = CyclTime::now();
 
         EpollReactor reactor{1024};
         EchoClnt echo_clnt{start_time, reactor, parse_endpoint<Tcp>("127.0.0.1:7777")};

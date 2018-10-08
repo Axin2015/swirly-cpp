@@ -117,7 +117,7 @@ SWIRLY_API std::ostream& operator<<(std::ostream& os, WallTime t);
 class SWIRLY_API CyclTime {
   public:
     static CyclTime current() noexcept { return {}; }
-    static CyclTime set() noexcept
+    static CyclTime now() noexcept
     {
         time_ = Time::now();
         return {}; // Empty tag.
@@ -125,13 +125,14 @@ class SWIRLY_API CyclTime {
     /**
      * This overload allows users to override wall-clock time.
      */
-    static CyclTime set(WallTime wall_time) noexcept
+    static CyclTime now(WallTime wall_time) noexcept
     {
         time_ = Time::now(wall_time);
         return {}; // Empty tag.
     }
     MonoTime mono_time() const noexcept { return time_.mono_time; }
     WallTime wall_time() const noexcept { return time_.wall_time; }
+    void set_wall_time(WallTime wall_time) noexcept { time_.wall_time = wall_time; }
 
   private:
     CyclTime() = default;

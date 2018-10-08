@@ -17,6 +17,8 @@
 #ifndef SWIRLY_LOB_SESS_HPP
 #define SWIRLY_LOB_SESS_HPP
 
+#include <swirly/lob/Types.hpp>
+
 #include <swirly/fin/Exec.hpp>
 #include <swirly/fin/MarketId.hpp>
 #include <swirly/fin/Order.hpp>
@@ -33,8 +35,6 @@
 
 namespace swirly {
 inline namespace lob {
-
-class Sess;
 
 using SessPtr = std::unique_ptr<Sess>;
 using ConstSessPtr = std::unique_ptr<const Sess>;
@@ -97,6 +97,7 @@ class SWIRLY_API Sess : protected Comparable<Sess> {
     }
     const auto& posns() const noexcept { return posns_; }
 
+    void set_trade_slot(TradeSlot slot) noexcept { trade_slot_ = slot; }
     auto& orders() noexcept { return orders_; }
     Order& order(Id64 market_id, Id64 id)
     {
@@ -146,6 +147,8 @@ class SWIRLY_API Sess : protected Comparable<Sess> {
         assert(trade->state() == State::Trade);
         trades_.insert(trade);
     }
+    void insert_trade_and_notify(CyclTime now, const ExecPtr& trade) noexcept;
+
     ConstExecPtr remove_trade(const Exec& trade) noexcept
     {
         assert(trade.accnt() == accnt_);
@@ -166,6 +169,7 @@ class SWIRLY_API Sess : protected Comparable<Sess> {
 
   private:
     const Symbol accnt_;
+    TradeSlot trade_slot_;
     OrderIdSet orders_;
     boost::circular_buffer<ConstExecPtr> execs_;
     ExecIdSet trades_;
