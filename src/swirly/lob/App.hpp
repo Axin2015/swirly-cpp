@@ -17,6 +17,8 @@
 #ifndef SWIRLY_LOB_APP_HPP
 #define SWIRLY_LOB_APP_HPP
 
+#include <swirly/lob/Types.hpp>
+
 #include <swirly/fin/Asset.hpp>
 #include <swirly/fin/Instr.hpp>
 #include <swirly/fin/Market.hpp>
@@ -58,54 +60,56 @@ class SWIRLY_API LobApp {
     LobApp(LobApp&&);
     LobApp& operator=(LobApp&&);
 
-    void load(WallTime now, const Model& model);
-
     const AssetSet& assets() const noexcept;
-
-    const Instr& instr(Symbol symbol) const;
 
     const InstrSet& instrs() const noexcept;
 
-    const Sess& sess(Symbol accnt) const;
+    const MarketSet& markets() const noexcept;
+
+    const Instr& instr(Symbol symbol) const;
 
     const Market& market(Id64 id) const;
 
-    const MarketSet& markets() const noexcept;
+    const Sess& sess(Symbol accnt) const;
 
-    const Market& create_market(WallTime now, const Instr& instr, JDay settl_day,
+    void load(CyclTime now, const Model& model);
+
+    void set_trade_slot(const Sess& sess, TradeSlot slot) noexcept;
+
+    const Market& create_market(CyclTime now, const Instr& instr, JDay settl_day,
                                 MarketState state);
 
-    void update_market(WallTime now, const Market& market, MarketState state);
+    void update_market(CyclTime now, const Market& market, MarketState state);
 
-    OrderPtr create_order(WallTime now, const Sess& sess, const Market& market,
+    OrderPtr create_order(CyclTime now, const Sess& sess, const Market& market,
                           std::string_view ref, Side side, Lots lots, Ticks ticks, Lots min_lots,
                           Response& resp);
 
-    OrderPtr create_quote(WallTime now, const Sess& sess, const Market& market,
+    OrderPtr create_quote(CyclTime now, const Sess& sess, const Market& market,
                           std::string_view ref, Side side, Lots lots, Ticks ticks, Lots min_lots);
 
-    void revise_order(WallTime now, const Sess& sess, const Market& market, const Order& order,
+    void revise_order(CyclTime now, const Sess& sess, const Market& market, const Order& order,
                       Lots lots, Response& resp);
 
-    void revise_order(WallTime now, const Sess& sess, const Market& market, Id64 id, Lots lots,
+    void revise_order(CyclTime now, const Sess& sess, const Market& market, Id64 id, Lots lots,
                       Response& resp);
 
-    void revise_order(WallTime now, const Sess& sess, const Market& market, std::string_view ref,
+    void revise_order(CyclTime now, const Sess& sess, const Market& market, std::string_view ref,
                       Lots lots, Response& resp);
 
-    void revise_order(WallTime now, const Sess& sess, const Market& market, ArrayView<Id64> ids,
+    void revise_order(CyclTime now, const Sess& sess, const Market& market, ArrayView<Id64> ids,
                       Lots lots, Response& resp);
 
-    void cancel_order(WallTime now, const Sess& sess, const Market& market, const Order& order,
+    void cancel_order(CyclTime now, const Sess& sess, const Market& market, const Order& order,
                       Response& resp);
 
-    void cancel_order(WallTime now, const Sess& sess, const Market& market, Id64 id,
+    void cancel_order(CyclTime now, const Sess& sess, const Market& market, Id64 id,
                       Response& resp);
 
-    void cancel_order(WallTime now, const Sess& sess, const Market& market, std::string_view ref,
+    void cancel_order(CyclTime now, const Sess& sess, const Market& market, std::string_view ref,
                       Response& resp);
 
-    void cancel_order(WallTime now, const Sess& sess, const Market& market, ArrayView<Id64> ids,
+    void cancel_order(CyclTime now, const Sess& sess, const Market& market, ArrayView<Id64> ids,
                       Response& resp);
 
     /**
@@ -116,31 +120,31 @@ class SWIRLY_API LobApp {
      * @param now
      *            The current time.
      */
-    void cancel_order(WallTime now, const Sess& sess);
+    void cancel_order(CyclTime now, const Sess& sess);
 
-    void cancel_order(WallTime now, const Market& market);
+    void cancel_order(CyclTime now, const Market& market);
 
-    bool try_cancel_order(WallTime now, const Sess& sess, const Market& market, const Order& order,
+    bool try_cancel_order(CyclTime now, const Sess& sess, const Market& market, const Order& order,
                           Response& resp);
 
-    bool try_cancel_order(WallTime now, const Sess& sess, const Market& market, Id64 id,
+    bool try_cancel_order(CyclTime now, const Sess& sess, const Market& market, Id64 id,
                           Response& resp);
 
-    bool try_cancel_order(WallTime now, const Sess& sess, const Market& market,
+    bool try_cancel_order(CyclTime now, const Sess& sess, const Market& market,
                           std::string_view ref, Response& resp);
 
-    bool try_cancel_quote(WallTime now, const Sess& sess, const Market& market,
+    bool try_cancel_quote(CyclTime now, const Sess& sess, const Market& market,
                           const Order& order) noexcept;
 
-    TradePair create_trade(WallTime now, const Sess& sess, const Market& market,
+    TradePair create_trade(CyclTime now, const Sess& sess, const Market& market,
                            std::string_view ref, Side side, Lots lots, Ticks ticks, LiqInd liq_ind,
                            Symbol cpty);
 
-    void archive_trade(WallTime now, const Sess& sess, const Exec& trade);
+    void archive_trade(CyclTime now, const Sess& sess, const Exec& trade);
 
-    void archive_trade(WallTime now, const Sess& sess, Id64 market_id, Id64 id);
+    void archive_trade(CyclTime now, const Sess& sess, Id64 market_id, Id64 id);
 
-    void archive_trade(WallTime now, const Sess& sess, Id64 market_id, ArrayView<Id64> ids);
+    void archive_trade(CyclTime now, const Sess& sess, Id64 market_id, ArrayView<Id64> ids);
 
     /**
      * This method may partially fail.
@@ -148,9 +152,9 @@ class SWIRLY_API LobApp {
      * @param now
      *            The current time.
      */
-    void expire_end_of_day(WallTime now);
+    void expire_end_of_day(CyclTime now);
 
-    void settl_end_of_day(WallTime now);
+    void settl_end_of_day(CyclTime now);
 
   private:
     struct Impl;

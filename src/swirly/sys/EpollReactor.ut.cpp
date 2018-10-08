@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(EpollReactorLevelCase)
     auto socks = socketpair(LocalStream{});
     const auto sub = r.subscribe(*socks.second, EventIn, bind<&TestHandler::on_input>(h.get()));
 
-    const auto now = CyclTime::set();
+    const auto now = CyclTime::now();
     BOOST_TEST(r.poll(now, 0ms) == 0);
     BOOST_TEST(h->matches == 0);
 
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE(EpollReactorEdgeCase)
     auto socks = socketpair(LocalStream{});
     auto sub = r.subscribe(*socks.second, EventIn | EventEt, bind<&TestHandler::on_input>(h.get()));
 
-    const auto now = CyclTime::set();
+    const auto now = CyclTime::now();
     BOOST_TEST(r.poll(now, 0ms) == 0);
     BOOST_TEST(h->matches == 0);
 

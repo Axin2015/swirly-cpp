@@ -44,8 +44,8 @@ using namespace swirly;
 
 namespace {
 
-const Market& create_market(LobApp& app, Symbol instr_symbol, JDay settl_day, MarketState state,
-                            WallTime now)
+const Market& create_market(CyclTime now, LobApp& app, Symbol instr_symbol, JDay settl_day,
+                            MarketState state)
 {
     const auto& instr = app.instr(instr_symbol);
     const auto market_id = to_market_id(instr.id(), settl_day);
@@ -62,7 +62,7 @@ class Archiver {
     : app_(app)
     {
     }
-    void operator()(WallTime now, const Sess& sess, Id64 market_id)
+    void operator()(CyclTime now, const Sess& sess, Id64 market_id)
     {
         ids_.clear();
         for (const auto& trade : sess.trades()) {
@@ -125,7 +125,7 @@ int main(int argc, char* argv[])
     int ret = 1;
     try {
 
-        const auto start_time = CyclTime::set();
+        const auto start_time = CyclTime::now();
 
         mem_ctx = MemCtx{1 << 20};
 
@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
 
         MsgQueue mq{1 << 12};
         LobApp app{mq, 1 << 4};
-        app.load(start_time.wall_time(), *model);
+        app.load(start_time, *model);
         model = nullptr;
 
         NullJourn journ;
@@ -158,8 +158,8 @@ int main(int argc, char* argv[])
         };
         AgentThread journ_thread{journ_agent, ThreadConfig{"journ"s}};
 
-        auto& market = create_market(app, "EURUSD"sv, bus_day(start_time.wall_time()), 0,
-                                     start_time.wall_time());
+        auto& market
+            = create_market(start_time, app, "EURUSD"sv, bus_day(start_time.wall_time()), 0);
 
         auto& eddayl = app.sess("EDDAYL"sv);
         auto& gosayl = app.sess("GOSAYL"sv);
@@ -174,7 +174,7 @@ int main(int argc, char* argv[])
 
         for (int i = 0; i < 1'001'000; ++i) {
 
-            const auto now = CyclTime::set().wall_time();
+            const auto now = CyclTime::now();
 
             // Reset profiles after warmup period.
             if (i == 1000) {

@@ -14,40 +14,21 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Sess.hpp"
+#ifndef SWIRLY_LOB_TYPES_HPP
+#define SWIRLY_LOB_TYPES_HPP
 
-#include <swirly/util/Log.hpp>
+#include <swirly/fin/Types.hpp>
+
+#include <swirly/util/Slot.hpp>
+#include <swirly/util/Time.hpp>
 
 namespace swirly {
 inline namespace lob {
-using namespace std;
 
-static_assert(sizeof(Sess) <= 6 * 64, "no greater than specified cache-lines");
-
-Sess::~Sess() = default;
-
-Sess::Sess(Sess&&) = default;
-
-void Sess::insert_trade_and_notify(CyclTime now, const ExecPtr& trade) noexcept
-{
-    insert_trade(trade);
-    if (trade_slot_) {
-        try {
-            trade_slot_.invoke(now, *this, trade);
-        } catch (const std::exception& e) {
-            SWIRLY_ERROR << "error handling trade event: " << e.what();
-        }
-    }
-}
-
-PosnPtr Sess::posn(Id64 market_id, Symbol instr, JDay settl_day)
-{
-    auto [it, found] = posns_.find_hint(market_id);
-    if (!found) {
-        it = posns_.insert_hint(it, Posn::make(accnt_, market_id, instr, settl_day));
-    }
-    return &*it;
-}
+class Sess;
+using TradeSlot = BasicSlot<CyclTime, const Sess&, const ExecPtr&>;
 
 } // namespace lob
 } // namespace swirly
+
+#endif // SWIRLY_LOB_TYPES_HPP

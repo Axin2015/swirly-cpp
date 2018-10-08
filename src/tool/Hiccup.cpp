@@ -49,7 +49,7 @@ class HiccupThread {
         try {
             EpollReactor r{1};
             while (!stop.load(memory_order_relaxed)) {
-                auto start = CyclTime::set();
+                auto start = CyclTime::now();
                 auto fn = [&recorder, start](CyclTime now, Timer& tmr) {
                     const auto end = MonoClock::now();
                     const auto diff
@@ -58,7 +58,7 @@ class HiccupThread {
                 };
                 auto t = r.timer(start.mono_time() + 1ms, Priority::Low, bind(&fn));
                 while (!r.poll(start)) {
-                    start = CyclTime::set();
+                    start = CyclTime::now();
                 }
             }
         } catch (const std::exception& e) {
@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
 {
     int ret = 1;
     try {
-        auto start_time = CyclTime::set().wall_time();
+        auto start_time = CyclTime::now().wall_time();
 
         IntervalRecorder recorder{1, 1'000'000, 5};
         LogWriter writer{stdout};

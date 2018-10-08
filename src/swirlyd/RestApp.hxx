@@ -63,19 +63,19 @@ class RestApp {
   private:
     NoCache reset(const RestRequest& req) noexcept;
 
-    void rest_request(WallTime now, const RestRequest& req, HttpStream& os);
+    void rest_request(CyclTime now, const RestRequest& req, HttpStream& os);
 
-    void ref_data_request(WallTime now, const RestRequest& req, HttpStream& os);
-    void asset_request(WallTime now, const RestRequest& req, HttpStream& os);
-    void instr_request(WallTime now, const RestRequest& req, HttpStream& os);
+    void ref_data_request(CyclTime now, const RestRequest& req, HttpStream& os);
+    void asset_request(CyclTime now, const RestRequest& req, HttpStream& os);
+    void instr_request(CyclTime now, const RestRequest& req, HttpStream& os);
 
-    void sess_request(WallTime now, const RestRequest& req, HttpStream& os);
-    void market_request(WallTime now, const RestRequest& req, HttpStream& os);
+    void sess_request(CyclTime now, const RestRequest& req, HttpStream& os);
+    void market_request(CyclTime now, const RestRequest& req, HttpStream& os);
 
-    void order_request(WallTime now, const RestRequest& req, HttpStream& os);
-    void exec_request(WallTime now, const RestRequest& req, HttpStream& os);
-    void trade_request(WallTime now, const RestRequest& req, HttpStream& os);
-    void posn_request(WallTime now, const RestRequest& req, HttpStream& os);
+    void order_request(CyclTime now, const RestRequest& req, HttpStream& os);
+    void exec_request(CyclTime now, const RestRequest& req, HttpStream& os);
+    void trade_request(CyclTime now, const RestRequest& req, HttpStream& os);
+    void posn_request(CyclTime now, const RestRequest& req, HttpStream& os);
 
     RestImpl impl_;
     bool match_method_{false};

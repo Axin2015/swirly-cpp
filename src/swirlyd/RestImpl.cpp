@@ -79,7 +79,7 @@ void do_get_posn(const Sess& sess, ostream& out)
 
 RestImpl::~RestImpl() = default;
 
-void RestImpl::get_ref_data(WallTime now, EntitySet es, ostream& out) const
+void RestImpl::get_ref_data(CyclTime now, EntitySet es, ostream& out) const
 {
     int i{0};
     out << '{';
@@ -108,7 +108,7 @@ void RestImpl::get_ref_data(WallTime now, EntitySet es, ostream& out) const
     out << '}';
 }
 
-void RestImpl::get_asset(WallTime now, ostream& out) const
+void RestImpl::get_asset(CyclTime now, ostream& out) const
 {
     const auto& assets = lob_app_.assets();
     out << '[';
@@ -116,7 +116,7 @@ void RestImpl::get_asset(WallTime now, ostream& out) const
     out << ']';
 }
 
-void RestImpl::get_asset(WallTime now, Symbol symbol, ostream& out) const
+void RestImpl::get_asset(CyclTime now, Symbol symbol, ostream& out) const
 {
     const auto& assets = lob_app_.assets();
     auto it = assets.find(symbol);
@@ -126,7 +126,7 @@ void RestImpl::get_asset(WallTime now, Symbol symbol, ostream& out) const
     out << *it;
 }
 
-void RestImpl::get_instr(WallTime now, ostream& out) const
+void RestImpl::get_instr(CyclTime now, ostream& out) const
 {
     const auto& instrs = lob_app_.instrs();
     out << '[';
@@ -134,7 +134,7 @@ void RestImpl::get_instr(WallTime now, ostream& out) const
     out << ']';
 }
 
-void RestImpl::get_instr(WallTime now, Symbol symbol, ostream& out) const
+void RestImpl::get_instr(CyclTime now, Symbol symbol, ostream& out) const
 {
     const auto& instrs = lob_app_.instrs();
     auto it = instrs.find(symbol);
@@ -144,7 +144,7 @@ void RestImpl::get_instr(WallTime now, Symbol symbol, ostream& out) const
     out << *it;
 }
 
-void RestImpl::get_sess(WallTime now, Symbol accnt, EntitySet es, Page page, ostream& out) const
+void RestImpl::get_sess(CyclTime now, Symbol accnt, EntitySet es, Page page, ostream& out) const
 {
     const auto& sess = lob_app_.sess(accnt);
     int i{0};
@@ -189,7 +189,7 @@ void RestImpl::get_sess(WallTime now, Symbol accnt, EntitySet es, Page page, ost
     out << '}';
 }
 
-void RestImpl::get_market(WallTime now, std::ostream& out) const
+void RestImpl::get_market(CyclTime now, std::ostream& out) const
 {
     const auto& markets = lob_app_.markets();
     out << '[';
@@ -197,7 +197,7 @@ void RestImpl::get_market(WallTime now, std::ostream& out) const
     out << ']';
 }
 
-void RestImpl::get_market(WallTime now, Symbol instr, std::ostream& out) const
+void RestImpl::get_market(CyclTime now, Symbol instr, std::ostream& out) const
 {
     const auto& markets = lob_app_.markets();
     out << '[';
@@ -206,18 +206,18 @@ void RestImpl::get_market(WallTime now, Symbol instr, std::ostream& out) const
     out << ']';
 }
 
-void RestImpl::get_market(WallTime now, Symbol instr, IsoDate settl_date, std::ostream& out) const
+void RestImpl::get_market(CyclTime now, Symbol instr, IsoDate settl_date, std::ostream& out) const
 {
     const auto id = to_market_id(lob_app_.instr(instr).id(), settl_date);
     out << lob_app_.market(id);
 }
 
-void RestImpl::get_order(WallTime now, Symbol accnt, std::ostream& out) const
+void RestImpl::get_order(CyclTime now, Symbol accnt, std::ostream& out) const
 {
     do_get_order(lob_app_.sess(accnt), out);
 }
 
-void RestImpl::get_order(WallTime now, Symbol accnt, Symbol instr, ostream& out) const
+void RestImpl::get_order(CyclTime now, Symbol accnt, Symbol instr, ostream& out) const
 {
     const auto& sess = lob_app_.sess(accnt);
     const auto& orders = sess.orders();
@@ -227,7 +227,7 @@ void RestImpl::get_order(WallTime now, Symbol accnt, Symbol instr, ostream& out)
     out << ']';
 }
 
-void RestImpl::get_order(WallTime now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
+void RestImpl::get_order(CyclTime now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
                          ostream& out) const
 {
     const auto& sess = lob_app_.sess(accnt);
@@ -240,7 +240,7 @@ void RestImpl::get_order(WallTime now, Symbol accnt, Symbol instr_symbol, IsoDat
     out << ']';
 }
 
-void RestImpl::get_order(WallTime now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
+void RestImpl::get_order(CyclTime now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
                          Id64 id, ostream& out) const
 {
     const auto& sess = lob_app_.sess(accnt);
@@ -254,17 +254,17 @@ void RestImpl::get_order(WallTime now, Symbol accnt, Symbol instr_symbol, IsoDat
     out << *it;
 }
 
-void RestImpl::get_exec(WallTime now, Symbol accnt, Page page, std::ostream& out) const
+void RestImpl::get_exec(CyclTime now, Symbol accnt, Page page, std::ostream& out) const
 {
     do_get_exec(lob_app_.sess(accnt), page, out);
 }
 
-void RestImpl::get_trade(WallTime now, Symbol accnt, std::ostream& out) const
+void RestImpl::get_trade(CyclTime now, Symbol accnt, std::ostream& out) const
 {
     do_get_trade(lob_app_.sess(accnt), out);
 }
 
-void RestImpl::get_trade(WallTime now, Symbol accnt, Symbol instr, std::ostream& out) const
+void RestImpl::get_trade(CyclTime now, Symbol accnt, Symbol instr, std::ostream& out) const
 {
     const auto& sess = lob_app_.sess(accnt);
     const auto& trades = sess.trades();
@@ -274,7 +274,7 @@ void RestImpl::get_trade(WallTime now, Symbol accnt, Symbol instr, std::ostream&
     out << ']';
 }
 
-void RestImpl::get_trade(WallTime now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
+void RestImpl::get_trade(CyclTime now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
                          std::ostream& out) const
 {
     const auto& sess = lob_app_.sess(accnt);
@@ -287,7 +287,7 @@ void RestImpl::get_trade(WallTime now, Symbol accnt, Symbol instr_symbol, IsoDat
     out << ']';
 }
 
-void RestImpl::get_trade(WallTime now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
+void RestImpl::get_trade(CyclTime now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
                          Id64 id, std::ostream& out) const
 {
     const auto& sess = lob_app_.sess(accnt);
@@ -301,12 +301,12 @@ void RestImpl::get_trade(WallTime now, Symbol accnt, Symbol instr_symbol, IsoDat
     out << *it;
 }
 
-void RestImpl::get_posn(WallTime now, Symbol accnt, std::ostream& out) const
+void RestImpl::get_posn(CyclTime now, Symbol accnt, std::ostream& out) const
 {
     do_get_posn(lob_app_.sess(accnt), out);
 }
 
-void RestImpl::get_posn(WallTime now, Symbol accnt, Symbol instr, std::ostream& out) const
+void RestImpl::get_posn(CyclTime now, Symbol accnt, Symbol instr, std::ostream& out) const
 {
     const auto& sess = lob_app_.sess(accnt);
     const auto& posns = sess.posns();
@@ -316,7 +316,7 @@ void RestImpl::get_posn(WallTime now, Symbol accnt, Symbol instr, std::ostream& 
     out << ']';
 }
 
-void RestImpl::get_posn(WallTime now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
+void RestImpl::get_posn(CyclTime now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
                         std::ostream& out) const
 {
     const auto& sess = lob_app_.sess(accnt);
@@ -331,7 +331,7 @@ void RestImpl::get_posn(WallTime now, Symbol accnt, Symbol instr_symbol, IsoDate
     out << *it;
 }
 
-void RestImpl::post_market(WallTime now, Symbol instr_symbol, IsoDate settl_date, MarketState state,
+void RestImpl::post_market(CyclTime now, Symbol instr_symbol, IsoDate settl_date, MarketState state,
                            std::ostream& out)
 {
     const auto& instr = lob_app_.instr(instr_symbol);
@@ -340,7 +340,7 @@ void RestImpl::post_market(WallTime now, Symbol instr_symbol, IsoDate settl_date
     out << market;
 }
 
-void RestImpl::put_market(WallTime now, Symbol instr_symbol, IsoDate settl_date, MarketState state,
+void RestImpl::put_market(CyclTime now, Symbol instr_symbol, IsoDate settl_date, MarketState state,
                           std::ostream& out)
 {
     const auto& instr = lob_app_.instr(instr_symbol);
@@ -350,7 +350,7 @@ void RestImpl::put_market(WallTime now, Symbol instr_symbol, IsoDate settl_date,
     out << market;
 }
 
-void RestImpl::post_order(WallTime now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
+void RestImpl::post_order(CyclTime now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
                           std::string_view ref, Side side, Lots lots, Ticks ticks, Lots min_lots,
                           std::ostream& out)
 {
@@ -363,7 +363,7 @@ void RestImpl::post_order(WallTime now, Symbol accnt, Symbol instr_symbol, IsoDa
     out << resp;
 }
 
-void RestImpl::put_order(WallTime now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
+void RestImpl::put_order(CyclTime now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
                          ArrayView<Id64> ids, Lots lots, std::ostream& out)
 {
     const auto& sess = lob_app_.sess(accnt);
@@ -387,7 +387,7 @@ void RestImpl::put_order(WallTime now, Symbol accnt, Symbol instr_symbol, IsoDat
     out << resp;
 }
 
-void RestImpl::post_trade(WallTime now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
+void RestImpl::post_trade(CyclTime now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
                           std::string_view ref, Side side, Lots lots, Ticks ticks, LiqInd liq_ind,
                           Symbol cpty, std::ostream& out)
 {
@@ -403,7 +403,7 @@ void RestImpl::post_trade(WallTime now, Symbol accnt, Symbol instr_symbol, IsoDa
     out << ']';
 }
 
-void RestImpl::delete_trade(WallTime now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
+void RestImpl::delete_trade(CyclTime now, Symbol accnt, Symbol instr_symbol, IsoDate settl_date,
                             ArrayView<Id64> ids)
 {
     const auto& sess = lob_app_.sess(accnt);

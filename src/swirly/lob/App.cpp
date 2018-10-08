@@ -16,8 +16,9 @@
  */
 #include "App.hpp"
 
-#include <swirly/lob/Response.hpp>
-#include <swirly/lob/Sess.hpp>
+#include "Match.hxx"
+#include "Response.hpp"
+#include "Sess.hpp"
 
 #include <swirly/fin/Date.hpp>
 #include <swirly/fin/Journ.hpp>
@@ -28,8 +29,6 @@
 
 #include <swirly/util/Date.hpp>
 #include <swirly/util/Finally.hpp>
-
-#include "Match.hxx"
 
 #include <regex>
 
@@ -77,9 +76,53 @@ struct LobApp::Impl {
         mq_batch_.reserve(1 + 16);
     }
 
-    void load(WallTime now, const Model& model)
+    const AssetSet& assets() const noexcept { return assets_; }
+
+    const InstrSet& instrs() const noexcept { return instrs_; }
+
+    const MarketSet& markets() const noexcept { return markets_; }
+
+    const Instr& instr(Symbol symbol) const
     {
-        const auto bus_day = bus_day_(now);
+        auto it = instrs_.find(symbol);
+        if (it == instrs_.end()) {
+            throw MarketNotFoundException{err_msg()
+                                          << "instrument '" << symbol << "' does not exist"};
+        }
+        return *it;
+    }
+
+    const Market& market(Id64 id) const
+    {
+        auto it = markets_.find(id);
+        if (it == markets_.end()) {
+            throw MarketNotFoundException{err_msg() << "market '" << id << "' does not exist"};
+        }
+        return *it;
+    }
+
+    const Sess& sess(Symbol accnt) const
+    {
+        auto [it, found] = sesss_.find_hint(accnt);
+        if (!found) {
+            it = sesss_.insert_hint(it, Sess::make(accnt, max_execs_));
+        }
+        return *it;
+    }
+
+    Sess& sess(Symbol accnt)
+    {
+        auto [it, found] = sesss_.find_hint(accnt);
+        if (!found) {
+            it = sesss_.insert_hint(it, Sess::make(accnt, max_execs_));
+        }
+        return *it;
+    }
+
+    void load(CyclTime now, const Model& model)
+    {
+        const auto wall_time = now.wall_time();
+        const auto bus_day = bus_day_(wall_time);
         model.read_asset([& assets = assets_](auto ptr) { assets.insert(move(ptr)); });
         model.read_instr([& instrs = instrs_](auto ptr) { instrs.insert(move(ptr)); });
         model.read_market([& markets = markets_](MarketPtr ptr) { markets.insert(ptr); });
@@ -98,7 +141,7 @@ struct LobApp::Impl {
             success = true;
         });
         // One week ago.
-        model.read_exec(now - 604800000ms, [this](auto ptr) {
+        model.read_exec(wall_time - 604800000ms, [this](auto ptr) {
             auto& sess = this->sess(ptr->accnt());
             sess.push_exec_back(ptr);
         });
@@ -112,51 +155,9 @@ struct LobApp::Impl {
         });
     }
 
-    const AssetSet& assets() const noexcept { return assets_; }
-
-    const Instr& instr(Symbol symbol) const
+    const Market& create_market(CyclTime now, const Instr& instr, JDay settl_day, MarketState state)
     {
-        auto it = instrs_.find(symbol);
-        if (it == instrs_.end()) {
-            throw MarketNotFoundException{err_msg()
-                                          << "instrument '" << symbol << "' does not exist"};
-        }
-        return *it;
-    }
-
-    const InstrSet& instrs() const noexcept { return instrs_; }
-
-    const Sess& sess(Symbol accnt) const
-    {
-        auto [it, found] = sesss_.find_hint(accnt);
-        if (!found) {
-            it = sesss_.insert_hint(it, Sess::make(accnt, max_execs_));
-        }
-        return *it;
-    }
-
-    const Market& market(Id64 id) const
-    {
-        auto it = markets_.find(id);
-        if (it == markets_.end()) {
-            throw MarketNotFoundException{err_msg() << "market '" << id << "' does not exist"};
-        }
-        return *it;
-    }
-
-    const MarketSet& markets() const noexcept { return markets_; }
-
-    Sess& sess(Symbol accnt)
-    {
-        auto [it, found] = sesss_.find_hint(accnt);
-        if (!found) {
-            it = sesss_.insert_hint(it, Sess::make(accnt, max_execs_));
-        }
-        return *it;
-    }
-
-    const Market& create_market(WallTime now, const Instr& instr, JDay settl_day, MarketState state)
-    {
+        const auto wall_time = now.wall_time();
         const auto id = to_market_id(instr.id(), settl_day);
         auto [it, found] = markets_.find_hint(id);
         if (found) {
@@ -165,38 +166,38 @@ struct LobApp::Impl {
         }
         if (settl_day != 0_jd) {
             // bus_day <= settl_day.
-            const auto bus_day = bus_day_(now);
+            const auto bus_day = bus_day_(wall_time);
             if (settl_day < bus_day) {
                 throw InvalidException{"settl-day before bus-day"sv};
             }
         }
         auto market = Market::make(id, instr.symbol(), settl_day, state);
-        mq_.create_market(now, id, instr.symbol(), settl_day, state);
+        mq_.create_market(wall_time, id, instr.symbol(), settl_day, state);
         it = markets_.insert_hint(it, market);
         return *it;
     }
 
-    void update_market(WallTime now, Market& market, MarketState state)
+    void update_market(CyclTime now, Market& market, MarketState state)
     {
-        mq_.update_market(now, market.id(), state);
+        mq_.update_market(now.wall_time(), market.id(), state);
         market.set_state(state);
     }
 
-    OrderPtr create_order(WallTime now, Sess& sess, Market& market, string_view ref, Side side,
+    OrderPtr create_order(CyclTime now, Sess& sess, Market& market, string_view ref, Side side,
                           Lots lots, Ticks ticks, Lots min_lots, Response& resp)
     {
         return do_create_order_or_quote<OrderPolicy>(now, sess, market, ref, side, lots, ticks,
                                                      min_lots, &resp);
     }
 
-    OrderPtr create_quote(WallTime now, Sess& sess, Market& market, string_view ref, Side side,
+    OrderPtr create_quote(CyclTime now, Sess& sess, Market& market, string_view ref, Side side,
                           Lots lots, Ticks ticks, Lots min_lots)
     {
         return do_create_order_or_quote<QuotePolicy>(now, sess, market, ref, side, lots, ticks,
                                                      min_lots, nullptr);
     }
 
-    void revise_order(WallTime now, Sess& sess, Market& market, Order& order, Lots lots,
+    void revise_order(CyclTime now, Sess& sess, Market& market, Order& order, Lots lots,
                       Response& resp)
     {
         if (order.done()) {
@@ -205,7 +206,7 @@ struct LobApp::Impl {
         do_revise_order(now, sess, market, order, lots, resp);
     }
 
-    void revise_order(WallTime now, Sess& sess, Market& market, Id64 id, Lots lots, Response& resp)
+    void revise_order(CyclTime now, Sess& sess, Market& market, Id64 id, Lots lots, Response& resp)
     {
         auto& order = sess.order(market.id(), id);
         if (order.done()) {
@@ -214,7 +215,7 @@ struct LobApp::Impl {
         do_revise_order(now, sess, market, order, lots, resp);
     }
 
-    void revise_order(WallTime now, Sess& sess, Market& market, string_view ref, Lots lots,
+    void revise_order(CyclTime now, Sess& sess, Market& market, string_view ref, Lots lots,
                       Response& resp)
     {
         auto& order = sess.order(ref);
@@ -224,9 +225,10 @@ struct LobApp::Impl {
         do_revise_order(now, sess, market, order, lots, resp);
     }
 
-    void revise_order(WallTime now, Sess& sess, Market& market, ArrayView<Id64> ids, Lots lots,
+    void revise_order(CyclTime now, Sess& sess, Market& market, ArrayView<Id64> ids, Lots lots,
                       Response& resp)
     {
+        const auto wall_time = now.wall_time();
         resp.set_market(&market);
         for (const auto id : ids) {
 
@@ -244,7 +246,7 @@ struct LobApp::Impl {
                 || lots < order.min_lots()) {
                 throw InvalidLotsException{err_msg() << "invalid lots '" << lots << '\''};
             }
-            auto exec = new_exec(now, order, market.alloc_id());
+            auto exec = new_exec(wall_time, order, market.alloc_id());
             exec->revise(lots);
 
             resp.insert_order(&order);
@@ -258,7 +260,7 @@ struct LobApp::Impl {
         for (const auto& exec : resp.execs()) {
             auto it = sess.orders().find(market.id(), exec->order_id());
             assert(it != sess.orders().end());
-            market.revise_order(now, *it, lots);
+            market.revise_order(wall_time, *it, lots);
             if (it->done()) {
                 sess.remove_order(*it);
             }
@@ -266,7 +268,7 @@ struct LobApp::Impl {
         }
     }
 
-    void cancel_order(WallTime now, Sess& sess, Market& market, Order& order, Response& resp)
+    void cancel_order(CyclTime now, Sess& sess, Market& market, Order& order, Response& resp)
     {
         if (order.done()) {
             throw TooLateException{err_msg() << "order '" << order.id() << "' is done"};
@@ -274,8 +276,9 @@ struct LobApp::Impl {
         do_cancel_order(now, sess, market, order, resp);
     }
 
-    void cancel_order(WallTime now, Sess& sess, Market& market, ArrayView<Id64> ids, Response& resp)
+    void cancel_order(CyclTime now, Sess& sess, Market& market, ArrayView<Id64> ids, Response& resp)
     {
+        const auto wall_time = now.wall_time();
         resp.set_market(&market);
         for (const auto id : ids) {
 
@@ -283,7 +286,7 @@ struct LobApp::Impl {
             if (order.done()) {
                 throw TooLateException{err_msg() << "order '" << order.id() << "' is done"};
             }
-            auto exec = new_exec(now, order, market.alloc_id());
+            auto exec = new_exec(wall_time, order, market.alloc_id());
             exec->cancel();
 
             resp.insert_order(&order);
@@ -297,23 +300,23 @@ struct LobApp::Impl {
         for (const auto& exec : resp.execs()) {
             auto it = sess.orders().find(market.id(), exec->order_id());
             assert(it != sess.orders().end());
-            market.cancel_order(now, *it);
+            market.cancel_order(wall_time, *it);
             sess.remove_order(*it);
             sess.push_exec_front(exec);
         }
     }
 
-    void cancel_order(WallTime now, Sess& sess)
+    void cancel_order(CyclTime now, Sess& sess)
     {
         // FIXME: Not implemented.
     }
 
-    void cancel_order(WallTime now, Market& market)
+    void cancel_order(CyclTime now, Market& market)
     {
         // FIXME: Not implemented.
     }
 
-    bool try_cancel_order(WallTime now, Sess& sess, Market& market, Order& order, Response& resp)
+    bool try_cancel_order(CyclTime now, Sess& sess, Market& market, Order& order, Response& resp)
     {
         if (order.done()) {
             return false;
@@ -322,22 +325,22 @@ struct LobApp::Impl {
         return true;
     }
 
-    bool try_cancel_quote(WallTime now, Sess& sess, Market& market, Order& order) noexcept
+    bool try_cancel_quote(CyclTime now, Sess& sess, Market& market, Order& order) noexcept
     {
         if (order.done()) {
             return false;
         }
-        market.cancel_order(now, order);
+        market.cancel_order(now.wall_time(), order);
         sess.remove_order(order);
         return true;
     }
 
-    TradePair create_trade(WallTime now, Sess& sess, Market& market, string_view ref, Side side,
+    TradePair create_trade(CyclTime now, Sess& sess, Market& market, string_view ref, Side side,
                            Lots lots, Ticks ticks, LiqInd liq_ind, Symbol cpty)
     {
         auto posn = sess.posn(market.id(), market.instr(), market.settl_day());
-        auto trade = new_manual(now, sess.accnt(), market, ref, side, lots, ticks, posn->net_lots(),
-                                posn->net_cost(), liq_ind, cpty);
+        auto trade = new_manual(now.wall_time(), sess.accnt(), market, ref, side, lots, ticks,
+                                posn->net_lots(), posn->net_cost(), liq_ind, cpty);
         decltype(trade) cpty_trade;
 
         if (!cpty.empty()) {
@@ -352,10 +355,10 @@ struct LobApp::Impl {
 
             // Commit phase.
 
-            cpty_sess.push_exec_front(cpty_trade);
-            cpty_sess.insert_trade(cpty_trade);
             cpty_posn->add_trade(cpty_trade->side(), cpty_trade->last_lots(),
                                  cpty_trade->last_ticks());
+            cpty_sess.push_exec_front(cpty_trade);
+            cpty_sess.insert_trade_and_notify(now, cpty_trade);
 
         } else {
 
@@ -363,14 +366,14 @@ struct LobApp::Impl {
 
             // Commit phase.
         }
-        sess.push_exec_front(trade);
-        sess.insert_trade(trade);
         posn->add_trade(trade->side(), trade->last_lots(), trade->last_ticks());
+        sess.push_exec_front(trade);
+        sess.insert_trade_and_notify(now, trade);
 
         return {trade, cpty_trade};
     }
 
-    void archive_trade(WallTime now, Sess& sess, const Exec& trade)
+    void archive_trade(CyclTime now, Sess& sess, const Exec& trade)
     {
         if (trade.state() != State::Trade) {
             throw InvalidException{err_msg() << "exec '" << trade.id() << "' is not a trade"};
@@ -378,20 +381,20 @@ struct LobApp::Impl {
         do_archive_trade(now, sess, trade);
     }
 
-    void archive_trade(WallTime now, Sess& sess, Id64 market_id, Id64 id)
+    void archive_trade(CyclTime now, Sess& sess, Id64 market_id, Id64 id)
     {
         auto& trade = sess.trade(market_id, id);
         do_archive_trade(now, sess, trade);
     }
 
-    void archive_trade(WallTime now, Sess& sess, Id64 market_id, ArrayView<Id64> ids)
+    void archive_trade(CyclTime now, Sess& sess, Id64 market_id, ArrayView<Id64> ids)
     {
         // Validate.
         for (const auto id : ids) {
             sess.trade(market_id, id);
         }
 
-        mq_.archive_trade(now, market_id, ids);
+        mq_.archive_trade(now.wall_time(), market_id, ids);
 
         // Commit phase.
 
@@ -403,12 +406,12 @@ struct LobApp::Impl {
         }
     }
 
-    void expire_end_of_day(WallTime now)
+    void expire_end_of_day(CyclTime now)
     {
         // FIXME: Not implemented.
     }
 
-    void settl_end_of_day(WallTime now)
+    void settl_end_of_day(CyclTime now)
     {
         // FIXME: Not implemented.
     }
@@ -476,9 +479,11 @@ struct LobApp::Impl {
     }
 
     template <typename PolicyT>
-    void match_orders(WallTime now, const Sess& taker_sess, Market& market, Order& taker_order,
+    void match_orders(CyclTime now, const Sess& taker_sess, Market& market, Order& taker_order,
                       MarketSide& side, Direct direct, Response* resp)
     {
+        const auto wall_time = now.wall_time();
+
         auto sum_lots = 0_lts;
         auto sum_cost = 0_cst;
         auto last_lots = 0_lts;
@@ -503,7 +508,7 @@ struct LobApp::Impl {
             last_ticks = ticks;
 
             auto match
-                = new_match(now, market, taker_order, &maker_order, lots, sum_lots, sum_cost);
+                = new_match(wall_time, market, taker_order, &maker_order, lots, sum_lots, sum_cost);
 
             if constexpr (PolicyT::WantResponse) {
                 assert(resp);
@@ -523,12 +528,12 @@ struct LobApp::Impl {
         }
 
         if (!matches_.empty()) {
-            taker_order.trade(now, sum_lots, sum_cost, last_lots, last_ticks);
+            taker_order.trade(wall_time, sum_lots, sum_cost, last_lots, last_ticks);
         }
     }
 
     template <typename PolicyT>
-    void match_orders(WallTime now, const Sess& taker_sess, Market& market, Order& taker_order,
+    void match_orders(CyclTime now, const Sess& taker_sess, Market& market, Order& taker_order,
                       Response* resp)
     {
         MarketSide* market_side;
@@ -550,7 +555,7 @@ struct LobApp::Impl {
     // is responsible for committing a transaction, so it is particularly important that it does not
     // throw.
     template <typename PolicyT>
-    void commit_matches(WallTime now, Sess& taker_sess, Market& market, Posn& taker_posn) noexcept
+    void commit_matches(CyclTime now, Sess& taker_sess, Market& market, Posn& taker_posn) noexcept
     {
         for (const auto& match : matches_) {
 
@@ -558,7 +563,7 @@ struct LobApp::Impl {
             assert(maker_order);
 
             // Reduce maker.
-            market.take_order(now, *maker_order, match.lots);
+            market.take_order(now.wall_time(), *maker_order, match.lots);
 
             // Must succeed because maker order exists.
             auto it = sesss_.find(maker_order->accnt());
@@ -578,10 +583,10 @@ struct LobApp::Impl {
             if constexpr (PolicyT::WantSessExec) {
                 maker_sess.push_exec_front(maker_trade);
             }
-            maker_sess.insert_trade(maker_trade);
             if (maker_order->done()) {
                 maker_sess.remove_order(*maker_order);
             }
+            maker_sess.insert_trade_and_notify(now, maker_trade);
 
             // Update taker position.
             const auto taker_trade = match.taker_trade;
@@ -594,12 +599,12 @@ struct LobApp::Impl {
             if constexpr (PolicyT::WantSessExec) {
                 taker_sess.push_exec_front(taker_trade);
             }
-            taker_sess.insert_trade(taker_trade);
+            taker_sess.insert_trade_and_notify(now, taker_trade);
         }
     }
 
     template <typename PolicyT>
-    OrderPtr do_create_order_or_quote(WallTime now, Sess& sess, Market& market, string_view ref,
+    OrderPtr do_create_order_or_quote(CyclTime now, Sess& sess, Market& market, string_view ref,
                                       Side side, Lots lots, Ticks ticks, Lots min_lots,
                                       Response* resp)
     {
@@ -610,7 +615,8 @@ struct LobApp::Impl {
             throw RefAlreadyExistsException{err_msg() << "order '" << ref << "' already exists"};
         }
 
-        const auto bus_day = bus_day_(now);
+        const auto wall_time = now.wall_time();
+        const auto bus_day = bus_day_(wall_time);
         if (market.settl_day() != 0_jd && market.settl_day() < bus_day) {
             throw MarketClosedException{err_msg()
                                         << "market for '" << market.instr() << "' on "
@@ -620,17 +626,19 @@ struct LobApp::Impl {
             throw InvalidLotsException{err_msg() << "invalid lots '" << lots << '\''};
         }
         const auto id = market.alloc_id();
-        auto order = Order::make(now, sess.accnt(), market.id(), market.instr(), market.settl_day(),
-                                 id, ref, side, lots, ticks, min_lots);
+        auto order = Order::make(wall_time, sess.accnt(), market.id(), market.instr(),
+                                 market.settl_day(), id, ref, side, lots, ticks, min_lots);
 
         ConstExecPtr exec;
         if constexpr (PolicyT::WantSessExec) {
-            exec = new_exec(now, *order, id);
+            exec = new_exec(wall_time, *order, id);
             mq_batch_.push_back(exec);
         }
-        // Ensure that temporary exec buffer is cleared when scope exits.
-        const auto finally = make_finally([this]() noexcept { this->mq_batch_.clear(); });
-
+        // Ensure that matches are cleared when scope exits.
+        const auto finally = make_finally([this]() noexcept {
+            matches_.clear();
+            mq_batch_.clear();
+        });
         if constexpr (PolicyT::WantResponse) {
             assert(resp);
             resp->set_market(&market);
@@ -638,7 +646,6 @@ struct LobApp::Impl {
             resp->insert_exec(exec);
         }
 
-        matches_.clear();
         // Order fields are updated on match.
         match_orders<PolicyT>(now, sess, market, *order, resp);
 
@@ -694,9 +701,11 @@ struct LobApp::Impl {
         return order;
     }
 
-    void do_revise_order(WallTime now, Sess& sess, Market& market, Order& order, Lots lots,
+    void do_revise_order(CyclTime now, Sess& sess, Market& market, Order& order, Lots lots,
                          Response& resp)
     {
+        const auto wall_time = now.wall_time();
+
         // Revised lots must not be:
         // 1. greater than original lots;
         // 2. less than executed lots;
@@ -707,7 +716,7 @@ struct LobApp::Impl {
             || lots < order.min_lots()) {
             throw InvalidLotsException{err_msg() << "invalid lots '" << lots << '\''};
         }
-        auto exec = new_exec(now, order, market.alloc_id());
+        auto exec = new_exec(wall_time, order, market.alloc_id());
         exec->revise(lots);
 
         resp.set_market(&market);
@@ -718,16 +727,18 @@ struct LobApp::Impl {
 
         // Commit phase.
 
-        market.revise_order(now, order, lots);
+        market.revise_order(wall_time, order, lots);
         if (order.done()) {
             sess.remove_order(order);
         }
         sess.push_exec_front(exec);
     }
 
-    void do_cancel_order(WallTime now, Sess& sess, Market& market, Order& order, Response& resp)
+    void do_cancel_order(CyclTime now, Sess& sess, Market& market, Order& order, Response& resp)
     {
-        auto exec = new_exec(now, order, market.alloc_id());
+        const auto wall_time = now.wall_time();
+
+        auto exec = new_exec(wall_time, order, market.alloc_id());
         exec->cancel();
 
         resp.set_market(&market);
@@ -738,14 +749,14 @@ struct LobApp::Impl {
 
         // Commit phase.
 
-        market.cancel_order(now, order);
+        market.cancel_order(wall_time, order);
         sess.remove_order(order);
         sess.push_exec_front(exec);
     }
 
-    void do_archive_trade(WallTime now, Sess& sess, const Exec& trade)
+    void do_archive_trade(CyclTime now, Sess& sess, const Exec& trade)
     {
-        mq_.archive_trade(now, trade.market_id(), trade.id());
+        mq_.archive_trade(now.wall_time(), trade.market_id(), trade.id());
 
         // Commit phase.
 
@@ -773,11 +784,6 @@ LobApp::~LobApp() = default;
 LobApp::LobApp(LobApp&&) = default;
 
 LobApp& LobApp::operator=(LobApp&&) = default;
-
-void LobApp::load(WallTime now, const Model& model)
-{
-    impl_->load(now, model);
-}
 
 const AssetSet& LobApp::assets() const noexcept
 {
@@ -809,18 +815,28 @@ const Sess& LobApp::sess(Symbol accnt) const
     return impl_->sess(accnt);
 }
 
-const Market& LobApp::create_market(WallTime now, const Instr& instr, JDay settl_day,
+void LobApp::load(CyclTime now, const Model& model)
+{
+    impl_->load(now, model);
+}
+
+void LobApp::set_trade_slot(const Sess& sess, TradeSlot slot) noexcept
+{
+    remove_const(sess).set_trade_slot(slot);
+}
+
+const Market& LobApp::create_market(CyclTime now, const Instr& instr, JDay settl_day,
                                     MarketState state)
 {
     return impl_->create_market(now, instr, settl_day, state);
 }
 
-void LobApp::update_market(WallTime now, const Market& market, MarketState state)
+void LobApp::update_market(CyclTime now, const Market& market, MarketState state)
 {
     impl_->update_market(now, remove_const(market), state);
 }
 
-OrderPtr LobApp::create_order(WallTime now, const Sess& sess, const Market& market,
+OrderPtr LobApp::create_order(CyclTime now, const Sess& sess, const Market& market,
                               std::string_view ref, Side side, Lots lots, Ticks ticks,
                               Lots min_lots, Response& resp)
 {
@@ -828,7 +844,7 @@ OrderPtr LobApp::create_order(WallTime now, const Sess& sess, const Market& mark
                                ticks, min_lots, resp);
 }
 
-OrderPtr LobApp::create_quote(WallTime now, const Sess& sess, const Market& market,
+OrderPtr LobApp::create_quote(CyclTime now, const Sess& sess, const Market& market,
                               std::string_view ref, Side side, Lots lots, Ticks ticks,
                               Lots min_lots)
 {
@@ -836,75 +852,75 @@ OrderPtr LobApp::create_quote(WallTime now, const Sess& sess, const Market& mark
                                ticks, min_lots);
 }
 
-void LobApp::revise_order(WallTime now, const Sess& sess, const Market& market, const Order& order,
+void LobApp::revise_order(CyclTime now, const Sess& sess, const Market& market, const Order& order,
                           Lots lots, Response& resp)
 {
     impl_->revise_order(now, remove_const(sess), remove_const(market), remove_const(order), lots,
                         resp);
 }
 
-void LobApp::revise_order(WallTime now, const Sess& sess, const Market& market, Id64 id, Lots lots,
+void LobApp::revise_order(CyclTime now, const Sess& sess, const Market& market, Id64 id, Lots lots,
                           Response& resp)
 {
     impl_->revise_order(now, remove_const(sess), remove_const(market), id, lots, resp);
 }
 
-void LobApp::revise_order(WallTime now, const Sess& sess, const Market& market,
+void LobApp::revise_order(CyclTime now, const Sess& sess, const Market& market,
                           std::string_view ref, Lots lots, Response& resp)
 {
     impl_->revise_order(now, remove_const(sess), remove_const(market), ref, lots, resp);
 }
 
-void LobApp::revise_order(WallTime now, const Sess& sess, const Market& market, ArrayView<Id64> ids,
+void LobApp::revise_order(CyclTime now, const Sess& sess, const Market& market, ArrayView<Id64> ids,
                           Lots lots, Response& resp)
 {
     impl_->revise_order(now, remove_const(sess), remove_const(market), ids, lots, resp);
 }
 
-void LobApp::cancel_order(WallTime now, const Sess& sess, const Market& market, const Order& order,
+void LobApp::cancel_order(CyclTime now, const Sess& sess, const Market& market, const Order& order,
                           Response& resp)
 {
     impl_->cancel_order(now, remove_const(sess), remove_const(market), remove_const(order), resp);
 }
 
-void LobApp::cancel_order(WallTime now, const Sess& sess, const Market& market, Id64 id,
+void LobApp::cancel_order(CyclTime now, const Sess& sess, const Market& market, Id64 id,
                           Response& resp)
 {
     const auto& order = sess.order(market.id(), id);
     impl_->cancel_order(now, remove_const(sess), remove_const(market), remove_const(order), resp);
 }
 
-void LobApp::cancel_order(WallTime now, const Sess& sess, const Market& market,
+void LobApp::cancel_order(CyclTime now, const Sess& sess, const Market& market,
                           std::string_view ref, Response& resp)
 {
     const auto& order = sess.order(ref);
     impl_->cancel_order(now, remove_const(sess), remove_const(market), remove_const(order), resp);
 }
 
-void LobApp::cancel_order(WallTime now, const Sess& sess, const Market& market, ArrayView<Id64> ids,
+void LobApp::cancel_order(CyclTime now, const Sess& sess, const Market& market, ArrayView<Id64> ids,
                           Response& resp)
 {
     impl_->cancel_order(now, remove_const(sess), remove_const(market), ids, resp);
 }
 
-void LobApp::cancel_order(WallTime now, const Sess& sess)
+void LobApp::cancel_order(CyclTime now, const Sess& sess)
 {
     impl_->cancel_order(now, remove_const(sess));
 }
 
-void LobApp::cancel_order(WallTime now, const Market& market)
+void LobApp::cancel_order(CyclTime now, const Market& market)
 {
     impl_->cancel_order(now, remove_const(market));
 }
 
-bool LobApp::try_cancel_order(WallTime now, const Sess& sess, const Market& market,
+bool LobApp::try_cancel_order(CyclTime now, const Sess& sess, const Market& market,
                               const Order& order, Response& resp)
 {
     return impl_->try_cancel_order(now, remove_const(sess), remove_const(market),
                                    remove_const(order), resp);
 }
 
-bool LobApp::try_cancel_order(WallTime now, const Sess& sess, const Market& market, Id64 id,
+bool LobApp::try_cancel_order(CyclTime now, const Sess& sess, const Market& market, Id64 id,
                               Response& resp)
 {
     const auto& order = sess.order(market.id(), id);
@@ -912,7 +928,7 @@ bool LobApp::try_cancel_order(WallTime now, const Sess& sess, const Market& mark
                                    remove_const(order), resp);
 }
 
-bool LobApp::try_cancel_order(WallTime now, const Sess& sess, const Market& market,
+bool LobApp::try_cancel_order(CyclTime now, const Sess& sess, const Market& market,
                               std::string_view ref, Response& resp)
 {
     const auto& order = sess.order(ref);
@@ -920,14 +936,14 @@ bool LobApp::try_cancel_order(WallTime now, const Sess& sess, const Market& mark
                                    remove_const(order), resp);
 }
 
-bool LobApp::try_cancel_quote(WallTime now, const Sess& sess, const Market& market,
+bool LobApp::try_cancel_quote(CyclTime now, const Sess& sess, const Market& market,
                               const Order& order) noexcept
 {
     return impl_->try_cancel_quote(now, remove_const(sess), remove_const(market),
                                    remove_const(order));
 }
 
-TradePair LobApp::create_trade(WallTime now, const Sess& sess, const Market& market,
+TradePair LobApp::create_trade(CyclTime now, const Sess& sess, const Market& market,
                                std::string_view ref, Side side, Lots lots, Ticks ticks,
                                LiqInd liq_ind, Symbol cpty)
 {
@@ -935,27 +951,27 @@ TradePair LobApp::create_trade(WallTime now, const Sess& sess, const Market& mar
                                ticks, liq_ind, cpty);
 }
 
-void LobApp::archive_trade(WallTime now, const Sess& sess, const Exec& trade)
+void LobApp::archive_trade(CyclTime now, const Sess& sess, const Exec& trade)
 {
     impl_->archive_trade(now, remove_const(sess), trade);
 }
 
-void LobApp::archive_trade(WallTime now, const Sess& sess, Id64 market_id, Id64 id)
+void LobApp::archive_trade(CyclTime now, const Sess& sess, Id64 market_id, Id64 id)
 {
     impl_->archive_trade(now, remove_const(sess), market_id, id);
 }
 
-void LobApp::archive_trade(WallTime now, const Sess& sess, Id64 market_id, ArrayView<Id64> ids)
+void LobApp::archive_trade(CyclTime now, const Sess& sess, Id64 market_id, ArrayView<Id64> ids)
 {
     impl_->archive_trade(now, remove_const(sess), market_id, ids);
 }
 
-void LobApp::expire_end_of_day(WallTime now)
+void LobApp::expire_end_of_day(CyclTime now)
 {
     impl_->expire_end_of_day(now);
 }
 
-void LobApp::settl_end_of_day(WallTime now)
+void LobApp::settl_end_of_day(CyclTime now)
 {
     impl_->settl_end_of_day(now);
 }

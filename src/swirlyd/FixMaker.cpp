@@ -17,6 +17,7 @@
 #include "FixMaker.hxx"
 
 #include <swirly/lob/App.hpp>
+#include <swirly/lob/Sess.hpp>
 
 #include <swirly/fin/MarketId.hpp>
 
@@ -32,9 +33,13 @@ FixMaker::FixMaker(CyclTime now, Reactor& r, const FixSessId& sess_id, const Con
 : lob_app_(lob_app)
 , sess_(lob_app_.sess(config.get<string_view>("accnt")))
 {
+    lob_app_.set_trade_slot(sess_, bind<&FixMaker::on_trade>(this));
 }
 
-FixMaker::~FixMaker() = default;
+FixMaker::~FixMaker()
+{
+    lob_app_.set_trade_slot(sess_, {});
+}
 
 void FixMaker::do_on_logon(CyclTime now, FixConn& conn, const FixSessId& sess_id)
 {
@@ -99,7 +104,7 @@ void FixMaker::on_market_data_snapshot(CyclTime now, FixConn& conn, string_view 
     auto& orders = order_map_[market_id];
 
     for (const auto& order : orders) {
-        lob_app_.try_cancel_quote(now.wall_time(), sess_, market, *order);
+        lob_app_.try_cancel_quote(now, sess_, market, *order);
     }
     orders.clear();
     for (const auto& md_entry : mds_.md_entries) {
@@ -116,9 +121,14 @@ void FixMaker::on_market_data_snapshot(CyclTime now, FixConn& conn, string_view 
         }
         const Lots lots{md_entry.size.value};
         const Ticks ticks{md_entry.px.value};
-        orders.push_back(
-            lob_app_.create_quote(now.wall_time(), sess_, market, ""sv, side, lots, ticks, 1_lts));
+        orders.push_back(lob_app_.create_quote(now, sess_, market, ""sv, side, lots, ticks, 1_lts));
     }
+}
+
+void FixMaker::on_trade(CyclTime now, const Sess& sess, const ExecPtr& trade)
+{
+    SWIRLY_INFO << sess.accnt() << " <Maker> trade: " << trade->id();
+    lob_app_.archive_trade(now, sess, *trade);
 }
 
 } // namespace swirly

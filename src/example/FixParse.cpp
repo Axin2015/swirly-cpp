@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
                 break;
             }
             buf.commit(n);
-            buf.consume(p.parse(CyclTime::set(), buf.data()));
+            buf.consume(p.parse(CyclTime::now(), buf.data()));
         }
 
         ret = 0;

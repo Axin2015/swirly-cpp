@@ -160,7 +160,7 @@ int main(int argc, char* argv[])
         get_opts(argc, argv, opts);
 
         const auto start_time
-            = is_zero(opts.start_time) ? CyclTime::set() : CyclTime::set(opts.start_time);
+            = is_zero(opts.start_time) ? CyclTime::now() : CyclTime::now(opts.start_time);
 
         Config config;
         if (!opts.config.empty()) {
@@ -283,7 +283,7 @@ int main(int argc, char* argv[])
         LobApp lob_app{mq, max_execs};
         {
             Model& model = db_ctx.model();
-            lob_app.load(start_time.wall_time(), model);
+            lob_app.load(start_time, model);
         }
 
         EpollReactor reactor{1024};

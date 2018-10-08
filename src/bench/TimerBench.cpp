@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
 
         auto h = make_intrusive<TimerHandler>();
         for (int i{0}; i < 5'000'000; ++i) {
-            const auto now = CyclTime::set();
+            const auto now = CyclTime::now();
             auto& t = ts[dis(gen) % 128];
             if (t && dis(gen) % 2 == 0) {
                 Recorder tr{reset_hist};
