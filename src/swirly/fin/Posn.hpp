@@ -41,7 +41,7 @@ class SWIRLY_API Posn : public RefCount<Posn, ThreadUnsafePolicy> {
     , buy_cost_{buy_cost}
     , sell_lots_{sell_lots}
     , sell_cost_{sell_cost}
-    , net_cost_{buy_cost - sell_cost}
+    , open_cost_{buy_cost - sell_cost}
     {
     }
     Posn(Symbol accnt, Id64 market_id, Symbol instr, JDay settl_day) noexcept
@@ -75,20 +75,20 @@ class SWIRLY_API Posn : public RefCount<Posn, ThreadUnsafePolicy> {
     auto buy_cost() const noexcept { return buy_cost_; }
     auto sell_lots() const noexcept { return sell_lots_; }
     auto sell_cost() const noexcept { return sell_cost_; }
-    auto net_lots() const noexcept { return buy_lots_ - sell_lots_; }
-    auto net_cost() const noexcept { return net_cost_; }
+    auto open_lots() const noexcept { return buy_lots_ - sell_lots_; }
+    auto open_cost() const noexcept { return open_cost_; }
 
     void add_buy(Lots lots, Cost cost) noexcept
     {
         buy_lots_ += lots;
         buy_cost_ += cost;
-        net_cost_ = buy_cost_ - sell_cost_;
+        open_cost_ = buy_cost_ - sell_cost_;
     }
     void add_sell(Lots lots, Cost cost) noexcept
     {
         sell_lots_ += lots;
         sell_cost_ += cost;
-        net_cost_ = buy_cost_ - sell_cost_;
+        open_cost_ = buy_cost_ - sell_cost_;
     }
     void add_buy(Lots lots, Ticks ticks) noexcept;
     void add_sell(Lots lots, Ticks ticks) noexcept;
@@ -118,7 +118,7 @@ class SWIRLY_API Posn : public RefCount<Posn, ThreadUnsafePolicy> {
     Cost buy_cost_;
     Lots sell_lots_;
     Cost sell_cost_;
-    Cost net_cost_;
+    Cost open_cost_;
 };
 
 inline std::ostream& operator<<(std::ostream& os, const Posn& posn)

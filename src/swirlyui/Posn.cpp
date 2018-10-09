@@ -31,7 +31,8 @@ Posn Posn::from_json(const Instr& instr, const QJsonObject& obj)
                 from_json<Lots>(obj["buy_lots"]),
                 from_json<Cost>(obj["buy_cost"]),
                 from_json<Lots>(obj["sell_lots"]),
-                from_json<Cost>(obj["sell_cost"])};
+                from_json<Cost>(obj["sell_cost"]),
+                from_json<Cost>(obj["open_cost"])};
 }
 
 QDebug operator<<(QDebug debug, const Posn& posn)
@@ -44,6 +45,7 @@ QDebug operator<<(QDebug debug, const Posn& posn)
                     << ",buy_cost=" << posn.buy_cost()     //
                     << ",sell_lots=" << posn.sell_lots()   //
                     << ",sell_cost=" << posn.sell_cost()   //
+                    << ",open_cost=" << posn.sell_cost()   //
                     << '}';
     return debug;
 }

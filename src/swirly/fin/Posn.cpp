@@ -78,34 +78,34 @@ void Posn::to_json(ostream& os) const
     } else {
         os << ",\"sell_lots\":0,\"sell_cost\":0";
     }
-    os << '}';
+    os << ",\"open_cost\":" << open_cost_ << '}';
 }
 
 void Posn::add_buy(Lots lots, Ticks ticks) noexcept
 {
     //   -2  -1   0   1
     //    +-------+---+
-    //    |-->    |   |     net_lots < 0
-    //    |------>|   |     net_lots == 0
-    //    |---------->|     net_lots > 0 && net_lots < lots
-    //    |       |   |-->  net_lots >= lots
+    //    |-->    |   |     open_lots < 0
+    //    |------>|   |     open_lots == 0
+    //    |---------->|     open_lots > 0 && open_lots < lots
+    //    |       |   |-->  open_lots >= lots
 
     const auto cost = swirly::cost(lots, ticks);
-    const auto net_lots = this->net_lots() + lots;
+    const auto open_lots = this->open_lots() + lots;
     buy_lots_ += lots;
     buy_cost_ += cost;
-    if (net_lots < 0_lts || net_lots >= lots) {
+    if (open_lots < 0_lts || open_lots >= lots) {
         // Either short position was partially closed.
         // Or long position was extended.
-        net_cost_ += cost;
-    } else if (net_lots > 0_lts) {
-        assert(net_lots < lots);
+        open_cost_ += cost;
+    } else if (open_lots > 0_lts) {
+        assert(open_lots < lots);
         // Short position was fully closed and long position opened.
-        net_cost_ = swirly::cost(net_lots, ticks);
+        open_cost_ = swirly::cost(open_lots, ticks);
     } else {
-        assert(net_lots == 0_lts);
+        assert(open_lots == 0_lts);
         // Short position was fully closed.
-        net_cost_ = 0_cst;
+        open_cost_ = 0_cst;
     }
 }
 
@@ -113,27 +113,27 @@ void Posn::add_sell(Lots lots, Ticks ticks) noexcept
 {
     //   -1   0   1   2
     //    +-------+---+
-    //    |   |    <--|     net_lots > 0
-    //    |   |<------|     net_lots == 0
-    //    |<----------|     net_lots < 0 && net_lots > -lots
-    // <--|   |       |     net_lots <= -lots
+    //    |   |    <--|     open_lots > 0
+    //    |   |<------|     open_lots == 0
+    //    |<----------|     open_lots < 0 && open_lots > -lots
+    // <--|   |       |     open_lots <= -lots
 
     const auto cost = swirly::cost(lots, ticks);
-    const auto net_lots = this->net_lots() - lots;
+    const auto open_lots = this->open_lots() - lots;
     sell_lots_ += lots;
     sell_cost_ += cost;
-    if (net_lots > 0_lts || net_lots <= -lots) {
+    if (open_lots > 0_lts || open_lots <= -lots) {
         // Either long position was partially closed.
         // Or short position was extended.
-        net_cost_ -= cost;
-    } else if (net_lots < 0_lts) {
-        assert(net_lots > -lots);
+        open_cost_ -= cost;
+    } else if (open_lots < 0_lts) {
+        assert(open_lots > -lots);
         // Long position was fully closed and short position opened.
-        net_cost_ = swirly::cost(net_lots, ticks);
+        open_cost_ = swirly::cost(open_lots, ticks);
     } else {
-        assert(net_lots == 0_lts);
+        assert(open_lots == 0_lts);
         // Long position was fully closed.
-        net_cost_ = 0_cst;
+        open_cost_ = 0_cst;
     }
 }
 

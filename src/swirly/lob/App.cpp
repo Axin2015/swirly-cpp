@@ -340,7 +340,7 @@ struct LobApp::Impl {
     {
         auto posn = sess.posn(market.id(), market.instr(), market.settl_day());
         auto trade = new_manual(now.wall_time(), sess.accnt(), market, ref, side, lots, ticks,
-                                posn->net_lots(), posn->net_cost(), liq_ind, cpty);
+                                posn->open_lots(), posn->open_cost(), liq_ind, cpty);
         decltype(trade) cpty_trade;
 
         if (!cpty.empty()) {
@@ -575,7 +575,7 @@ struct LobApp::Impl {
             // Update maker position.
             const auto maker_trade = match.maker_trade;
             assert(maker_trade);
-            maker_trade->posn(match.maker_posn->net_lots(), match.maker_posn->net_cost());
+            maker_trade->posn(match.maker_posn->open_lots(), match.maker_posn->open_cost());
             match.maker_posn->add_trade(maker_trade->side(), maker_trade->last_lots(),
                                         maker_trade->last_ticks());
 
@@ -591,7 +591,7 @@ struct LobApp::Impl {
             // Update taker position.
             const auto taker_trade = match.taker_trade;
             assert(taker_trade);
-            taker_trade->posn(taker_posn.net_lots(), taker_posn.net_cost());
+            taker_trade->posn(taker_posn.open_lots(), taker_posn.open_cost());
             taker_posn.add_trade(taker_trade->side(), taker_trade->last_lots(),
                                  taker_trade->last_ticks());
 

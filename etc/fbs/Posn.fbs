@@ -26,4 +26,5 @@ table Posn {
   buy_cost:long;
   sell_lots:long;
   sell_cost:long;
+  open_cost:long;
 }

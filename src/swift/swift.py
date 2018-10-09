@@ -280,6 +280,9 @@ class Client(object):
 
 class RestTestCase(unittest.TestCase):
 
+  def setUp(self):
+      self.maxDiff = None
+
   def create_market(self, client, instr, settl_date):
     client.set_admin()
     resp = client.send('POST', '/api/market',

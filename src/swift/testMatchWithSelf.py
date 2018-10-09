@@ -174,6 +174,7 @@ class TestCase(RestTestCase):
         u'buy_lots': 5,
         u'instr': u'EURUSD',
         u'market_id': 82255,
+        u'open_cost': 0,
         u'sell_cost': 61725,
         u'sell_lots': 5,
         u'settl_date': 20140302

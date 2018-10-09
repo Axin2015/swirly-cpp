@@ -41,7 +41,7 @@ constexpr int ColumnCount{unbox(Column::SellAvgPrice) + 1};
 class Posn {
   public:
     Posn(const QString& accnt, Id64 market_id, const Instr& instr, QDate settl_date, Lots buy_lots,
-         Cost buy_cost, Lots sell_lots, Cost sell_cost)
+         Cost buy_cost, Lots sell_lots, Cost sell_cost, Cost open_cost)
     : accnt_{accnt}
     , market_id_{market_id}
     , instr_{instr}
@@ -50,6 +50,7 @@ class Posn {
     , buy_cost_{buy_cost}
     , sell_lots_{sell_lots}
     , sell_cost_{sell_cost}
+    , open_cost_{open_cost}
     {
     }
     Posn() = default;
@@ -65,6 +66,7 @@ class Posn {
     Cost buy_cost() const noexcept { return buy_cost_; }
     Lots sell_lots() const noexcept { return sell_lots_; }
     Cost sell_cost() const noexcept { return sell_cost_; }
+    Cost open_cost() const noexcept { return open_cost_; }
 
   private:
     QString accnt_{};
@@ -75,6 +77,7 @@ class Posn {
     Cost buy_cost_{};
     Lots sell_lots_{};
     Cost sell_cost_{};
+    Cost open_cost_{};
 };
 
 QDebug operator<<(QDebug debug, const Posn& posn);
@@ -84,7 +87,8 @@ inline bool is_modified(const Posn& prev, const Posn& next) noexcept
     return prev.buy_lots() != next.buy_lots()   //
         || prev.buy_cost() != next.buy_cost()   //
         || prev.sell_lots() != next.sell_lots() //
-        || prev.sell_cost() != next.sell_cost();
+        || prev.sell_cost() != next.sell_cost() //
+        || prev.open_cost() != next.open_cost();
 }
 
 } // namespace ui
