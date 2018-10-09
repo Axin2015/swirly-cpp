@@ -35,10 +35,10 @@ BOOST_AUTO_TEST_CASE(ParseMdEntrySingleCase)
                      "271=2000\1"sv};
         MdEntry md_entry;
 
-        parse_body(lex, md_entry);
+        parse_group(lex, md_entry);
         BOOST_TEST(md_entry.type.value == '0');
-        BOOST_TEST(md_entry.px.value == 12341);
-        BOOST_TEST(md_entry.size.value == 2000);
+        BOOST_TEST(md_entry.px.value == 12341_tks);
+        BOOST_TEST(md_entry.size.value == 2000_lts);
         BOOST_TEST(lex.empty());
     }
     {
@@ -48,10 +48,10 @@ BOOST_AUTO_TEST_CASE(ParseMdEntrySingleCase)
                      "10=097\1"sv};
         MdEntry md_entry;
 
-        parse_body(lex, md_entry);
+        parse_group(lex, md_entry);
         BOOST_TEST(md_entry.type.value == '0');
-        BOOST_TEST(md_entry.px.value == 12341);
-        BOOST_TEST(md_entry.size.value == 2000);
+        BOOST_TEST(md_entry.px.value == 12341_tks);
+        BOOST_TEST(md_entry.size.value == 2000_lts);
         BOOST_TEST_REQUIRE(!lex.empty());
         BOOST_TEST(lex.top().first == 10);
     }
@@ -68,16 +68,16 @@ BOOST_AUTO_TEST_CASE(ParseMdEntryMultiCase)
                      "271=2000\1"sv};
         MdEntry md_entry;
 
-        parse_body(lex, md_entry);
+        parse_group(lex, md_entry);
         BOOST_TEST(md_entry.type.value == '0');
-        BOOST_TEST(md_entry.px.value == 12344);
-        BOOST_TEST(md_entry.size.value == 1000);
+        BOOST_TEST(md_entry.px.value == 12344_tks);
+        BOOST_TEST(md_entry.size.value == 1000_lts);
         BOOST_TEST_REQUIRE(!lex.empty());
 
-        parse_body(lex, md_entry);
+        parse_group(lex, md_entry);
         BOOST_TEST(md_entry.type.value == '1');
-        BOOST_TEST(md_entry.px.value == 12346);
-        BOOST_TEST(md_entry.size.value == 2000);
+        BOOST_TEST(md_entry.px.value == 12346_tks);
+        BOOST_TEST(md_entry.size.value == 2000_lts);
         BOOST_TEST(lex.empty());
     }
     {
@@ -90,16 +90,16 @@ BOOST_AUTO_TEST_CASE(ParseMdEntryMultiCase)
                      "10=097\1"sv};
         MdEntry md_entry;
 
-        parse_body(lex, md_entry);
+        parse_group(lex, md_entry);
         BOOST_TEST(md_entry.type.value == '0');
-        BOOST_TEST(md_entry.px.value == 12344);
-        BOOST_TEST(md_entry.size.value == 1000);
+        BOOST_TEST(md_entry.px.value == 12344_tks);
+        BOOST_TEST(md_entry.size.value == 1000_lts);
         BOOST_TEST_REQUIRE(!lex.empty());
 
-        parse_body(lex, md_entry);
+        parse_group(lex, md_entry);
         BOOST_TEST(md_entry.type.value == '1');
-        BOOST_TEST(md_entry.px.value == 12346);
-        BOOST_TEST(md_entry.size.value == 2000);
+        BOOST_TEST(md_entry.px.value == 12346_tks);
+        BOOST_TEST(md_entry.size.value == 2000_lts);
         BOOST_TEST_REQUIRE(!lex.empty());
         BOOST_TEST(lex.top().first == 10);
     }
@@ -110,14 +110,14 @@ BOOST_AUTO_TEST_CASE(ParseMdEntryMissingCase)
     {
         FixLexer lex{""sv};
         MdEntry md_entry;
-        BOOST_CHECK_THROW(parse_body(lex, md_entry), ProtocolException);
+        BOOST_CHECK_THROW(parse_group(lex, md_entry), ProtocolException);
     }
     {
         // MdEntryType(269) must be first field in group.
         FixLexer lex{"270=12341\1"
                      "271=2000\1"sv};
         MdEntry md_entry;
-        BOOST_CHECK_THROW(parse_body(lex, md_entry), ProtocolException);
+        BOOST_CHECK_THROW(parse_group(lex, md_entry), ProtocolException);
     }
 }
 
@@ -129,8 +129,8 @@ BOOST_AUTO_TEST_CASE(FormatMarketDataSnapshotCase)
 
     MdEntry md_entry;
     md_entry.type.value = '0';
-    md_entry.px.value = 12344;
-    md_entry.size.value = 1000;
+    md_entry.px.value = 12344_tks;
+    md_entry.size.value = 1000_lts;
 
     mds.md_entries.push_back(md_entry);
 
@@ -171,20 +171,20 @@ BOOST_AUTO_TEST_CASE(ParseMarketDataSnapshotCase)
     BOOST_TEST_REQUIRE(mds.md_entries.size() == 4);
 
     BOOST_TEST(mds.md_entries[0].type.value == '0');
-    BOOST_TEST(mds.md_entries[0].px.value == 12343);
-    BOOST_TEST(mds.md_entries[0].size.value == 2000);
+    BOOST_TEST(mds.md_entries[0].px.value == 12343_tks);
+    BOOST_TEST(mds.md_entries[0].size.value == 2000_lts);
 
     BOOST_TEST(mds.md_entries[1].type.value == '0');
-    BOOST_TEST(mds.md_entries[1].px.value == 12344);
-    BOOST_TEST(mds.md_entries[1].size.value == 1000);
+    BOOST_TEST(mds.md_entries[1].px.value == 12344_tks);
+    BOOST_TEST(mds.md_entries[1].size.value == 1000_lts);
 
     BOOST_TEST(mds.md_entries[2].type.value == '1');
-    BOOST_TEST(mds.md_entries[2].px.value == 12346);
-    BOOST_TEST(mds.md_entries[2].size.value == 1000);
+    BOOST_TEST(mds.md_entries[2].px.value == 12346_tks);
+    BOOST_TEST(mds.md_entries[2].size.value == 1000_lts);
 
     BOOST_TEST(mds.md_entries[3].type.value == '1');
-    BOOST_TEST(mds.md_entries[3].px.value == 12347);
-    BOOST_TEST(mds.md_entries[3].size.value == 2000);
+    BOOST_TEST(mds.md_entries[3].px.value == 12347_tks);
+    BOOST_TEST(mds.md_entries[3].size.value == 2000_lts);
 
     BOOST_TEST(lex.empty());
 }

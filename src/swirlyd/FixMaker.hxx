@@ -61,6 +61,8 @@ class FixMaker : public FixHandler {
     void do_send(CyclTime now, std::string_view msg_type, std::string_view msg) override;
 
   private:
+    void on_execution_report(CyclTime now, FixConn& conn, std::string_view msg,
+                             std::size_t body_off, Version ver, const FixHeader& hdr);
     void on_market_data_snapshot(CyclTime now, FixConn& conn, std::string_view msg,
                                  std::size_t body_off, Version ver, const FixHeader& hdr);
     void on_trade(CyclTime now, const Sess& sess, const ExecPtr& exec);

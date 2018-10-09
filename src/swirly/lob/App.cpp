@@ -40,13 +40,13 @@ namespace {
 const regex SymbolPattern{R"(^[0-9A-Za-z-._]{3,16}$)"};
 
 struct OrderPolicy {
-    static constexpr bool WantSessExec = true;
-    static constexpr bool WantResponse = true;
+    static constexpr bool SetResponse = true;
+    static constexpr bool Transient = false;
 };
 
 struct QuotePolicy {
-    static constexpr bool WantSessExec = false;
-    static constexpr bool WantResponse = false;
+    static constexpr bool SetResponse = false;
+    static constexpr bool Transient = true;
 };
 
 Ticks spread(const Order& taker_order, const Order& maker_order, Direct direct) noexcept
@@ -510,7 +510,7 @@ struct LobApp::Impl {
             auto match
                 = new_match(wall_time, market, taker_order, &maker_order, lots, sum_lots, sum_cost);
 
-            if constexpr (PolicyT::WantResponse) {
+            if constexpr (PolicyT::SetResponse) {
                 assert(resp);
                 // Insert order if trade crossed with self.
                 if (maker_order.accnt() == taker_sess.accnt()) {
@@ -580,7 +580,7 @@ struct LobApp::Impl {
                                         maker_trade->last_ticks());
 
             // Update maker account.
-            if constexpr (PolicyT::WantSessExec) {
+            if (!maker_order->transient()) {
                 maker_sess.push_exec_front(maker_trade);
             }
             if (maker_order->done()) {
@@ -596,7 +596,7 @@ struct LobApp::Impl {
                                  taker_trade->last_ticks());
 
             // Update taker account.
-            if constexpr (PolicyT::WantSessExec) {
+            if constexpr (!PolicyT::Transient) {
                 taker_sess.push_exec_front(taker_trade);
             }
             taker_sess.insert_trade_and_notify(now, taker_trade);
@@ -630,7 +630,9 @@ struct LobApp::Impl {
                                  market.settl_day(), id, ref, side, lots, ticks, min_lots);
 
         ConstExecPtr exec;
-        if constexpr (PolicyT::WantSessExec) {
+        if constexpr (PolicyT::Transient) {
+            order->set_transient();
+        } else {
             exec = new_exec(wall_time, *order, id);
             mq_batch_.push_back(exec);
         }
@@ -639,7 +641,7 @@ struct LobApp::Impl {
             matches_.clear();
             mq_batch_.clear();
         });
-        if constexpr (PolicyT::WantResponse) {
+        if constexpr (PolicyT::SetResponse) {
             assert(resp);
             resp->set_market(&market);
             resp->insert_order(order);
@@ -656,7 +658,7 @@ struct LobApp::Impl {
             // Avoid allocating position when there are no matches.
             // N.B. before commit phase, because this may fail.
             posn = sess.posn(market.id(), market.instr(), market.settl_day());
-            if constexpr (PolicyT::WantResponse) {
+            if constexpr (PolicyT::SetResponse) {
                 assert(resp);
                 resp->set_posn(posn);
             }
@@ -689,7 +691,7 @@ struct LobApp::Impl {
         if (!order->done()) {
             sess.insert_order(order);
         }
-        if constexpr (PolicyT::WantSessExec) {
+        if constexpr (!PolicyT::Transient) {
             sess.push_exec_front(exec);
         }
 

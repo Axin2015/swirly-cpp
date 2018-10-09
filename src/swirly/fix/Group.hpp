@@ -14,45 +14,31 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_FIX_RANDOM_HPP
-#define SWIRLY_FIX_RANDOM_HPP
+#ifndef SWIRLY_FIX_GROUP_HPP
+#define SWIRLY_FIX_GROUP_HPP
 
-#include <swirly/Config.h>
-
-#include <random>
+#include <swirly/fix/Field.hpp>
 
 namespace swirly {
 inline namespace fix {
+class FixLexer;
 
-/**
- * Random best bid and offer based on "open" (or reference) price.
- */
-class SWIRLY_API RandomBbo {
-  public:
-    explicit RandomBbo(std::random_device& rd)
-    : rd_(rd)
-    {
-    }
-    ~RandomBbo();
-
-    // Copy.
-    RandomBbo(const RandomBbo&) = delete;
-    RandomBbo& operator=(const RandomBbo&) = delete;
-
-    // Move.
-    RandomBbo(RandomBbo&&) = delete;
-    RandomBbo& operator=(RandomBbo&&) = delete;
-
-    std::pair<std::int64_t, std::int64_t> operator()(std::int64_t open);
-
-  private:
-    std::random_device& rd_;
-    std::mt19937 gen_{rd_()};
-    std::binomial_distribution<std::int64_t> dist_{4, 0.5};
-    std::int64_t offset_{0};
+struct MdEntry {
+    MdEntryType type;
+    MdEntryPx px;
+    MdEntrySize size;
 };
+
+template <typename StreamT>
+StreamT& operator<<(StreamT& os, const MdEntry& grp)
+{
+    os << grp.type << grp.px << grp.size;
+    return os;
+}
+
+SWIRLY_API void parse_group(FixLexer& lex, MdEntry& grp);
 
 } // namespace fix
 } // namespace swirly
 
-#endif // SWIRLY_FIX_RANDOM_HPP
+#endif // SWIRLY_FIX_GROUP_HPP

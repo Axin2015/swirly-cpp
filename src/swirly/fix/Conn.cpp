@@ -73,6 +73,19 @@ void FixConn::logout(CyclTime now)
     }
 }
 
+void FixConn::send(CyclTime now, string_view msg_type, string_view body)
+{
+    const auto hdr = make_header(now, msg_type);
+
+    FixStream os{out_.buf};
+    os.reset(sess_id_.version);
+    os << hdr << body;
+    os.commit();
+
+    seq_num_ = hdr.msg_seq_num.value;
+    read_and_write(now);
+}
+
 FixConn::~FixConn() = default;
 
 FixHeader FixConn::make_header(CyclTime now, string_view msg_type) const noexcept

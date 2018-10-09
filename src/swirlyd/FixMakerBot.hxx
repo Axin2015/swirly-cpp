@@ -63,7 +63,9 @@ class FixMakerBot : public FixHandler {
     Reactor& reactor_;
     FixConn* conn_{nullptr};
     Timer md_tmr_, stat_tmr_;
-    RandomBbo bbo_;
+    std::random_device rd_;
+    RandomBbo bbo_{rd_};
+    int count_{0};
 };
 
 } // namespace swirly

@@ -60,6 +60,7 @@ class SWIRLY_API FixConn final : BasicFixParser<FixConn> {
     void dispose(CyclTime now) noexcept;
     void logon(CyclTime now, const FixSessId& sess_id);
     void logout(CyclTime now);
+    void send(CyclTime now, std::string_view msg_type, std::string_view body);
     template <typename FnT>
     void send(CyclTime now, std::string_view msg_type, FnT fn)
     {

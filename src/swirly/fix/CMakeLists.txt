@@ -33,6 +33,7 @@ set(lib_SOURCES
   Conn.cpp
   Ctx.cpp
   Field.cpp
+  Group.cpp
   Handler.cpp
   Header.cpp
   Initiator.cpp

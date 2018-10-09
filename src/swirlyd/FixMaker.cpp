@@ -55,13 +55,28 @@ void FixMaker::do_on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_i
     } else {
         SWIRLY_WARNING << sess_id << " <Maker> on_logout";
     }
+    // Cancel all orders on logout.
+    const auto& markets = lob_app_.markets(); // noexcept
+    for (auto& [market_id, orders] : order_map_) {
+        const auto it = markets.find(market_id);
+        if (it == markets.end()) {
+            // Defensive: this should not happen.
+            SWIRLY_WARNING << sess_id << " <Maker> market not found: " << market_id;
+            continue;
+        }
+        for (const auto& order : orders) {
+            lob_app_.try_cancel_quote(now, sess_, *it, *order); // noexcept
+        }
+    }
     conn_ = nullptr;
 }
 
 void FixMaker::do_on_message(CyclTime now, FixConn& conn, string_view msg, size_t body_off,
                              Version ver, const FixHeader& hdr)
 {
-    if (hdr.msg_type.value == "W") {
+    if (hdr.msg_type.value == "8") {
+        on_execution_report(now, conn, msg, body_off, ver, hdr);
+    } else if (hdr.msg_type.value == "W") {
         on_market_data_snapshot(now, conn, msg, body_off, ver, hdr);
     } else {
         SWIRLY_INFO << conn.sess_id() << " <Maker> on_message: " << hdr.msg_type.value;
@@ -86,25 +101,38 @@ void FixMaker::do_prepare(CyclTime now, const FixSessId& sess_id, const FixHandl
 void FixMaker::do_send(CyclTime now, string_view msg_type, string_view msg)
 {
     if (conn_) {
-        auto fn = [msg](CyclTime now, ostream& os) { os << msg; };
-        conn_->send(now, msg_type, fn);
+        conn_->send(now, msg_type, msg);
     }
+}
+
+void FixMaker::on_execution_report(CyclTime now, FixConn& conn, string_view msg, size_t body_off,
+                                   Version ver, const FixHeader& hdr)
+{
+    SWIRLY_INFO << conn.sess_id() << " <Maker> on_execution_report";
+
+    ExecutionReport er;
+    parse_body(msg, body_off, er);
+
+    // Archive on trade acknowledgement.
+
+    const auto& instr = lob_app_.instr(er.symbol.value);
+    const auto market_id = to_market_id(instr.id(), er.maturity_date.value);
+    lob_app_.archive_trade(now, sess_, market_id, er.exec_id.value);
 }
 
 void FixMaker::on_market_data_snapshot(CyclTime now, FixConn& conn, string_view msg,
                                        size_t body_off, Version ver, const FixHeader& hdr)
 {
     mds_.clear();
-
     parse_body(msg, body_off, mds_);
 
     const auto& instr = lob_app_.instr(mds_.symbol.value);
     const auto market_id = to_market_id(instr.id(), mds_.maturity_date.value);
     const auto& market = lob_app_.market(market_id);
-    auto& orders = order_map_[market_id];
 
+    auto& orders = order_map_[market_id];
     for (const auto& order : orders) {
-        lob_app_.try_cancel_quote(now, sess_, market, *order);
+        lob_app_.try_cancel_quote(now, sess_, market, *order); // noexcept
     }
     orders.clear();
     for (const auto& md_entry : mds_.md_entries) {
@@ -127,8 +155,17 @@ void FixMaker::on_market_data_snapshot(CyclTime now, FixConn& conn, string_view 
 
 void FixMaker::on_trade(CyclTime now, const Sess& sess, const ExecPtr& trade)
 {
-    SWIRLY_INFO << sess.accnt() << " <Maker> trade: " << trade->id();
-    lob_app_.archive_trade(now, sess, *trade);
+    if (conn_) {
+        auto fn = [&trade](CyclTime now, ostream& os) {
+            // clang-format off
+            os << SymbolField{trade->instr()}
+               << MaturityDate{maybe_jd_to_iso(trade->settl_day())}
+               << ExecId{trade->id()}
+               << OrderId{trade->order_id()};
+            // clang-format off
+        };
+        conn_->send(now, "8"sv, fn);
+    }
 }
 
 } // namespace swirly
