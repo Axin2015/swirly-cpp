@@ -93,6 +93,7 @@ class TestCase(RestTestCase):
       u'buy_lots': 3,
       u'instr': u'EURUSD',
       u'market_id': 82255,
+      u'open_cost': 0,
       u'sell_cost': 37038,
       u'sell_lots': 3,
       u'settl_date': 20140302
@@ -102,6 +103,7 @@ class TestCase(RestTestCase):
       u'buy_lots': 5,
       u'instr': u'EURUSD',
       u'market_id': 82286,
+      u'open_cost': 0,
       u'sell_cost': 61730,
       u'sell_lots': 5,
       u'settl_date': 20140402
@@ -111,6 +113,7 @@ class TestCase(RestTestCase):
       u'buy_lots': 7,
       u'instr': u'GBPUSD',
       u'market_id': 147791,
+      u'open_cost': 0,
       u'sell_cost': 107422,
       u'sell_lots': 7,
       u'settl_date': 20140302
@@ -128,6 +131,7 @@ class TestCase(RestTestCase):
       u'buy_lots': 3,
       u'instr': u'EURUSD',
       u'market_id': 82255,
+      u'open_cost': 0,
       u'sell_cost': 37038,
       u'sell_lots': 3,
       u'settl_date': 20140302
@@ -137,6 +141,7 @@ class TestCase(RestTestCase):
       u'buy_lots': 5,
       u'instr': u'EURUSD',
       u'market_id': 82286,
+      u'open_cost': 0,
       u'sell_cost': 61730,
       u'sell_lots': 5,
       u'settl_date': 20140402
@@ -154,6 +159,7 @@ class TestCase(RestTestCase):
       u'buy_lots': 3,
       u'instr': u'EURUSD',
       u'market_id': 82255,
+      u'open_cost': 0,
       u'sell_cost': 37038,
       u'sell_lots': 3,
       u'settl_date': 20140302
