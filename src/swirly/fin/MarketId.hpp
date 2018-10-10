@@ -29,8 +29,15 @@ constexpr Id64 to_market_id(Id32 instr_id) noexcept
 
 constexpr Id64 to_market_id(Id32 instr_id, JDay settl_day) noexcept
 {
-    return Id64{(instr_id.count() << 16) | (jd_to_tjd(settl_day) & 0xffff)};
+    std::int64_t id{instr_id.count() << 16};
+    if (settl_day != 0_jd) {
+        id |= jd_to_tjd(settl_day) & 0xffff;
+    }
+    return Id64{id};
 }
+static_assert(to_market_id(12_id32, 0_jd) == 786432_id64);
+// 2440000 is the epoch for truncated Julian day.
+static_assert(to_market_id(12_id32, 2440000_jd + 1_jd) == 786433_id64);
 
 constexpr Id64 to_market_id(Id32 instr_id, IsoDate settl_date) noexcept
 {

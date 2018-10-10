@@ -91,7 +91,7 @@ set(test_SOURCES
 add_executable(swirly-fin-test
   ${test_SOURCES}
   Main.ut.cpp)
-target_link_libraries(swirly-fin-test ${swirly_fin_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+target_link_libraries(swirly-fin-test ${swirly_fin_LIBRARY} "${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}")
 
 foreach(file ${test_SOURCES})
   get_filename_component (name "${file}" NAME_WE)

@@ -392,8 +392,8 @@ void RestApp::market_request(CyclTime now, const RestRequest& req, HttpStream& o
             match_method_ = true;
             get_admin(req);
             {
-                constexpr auto ReqFields = RestBody::Instr | RestBody::SettlDate;
-                constexpr auto OptFields = RestBody::State;
+                constexpr auto ReqFields = RestBody::Instr;
+                constexpr auto OptFields = RestBody::State | RestBody::SettlDate;
                 if (!req.body().valid(ReqFields, OptFields)) {
                     throw InvalidException{"request fields are invalid"sv};
                 }
