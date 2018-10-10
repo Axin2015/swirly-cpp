@@ -66,7 +66,7 @@ INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_d
 
 -- Example cash market.
 INSERT INTO market_t (id, instr, settl_day, state)
-       VALUES ((SELECT (id << 16) FROM instr_t WHERE symbol = 'CAP'), 'CAP', 0, 0)
+       VALUES ((SELECT (id << 16) FROM instr_t WHERE symbol = 'CAP'), 'CAP', NULL, 0)
 ;
 
 COMMIT

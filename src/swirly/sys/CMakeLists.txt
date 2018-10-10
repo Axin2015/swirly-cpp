@@ -56,13 +56,13 @@ set(lib_SOURCES
 
 add_library(swirly-sys-static STATIC ${lib_SOURCES})
 set_target_properties(swirly-sys-static PROPERTIES OUTPUT_NAME swirly-sys)
-target_link_libraries(swirly-sys-static swirly-util-static pthread)
+target_link_libraries(swirly-sys-static swirly-util-static "${Boost_SYSTEM_LIBRARY}" pthread)
 install(TARGETS swirly-sys-static DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT static)
 
 if(SWIRLY_BUILD_SHARED)
   add_library(swirly-sys-shared SHARED ${lib_SOURCES})
   set_target_properties(swirly-sys-shared PROPERTIES OUTPUT_NAME swirly-sys)
-  target_link_libraries(swirly-sys-shared swirly-util-shared pthread)
+  target_link_libraries(swirly-sys-shared swirly-util-shared "${Boost_SYSTEM_LIBRARY}" pthread)
   install(TARGETS swirly-sys-shared DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT shared)
 endif()
 
@@ -87,7 +87,7 @@ set(test_SOURCES
 add_executable(swirly-sys-test
   ${test_SOURCES}
   Main.ut.cpp)
-target_link_libraries(swirly-sys-test ${swirly_sys_LIBRARY} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+target_link_libraries(swirly-sys-test ${swirly_sys_LIBRARY} "${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}")
 
 foreach(file ${test_SOURCES})
   get_filename_component (name "${file}" NAME_WE)
