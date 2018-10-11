@@ -60,18 +60,45 @@ struct FixField {
     FixField(FixField&&) = default;
     FixField& operator=(FixField&&) = default;
 
-    template <typename ArgT>
-    constexpr FixField(ArgT&& arg)
-    : value(std::forward<ArgT>(arg))
+    constexpr FixField(std::string_view sv)
+    : value{from_string<ValueT>(sv)}
     {
     }
-    void clear() { value = ValueT{}; }
+    constexpr FixField(const std::string& s)
+    : value{from_string<ValueT>(s)}
+    {
+    }
+    constexpr FixField(const char* s)
+    : value{from_string<ValueT>(s)}
+    {
+    }
+    template <typename ArgT>
+    constexpr FixField(ArgT&& arg)
+    : value{std::forward<ArgT>(arg)}
+    {
+    }
+    constexpr FixField& operator=(std::string_view sv)
+    {
+        value = from_string<ValueT>(sv);
+        return *this;
+    }
+    constexpr FixField& operator=(const std::string& s)
+    {
+        value = from_string<ValueT>(s);
+        return *this;
+    }
+    constexpr FixField& operator=(const char* s)
+    {
+        value = from_string<ValueT>(s);
+        return *this;
+    }
     template <typename ArgT>
     constexpr FixField& operator=(ArgT&& arg)
     {
         value = std::forward<ArgT>(arg);
         return *this;
     }
+    void clear() { value = ValueT{}; }
     static constexpr int Tag = TagN;
     ValueT value{};
 };
@@ -82,10 +109,34 @@ bool operator==(const FixField<TagN, ValueT>& lhs, const FixField<TagN, ValueT>&
     return lhs.value == rhs.value;
 }
 
+template <int TagN, typename ValueT, typename RhsT>
+bool operator==(const FixField<TagN, ValueT>& lhs, const RhsT& rhs) noexcept
+{
+    return lhs.value == rhs;
+}
+
+template <int TagN, typename ValueT, typename LhsT>
+bool operator==(const LhsT& lhs, const FixField<TagN, ValueT>& rhs) noexcept
+{
+    return lhs == rhs.value;
+}
+
 template <int TagN, typename ValueT>
 bool operator!=(const FixField<TagN, ValueT>& lhs, const FixField<TagN, ValueT>& rhs) noexcept
 {
     return lhs.value != rhs.value;
+}
+
+template <int TagN, typename ValueT, typename RhsT>
+bool operator!=(const FixField<TagN, ValueT>& lhs, const RhsT& rhs) noexcept
+{
+    return lhs.value != rhs;
+}
+
+template <int TagN, typename ValueT, typename LhsT>
+bool operator!=(const LhsT& lhs, const FixField<TagN, ValueT>& rhs) noexcept
+{
+    return lhs != rhs.value;
 }
 
 template <int TagN, typename ValueT>
@@ -177,30 +228,153 @@ using PriceField = FixField<TagN, Ticks>;
 template <int TagN>
 using QtyField = FixField<TagN, Lots>;
 
+using AvgPx = PriceField<6>;
 using BeginString = StringField<8, 7>;
 using BodyLength = LengthField<9>;
-using ExecId = Id64Field<17>;
-using MsgSeqNum = SeqNumField<34>;
-using MsgType = StringField<35, 2>;
-using OrderId = Id64Field<37>;
-using SenderCompId = StringField<49, 32>;
-using PossDupFlag = BoolField<43>;
-using SendingTime = TimeField<52>;
-using SymbolField = FixField<55, Symbol>;
-using TargetCompId = StringField<56, 32>;
-using PossResend = BoolField<97>;
+using CumQty = QtyField<14>;
 using EncryptMethod = IntField<98>;
+using ExecId = Id64Field<17>;
+using ExecType = CharField<150>;
 using HeartBtInt = IntField<108>;
-using NoMdEntries = NumInGroupField<268>;
-using MdEntryType = CharField<269>;
+using LastPx = PriceField<31>;
+using LastQty = QtyField<32>;
+using LeavesQty = QtyField<151>;
+using MaturityDate = LocalMktDateField<541>;
 using MdEntryPx = PriceField<270>;
 using MdEntrySize = QtyField<271>;
-using TradingSessionId = StringField<336, 32>;
+using MdEntryType = CharField<269>;
+using MinQty = QtyField<110>;
+using MsgSeqNum = SeqNumField<34>;
+using MsgType = StringField<35, 2>;
+using NoMdEntries = NumInGroupField<268>;
+using OrdStatus = CharField<39>;
+using OrderId = Id64Field<37>;
+using OrderQty = QtyField<38>;
+using PossDupFlag = BoolField<43>;
+using PossResend = BoolField<97>;
+using Price = PriceField<44>;
+using SenderCompId = StringField<49, 32>;
+using SendingTime = TimeField<52>;
+using SideField = CharField<54>;
+using SymbolField = FixField<55, Symbol>;
+using TargetCompId = StringField<56, 32>;
 using TradSesStatus = IntField<340>;
-using MaturityDate = LocalMktDateField<541>;
+using TradingSessionId = StringField<336, 32>;
 
 static_assert(FixField<8, std::string_view>{}.Tag == 8);
 static_assert(BodyLength{101}.value == BodyLength{101}.value);
+
+constexpr State from_fix(ExecType exec_type) noexcept
+{
+    State val{};
+    switch (exec_type.value) {
+    case '0':
+        val = State::New;
+        break;
+    case '4':
+        val = State::Cancel;
+        break;
+    case '5':
+        val = State::Revise;
+        break;
+    case 'F':
+        val = State::Trade;
+        break;
+    default:
+        val = State::None;
+    }
+    return val;
+}
+static_assert(from_fix(ExecType{'F'}) == State::Trade);
+
+constexpr State from_fix(OrdStatus ord_status) noexcept
+{
+    State val{};
+    switch (ord_status.value) {
+    case '0':
+        val = State::New;
+        break;
+    case '1':
+    case '2':
+        val = State::Trade;
+        break;
+    case '4':
+        val = State::Cancel;
+        break;
+    case '5':
+        val = State::Revise;
+        break;
+    default:
+        val = State::None;
+    }
+    return val;
+}
+static_assert(from_fix(OrdStatus{'1'}) == State::Trade);
+
+template <typename FixFieldT>
+inline FixFieldT to_fix(State state, Lots resd)
+{
+    typename FixFieldT::Type val;
+    switch (state) {
+    case State::New:
+        val = '0';
+        break;
+    case State::Revise:
+        val = '5';
+        break;
+    case State::Cancel:
+        val = '4';
+        break;
+    case State::Trade:
+        if constexpr (std::is_same_v<FixFieldT, ExecType>) {
+            (void)resd;
+            val = 'F';
+        } else if constexpr (std::is_same_v<FixFieldT, OrdStatus>) {
+            val = resd == 0_lts ? '2' : '1';
+        } else {
+            static_assert(DependentFalse<FixFieldT>::value);
+        }
+        break;
+    case State::None:
+    default:
+        throw std::domain_error{"invalid state"};
+    }
+    return {val};
+}
+
+constexpr Side from_fix(SideField side) noexcept
+{
+    Side val{};
+    switch (side.value) {
+    case '1':
+        val = Side::Buy;
+        break;
+    case '2':
+        val = Side::Sell;
+        break;
+    default:
+        val = Side::None;
+    }
+    return val;
+}
+static_assert(from_fix(SideField{'1'}) == Side::Buy);
+
+inline SideField to_fix(Side side)
+{
+    SideField::Type val;
+    switch (side) {
+    case Side::Buy:
+        val = '1';
+        break;
+    case Side::Sell:
+        val = '2';
+        break;
+    case Side::None:
+    default:
+        throw std::domain_error{"invalid side"};
+    }
+    return {val};
+}
 
 } // namespace fix
 } // namespace swirly

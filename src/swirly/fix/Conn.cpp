@@ -93,8 +93,8 @@ FixHeader FixConn::make_header(CyclTime now, string_view msg_type) const noexcep
     assert(!sess_id_.empty());
     FixHeader hdr;
     hdr.msg_type = msg_type;
-    hdr.sender_comp_id = sess_id_.sender_comp_id;
-    hdr.target_comp_id = sess_id_.target_comp_id;
+    hdr.sender_comp_id = string_view{sess_id_.sender_comp_id};
+    hdr.target_comp_id = string_view{sess_id_.target_comp_id};
     hdr.msg_seq_num = seq_num_ + 1;
     hdr.sending_time = now.wall_time();
     return hdr;
@@ -116,7 +116,7 @@ void FixConn::read_only(CyclTime now)
 
 void FixConn::send_logon(CyclTime now)
 {
-    Logon body{0, hb_int_.count()};
+    Logon body{0, static_cast<int>(hb_int_.count())};
     send(now, "A"sv, [&body](CyclTime now, ostream& os) { os << body; });
 }
 

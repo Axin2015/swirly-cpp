@@ -260,7 +260,7 @@ class ProxyHandler : public FixHandler {
                        const FixHeader& hdr) override
     {
         SWIRLY_INFO << conn.sess_id() << " <Proxy> on_message: " << hdr.msg_type.value;
-        if (hdr.msg_type.value == "W") {
+        if (hdr.msg_type == "W") {
             assert(proxy_);
             msg.remove_prefix(body_off);
             msg.remove_suffix(CheckSumLen);
