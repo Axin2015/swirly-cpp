@@ -60,7 +60,7 @@ void FixApp::do_on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_id,
 }
 
 void FixApp::do_on_message(CyclTime now, FixConn& conn, string_view msg, size_t body_off,
-                           Version ver, const FixHeader& hdr)
+                           Version ver, const FixHeaderView& hdr)
 {
     const auto& sess_id = conn.sess_id();
     if (!sess_id.empty()) {

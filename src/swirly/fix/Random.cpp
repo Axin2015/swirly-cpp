@@ -22,13 +22,13 @@ using namespace std;
 
 RandomBbo::~RandomBbo() = default;
 
-pair<int64_t, int64_t> RandomBbo::operator()(int64_t open)
+pair<Ticks, Ticks> RandomBbo::operator()(Ticks open)
 {
     if ((gen_() & 0x7) == 0) {
         offset_ += dist_(gen_) - 2;
     }
-    const auto delta = offset_ + dist_(gen_) - 2;
-    const auto spread = dist_(gen_) / 2 + 1;
+    const Ticks delta{offset_ + dist_(gen_) - 2};
+    const Ticks spread{dist_(gen_) / 2 + 1};
     return {open + delta - spread, open + delta + spread};
 }
 

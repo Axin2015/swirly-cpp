@@ -14,48 +14,58 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_FIX_HDR_HPP
-#define SWIRLY_FIX_HDR_HPP
+#ifndef SWIRLY_FIX_HEADER_HPP
+#define SWIRLY_FIX_HEADER_HPP
 
-#include <swirly/fix/Field.hpp>
+#include <swirly/fix/List.hpp>
 #include <swirly/fix/SessId.hpp>
 
 namespace swirly {
 inline namespace fix {
-
-struct FixHeader {
-    MsgType::View msg_type;
-    SenderCompId::View sender_comp_id;
-    TargetCompId::View target_comp_id;
-    MsgSeqNum msg_seq_num;
-    SendingTime sending_time;
-    std::optional<PossDupFlag> poss_dup;
-    std::optional<PossResend> poss_resend;
+namespace detail {
+struct FixHeaderOpts {
+    template <typename TagListT, typename TagT>
+    static constexpr bool empty(const TagListT& tl, TagT)
+    {
+        bool ret{false};
+        if constexpr (std::is_same_v<TagT, TagType<Tag::PossDupFlag>>) {
+            ret = !get<Tag::PossDupFlag>(tl);
+        } else if constexpr (std::is_same_v<TagT, TagType<Tag::PossResend>>) {
+            ret = !get<Tag::PossResend>(tl);
+        }
+        return ret;
+    }
 };
+} // namespace detail
 
-template <typename StreamT>
-StreamT& operator<<(StreamT& os, const FixHeader& hdr)
-{
-    os << hdr.msg_type << hdr.sender_comp_id << hdr.target_comp_id << hdr.msg_seq_num
-       << hdr.sending_time;
-    if (hdr.poss_dup) {
-        os << *hdr.poss_dup;
-    }
-    if (hdr.poss_resend) {
-        os << *hdr.poss_resend;
-    }
-    return os;
-}
+// clang-format off
+using FixHeader = TagList<detail::FixHeaderOpts,
+                          Tag::MsgType,
+                          Tag::SenderCompId,
+                          Tag::TargetCompId,
+                          Tag::MsgSeqNum,
+                          Tag::SendingTime,
+                          Tag::PossDupFlag,
+                          Tag::PossResend
+                          >;
+// clang-format on
 
-SWIRLY_API std::size_t parse_header(std::string_view msg, std::size_t msg_type_off, FixHeader& hdr);
+using FixHeaderView = FixHeader::View;
 
+SWIRLY_API std::size_t parse_header(std::string_view msg, std::size_t msg_type_off,
+                                    FixHeader& hdr);
+
+SWIRLY_API std::size_t parse_header(std::string_view msg, std::size_t msg_type_off,
+                                    FixHeaderView& hdr);
+
+// TODO: consider adding support for FixHeader type.
 template <typename StringT>
-BasicFixSessId<StringT> get_sess_id(Version ver, const FixHeader& hdr) noexcept
+BasicFixSessId<StringT> get_sess_id(Version ver, const FixHeaderView& hdr) noexcept
 {
-    return {ver, StringT{hdr.sender_comp_id.value}, StringT{hdr.target_comp_id.value}};
+    return {ver, StringT{get<Tag::SenderCompId>(hdr)}, StringT{get<Tag::TargetCompId>(hdr)}};
 }
 
 } // namespace fix
 } // namespace swirly
 
-#endif // SWIRLY_FIX_HDR_HPP
+#endif // SWIRLY_FIX_HEADER_HPP

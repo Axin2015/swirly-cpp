@@ -36,14 +36,6 @@ static_assert(has<tag::Foo>(Struct.extend<tag::Foo>(101)));
 static_assert(!has<tag::Bar>(Struct.extend<tag::Foo>(101)));
 static_assert(get<tag::Foo>(Struct.extend<tag::Foo>(101)) == 101);
 
-/*
-        get<TestTag2>(s) = Test{303};
-        cout << get<TestTag2>(s).x << endl;
-        cout << has<TestTag1>(s) << endl;
-        cout << has<int>(s) << endl;
-        cout << size(s) << endl;
- */
-
 } // namespace
 
 BOOST_AUTO_TEST_SUITE(StructSuite)

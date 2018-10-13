@@ -36,9 +36,9 @@ BOOST_AUTO_TEST_CASE(ParseMdEntrySingleCase)
         MdEntry md_entry;
 
         parse_group(lex, md_entry);
-        BOOST_TEST(md_entry.type == '0');
-        BOOST_TEST(md_entry.px == 12341_tks);
-        BOOST_TEST(md_entry.size == 2000_lts);
+        BOOST_TEST(get<Tag::MdEntryType>(md_entry).side == Side::Buy);
+        BOOST_TEST(get<Tag::MdEntryPx>(md_entry) == 12341_tks);
+        BOOST_TEST(get<Tag::MdEntrySize>(md_entry) == 2000_lts);
         BOOST_TEST(lex.empty());
     }
     {
@@ -49,9 +49,9 @@ BOOST_AUTO_TEST_CASE(ParseMdEntrySingleCase)
         MdEntry md_entry;
 
         parse_group(lex, md_entry);
-        BOOST_TEST(md_entry.type == '0');
-        BOOST_TEST(md_entry.px == 12341_tks);
-        BOOST_TEST(md_entry.size == 2000_lts);
+        BOOST_TEST(get<Tag::MdEntryType>(md_entry).side == Side::Buy);
+        BOOST_TEST(get<Tag::MdEntryPx>(md_entry) == 12341_tks);
+        BOOST_TEST(get<Tag::MdEntrySize>(md_entry) == 2000_lts);
         BOOST_TEST_REQUIRE(!lex.empty());
         BOOST_TEST(lex.top().first == 10);
     }
@@ -69,15 +69,15 @@ BOOST_AUTO_TEST_CASE(ParseMdEntryMultiCase)
         MdEntry md_entry;
 
         parse_group(lex, md_entry);
-        BOOST_TEST(md_entry.type == '0');
-        BOOST_TEST(md_entry.px == 12344_tks);
-        BOOST_TEST(md_entry.size == 1000_lts);
+        BOOST_TEST(get<Tag::MdEntryType>(md_entry).side == Side::Buy);
+        BOOST_TEST(get<Tag::MdEntryPx>(md_entry) == 12344_tks);
+        BOOST_TEST(get<Tag::MdEntrySize>(md_entry) == 1000_lts);
         BOOST_TEST_REQUIRE(!lex.empty());
 
         parse_group(lex, md_entry);
-        BOOST_TEST(md_entry.type == '1');
-        BOOST_TEST(md_entry.px == 12346_tks);
-        BOOST_TEST(md_entry.size == 2000_lts);
+        BOOST_TEST(get<Tag::MdEntryType>(md_entry).side == Side::Sell);
+        BOOST_TEST(get<Tag::MdEntryPx>(md_entry) == 12346_tks);
+        BOOST_TEST(get<Tag::MdEntrySize>(md_entry) == 2000_lts);
         BOOST_TEST(lex.empty());
     }
     {
@@ -91,15 +91,15 @@ BOOST_AUTO_TEST_CASE(ParseMdEntryMultiCase)
         MdEntry md_entry;
 
         parse_group(lex, md_entry);
-        BOOST_TEST(md_entry.type == '0');
-        BOOST_TEST(md_entry.px == 12344_tks);
-        BOOST_TEST(md_entry.size == 1000_lts);
+        BOOST_TEST(get<Tag::MdEntryType>(md_entry).side == Side::Buy);
+        BOOST_TEST(get<Tag::MdEntryPx>(md_entry) == 12344_tks);
+        BOOST_TEST(get<Tag::MdEntrySize>(md_entry) == 1000_lts);
         BOOST_TEST_REQUIRE(!lex.empty());
 
         parse_group(lex, md_entry);
-        BOOST_TEST(md_entry.type == '1');
-        BOOST_TEST(md_entry.px == 12346_tks);
-        BOOST_TEST(md_entry.size == 2000_lts);
+        BOOST_TEST(get<Tag::MdEntryType>(md_entry).side == Side::Sell);
+        BOOST_TEST(get<Tag::MdEntryPx>(md_entry) == 12346_tks);
+        BOOST_TEST(get<Tag::MdEntrySize>(md_entry) == 2000_lts);
         BOOST_TEST_REQUIRE(!lex.empty());
         BOOST_TEST(lex.top().first == 10);
     }
@@ -124,13 +124,13 @@ BOOST_AUTO_TEST_CASE(ParseMdEntryMissingCase)
 BOOST_AUTO_TEST_CASE(FormatMarketDataSnapshotCase)
 {
     MarketDataSnapshot mds;
-    mds.symbol = "EURUSD"sv;
-    mds.maturity_date = 20181004_ymd;
+    get<Tag::Symbol>(mds) = "EURUSD"sv;
+    get<Tag::MaturityDate>(mds) = 20181004_ymd;
 
     MdEntry md_entry;
-    md_entry.type = '0';
-    md_entry.px = 12344_tks;
-    md_entry.size = 1000_lts;
+    get<Tag::MdEntryType>(md_entry).side = Side::Buy;
+    get<Tag::MdEntryPx>(md_entry) = 12344_tks;
+    get<Tag::MdEntrySize>(md_entry) = 1000_lts;
 
     mds.md_entries.push_back(md_entry);
 
@@ -166,25 +166,25 @@ BOOST_AUTO_TEST_CASE(ParseMarketDataSnapshotCase)
     MarketDataSnapshot mds;
     parse_body(lex, mds);
 
-    BOOST_TEST(mds.symbol == "EURUSD"sv);
-    BOOST_TEST(mds.maturity_date == 20181004_ymd);
+    BOOST_TEST(get<Tag::Symbol>(mds) == "EURUSD"sv);
+    BOOST_TEST(get<Tag::MaturityDate>(mds) == 20181004_ymd);
     BOOST_TEST_REQUIRE(mds.md_entries.size() == 4);
 
-    BOOST_TEST(mds.md_entries[0].type == '0');
-    BOOST_TEST(mds.md_entries[0].px == 12343_tks);
-    BOOST_TEST(mds.md_entries[0].size == 2000_lts);
+    BOOST_TEST(get<Tag::MdEntryType>(mds.md_entries[0]).side == Side::Buy);
+    BOOST_TEST(get<Tag::MdEntryPx>(mds.md_entries[0]) == 12343_tks);
+    BOOST_TEST(get<Tag::MdEntrySize>(mds.md_entries[0]) == 2000_lts);
 
-    BOOST_TEST(mds.md_entries[1].type == '0');
-    BOOST_TEST(mds.md_entries[1].px == 12344_tks);
-    BOOST_TEST(mds.md_entries[1].size == 1000_lts);
+    BOOST_TEST(get<Tag::MdEntryType>(mds.md_entries[1]).side == Side::Buy);
+    BOOST_TEST(get<Tag::MdEntryPx>(mds.md_entries[1]) == 12344_tks);
+    BOOST_TEST(get<Tag::MdEntrySize>(mds.md_entries[1]) == 1000_lts);
 
-    BOOST_TEST(mds.md_entries[2].type == '1');
-    BOOST_TEST(mds.md_entries[2].px == 12346_tks);
-    BOOST_TEST(mds.md_entries[2].size == 1000_lts);
+    BOOST_TEST(get<Tag::MdEntryType>(mds.md_entries[2]).side == Side::Sell);
+    BOOST_TEST(get<Tag::MdEntryPx>(mds.md_entries[2]) == 12346_tks);
+    BOOST_TEST(get<Tag::MdEntrySize>(mds.md_entries[2]) == 1000_lts);
 
-    BOOST_TEST(mds.md_entries[3].type == '1');
-    BOOST_TEST(mds.md_entries[3].px == 12347_tks);
-    BOOST_TEST(mds.md_entries[3].size == 2000_lts);
+    BOOST_TEST(get<Tag::MdEntryType>(mds.md_entries[3]).side == Side::Sell);
+    BOOST_TEST(get<Tag::MdEntryPx>(mds.md_entries[3]) == 12347_tks);
+    BOOST_TEST(get<Tag::MdEntrySize>(mds.md_entries[3]) == 2000_lts);
 
     BOOST_TEST(lex.empty());
 }

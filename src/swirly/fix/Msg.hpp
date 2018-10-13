@@ -23,118 +23,99 @@
 namespace swirly {
 inline namespace fix {
 
-struct ExecutionReport {
-    void clear()
-    {
-        symbol.clear();
-        maturity_date.clear();
-        exec_id.clear();
-        order_id.clear();
-        exec_type.clear();
-        ord_status.clear();
-        side.clear();
-        order_qty.clear();
-        price.clear();
-        leaves_qty.clear();
-        cum_qty.clear();
-        avg_px.clear();
-        last_qty.clear();
-        last_px.clear();
-        min_qty.clear();
-    }
-    SymbolField symbol;
-    MaturityDate maturity_date;
-    ExecId exec_id;
-    OrderId order_id;
-    ExecType exec_type;
-    OrdStatus ord_status;
-    SideField side;
-    OrderQty order_qty;
-    Price price;
-    LeavesQty leaves_qty;
-    CumQty cum_qty;
-    AvgPx avg_px;
-    LastQty last_qty;
-    LastPx last_px;
-    MinQty min_qty;
-};
-
-template <typename StreamT>
-StreamT& operator<<(StreamT& os, const ExecutionReport& body)
+template <typename TagOptsT, Tag... TagN>
+void parse_fix_list(FixLexer& lex, TagList<TagOptsT, TagN...>& tl)
 {
-    os << body.symbol << body.maturity_date << body.exec_id << body.order_id << body.exec_type
-       << body.ord_status << body.side << body.order_qty << body.price << body.leaves_qty
-       << body.cum_qty << body.avg_px;
-    if (body.last_qty != 0_lts) {
-        os << body.last_qty << body.last_px;
+    while (!lex.empty()) {
+        const auto [t, v] = lex.next();
+        tl.set(box<Tag>(t), v);
     }
-    os << body.min_qty;
-    return os;
 }
 
-SWIRLY_API void parse_body(FixLexer& lex, ExecutionReport& body);
-
-struct Logon {
-    void clear()
+namespace detail {
+struct ExecutionReportOpts {
+    template <typename TagListT, typename TagT>
+    static constexpr bool empty(const TagListT& tl, TagT)
     {
-        encrypt_method.clear();
-        heart_bt_int.clear();
+        bool ret{false};
+        if constexpr (std::is_same_v<TagT, TagType<Tag::LastQty>>) {
+            ret = get<Tag::LastQty>(tl) == 0_lts;
+        } else if constexpr (std::is_same_v<TagT, TagType<Tag::LastPx>>) {
+            ret = get<Tag::LastQty>(tl) == 0_lts;
+        }
+        return ret;
     }
-    EncryptMethod encrypt_method;
-    HeartBtInt heart_bt_int;
 };
+} // namespace detail
 
-template <typename StreamT>
-StreamT& operator<<(StreamT& os, const Logon& body)
-{
-    os << body.encrypt_method << body.heart_bt_int;
-    return os;
-}
+// clang-format off
+using ExecutionReport = TagList<detail::ExecutionReportOpts,
+                                Tag::Symbol,
+                                Tag::MaturityDate,
+                                Tag::ExecId,
+                                Tag::OrderId,
+                                Tag::ExecType,
+                                Tag::OrdStatus,
+                                Tag::Side,
+                                Tag::OrderQty,
+                                Tag::Price,
+                                Tag::LeavesQty,
+                                Tag::CumQty,
+                                Tag::AvgPx,
+                                Tag::LastPx,
+                                // LastQty must be after LastPx for empty predicate to work.
+                                Tag::LastQty,
+                                Tag::MinQty
+                                >;
+// clang-format on
 
-SWIRLY_API void parse_body(FixLexer& lex, Logon& body);
+using Logon = TagList<NoTagOpts, Tag::EncryptMethod, Tag::HeartBtInt>;
 
-struct MarketDataSnapshot {
+struct SWIRLY_API MarketDataSnapshot : TagList<NoTagOpts, Tag::Symbol, Tag::MaturityDate> {
+    using Base = TagList<NoTagOpts, Tag::Symbol, Tag::MaturityDate>;
     void clear()
     {
-        symbol.clear();
-        maturity_date.clear();
+        Base::clear();
         md_entries.clear();
     }
-    SymbolField symbol;
-    MaturityDate maturity_date;
     std::vector<MdEntry> md_entries;
 };
 
-template <typename StreamT>
-StreamT& operator<<(StreamT& os, const MarketDataSnapshot& body)
+template <Tag GetN>
+const auto& get(const MarketDataSnapshot& mds) noexcept
 {
-    const auto n = static_cast<int>(body.md_entries.size());
-    os << body.symbol << body.maturity_date << NoMdEntries{n};
-    for (const auto& md_entry : body.md_entries) {
+    return mds.get(TagType<GetN>{});
+}
+
+template <Tag GetN>
+auto& get(MarketDataSnapshot& mds) noexcept
+{
+    return mds.get(TagType<GetN>{});
+}
+
+template <Tag GetN>
+void set(MarketDataSnapshot& mds, std::string_view sv)
+{
+    mds.set(TagType<GetN>{}, sv);
+}
+
+template <typename StreamT>
+StreamT& operator<<(StreamT& os, const MarketDataSnapshot& mds)
+{
+    mds.put(os);
+    const auto n = static_cast<int>(mds.md_entries.size());
+    os << put_fix<Tag::NoMdEntries>(n);
+    for (const auto& md_entry : mds.md_entries) {
         os << md_entry;
     }
     return os;
 }
 
+using TradingSessionStatus = TagList<NoTagOpts, Tag::TradingSessionId, Tag::TradSesStatus>;
+
+SWIRLY_API void parse_body(FixLexer& lex, ExecutionReport& body);
+SWIRLY_API void parse_body(FixLexer& lex, Logon& body);
 SWIRLY_API void parse_body(FixLexer& lex, MarketDataSnapshot& body);
-
-struct TradingSessionStatus {
-    void clear()
-    {
-        trading_session_id.clear();
-        trad_ses_status.clear();
-    }
-    TradingSessionId::View trading_session_id;
-    TradSesStatus trad_ses_status;
-};
-
-template <typename StreamT>
-StreamT& operator<<(StreamT& os, const TradingSessionStatus& body)
-{
-    os << body.trading_session_id << body.trad_ses_status;
-    return os;
-}
-
 SWIRLY_API void parse_body(FixLexer& lex, TradingSessionStatus& body);
 
 template <typename BodyT>

@@ -17,7 +17,7 @@
 #ifndef SWIRLY_FIX_HANDLER_HPP
 #define SWIRLY_FIX_HANDLER_HPP
 
-#include <swirly/fix/SessId.hpp>
+#include <swirly/fix/Header.hpp>
 
 #include <swirly/util/Time.hpp>
 
@@ -28,7 +28,6 @@ class Config;
 inline namespace fix {
 
 class FixConn;
-struct FixHeader;
 
 class SWIRLY_API FixHandlerBase {
   public:
@@ -53,7 +52,7 @@ class SWIRLY_API FixHandlerBase {
         do_on_logout(now, conn, sess_id, disconnect);
     }
     void on_message(CyclTime now, FixConn& conn, std::string_view msg, std::size_t body_off,
-                    Version ver, const FixHeader& hdr)
+                    Version ver, const FixHeaderView& hdr)
     {
         do_on_message(now, conn, msg, body_off, ver, hdr);
     }
@@ -77,7 +76,7 @@ class SWIRLY_API FixHandlerBase {
                               Disconnect disconnect) noexcept
         = 0;
     virtual void do_on_message(CyclTime now, FixConn& conn, std::string_view msg,
-                               std::size_t body_off, Version ver, const FixHeader& hdr)
+                               std::size_t body_off, Version ver, const FixHeaderView& hdr)
         = 0;
 
     virtual void do_on_error(CyclTime now, const FixConn& conn, const std::exception& e) noexcept

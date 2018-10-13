@@ -104,9 +104,9 @@ class PingHandler : public FixHandler {
         conn.logon(now, sess_id);
     }
     void do_on_message(CyclTime now, FixConn& conn, string_view msg, size_t body_off, Version ver,
-                       const FixHeader& hdr) override
+                       const FixHeaderView& hdr) override
     {
-        SWIRLY_INFO << conn.sess_id() << " <Ping> on_message: " << hdr.msg_type.value;
+        SWIRLY_INFO << conn.sess_id() << " <Ping> on_message: " << get<Tag::MsgType>(hdr);
     }
     void do_on_error(CyclTime now, const FixConn& conn, const std::exception& e) noexcept override
     {
@@ -130,21 +130,21 @@ class PingHandler : public FixHandler {
         SWIRLY_INFO << conn_->sess_id() << " <Ping> on_market_data";
 
         auto fn = [this](CyclTime now, ostream& os) {
-            const auto [bid, offer] = bbo_(12345);
+            const auto [bid, offer] = bbo_(12345_tks);
             // clang-format off
-            os << NoMdEntries{4}
-               << MdEntryType{'0'}
-               << MdEntryPx{bid - 1}
-               << MdEntrySize{2000}
-               << MdEntryType{'0'}
-               << MdEntryPx{bid}
-               << MdEntrySize{1000}
-               << MdEntryType{'1'}
-               << MdEntryPx{offer}
-               << MdEntrySize{1000}
-               << MdEntryType{'1'}
-               << MdEntryPx{offer + 1}
-               << MdEntrySize{2000};
+            os << put_fix<Tag::NoMdEntries>(4)
+               << put_fix<Tag::MdEntryType>(Side::Buy)
+               << put_fix<Tag::MdEntryPx>(bid - 1_tks)
+               << put_fix<Tag::MdEntrySize>(2000_lts)
+               << put_fix<Tag::MdEntryType>(Side::Buy)
+               << put_fix<Tag::MdEntryPx>(bid)
+               << put_fix<Tag::MdEntrySize>(1000_lts)
+               << put_fix<Tag::MdEntryType>(Side::Sell)
+               << put_fix<Tag::MdEntryPx>(offer)
+               << put_fix<Tag::MdEntrySize>(1000_lts)
+               << put_fix<Tag::MdEntryType>(Side::Sell)
+               << put_fix<Tag::MdEntryPx>(offer + 1_tks)
+               << put_fix<Tag::MdEntrySize>(2000_lts);
             // clang-format on
         };
         conn_->send(now, "W"sv, fn);
@@ -156,7 +156,7 @@ class PingHandler : public FixHandler {
 
         if (count_++ < 10) {
             auto fn = [](CyclTime now, ostream& os) {
-                os << TradingSessionId::View{"OPEN"} << TradSesStatus{2};
+                os << put_fix<Tag::TradingSessionId>("OPEN"sv) << put_fix<Tag::TradSesStatus>(2);
             };
             conn_->send(now, "h"sv, fn);
         } else {
@@ -201,9 +201,9 @@ class PongHandler : public FixHandler {
         conn_ = nullptr;
     }
     void do_on_message(CyclTime now, FixConn& conn, string_view msg, size_t body_off, Version ver,
-                       const FixHeader& hdr) override
+                       const FixHeaderView& hdr) override
     {
-        SWIRLY_INFO << conn.sess_id() << " <Pong> on_message: " << hdr.msg_type.value;
+        SWIRLY_INFO << conn.sess_id() << " <Pong> on_message: " << get<Tag::MsgType>(hdr);
     }
     void do_on_error(CyclTime now, const FixConn& conn, const std::exception& e) noexcept override
     {
@@ -257,14 +257,15 @@ class ProxyHandler : public FixHandler {
         conn_ = nullptr;
     }
     void do_on_message(CyclTime now, FixConn& conn, string_view msg, size_t body_off, Version ver,
-                       const FixHeader& hdr) override
+                       const FixHeaderView& hdr) override
     {
-        SWIRLY_INFO << conn.sess_id() << " <Proxy> on_message: " << hdr.msg_type.value;
-        if (hdr.msg_type == "W") {
+        const auto& msg_type = get<Tag::MsgType>(hdr);
+        SWIRLY_INFO << conn.sess_id() << " <Proxy> on_message: " << msg_type;
+        if (msg_type == "W"sv) {
             assert(proxy_);
             msg.remove_prefix(body_off);
             msg.remove_suffix(CheckSumLen);
-            proxy_->send(now, hdr.msg_type.value, msg);
+            proxy_->send(now, msg_type, msg);
         }
     }
     void do_on_error(CyclTime now, const FixConn& conn, const std::exception& e) noexcept override
@@ -343,7 +344,7 @@ class FixApp : public FixAppBase {
         handler_map_[sess_id]->on_logout(now, conn, sess_id, disconnect);
     }
     void do_on_message(CyclTime now, FixConn& conn, string_view msg, size_t body_off, Version ver,
-                       const FixHeader& hdr) override
+                       const FixHeaderView& hdr) override
     {
         FixLexer lex{msg};
         while (!lex.empty()) {

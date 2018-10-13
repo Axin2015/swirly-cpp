@@ -82,21 +82,21 @@ void FixConn::send(CyclTime now, string_view msg_type, string_view body)
     os << hdr << body;
     os.commit();
 
-    seq_num_ = hdr.msg_seq_num.value;
+    seq_num_ = get<Tag::MsgSeqNum>(hdr);
     read_and_write(now);
 }
 
 FixConn::~FixConn() = default;
 
-FixHeader FixConn::make_header(CyclTime now, string_view msg_type) const noexcept
+FixHeaderView FixConn::make_header(CyclTime now, string_view msg_type) const noexcept
 {
     assert(!sess_id_.empty());
-    FixHeader hdr;
-    hdr.msg_type = msg_type;
-    hdr.sender_comp_id = string_view{sess_id_.sender_comp_id};
-    hdr.target_comp_id = string_view{sess_id_.target_comp_id};
-    hdr.msg_seq_num = seq_num_ + 1;
-    hdr.sending_time = now.wall_time();
+    FixHeaderView hdr;
+    get<Tag::MsgType>(hdr) = msg_type;
+    get<Tag::SenderCompId>(hdr) = string_view{sess_id_.sender_comp_id};
+    get<Tag::TargetCompId>(hdr) = string_view{sess_id_.target_comp_id};
+    get<Tag::MsgSeqNum>(hdr) = seq_num_ + 1;
+    get<Tag::SendingTime>(hdr) = now.wall_time();
     return hdr;
 }
 
@@ -116,7 +116,9 @@ void FixConn::read_only(CyclTime now)
 
 void FixConn::send_logon(CyclTime now)
 {
-    Logon body{0, static_cast<int>(hb_int_.count())};
+    Logon body;
+    get<Tag::EncryptMethod>(body) = 0;
+    get<Tag::HeartBtInt>(body) = hb_int_;
     send(now, "A"sv, [&body](CyclTime now, ostream& os) { os << body; });
 }
 
@@ -177,9 +179,9 @@ void FixConn::on_heartbeat(CyclTime now, Timer& tmr)
 
 void FixConn::on_message(CyclTime now, std::string_view msg, std::size_t msg_type_off, Version ver)
 {
-    FixHeader hdr;
+    FixHeaderView hdr;
     const size_t body_off = parse_header(msg, msg_type_off, hdr);
-    const auto& msg_type = hdr.msg_type.value;
+    const auto& msg_type = get<Tag::MsgType>(hdr);
     if (msg_type.empty()) {
         throw domain_error{"invalid FIX header"};
     }
@@ -222,7 +224,7 @@ void FixConn::on_message(CyclTime now, std::string_view msg, std::size_t msg_typ
             parse_body(msg, body_off, body);
             // Send logon response.
             sess_id_ = ~get_sess_id<string>(ver, hdr);
-            hb_int_ = Seconds{body.heart_bt_int.value};
+            hb_int_ = get<Tag::HeartBtInt>(body);
             send_logon(now);
             app_.on_logon(now, *this, sess_id_);
         }

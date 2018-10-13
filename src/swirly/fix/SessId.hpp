@@ -17,8 +17,6 @@
 #ifndef SWIRLY_FIX_SESSID_HPP
 #define SWIRLY_FIX_SESSID_HPP
 
-#include <swirly/fix/Field.hpp>
-
 #include <swirly/util/Version.hpp>
 
 namespace swirly {

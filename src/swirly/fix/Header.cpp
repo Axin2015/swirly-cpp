@@ -41,48 +41,32 @@ inline bool is_header_tag(int tag) noexcept
     return binary_search(HeaderTags.begin(), HeaderTags.end(), tag);
 }
 
-} // namespace
-
-size_t parse_header(string_view msg, size_t msg_type_off, FixHeader& hdr)
+template <typename HeaderT>
+size_t do_parse_header(string_view msg, size_t msg_type_off, HeaderT& hdr)
 {
     FixLexer lex{msg, msg_type_off};
     assert(!lex.empty());
     do {
         const auto [t, v] = lex.top();
-        switch (t) {
-        case MsgType::Tag:
-            hdr.msg_type = v;
+        if (!is_header_tag(t)) {
             break;
-        case SenderCompId::Tag:
-            hdr.sender_comp_id = v;
-            break;
-        case TargetCompId::Tag:
-            hdr.target_comp_id = v;
-            break;
-        case MsgSeqNum::Tag:
-            hdr.msg_seq_num = from_string<MsgSeqNum::Type>(v);
-            break;
-        case SendingTime::Tag: {
-            auto [time, valid] = parse_time(v);
-            if (!valid) {
-                throw ProtocolException{"invalid SendingTime(52)"};
-            }
-            hdr.sending_time = time;
-        } break;
-        case PossDupFlag::Tag:
-            hdr.poss_dup = from_string<PossDupFlag::Type>(v);
-            break;
-        case PossResend::Tag:
-            hdr.poss_resend = from_string<PossResend::Type>(v);
-            break;
-        default:
-            if (!is_header_tag(t)) {
-                return lex.offset();
-            }
         }
+        hdr.set(box<Tag>(t), v);
         lex.pop();
     } while (!lex.empty());
     return lex.offset();
+}
+
+} // namespace
+
+size_t parse_header(string_view msg, size_t msg_type_off, FixHeader& hdr)
+{
+    return do_parse_header(msg, msg_type_off, hdr);
+}
+
+size_t parse_header(string_view msg, size_t msg_type_off, FixHeaderView& hdr)
+{
+    return do_parse_header(msg, msg_type_off, hdr);
 }
 
 } // namespace fix

@@ -18,6 +18,7 @@
 #define SWIRLY_FIX_APP_HPP
 
 #include <swirly/fix/Handler.hpp>
+#include <swirly/fix/Header.hpp>
 
 namespace swirly {
 inline namespace util {
@@ -26,7 +27,6 @@ class Config;
 inline namespace fix {
 
 class FixConn;
-struct FixHeader;
 
 class SWIRLY_API FixAppBase : public FixHandlerBase {
   public:

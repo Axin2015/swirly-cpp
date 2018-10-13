@@ -32,7 +32,13 @@ constexpr EnumT box(typename std::underlying_type_t<EnumT> val) noexcept
 template <typename EnumT, typename = std::enable_if_t<std::is_enum_v<EnumT>>>
 constexpr typename std::underlying_type_t<EnumT> unbox(EnumT val) noexcept
 {
-    return static_cast<typename std::underlying_type_t<EnumT>>(val);
+    return static_cast<std::underlying_type_t<EnumT>>(val);
+}
+
+template <typename EnumT, typename = std::enable_if_t<std::is_enum_v<EnumT>>>
+constexpr typename std::underlying_type_t<EnumT> operator+(EnumT val) noexcept
+{
+    return static_cast<std::underlying_type_t<EnumT>>(val);
 }
 
 template <typename EnumT, typename = std::enable_if_t<std::is_enum_v<EnumT>>>

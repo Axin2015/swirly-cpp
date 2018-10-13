@@ -64,17 +64,17 @@ BOOST_AUTO_TEST_CASE(HeaderDirectCase)
 
 BOOST_AUTO_TEST_CASE(HeaderFieldCase)
 {
-    FixHeader hdr;
-    hdr.msg_type = "h"sv;
-    hdr.sender_comp_id = "CLIENT"sv;
-    hdr.target_comp_id = "SERVER"sv;
-    hdr.msg_seq_num = 1;
-    hdr.sending_time = parse_time("20180824-05:32:29.123"sv).value;
+    FixHeaderView hdr;
+    get<Tag::MsgType>(hdr) = "h"sv;
+    get<Tag::SenderCompId>(hdr) = "CLIENT"sv;
+    get<Tag::TargetCompId>(hdr) = "SERVER"sv;
+    get<Tag::MsgSeqNum>(hdr) = 1;
+    get<Tag::SendingTime>(hdr) = parse_time("20180824-05:32:29.123"sv).value;
 
     Buffer buf{16};
     FixStream os{buf};
     os.reset({4, 3});
-    os << hdr << TradingSessionId::View{"OPEN"} << TradSesStatus{2};
+    os << hdr << put_fix<Tag::TradingSessionId>("OPEN"sv) << put_fix<Tag::TradSesStatus>(2);
     os.commit();
     BOOST_TEST(buf
                == "8=FIX.4.3\1"

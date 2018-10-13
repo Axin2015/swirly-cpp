@@ -14,36 +14,52 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Group.hpp"
-
-#include "Lexer.hpp"
-
-#include <swirly/app/Exception.hpp>
+#ifndef SWIRLY_FIX_TAG_HPP
+#define SWIRLY_FIX_TAG_HPP
 
 namespace swirly {
 inline namespace fix {
-using namespace std;
 
-void parse_group(FixLexer& lex, MdEntry& grp)
-{
-    constexpr string_view ErrMsg{"missing MdEntryType(269)"};
-    if (lex.empty()) {
-        throw ProtocolException{ErrMsg};
-    }
-    const auto [t, v] = lex.next();
-    if (t != +Tag::MdEntryType) {
-        throw ProtocolException{ErrMsg};
-    }
-    set<Tag::MdEntryType>(grp, v);
-    while (!lex.empty()) {
-        const auto [t, v] = lex.top();
-        if (t == +Tag::MdEntryType || !grp.set(box<Tag>(t), v)) {
-            // End of group.
-            break;
-        }
-        lex.pop();
-    }
-}
+enum class Tag : int {
+    AvgPx = 6,
+    BeginString = 8,
+    BodyLength = 9,
+    CumQty = 14,
+    EncryptMethod = 98,
+    ExecId = 17,
+    ExecType = 150,
+    HeartBtInt = 108,
+    LastPx = 31,
+    LastQty = 32,
+    LeavesQty = 151,
+    MaturityDate = 541,
+    MdEntryPx = 270,
+    MdEntrySize = 271,
+    MdEntryType = 269,
+    MinQty = 110,
+    MsgSeqNum = 34,
+    MsgType = 35,
+    NoMdEntries = 268,
+    OrdStatus = 39,
+    OrderId = 37,
+    OrderQty = 38,
+    PossDupFlag = 43,
+    PossResend = 97,
+    Price = 44,
+    SenderCompId = 49,
+    SendingTime = 52,
+    Side = 54,
+    Symbol = 55,
+    TargetCompId = 56,
+    TradSesStatus = 340,
+    TradingSessionId = 336
+};
+
+template <Tag TagN>
+struct TagType {
+};
 
 } // namespace fix
 } // namespace swirly
+
+#endif // SWIRLY_FIX_TAG_HPP

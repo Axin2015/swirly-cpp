@@ -71,14 +71,14 @@ class SWIRLY_API FixConn final : BasicFixParser<FixConn> {
         fn(now, os << hdr);
         os.commit();
 
-        seq_num_ = hdr.msg_seq_num.value;
+        seq_num_ = get<Tag::MsgSeqNum>(hdr);
         read_and_write(now);
     }
     boost::intrusive::list_member_hook<AutoUnlinkOption> list_hook;
 
   private:
     ~FixConn();
-    FixHeader make_header(CyclTime now, std::string_view msg_type) const noexcept;
+    FixHeaderView make_header(CyclTime now, std::string_view msg_type) const noexcept;
     void read_and_write(CyclTime now);
     void read_only(CyclTime now);
     void send_logon(CyclTime now);
