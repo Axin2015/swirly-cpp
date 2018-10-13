@@ -27,6 +27,16 @@
 
 namespace swirly {
 using namespace std;
+namespace {
+inline Ticks to_avg_ticks(Lots lots, Cost cost) noexcept
+{
+    Ticks ticks = 0_tks;
+    if (lots != 0_lts) {
+        ticks = Ticks{fract_to_real(cost.count(), lots.count()) + 0.5};
+    }
+    return ticks;
+}
+} // namespace
 
 FixMaker::FixMaker(CyclTime now, Reactor& r, const FixSessId& sess_id, const Config& config,
                    LobApp& lob_app)
@@ -74,9 +84,9 @@ void FixMaker::do_on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_i
 void FixMaker::do_on_message(CyclTime now, FixConn& conn, string_view msg, size_t body_off,
                              Version ver, const FixHeader& hdr)
 {
-    if (hdr.msg_type.value == "8") {
+    if (hdr.msg_type == "8") {
         on_execution_report(now, conn, msg, body_off, ver, hdr);
-    } else if (hdr.msg_type.value == "W") {
+    } else if (hdr.msg_type == "W") {
         on_market_data_snapshot(now, conn, msg, body_off, ver, hdr);
     } else {
         SWIRLY_INFO << conn.sess_id() << " <Maker> on_message: " << hdr.msg_type.value;
@@ -161,8 +171,20 @@ void FixMaker::on_trade(CyclTime now, const Sess& sess, const ExecPtr& trade)
             os << SymbolField{trade->instr()}
                << MaturityDate{maybe_jd_to_iso(trade->settl_day())}
                << ExecId{trade->id()}
-               << OrderId{trade->order_id()};
+               << OrderId{trade->order_id()}
+               << to_fix<ExecType>(trade->state(), trade->resd_lots())
+               << to_fix<OrdStatus>(trade->state(), trade->resd_lots())
+               << to_fix(trade->side())
+               << OrderQty{trade->lots()}
+               << Price{trade->ticks()}
+               << LeavesQty{trade->resd_lots()}
+               << CumQty{trade->exec_lots()}
+               << AvgPx{to_avg_ticks(trade->exec_lots(), trade->exec_cost())};
             // clang-format off
+            if (trade->last_lots() != 0_lts) {
+                os << LastPx{trade->last_ticks()} << LastQty{trade->last_lots()};
+            }
+            os << MinQty{trade->min_lots()};
         };
         conn_->send(now, "8"sv, fn);
     }

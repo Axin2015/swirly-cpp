@@ -39,10 +39,10 @@ void parse_group(FixLexer& lex, MdEntry& grp)
         const auto [t, v] = lex.top();
         switch (t) {
         case MdEntryPx::Tag:
-            grp.px = from_string<MdEntryPx::Type>(v);
+            grp.px = v;
             break;
         case MdEntrySize::Tag:
-            grp.size = from_string<MdEntrySize::Type>(v);
+            grp.size = v;
             break;
         default:
             // End of group.

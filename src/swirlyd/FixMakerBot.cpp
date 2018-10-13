@@ -56,7 +56,7 @@ void FixMakerBot::do_on_message(CyclTime now, FixConn& conn, string_view msg, si
                                 Version ver, const FixHeader& hdr)
 {
     SWIRLY_INFO << conn.sess_id() << " <MakerBot> on_message: " << hdr.msg_type.value;
-    if (hdr.msg_type.value == "8") {
+    if (hdr.msg_type == "8") {
         msg.remove_prefix(body_off);
         msg.remove_suffix(CheckSumLen);
         conn_->send(now, "8"sv, msg);

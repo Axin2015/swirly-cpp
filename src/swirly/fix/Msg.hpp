@@ -24,17 +24,51 @@ namespace swirly {
 inline namespace fix {
 
 struct ExecutionReport {
-    void clear() { order_id.clear(); }
+    void clear()
+    {
+        symbol.clear();
+        maturity_date.clear();
+        exec_id.clear();
+        order_id.clear();
+        exec_type.clear();
+        ord_status.clear();
+        side.clear();
+        order_qty.clear();
+        price.clear();
+        leaves_qty.clear();
+        cum_qty.clear();
+        avg_px.clear();
+        last_qty.clear();
+        last_px.clear();
+        min_qty.clear();
+    }
     SymbolField symbol;
     MaturityDate maturity_date;
     ExecId exec_id;
     OrderId order_id;
+    ExecType exec_type;
+    OrdStatus ord_status;
+    SideField side;
+    OrderQty order_qty;
+    Price price;
+    LeavesQty leaves_qty;
+    CumQty cum_qty;
+    AvgPx avg_px;
+    LastQty last_qty;
+    LastPx last_px;
+    MinQty min_qty;
 };
 
 template <typename StreamT>
 StreamT& operator<<(StreamT& os, const ExecutionReport& body)
 {
-    os << body.symbol << body.maturity_date << body.exec_id << body.order_id;
+    os << body.symbol << body.maturity_date << body.exec_id << body.order_id << body.exec_type
+       << body.ord_status << body.side << body.order_qty << body.price << body.leaves_qty
+       << body.cum_qty << body.avg_px;
+    if (body.last_qty != 0_lts) {
+        os << body.last_qty << body.last_px;
+    }
+    os << body.min_qty;
     return os;
 }
 
@@ -74,7 +108,8 @@ struct MarketDataSnapshot {
 template <typename StreamT>
 StreamT& operator<<(StreamT& os, const MarketDataSnapshot& body)
 {
-    os << body.symbol << body.maturity_date << NoMdEntries{body.md_entries.size()};
+    const auto n = static_cast<int>(body.md_entries.size());
+    os << body.symbol << body.maturity_date << NoMdEntries{n};
     for (const auto& md_entry : body.md_entries) {
         os << md_entry;
     }
