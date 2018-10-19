@@ -17,24 +17,14 @@
 #ifndef SWIRLY_FIX_GROUP_HPP
 #define SWIRLY_FIX_GROUP_HPP
 
-#include <swirly/fix/Field.hpp>
+#include <swirly/fix/List.hpp>
 
 namespace swirly {
 inline namespace fix {
+
 class FixLexer;
 
-struct MdEntry {
-    MdEntryType type;
-    MdEntryPx px;
-    MdEntrySize size;
-};
-
-template <typename StreamT>
-StreamT& operator<<(StreamT& os, const MdEntry& grp)
-{
-    os << grp.type << grp.px << grp.size;
-    return os;
-}
+using MdEntry = TagList<NoTagOpts, Tag::MdEntryType, Tag::MdEntryPx, Tag::MdEntrySize>;
 
 SWIRLY_API void parse_group(FixLexer& lex, MdEntry& grp);
 

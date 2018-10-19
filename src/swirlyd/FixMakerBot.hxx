@@ -49,7 +49,7 @@ class FixMakerBot : public FixHandler {
     void do_on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_id,
                       Disconnect disconnect) noexcept override;
     void do_on_message(CyclTime now, FixConn& conn, std::string_view msg, std::size_t body_off,
-                       Version ver, const FixHeader& hdr) override;
+                       Version ver, const FixHeaderView& hdr) override;
     void do_on_error(CyclTime now, const FixConn& conn, const std::exception& e) noexcept override;
     void do_on_timeout(CyclTime now, const FixConn& conn) noexcept override;
     void do_prepare(CyclTime now, const FixSessId& sess_id,

@@ -14,9 +14,9 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/fix/Field.hpp>
 #include <swirly/fix/Random.hpp>
 #include <swirly/fix/Stream.hpp>
+#include <swirly/fix/Traits.hpp>
 
 #include <swirly/hdr/Histogram.hpp>
 #include <swirly/hdr/Recorder.hpp>
@@ -39,25 +39,25 @@ int main(int argc, char* argv[])
         Histogram hist{1, 1'000'000, 5};
 
         for (int i{0}; i < 5'000'000; ++i) {
-            const auto [bid, offer] = bbo(12345);
+            const auto [bid, offer] = bbo(12345_tks);
             {
                 Recorder tr{hist};
                 os.reset({4, 3});
                 // clang-format off
-                os << MsgType::View{"W"}
-                   << NoMdEntries{4}
-                   << MdEntryType{'0'}
-                   << MdEntryPx{bid - 1}
-                   << MdEntrySize{2000}
-                   << MdEntryType{'0'}
-                   << MdEntryPx{bid}
-                   << MdEntrySize{1000}
-                   << MdEntryType{'1'}
-                   << MdEntryPx{offer}
-                   << MdEntrySize{1000}
-                   << MdEntryType{'1'}
-                   << MdEntryPx{offer + 1}
-                   << MdEntrySize{2000};
+                os << put_fix<Tag::MsgType>("W"sv)
+                   << put_fix<Tag::NoMdEntries>(4)
+                   << put_fix<Tag::MdEntryType>(Side::Buy)
+                   << put_fix<Tag::MdEntryPx>(bid - 1_tks)
+                   << put_fix<Tag::MdEntrySize>(2000_lts)
+                   << put_fix<Tag::MdEntryType>(Side::Buy)
+                   << put_fix<Tag::MdEntryPx>(bid)
+                   << put_fix<Tag::MdEntrySize>(1000_lts)
+                   << put_fix<Tag::MdEntryType>(Side::Sell)
+                   << put_fix<Tag::MdEntryPx>(offer)
+                   << put_fix<Tag::MdEntrySize>(1000_lts)
+                   << put_fix<Tag::MdEntryType>(Side::Sell)
+                   << put_fix<Tag::MdEntryPx>(offer + 1_tks)
+                   << put_fix<Tag::MdEntrySize>(2000_lts);
                 // clang-format on
                 os.commit();
             }

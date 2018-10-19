@@ -17,7 +17,7 @@
 #ifndef SWIRLY_FIX_RANDOM_HPP
 #define SWIRLY_FIX_RANDOM_HPP
 
-#include <swirly/Config.h>
+#include <swirly/fin/IntTypes.hpp>
 
 #include <random>
 
@@ -43,7 +43,7 @@ class SWIRLY_API RandomBbo {
     RandomBbo(RandomBbo&&) = delete;
     RandomBbo& operator=(RandomBbo&&) = delete;
 
-    std::pair<std::int64_t, std::int64_t> operator()(std::int64_t open);
+    std::pair<Ticks, Ticks> operator()(Ticks open);
 
   private:
     std::random_device& rd_;

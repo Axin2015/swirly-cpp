@@ -5,7 +5,6 @@ variables:
   SWIRLY_BUILD_ARCH: haswell
   SWIRLY_BUILD_SHARED: 'ON'
   SWIRLY_INSTALL_PREFIX: /opt/swirlycloud
-  VERBOSE: 1
 
 stages:
   - check
@@ -18,7 +17,7 @@ check-cppcheck:
     - cd build
     - cmake .. -G 'Unix Makefiles'
   script:
-    - make -j2 cppcheck
+    - VERBOSE=1 make -j2 cppcheck
 
 build-debug-clang:
   stage: build
@@ -33,7 +32,7 @@ build-debug-clang:
       -DCMAKE_CXX_COMPILER=clang++
       -DCMAKE_INSTALL_PREFIX=$SWIRLY_INSTALL_PREFIX
   script:
-    - make -j2 all test swift
+    - VERBOSE=1 make -j2 all test swift
 
 build-release-clang:
   stage: build
@@ -48,7 +47,7 @@ build-release-clang:
       -DCMAKE_CXX_COMPILER=clang++
       -DCMAKE_INSTALL_PREFIX=$SWIRLY_INSTALL_PREFIX
   script:
-    - make -j2 all test swift package
+    - VERBOSE=1 make -j2 all test swift package
   artifacts:
     paths:
       - 'build/*.rpm'
@@ -68,7 +67,7 @@ build-debug-gcc:
       -DCMAKE_CXX_COMPILER=g++
       -DCMAKE_INSTALL_PREFIX=$SWIRLY_INSTALL_PREFIX
   script:
-    - make -j2 all test swift
+    - VERBOSE=1 make -j2 all test swift
 
 build-release-gcc:
   stage: build
@@ -83,7 +82,7 @@ build-release-gcc:
       -DCMAKE_CXX_COMPILER=g++
       -DCMAKE_INSTALL_PREFIX=$SWIRLY_INSTALL_PREFIX
   script:
-    - make -j2 all test swift package
+    - VERBOSE=1 make -j2 all test swift package
   artifacts:
     paths:
       - 'build/*.rpm'

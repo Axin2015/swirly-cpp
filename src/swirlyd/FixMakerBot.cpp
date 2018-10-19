@@ -53,10 +53,11 @@ void FixMakerBot::do_on_logout(CyclTime now, FixConn& conn, const FixSessId& ses
 }
 
 void FixMakerBot::do_on_message(CyclTime now, FixConn& conn, string_view msg, size_t body_off,
-                                Version ver, const FixHeader& hdr)
+                                Version ver, const FixHeaderView& hdr)
 {
-    SWIRLY_INFO << conn.sess_id() << " <MakerBot> on_message: " << hdr.msg_type.value;
-    if (hdr.msg_type == "8") {
+    const auto& msg_type = get<Tag::MsgType>(hdr);
+    SWIRLY_INFO << conn.sess_id() << " <MakerBot> on_message: " << msg_type;
+    if (msg_type == "8"sv) {
         msg.remove_prefix(body_off);
         msg.remove_suffix(CheckSumLen);
         conn_->send(now, "8"sv, msg);
@@ -90,28 +91,28 @@ void FixMakerBot::on_market_data(CyclTime now, Timer& tmr)
 {
     assert(conn_);
     auto fn = [this](CyclTime now, ostream& os) {
-        const auto [bid, offer] = bbo_(12345);
+        const auto [bid, offer] = bbo_(12345_tks);
         // clang-format off
-        os << SymbolField{"EURUSD"sv}
-           << NoMdEntries{6}
-           << MdEntryType{'0'}
-           << MdEntryPx{bid - 2}
-           << MdEntrySize{3000}
-           << MdEntryType{'0'}
-           << MdEntryPx{bid - 1}
-           << MdEntrySize{2000}
-           << MdEntryType{'0'}
-           << MdEntryPx{bid}
-           << MdEntrySize{1000}
-           << MdEntryType{'1'}
-           << MdEntryPx{offer}
-           << MdEntrySize{1000}
-           << MdEntryType{'1'}
-           << MdEntryPx{offer + 1}
-           << MdEntrySize{2000}
-           << MdEntryType{'1'}
-           << MdEntryPx{offer + 2}
-           << MdEntrySize{3000};
+        os << put_fix<Tag::Symbol>("EURUSD"sv)
+           << put_fix<Tag::NoMdEntries>(6)
+           << put_fix<Tag::MdEntryType>(Side::Buy)
+           << put_fix<Tag::MdEntryPx>(bid - 2_tks)
+           << put_fix<Tag::MdEntrySize>(3000_lts)
+           << put_fix<Tag::MdEntryType>(Side::Buy)
+           << put_fix<Tag::MdEntryPx>(bid - 1_tks)
+           << put_fix<Tag::MdEntrySize>(2000_lts)
+           << put_fix<Tag::MdEntryType>(Side::Buy)
+           << put_fix<Tag::MdEntryPx>(bid)
+           << put_fix<Tag::MdEntrySize>(1000_lts)
+           << put_fix<Tag::MdEntryType>(Side::Sell)
+           << put_fix<Tag::MdEntryPx>(offer)
+           << put_fix<Tag::MdEntrySize>(1000_lts)
+           << put_fix<Tag::MdEntryType>(Side::Sell)
+           << put_fix<Tag::MdEntryPx>(offer + 1_tks)
+           << put_fix<Tag::MdEntrySize>(2000_lts)
+           << put_fix<Tag::MdEntryType>(Side::Sell)
+           << put_fix<Tag::MdEntryPx>(offer + 2_tks)
+           << put_fix<Tag::MdEntrySize>(3000_lts);
         // clang-format on
     };
     conn_->send(now, "W"sv, fn);
@@ -122,7 +123,7 @@ void FixMakerBot::on_status(CyclTime now, Timer& tmr)
     assert(conn_);
     if (count_++ < 3) {
         auto fn = [](CyclTime now, ostream& os) {
-            os << TradingSessionId::View{"OPEN"} << TradSesStatus{2};
+            os << put_fix<Tag::TradingSessionId>("OPEN"sv) << put_fix<Tag::TradSesStatus>(2);
         };
         conn_->send(now, "h"sv, fn);
     } else {

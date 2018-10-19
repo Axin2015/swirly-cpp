@@ -17,6 +17,8 @@
 #ifndef SWIRLY_FIX_TYPES_HPP
 #define SWIRLY_FIX_TYPES_HPP
 
+#include <swirly/fin/IntTypes.hpp>
+
 #include <swirly/util/Version.hpp>
 
 namespace swirly {
@@ -53,6 +55,19 @@ enum class FixMode {
     Acceptor
 };
 using FixPair = std::pair<int, std::string_view>;
+
+struct ExecType {
+    State state{State::None};
+};
+
+struct MdEntryType {
+    Side side{Side::None};
+};
+
+struct OrdStatus {
+    State state{State::None};
+    bool filled{false};
+};
 
 } // namespace fix
 } // namespace swirly

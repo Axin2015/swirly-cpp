@@ -14,36 +14,4 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Group.hpp"
-
-#include "Lexer.hpp"
-
-#include <swirly/app/Exception.hpp>
-
-namespace swirly {
-inline namespace fix {
-using namespace std;
-
-void parse_group(FixLexer& lex, MdEntry& grp)
-{
-    constexpr string_view ErrMsg{"missing MdEntryType(269)"};
-    if (lex.empty()) {
-        throw ProtocolException{ErrMsg};
-    }
-    const auto [t, v] = lex.next();
-    if (t != +Tag::MdEntryType) {
-        throw ProtocolException{ErrMsg};
-    }
-    set<Tag::MdEntryType>(grp, v);
-    while (!lex.empty()) {
-        const auto [t, v] = lex.top();
-        if (t == +Tag::MdEntryType || !grp.set(box<Tag>(t), v)) {
-            // End of group.
-            break;
-        }
-        lex.pop();
-    }
-}
-
-} // namespace fix
-} // namespace swirly
+#include "Traits.hpp"

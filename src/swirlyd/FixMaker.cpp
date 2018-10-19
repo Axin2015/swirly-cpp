@@ -82,14 +82,15 @@ void FixMaker::do_on_logout(CyclTime now, FixConn& conn, const FixSessId& sess_i
 }
 
 void FixMaker::do_on_message(CyclTime now, FixConn& conn, string_view msg, size_t body_off,
-                             Version ver, const FixHeader& hdr)
+                             Version ver, const FixHeaderView& hdr)
 {
-    if (hdr.msg_type == "8") {
+    const auto& msg_type = get<Tag::MsgType>(hdr);
+    if (msg_type == "8"sv) {
         on_execution_report(now, conn, msg, body_off, ver, hdr);
-    } else if (hdr.msg_type == "W") {
+    } else if (msg_type == "W"sv) {
         on_market_data_snapshot(now, conn, msg, body_off, ver, hdr);
     } else {
-        SWIRLY_INFO << conn.sess_id() << " <Maker> on_message: " << hdr.msg_type.value;
+        SWIRLY_INFO << conn.sess_id() << " <Maker> on_message: " << msg_type;
     }
 }
 
@@ -116,7 +117,7 @@ void FixMaker::do_send(CyclTime now, string_view msg_type, string_view msg)
 }
 
 void FixMaker::on_execution_report(CyclTime now, FixConn& conn, string_view msg, size_t body_off,
-                                   Version ver, const FixHeader& hdr)
+                                   Version ver, const FixHeaderView& hdr)
 {
     SWIRLY_INFO << conn.sess_id() << " <Maker> on_execution_report";
 
@@ -125,19 +126,19 @@ void FixMaker::on_execution_report(CyclTime now, FixConn& conn, string_view msg,
 
     // Archive on trade acknowledgement.
 
-    const auto& instr = lob_app_.instr(er.symbol.value);
-    const auto market_id = to_market_id(instr.id(), er.maturity_date.value);
-    lob_app_.archive_trade(now, sess_, market_id, er.exec_id.value);
+    const auto& instr = lob_app_.instr(get<Tag::Symbol>(er));
+    const auto market_id = to_market_id(instr.id(), get<Tag::MaturityDate>(er));
+    lob_app_.archive_trade(now, sess_, market_id, get<Tag::ExecId>(er));
 }
 
 void FixMaker::on_market_data_snapshot(CyclTime now, FixConn& conn, string_view msg,
-                                       size_t body_off, Version ver, const FixHeader& hdr)
+                                       size_t body_off, Version ver, const FixHeaderView& hdr)
 {
     mds_.clear();
     parse_body(msg, body_off, mds_);
 
-    const auto& instr = lob_app_.instr(mds_.symbol.value);
-    const auto market_id = to_market_id(instr.id(), mds_.maturity_date.value);
+    const auto& instr = lob_app_.instr(get<Tag::Symbol>(mds_));
+    const auto market_id = to_market_id(instr.id(), get<Tag::MaturityDate>(mds_));
     const auto& market = lob_app_.market(market_id);
 
     auto& orders = order_map_[market_id];
@@ -146,19 +147,9 @@ void FixMaker::on_market_data_snapshot(CyclTime now, FixConn& conn, string_view 
     }
     orders.clear();
     for (const auto& md_entry : mds_.md_entries) {
-        Side side;
-        switch (md_entry.type.value) {
-        case '0':
-            side = Side::Buy;
-            break;
-        case '1':
-            side = Side::Sell;
-            break;
-        default:
-            continue;
-        }
-        const Lots lots{md_entry.size.value};
-        const Ticks ticks{md_entry.px.value};
+        const Side side{get<Tag::MdEntryType>(md_entry).side};
+        const Lots lots{get<Tag::MdEntrySize>(md_entry)};
+        const Ticks ticks{get<Tag::MdEntryPx>(md_entry)};
         orders.push_back(lob_app_.create_quote(now, sess_, market, ""sv, side, lots, ticks, 1_lts));
     }
 }
@@ -168,23 +159,24 @@ void FixMaker::on_trade(CyclTime now, const Sess& sess, const ExecPtr& trade)
     if (conn_) {
         auto fn = [&trade](CyclTime now, ostream& os) {
             // clang-format off
-            os << SymbolField{trade->instr()}
-               << MaturityDate{maybe_jd_to_iso(trade->settl_day())}
-               << ExecId{trade->id()}
-               << OrderId{trade->order_id()}
-               << to_fix<ExecType>(trade->state(), trade->resd_lots())
-               << to_fix<OrdStatus>(trade->state(), trade->resd_lots())
-               << to_fix(trade->side())
-               << OrderQty{trade->lots()}
-               << Price{trade->ticks()}
-               << LeavesQty{trade->resd_lots()}
-               << CumQty{trade->exec_lots()}
-               << AvgPx{to_avg_ticks(trade->exec_lots(), trade->exec_cost())};
+            os << put_fix<Tag::Symbol>(trade->instr())
+               << put_fix<Tag::MaturityDate>(maybe_jd_to_iso(trade->settl_day()))
+               << put_fix<Tag::ExecId>(trade->id())
+               << put_fix<Tag::OrderId>(trade->order_id())
+               << put_fix<Tag::ExecType>(trade->state())
+               << put_fix<Tag::OrdStatus>(OrdStatus{trade->state(), trade->resd_lots() == 0_lts})
+               << put_fix<Tag::Side>(trade->side())
+               << put_fix<Tag::OrderQty>(trade->lots())
+               << put_fix<Tag::Price>(trade->ticks())
+               << put_fix<Tag::LeavesQty>(trade->resd_lots())
+               << put_fix<Tag::CumQty>(trade->exec_lots())
+               << put_fix<Tag::AvgPx>(to_avg_ticks(trade->exec_lots(), trade->exec_cost()));
             // clang-format off
             if (trade->last_lots() != 0_lts) {
-                os << LastPx{trade->last_ticks()} << LastQty{trade->last_lots()};
+                os << put_fix<Tag::LastPx>(trade->last_ticks())
+                   << put_fix<Tag::LastQty>(trade->last_lots());
             }
-            os << MinQty{trade->min_lots()};
+            os << put_fix<Tag::MinQty>(trade->min_lots());
         };
         conn_->send(now, "8"sv, fn);
     }

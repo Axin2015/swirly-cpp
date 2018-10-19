@@ -32,28 +32,30 @@ set(lib_SOURCES
   Config.cpp
   Conn.cpp
   Ctx.cpp
-  Field.cpp
   Group.cpp
   Handler.cpp
   Header.cpp
   Initiator.cpp
   Lexer.cpp
+  List.cpp
   Msg.cpp
   Parser.cpp
   Random.cpp
   SessId.cpp
   Stream.cpp
+  Tag.cpp
+  Traits.cpp
   Types.cpp)
 
 add_library(swirly-fix-static STATIC ${lib_SOURCES})
 set_target_properties(swirly-fix-static PROPERTIES OUTPUT_NAME swirly-fix)
-target_link_libraries(swirly-fix-static swirly-app-static)
+target_link_libraries(swirly-fix-static swirly-fin-static)
 install(TARGETS swirly-fix-static DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT static)
 
 if(SWIRLY_BUILD_SHARED)
   add_library(swirly-fix-shared SHARED ${lib_SOURCES})
   set_target_properties(swirly-fix-shared PROPERTIES OUTPUT_NAME swirly-fix)
-  target_link_libraries(swirly-fix-shared swirly-app-shared)
+  target_link_libraries(swirly-fix-shared swirly-fin-shared)
   install(TARGETS swirly-fix-shared DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT shared)
 endif()
 
