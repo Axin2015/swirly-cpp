@@ -67,7 +67,7 @@ class RestApp {
 
     void ref_data_request(CyclTime now, const RestRequest& req, HttpStream& os);
     void asset_request(CyclTime now, const RestRequest& req, HttpStream& os);
-    void instr_request(CyclTime now, const RestRequest& req, HttpStream& os);
+    void product_request(CyclTime now, const RestRequest& req, HttpStream& os);
 
     void sess_request(CyclTime now, const RestRequest& req, HttpStream& os);
     void market_request(CyclTime now, const RestRequest& req, HttpStream& os);

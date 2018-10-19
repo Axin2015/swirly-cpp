@@ -105,20 +105,20 @@ namespace {
   accnt = 'null' %nullAccnt
     | str >beginAccnt %endAccnt;
 
-  action nullInstr {
-    fields_ &= ~Instr;
-    instr_.len = 0;
+  action nullProduct {
+    fields_ &= ~Product;
+    product_.len = 0;
   }
-  action beginInstr {
-    str_.len = &instr_.len;
-    str_.buf = instr_.buf;
+  action beginProduct {
+    str_.len = &product_.len;
+    str_.buf = product_.buf;
     str_.max = MaxSymbol;
   }
-  action endInstr {
-    fields_ |= Instr;
+  action endProduct {
+    fields_ |= Product;
   }
-  instr = 'null' %nullInstr
-    | str >beginInstr %endInstr;
+  product = 'null' %nullProduct
+    | str >beginProduct %endProduct;
 
   action nullSettlDate {
     fields_ &= ~SettlDate;
@@ -241,7 +241,7 @@ namespace {
 
   pair = '"symbol"'i colon symbol
     | '"accnt"'i colon accnt
-    | '"instr"'i colon instr
+    | '"product"'i colon product
     | '"settl_date"'i colon settlDate
     | '"ref"'i colon ref
     | '"state"'i colon state
@@ -279,7 +279,7 @@ void RestBody::reset(bool clear) noexcept
 
   symbol_.len = 0;
   accnt_.len = 0;
-  instr_.len = 0;
+  product_.len = 0;
   settl_date_ = 0_ymd;
   ref_.len = 0;
   state_ = 0;

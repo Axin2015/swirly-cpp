@@ -87,9 +87,9 @@ class SWIRLY_API MsgQueue {
     /**
      * Create Market.
      */
-    void create_market(WallTime now, Id64 id, Symbol instr, JDay settl_day, MarketState state)
+    void create_market(WallTime now, Id64 id, Symbol product, JDay settl_day, MarketState state)
     {
-        do_create_market(now, id, instr, settl_day, state);
+        do_create_market(now, id, product, settl_day, state);
     }
     /**
      * Update Market.
@@ -123,7 +123,7 @@ class SWIRLY_API MsgQueue {
     bool pop(Msg& msg) noexcept { return mq_.pop(msg); }
 
   private:
-    void do_create_market(WallTime now, Id64 id, Symbol instr, JDay settl_day, MarketState state);
+    void do_create_market(WallTime now, Id64 id, Symbol product, JDay settl_day, MarketState state);
 
     void do_update_market(WallTime now, Id64 id, MarketState state);
 

@@ -41,7 +41,7 @@ class TestCase(RestTestCase):
           self.check_auth(client)
 
           self.get_all(client)
-          self.get_by_instr(client)
+          self.get_by_product(client)
           self.get_by_settl_date(client)
 
       with Server(db_file, self.now) as server:
@@ -49,7 +49,7 @@ class TestCase(RestTestCase):
           client.set_time(self.now)
 
           self.get_all(client)
-          self.get_by_instr(client)
+          self.get_by_product(client)
           self.get_by_settl_date(client)
 
   def check_auth(self, client):
@@ -91,7 +91,7 @@ class TestCase(RestTestCase):
       u'accnt': u'MARAYL',
       u'buy_cost': 37038,
       u'buy_lots': 3,
-      u'instr': u'EURUSD',
+      u'product': u'EURUSD',
       u'market_id': 82255,
       u'open_cost': 0,
       u'sell_cost': 37038,
@@ -101,7 +101,7 @@ class TestCase(RestTestCase):
       u'accnt': u'MARAYL',
       u'buy_cost': 61730,
       u'buy_lots': 5,
-      u'instr': u'EURUSD',
+      u'product': u'EURUSD',
       u'market_id': 82286,
       u'open_cost': 0,
       u'sell_cost': 61730,
@@ -111,7 +111,7 @@ class TestCase(RestTestCase):
       u'accnt': u'MARAYL',
       u'buy_cost': 107422,
       u'buy_lots': 7,
-      u'instr': u'GBPUSD',
+      u'product': u'GBPUSD',
       u'market_id': 147791,
       u'open_cost': 0,
       u'sell_cost': 107422,
@@ -119,7 +119,7 @@ class TestCase(RestTestCase):
       u'settl_date': 20140302
     }], resp.content)
 
-  def get_by_instr(self, client):
+  def get_by_product(self, client):
     client.set_trader('MARAYL')
     resp = client.send('GET', '/api/sess/posn/EURUSD')
 
@@ -129,7 +129,7 @@ class TestCase(RestTestCase):
       u'accnt': u'MARAYL',
       u'buy_cost': 37038,
       u'buy_lots': 3,
-      u'instr': u'EURUSD',
+      u'product': u'EURUSD',
       u'market_id': 82255,
       u'open_cost': 0,
       u'sell_cost': 37038,
@@ -139,7 +139,7 @@ class TestCase(RestTestCase):
       u'accnt': u'MARAYL',
       u'buy_cost': 61730,
       u'buy_lots': 5,
-      u'instr': u'EURUSD',
+      u'product': u'EURUSD',
       u'market_id': 82286,
       u'open_cost': 0,
       u'sell_cost': 61730,
@@ -157,7 +157,7 @@ class TestCase(RestTestCase):
       u'accnt': u'MARAYL',
       u'buy_cost': 37038,
       u'buy_lots': 3,
-      u'instr': u'EURUSD',
+      u'product': u'EURUSD',
       u'market_id': 82255,
       u'open_cost': 0,
       u'sell_cost': 37038,

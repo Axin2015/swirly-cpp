@@ -32,10 +32,10 @@ class SWIRLY_API Market
 : public RefCount<Market, ThreadUnsafePolicy>
 , public Comparable<Market> {
   public:
-    Market(Id64 id, Symbol instr, JDay settl_day, MarketState state, WallTime last_time = {},
+    Market(Id64 id, Symbol product, JDay settl_day, MarketState state, WallTime last_time = {},
            Lots last_lots = 0_lts, Ticks last_ticks = 0_tks, Id64 max_id = 0_id64) noexcept
     : id_{id}
-    , instr_{instr}
+    , product_{product}
     , settl_day_{settl_day}
     , state_{state}
     , last_time_{last_time}
@@ -65,7 +65,7 @@ class SWIRLY_API Market
 
     int compare(const Market& rhs) const noexcept { return swirly::compare(id_, rhs.id_); }
     auto id() const noexcept { return id_; }
-    auto instr() const noexcept { return instr_; }
+    auto product() const noexcept { return product_; }
     auto settl_day() const noexcept { return settl_day_; }
     auto state() const noexcept { return state_; }
     WallTime last_time() const noexcept { return last_time_; }
@@ -116,7 +116,7 @@ class SWIRLY_API Market
     }
 
     const Id64 id_;
-    const Symbol instr_;
+    const Symbol product_;
     const JDay settl_day_;
     MarketState state_;
     WallTime last_time_;

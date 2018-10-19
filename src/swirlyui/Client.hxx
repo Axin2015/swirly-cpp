@@ -19,10 +19,10 @@
 
 #include "AssetModel.hxx"
 #include "ExecModel.hxx"
-#include "InstrModel.hxx"
 #include "MarketModel.hxx"
 #include "OrderModel.hxx"
 #include "PosnModel.hxx"
+#include "ProductModel.hxx"
 #include "TradeModel.hxx"
 
 #include <QObject>
@@ -38,7 +38,7 @@ class Client : public QObject {
     ~Client() override = default;
 
     const AssetModel& asset_model() const noexcept { return asset_model_; }
-    const InstrModel& instr_model() const noexcept { return instr_model_; }
+    const ProductModel& product_model() const noexcept { return product_model_; }
     const MarketModel& market_model() const noexcept { return market_model_; }
     const OrderModel& order_model() const noexcept { return order_model_; }
     const ExecModel& exec_model() const noexcept { return exec_model_; }
@@ -46,16 +46,16 @@ class Client : public QObject {
     const PosnModel& posn_model() const noexcept { return posn_model_; }
 
     AssetModel& asset_model() noexcept { return asset_model_; }
-    InstrModel& instr_model() noexcept { return instr_model_; }
+    ProductModel& product_model() noexcept { return product_model_; }
     MarketModel& market_model() noexcept { return market_model_; }
     OrderModel& order_model() noexcept { return order_model_; }
     ExecModel& exec_model() noexcept { return exec_model_; }
     TradeModel& trade_model() noexcept { return trade_model_; }
     PosnModel& posn_model() noexcept { return posn_model_; }
 
-    virtual void create_market(const Instr& instr, QDate settl_date) = 0;
-    virtual void create_order(const Instr& instr, QDate settl_date, const QString& ref, Side side,
-                              Lots lots, Ticks ticks)
+    virtual void create_market(const Product& product, QDate settl_date) = 0;
+    virtual void create_order(const Product& product, QDate settl_date, const QString& ref,
+                              Side side, Lots lots, Ticks ticks)
         = 0;
     virtual void cancel_orders(const OrderKeys& keys) = 0;
 
@@ -70,7 +70,7 @@ class Client : public QObject {
 
   private:
     AssetModel asset_model_;
-    InstrModel instr_model_;
+    ProductModel product_model_;
     MarketModel market_model_;
     OrderModel order_model_;
     ExecModel exec_model_;

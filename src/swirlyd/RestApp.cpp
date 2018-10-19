@@ -218,7 +218,7 @@ void RestApp::ref_data_request(CyclTime now, const RestRequest& req, HttpStream&
         if (req.method() == HttpMethod::Get) {
             // GET /api/refdata
             match_method_ = true;
-            const int bs{EntitySet::Asset | EntitySet::Instr};
+            const int bs{EntitySet::Asset | EntitySet::Product};
             impl_.get_ref_data(now, bs, os);
         }
         return;
@@ -248,8 +248,8 @@ void RestApp::ref_data_request(CyclTime now, const RestRequest& req, HttpStream&
     case EntitySet::Asset:
         asset_request(now, req, os);
         break;
-    case EntitySet::Instr:
-        instr_request(now, req, os);
+    case EntitySet::Product:
+        product_request(now, req, os);
         break;
     }
 }
@@ -286,17 +286,17 @@ void RestApp::asset_request(CyclTime now, const RestRequest& req, HttpStream& os
     }
 }
 
-void RestApp::instr_request(CyclTime now, const RestRequest& req, HttpStream& os)
+void RestApp::product_request(CyclTime now, const RestRequest& req, HttpStream& os)
 {
     if (path_.empty()) {
 
-        // /api/refdata/instr
+        // /api/refdata/product
         match_path_ = true;
 
         if (req.method() == HttpMethod::Get) {
-            // GET /api/refdata/instr
+            // GET /api/refdata/product
             match_method_ = true;
-            impl_.get_instr(now, os);
+            impl_.get_product(now, os);
         }
         return;
     }
@@ -306,13 +306,13 @@ void RestApp::instr_request(CyclTime now, const RestRequest& req, HttpStream& os
 
     if (path_.empty()) {
 
-        // /api/refdata/instr/SYMBOL
+        // /api/refdata/product/SYMBOL
         match_path_ = true;
 
         if (req.method() == HttpMethod::Get) {
-            // GET /api/refdata/instr/SYMBOL
+            // GET /api/refdata/product/SYMBOL
             match_method_ = true;
-            impl_.get_instr(now, symbol, os);
+            impl_.get_product(now, symbol, os);
         }
         return;
     }
@@ -392,12 +392,12 @@ void RestApp::market_request(CyclTime now, const RestRequest& req, HttpStream& o
             match_method_ = true;
             get_admin(req);
             {
-                constexpr auto ReqFields = RestBody::Instr;
+                constexpr auto ReqFields = RestBody::Product;
                 constexpr auto OptFields = RestBody::SettlDate | RestBody::State;
                 if (!req.body().valid(ReqFields, OptFields)) {
                     throw InvalidException{"request fields are invalid"sv};
                 }
-                impl_.post_market(now, req.body().instr(), req.body().settl_date(),
+                impl_.post_market(now, req.body().product(), req.body().settl_date(),
                                   req.body().state(), os);
             }
             break;
@@ -407,22 +407,22 @@ void RestApp::market_request(CyclTime now, const RestRequest& req, HttpStream& o
         return;
     }
 
-    const auto instr = path_.top();
+    const auto product = path_.top();
     path_.pop();
 
     if (path_.empty()) {
 
-        // /api/market/INSTR
+        // /api/market/PRODUCT
         match_path_ = true;
 
         switch (req.method()) {
         case HttpMethod::Get:
-            // GET /api/market/INSTR
+            // GET /api/market/PRODUCT
             match_method_ = true;
-            impl_.get_market(now, instr, os);
+            impl_.get_market(now, product, os);
             break;
         case HttpMethod::Post:
-            // POST /api/market/INSTR
+            // POST /api/market/PRODUCT
             match_method_ = true;
             get_admin(req);
             {
@@ -431,7 +431,7 @@ void RestApp::market_request(CyclTime now, const RestRequest& req, HttpStream& o
                 if (!req.body().valid(ReqFields, OptFields)) {
                     throw InvalidException{"request fields are invalid"sv};
                 }
-                impl_.post_market(now, instr, req.body().settl_date(), req.body().state(), os);
+                impl_.post_market(now, product, req.body().settl_date(), req.body().state(), os);
             }
             break;
         default:
@@ -445,17 +445,17 @@ void RestApp::market_request(CyclTime now, const RestRequest& req, HttpStream& o
 
     if (path_.empty()) {
 
-        // /api/market/INSTR/SETTL_DATE
+        // /api/market/PRODUCT/SETTL_DATE
         match_path_ = true;
 
         switch (req.method()) {
         case HttpMethod::Get:
-            // GET /api/market/INSTR/SETTL_DATE
+            // GET /api/market/PRODUCT/SETTL_DATE
             match_method_ = true;
-            impl_.get_market(now, instr, settl_date, os);
+            impl_.get_market(now, product, settl_date, os);
             break;
         case HttpMethod::Post:
-            // POST /api/market/INSTR/SETTL_DATE
+            // POST /api/market/PRODUCT/SETTL_DATE
             match_method_ = true;
             get_admin(req);
             {
@@ -464,11 +464,11 @@ void RestApp::market_request(CyclTime now, const RestRequest& req, HttpStream& o
                 if (!req.body().valid(ReqFields, OptFields)) {
                     throw InvalidException{"request fields are invalid"sv};
                 }
-                impl_.post_market(now, instr, settl_date, req.body().state(), os);
+                impl_.post_market(now, product, settl_date, req.body().state(), os);
             }
             break;
         case HttpMethod::Put:
-            // PUT /api/market/INSTR/SETTL_DATE
+            // PUT /api/market/PRODUCT/SETTL_DATE
             match_method_ = true;
             get_admin(req);
             {
@@ -476,7 +476,7 @@ void RestApp::market_request(CyclTime now, const RestRequest& req, HttpStream& o
                 if (!req.body().valid(ReqFields)) {
                     throw InvalidException{"request fields are invalid"sv};
                 }
-                impl_.put_market(now, instr, settl_date, req.body().state(), os);
+                impl_.put_market(now, product, settl_date, req.body().state(), os);
             }
             break;
         default:
@@ -506,12 +506,12 @@ void RestApp::order_request(CyclTime now, const RestRequest& req, HttpStream& os
                 // Validate account before request.
                 const auto accnt = get_trader(req);
                 constexpr auto ReqFields
-                    = RestBody::Instr | RestBody::Side | RestBody::Lots | RestBody::Ticks;
+                    = RestBody::Product | RestBody::Side | RestBody::Lots | RestBody::Ticks;
                 constexpr auto OptFields = RestBody::SettlDate | RestBody::Ref | RestBody::MinLots;
                 if (!req.body().valid(ReqFields, OptFields)) {
                     throw InvalidException{"request fields are invalid"sv};
                 }
-                impl_.post_order(now, accnt, req.body().instr(), req.body().settl_date(),
+                impl_.post_order(now, accnt, req.body().product(), req.body().settl_date(),
                                  req.body().ref(), req.body().side(), req.body().lots(),
                                  req.body().ticks(), req.body().min_lots(), os);
             }
@@ -522,22 +522,22 @@ void RestApp::order_request(CyclTime now, const RestRequest& req, HttpStream& os
         return;
     }
 
-    const auto instr = path_.top();
+    const auto product = path_.top();
     path_.pop();
 
     if (path_.empty()) {
 
-        // /api/sess/order/INSTR
+        // /api/sess/order/PRODUCT
         match_path_ = true;
 
         switch (req.method()) {
         case HttpMethod::Get:
-            // GET /api/sess/order/INSTR
+            // GET /api/sess/order/PRODUCT
             match_method_ = true;
-            impl_.get_order(now, get_trader(req), instr, os);
+            impl_.get_order(now, get_trader(req), product, os);
             break;
         case HttpMethod::Post:
-            // POST /api/sess/order/INSTR
+            // POST /api/sess/order/PRODUCT
             match_method_ = true;
             {
                 // Validate account before request.
@@ -547,7 +547,7 @@ void RestApp::order_request(CyclTime now, const RestRequest& req, HttpStream& os
                 if (!req.body().valid(ReqFields, OptFields)) {
                     throw InvalidException{"request fields are invalid"sv};
                 }
-                impl_.post_order(now, accnt, instr, req.body().settl_date(), req.body().ref(),
+                impl_.post_order(now, accnt, product, req.body().settl_date(), req.body().ref(),
                                  req.body().side(), req.body().lots(), req.body().ticks(),
                                  req.body().min_lots(), os);
             }
@@ -563,17 +563,17 @@ void RestApp::order_request(CyclTime now, const RestRequest& req, HttpStream& os
 
     if (path_.empty()) {
 
-        // /api/sess/order/INSTR/SETTL_DATE
+        // /api/sess/order/PRODUCT/SETTL_DATE
         match_path_ = true;
 
         switch (req.method()) {
         case HttpMethod::Get:
-            // GET /api/sess/order/INSTR/SETTL_DATE
+            // GET /api/sess/order/PRODUCT/SETTL_DATE
             match_method_ = true;
-            impl_.get_order(now, get_trader(req), instr, settl_date, os);
+            impl_.get_order(now, get_trader(req), product, settl_date, os);
             break;
         case HttpMethod::Post:
-            // POST /api/sess/order/INSTR/SETTL_DATE
+            // POST /api/sess/order/PRODUCT/SETTL_DATE
             match_method_ = true;
             {
                 // Validate account before request.
@@ -583,8 +583,9 @@ void RestApp::order_request(CyclTime now, const RestRequest& req, HttpStream& os
                 if (!req.body().valid(ReqFields, OptFields)) {
                     throw InvalidException{"request fields are invalid"sv};
                 }
-                impl_.post_order(now, accnt, instr, settl_date, req.body().ref(), req.body().side(),
-                                 req.body().lots(), req.body().ticks(), req.body().min_lots(), os);
+                impl_.post_order(now, accnt, product, settl_date, req.body().ref(),
+                                 req.body().side(), req.body().lots(), req.body().ticks(),
+                                 req.body().min_lots(), os);
             }
             break;
         default:
@@ -598,17 +599,17 @@ void RestApp::order_request(CyclTime now, const RestRequest& req, HttpStream& os
 
     if (path_.empty()) {
 
-        // /api/sess/order/INSTR/SETTL_DATE/ID,ID...
+        // /api/sess/order/PRODUCT/SETTL_DATE/ID,ID...
         match_path_ = true;
 
         switch (req.method()) {
         case HttpMethod::Get:
-            // GET /api/sess/order/INSTR/SETTL_DATE/ID
+            // GET /api/sess/order/PRODUCT/SETTL_DATE/ID
             match_method_ = true;
-            impl_.get_order(now, get_trader(req), instr, settl_date, ids_[0], os);
+            impl_.get_order(now, get_trader(req), product, settl_date, ids_[0], os);
             break;
         case HttpMethod::Put:
-            // PUT /api/sess/order/INSTR/SETTL_DATE/ID,ID...
+            // PUT /api/sess/order/PRODUCT/SETTL_DATE/ID,ID...
             match_method_ = true;
             {
                 // Validate account before request.
@@ -617,7 +618,7 @@ void RestApp::order_request(CyclTime now, const RestRequest& req, HttpStream& os
                 if (req.body().fields() != ReqFields) {
                     throw InvalidException{"request fields are invalid"sv};
                 }
-                impl_.put_order(now, accnt, instr, settl_date, ids_, req.body().lots(), os);
+                impl_.put_order(now, accnt, product, settl_date, ids_, req.body().lots(), os);
             }
             break;
         default:
@@ -662,13 +663,13 @@ void RestApp::trade_request(CyclTime now, const RestRequest& req, HttpStream& os
             get_admin(req);
             {
                 constexpr auto ReqFields
-                    = RestBody::Instr | RestBody::Accnt | RestBody::Side | RestBody::Lots;
+                    = RestBody::Product | RestBody::Accnt | RestBody::Side | RestBody::Lots;
                 constexpr auto OptFields = RestBody::SettlDate | RestBody::Ref | RestBody::Ticks
                     | RestBody::LiqInd | RestBody::Cpty;
                 if (!req.body().valid(ReqFields, OptFields)) {
                     throw InvalidException{"request fields are invalid"sv};
                 }
-                impl_.post_trade(now, req.body().accnt(), req.body().instr(),
+                impl_.post_trade(now, req.body().accnt(), req.body().product(),
                                  req.body().settl_date(), req.body().ref(), req.body().side(),
                                  req.body().lots(), req.body().ticks(), req.body().liq_ind(),
                                  req.body().cpty(), os);
@@ -680,22 +681,22 @@ void RestApp::trade_request(CyclTime now, const RestRequest& req, HttpStream& os
         return;
     }
 
-    const auto instr = path_.top();
+    const auto product = path_.top();
     path_.pop();
 
     if (path_.empty()) {
 
-        // /api/sess/trade/INSTR
+        // /api/sess/trade/PRODUCT
         match_path_ = true;
 
         switch (req.method()) {
         case HttpMethod::Get:
-            // GET /api/sess/trade/INSTR
+            // GET /api/sess/trade/PRODUCT
             match_method_ = true;
-            impl_.get_trade(now, get_trader(req), instr, os);
+            impl_.get_trade(now, get_trader(req), product, os);
             break;
         case HttpMethod::Post:
-            // POST /api/sess/trade/INSTR
+            // POST /api/sess/trade/PRODUCT
             match_method_ = true;
             get_admin(req);
             {
@@ -705,7 +706,7 @@ void RestApp::trade_request(CyclTime now, const RestRequest& req, HttpStream& os
                 if (!req.body().valid(ReqFields, OptFields)) {
                     throw InvalidException{"request fields are invalid"sv};
                 }
-                impl_.post_trade(now, req.body().accnt(), instr, req.body().settl_date(),
+                impl_.post_trade(now, req.body().accnt(), product, req.body().settl_date(),
                                  req.body().ref(), req.body().side(), req.body().lots(),
                                  req.body().ticks(), req.body().liq_ind(), req.body().cpty(), os);
             }
@@ -721,17 +722,17 @@ void RestApp::trade_request(CyclTime now, const RestRequest& req, HttpStream& os
 
     if (path_.empty()) {
 
-        // /api/sess/trade/INSTR/SETTL_DATE
+        // /api/sess/trade/PRODUCT/SETTL_DATE
         match_path_ = true;
 
         switch (req.method()) {
         case HttpMethod::Get:
-            // GET /api/sess/trade/INSTR/SETTL_DATE
+            // GET /api/sess/trade/PRODUCT/SETTL_DATE
             match_method_ = true;
-            impl_.get_trade(now, get_trader(req), instr, settl_date, os);
+            impl_.get_trade(now, get_trader(req), product, settl_date, os);
             break;
         case HttpMethod::Post:
-            // POST /api/sess/trade/INSTR/SETTL_DATE
+            // POST /api/sess/trade/PRODUCT/SETTL_DATE
             match_method_ = true;
             get_admin(req);
             {
@@ -741,7 +742,7 @@ void RestApp::trade_request(CyclTime now, const RestRequest& req, HttpStream& os
                 if (!req.body().valid(ReqFields, OptFields)) {
                     throw InvalidException{"request fields are invalid"sv};
                 }
-                impl_.post_trade(now, req.body().accnt(), instr, settl_date, req.body().ref(),
+                impl_.post_trade(now, req.body().accnt(), product, settl_date, req.body().ref(),
                                  req.body().side(), req.body().lots(), req.body().ticks(),
                                  req.body().liq_ind(), req.body().cpty(), os);
             }
@@ -757,19 +758,19 @@ void RestApp::trade_request(CyclTime now, const RestRequest& req, HttpStream& os
 
     if (path_.empty()) {
 
-        // /api/sess/trade/INSTR/SETTL_DATE/ID,ID...
+        // /api/sess/trade/PRODUCT/SETTL_DATE/ID,ID...
         match_path_ = true;
 
         switch (req.method()) {
         case HttpMethod::Get:
-            // GET /api/sess/trade/INSTR/SETTL_DATE/ID
+            // GET /api/sess/trade/PRODUCT/SETTL_DATE/ID
             match_method_ = true;
-            impl_.get_trade(now, get_trader(req), instr, settl_date, ids_[0], os);
+            impl_.get_trade(now, get_trader(req), product, settl_date, ids_[0], os);
             break;
         case HttpMethod::Delete:
-            // DELETE /api/sess/trade/INSTR/SETTL_DATE/ID,ID...
+            // DELETE /api/sess/trade/PRODUCT/SETTL_DATE/ID,ID...
             match_method_ = true;
-            impl_.delete_trade(now, get_trader(req), instr, settl_date, ids_);
+            impl_.delete_trade(now, get_trader(req), product, settl_date, ids_);
             break;
         default:
             break;
@@ -793,18 +794,18 @@ void RestApp::posn_request(CyclTime now, const RestRequest& req, HttpStream& os)
         return;
     }
 
-    const auto instr = path_.top();
+    const auto product = path_.top();
     path_.pop();
 
     if (path_.empty()) {
 
-        // /api/sess/posn/INSTR
+        // /api/sess/posn/PRODUCT
         match_path_ = true;
 
         if (req.method() == HttpMethod::Get) {
-            // GET /api/sess/posn/INSTR
+            // GET /api/sess/posn/PRODUCT
             match_method_ = true;
-            impl_.get_posn(now, get_trader(req), instr, os);
+            impl_.get_posn(now, get_trader(req), product, os);
         }
         return;
     }
@@ -814,13 +815,13 @@ void RestApp::posn_request(CyclTime now, const RestRequest& req, HttpStream& os)
 
     if (path_.empty()) {
 
-        // /api/sess/posn/INSTR/SETTL_DATE
+        // /api/sess/posn/PRODUCT/SETTL_DATE
         match_path_ = true;
 
         if (req.method() == HttpMethod::Get) {
-            // GET /api/sess/posn/INSTR/SETTL_DATE
+            // GET /api/sess/posn/PRODUCT/SETTL_DATE
             match_method_ = true;
-            impl_.get_posn(now, get_trader(req), instr, settl_date, os);
+            impl_.get_posn(now, get_trader(req), product, settl_date, os);
         }
         return;
     }

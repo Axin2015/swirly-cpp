@@ -14,9 +14,9 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "InstrView.hxx"
+#include "ProductView.hxx"
 
-#include "InstrModel.hxx"
+#include "ProductModel.hxx"
 #include "Utility.hxx"
 
 #include <QGridLayout>
@@ -27,10 +27,10 @@
 
 namespace swirly {
 namespace ui {
-using namespace instr;
+using namespace product;
 using namespace std;
 
-InstrView::InstrView(InstrModel& model, QWidget* parent, Qt::WindowFlags f)
+ProductView::ProductView(ProductModel& model, QWidget* parent, Qt::WindowFlags f)
 : QWidget{parent, f}
 , model_(model)
 {
@@ -47,21 +47,21 @@ InstrView::InstrView(InstrModel& model, QWidget* parent, Qt::WindowFlags f)
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::NoSelection);
 
-    connect(table.get(), &QTableView::clicked, this, &InstrView::slot_clicked);
+    connect(table.get(), &QTableView::clicked, this, &ProductView::slot_clicked);
 
     auto layout = make_unique<QGridLayout>();
     layout->addWidget(table_ = table.release(), 0, 0);
     setLayout(layout.release());
 }
 
-InstrView::~InstrView() = default;
+ProductView::~ProductView() = default;
 
-void InstrView::resize_columns_to_contents()
+void ProductView::resize_columns_to_contents()
 {
     table_->resizeColumnsToContents();
 }
 
-void InstrView::slot_clicked(const QModelIndex& index)
+void ProductView::slot_clicked(const QModelIndex& index)
 {
     if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
         model_.toggle_check_state(index.row());

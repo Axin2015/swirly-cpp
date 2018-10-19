@@ -15,7 +15,7 @@
 
 namespace swirly.fbs;
 
-table Instr {
+table Product {
   id:int;
   symbol:string (required);
   display:string (required);

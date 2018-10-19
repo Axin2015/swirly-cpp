@@ -59,7 +59,7 @@ class TestCase(RestTestCase):
         u'bid_count': [2, None, None],
         u'bid_lots': [9, None, None],
         u'bid_ticks': [12345, None, None],
-        u'instr': u'EURUSD',
+        u'product': u'EURUSD',
         u'id': 82255,
         u'last_lots': None,
         u'last_ticks': None,
@@ -72,7 +72,7 @@ class TestCase(RestTestCase):
       },
       u'execs': [{
         u'accnt': u'MARAYL',
-        u'instr': u'EURUSD',
+        u'product': u'EURUSD',
         u'cpty': None,
         u'created': self.now,
         u'exec_cost': 0,
@@ -97,7 +97,7 @@ class TestCase(RestTestCase):
       }],
       u'orders': [{
         u'accnt': u'MARAYL',
-        u'instr': u'EURUSD',
+        u'product': u'EURUSD',
         u'created': self.now,
         u'exec_cost': 0,
         u'exec_lots': 0,
@@ -129,7 +129,7 @@ class TestCase(RestTestCase):
         u'bid_count': [2, None, None],
         u'bid_lots': [6, None, None],
         u'bid_ticks': [12345, None, None],
-        u'instr': u'EURUSD',
+        u'product': u'EURUSD',
         u'id': 82255,
         u'last_lots': None,
         u'last_ticks': None,
@@ -142,7 +142,7 @@ class TestCase(RestTestCase):
       },
       u'execs': [{
         u'accnt': u'MARAYL',
-        u'instr': u'EURUSD',
+        u'product': u'EURUSD',
         u'cpty': None,
         u'created': self.now,
         u'exec_cost': 0,
@@ -166,7 +166,7 @@ class TestCase(RestTestCase):
         u'ticks': 12345
       }, {
         u'accnt': u'MARAYL',
-        u'instr': u'EURUSD',
+        u'product': u'EURUSD',
         u'cpty': None,
         u'created': self.now,
         u'exec_cost': 0,
@@ -191,7 +191,7 @@ class TestCase(RestTestCase):
       }],
       u'orders': [{
         u'accnt': u'MARAYL',
-        u'instr': u'EURUSD',
+        u'product': u'EURUSD',
         u'created': self.now,
         u'exec_cost': 0,
         u'exec_lots': 0,
@@ -210,7 +210,7 @@ class TestCase(RestTestCase):
         u'ticks': 12345
       }, {
         u'accnt': u'MARAYL',
-        u'instr': u'EURUSD',
+        u'product': u'EURUSD',
         u'created': self.now,
         u'exec_cost': 0,
         u'exec_lots': 0,

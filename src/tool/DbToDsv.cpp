@@ -19,11 +19,11 @@
 #include <swirly/fin/Asset.hpp>
 #include <swirly/fin/Date.hpp>
 #include <swirly/fin/Exec.hpp>
-#include <swirly/fin/Instr.hpp>
 #include <swirly/fin/Market.hpp>
 #include <swirly/fin/Model.hpp>
 #include <swirly/fin/Order.hpp>
 #include <swirly/fin/Posn.hpp>
+#include <swirly/fin/Product.hpp>
 
 #include <swirly/util/Config.hpp>
 #include <swirly/util/Stream.hpp>
@@ -58,17 +58,17 @@ int main(int argc, char* argv[])
             });
         }
         {
-            ofstream os{"instr.txt"};
+            ofstream os{"product.txt"};
             os << "id\tsymbol\tdisplay\tbase_asset\tterm_ccy\tlot_numer\tlot_denom\ttick_numer\t"
                   "tick_denom\tpip_dp\tmin_lots\tmax_lots\n";
-            model.read_instr([&os](auto ptr) {
+            model.read_product([&os](auto ptr) {
                 ptr->to_dsv(os, '\t');
                 os << '\n';
             });
         }
         {
             ofstream os{"market.txt"};
-            os << "id\tinstr\tsettl_day\tstate\tlast_time\tlast_lots\tlast_ticks\tmax_id\n";
+            os << "id\tproduct\tsettl_day\tstate\tlast_time\tlast_lots\tlast_ticks\tmax_id\n";
             model.read_market([&os](auto ptr) {
                 ptr->to_dsv(os, '\t');
                 os << '\n';
@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
         }
         {
             ofstream os{"order.txt"};
-            os << "created\tmodified\taccnt\tmarket_id\tinstr\tsettl_date\tid\tref\tstate\tside\t"
+            os << "created\tmodified\taccnt\tmarket_id\tproduct\tsettl_date\tid\tref\tstate\tside\t"
                   "lots\tticks\tresd_lots\texec_lots\texec_cost\tlast_lots\tlast_ticks\tmin_lots\n";
             model.read_order([&os](auto ptr) {
                 ptr->to_dsv(os, '\t');
@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
         }
         {
             ofstream os{"exec.txt"};
-            os << "created\taccnt\tmarket_id\tinstr\tsettl_date\tid\torder_id\tref\tstate\tside\t"
+            os << "created\taccnt\tmarket_id\tproduct\tsettl_date\tid\torder_id\tref\tstate\tside\t"
                   "lots\tticks\tresd_lots\texec_lots\texec_cost\tlast_lots\tlast_ticks\tmin_lots\t"
                   "match_id\tposn_lots\tposn_cost\tliq_ind\tcpty\n";
             // One week ago.
@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
         }
         {
             ofstream os{"trade.txt"};
-            os << "created\taccnt\tmarket_id\tinstr\tsettl_date\tid\torder_id\tref\tstate\tside\t"
+            os << "created\taccnt\tmarket_id\tproduct\tsettl_date\tid\torder_id\tref\tstate\tside\t"
                   "lots\tticks\tresd_lots\texec_lots\texec_cost\tlast_lots\tlast_ticks\tmin_lots\t"
                   "match_id\tposn_lots\tposn_cost\tliq_ind\tcpty\n";
             model.read_trade([&os](auto ptr) {
@@ -106,7 +106,8 @@ int main(int argc, char* argv[])
         }
         {
             ofstream os{"posn.txt"};
-            os << "accnt\tmarket_id\tinstr\tsettl_date\tbuy_lots\tbuy_cost\tsell_lots\tsell_cost\n";
+            os << "accnt\tmarket_id\tproduct\tsettl_date\tbuy_lots\tbuy_cost\tsell_lots\tsell_"
+                  "cost\n";
             model.read_posn(bus_day(now), [&os](auto ptr) {
                 ptr->to_dsv(os, '\t');
                 os << '\n';

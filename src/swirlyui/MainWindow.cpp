@@ -18,10 +18,10 @@
 
 #include "AssetView.hxx"
 #include "ExecView.hxx"
-#include "InstrView.hxx"
 #include "MarketView.hxx"
 #include "OrderView.hxx"
 #include "PosnView.hxx"
+#include "ProductView.hxx"
 #include "TradeView.hxx"
 
 #include <QtWidgets>
@@ -37,7 +37,7 @@ MainWindow::MainWindow()
     connect(&client_, &HttpClient::ref_data_complete, this, &MainWindow::slot_ref_data_complete);
     connect(&client_, &HttpClient::service_error, this, &MainWindow::slot_service_error);
 
-    auto market_view = make_unique<MarketView>(client_.instr_model(), client_.market_model());
+    auto market_view = make_unique<MarketView>(client_.product_model(), client_.market_model());
     connect(market_view.get(), &MarketView::create_market, this, &MainWindow::slot_create_market);
     connect(market_view.get(), &MarketView::create_order, this, &MainWindow::slot_create_order);
 
@@ -56,7 +56,7 @@ MainWindow::MainWindow()
 
     auto top_tabs = make_unique<QTabWidget>();
     top_tabs->addTab(asset_view_ = new AssetView{client_.asset_model()}, tr("Asset"));
-    top_tabs->addTab(instr_view_ = new InstrView{client_.instr_model()}, tr("Instr"));
+    top_tabs->addTab(product_view_ = new ProductView{client_.product_model()}, tr("Product"));
     top_tabs->addTab(market_view_ = market_view.release(), tr("Market"));
     top_tabs->setCurrentIndex(2);
 
@@ -97,7 +97,7 @@ void MainWindow::slot_ref_data_complete()
 {
     qDebug() << "slot_ref_data_complete";
     asset_view_->resize_columns_to_contents();
-    instr_view_->resize_columns_to_contents();
+    product_view_->resize_columns_to_contents();
 }
 
 void MainWindow::slot_service_error(const QString& error)
@@ -105,23 +105,23 @@ void MainWindow::slot_service_error(const QString& error)
     qDebug().nospace() << "slot_service_error: " << error;
 }
 
-void MainWindow::slot_create_market(const Instr& instr, QDate settl_date)
+void MainWindow::slot_create_market(const Product& product, QDate settl_date)
 {
-    qDebug().nospace() << "slot_create_market: instr=" << instr //
+    qDebug().nospace() << "slot_create_market: product=" << product //
                        << ",settl_date=" << settl_date;
-    client_.create_market(instr, settl_date);
+    client_.create_market(product, settl_date);
 }
 
-void MainWindow::slot_create_order(const Instr& instr, QDate settl_date, const QString& ref,
+void MainWindow::slot_create_order(const Product& product, QDate settl_date, const QString& ref,
                                    Side side, Lots lots, Ticks ticks)
 {
-    qDebug().nospace() << "slot_create_order: instr=" << instr //
-                       << ",settl_date=" << settl_date         //
-                       << ",ref=" << ref                       //
-                       << ",side=" << side                     //
-                       << ",lots=" << lots                     //
+    qDebug().nospace() << "slot_create_order: product=" << product //
+                       << ",settl_date=" << settl_date             //
+                       << ",ref=" << ref                           //
+                       << ",side=" << side                         //
+                       << ",lots=" << lots                         //
                        << ",ticks=" << ticks;
-    client_.create_order(instr, settl_date, ref, side, lots, ticks);
+    client_.create_order(product, settl_date, ref, side, lots, ticks);
 }
 
 void MainWindow::slot_cancel_orders(const OrderKeys& keys)

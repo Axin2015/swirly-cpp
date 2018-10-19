@@ -89,7 +89,7 @@ void MySqlJourn::on_create_market(WallTime time, const CreateMarket& body)
     BindArray<4> param;
     auto pit = param.begin();
     field::Id64 id{*pit++, body.id};
-    field::Symbol::bind(*pit++, body.instr);
+    field::Symbol::bind(*pit++, body.product);
     field::JDay settl_day{*pit++, body.settl_day, MaybeNull};
     field::MarketState state{*pit++, static_cast<int32_t>(body.state)};
     bind_param(stmt, &param[0]);
@@ -119,7 +119,7 @@ void MySqlJourn::on_create_exec(WallTime time, const CreateExec& body)
     field::Time created{*pit++, ns_since_epoch(time)};
     field::Symbol::bind(*pit++, body.accnt);
     field::Id64 market_id{*pit++, body.market_id};
-    field::Symbol::bind(*pit++, body.instr);
+    field::Symbol::bind(*pit++, body.product);
     field::JDay settl_day{*pit++, body.settl_day, MaybeNull};
     field::Id64 id{*pit++, body.id};
     field::Id64 order_id{*pit++, body.order_id, MaybeNull};

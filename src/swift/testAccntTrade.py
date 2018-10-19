@@ -41,7 +41,7 @@ class TestCase(RestTestCase):
           self.check_auth(client)
 
           self.get_all(client)
-          self.get_by_instr(client)
+          self.get_by_product(client)
           self.get_by_market(client)
           self.get_by_id(client)
 
@@ -82,7 +82,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
+      u'product': u'EURUSD',
       u'cpty': u'MARAYL',
       u'created': self.now,
       u'exec_cost': 37038,
@@ -106,7 +106,7 @@ class TestCase(RestTestCase):
       u'ticks': 12346
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
+      u'product': u'EURUSD',
       u'cpty': u'MARAYL',
       u'created': self.now,
       u'exec_cost': 37038,
@@ -130,7 +130,7 @@ class TestCase(RestTestCase):
       u'ticks': 12346
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
+      u'product': u'EURUSD',
       u'cpty': u'MARAYL',
       u'created': self.now,
       u'exec_cost': 61735,
@@ -154,7 +154,7 @@ class TestCase(RestTestCase):
       u'ticks': 12347
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
+      u'product': u'EURUSD',
       u'cpty': u'MARAYL',
       u'created': self.now,
       u'exec_cost': 61735,
@@ -178,7 +178,7 @@ class TestCase(RestTestCase):
       u'ticks': 12347
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'GBPUSD',
+      u'product': u'GBPUSD',
       u'cpty': u'MARAYL',
       u'created': self.now,
       u'exec_cost': 46038,
@@ -202,7 +202,7 @@ class TestCase(RestTestCase):
       u'ticks': 15346
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'GBPUSD',
+      u'product': u'GBPUSD',
       u'cpty': u'MARAYL',
       u'created': self.now,
       u'exec_cost': 46038,
@@ -226,7 +226,7 @@ class TestCase(RestTestCase):
       u'ticks': 15346
     }], resp.content)
 
-  def get_by_instr(self, client):
+  def get_by_product(self, client):
     client.set_trader('MARAYL')
     resp = client.send('GET', '/api/sess/trade/EURUSD')
 
@@ -234,7 +234,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
+      u'product': u'EURUSD',
       u'cpty': u'MARAYL',
       u'created': self.now,
       u'exec_cost': 37038,
@@ -258,7 +258,7 @@ class TestCase(RestTestCase):
       u'ticks': 12346
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
+      u'product': u'EURUSD',
       u'cpty': u'MARAYL',
       u'created': self.now,
       u'exec_cost': 37038,
@@ -282,7 +282,7 @@ class TestCase(RestTestCase):
       u'ticks': 12346
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
+      u'product': u'EURUSD',
       u'cpty': u'MARAYL',
       u'created': self.now,
       u'exec_cost': 61735,
@@ -306,7 +306,7 @@ class TestCase(RestTestCase):
       u'ticks': 12347
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
+      u'product': u'EURUSD',
       u'cpty': u'MARAYL',
       u'created': self.now,
       u'exec_cost': 61735,
@@ -338,7 +338,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'instr': u'GBPUSD',
+      u'product': u'GBPUSD',
       u'cpty': u'MARAYL',
       u'created': self.now,
       u'exec_cost': 46038,
@@ -362,7 +362,7 @@ class TestCase(RestTestCase):
       u'ticks': 15346
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'GBPUSD',
+      u'product': u'GBPUSD',
       u'cpty': u'MARAYL',
       u'created': self.now,
       u'exec_cost': 46038,
@@ -394,7 +394,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'accnt': u'MARAYL',
-      u'instr': u'GBPUSD',
+      u'product': u'GBPUSD',
       u'cpty': u'MARAYL',
       u'created': self.now,
       u'exec_cost': 46038,

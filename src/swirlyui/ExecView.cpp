@@ -74,7 +74,7 @@ void ExecView::slot_clicked(const QModelIndex& index)
         lots = exec.resd_lots() > 0_lts ? exec.resd_lots() : exec.lots();
         ticks = exec.ticks();
     }
-    emit set_fields(exec.instr().symbol(), exec.settl_date(), lots, ticks);
+    emit set_fields(exec.product().symbol(), exec.settl_date(), lots, ticks);
 }
 
 } // namespace ui

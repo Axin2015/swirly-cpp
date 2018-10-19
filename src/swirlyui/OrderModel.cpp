@@ -29,7 +29,7 @@ OrderModel::OrderModel(QObject* parent)
     header_[unbox(Column::Modified)] = tr("Modified");
     header_[unbox(Column::Accnt)] = tr("Accnt");
     header_[unbox(Column::MarketId)] = tr("Market Id");
-    header_[unbox(Column::Instr)] = tr("Instr");
+    header_[unbox(Column::Product)] = tr("Product");
     header_[unbox(Column::SettlDate)] = tr("Settl Date");
     header_[unbox(Column::Id)] = tr("Id");
     header_[unbox(Column::Ref)] = tr("Ref");
@@ -78,8 +78,8 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
         case Column::MarketId:
             var = to_variant(order.market_id());
             break;
-        case Column::Instr:
-            var = order.instr().symbol();
+        case Column::Product:
+            var = order.product().symbol();
             break;
         case Column::SettlDate:
             var = order.settl_date();
@@ -101,7 +101,7 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
             break;
         case Column::Price:
             if (order.lots() != 0_lts) {
-                var = ticks_to_price_string(order.ticks(), order.instr());
+                var = ticks_to_price_string(order.ticks(), order.product());
             }
             break;
         case Column::ResdLots:
@@ -111,14 +111,14 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
             var = to_variant(order.exec_lots());
             break;
         case Column::AvgPrice:
-            var = ticks_to_avg_price_string(order.exec_lots(), order.exec_cost(), order.instr());
+            var = ticks_to_avg_price_string(order.exec_lots(), order.exec_cost(), order.product());
             break;
         case Column::LastLots:
             var = to_variant(order.last_lots());
             break;
         case Column::LastPrice:
             if (order.last_lots() != 0_lts) {
-                var = ticks_to_price_string(order.last_ticks(), order.instr());
+                var = ticks_to_price_string(order.last_ticks(), order.product());
             }
             break;
         case Column::MinLots:
@@ -145,7 +145,7 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
             var = QVariant{Qt::AlignRight | Qt::AlignVCenter};
             break;
         case Column::Accnt:
-        case Column::Instr:
+        case Column::Product:
         case Column::Ref:
         case Column::State:
         case Column::Side:
