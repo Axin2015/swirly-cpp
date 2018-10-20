@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Instr.hpp"
+#include "Product.hpp"
 
 #include <swirly/util/String.hpp>
 
@@ -23,14 +23,14 @@
 using namespace std;
 using namespace swirly;
 
-BOOST_AUTO_TEST_SUITE(InstrSuite)
+BOOST_AUTO_TEST_SUITE(ProductSuite)
 
-BOOST_AUTO_TEST_CASE(InstrToStringCase)
+BOOST_AUTO_TEST_CASE(ProductToStringCase)
 {
-    Instr instr{1_id32, "EURUSD"sv, "EURUSD"sv, "EUR"sv, "USD"sv, 1000000,
-                1,      1,          10000,      4,       1_lts,   10_lts};
+    Product product{1_id32, "EURUSD"sv, "EURUSD"sv, "EUR"sv, "USD"sv, 1000000,
+                    1,      1,          10000,      4,       1_lts,   10_lts};
 
-    BOOST_TEST(to_string(instr) == //
+    BOOST_TEST(to_string(product) == //
                "{\"symbol\":\"EURUSD\""
                ",\"display\":\"EURUSD\""
                ",\"base_asset\":\"EUR\""

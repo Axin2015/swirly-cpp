@@ -34,7 +34,7 @@ void Client::reset()
     exec_model_.reset();
     order_model_.reset();
     market_model_.reset();
-    instr_model_.reset();
+    product_model_.reset();
     asset_model_.reset();
 }
 

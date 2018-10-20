@@ -21,14 +21,14 @@
 namespace swirly {
 namespace ui {
 
-Exec::Exec(const QDateTime& created, const QString& accnt, Id64 market_id, const Instr& instr,
+Exec::Exec(const QDateTime& created, const QString& accnt, Id64 market_id, const Product& product,
            QDate settl_date, Id64 id, Id64 order_id, const QString& ref, State state, Side side,
            Lots lots, Ticks ticks, Lots resd_lots, Lots exec_lots, Cost exec_cost, Lots last_lots,
            Ticks last_ticks, Lots min_lots, Id64 match_id, LiqInd liq_ind, const QString& cpty)
 : created_{created}
 , accnt_{accnt}
 , market_id_{market_id}
-, instr_{instr}
+, product_{product}
 , settl_date_{settl_date}
 , id_{id}
 , order_id_{order_id}
@@ -49,11 +49,11 @@ Exec::Exec(const QDateTime& created, const QString& accnt, Id64 market_id, const
 {
 }
 
-Exec Exec::from_json(const Instr& instr, const QJsonObject& obj)
+Exec Exec::from_json(const Product& product, const QJsonObject& obj)
 {
     using swirly::ui::from_json;
     return Exec{from_json<QDateTime>(obj["created"]), from_json<QString>(obj["accnt"]),
-                from_json<Id64>(obj["market_id"]),    instr,
+                from_json<Id64>(obj["market_id"]),    product,
                 from_json<QDate>(obj["settl_date"]),  from_json<Id64>(obj["id"]),
                 from_json<Id64>(obj["order_id"]),     from_json<QString>(obj["ref"]),
                 from_json<State>(obj["state"]),       from_json<Side>(obj["side"]),
@@ -70,7 +70,7 @@ QDebug operator<<(QDebug debug, const Exec& exec)
     debug.nospace() << "Exec{created=" << exec.created()   //
                     << ",accnt=" << exec.accnt()           //
                     << ",market_id=" << exec.market_id()   //
-                    << ",instr=" << exec.instr()           //
+                    << ",product=" << exec.product()       //
                     << ",settl_date=" << exec.settl_date() //
                     << ",id=" << exec.id()                 //
                     << ",order_id=" << exec.order_id()     //

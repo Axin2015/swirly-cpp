@@ -31,12 +31,12 @@ namespace ui {
 using namespace market;
 using namespace std;
 
-MarketView::MarketView(InstrModel& instr_model, MarketModel& model, QWidget* parent,
+MarketView::MarketView(ProductModel& product_model, MarketModel& model, QWidget* parent,
                        Qt::WindowFlags f)
 : QWidget{parent, f}
 , model_(model)
 {
-    auto form = make_unique<MarketForm>(instr_model);
+    auto form = make_unique<MarketForm>(product_model);
     connect(form.get(), &MarketForm::create_market, this, &MarketView::create_market);
     connect(form.get(), &MarketForm::create_order, this, &MarketView::create_order);
 
@@ -67,10 +67,10 @@ MarketView::MarketView(InstrModel& instr_model, MarketModel& model, QWidget* par
 
 MarketView::~MarketView() = default;
 
-void MarketView::set_fields(const QString& instr_symbol, QDate settl_date, optional<Lots> lots,
+void MarketView::set_fields(const QString& product_symbol, QDate settl_date, optional<Lots> lots,
                             optional<Ticks> ticks)
 {
-    market_form_->set_fields(instr_symbol, settl_date, lots, ticks);
+    market_form_->set_fields(product_symbol, settl_date, lots, ticks);
 }
 
 void MarketView::slot_clicked(const QModelIndex& index)
@@ -84,7 +84,7 @@ void MarketView::slot_clicked(const QModelIndex& index)
             model_.toggle_check_state(index.row());
         // Fall-through.
         case Column::Id:
-        case Column::Instr:
+        case Column::Product:
         case Column::SettlDate:
         case Column::State:
         case Column::LastLots:
@@ -118,7 +118,7 @@ void MarketView::slot_clicked(const QModelIndex& index)
             }
             break;
         }
-        set_fields(market.instr().symbol(), market.settl_date(), lots, ticks);
+        set_fields(market.product().symbol(), market.settl_date(), lots, ticks);
     }
 }
 

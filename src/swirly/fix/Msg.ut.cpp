@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_CASE(FormatMarketDataSnapshotCase)
 {
     MarketDataSnapshot mds;
     get<Tag::Symbol>(mds) = "EURUSD"sv;
-    get<Tag::MaturityDate>(mds) = 20181004_ymd;
+    get<Tag::SettlDate>(mds) = 20181004_ymd;
 
     MdEntry md_entry;
     get<Tag::MdEntryType>(md_entry).side = Side::Buy;
@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE(FormatMarketDataSnapshotCase)
     ss << mds;
     BOOST_TEST(ss.str()
                == "55=EURUSD\1"
-                  "541=20181004\1"
+                  "64=20181004\1"
                   "268=1\1"
                   "269=0\1"
                   "270=12344\1"
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE(FormatMarketDataSnapshotCase)
 BOOST_AUTO_TEST_CASE(ParseMarketDataSnapshotCase)
 {
     FixLexer lex{"55=EURUSD\1"
-                 "541=20181004\1"
+                 "64=20181004\1"
                  "268=4\1"
                  "269=0\1"
                  "270=12343\1"
@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE(ParseMarketDataSnapshotCase)
     parse_body(lex, mds);
 
     BOOST_TEST(get<Tag::Symbol>(mds) == "EURUSD"sv);
-    BOOST_TEST(get<Tag::MaturityDate>(mds) == 20181004_ymd);
+    BOOST_TEST(get<Tag::SettlDate>(mds) == 20181004_ymd);
     BOOST_TEST_REQUIRE(mds.md_entries.size() == 4);
 
     BOOST_TEST(get<Tag::MdEntryType>(mds.md_entries[0]).side == Side::Buy);

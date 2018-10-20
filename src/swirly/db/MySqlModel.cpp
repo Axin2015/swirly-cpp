@@ -21,11 +21,10 @@
 
 #include <swirly/fin/Asset.hpp>
 #include <swirly/fin/Exec.hpp>
-#include <swirly/fin/Instr.hpp>
 #include <swirly/fin/Market.hpp>
-
 #include <swirly/fin/Order.hpp>
 #include <swirly/fin/Posn.hpp>
+#include <swirly/fin/Product.hpp>
 
 namespace swirly {
 inline namespace db {
@@ -70,9 +69,9 @@ void MySqlModel::do_read_asset(const ModelCallback<AssetPtr>& cb) const
     }
 }
 
-void MySqlModel::do_read_instr(const ModelCallback<InstrPtr>& cb) const
+void MySqlModel::do_read_product(const ModelCallback<ProductPtr>& cb) const
 {
-    using namespace instr;
+    using namespace product;
 
     auto stmt = prepare(*db_, SelectSql);
     execute(*stmt);
@@ -94,18 +93,18 @@ void MySqlModel::do_read_instr(const ModelCallback<InstrPtr>& cb) const
 
     bind_result(*stmt, &result[0]);
     while (fetch(*stmt)) {
-        cb(Instr::make(Id32{id.value()},       //
-                       symbol.value(),         //
-                       display.value(),        //
-                       base_asset.value(),     //
-                       term_ccy.value(),       //
-                       lot_numer.value(),      //
-                       lot_denom.value(),      //
-                       tick_numer.value(),     //
-                       tick_denom.value(),     //
-                       pip_dp.value(),         //
-                       Lots{min_lots.value()}, //
-                       Lots{max_lots.value()}));
+        cb(Product::make(Id32{id.value()},       //
+                         symbol.value(),         //
+                         display.value(),        //
+                         base_asset.value(),     //
+                         term_ccy.value(),       //
+                         lot_numer.value(),      //
+                         lot_denom.value(),      //
+                         tick_numer.value(),     //
+                         tick_denom.value(),     //
+                         pip_dp.value(),         //
+                         Lots{min_lots.value()}, //
+                         Lots{max_lots.value()}));
     }
 }
 
@@ -119,7 +118,7 @@ void MySqlModel::do_read_market(const ModelCallback<MarketPtr>& cb) const
 
     BindArray<8> result;
     field::Id64 id{result[Id]};
-    field::Symbol instr{result[Instr]};
+    field::Symbol product{result[Product]};
     field::JDay settl_day{result[SettlDay]};
     field::MarketState state{result[State]};
     field::Time last_time{result[LastTime]};
@@ -130,7 +129,7 @@ void MySqlModel::do_read_market(const ModelCallback<MarketPtr>& cb) const
     bind_result(*stmt, &result[0]);
     while (fetch(*stmt)) {
         cb(Market::make(Id64{id.value()},                             //
-                        instr.value(),                                //
+                        product.value(),                              //
                         JDay{settl_day.value()},                      //
                         static_cast<MarketState>(state.value()),      //
                         to_time<WallClock>(Nanos{last_time.value()}), //
@@ -153,7 +152,7 @@ void MySqlModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
     field::Time modified{result[Modified]};
     field::Symbol accnt{result[Accnt]};
     field::Id64 market_id{result[MarketId]};
-    field::Symbol instr{result[Instr]};
+    field::Symbol product{result[Product]};
     field::JDay settl_day{result[SettlDay]};
     field::Id64 id{result[Id]};
     field::Ref ref{result[Ref]};
@@ -174,7 +173,7 @@ void MySqlModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
                        to_time<WallClock>(Nanos{modified.value()}), //
                        accnt.value(),                               //
                        Id64{market_id.value()},                     //
-                       instr.value(),                               //
+                       product.value(),                             //
                        JDay{settl_day.value()},                     //
                        Id64{id.value()},                            //
                        ref.value(),                                 //
@@ -209,7 +208,7 @@ void MySqlModel::do_read_exec(WallTime since, const ModelCallback<ExecPtr>& cb) 
     field::Time created{result[Created]};
     field::Symbol accnt{result[Accnt]};
     field::Id64 market_id{result[MarketId]};
-    field::Symbol instr{result[Instr]};
+    field::Symbol product{result[Product]};
     field::JDay settl_day{result[SettlDay]};
     field::Id64 id{result[Id]};
     field::Id64 order_id{result[OrderId]};
@@ -235,7 +234,7 @@ void MySqlModel::do_read_exec(WallTime since, const ModelCallback<ExecPtr>& cb) 
         cb(Exec::make(to_time<WallClock>(Nanos{created.value()}), //
                       accnt.value(),                              //
                       Id64{market_id.value()},                    //
-                      instr.value(),                              //
+                      product.value(),                            //
                       JDay{settl_day.value()},                    //
                       Id64{id.value()},                           //
                       Id64{order_id.value()},                     //
@@ -270,7 +269,7 @@ void MySqlModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
     field::Time created{result[Created]};
     field::Symbol accnt{result[Accnt]};
     field::Id64 market_id{result[MarketId]};
-    field::Symbol instr{result[Instr]};
+    field::Symbol product{result[Product]};
     field::JDay settl_day{result[SettlDay]};
     field::Id64 id{result[Id]};
     field::Id64 order_id{result[OrderId]};
@@ -295,7 +294,7 @@ void MySqlModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
         cb(Exec::make(to_time<WallClock>(Nanos{created.value()}), //
                       accnt.value(),                              //
                       Id64{market_id.value()},                    //
-                      instr.value(),                              //
+                      product.value(),                            //
                       JDay{settl_day.value()},                    //
                       Id64{id.value()},                           //
                       Id64{order_id.value()},                     //
@@ -332,7 +331,7 @@ void MySqlModel::do_read_posn(JDay bus_day, const ModelCallback<PosnPtr>& cb) co
     BindArray<7> result;
     field::Symbol accnt_field{result[Accnt]};
     field::Id64 market_id_field{result[MarketId]};
-    field::Symbol instr_field{result[Instr]};
+    field::Symbol product_field{result[Product]};
     field::JDay settl_day_field{result[SettlDay]};
     field::Side side_field{result[Side]};
     field::Lots lots_field{result[Lots]};
@@ -342,7 +341,7 @@ void MySqlModel::do_read_posn(JDay bus_day, const ModelCallback<PosnPtr>& cb) co
     while (fetch(*stmt)) {
         const auto accnt = accnt_field.value();
         auto market_id = Id64{market_id_field.value()};
-        const auto instr = instr_field.value();
+        const auto product = product_field.value();
         auto settl_day = JDay{settl_day_field.value()};
 
         // FIXME: review when end of day is implemented.
@@ -354,7 +353,7 @@ void MySqlModel::do_read_posn(JDay bus_day, const ModelCallback<PosnPtr>& cb) co
         bool found;
         tie(it, found) = ps.find_hint(accnt, market_id);
         if (!found) {
-            it = ps.insert_hint(it, Posn::make(accnt, market_id, instr, settl_day));
+            it = ps.insert_hint(it, Posn::make(accnt, market_id, product, settl_day));
         }
 
         const auto side = swirly::Side{side_field.value()};

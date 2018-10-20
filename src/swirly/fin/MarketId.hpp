@@ -22,14 +22,14 @@
 namespace swirly {
 inline namespace fin {
 
-constexpr Id64 to_market_id(Id32 instr_id) noexcept
+constexpr Id64 to_market_id(Id32 product_id) noexcept
 {
-    return Id64{instr_id.count() << 16};
+    return Id64{product_id.count() << 16};
 }
 
-constexpr Id64 to_market_id(Id32 instr_id, JDay settl_day) noexcept
+constexpr Id64 to_market_id(Id32 product_id, JDay settl_day) noexcept
 {
-    std::int64_t id{instr_id.count() << 16};
+    std::int64_t id{product_id.count() << 16};
     if (settl_day != 0_jd) {
         id |= jd_to_tjd(settl_day) & 0xffff;
     }
@@ -39,9 +39,9 @@ static_assert(to_market_id(12_id32, 0_jd) == 786432_id64);
 // 2440000 is the epoch for truncated Julian day.
 static_assert(to_market_id(12_id32, 2440000_jd + 1_jd) == 786433_id64);
 
-constexpr Id64 to_market_id(Id32 instr_id, IsoDate settl_date) noexcept
+constexpr Id64 to_market_id(Id32 product_id, IsoDate settl_date) noexcept
 {
-    std::int64_t id{instr_id.count() << 16};
+    std::int64_t id{product_id.count() << 16};
     if (settl_date != 0_ymd) {
         id |= jd_to_tjd(iso_to_jd(settl_date)) & 0xffff;
     }

@@ -20,8 +20,8 @@
 #include <swirly/lob/Types.hpp>
 
 #include <swirly/fin/Asset.hpp>
-#include <swirly/fin/Instr.hpp>
 #include <swirly/fin/Market.hpp>
+#include <swirly/fin/Product.hpp>
 
 #include <swirly/util/Array.hpp>
 
@@ -62,11 +62,11 @@ class SWIRLY_API LobApp {
 
     const AssetSet& assets() const noexcept;
 
-    const InstrSet& instrs() const noexcept;
+    const ProductSet& products() const noexcept;
 
     const MarketSet& markets() const noexcept;
 
-    const Instr& instr(Symbol symbol) const;
+    const Product& product(Symbol symbol) const;
 
     const Market& market(Id64 id) const;
 
@@ -76,7 +76,7 @@ class SWIRLY_API LobApp {
 
     void set_trade_slot(const Sess& sess, TradeSlot slot) noexcept;
 
-    const Market& create_market(CyclTime now, const Instr& instr, JDay settl_day,
+    const Market& create_market(CyclTime now, const Product& product, JDay settl_day,
                                 MarketState state);
 
     void update_market(CyclTime now, const Market& market, MarketState state);

@@ -21,7 +21,7 @@ table Exec {
   created:long;
   accnt:string (required);
   market_id:long;
-  instr:string (required);
+  product:string (required);
   settl_day:int;
   id:long;
   order_id:long;

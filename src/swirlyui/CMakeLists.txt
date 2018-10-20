@@ -30,9 +30,6 @@ set(prog_SOURCES
   AssetModel.cpp
   AssetView.cpp
   Client.cpp
-  Instr.cpp
-  InstrModel.cpp
-  InstrView.cpp
   Exec.cpp
   ExecModel.cpp
   ExecView.cpp
@@ -51,6 +48,9 @@ set(prog_SOURCES
   Posn.cpp
   PosnModel.cpp
   PosnView.cpp
+  Product.cpp
+  ProductModel.cpp
+  ProductView.cpp
   Row.cpp
   TableModel.cpp
   TradeModel.cpp

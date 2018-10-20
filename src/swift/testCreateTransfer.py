@@ -57,7 +57,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
+      u'product': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
       u'exec_cost': 0,
@@ -93,7 +93,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
+      u'product': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
       u'exec_cost': 0,

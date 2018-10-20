@@ -51,7 +51,7 @@ struct ExecutionReportOpts {
 // clang-format off
 using ExecutionReport = TagList<detail::ExecutionReportOpts,
                                 Tag::Symbol,
-                                Tag::MaturityDate,
+                                Tag::SettlDate,
                                 Tag::ExecId,
                                 Tag::OrderId,
                                 Tag::ExecType,
@@ -71,8 +71,8 @@ using ExecutionReport = TagList<detail::ExecutionReportOpts,
 
 using Logon = TagList<NoTagOpts, Tag::EncryptMethod, Tag::HeartBtInt>;
 
-struct SWIRLY_API MarketDataSnapshot : TagList<NoTagOpts, Tag::Symbol, Tag::MaturityDate> {
-    using Base = TagList<NoTagOpts, Tag::Symbol, Tag::MaturityDate>;
+struct SWIRLY_API MarketDataSnapshot : TagList<NoTagOpts, Tag::Symbol, Tag::SettlDate> {
+    using Base = TagList<NoTagOpts, Tag::Symbol, Tag::SettlDate>;
     void clear()
     {
         Base::clear();
