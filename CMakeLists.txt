@@ -85,7 +85,7 @@ set(COMMON_C_FLAGS "-fstrict-aliasing -fvisibility=hidden")
 set(COMMON_CXX_FLAGS "${COMMON_C_FLAGS} -faligned-new -fno-rtti")
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  set(COMMON_WARN "${COMMON_WARN} -Wno-implicit-fallthrough")
+  set(COMMON_WARN "${COMMON_WARN} -Wno-implicit-fallthrough -Wno-psabi")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMMON_C_FLAGS} ${COMMON_WARN}")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_CXX_FLAGS} ${COMMON_WARN} -fno-enforce-eh-specs -fnothrow-opt")
 elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
