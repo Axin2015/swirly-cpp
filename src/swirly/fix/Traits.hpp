@@ -381,7 +381,7 @@ template <> struct TagTraits<Tag::HeartBtInt> : SecondsTraits {};
 template <> struct TagTraits<Tag::LastPx> : PriceTraits {};
 template <> struct TagTraits<Tag::LastQty> : QtyTraits {};
 template <> struct TagTraits<Tag::LeavesQty> : QtyTraits {};
-template <> struct TagTraits<Tag::MaturityDate> : DateTraits {};
+template <> struct TagTraits<Tag::SettlDate> : DateTraits {};
 template <> struct TagTraits<Tag::MdEntryPx> : PriceTraits {};
 template <> struct TagTraits<Tag::MdEntrySize> : QtyTraits {};
 template <> struct TagTraits<Tag::MdEntryType> : MdEntryTraits {};
