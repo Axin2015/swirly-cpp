@@ -39,6 +39,6 @@ table Exec {
   match_id:long;
   posn_lots:long;
   posn_ticks:long;
-  liqind:LiqInd;
+  liq_ind:LiqInd;
   cpty:string;
 }

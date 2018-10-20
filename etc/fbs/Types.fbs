@@ -28,7 +28,9 @@ enum AssetType:int {
   // Government Bond.
   Govt,
   // Index.
-  Index
+  Index,
+  // Crypto.
+  Crypto
 }
 
 enum Direct:int {
@@ -40,7 +42,7 @@ enum Direct:int {
 }
 
 enum LiqInd:int {
-  // No liqInd.
+  // No liquidity indicator.
   None = 0,
   // Passive buyer or seller that receives the spread.
   Maker,

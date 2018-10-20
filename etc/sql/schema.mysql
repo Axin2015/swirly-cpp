@@ -98,6 +98,8 @@ INSERT INTO asset_type_t (id, symbol) VALUES (5, 'GOVT')
 ;
 INSERT INTO asset_type_t (id, symbol) VALUES (6, 'INDEX')
 ;
+INSERT INTO asset_type_t (id, symbol) VALUES (7, 'CRYPTO')
+;
 
 CREATE TABLE asset_t (
   id INT NOT NULL PRIMARY KEY,

@@ -55,7 +55,7 @@ class SWIRLY_API FixBuf : public std::streambuf {
     void set_body_length(std::streamsize pos, std::streamsize len) noexcept;
 
     void put_num(int val) { put_num<int, 11>(val); }
-    void put_num(long val) { put_num<long, 21>(val); }
+    void put_num(std::int64_t val) { put_num<std::int64_t, 21>(val); }
 
   protected:
     int_type overflow(int_type c) override;
