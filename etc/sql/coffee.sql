@@ -52,42 +52,42 @@ INSERT INTO asset_t (id, symbol, display, type_id)
        VALUES (9, 'WGAB', 'Gelena Abaya B', 1)
 ;
 
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (1, 'WYCA', 'Yirgachefe A', 'WYCA', 'ETB', 1, 1, 1, 1, 0, 1, 10);
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (2, 'WWNA', 'Wenago A', 'WWNA', 'ETB', 1, 1, 1, 1, 0, 1, 10);
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (3, 'WKCA', 'Kochere A', 'WKCA', 'ETB', 1, 1, 1, 1, 0, 1, 10);
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (4, 'WGAA', 'Gelena Abaya A', 'WGAA', 'ETB', 1, 1, 1, 1, 0, 1, 10);
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (5, 'WYCB', 'Yirgachefe B', 'WYCB', 'ETB', 1, 1, 1, 1, 0, 1, 10);
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (6, 'WWNB', 'Wenago B', 'WWNB', 'ETB', 1, 1, 1, 1, 0, 1, 10);
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (7, 'WKCB', 'Kochere B', 'WKCB', 'ETB', 1, 1, 1, 1, 0, 1, 10);
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (8, 'WGAB', 'Gelena Abaya B', 'WGAB', 'ETB', 1, 1, 1, 1, 0, 1, 10);
 ;
 
 -- Example cash market.
-INSERT INTO market_t (id, product, settl_day, state)
-       VALUES ((SELECT (id << 16) FROM product_t WHERE symbol = 'WYCA'), 'WYCA', NULL, 0)
+INSERT INTO market_t (id, instr, settl_day, state)
+       VALUES ((SELECT (id << 16) FROM instr_t WHERE symbol = 'WYCA'), 'WYCA', NULL, 0)
 ;
 
 COMMIT

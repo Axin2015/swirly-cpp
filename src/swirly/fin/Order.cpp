@@ -36,7 +36,7 @@ void Order::to_dsv(ostream& os, char delim) const
         << modified_  //
         << accnt_     //
         << market_id_ //
-        << product_;
+        << instr_;
     if (settl_day_ != 0_jd) {
         osj << jd_to_iso(settl_day_);
     } else {
@@ -75,7 +75,7 @@ void Order::to_json(ostream& os) const
        << ",\"modified\":" << modified_     //
        << ",\"accnt\":\"" << accnt_         //
        << "\",\"market_id\":" << market_id_ //
-       << ",\"product\":\"" << product_     //
+       << ",\"instr\":\"" << instr_         //
        << "\",\"settl_date\":";
     if (settl_day_ != 0_jd) {
         os << jd_to_iso(settl_day_);

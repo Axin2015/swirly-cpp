@@ -17,7 +17,7 @@
 #ifndef SWIRLYUI_EXEC_HXX
 #define SWIRLYUI_EXEC_HXX
 
-#include "Product.hxx"
+#include "Instr.hxx"
 
 namespace swirly {
 namespace ui {
@@ -28,7 +28,7 @@ enum class Column : int { //
     Created,              //
     Accnt,                //
     MarketId,             //
-    Product,              //
+    Instr,                //
     SettlDate,            //
     Id,                   //
     OrderId,              //
@@ -53,20 +53,20 @@ constexpr int ColumnCount{unbox(Column::Cpty) + 1};
 
 class Exec {
   public:
-    Exec(const QDateTime& created, const QString& accnt, Id64 market_id, const Product& product,
+    Exec(const QDateTime& created, const QString& accnt, Id64 market_id, const Instr& instr,
          QDate settl_date, Id64 id, Id64 order_id, const QString& ref, State state, Side side,
          Lots lots, Ticks ticks, Lots resd_lots, Lots exec_lots, Cost exec_cost, Lots last_lots,
          Ticks last_ticks, Lots min_lots, Id64 match_id, LiqInd liq_ind, const QString& cpty);
     Exec() = default;
     ~Exec() = default;
 
-    static Exec from_json(const Product& product, const QJsonObject& obj);
+    static Exec from_json(const Instr& instr, const QJsonObject& obj);
 
     ExecKey key() const noexcept { return {market_id_, id_}; }
     const QDateTime& created() const noexcept { return created_; }
     const QString& accnt() const noexcept { return accnt_; }
     Id64 market_id() const noexcept { return market_id_; }
-    const Product& product() const noexcept { return product_; }
+    const Instr& instr() const noexcept { return instr_; }
     QDate settl_date() const noexcept { return settl_date_; }
     Id64 id() const noexcept { return id_; }
     Id64 order_id() const noexcept { return order_id_; }
@@ -89,7 +89,7 @@ class Exec {
     QDateTime created_{};
     QString accnt_{};
     Id64 market_id_{};
-    Product product_{};
+    Instr instr_{};
     QDate settl_date_{};
     Id64 id_{};
     Id64 order_id_{};

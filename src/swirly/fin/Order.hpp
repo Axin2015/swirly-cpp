@@ -30,18 +30,18 @@ inline namespace fin {
 class Level;
 
 /**
- * An instructions to buy or sell goods or services.
+ * An instruction to buy or sell goods or services.
  */
 class SWIRLY_API Order
 : public RefCount<Order, ThreadUnsafePolicy>
 , public Request
 , public MemAlloc {
   public:
-    Order(WallTime created, WallTime modified, Symbol accnt, Id64 market_id, Symbol product,
+    Order(WallTime created, WallTime modified, Symbol accnt, Id64 market_id, Symbol instr,
           JDay settl_day, Id64 id, std::string_view ref, State state, Side side, Lots lots,
           Ticks ticks, Lots resd_lots, Lots exec_lots, Cost exec_cost, Lots last_lots,
           Ticks last_ticks, Lots min_lots) noexcept
-    : Request{created, accnt, market_id, product, settl_day, id, ref, side, lots}
+    : Request{created, accnt, market_id, instr, settl_day, id, ref, side, lots}
     , modified_{modified}
     , state_{state}
     , ticks_{ticks}
@@ -53,10 +53,10 @@ class SWIRLY_API Order
     , min_lots_{min_lots}
     {
     }
-    Order(WallTime created, Symbol accnt, Id64 market_id, Symbol product, JDay settl_day, Id64 id,
+    Order(WallTime created, Symbol accnt, Id64 market_id, Symbol instr, JDay settl_day, Id64 id,
           std::string_view ref, Side side, Lots lots, Ticks ticks, Lots min_lots) noexcept
-    : Order{created, created, accnt, market_id, product, settl_day, id,    ref,   State::New,
-            side,    lots,    ticks, lots,      0_lts,   0_cst,     0_lts, 0_tks, min_lots}
+    : Order{created, created, accnt, market_id, instr, settl_day, id,    ref,   State::New,
+            side,    lots,    ticks, lots,      0_lts, 0_cst,     0_lts, 0_tks, min_lots}
     {
     }
     ~Order();

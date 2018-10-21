@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_FIN_PRODUCT_HPP
-#define SWIRLY_FIN_PRODUCT_HPP
+#ifndef SWIRLY_FIN_INSTR_HPP
+#define SWIRLY_FIN_INSTR_HPP
 
 #include <swirly/fin/Types.hpp>
 
@@ -27,32 +27,32 @@ inline namespace fin {
 /**
  * A specification that stipulates the terms and conditions of sale.
  */
-class SWIRLY_API Product : protected Comparable<Product> {
+class SWIRLY_API Instr : protected Comparable<Instr> {
   public:
-    Product(Id32 id, Symbol symbol, std::string_view display, Symbol base_asset, Symbol term_ccy,
-            int lot_numer, int lot_denom, int tick_numer, int tick_denom, int pip_dp, Lots min_lots,
-            Lots max_lots) noexcept;
+    Instr(Id32 id, Symbol symbol, std::string_view display, Symbol base_asset, Symbol term_ccy,
+          int lot_numer, int lot_denom, int tick_numer, int tick_denom, int pip_dp, Lots min_lots,
+          Lots max_lots) noexcept;
 
-    ~Product();
+    ~Instr();
 
     // Copy.
-    Product(const Product&);
-    Product& operator=(const Product&) = delete;
+    Instr(const Instr&);
+    Instr& operator=(const Instr&) = delete;
 
     // Move.
-    Product(Product&&);
-    Product& operator=(Product&&) = delete;
+    Instr(Instr&&);
+    Instr& operator=(Instr&&) = delete;
 
     template <typename... ArgsT>
-    static ProductPtr make(ArgsT&&... args)
+    static InstrPtr make(ArgsT&&... args)
     {
-        return std::make_unique<Product>(std::forward<ArgsT>(args)...);
+        return std::make_unique<Instr>(std::forward<ArgsT>(args)...);
     }
 
     void to_dsv(std::ostream& os, char delim = ',') const;
     void to_json(std::ostream& os) const;
 
-    int compare(const Product& rhs) const noexcept { return symbol_.compare(rhs.symbol_); }
+    int compare(const Instr& rhs) const noexcept { return symbol_.compare(rhs.symbol_); }
     auto id() const noexcept { return id_; }
     auto symbol() const noexcept { return symbol_; }
     auto display() const noexcept { return +display_; }
@@ -94,15 +94,15 @@ class SWIRLY_API Product : protected Comparable<Product> {
     const Lots max_lots_;
 };
 
-inline std::ostream& operator<<(std::ostream& os, const Product& product)
+inline std::ostream& operator<<(std::ostream& os, const Instr& instr)
 {
-    product.to_json(os);
+    instr.to_json(os);
     return os;
 }
 
-using ProductSet = SymbolSet<Product>;
+using InstrSet = SymbolSet<Instr>;
 
 } // namespace fin
 } // namespace swirly
 
-#endif // SWIRLY_FIN_PRODUCT_HPP
+#endif // SWIRLY_FIN_INSTR_HPP

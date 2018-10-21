@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE(PosnSetCase)
 
     PosnPtr posn1{&*s.emplace("MARAYL"sv, MarketId, "EURUSD"sv, SettlDay)};
     BOOST_TEST(posn1->ref_count() == 2);
-    BOOST_TEST(posn1->product() == "EURUSD"sv);
+    BOOST_TEST(posn1->instr() == "EURUSD"sv);
     BOOST_TEST(posn1->settl_day() == SettlDay);
     BOOST_TEST(s.find(MarketId) != s.end());
 
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(PosnSetCase)
     PosnPtr posn3{&*s.emplace_or_replace("MARAYL"sv, MarketId, "EURUSD"sv, SettlDay)};
     BOOST_TEST(posn3->ref_count() == 2);
     BOOST_TEST(posn3 != posn1);
-    BOOST_TEST(posn3->product() == "EURUSD"sv);
+    BOOST_TEST(posn3->instr() == "EURUSD"sv);
     BOOST_TEST(posn3->settl_day() == SettlDay);
 }
 

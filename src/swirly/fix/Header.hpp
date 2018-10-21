@@ -52,7 +52,8 @@ using FixHeader = TagList<detail::FixHeaderOpts,
 
 using FixHeaderView = FixHeader::View;
 
-SWIRLY_API std::size_t parse_header(std::string_view msg, std::size_t msg_type_off, FixHeader& hdr);
+SWIRLY_API std::size_t parse_header(std::string_view msg, std::size_t msg_type_off,
+                                    FixHeader& hdr);
 
 SWIRLY_API std::size_t parse_header(std::string_view msg, std::size_t msg_type_off,
                                     FixHeaderView& hdr);

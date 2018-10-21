@@ -40,16 +40,16 @@ void MsgQueue::archive_trade(WallTime now, Id64 market_id, ArrayView<Id64> ids)
     } while (r.next());
 }
 
-void MsgQueue::do_create_market(WallTime now, Id64 id, Symbol product, JDay settl_day,
+void MsgQueue::do_create_market(WallTime now, Id64 id, Symbol instr, JDay settl_day,
                                 MarketState state)
 {
-    const auto fn = [ now, id, &product, settl_day, state ](Msg & msg) noexcept
+    const auto fn = [ now, id, &instr, settl_day, state ](Msg & msg) noexcept
     {
         msg.type = MsgType::CreateMarket;
         msg.time = ns_since_epoch(now);
         auto& body = msg.create_market;
         body.id = id;
-        pstrcpy<'\0'>(body.product, product);
+        pstrcpy<'\0'>(body.instr, instr);
         body.settl_day = settl_day;
         body.state = state;
     };
@@ -82,7 +82,7 @@ void MsgQueue::do_create_exec(const Exec& exec)
         auto& body = msg.create_exec;
         pstrcpy<'\0'>(body.accnt, exec.accnt());
         body.market_id = exec.market_id();
-        pstrcpy<'\0'>(body.product, exec.product());
+        pstrcpy<'\0'>(body.instr, exec.instr());
         body.settl_day = exec.settl_day();
         body.id = exec.id();
         body.order_id = exec.order_id();

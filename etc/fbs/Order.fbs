@@ -22,7 +22,7 @@ table Order {
   modified:long;
   accnt:string (required);
   market_id:long;
-  product:string (required);
+  instr:string (required);
   settl_day:int;
   id:long;
   ref:string;

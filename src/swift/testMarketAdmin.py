@@ -28,7 +28,7 @@ class TestCase(RestTestCase):
           self.check_auth(client)
 
           self.create_market(client)
-          self.create_market_by_product(client)
+          self.create_market_by_instr(client)
           self.create_market_by_market(client)
           self.update_market(client)
 
@@ -72,7 +72,7 @@ class TestCase(RestTestCase):
   def create_market(self, client):
     client.set_admin()
     resp = client.send('POST', '/api/market',
-                       product = 'EURUSD',
+                       instr = 'EURUSD',
                        settl_date = 20140302,
                        state = 1)
 
@@ -82,7 +82,7 @@ class TestCase(RestTestCase):
       u'bid_count': [None, None, None],
       u'bid_lots': [None, None, None],
       u'bid_ticks': [None, None, None],
-      u'product': u'EURUSD',
+      u'instr': u'EURUSD',
       u'id': 82255,
       u'last_lots': None,
       u'last_ticks': None,
@@ -94,7 +94,7 @@ class TestCase(RestTestCase):
       u'state': 1
     }, resp.content)
 
-  def create_market_by_product(self, client):
+  def create_market_by_instr(self, client):
     client.set_admin()
     resp = client.send('POST', '/api/market/GBPUSD',
                        settl_date = 20140302,
@@ -106,7 +106,7 @@ class TestCase(RestTestCase):
       u'bid_count': [None, None, None],
       u'bid_lots': [None, None, None],
       u'bid_ticks': [None, None, None],
-      u'product': u'GBPUSD',
+      u'instr': u'GBPUSD',
       u'id': 147791,
       u'last_lots': None,
       u'last_ticks': None,
@@ -129,7 +129,7 @@ class TestCase(RestTestCase):
       u'bid_count': [None, None, None],
       u'bid_lots': [None, None, None],
       u'bid_ticks': [None, None, None],
-      u'product': u'USDJPY',
+      u'instr': u'USDJPY',
       u'id': 278863,
       u'last_lots': None,
       u'last_ticks': None,
@@ -151,7 +151,7 @@ class TestCase(RestTestCase):
       u'bid_count': [None, None, None],
       u'bid_lots': [None, None, None],
       u'bid_ticks': [None, None, None],
-      u'product': u'USDJPY',
+      u'instr': u'USDJPY',
       u'id': 278863,
       u'last_lots': None,
       u'last_ticks': None,

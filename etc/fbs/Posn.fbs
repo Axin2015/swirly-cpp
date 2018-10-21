@@ -20,7 +20,7 @@ namespace swirly.fbs;
 table Posn {
   accnt:string (required);
   market_id:long;
-  product:string (required);
+  instr:string (required);
   settl_day:int;
   buy_lots:long;
   buy_cost:long;

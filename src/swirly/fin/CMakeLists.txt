@@ -32,6 +32,7 @@ set(lib_SOURCES
   Date.cpp
   DsvModel.cpp
   Exec.cpp
+  Instr.cpp
   IntTypes.cpp
   Journ.cpp
   Level.cpp
@@ -45,7 +46,6 @@ set(lib_SOURCES
   MsgQueue.cpp
   Order.cpp
   Posn.cpp
-  Product.cpp
   Request.cpp
   Transaction.cpp
   Types.cpp)
@@ -77,6 +77,7 @@ endforeach()
 set(test_SOURCES
   Asset.ut.cpp
   Date.ut.cpp
+  Instr.ut.cpp
   IntTypes.ut.cpp
   Level.ut.cpp
   Market.ut.cpp
@@ -84,7 +85,6 @@ set(test_SOURCES
   MsgHandler.ut.cpp
   MsgQueue.ut.cpp
   Posn.ut.cpp
-  Product.ut.cpp
   Request.ut.cpp
   Transaction.ut.cpp)
 

@@ -177,7 +177,7 @@ BOOST_FIXTURE_TEST_CASE(MsgQueueCreateMarket, Fixture)
     const auto& body = msg.create_market;
 
     BOOST_CHECK_EQUAL(body.id, MarketId);
-    BOOST_CHECK_EQUAL(strncmp(body.product, "EURUSD", sizeof(body.product)), 0);
+    BOOST_CHECK_EQUAL(strncmp(body.instr, "EURUSD", sizeof(body.instr)), 0);
     BOOST_CHECK_EQUAL(body.settl_day, SettlDay);
     BOOST_CHECK_EQUAL(body.state, 0x1U);
 }
@@ -217,7 +217,7 @@ BOOST_FIXTURE_TEST_CASE(MsgQueueCreateExec, Fixture)
 
         BOOST_CHECK_EQUAL(strncmp(body.accnt, "MARAYL", sizeof(body.accnt)), 0);
         BOOST_CHECK_EQUAL(body.market_id, MarketId);
-        BOOST_CHECK_EQUAL(strncmp(body.product, "EURUSD", sizeof(body.product)), 0);
+        BOOST_CHECK_EQUAL(strncmp(body.instr, "EURUSD", sizeof(body.instr)), 0);
         BOOST_CHECK_EQUAL(body.settl_day, SettlDay);
         BOOST_CHECK_EQUAL(body.id, 1_id64);
         BOOST_CHECK_EQUAL(body.order_id, 2_id64);
@@ -246,7 +246,7 @@ BOOST_FIXTURE_TEST_CASE(MsgQueueCreateExec, Fixture)
         const auto& body = msg.create_exec;
 
         BOOST_CHECK_EQUAL(body.market_id, MarketId);
-        BOOST_CHECK_EQUAL(strncmp(body.product, "EURUSD", sizeof(body.product)), 0);
+        BOOST_CHECK_EQUAL(strncmp(body.instr, "EURUSD", sizeof(body.instr)), 0);
         BOOST_CHECK_EQUAL(body.settl_day, SettlDay);
         BOOST_CHECK_EQUAL(body.id, 3_id64);
         BOOST_CHECK_EQUAL(body.order_id, 2_id64);

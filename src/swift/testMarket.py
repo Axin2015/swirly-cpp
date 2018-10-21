@@ -49,7 +49,7 @@ class TestCase(RestTestCase):
           self.create_order(client, 'MARAYL', 'USDCHF', 20140302, 'Buy', 3, 9344)
 
           self.get_all(client)
-          self.get_by_product(client)
+          self.get_by_instr(client)
           self.get_by_market(client)
 
       with Server(db_file, self.now) as server:
@@ -57,7 +57,7 @@ class TestCase(RestTestCase):
           client.set_time(self.now)
 
           self.get_all(client)
-          self.get_by_product(client)
+          self.get_by_instr(client)
           self.get_by_market(client)
 
   def get_all(self, client):
@@ -70,7 +70,7 @@ class TestCase(RestTestCase):
       u'bid_count': [1, 2, None],
       u'bid_lots': [3, 12, None],
       u'bid_ticks': [12344, 12343, None],
-      u'product': u'EURUSD',
+      u'instr': u'EURUSD',
       u'id': 82255,
       u'last_lots': None,
       u'last_ticks': None,
@@ -84,7 +84,7 @@ class TestCase(RestTestCase):
       u'bid_count': [1, 1, None],
       u'bid_lots': [3, 5, None],
       u'bid_ticks': [15344, 15343, None],
-      u'product': u'GBPUSD',
+      u'instr': u'GBPUSD',
       u'id': 147791,
       u'last_lots': None,
       u'last_ticks': None,
@@ -98,7 +98,7 @@ class TestCase(RestTestCase):
       u'bid_count': [1, None, None],
       u'bid_lots': [7, None, None],
       u'bid_ticks': [15342, None, None],
-      u'product': u'GBPUSD',
+      u'instr': u'GBPUSD',
       u'id': 147822,
       u'last_lots': None,
       u'last_ticks': None,
@@ -112,7 +112,7 @@ class TestCase(RestTestCase):
       u'bid_count': [1, None, None],
       u'bid_lots': [3, None, None],
       u'bid_ticks': [9344, None, None],
-      u'product': u'USDCHF',
+      u'instr': u'USDCHF',
       u'id': 213327,
       u'last_lots': None,
       u'last_ticks': None,
@@ -124,7 +124,7 @@ class TestCase(RestTestCase):
       u'state': 0
     }], resp.content)
 
-  def get_by_product(self, client):
+  def get_by_instr(self, client):
     client.set_anon()
     resp = client.send('GET', '/api/market/GBPUSD')
 
@@ -134,7 +134,7 @@ class TestCase(RestTestCase):
       u'bid_count': [1, 1, None],
       u'bid_lots': [3, 5, None],
       u'bid_ticks': [15344, 15343, None],
-      u'product': u'GBPUSD',
+      u'instr': u'GBPUSD',
       u'id': 147791,
       u'last_lots': None,
       u'last_ticks': None,
@@ -148,7 +148,7 @@ class TestCase(RestTestCase):
       u'bid_count': [1, None, None],
       u'bid_lots': [7, None, None],
       u'bid_ticks': [15342, None, None],
-      u'product': u'GBPUSD',
+      u'instr': u'GBPUSD',
       u'id': 147822,
       u'last_lots': None,
       u'last_ticks': None,
@@ -170,7 +170,7 @@ class TestCase(RestTestCase):
       u'bid_count': [1, 1, None],
       u'bid_lots': [3, 5, None],
       u'bid_ticks': [15344, 15343, None],
-      u'product': u'GBPUSD',
+      u'instr': u'GBPUSD',
       u'id': 147791,
       u'last_lots': None,
       u'last_ticks': None,

@@ -17,8 +17,8 @@
 #ifndef SWIRLYUI_MARKET_HXX
 #define SWIRLYUI_MARKET_HXX
 
+#include "Instr.hxx"
 #include "Level.hxx"
-#include "Product.hxx"
 
 namespace swirly {
 namespace ui {
@@ -27,7 +27,7 @@ namespace market {
 enum class Column : int { //
     CheckState,           //
     Id,                   //
-    Product,              //
+    Instr,                //
     SettlDate,            //
     State,                //
     BidCount,             //
@@ -48,10 +48,10 @@ class Market {
   public:
     using Levels = std::array<Level, MaxLevels>;
 
-    Market(Id64 id, const Product& product, QDate settl_date, MarketState state,
+    Market(Id64 id, const Instr& instr, QDate settl_date, MarketState state,
            const QDateTime& last_time, Lots last_lots, Ticks last_ticks)
     : id_{id}
-    , product_{product}
+    , instr_{instr}
     , settl_date_{settl_date}
     , state_{state}
     , last_time_{last_time}
@@ -62,10 +62,10 @@ class Market {
     Market() = default;
     ~Market() = default;
 
-    static Market from_json(const Product& product, const QJsonObject& obj);
+    static Market from_json(const Instr& instr, const QJsonObject& obj);
 
     Id64 id() const noexcept { return id_; }
-    const Product& product() const noexcept { return product_; }
+    const Instr& instr() const noexcept { return instr_; }
     QDate settl_date() const noexcept { return settl_date_; }
     MarketState state() const noexcept { return state_; }
     const QDateTime& last_time() const noexcept { return last_time_; }
@@ -78,7 +78,7 @@ class Market {
 
   private:
     Id64 id_{};
-    Product product_{};
+    Instr instr_{};
     QDate settl_date_{};
     MarketState state_{};
     QDateTime last_time_{};

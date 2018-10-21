@@ -50,7 +50,7 @@ class TestCase(RestTestCase):
         u'bid_count': [None, None, None],
         u'bid_lots': [None, None, None],
         u'bid_ticks': [None, None, None],
-        u'product': u'EURUSD',
+        u'instr': u'EURUSD',
         u'id': 82255,
         u'last_lots': 3,
         u'last_ticks': 12345,
@@ -63,7 +63,7 @@ class TestCase(RestTestCase):
       },
       u'execs': [{
         u'accnt': u'GOSAYL',
-        u'product': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cpty': u'MARAYL',
         u'created': self.now,
         u'exec_cost': 37035,
@@ -87,7 +87,7 @@ class TestCase(RestTestCase):
         u'ticks': 12345
       }, {
         u'accnt': u'GOSAYL',
-        u'product': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cpty': None,
         u'created': self.now,
         u'exec_cost': 0,
@@ -112,7 +112,7 @@ class TestCase(RestTestCase):
       }],
       u'orders': [{
         u'accnt': u'GOSAYL',
-        u'product': u'EURUSD',
+        u'instr': u'EURUSD',
         u'created': self.now,
         u'exec_cost': 37035,
         u'exec_lots': 3,
@@ -134,7 +134,7 @@ class TestCase(RestTestCase):
         u'accnt': u'GOSAYL',
         u'buy_cost': 0,
         u'buy_lots': 0,
-        u'product': u'EURUSD',
+        u'instr': u'EURUSD',
         u'market_id': 82255,
         u'open_cost': -37035,
         u'sell_cost': 37035,
@@ -159,7 +159,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'product': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cpty': u'GOSAYL',
       u'created': self.now,
       u'exec_cost': 37035,
@@ -183,7 +183,7 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }, {
       u'accnt': u'MARAYL',
-      u'product': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
       u'exec_cost': 0,
@@ -215,7 +215,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'product': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cpty': u'GOSAYL',
       u'created': self.now,
       u'exec_cost': 37035,
@@ -249,7 +249,7 @@ class TestCase(RestTestCase):
       u'accnt': u'MARAYL',
       u'buy_cost': 37035,
       u'buy_lots': 3,
-      u'product': u'EURUSD',
+      u'instr': u'EURUSD',
       u'market_id': 82255,
       u'open_cost': 37035,
       u'sell_cost': 0,

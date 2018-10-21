@@ -30,12 +30,12 @@ inline namespace fin {
 
 class SWIRLY_API Request {
   public:
-    Request(WallTime created, Symbol accnt, Id64 market_id, Symbol product, JDay settl_day, Id64 id,
+    Request(WallTime created, Symbol accnt, Id64 market_id, Symbol instr, JDay settl_day, Id64 id,
             std::string_view ref, Side side, Lots lots) noexcept
     : created_{created}
     , accnt_{accnt}
     , market_id_{market_id}
-    , product_{product}
+    , instr_{instr}
     , settl_day_{settl_day}
     , id_{id}
     , ref_{ref}
@@ -55,7 +55,7 @@ class SWIRLY_API Request {
     auto created() const noexcept { return created_; }
     auto accnt() const noexcept { return accnt_; }
     auto market_id() const noexcept { return market_id_; }
-    auto product() const noexcept { return product_; }
+    auto instr() const noexcept { return instr_; }
     auto settl_day() const noexcept { return settl_day_; }
     auto id() const noexcept { return id_; }
     auto ref() const noexcept { return +ref_; }
@@ -71,7 +71,7 @@ class SWIRLY_API Request {
      */
     const Symbol accnt_;
     const Id64 market_id_;
-    const Symbol product_;
+    const Symbol instr_;
     const JDay settl_day_;
     const Id64 id_;
     /**

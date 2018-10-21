@@ -14,40 +14,40 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYUI_PRODUCTMODEL_HXX
-#define SWIRLYUI_PRODUCTMODEL_HXX
+#ifndef SWIRLYUI_INSTRVIEW_HXX
+#define SWIRLYUI_INSTRVIEW_HXX
 
-#include "Product.hxx"
-#include "TableModel.hxx"
+#include <QWidget>
+
+class QModelIndex;
+class QTableView;
 
 namespace swirly {
 namespace ui {
 
-class ProductModel
-: public TableModel<QString, Product, unbox(product::Column::CheckState), product::ColumnCount> {
+class Instr;
+class InstrModel;
+
+class InstrView : public QWidget {
+    Q_OBJECT
+
   public:
-    ProductModel(QObject* parent = nullptr);
-    ~ProductModel() override;
+    InstrView(InstrModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
+    ~InstrView() override;
 
-    QVariant data(const QModelIndex& index, int role) const override;
+    void resize_columns_to_contents();
 
-    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+  signals:
 
-    Product find(const QString& symbol) const;
-
-    int index_of(const QString& symbol) const;
-
-    void remove_row(const Product& product) { TableModel::remove_row(product.symbol()); }
-    void update_row(std::uint64_t tag, const Product& product)
-    {
-        TableModel::update_row(product.symbol(), tag, product);
-    }
+  private slots:
+    void slot_clicked(const QModelIndex& index);
 
   private:
-    QVariant header_[product::ColumnCount];
+    InstrModel& model_;
+    QTableView* table_{nullptr};
 };
 
 } // namespace ui
 } // namespace swirly
 
-#endif // SWIRLYUI_PRODUCTMODEL_HXX
+#endif // SWIRLYUI_INSTRVIEW_HXX

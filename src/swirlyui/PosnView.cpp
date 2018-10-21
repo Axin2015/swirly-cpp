@@ -66,7 +66,7 @@ void PosnView::slot_clicked(const QModelIndex& index)
     optional<Lots> lots;
     optional<Ticks> ticks;
     const auto& posn = model_.value_at(index.row());
-    emit set_fields(posn.product().symbol(), posn.settl_date(), lots, ticks);
+    emit set_fields(posn.instr().symbol(), posn.settl_date(), lots, ticks);
 }
 
 } // namespace ui

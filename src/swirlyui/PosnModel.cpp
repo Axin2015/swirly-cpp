@@ -29,7 +29,7 @@ PosnModel::PosnModel(QObject* parent)
     header_[unbox(Column::CheckState)] = tr("");
     header_[unbox(Column::Accnt)] = tr("Accnt");
     header_[unbox(Column::MarketId)] = tr("Market Id");
-    header_[unbox(Column::Product)] = tr("Product");
+    header_[unbox(Column::Instr)] = tr("Instr");
     header_[unbox(Column::SettlDate)] = tr("Settl Date");
     header_[unbox(Column::BuyLots)] = tr("Buy Lots");
     header_[unbox(Column::BuyAvgPrice)] = tr("Buy Avg");
@@ -64,8 +64,8 @@ QVariant PosnModel::data(const QModelIndex& index, int role) const
         case Column::MarketId:
             var = to_variant(posn.market_id());
             break;
-        case Column::Product:
-            var = posn.product().symbol();
+        case Column::Instr:
+            var = posn.instr().symbol();
             break;
         case Column::SettlDate:
             var = posn.settl_date();
@@ -74,13 +74,13 @@ QVariant PosnModel::data(const QModelIndex& index, int role) const
             var = to_variant(posn.buy_lots());
             break;
         case Column::BuyAvgPrice:
-            var = ticks_to_avg_price_string(posn.buy_lots(), posn.buy_cost(), posn.product());
+            var = ticks_to_avg_price_string(posn.buy_lots(), posn.buy_cost(), posn.instr());
             break;
         case Column::SellLots:
             var = to_variant(posn.sell_lots());
             break;
         case Column::SellAvgPrice:
-            var = ticks_to_avg_price_string(posn.sell_lots(), posn.sell_cost(), posn.product());
+            var = ticks_to_avg_price_string(posn.sell_lots(), posn.sell_cost(), posn.instr());
             break;
         }
     } else if (role == Qt::TextAlignmentRole) {
@@ -91,7 +91,7 @@ QVariant PosnModel::data(const QModelIndex& index, int role) const
             var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
             break;
         case Column::MarketId:
-        case Column::Product:
+        case Column::Instr:
         case Column::SettlDate:
         case Column::BuyLots:
         case Column::BuyAvgPrice:

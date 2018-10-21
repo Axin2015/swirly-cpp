@@ -100,7 +100,7 @@ CREATE TABLE asset_t (
 )
 ;
 
-CREATE TABLE product_t (
+CREATE TABLE instr_t (
   id INT NOT NULL PRIMARY KEY,
   symbol CHAR(16) NOT NULL UNIQUE,
   display VARCHAR(64) NOT NULL UNIQUE,
@@ -133,14 +133,14 @@ CREATE INDEX accnt_modified_idx ON accnt_t (modified);
 
 CREATE TABLE market_t (
   id BIGINT NOT NULL PRIMARY KEY,
-  product CHAR(16) NOT NULL,
+  instr CHAR(16) NOT NULL,
   settl_day INT NULL DEFAULT NULL,
   state INT NOT NULL DEFAULT 0,
   last_time BIGINT NULL DEFAULT NULL,
   last_lots BIGINT NULL DEFAULT NULL,
   last_ticks BIGINT NULL DEFAULT NULL,
 
-  FOREIGN KEY (product) REFERENCES product_t (symbol)
+  FOREIGN KEY (instr) REFERENCES instr_t (symbol)
 )
 ;
 
@@ -149,7 +149,7 @@ CREATE TABLE order_t (
   modified BIGINT NOT NULL,
   accnt CHAR(16) NOT NULL,
   market_id BIGINT NOT NULL,
-  product CHAR(16) NOT NULL,
+  instr CHAR(16) NOT NULL,
   settl_day INT NULL DEFAULT NULL,
   id BIGINT NOT NULL,
   ref VARCHAR(64) NULL DEFAULT NULL,
@@ -167,7 +167,7 @@ CREATE TABLE order_t (
   PRIMARY KEY (market_id, id),
 
   FOREIGN KEY (market_id) REFERENCES market_t (id),
-  FOREIGN KEY (product) REFERENCES product_t (symbol),
+  FOREIGN KEY (instr) REFERENCES instr_t (symbol),
   FOREIGN KEY (state_id) REFERENCES state_t (id),
   FOREIGN KEY (side_id) REFERENCES side_t (id)
 )
@@ -180,7 +180,7 @@ CREATE TABLE exec_t (
   archive BIGINT NULL DEFAULT NULL,
   accnt CHAR(16) NOT NULL,
   market_id BIGINT NOT NULL,
-  product CHAR(16) NOT NULL,
+  instr CHAR(16) NOT NULL,
   settl_day INT NULL DEFAULT NULL,
   id BIGINT NOT NULL,
   order_id BIGINT NULL DEFAULT NULL,
@@ -206,7 +206,7 @@ CREATE TABLE exec_t (
 
   FOREIGN KEY (market_id) REFERENCES market_t (id),
   FOREIGN KEY (market_id, order_id) REFERENCES order_t (market_id, id),
-  FOREIGN KEY (product) REFERENCES product_t (symbol),
+  FOREIGN KEY (instr) REFERENCES instr_t (symbol),
   FOREIGN KEY (state_id) REFERENCES state_t (id),
   FOREIGN KEY (side_id) REFERENCES side_t (id),
   FOREIGN KEY (liq_ind_id) REFERENCES liq_ind_t (id)
@@ -239,7 +239,7 @@ CREATE TRIGGER before_insert_on_exec2
       modified,
       accnt,
       market_id,
-      product,
+      instr,
       settl_day,
       id,
       ref,
@@ -258,7 +258,7 @@ CREATE TRIGGER before_insert_on_exec2
       NEW.created,
       NEW.accnt,
       NEW.market_id,
-      NEW.product,
+      NEW.instr,
       NEW.settl_day,
       NEW.order_id,
       NEW.ref,
@@ -331,7 +331,7 @@ CREATE VIEW asset_v AS
   ON a.type_id = t.id
 ;
 
-CREATE VIEW product_v AS
+CREATE VIEW instr_v AS
   SELECT
     i.id,
     i.symbol,
@@ -346,7 +346,7 @@ CREATE VIEW product_v AS
     i.pip_dp,
     i.min_lots,
     i.max_lots
-  FROM product_t i
+  FROM instr_t i
   LEFT OUTER JOIN asset_v a
   ON i.base_asset = a.symbol
 ;
@@ -354,7 +354,7 @@ CREATE VIEW product_v AS
 CREATE VIEW market_v AS
   SELECT
     m.id,
-    m.product,
+    m.instr,
     m.settl_day,
     m.state,
     m.last_time,
@@ -373,7 +373,7 @@ CREATE VIEW order_v AS
     o.modified,
     o.accnt,
     o.market_id,
-    o.product,
+    o.instr,
     o.settl_day,
     o.id,
     o.ref,
@@ -400,7 +400,7 @@ CREATE VIEW exec_v AS
     e.archive,
     e.accnt,
     e.market_id,
-    e.product,
+    e.instr,
     e.settl_day,
     e.id,
     e.order_id,
@@ -434,7 +434,7 @@ CREATE VIEW posn_v AS
   SELECT
     e.accnt,
     e.market_id,
-    e.product,
+    e.instr,
     e.settl_day,
     e.side_id,
     SUM(e.last_lots) lots,

@@ -21,10 +21,11 @@
 
 #include <swirly/fin/Asset.hpp>
 #include <swirly/fin/Exec.hpp>
+#include <swirly/fin/Instr.hpp>
 #include <swirly/fin/Market.hpp>
+
 #include <swirly/fin/Order.hpp>
 #include <swirly/fin/Posn.hpp>
-#include <swirly/fin/Product.hpp>
 
 #include <swirly/util/Config.hpp>
 
@@ -61,23 +62,23 @@ void SqliteModel::do_read_asset(const ModelCallback<AssetPtr>& cb) const
     }
 }
 
-void SqliteModel::do_read_product(const ModelCallback<ProductPtr>& cb) const
+void SqliteModel::do_read_instr(const ModelCallback<InstrPtr>& cb) const
 {
-    using namespace product;
+    using namespace instr;
     StmtPtr stmt{prepare(*db_, SelectSql)};
     while (step(*stmt)) {
-        cb(Product::make(column<Id32>(*stmt, Id),               //
-                         column<string_view>(*stmt, Symbol),    //
-                         column<string_view>(*stmt, Display),   //
-                         column<string_view>(*stmt, BaseAsset), //
-                         column<string_view>(*stmt, TermCcy),   //
-                         column<int>(*stmt, LotNumer),          //
-                         column<int>(*stmt, LotDenom),          //
-                         column<int>(*stmt, TickNumer),         //
-                         column<int>(*stmt, TickDenom),         //
-                         column<int>(*stmt, PipDp),             //
-                         column<Lots>(*stmt, MinLots),          //
-                         column<Lots>(*stmt, MaxLots)));
+        cb(Instr::make(column<Id32>(*stmt, Id),               //
+                       column<string_view>(*stmt, Symbol),    //
+                       column<string_view>(*stmt, Display),   //
+                       column<string_view>(*stmt, BaseAsset), //
+                       column<string_view>(*stmt, TermCcy),   //
+                       column<int>(*stmt, LotNumer),          //
+                       column<int>(*stmt, LotDenom),          //
+                       column<int>(*stmt, TickNumer),         //
+                       column<int>(*stmt, TickDenom),         //
+                       column<int>(*stmt, PipDp),             //
+                       column<Lots>(*stmt, MinLots),          //
+                       column<Lots>(*stmt, MaxLots)));
     }
 }
 
@@ -86,13 +87,13 @@ void SqliteModel::do_read_market(const ModelCallback<MarketPtr>& cb) const
     using namespace market;
     StmtPtr stmt{prepare(*db_, SelectSql)};
     while (step(*stmt)) {
-        cb(Market::make(column<Id64>(*stmt, Id),             //
-                        column<string_view>(*stmt, Product), //
-                        column<JDay>(*stmt, SettlDay),       //
-                        column<MarketState>(*stmt, State),   //
-                        column<WallTime>(*stmt, LastTime),   //
-                        column<Lots>(*stmt, LastLots),       //
-                        column<Ticks>(*stmt, LastTicks),     //
+        cb(Market::make(column<Id64>(*stmt, Id),           //
+                        column<string_view>(*stmt, Instr), //
+                        column<JDay>(*stmt, SettlDay),     //
+                        column<MarketState>(*stmt, State), //
+                        column<WallTime>(*stmt, LastTime), //
+                        column<Lots>(*stmt, LastLots),     //
+                        column<Ticks>(*stmt, LastTicks),   //
                         column<Id64>(*stmt, MaxId)));
     }
 }
@@ -106,7 +107,7 @@ void SqliteModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
                        column<WallTime>(*stmt, Modified),       //
                        column<string_view>(*stmt, Accnt),       //
                        column<Id64>(*stmt, MarketId),           //
-                       column<string_view>(*stmt, Product),     //
+                       column<string_view>(*stmt, Instr),       //
                        column<JDay>(*stmt, SettlDay),           //
                        column<Id64>(*stmt, Id),                 //
                        column<string_view>(*stmt, Ref),         //
@@ -133,7 +134,7 @@ void SqliteModel::do_read_exec(WallTime since, const ModelCallback<ExecPtr>& cb)
         cb(Exec::make(column<WallTime>(*stmt, Created),        //
                       column<string_view>(*stmt, Accnt),       //
                       column<Id64>(*stmt, MarketId),           //
-                      column<string_view>(*stmt, Product),     //
+                      column<string_view>(*stmt, Instr),       //
                       column<JDay>(*stmt, SettlDay),           //
                       column<Id64>(*stmt, Id),                 //
                       column<Id64>(*stmt, OrderId),            //
@@ -164,7 +165,7 @@ void SqliteModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
         cb(Exec::make(column<WallTime>(*stmt, Created),        //
                       column<string_view>(*stmt, Accnt),       //
                       column<Id64>(*stmt, MarketId),           //
-                      column<string_view>(*stmt, Product),     //
+                      column<string_view>(*stmt, Instr),       //
                       column<JDay>(*stmt, SettlDay),           //
                       column<Id64>(*stmt, Id),                 //
                       column<Id64>(*stmt, OrderId),            //
@@ -198,7 +199,7 @@ void SqliteModel::do_read_posn(JDay bus_day, const ModelCallback<PosnPtr>& cb) c
     while (step(*stmt)) {
         const auto accnt = column<string_view>(*stmt, Accnt);
         auto market_id = column<Id64>(*stmt, MarketId);
-        const auto product = column<string_view>(*stmt, Product);
+        const auto instr = column<string_view>(*stmt, Instr);
         auto settl_day = column<JDay>(*stmt, SettlDay);
 
         // FIXME: review when end of day is implemented.
@@ -210,7 +211,7 @@ void SqliteModel::do_read_posn(JDay bus_day, const ModelCallback<PosnPtr>& cb) c
         bool found;
         tie(it, found) = ps.find_hint(accnt, market_id);
         if (!found) {
-            it = ps.insert_hint(it, Posn::make(accnt, market_id, product, settl_day));
+            it = ps.insert_hint(it, Posn::make(accnt, market_id, instr, settl_day));
         }
 
         const auto side = column<swirly::Side>(*stmt, Side);

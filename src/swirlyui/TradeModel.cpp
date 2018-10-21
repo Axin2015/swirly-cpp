@@ -28,7 +28,7 @@ TradeModel::TradeModel(QObject* parent)
     header_[unbox(Column::Created)] = tr("Created");
     header_[unbox(Column::Accnt)] = tr("Accnt");
     header_[unbox(Column::MarketId)] = tr("Market Id");
-    header_[unbox(Column::Product)] = tr("Product");
+    header_[unbox(Column::Instr)] = tr("Instr");
     header_[unbox(Column::SettlDate)] = tr("Settl Date");
     header_[unbox(Column::Id)] = tr("Id");
     header_[unbox(Column::OrderId)] = tr("Order Id");
@@ -78,8 +78,8 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
         case Column::MarketId:
             var = to_variant(trade.market_id());
             break;
-        case Column::Product:
-            var = trade.product().symbol();
+        case Column::Instr:
+            var = trade.instr().symbol();
             break;
         case Column::SettlDate:
             var = trade.settl_date();
@@ -104,7 +104,7 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
             break;
         case Column::Price:
             if (trade.lots() != 0_lts) {
-                var = ticks_to_price_string(trade.ticks(), trade.product());
+                var = ticks_to_price_string(trade.ticks(), trade.instr());
             }
             break;
         case Column::ResdLots:
@@ -114,14 +114,14 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
             var = to_variant(trade.exec_lots());
             break;
         case Column::AvgPrice:
-            var = ticks_to_avg_price_string(trade.exec_lots(), trade.exec_cost(), trade.product());
+            var = ticks_to_avg_price_string(trade.exec_lots(), trade.exec_cost(), trade.instr());
             break;
         case Column::LastLots:
             var = to_variant(trade.last_lots());
             break;
         case Column::LastPrice:
             if (trade.last_lots() != 0_lts) {
-                var = ticks_to_price_string(trade.last_ticks(), trade.product());
+                var = ticks_to_price_string(trade.last_ticks(), trade.instr());
             }
             break;
         case Column::MinLots:
@@ -158,7 +158,7 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
             var = QVariant{Qt::AlignRight | Qt::AlignVCenter};
             break;
         case Column::Accnt:
-        case Column::Product:
+        case Column::Instr:
         case Column::Ref:
         case Column::State:
         case Column::Side:

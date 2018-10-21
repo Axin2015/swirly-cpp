@@ -52,42 +52,42 @@ INSERT INTO asset_t (id, symbol, display, type_id)
        VALUES (9, 'VZ', 'Verizon Com', 2)
 ;
 
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (1, 'CSCO', 'Cisco Systems Inc', 'CSCO', 'USD', 1, 1, 1, 1000, 3, 1, 10);
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (2, 'DIS', 'Walt Disney', 'DIS', 'USD', 1, 1, 1, 1000, 3, 1, 10);
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (3, 'IBM', 'Ibm Corp', 'IBM', 'USD', 1, 1, 1, 1000, 3, 1, 10);
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (4, 'INTC', 'Intel Corp', 'INTC', 'USD', 1, 1, 1, 1000, 3, 1, 10);
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (5, 'MSFT', 'Microsoft Corp', 'MSFT', 'USD', 1, 1, 1, 1000, 3, 1, 10);
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (6, 'VIA', 'Viacom Inc', 'VIA', 'USD', 1, 1, 1, 1000, 3, 1, 10);
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (7, 'VOD', 'Vodafone Group Plc', 'VOD', 'USD', 1, 1, 1, 1000, 3, 1, 10);
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (8, 'VZ', 'Verizon Com', 'VZ', 'USD', 1, 1, 1, 1000, 3, 1, 10);
 ;
 
 -- Example cash market.
-INSERT INTO market_t (id, product, settl_day, state)
-       VALUES ((SELECT (id << 16) FROM product_t WHERE symbol = 'CSCO'), 'CSCO', NULL, 0)
+INSERT INTO market_t (id, instr, settl_day, state)
+       VALUES ((SELECT (id << 16) FROM instr_t WHERE symbol = 'CSCO'), 'CSCO', NULL, 0)
 ;
 
 COMMIT

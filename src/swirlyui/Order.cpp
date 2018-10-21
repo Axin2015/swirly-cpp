@@ -22,14 +22,14 @@ namespace swirly {
 namespace ui {
 
 Order::Order(const QDateTime& created, const QDateTime& modified, const QString& accnt,
-             Id64 market_id, const Product& product, QDate settl_date, Id64 id, const QString& ref,
+             Id64 market_id, const Instr& instr, QDate settl_date, Id64 id, const QString& ref,
              State state, Side side, Lots lots, Ticks ticks, Lots resd_lots, Lots exec_lots,
              Cost exec_cost, Lots last_lots, Ticks last_ticks, Lots min_lots)
 : created_{created}
 , modified_{modified}
 , accnt_{accnt}
 , market_id_{market_id}
-, product_{product}
+, instr_{instr}
 , settl_date_{settl_date}
 , id_{id}
 , ref_{ref}
@@ -46,14 +46,14 @@ Order::Order(const QDateTime& created, const QDateTime& modified, const QString&
 {
 }
 
-Order Order::from_json(const Product& product, const QJsonObject& obj)
+Order Order::from_json(const Instr& instr, const QJsonObject& obj)
 {
     using swirly::ui::from_json;
     return Order{from_json<QDateTime>(obj["created"]),
                  from_json<QDateTime>(obj["modified"]),
                  from_json<QString>(obj["accnt"]),
                  from_json<Id64>(obj["market_id"]),
-                 product,
+                 instr,
                  from_json<QDate>(obj["settl_date"]),
                  from_json<Id64>(obj["id"]),
                  from_json<QString>(obj["ref"]),
@@ -74,7 +74,7 @@ QDebug operator<<(QDebug debug, const Order& order)
     debug.nospace() << "Order{created=" << order.created()  //
                     << ",modified=" << order.modified()     //
                     << ",market_id=" << order.market_id()   //
-                    << ",product=" << order.product()       //
+                    << ",instr=" << order.instr()           //
                     << ",settl_date=" << order.settl_date() //
                     << ",id=" << order.id()                 //
                     << ",ref=" << order.ref()               //

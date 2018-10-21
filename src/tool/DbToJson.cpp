@@ -19,11 +19,11 @@
 #include <swirly/fin/Asset.hpp>
 #include <swirly/fin/Date.hpp>
 #include <swirly/fin/Exec.hpp>
+#include <swirly/fin/Instr.hpp>
 #include <swirly/fin/Market.hpp>
 #include <swirly/fin/Model.hpp>
 #include <swirly/fin/Order.hpp>
 #include <swirly/fin/Posn.hpp>
-#include <swirly/fin/Product.hpp>
 
 #include <swirly/util/Config.hpp>
 #include <swirly/util/Stream.hpp>
@@ -55,10 +55,10 @@ int main(int argc, char* argv[])
             OStreamJoiner it(cout, ',');
             model.read_asset([&it](auto ptr) { it = *ptr; });
         }
-        cout << "],\"products\":[";
+        cout << "],\"instrs\":[";
         {
             OStreamJoiner it(cout, ',');
-            model.read_product([&it](auto ptr) { it = *ptr; });
+            model.read_instr([&it](auto ptr) { it = *ptr; });
         }
         cout << "],\"markets\":[";
         {

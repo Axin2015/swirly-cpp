@@ -87,7 +87,7 @@ void SqliteJourn::on_create_market(WallTime now, const CreateMarket& body)
 
     ScopedBind bind{stmt};
     bind(body.id);
-    bind(to_string_view(body.product));
+    bind(to_string_view(body.instr));
     bind(body.settl_day, MaybeNull);
     bind(body.state);
 
@@ -113,7 +113,7 @@ void SqliteJourn::on_create_exec(WallTime now, const CreateExec& body)
     bind(now);
     bind(to_string_view(body.accnt));
     bind(body.market_id);
-    bind(to_string_view(body.product));
+    bind(to_string_view(body.instr));
     bind(body.settl_day, MaybeNull);
     bind(body.id);
     bind(body.order_id, MaybeNull);

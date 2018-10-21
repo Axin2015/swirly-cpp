@@ -31,9 +31,9 @@ class HttpClient : public Client {
     HttpClient(QObject* parent = nullptr);
     ~HttpClient() override;
 
-    void create_market(const Product& product, QDate settl_date) override;
+    void create_market(const Instr& instr, QDate settl_date) override;
 
-    void create_order(const Product& product, QDate settl_date, const QString& ref, Side side,
+    void create_order(const Instr& instr, QDate settl_date, const QString& ref, Side side,
                       Lots lots, Ticks ticks) override;
 
     void cancel_orders(const OrderKeys& keys) override;
@@ -49,7 +49,7 @@ class HttpClient : public Client {
     void slot_networkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility accessible);
 
   private:
-    Product find_product(const QJsonObject& obj) const;
+    Instr find_instr(const QJsonObject& obj) const;
 
     void get_ref_data();
     void get_sess();

@@ -44,16 +44,16 @@ using namespace swirly;
 
 namespace {
 
-const Market& create_market(CyclTime now, LobApp& app, Symbol product_symbol, JDay settl_day,
+const Market& create_market(CyclTime now, LobApp& app, Symbol instr_symbol, JDay settl_day,
                             MarketState state)
 {
-    const auto& product = app.product(product_symbol);
-    const auto market_id = to_market_id(product.id(), settl_day);
+    const auto& instr = app.instr(instr_symbol);
+    const auto market_id = to_market_id(instr.id(), settl_day);
     auto it = app.markets().find(market_id);
     if (it != app.markets().end()) {
         return *it;
     }
-    return app.create_market(now, product, settl_day, state);
+    return app.create_market(now, instr, settl_day, state);
 }
 
 class Archiver {

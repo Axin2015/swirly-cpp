@@ -157,7 +157,7 @@ class SWIRLY_API Sess : protected Comparable<Sess> {
     /**
      * Throws std::bad_alloc.
      */
-    PosnPtr posn(Id64 market_id, Symbol product, JDay settl_day);
+    PosnPtr posn(Id64 market_id, Symbol instr, JDay settl_day);
 
     void insert_posn(const PosnPtr& posn) noexcept
     {

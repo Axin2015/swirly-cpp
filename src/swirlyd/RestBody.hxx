@@ -44,7 +44,7 @@ class RestBody {
     enum : unsigned {
         Symbol = 1 << 0,
         Accnt = 1 << 1,
-        Product = 1 << 2,
+        Instr = 1 << 2,
         SettlDate = 1 << 3,
         Ref = 1 << 4,
         State = 1 << 5,
@@ -70,7 +70,7 @@ class RestBody {
     unsigned fields() const noexcept { return fields_; }
     swirly::Symbol symbol() const noexcept { return +symbol_; }
     swirly::Symbol accnt() const noexcept { return +accnt_; }
-    swirly::Symbol product() const noexcept { return +product_; }
+    swirly::Symbol instr() const noexcept { return +instr_; }
     IsoDate settl_date() const noexcept { return settl_date_; }
     std::string_view ref() const noexcept { return +ref_; }
     MarketState state() const noexcept { return state_; }
@@ -114,7 +114,7 @@ class RestBody {
 
     StringData<MaxSymbol> symbol_;
     StringData<MaxSymbol> accnt_;
-    StringData<MaxSymbol> product_;
+    StringData<MaxSymbol> instr_;
     IsoDate settl_date_;
     StringData<MaxRef> ref_;
     MarketState state_;
