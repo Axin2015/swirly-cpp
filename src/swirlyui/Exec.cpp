@@ -21,15 +21,13 @@
 namespace swirly {
 namespace ui {
 
-Exec::Exec(const QDateTime& created, const QString& accnt, Id64 market_id, const Instr& instr,
-           QDate settl_date, Id64 id, Id64 order_id, const QString& ref, State state, Side side,
-           Lots lots, Ticks ticks, Lots resd_lots, Lots exec_lots, Cost exec_cost, Lots last_lots,
-           Ticks last_ticks, Lots min_lots, Id64 match_id, LiqInd liq_ind, const QString& cpty)
+Exec::Exec(const QDateTime& created, const QString& accnt, const Market& market, Id64 id,
+           Id64 order_id, const QString& ref, State state, Side side, Lots lots, Ticks ticks,
+           Lots resd_lots, Lots exec_lots, Cost exec_cost, Lots last_lots, Ticks last_ticks,
+           Lots min_lots, Id64 match_id, LiqInd liq_ind, const QString& cpty)
 : created_{created}
 , accnt_{accnt}
-, market_id_{market_id}
-, instr_{instr}
-, settl_date_{settl_date}
+, market_{market}
 , id_{id}
 , order_id_{order_id}
 , ref_{ref}
@@ -49,19 +47,27 @@ Exec::Exec(const QDateTime& created, const QString& accnt, Id64 market_id, const
 {
 }
 
-Exec Exec::from_json(const Instr& instr, const QJsonObject& obj)
+Exec Exec::from_json(const Market& market, const QJsonObject& obj)
 {
     using swirly::ui::from_json;
-    return Exec{from_json<QDateTime>(obj["created"]), from_json<QString>(obj["accnt"]),
-                from_json<Id64>(obj["market_id"]),    instr,
-                from_json<QDate>(obj["settl_date"]),  from_json<Id64>(obj["id"]),
-                from_json<Id64>(obj["order_id"]),     from_json<QString>(obj["ref"]),
-                from_json<State>(obj["state"]),       from_json<Side>(obj["side"]),
-                from_json<Lots>(obj["lots"]),         from_json<Ticks>(obj["ticks"]),
-                from_json<Lots>(obj["resd_lots"]),    from_json<Lots>(obj["exec_lots"]),
-                from_json<Cost>(obj["exec_cost"]),    from_json<Lots>(obj["last_lots"]),
-                from_json<Ticks>(obj["last_ticks"]),  from_json<Lots>(obj["min_lots"]),
-                from_json<Id64>(obj["match_id"]),     from_json<LiqInd>(obj["liq_ind"]),
+    return Exec{from_json<QDateTime>(obj["created"]),
+                from_json<QString>(obj["accnt"]),
+                market,
+                from_json<Id64>(obj["id"]),
+                from_json<Id64>(obj["order_id"]),
+                from_json<QString>(obj["ref"]),
+                from_json<State>(obj["state"]),
+                from_json<Side>(obj["side"]),
+                from_json<Lots>(obj["lots"]),
+                from_json<Ticks>(obj["ticks"]),
+                from_json<Lots>(obj["resd_lots"]),
+                from_json<Lots>(obj["exec_lots"]),
+                from_json<Cost>(obj["exec_cost"]),
+                from_json<Lots>(obj["last_lots"]),
+                from_json<Ticks>(obj["last_ticks"]),
+                from_json<Lots>(obj["min_lots"]),
+                from_json<Id64>(obj["match_id"]),
+                from_json<LiqInd>(obj["liq_ind"]),
                 from_json<QString>(obj["cpty"])};
 }
 
@@ -69,7 +75,7 @@ QDebug operator<<(QDebug debug, const Exec& exec)
 {
     debug.nospace() << "Exec{created=" << exec.created()   //
                     << ",accnt=" << exec.accnt()           //
-                    << ",market_id=" << exec.market_id()   //
+                    << ",market_id=" << exec.market().id() //
                     << ",instr=" << exec.instr()           //
                     << ",settl_date=" << exec.settl_date() //
                     << ",id=" << exec.id()                 //

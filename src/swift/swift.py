@@ -292,10 +292,11 @@ class RestTestCase(unittest.TestCase):
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
+    return int(resp.content['id'])
 
-  def create_order(self, client, accnt, instr, settl_date, side, lots, ticks):
+  def create_order(self, client, accnt, market_id, side, lots, ticks):
     client.set_trader(accnt)
-    resp = client.send('POST', '/api/sess/order/' + instr + '/' + str(settl_date),
+    resp = client.send('POST', '/api/sess/order/' + str(market_id),
                        side = side,
                        lots = lots,
                        ticks = ticks)

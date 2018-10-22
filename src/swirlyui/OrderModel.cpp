@@ -76,7 +76,7 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
             var = order.accnt();
             break;
         case Column::MarketId:
-            var = to_variant(order.market_id());
+            var = to_variant(order.market().id());
             break;
         case Column::Instr:
             var = order.instr().symbol();

@@ -157,10 +157,11 @@ void FixMaker::on_market_data_snapshot(CyclTime now, FixConn& conn, string_view 
 void FixMaker::on_trade(CyclTime now, const Sess& sess, const ExecPtr& trade)
 {
     if (conn_) {
-        auto fn = [&trade](CyclTime now, ostream& os) {
+        const auto& market = lob_app_.market(trade->market_id());
+        auto fn = [&trade, &market](CyclTime now, ostream& os) {
             // clang-format off
-            os << put_fix<Tag::Symbol>(trade->instr())
-               << put_fix<Tag::SettlDate>(maybe_jd_to_iso(trade->settl_day()))
+            os << put_fix<Tag::Symbol>(market.instr())
+               << put_fix<Tag::SettlDate>(maybe_jd_to_iso(market.settl_day()))
                << put_fix<Tag::ExecId>(trade->id())
                << put_fix<Tag::OrderId>(trade->order_id())
                << put_fix<Tag::ExecType>(trade->state())

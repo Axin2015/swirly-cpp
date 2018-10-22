@@ -76,7 +76,7 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
             var = trade.accnt();
             break;
         case Column::MarketId:
-            var = to_variant(trade.market_id());
+            var = to_variant(trade.market().id());
             break;
         case Column::Instr:
             var = trade.instr().symbol();

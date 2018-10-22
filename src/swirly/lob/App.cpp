@@ -155,10 +155,10 @@ struct LobApp::Impl {
         });
     }
 
-    const Market& create_market(CyclTime now, const Instr& instr, JDay settl_day, MarketState state)
+    const Market& create_market(CyclTime now, Id64 id, const Instr& instr, JDay settl_day,
+                                MarketState state)
     {
         const auto wall_time = now.wall_time();
-        const auto id = to_market_id(instr.id(), settl_day);
         auto [it, found] = markets_.find_hint(id);
         if (found) {
             throw AlreadyExistsException{err_msg() << "market for '" << instr.symbol() << "' on "
@@ -173,6 +173,9 @@ struct LobApp::Impl {
         }
         auto market = Market::make(id, instr.symbol(), settl_day, state);
         mq_.create_market(wall_time, id, instr.symbol(), settl_day, state);
+
+        // Commit phase.
+
         it = markets_.insert_hint(it, market);
         return *it;
     }
@@ -338,7 +341,7 @@ struct LobApp::Impl {
     TradePair create_trade(CyclTime now, Sess& sess, Market& market, string_view ref, Side side,
                            Lots lots, Ticks ticks, LiqInd liq_ind, Symbol cpty)
     {
-        auto posn = sess.posn(market.id(), market.instr(), market.settl_day());
+        auto posn = sess.posn(market.id());
         auto trade = new_manual(now.wall_time(), sess.accnt(), market, ref, side, lots, ticks,
                                 posn->open_lots(), posn->open_cost(), liq_ind, cpty);
         decltype(trade) cpty_trade;
@@ -347,7 +350,7 @@ struct LobApp::Impl {
 
             // Create back-to-back trade if counter-party is specified.
             auto& cpty_sess = this->sess(cpty);
-            auto cpty_posn = cpty_sess.posn(market.id(), market.instr(), market.settl_day());
+            auto cpty_posn = cpty_sess.posn(market.id());
             cpty_trade = trade->opposite(market.alloc_id());
 
             ConstExecPtr trades[] = {trade, cpty_trade};
@@ -419,9 +422,9 @@ struct LobApp::Impl {
   private:
     ExecPtr new_exec(WallTime now, const Order& order, Id64 id) const
     {
-        return Exec::make(now, order.accnt(), order.market_id(), order.instr(), order.settl_day(),
-                          id, order.id(), order.ref(), order.state(), order.side(), order.lots(),
-                          order.ticks(), order.resd_lots(), order.exec_lots(), order.exec_cost(),
+        return Exec::make(now, order.accnt(), order.market_id(), id, order.id(), order.ref(),
+                          order.state(), order.side(), order.lots(), order.ticks(),
+                          order.resd_lots(), order.exec_lots(), order.exec_cost(),
                           order.last_lots(), order.last_ticks(), order.min_lots(), 0_id64, 0_lts,
                           0_cst, LiqInd::None, Symbol{});
     }
@@ -429,9 +432,9 @@ struct LobApp::Impl {
     /**
      * Special factory method for manual trades.
      */
-    ExecPtr new_manual(WallTime now, Id64 market_id, Symbol instr, JDay settl_day, Id64 id,
-                       Symbol accnt, string_view ref, Side side, Lots lots, Ticks ticks,
-                       Lots posn_lots, Cost posn_cost, LiqInd liq_ind, Symbol cpty) const
+    ExecPtr new_manual(WallTime now, Id64 market_id, Id64 id, Symbol accnt, string_view ref,
+                       Side side, Lots lots, Ticks ticks, Lots posn_lots, Cost posn_cost,
+                       LiqInd liq_ind, Symbol cpty) const
     {
         const auto order_id = 0_id64;
         const auto state = State::Trade;
@@ -442,17 +445,17 @@ struct LobApp::Impl {
         const auto last_ticks = ticks;
         const auto min_lots = 1_lts;
         const auto match_id = 0_id64;
-        return Exec::make(now, accnt, market_id, instr, settl_day, id, order_id, ref, state, side,
-                          lots, ticks, resd, exec, cost, last_lots, last_ticks, min_lots, match_id,
-                          posn_lots, posn_cost, liq_ind, cpty);
+        return Exec::make(now, accnt, market_id, id, order_id, ref, state, side, lots, ticks, resd,
+                          exec, cost, last_lots, last_ticks, min_lots, match_id, posn_lots,
+                          posn_cost, liq_ind, cpty);
     }
 
     ExecPtr new_manual(WallTime now, Symbol accnt, Market& market, string_view ref, Side side,
                        Lots lots, Ticks ticks, Lots posn_lots, Cost posn_cost, LiqInd liq_ind,
                        Symbol cpty) const
     {
-        return new_manual(now, market.id(), market.instr(), market.settl_day(), market.alloc_id(),
-                          accnt, ref, side, lots, ticks, posn_lots, posn_cost, liq_ind, cpty);
+        return new_manual(now, market.id(), market.alloc_id(), accnt, ref, side, lots, ticks,
+                          posn_lots, posn_cost, liq_ind, cpty);
     }
 
     Match new_match(WallTime now, Market& market, const Order& taker_order,
@@ -464,7 +467,7 @@ struct LobApp::Impl {
         auto it = sesss_.find(maker_order->accnt());
         assert(it != sesss_.end());
         auto& maker_sess = *it;
-        auto maker_posn = maker_sess.posn(market.id(), market.instr(), market.settl_day());
+        auto maker_posn = maker_sess.posn(market.id());
 
         const auto ticks = maker_order->ticks();
 
@@ -626,8 +629,8 @@ struct LobApp::Impl {
             throw InvalidLotsException{err_msg() << "invalid lots '" << lots << '\''};
         }
         const auto id = market.alloc_id();
-        auto order = Order::make(wall_time, sess.accnt(), market.id(), market.instr(),
-                                 market.settl_day(), id, ref, side, lots, ticks, min_lots);
+        auto order = Order::make(wall_time, sess.accnt(), market.id(), id, ref, side, lots, ticks,
+                                 min_lots);
 
         ConstExecPtr exec;
         if constexpr (PolicyT::Transient) {
@@ -657,7 +660,7 @@ struct LobApp::Impl {
         if (have_matches) {
             // Avoid allocating position when there are no matches.
             // N.B. before commit phase, because this may fail.
-            posn = sess.posn(market.id(), market.instr(), market.settl_day());
+            posn = sess.posn(market.id());
             if constexpr (PolicyT::SetResponse) {
                 assert(resp);
                 resp->set_posn(posn);
@@ -827,10 +830,10 @@ void LobApp::set_trade_slot(const Sess& sess, TradeSlot slot) noexcept
     remove_const(sess).set_trade_slot(slot);
 }
 
-const Market& LobApp::create_market(CyclTime now, const Instr& instr, JDay settl_day,
+const Market& LobApp::create_market(CyclTime now, Id64 id, const Instr& instr, JDay settl_day,
                                     MarketState state)
 {
-    return impl_->create_market(now, instr, settl_day, state);
+    return impl_->create_market(now, id, instr, settl_day, state);
 }
 
 void LobApp::update_market(CyclTime now, const Market& market, MarketState state)

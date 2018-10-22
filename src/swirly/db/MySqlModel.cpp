@@ -153,8 +153,6 @@ void MySqlModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
     field::Time modified{result[Modified]};
     field::Symbol accnt{result[Accnt]};
     field::Id64 market_id{result[MarketId]};
-    field::Symbol instr{result[Instr]};
-    field::JDay settl_day{result[SettlDay]};
     field::Id64 id{result[Id]};
     field::Ref ref{result[Ref]};
     field::State state{result[State]};
@@ -174,8 +172,6 @@ void MySqlModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
                        to_time<WallClock>(Nanos{modified.value()}), //
                        accnt.value(),                               //
                        Id64{market_id.value()},                     //
-                       instr.value(),                               //
-                       JDay{settl_day.value()},                     //
                        Id64{id.value()},                            //
                        ref.value(),                                 //
                        swirly::State{state.value()},                //
@@ -209,8 +205,6 @@ void MySqlModel::do_read_exec(WallTime since, const ModelCallback<ExecPtr>& cb) 
     field::Time created{result[Created]};
     field::Symbol accnt{result[Accnt]};
     field::Id64 market_id{result[MarketId]};
-    field::Symbol instr{result[Instr]};
-    field::JDay settl_day{result[SettlDay]};
     field::Id64 id{result[Id]};
     field::Id64 order_id{result[OrderId]};
     field::Ref ref{result[Ref]};
@@ -235,8 +229,6 @@ void MySqlModel::do_read_exec(WallTime since, const ModelCallback<ExecPtr>& cb) 
         cb(Exec::make(to_time<WallClock>(Nanos{created.value()}), //
                       accnt.value(),                              //
                       Id64{market_id.value()},                    //
-                      instr.value(),                              //
-                      JDay{settl_day.value()},                    //
                       Id64{id.value()},                           //
                       Id64{order_id.value()},                     //
                       ref.value(),                                //
@@ -270,8 +262,6 @@ void MySqlModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
     field::Time created{result[Created]};
     field::Symbol accnt{result[Accnt]};
     field::Id64 market_id{result[MarketId]};
-    field::Symbol instr{result[Instr]};
-    field::JDay settl_day{result[SettlDay]};
     field::Id64 id{result[Id]};
     field::Id64 order_id{result[OrderId]};
     field::Ref ref{result[Ref]};
@@ -295,8 +285,6 @@ void MySqlModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
         cb(Exec::make(to_time<WallClock>(Nanos{created.value()}), //
                       accnt.value(),                              //
                       Id64{market_id.value()},                    //
-                      instr.value(),                              //
-                      JDay{settl_day.value()},                    //
                       Id64{id.value()},                           //
                       Id64{order_id.value()},                     //
                       ref.value(),                                //
@@ -332,8 +320,6 @@ void MySqlModel::do_read_posn(JDay bus_day, const ModelCallback<PosnPtr>& cb) co
     BindArray<7> result;
     field::Symbol accnt_field{result[Accnt]};
     field::Id64 market_id_field{result[MarketId]};
-    field::Symbol instr_field{result[Instr]};
-    field::JDay settl_day_field{result[SettlDay]};
     field::Side side_field{result[Side]};
     field::Lots lots_field{result[Lots]};
     field::Cost cost_field{result[Cost]};
@@ -342,19 +328,11 @@ void MySqlModel::do_read_posn(JDay bus_day, const ModelCallback<PosnPtr>& cb) co
     while (fetch(*stmt)) {
         const auto accnt = accnt_field.value();
         auto market_id = Id64{market_id_field.value()};
-        const auto instr = instr_field.value();
-        auto settl_day = JDay{settl_day_field.value()};
-
-        // FIXME: review when end of day is implemented.
-        if (settl_day != 0_jd && settl_day <= bus_day) {
-            market_id &= Id64{~0xffff};
-            settl_day = 0_jd;
-        }
 
         bool found;
         tie(it, found) = ps.find_hint(accnt, market_id);
         if (!found) {
-            it = ps.insert_hint(it, Posn::make(accnt, market_id, instr, settl_day));
+            it = ps.insert_hint(it, Posn::make(accnt, market_id));
         }
 
         const auto side = swirly::Side{side_field.value()};

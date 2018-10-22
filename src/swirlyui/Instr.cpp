@@ -22,10 +22,11 @@ namespace swirly {
 namespace ui {
 using namespace std;
 
-Instr::Impl::Impl(const QString& symbol, const QString& display, const QString& base_asset,
+Instr::Impl::Impl(Id32 id, const QString& symbol, const QString& display, const QString& base_asset,
                   const QString& term_ccy, int lot_numer, int lot_denom, int tick_numer,
                   int tick_denom, int pip_dp, Lots min_lots, Lots max_lots)
-: symbol{symbol}
+: id{id}
+, symbol{symbol}
 , display{display}
 , base_asset{base_asset}
 , term_ccy{term_ccy}
@@ -46,12 +47,12 @@ Instr::Impl::Impl(const QString& symbol, const QString& display, const QString& 
 Instr Instr::from_json(const QJsonObject& obj)
 {
     using swirly::ui::from_json;
-    return Instr(from_json<QString>(obj["symbol"]), from_json<QString>(obj["display"]),
-                 from_json<QString>(obj["base_asset"]), from_json<QString>(obj["term_ccy"]),
-                 from_json<int>(obj["lot_numer"]), from_json<int>(obj["lot_denom"]),
-                 from_json<int>(obj["tick_numer"]), from_json<int>(obj["tick_denom"]),
-                 from_json<int>(obj["pip_dp"]), from_json<Lots>(obj["min_lots"]),
-                 from_json<Lots>(obj["max_lots"]));
+    return Instr(from_json<Id32>(obj["id"]), from_json<QString>(obj["symbol"]),
+                 from_json<QString>(obj["display"]), from_json<QString>(obj["base_asset"]),
+                 from_json<QString>(obj["term_ccy"]), from_json<int>(obj["lot_numer"]),
+                 from_json<int>(obj["lot_denom"]), from_json<int>(obj["tick_numer"]),
+                 from_json<int>(obj["tick_denom"]), from_json<int>(obj["pip_dp"]),
+                 from_json<Lots>(obj["min_lots"]), from_json<Lots>(obj["max_lots"]));
 }
 
 shared_ptr<const Instr::Impl> Instr::empty()

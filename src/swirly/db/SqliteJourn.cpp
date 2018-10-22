@@ -113,8 +113,6 @@ void SqliteJourn::on_create_exec(WallTime now, const CreateExec& body)
     bind(now);
     bind(to_string_view(body.accnt));
     bind(body.market_id);
-    bind(to_string_view(body.instr));
-    bind(body.settl_day, MaybeNull);
     bind(body.id);
     bind(body.order_id, MaybeNull);
     bind(to_string_view(body.ref), MaybeNull);

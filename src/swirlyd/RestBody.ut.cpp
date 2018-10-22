@@ -25,18 +25,18 @@ using namespace swirly;
 
 BOOST_AUTO_TEST_SUITE(RestBodySuite)
 
-BOOST_AUTO_TEST_CASE(RestBodySymbolCase)
+BOOST_AUTO_TEST_CASE(RestBodyIdCase)
 {
     RestBody rb;
 
-    BOOST_TEST(rb.parse(R"({"symbol":"EURUSD"})"sv));
-    BOOST_TEST(rb.fields() == RestBody::Symbol);
-    BOOST_TEST(rb.symbol() == "EURUSD"sv);
+    BOOST_TEST(rb.parse(R"({"id":101})"sv));
+    BOOST_TEST(rb.fields() == RestBody::Id);
+    BOOST_TEST(rb.id() == 101_id64);
 
     rb.reset(false);
-    BOOST_TEST(rb.parse(R"({"symbol":null})"sv));
+    BOOST_TEST(rb.parse(R"({"id":null})"sv));
     BOOST_TEST(rb.fields() == 0U);
-    BOOST_TEST(rb.symbol().empty());
+    BOOST_TEST(rb.id() == 0_id64);
 }
 
 BOOST_AUTO_TEST_CASE(RestBodyAccntCase)
@@ -242,7 +242,7 @@ BOOST_AUTO_TEST_CASE(RestBodyMaxLenCase)
 {
     RestBody rb;
 
-    BOOST_CHECK_THROW(rb.parse(R"({"symbol":"0123456789ABCDEFx"})"sv), BadRequestException);
+    BOOST_CHECK_THROW(rb.parse(R"({"accnt":"0123456789ABCDEFx"})"sv), BadRequestException);
 }
 
 BOOST_AUTO_TEST_CASE(RestBodyNegativeCase)
@@ -262,9 +262,9 @@ BOOST_AUTO_TEST_CASE(RestBodyAllCase)
     RestBody rb;
 
     BOOST_TEST(rb.parse(
-        R"({"accnt":"MARAYL","symbol":"EURUSD","instr":"EURUSD","settl_date":20140315,"ref":"EURUSD","state":3,"side":"Buy","lots":101,"ticks":12345,"min_lots":101,"liq_ind":"Maker","cpty":"MARAYL"})"sv));
+        R"({"id":101,"accnt":"MARAYL","instr":"EURUSD","settl_date":20140315,"ref":"EURUSD","state":3,"side":"Buy","lots":101,"ticks":12345,"min_lots":101,"liq_ind":"Maker","cpty":"MARAYL"})"sv));
     BOOST_TEST(rb.fields() == ((RestBody::Cpty - 1) | RestBody::Cpty));
-    BOOST_TEST(rb.symbol() == "EURUSD"sv);
+    BOOST_TEST(rb.id() == 101_id64);
     BOOST_TEST(rb.accnt() == "MARAYL"sv);
     BOOST_TEST(rb.instr() == "EURUSD"sv);
     BOOST_TEST(rb.settl_date() == 20140315_ymd);
@@ -282,13 +282,13 @@ BOOST_AUTO_TEST_CASE(RestBodyPartialCase)
 {
     RestBody rb;
 
-    BOOST_TEST(!rb.parse(R"({"symbol":"E)"sv));
-    BOOST_TEST(!rb.parse(R"(URUSD","ac)"sv));
+    BOOST_TEST(!rb.parse(R"({"id":10)"sv));
+    BOOST_TEST(!rb.parse(R"(1,"ac)"sv));
     BOOST_TEST(!rb.parse(R"(cnt":"MAR)"sv));
     BOOST_TEST(rb.parse(R"(AYL"})"sv));
 
-    BOOST_TEST(rb.fields() == (RestBody::Symbol | RestBody::Accnt));
-    BOOST_TEST(rb.symbol() == "EURUSD"sv);
+    BOOST_TEST(rb.fields() == (RestBody::Id | RestBody::Accnt));
+    BOOST_TEST(rb.id() == 101_id64);
     BOOST_TEST(rb.accnt() == "MARAYL"sv);
 }
 

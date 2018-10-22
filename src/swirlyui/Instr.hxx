@@ -32,6 +32,7 @@ namespace instr {
 
 enum class Column : int { //
     CheckState,           //
+    Id,                   //
     Symbol,               //
     Display,              //
     BaseAsset,            //
@@ -51,10 +52,10 @@ constexpr int ColumnCount{unbox(Column::MaxLots) + 1};
 // Cheap copies.
 class Instr {
   public:
-    Instr(const QString& symbol, const QString& display, const QString& base_asset,
+    Instr(Id32 id, const QString& symbol, const QString& display, const QString& base_asset,
           const QString& term_ccy, int lot_numer, int lot_denom, int tick_numer, int tick_denom,
           int pip_dp, Lots min_lots, Lots max_lots)
-    : impl_{std::make_shared<const Impl>(symbol, display, base_asset, term_ccy, lot_numer,
+    : impl_{std::make_shared<const Impl>(id, symbol, display, base_asset, term_ccy, lot_numer,
                                          lot_denom, tick_numer, tick_denom, pip_dp, min_lots,
                                          max_lots)}
     {
@@ -64,6 +65,7 @@ class Instr {
 
     static Instr from_json(const QJsonObject& obj);
 
+    const Id32 id() const noexcept { return impl_->id; }
     const QString& symbol() const noexcept { return impl_->symbol; }
     const QString& display() const noexcept { return impl_->display; }
     const QString& base_asset() const noexcept { return impl_->base_asset; }
@@ -82,11 +84,12 @@ class Instr {
 
   private:
     struct Impl {
-        Impl(const QString& symbol, const QString& display, const QString& base_asset,
+        Impl(Id32 id, const QString& symbol, const QString& display, const QString& base_asset,
              const QString& term_ccy, int lot_numer, int lot_denom, int tick_numer, int tick_denom,
              int pip_dp, Lots min_lots, Lots max_lots);
         Impl() = default;
         ~Impl() = default;
+        Id32 id{};
         QString symbol{};
         QString display{};
         QString base_asset{};

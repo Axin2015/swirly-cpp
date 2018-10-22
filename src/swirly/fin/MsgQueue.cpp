@@ -82,8 +82,6 @@ void MsgQueue::do_create_exec(const Exec& exec)
         auto& body = msg.create_exec;
         pstrcpy<'\0'>(body.accnt, exec.accnt());
         body.market_id = exec.market_id();
-        pstrcpy<'\0'>(body.instr, exec.instr());
-        body.settl_day = exec.settl_day();
         body.id = exec.id();
         body.order_id = exec.order_id();
         pstrcpy<'\0'>(body.ref, exec.ref());

@@ -107,8 +107,6 @@ void SqliteModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
                        column<WallTime>(*stmt, Modified),       //
                        column<string_view>(*stmt, Accnt),       //
                        column<Id64>(*stmt, MarketId),           //
-                       column<string_view>(*stmt, Instr),       //
-                       column<JDay>(*stmt, SettlDay),           //
                        column<Id64>(*stmt, Id),                 //
                        column<string_view>(*stmt, Ref),         //
                        column<swirly::State>(*stmt, State),     //
@@ -134,8 +132,6 @@ void SqliteModel::do_read_exec(WallTime since, const ModelCallback<ExecPtr>& cb)
         cb(Exec::make(column<WallTime>(*stmt, Created),        //
                       column<string_view>(*stmt, Accnt),       //
                       column<Id64>(*stmt, MarketId),           //
-                      column<string_view>(*stmt, Instr),       //
-                      column<JDay>(*stmt, SettlDay),           //
                       column<Id64>(*stmt, Id),                 //
                       column<Id64>(*stmt, OrderId),            //
                       column<string_view>(*stmt, Ref),         //
@@ -165,8 +161,6 @@ void SqliteModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
         cb(Exec::make(column<WallTime>(*stmt, Created),        //
                       column<string_view>(*stmt, Accnt),       //
                       column<Id64>(*stmt, MarketId),           //
-                      column<string_view>(*stmt, Instr),       //
-                      column<JDay>(*stmt, SettlDay),           //
                       column<Id64>(*stmt, Id),                 //
                       column<Id64>(*stmt, OrderId),            //
                       column<string_view>(*stmt, Ref),         //
@@ -199,19 +193,11 @@ void SqliteModel::do_read_posn(JDay bus_day, const ModelCallback<PosnPtr>& cb) c
     while (step(*stmt)) {
         const auto accnt = column<string_view>(*stmt, Accnt);
         auto market_id = column<Id64>(*stmt, MarketId);
-        const auto instr = column<string_view>(*stmt, Instr);
-        auto settl_day = column<JDay>(*stmt, SettlDay);
-
-        // FIXME: review when end of day is implemented.
-        if (settl_day != 0_jd && settl_day <= bus_day) {
-            market_id &= Id64{~0xffff};
-            settl_day = 0_jd;
-        }
 
         bool found;
         tie(it, found) = ps.find_hint(accnt, market_id);
         if (!found) {
-            it = ps.insert_hint(it, Posn::make(accnt, market_id, instr, settl_day));
+            it = ps.insert_hint(it, Posn::make(accnt, market_id));
         }
 
         const auto side = column<swirly::Side>(*stmt, Side);

@@ -59,6 +59,6 @@ set(prog_SOURCES
   Utility.cpp)
 
 add_executable(swirlyui ${prog_RESOURCES} ${prog_SOURCES})
+target_link_libraries(swirlyui swirly-fin-static Qt5::Widgets Qt5::Network)
 add_dependencies(swirlyui swirly-fbs)
-target_link_libraries(swirlyui Qt5::Widgets Qt5::Network)
 install(TARGETS swirlyui DESTINATION bin COMPONENT program)

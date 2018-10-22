@@ -41,7 +41,8 @@ void Asset::to_dsv(ostream& os, char delim) const
 
 void Asset::to_json(ostream& os) const
 {
-    os << "{\"symbol\":\"" << symbol_     //
+    os << "{\"id\":" << id_               //
+       << ",\"symbol\":\"" << symbol_     //
        << "\",\"display\":\"" << display_ //
        << "\",\"type\":\"" << type_       //
        << "\"}";

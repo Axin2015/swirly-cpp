@@ -153,8 +153,6 @@ void DsvModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
         Modified,  //
         Accnt,     //
         MarketId,  //
-        Instr,     //
-        SettlDay,  //
         Id,        //
         Ref,       //
         State,     //
@@ -185,8 +183,6 @@ void DsvModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
         const auto modified = from_string<WallTime>(row[Modified]);
         const auto accnt = from_string<Symbol>(row[Accnt]);
         const auto market_id = from_string<Id64>(row[MarketId]);
-        const auto instr = from_string<Symbol>(row[Instr]);
-        const auto settl_day = from_string<JDay>(row[SettlDay]);
         const auto id = from_string<Id64>(row[Id]);
         const auto ref = from_string<string_view>(row[Ref]);
         const auto state = from_string<swirly::State>(row[State]);
@@ -199,9 +195,8 @@ void DsvModel::do_read_order(const ModelCallback<OrderPtr>& cb) const
         const auto last_lots = from_string<swirly::Lots>(row[LastLots]);
         const auto last_ticks = from_string<swirly::Ticks>(row[LastTicks]);
         const auto min_lots = from_string<swirly::Lots>(row[MinLots]);
-        cb(Order::make(created, modified, accnt, market_id, instr, settl_day, id, ref, state, side,
-                       lots, ticks, resd_lots, exec_lots, exec_cost, last_lots, last_ticks,
-                       min_lots));
+        cb(Order::make(created, modified, accnt, market_id, id, ref, state, side, lots, ticks,
+                       resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots));
     }
 }
 
@@ -211,8 +206,6 @@ void DsvModel::do_read_exec(WallTime since, const ModelCallback<ExecPtr>& cb) co
         Created,   //
         Accnt,     //
         MarketId,  //
-        Instr,     //
-        SettlDay,  //
         Id,        //
         OrderId,   //
         Ref,       //
@@ -248,8 +241,6 @@ void DsvModel::do_read_exec(WallTime since, const ModelCallback<ExecPtr>& cb) co
         const auto created = from_string<WallTime>(row[Created]);
         const auto accnt = from_string<swirly::Symbol>(row[Accnt]);
         const auto market_id = from_string<Id64>(row[MarketId]);
-        const auto instr = from_string<Symbol>(row[Instr]);
-        const auto settl_day = from_string<JDay>(row[SettlDay]);
         const auto id = from_string<Id64>(row[Id]);
         const auto order_id = from_string<Id64>(row[OrderId]);
         const auto ref = from_string<string_view>(row[Ref]);
@@ -268,9 +259,9 @@ void DsvModel::do_read_exec(WallTime since, const ModelCallback<ExecPtr>& cb) co
         const auto posn_cost = from_string<Cost>(row[PosnCost]);
         const auto liq_ind = from_string<swirly::LiqInd>(row[LiqInd]);
         const auto cpty = from_string<Symbol>(row[Cpty]);
-        cb(Exec::make(created, accnt, market_id, instr, settl_day, id, order_id, ref, state, side,
-                      lots, ticks, resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots,
-                      match_id, posn_lots, posn_cost, liq_ind, cpty));
+        cb(Exec::make(created, accnt, market_id, id, order_id, ref, state, side, lots, ticks,
+                      resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots, match_id,
+                      posn_lots, posn_cost, liq_ind, cpty));
     }
 }
 
@@ -280,8 +271,6 @@ void DsvModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
         Created,   //
         Accnt,     //
         MarketId,  //
-        Instr,     //
-        SettlDay,  //
         Id,        //
         OrderId,   //
         Ref,       //
@@ -316,8 +305,6 @@ void DsvModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
         const auto created = from_string<WallTime>(row[Created]);
         const auto accnt = from_string<swirly::Symbol>(row[Accnt]);
         const auto market_id = from_string<Id64>(row[MarketId]);
-        const auto instr = from_string<Symbol>(row[Instr]);
-        const auto settl_day = from_string<JDay>(row[SettlDay]);
         const auto id = from_string<Id64>(row[Id]);
         const auto order_id = from_string<Id64>(row[OrderId]);
         const auto ref = from_string<string_view>(row[Ref]);
@@ -335,9 +322,9 @@ void DsvModel::do_read_trade(const ModelCallback<ExecPtr>& cb) const
         const auto posn_cost = from_string<Cost>(row[PosnCost]);
         const auto liq_ind = from_string<swirly::LiqInd>(row[LiqInd]);
         const auto cpty = from_string<Symbol>(row[Cpty]);
-        cb(Exec::make(created, accnt, market_id, instr, settl_day, id, order_id, ref, State::Trade,
-                      side, lots, ticks, resd_lots, exec_lots, exec_cost, last_lots, last_ticks,
-                      min_lots, match_id, posn_lots, posn_cost, liq_ind, cpty));
+        cb(Exec::make(created, accnt, market_id, id, order_id, ref, State::Trade, side, lots, ticks,
+                      resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots, match_id,
+                      posn_lots, posn_cost, liq_ind, cpty));
     }
 }
 
@@ -346,8 +333,6 @@ void DsvModel::do_read_posn(JDay bus_day, const ModelCallback<PosnPtr>& cb) cons
     enum {        //
         Accnt,    //
         MarketId, //
-        Instr,    //
-        SettlDay, //
         BuyLots,  //
         BuyCost,  //
         SellLots, //
@@ -368,14 +353,11 @@ void DsvModel::do_read_posn(JDay bus_day, const ModelCallback<PosnPtr>& cb) cons
         split(line, "\t"sv, row);
         const auto accnt = from_string<Symbol>(row[Accnt]);
         const auto market_id = from_string<Id64>(row[MarketId]);
-        const auto instr = from_string<Symbol>(row[Instr]);
-        const auto settl_day = from_string<JDay>(row[SettlDay]);
         const auto buy_lots = from_string<Lots>(row[BuyLots]);
         const auto buy_cost = from_string<Cost>(row[BuyCost]);
         const auto sell_lots = from_string<Lots>(row[SellLots]);
         const auto sell_cost = from_string<Cost>(row[SellCost]);
-        cb(Posn::make(accnt, market_id, instr, settl_day, buy_lots, buy_cost, sell_lots,
-                      sell_cost));
+        cb(Posn::make(accnt, market_id, buy_lots, buy_cost, sell_lots, sell_cost));
     }
 }
 

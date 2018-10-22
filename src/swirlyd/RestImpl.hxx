@@ -62,58 +62,41 @@ class RestImpl {
 
     void get_market(CyclTime now, std::ostream& out) const;
 
-    void get_market(CyclTime now, Symbol instr, std::ostream& out) const;
-
-    void get_market(CyclTime now, Symbol instr, IsoDate settl_date, std::ostream& out) const;
+    void get_market(CyclTime now, Id64 market_id, std::ostream& out) const;
 
     void get_order(CyclTime now, Symbol accnt, std::ostream& out) const;
 
-    void get_order(CyclTime now, Symbol accnt, Symbol instr, std::ostream& out) const;
+    void get_order(CyclTime now, Symbol accnt, Id64 market_id, std::ostream& out) const;
 
-    void get_order(CyclTime now, Symbol accnt, Symbol instr, IsoDate settl_date,
-                   std::ostream& out) const;
-
-    void get_order(CyclTime now, Symbol accnt, Symbol instr, IsoDate settl_date, Id64 id,
-                   std::ostream& out) const;
+    void get_order(CyclTime now, Symbol accnt, Id64 market_id, Id64 id, std::ostream& out) const;
 
     void get_exec(CyclTime now, Symbol accnt, Page page, std::ostream& out) const;
 
     void get_trade(CyclTime now, Symbol accnt, std::ostream& out) const;
 
-    void get_trade(CyclTime now, Symbol accnt, Symbol instr, std::ostream& out) const;
+    void get_trade(CyclTime now, Symbol accnt, Id64 market_id, std::ostream& out) const;
 
-    void get_trade(CyclTime now, Symbol accnt, Symbol instr, IsoDate settl_date,
-                   std::ostream& out) const;
-
-    void get_trade(CyclTime now, Symbol accnt, Symbol instr, IsoDate settl_date, Id64 id,
-                   std::ostream& out) const;
+    void get_trade(CyclTime now, Symbol accnt, Id64 market_id, Id64 id, std::ostream& out) const;
 
     void get_posn(CyclTime now, Symbol accnt, std::ostream& out) const;
 
-    void get_posn(CyclTime now, Symbol accnt, Symbol instr, std::ostream& out) const;
+    void get_posn(CyclTime now, Symbol accnt, Id64 market_id, std::ostream& out) const;
 
-    void get_posn(CyclTime now, Symbol accnt, Symbol instr, IsoDate settl_date,
-                  std::ostream& out) const;
-
-    void post_market(CyclTime now, Symbol instr, IsoDate settl_date, MarketState state,
+    void post_market(CyclTime now, Id64 id, Symbol instr, IsoDate settl_date, MarketState state,
                      std::ostream& out);
 
-    void put_market(CyclTime now, Symbol instr, IsoDate settl_date, MarketState state,
-                    std::ostream& out);
+    void put_market(CyclTime now, Id64 id, MarketState state, std::ostream& out);
 
-    void post_order(CyclTime now, Symbol accnt, Symbol instr, IsoDate settl_date,
-                    std::string_view ref, Side side, Lots lots, Ticks ticks, Lots min_lots,
-                    std::ostream& out);
+    void post_order(CyclTime now, Symbol accnt, Id64 market_id, std::string_view ref, Side side,
+                    Lots lots, Ticks ticks, Lots min_lots, std::ostream& out);
 
-    void put_order(CyclTime now, Symbol accnt, Symbol instr, IsoDate settl_date,
-                   ArrayView<Id64> ids, Lots lots, std::ostream& out);
+    void put_order(CyclTime now, Symbol accnt, Id64 market_id, ArrayView<Id64> ids, Lots lots,
+                   std::ostream& out);
 
-    void post_trade(CyclTime now, Symbol accnt, Symbol instr, IsoDate settl_date,
-                    std::string_view ref, Side side, Lots lots, Ticks ticks, LiqInd liq_ind,
-                    Symbol cpty, std::ostream& out);
+    void post_trade(CyclTime now, Symbol accnt, Id64 market_id, std::string_view ref, Side side,
+                    Lots lots, Ticks ticks, LiqInd liq_ind, Symbol cpty, std::ostream& out);
 
-    void delete_trade(CyclTime now, Symbol accnt, Symbol instr, IsoDate settl_date,
-                      ArrayView<Id64> ids);
+    void delete_trade(CyclTime now, Symbol accnt, Id64 market_id, ArrayView<Id64> ids);
 
   private:
     LobApp& lob_app_;

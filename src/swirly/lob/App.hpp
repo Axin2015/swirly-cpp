@@ -76,7 +76,7 @@ class SWIRLY_API LobApp {
 
     void set_trade_slot(const Sess& sess, TradeSlot slot) noexcept;
 
-    const Market& create_market(CyclTime now, const Instr& instr, JDay settl_day,
+    const Market& create_market(CyclTime now, Id64 id, const Instr& instr, JDay settl_day,
                                 MarketState state);
 
     void update_market(CyclTime now, const Market& market, MarketState state);

@@ -75,20 +75,16 @@ namespace {
     )
   ) >beginStr;
 
-  action nullSymbol {
-    fields_ &= ~Symbol;
-    symbol_.len = 0;
+  action nullId {
+    fields_ &= ~Id;
+    id_ = 0_id64;
   }
-  action beginSymbol {
-    str_.len = &symbol_.len;
-    str_.buf = symbol_.buf;
-    str_.max = MaxSymbol;
+  action endId {
+    fields_ |= Id;
+    id_ = swirly::Id64{num()};
   }
-  action endSymbol {
-    fields_ |= Symbol;
-  }
-  symbol = 'null' %nullSymbol
-    | str >beginSymbol %endSymbol;
+  id = 'null' %nullId
+    | num %endId;
 
   action nullAccnt {
     fields_ &= ~Accnt;
@@ -239,7 +235,7 @@ namespace {
   colon = space* ':' space*;
   comma = space* ',' space*;
 
-  pair = '"symbol"'i colon symbol
+  pair = '"id"'i colon id
     | '"accnt"'i colon accnt
     | '"instr"'i colon instr
     | '"settl_date"'i colon settlDate
@@ -277,7 +273,7 @@ void RestBody::reset(bool clear) noexcept
   }
   fields_ = 0;
 
-  symbol_.len = 0;
+  id_ = 0_id64;
   accnt_.len = 0;
   instr_.len = 0;
   settl_date_ = 0_ymd;

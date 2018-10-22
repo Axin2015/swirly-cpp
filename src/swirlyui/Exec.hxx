@@ -17,7 +17,7 @@
 #ifndef SWIRLYUI_EXEC_HXX
 #define SWIRLYUI_EXEC_HXX
 
-#include "Instr.hxx"
+#include "Market.hxx"
 
 namespace swirly {
 namespace ui {
@@ -53,21 +53,21 @@ constexpr int ColumnCount{unbox(Column::Cpty) + 1};
 
 class Exec {
   public:
-    Exec(const QDateTime& created, const QString& accnt, Id64 market_id, const Instr& instr,
-         QDate settl_date, Id64 id, Id64 order_id, const QString& ref, State state, Side side,
-         Lots lots, Ticks ticks, Lots resd_lots, Lots exec_lots, Cost exec_cost, Lots last_lots,
-         Ticks last_ticks, Lots min_lots, Id64 match_id, LiqInd liq_ind, const QString& cpty);
+    Exec(const QDateTime& created, const QString& accnt, const Market& market, Id64 id,
+         Id64 order_id, const QString& ref, State state, Side side, Lots lots, Ticks ticks,
+         Lots resd_lots, Lots exec_lots, Cost exec_cost, Lots last_lots, Ticks last_ticks,
+         Lots min_lots, Id64 match_id, LiqInd liq_ind, const QString& cpty);
     Exec() = default;
     ~Exec() = default;
 
-    static Exec from_json(const Instr& instr, const QJsonObject& obj);
+    static Exec from_json(const Market& market, const QJsonObject& obj);
 
-    ExecKey key() const noexcept { return {market_id_, id_}; }
+    ExecKey key() const noexcept { return {market_.id(), id_}; }
     const QDateTime& created() const noexcept { return created_; }
     const QString& accnt() const noexcept { return accnt_; }
-    Id64 market_id() const noexcept { return market_id_; }
-    const Instr& instr() const noexcept { return instr_; }
-    QDate settl_date() const noexcept { return settl_date_; }
+    const Market& market() const noexcept { return market_; }
+    const Instr& instr() const noexcept { return market_.instr(); }
+    QDate settl_date() const noexcept { return market_.settl_date(); }
     Id64 id() const noexcept { return id_; }
     Id64 order_id() const noexcept { return order_id_; }
     const QString& ref() const noexcept { return ref_; }
@@ -88,9 +88,7 @@ class Exec {
   private:
     QDateTime created_{};
     QString accnt_{};
-    Id64 market_id_{};
-    Instr instr_{};
-    QDate settl_date_{};
+    Market market_{};
     Id64 id_{};
     Id64 order_id_{};
     QString ref_{};

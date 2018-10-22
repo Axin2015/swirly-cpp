@@ -53,7 +53,7 @@ const Market& create_market(CyclTime now, LobApp& app, Symbol instr_symbol, JDay
     if (it != app.markets().end()) {
         return *it;
     }
-    return app.create_market(now, instr, settl_day, state);
+    return app.create_market(now, market_id, instr, settl_day, state);
 }
 
 class Archiver {

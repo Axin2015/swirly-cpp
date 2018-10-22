@@ -73,7 +73,8 @@ void Instr::to_dsv(ostream& os, char delim) const
 
 void Instr::to_json(ostream& os) const
 {
-    os << "{\"symbol\":\"" << symbol_           //
+    os << "{\"id\":" << id_                     //
+       << ",\"symbol\":\"" << symbol_           //
        << "\",\"display\":\"" << display_       //
        << "\",\"base_asset\":\"" << base_asset_ //
        << "\",\"term_ccy\":\"" << term_ccy_     //

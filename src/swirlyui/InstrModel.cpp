@@ -25,6 +25,7 @@ InstrModel::InstrModel(QObject* parent)
 : TableModel{parent}
 {
     header_[unbox(Column::CheckState)] = tr("");
+    header_[unbox(Column::Id)] = tr("Id");
     header_[unbox(Column::Symbol)] = tr("Symbol");
     header_[unbox(Column::Display)] = tr("Display");
     header_[unbox(Column::BaseAsset)] = tr("Base Asset");
@@ -58,6 +59,9 @@ QVariant InstrModel::data(const QModelIndex& index, int role) const
         const auto& instr = value_at(index.row());
         switch (box<Column>(index.column())) {
         case Column::CheckState:
+            break;
+        case Column::Id:
+            var = to_variant(instr.id());
             break;
         case Column::Symbol:
             var = instr.symbol();
@@ -103,6 +107,7 @@ QVariant InstrModel::data(const QModelIndex& index, int role) const
         case Column::TermCcy:
             var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
             break;
+        case Column::Id:
         case Column::LotNumer:
         case Column::LotDenom:
         case Column::TickNumer:

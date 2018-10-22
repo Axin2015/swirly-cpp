@@ -62,7 +62,7 @@ QVariant PosnModel::data(const QModelIndex& index, int role) const
             var = posn.accnt();
             break;
         case Column::MarketId:
-            var = to_variant(posn.market_id());
+            var = to_variant(posn.market().id());
             break;
         case Column::Instr:
             var = posn.instr().symbol();

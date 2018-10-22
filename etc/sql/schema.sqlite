@@ -149,8 +149,6 @@ CREATE TABLE order_t (
   modified BIGINT NOT NULL,
   accnt CHAR(16) NOT NULL,
   market_id BIGINT NOT NULL,
-  instr CHAR(16) NOT NULL,
-  settl_day INT NULL DEFAULT NULL,
   id BIGINT NOT NULL,
   ref VARCHAR(64) NULL DEFAULT NULL,
   state_id INT NOT NULL,
@@ -167,7 +165,6 @@ CREATE TABLE order_t (
   PRIMARY KEY (market_id, id),
 
   FOREIGN KEY (market_id) REFERENCES market_t (id),
-  FOREIGN KEY (instr) REFERENCES instr_t (symbol),
   FOREIGN KEY (state_id) REFERENCES state_t (id),
   FOREIGN KEY (side_id) REFERENCES side_t (id)
 )
@@ -180,8 +177,6 @@ CREATE TABLE exec_t (
   archive BIGINT NULL DEFAULT NULL,
   accnt CHAR(16) NOT NULL,
   market_id BIGINT NOT NULL,
-  instr CHAR(16) NOT NULL,
-  settl_day INT NULL DEFAULT NULL,
   id BIGINT NOT NULL,
   order_id BIGINT NULL DEFAULT NULL,
   ref VARCHAR(64) NULL DEFAULT NULL,
@@ -206,7 +201,6 @@ CREATE TABLE exec_t (
 
   FOREIGN KEY (market_id) REFERENCES market_t (id),
   FOREIGN KEY (market_id, order_id) REFERENCES order_t (market_id, id),
-  FOREIGN KEY (instr) REFERENCES instr_t (symbol),
   FOREIGN KEY (state_id) REFERENCES state_t (id),
   FOREIGN KEY (side_id) REFERENCES side_t (id),
   FOREIGN KEY (liq_ind_id) REFERENCES liq_ind_t (id)
@@ -239,8 +233,6 @@ CREATE TRIGGER before_insert_on_exec2
       modified,
       accnt,
       market_id,
-      instr,
-      settl_day,
       id,
       ref,
       state_id,
@@ -258,8 +250,6 @@ CREATE TRIGGER before_insert_on_exec2
       NEW.created,
       NEW.accnt,
       NEW.market_id,
-      NEW.instr,
-      NEW.settl_day,
       NEW.order_id,
       NEW.ref,
       NEW.state_id,
@@ -373,8 +363,6 @@ CREATE VIEW order_v AS
     o.modified,
     o.accnt,
     o.market_id,
-    o.instr,
-    o.settl_day,
     o.id,
     o.ref,
     s.symbol state,
@@ -400,8 +388,6 @@ CREATE VIEW exec_v AS
     e.archive,
     e.accnt,
     e.market_id,
-    e.instr,
-    e.settl_day,
     e.id,
     e.order_id,
     e.ref,
@@ -434,8 +420,6 @@ CREATE VIEW posn_v AS
   SELECT
     e.accnt,
     e.market_id,
-    e.instr,
-    e.settl_day,
     e.side_id,
     SUM(e.last_lots) lots,
     SUM(e.last_lots * e.last_ticks) cost

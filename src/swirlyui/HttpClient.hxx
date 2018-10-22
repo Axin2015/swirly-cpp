@@ -50,6 +50,7 @@ class HttpClient : public Client {
 
   private:
     Instr find_instr(const QJsonObject& obj) const;
+    Market find_market(const QJsonObject& obj) const;
 
     void get_ref_data();
     void get_sess();

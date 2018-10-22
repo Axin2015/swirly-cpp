@@ -40,11 +40,11 @@ void Sess::insert_trade_and_notify(CyclTime now, const ExecPtr& trade) noexcept
     }
 }
 
-PosnPtr Sess::posn(Id64 market_id, Symbol instr, JDay settl_day)
+PosnPtr Sess::posn(Id64 market_id)
 {
     auto [it, found] = posns_.find_hint(market_id);
     if (!found) {
-        it = posns_.insert_hint(it, Posn::make(accnt_, market_id, instr, settl_day));
+        it = posns_.insert_hint(it, Posn::make(accnt_, market_id));
     }
     return &*it;
 }

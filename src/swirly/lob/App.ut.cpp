@@ -133,9 +133,10 @@ BOOST_FIXTURE_TEST_CASE(AppCreateMarket, Fixture)
     const auto market_id = to_market_id(instr.id(), SettlDay);
 
     // Settl-day before bus-day.
-    BOOST_CHECK_THROW(app.create_market(now, instr, Today - 1_jd, 0x1), InvalidException);
+    BOOST_CHECK_THROW(app.create_market(now, market_id, instr, Today - 1_jd, 0x1),
+                      InvalidException);
 
-    auto& market = app.create_market(now, instr, SettlDay, 0x1);
+    auto& market = app.create_market(now, market_id, instr, SettlDay, 0x1);
 
     BOOST_TEST(market.id() == market_id);
 
@@ -149,14 +150,15 @@ BOOST_FIXTURE_TEST_CASE(AppCreateMarket, Fixture)
     BOOST_TEST(&*it == &market);
 
     // Already exists.
-    BOOST_CHECK_THROW(app.create_market(now, instr, SettlDay, 0x1), AlreadyExistsException);
+    BOOST_CHECK_THROW(app.create_market(now, market_id, instr, SettlDay, 0x1),
+                      AlreadyExistsException);
 }
 
 BOOST_FIXTURE_TEST_CASE(AppUpdateMarket, Fixture)
 {
     const Instr& instr = app.instr("USDJPY"sv);
     const auto market_id = to_market_id(instr.id(), SettlDay);
-    auto& market = app.create_market(now, instr, SettlDay, 0x1);
+    auto& market = app.create_market(now, market_id, instr, SettlDay, 0x1);
 
     app.update_market(now, market, 0x2);
 
@@ -182,8 +184,6 @@ BOOST_FIXTURE_TEST_CASE(AppCreateOrder, Fixture)
 
     ConstOrderPtr order{resp.orders().front()};
     BOOST_TEST(order->market_id() == market.id());
-    BOOST_TEST(order->instr() == instr.symbol());
-    BOOST_TEST(order->settl_day() == SettlDay);
     BOOST_TEST(order->id() == 1_id64);
     BOOST_TEST(order->accnt() == sess.accnt());
     BOOST_TEST(order->ref().empty());

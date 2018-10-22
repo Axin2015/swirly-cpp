@@ -33,14 +33,8 @@ Posn::Posn(Posn&&) = default;
 void Posn::to_dsv(ostream& os, char delim) const
 {
     OStreamJoiner osj{os, delim};
-    osj << accnt_     //
-        << market_id_ //
-        << instr_;
-    if (settl_day_ != 0_jd) {
-        osj << jd_to_iso(settl_day_);
-    } else {
-        osj << "";
-    }
+    osj << accnt_ //
+        << market_id_;
     if (buy_lots_ != 0_lts) {
         osj << buy_lots_ //
             << buy_cost_;
@@ -57,15 +51,8 @@ void Posn::to_dsv(ostream& os, char delim) const
 
 void Posn::to_json(ostream& os) const
 {
-    os << "{\"accnt\":\"" << accnt_         //
-       << "\",\"market_id\":" << market_id_ //
-       << ",\"instr\":\"" << instr_         //
-       << "\",\"settl_date\":";
-    if (settl_day_ != 0_jd) {
-        os << jd_to_iso(settl_day_);
-    } else {
-        os << "null";
-    }
+    os << "{\"accnt\":\"" << accnt_ //
+       << "\",\"market_id\":" << market_id_;
     if (buy_lots_ != 0_lts) {
         os << ",\"buy_lots\":" << buy_lots_ //
            << ",\"buy_cost\":" << buy_cost_;

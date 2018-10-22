@@ -119,8 +119,6 @@ void MySqlJourn::on_create_exec(WallTime time, const CreateExec& body)
     field::Time created{*pit++, ns_since_epoch(time)};
     field::Symbol::bind(*pit++, body.accnt);
     field::Id64 market_id{*pit++, body.market_id};
-    field::Symbol::bind(*pit++, body.instr);
-    field::JDay settl_day{*pit++, body.settl_day, MaybeNull};
     field::Id64 id{*pit++, body.id};
     field::Id64 order_id{*pit++, body.order_id, MaybeNull};
     field::Symbol::bind(*pit++, body.ref, MaybeNull);

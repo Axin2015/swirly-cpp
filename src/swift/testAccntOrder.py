@@ -25,23 +25,22 @@ class TestCase(RestTestCase):
         with Client() as client:
           client.set_time(self.now)
 
-          self.create_market(client, 'EURUSD', 20140302)
-          self.create_market(client, 'EURUSD', 20140402)
-          self.create_market(client, 'GBPUSD', 20140302)
+          self.eurusd_id = self.create_market(client, 'EURUSD', 20140302)
+          self.eurusd2_id = self.create_market(client, 'EURUSD', 20140402)
+          self.gbpusd_id = self.create_market(client, 'GBPUSD', 20140302)
 
-          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Sell', 3, 12346)
-          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 3, 12344)
+          self.create_order(client, 'MARAYL', self.eurusd_id, 'Sell', 3, 12346)
+          self.create_order(client, 'MARAYL', self.eurusd_id, 'Buy', 3, 12344)
 
-          self.create_order(client, 'MARAYL', 'EURUSD', 20140402, 'Sell', 5, 12347)
-          self.create_order(client, 'MARAYL', 'EURUSD', 20140402, 'Buy', 5, 12343)
+          self.create_order(client, 'MARAYL', self.eurusd2_id, 'Sell', 5, 12347)
+          self.create_order(client, 'MARAYL', self.eurusd2_id, 'Buy', 5, 12343)
 
-          self.create_order(client, 'MARAYL', 'GBPUSD', 20140302, 'Sell', 3, 15346)
-          self.create_order(client, 'MARAYL', 'GBPUSD', 20140302, 'Buy', 3, 15344)
+          self.create_order(client, 'MARAYL', self.gbpusd_id, 'Sell', 3, 15346)
+          self.create_order(client, 'MARAYL', self.gbpusd_id, 'Buy', 3, 15344)
 
           self.check_auth(client)
 
           self.get_all(client)
-          self.get_by_instr(client)
           self.get_by_market(client)
           self.get_by_id(client)
 
@@ -50,7 +49,6 @@ class TestCase(RestTestCase):
           client.set_time(self.now)
 
           self.get_all(client)
-          self.get_by_instr(client)
           self.get_by_market(client)
           self.get_by_id(client)
 
@@ -61,11 +59,7 @@ class TestCase(RestTestCase):
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    resp = client.send('GET', '/api/sess/order/EURUSD')
-    self.assertEqual(401, resp.status)
-    self.assertEqual('Unauthorized', resp.reason)
-
-    resp = client.send('GET', '/api/sess/order/EURUSD/20140302')
+    resp = client.send('GET', '/api/sess/order/' + str(self.eurusd_id))
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
@@ -75,11 +69,7 @@ class TestCase(RestTestCase):
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-    resp = client.send('GET', '/api/sess/order/EURUSD')
-    self.assertEqual(403, resp.status)
-    self.assertEqual('Forbidden', resp.reason)
-
-    resp = client.send('GET', '/api/sess/order/EURUSD/20140302')
+    resp = client.send('GET', '/api/sess/order/' + str(self.eurusd_id))
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
@@ -91,7 +81,6 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
       u'created': self.now,
       u'exec_cost': 0,
       u'exec_lots': 0,
@@ -99,18 +88,16 @@ class TestCase(RestTestCase):
       u'last_lots': None,
       u'last_ticks': None,
       u'lots': 3,
-      u'market_id': 82255,
+      u'market_id': self.eurusd_id,
       u'min_lots': None,
       u'modified': self.now,
       u'ref': None,
       u'resd_lots': 3,
-      u'settl_date': 20140302,
       u'side': u'Sell',
       u'state': u'New',
       u'ticks': 12346
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
       u'created': self.now,
       u'exec_cost': 0,
       u'exec_lots': 0,
@@ -118,18 +105,16 @@ class TestCase(RestTestCase):
       u'last_lots': None,
       u'last_ticks': None,
       u'lots': 3,
-      u'market_id': 82255,
+      u'market_id': self.eurusd_id,
       u'min_lots': None,
       u'modified': self.now,
       u'ref': None,
       u'resd_lots': 3,
-      u'settl_date': 20140302,
       u'side': u'Buy',
       u'state': u'New',
       u'ticks': 12344
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
       u'created': self.now,
       u'exec_cost': 0,
       u'exec_lots': 0,
@@ -137,18 +122,16 @@ class TestCase(RestTestCase):
       u'last_lots': None,
       u'last_ticks': None,
       u'lots': 5,
-      u'market_id': 82286,
+      u'market_id': self.eurusd2_id,
       u'min_lots': None,
       u'modified': self.now,
       u'ref': None,
       u'resd_lots': 5,
-      u'settl_date': 20140402,
       u'side': u'Sell',
       u'state': u'New',
       u'ticks': 12347
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
       u'created': self.now,
       u'exec_cost': 0,
       u'exec_lots': 0,
@@ -156,18 +139,16 @@ class TestCase(RestTestCase):
       u'last_lots': None,
       u'last_ticks': None,
       u'lots': 5,
-      u'market_id': 82286,
+      u'market_id': self.eurusd2_id,
       u'min_lots': None,
       u'modified': self.now,
       u'ref': None,
       u'resd_lots': 5,
-      u'settl_date': 20140402,
       u'side': u'Buy',
       u'state': u'New',
       u'ticks': 12343
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'GBPUSD',
       u'created': self.now,
       u'exec_cost': 0,
       u'exec_lots': 0,
@@ -175,18 +156,16 @@ class TestCase(RestTestCase):
       u'last_lots': None,
       u'last_ticks': None,
       u'lots': 3,
-      u'market_id': 147791,
+      u'market_id': self.gbpusd_id,
       u'min_lots': None,
       u'modified': self.now,
       u'ref': None,
       u'resd_lots': 3,
-      u'settl_date': 20140302,
       u'side': u'Sell',
       u'state': u'New',
       u'ticks': 15346
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'GBPUSD',
       u'created': self.now,
       u'exec_cost': 0,
       u'exec_lots': 0,
@@ -194,110 +173,24 @@ class TestCase(RestTestCase):
       u'last_lots': None,
       u'last_ticks': None,
       u'lots': 3,
-      u'market_id': 147791,
+      u'market_id': self.gbpusd_id,
       u'min_lots': None,
       u'modified': self.now,
       u'ref': None,
       u'resd_lots': 3,
-      u'settl_date': 20140302,
       u'side': u'Buy',
       u'state': u'New',
       u'ticks': 15344
     }], resp.content)
 
-  def get_by_instr(self, client):
-    client.set_trader('MARAYL')
-    resp = client.send('GET', '/api/sess/order/EURUSD')
-
-    self.assertEqual(200, resp.status)
-    self.assertEqual('OK', resp.reason)
-    self.assertListEqual([{
-      u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
-      u'created': self.now,
-      u'exec_cost': 0,
-      u'exec_lots': 0,
-      u'id': 1,
-      u'last_lots': None,
-      u'last_ticks': None,
-      u'lots': 3,
-      u'market_id': 82255,
-      u'min_lots': None,
-      u'modified': self.now,
-      u'ref': None,
-      u'resd_lots': 3,
-      u'settl_date': 20140302,
-      u'side': u'Sell',
-      u'state': u'New',
-      u'ticks': 12346
-    }, {
-      u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
-      u'created': self.now,
-      u'exec_cost': 0,
-      u'exec_lots': 0,
-      u'id': 2,
-      u'last_lots': None,
-      u'last_ticks': None,
-      u'lots': 3,
-      u'market_id': 82255,
-      u'min_lots': None,
-      u'modified': self.now,
-      u'ref': None,
-      u'resd_lots': 3,
-      u'settl_date': 20140302,
-      u'side': u'Buy',
-      u'state': u'New',
-      u'ticks': 12344
-    }, {
-      u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
-      u'created': self.now,
-      u'exec_cost': 0,
-      u'exec_lots': 0,
-      u'id': 1,
-      u'last_lots': None,
-      u'last_ticks': None,
-      u'lots': 5,
-      u'market_id': 82286,
-      u'min_lots': None,
-      u'modified': self.now,
-      u'ref': None,
-      u'resd_lots': 5,
-      u'settl_date': 20140402,
-      u'side': u'Sell',
-      u'state': u'New',
-      u'ticks': 12347
-    }, {
-      u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
-      u'created': self.now,
-      u'exec_cost': 0,
-      u'exec_lots': 0,
-      u'id': 2,
-      u'last_lots': None,
-      u'last_ticks': None,
-      u'lots': 5,
-      u'market_id': 82286,
-      u'min_lots': None,
-      u'modified': self.now,
-      u'ref': None,
-      u'resd_lots': 5,
-      u'settl_date': 20140402,
-      u'side': u'Buy',
-      u'state': u'New',
-      u'ticks': 12343
-    }], resp.content)
-
   def get_by_market(self, client):
     client.set_trader('MARAYL')
-    resp = client.send('GET', '/api/sess/order/EURUSD/20140302')
+    resp = client.send('GET', '/api/sess/order/' + str(self.eurusd_id))
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
       u'created': self.now,
       u'exec_cost': 0,
       u'exec_lots': 0,
@@ -305,18 +198,16 @@ class TestCase(RestTestCase):
       u'last_lots': None,
       u'last_ticks': None,
       u'lots': 3,
-      u'market_id': 82255,
+      u'market_id': self.eurusd_id,
       u'min_lots': None,
       u'modified': self.now,
       u'ref': None,
       u'resd_lots': 3,
-      u'settl_date': 20140302,
       u'side': u'Sell',
       u'state': u'New',
       u'ticks': 12346
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
       u'created': self.now,
       u'exec_cost': 0,
       u'exec_lots': 0,
@@ -324,12 +215,11 @@ class TestCase(RestTestCase):
       u'last_lots': None,
       u'last_ticks': None,
       u'lots': 3,
-      u'market_id': 82255,
+      u'market_id': self.eurusd_id,
       u'min_lots': None,
       u'modified': self.now,
       u'ref': None,
       u'resd_lots': 3,
-      u'settl_date': 20140302,
       u'side': u'Buy',
       u'state': u'New',
       u'ticks': 12344
@@ -337,13 +227,12 @@ class TestCase(RestTestCase):
 
   def get_by_id(self, client):
     client.set_trader('MARAYL')
-    resp = client.send('GET', '/api/sess/order/GBPUSD/20140302/1')
+    resp = client.send('GET', '/api/sess/order/{}/1'.format(self.gbpusd_id))
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'accnt': u'MARAYL',
-      u'instr': u'GBPUSD',
       u'created': self.now,
       u'exec_cost': 0,
       u'exec_lots': 0,
@@ -351,12 +240,11 @@ class TestCase(RestTestCase):
       u'last_lots': None,
       u'last_ticks': None,
       u'lots': 3,
-      u'market_id': 147791,
+      u'market_id': self.gbpusd_id,
       u'min_lots': None,
       u'modified': self.now,
       u'ref': None,
       u'resd_lots': 3,
-      u'settl_date': 20140302,
       u'side': u'Sell',
       u'state': u'New',
       u'ticks': 15346

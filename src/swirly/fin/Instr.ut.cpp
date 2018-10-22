@@ -31,7 +31,8 @@ BOOST_AUTO_TEST_CASE(InstrToStringCase)
                 1,      1,          10000,      4,       1_lts,   10_lts};
 
     BOOST_TEST(to_string(instr) == //
-               "{\"symbol\":\"EURUSD\""
+               "{\"id\":1"
+               ",\"symbol\":\"EURUSD\""
                ",\"display\":\"EURUSD\""
                ",\"base_asset\":\"EUR\""
                ",\"term_ccy\":\"USD\""

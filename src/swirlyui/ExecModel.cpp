@@ -88,7 +88,7 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
             var = exec.accnt();
             break;
         case Column::MarketId:
-            var = to_variant(exec.market_id());
+            var = to_variant(exec.market().id());
             break;
         case Column::Instr:
             var = exec.instr().symbol();
@@ -204,7 +204,7 @@ void ExecModel::update_row(uint64_t tag, const Exec& exec)
 {
     // Linear search is acceptable on small circular buffer.
     auto it = find_if(rows_.begin(), rows_.end(), [&exec](const auto& row) {
-        return row.value().market_id() == exec.market_id() && row.value().id() == exec.id();
+        return row.value().market().id() == exec.market().id() && row.value().id() == exec.id();
     });
 
     if (it != rows_.end()) {

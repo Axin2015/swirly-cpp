@@ -25,32 +25,30 @@ class TestCase(RestTestCase):
         with Client() as client:
           client.set_time(self.now)
 
-          self.create_market(client, 'EURUSD', 20140302)
-          self.create_market(client, 'EURUSD', 20140402)
-          self.create_market(client, 'GBPUSD', 20140302)
+          self.eurusd_id = self.create_market(client, 'EURUSD', 20140302)
+          self.eurusd2_id = self.create_market(client, 'EURUSD', 20140402)
+          self.gbpusd_id = self.create_market(client, 'GBPUSD', 20140302)
 
-          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Sell', 3, 12346)
-          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 3, 12346)
+          self.create_order(client, 'MARAYL', self.eurusd_id, 'Sell', 3, 12346)
+          self.create_order(client, 'MARAYL', self.eurusd_id, 'Buy', 3, 12346)
 
-          self.create_order(client, 'MARAYL', 'EURUSD', 20140402, 'Sell', 5, 12346)
-          self.create_order(client, 'MARAYL', 'EURUSD', 20140402, 'Buy', 5, 12346)
+          self.create_order(client, 'MARAYL', self.eurusd2_id, 'Sell', 5, 12346)
+          self.create_order(client, 'MARAYL', self.eurusd2_id, 'Buy', 5, 12346)
 
-          self.create_order(client, 'MARAYL', 'GBPUSD', 20140302, 'Sell', 7, 15346)
-          self.create_order(client, 'MARAYL', 'GBPUSD', 20140302, 'Buy', 7, 15346)
+          self.create_order(client, 'MARAYL', self.gbpusd_id, 'Sell', 7, 15346)
+          self.create_order(client, 'MARAYL', self.gbpusd_id, 'Buy', 7, 15346)
 
           self.check_auth(client)
 
           self.get_all(client)
-          self.get_by_instr(client)
-          self.get_by_settl_date(client)
+          self.get_by_market(client)
 
       with Server(db_file, self.now) as server:
         with Client() as client:
           client.set_time(self.now)
 
           self.get_all(client)
-          self.get_by_instr(client)
-          self.get_by_settl_date(client)
+          self.get_by_market(client)
 
   def check_auth(self, client):
     client.set_auth(None, 0x2)
@@ -59,11 +57,7 @@ class TestCase(RestTestCase):
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    resp = client.send('GET', '/api/sess/posn/EURUSD')
-    self.assertEqual(401, resp.status)
-    self.assertEqual('Unauthorized', resp.reason)
-
-    resp = client.send('GET', '/api/sess/posn/EURUSD/20140302')
+    resp = client.send('GET', '/api/sess/posn/' + str(self.eurusd_id))
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
@@ -73,11 +67,7 @@ class TestCase(RestTestCase):
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-    resp = client.send('GET', '/api/sess/posn/EURUSD')
-    self.assertEqual(403, resp.status)
-    self.assertEqual('Forbidden', resp.reason)
-
-    resp = client.send('GET', '/api/sess/posn/EURUSD/20140302')
+    resp = client.send('GET', '/api/sess/posn/' + str(self.eurusd_id))
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
@@ -91,32 +81,26 @@ class TestCase(RestTestCase):
       u'accnt': u'MARAYL',
       u'buy_cost': 37038,
       u'buy_lots': 3,
-      u'instr': u'EURUSD',
-      u'market_id': 82255,
+      u'market_id': self.eurusd_id,
       u'open_cost': 0,
       u'sell_cost': 37038,
-      u'sell_lots': 3,
-      u'settl_date': 20140302
+      u'sell_lots': 3
     }, {
       u'accnt': u'MARAYL',
       u'buy_cost': 61730,
       u'buy_lots': 5,
-      u'instr': u'EURUSD',
-      u'market_id': 82286,
+      u'market_id': self.eurusd2_id,
       u'open_cost': 0,
       u'sell_cost': 61730,
-      u'sell_lots': 5,
-      u'settl_date': 20140402
+      u'sell_lots': 5
     }, {
       u'accnt': u'MARAYL',
       u'buy_cost': 107422,
       u'buy_lots': 7,
-      u'instr': u'GBPUSD',
-      u'market_id': 147791,
+      u'market_id': self.gbpusd_id,
       u'open_cost': 0,
       u'sell_cost': 107422,
-      u'sell_lots': 7,
-      u'settl_date': 20140302
+      u'sell_lots': 7
     }], resp.content)
 
   def get_by_instr(self, client):
@@ -129,27 +113,23 @@ class TestCase(RestTestCase):
       u'accnt': u'MARAYL',
       u'buy_cost': 37038,
       u'buy_lots': 3,
-      u'instr': u'EURUSD',
-      u'market_id': 82255,
+      u'market_id': self.eurusd_id,
       u'open_cost': 0,
       u'sell_cost': 37038,
-      u'sell_lots': 3,
-      u'settl_date': 20140302
+      u'sell_lots': 3
     }, {
       u'accnt': u'MARAYL',
       u'buy_cost': 61730,
       u'buy_lots': 5,
-      u'instr': u'EURUSD',
-      u'market_id': 82286,
+      u'market_id': self.eurusd2_id,
       u'open_cost': 0,
       u'sell_cost': 61730,
-      u'sell_lots': 5,
-      u'settl_date': 20140402
+      u'sell_lots': 5
     }], resp.content)
 
-  def get_by_settl_date(self, client):
+  def get_by_market(self, client):
     client.set_trader('MARAYL')
-    resp = client.send('GET', '/api/sess/posn/EURUSD/20140302')
+    resp = client.send('GET', '/api/sess/posn/' + str(self.eurusd_id))
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -157,10 +137,8 @@ class TestCase(RestTestCase):
       u'accnt': u'MARAYL',
       u'buy_cost': 37038,
       u'buy_lots': 3,
-      u'instr': u'EURUSD',
-      u'market_id': 82255,
+      u'market_id': self.eurusd_id,
       u'open_cost': 0,
       u'sell_cost': 37038,
-      u'sell_lots': 3,
-      u'settl_date': 20140302
+      u'sell_lots': 3
     }, resp.content)

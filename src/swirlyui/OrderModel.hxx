@@ -35,15 +35,10 @@ class OrderModel
 
     OrderKeys checked() const;
 
-    void remove_row(const Order& order)
-    {
-        const OrderKey key{order.market_id(), order.id()};
-        TableModel::remove_row(key);
-    }
+    void remove_row(const Order& order) { TableModel::remove_row(order.key()); }
     void update_row(std::uint64_t tag, const Order& order)
     {
-        const OrderKey key{order.market_id(), order.id()};
-        TableModel::update_row(key, tag, order);
+        TableModel::update_row(order.key(), tag, order);
     }
 
   private:

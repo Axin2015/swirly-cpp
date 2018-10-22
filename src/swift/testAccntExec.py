@@ -25,16 +25,16 @@ class TestCase(RestTestCase):
         with Client() as client:
           client.set_time(self.now)
 
-          self.create_market(client, 'EURUSD', 20140302)
-          self.create_market(client, 'GBPUSD', 20140302)
+          self.eurusd_id = self.create_market(client, 'EURUSD', 20140302)
+          self.gbpusd_id = self.create_market(client, 'GBPUSD', 20140302)
 
-          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Sell', 5, 12347)
-          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Sell', 3, 12346)
-          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 3, 12344)
-          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 5, 12343)
+          self.create_order(client, 'MARAYL', self.eurusd_id, 'Sell', 5, 12347)
+          self.create_order(client, 'MARAYL', self.eurusd_id, 'Sell', 3, 12346)
+          self.create_order(client, 'MARAYL', self.eurusd_id, 'Buy', 3, 12344)
+          self.create_order(client, 'MARAYL', self.eurusd_id, 'Buy', 5, 12343)
 
-          self.create_order(client, 'MARAYL', 'GBPUSD', 20140302, 'Sell', 3, 15346)
-          self.create_order(client, 'MARAYL', 'GBPUSD', 20140302, 'Buy', 3, 15344)
+          self.create_order(client, 'MARAYL', self.gbpusd_id, 'Sell', 3, 15346)
+          self.create_order(client, 'MARAYL', self.gbpusd_id, 'Buy', 3, 15344)
 
           self.check_auth(client)
 
@@ -79,7 +79,6 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'instr': u'GBPUSD',
       u'cpty': None,
       u'created': self.now,
       u'exec_cost': 0,
@@ -89,7 +88,7 @@ class TestCase(RestTestCase):
       u'last_ticks': None,
       u'liq_ind': None,
       u'lots': 3,
-      u'market_id': 147791,
+      u'market_id': self.gbpusd_id,
       u'match_id': None,
       u'min_lots': None,
       u'order_id': 2,
@@ -97,13 +96,11 @@ class TestCase(RestTestCase):
       u'posn_lots': None,
       u'ref': None,
       u'resd_lots': 3,
-      u'settl_date': 20140302,
       u'side': u'Buy',
       u'state': u'New',
       u'ticks': 15344
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'GBPUSD',
       u'cpty': None,
       u'created': self.now,
       u'exec_cost': 0,
@@ -113,7 +110,7 @@ class TestCase(RestTestCase):
       u'last_ticks': None,
       u'liq_ind': None,
       u'lots': 3,
-      u'market_id': 147791,
+      u'market_id': self.gbpusd_id,
       u'match_id': None,
       u'min_lots': None,
       u'order_id': 1,
@@ -121,13 +118,11 @@ class TestCase(RestTestCase):
       u'posn_lots': None,
       u'ref': None,
       u'resd_lots': 3,
-      u'settl_date': 20140302,
       u'side': u'Sell',
       u'state': u'New',
       u'ticks': 15346
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
       u'exec_cost': 0,
@@ -137,7 +132,7 @@ class TestCase(RestTestCase):
       u'last_ticks': None,
       u'liq_ind': None,
       u'lots': 5,
-      u'market_id': 82255,
+      u'market_id': self.eurusd_id,
       u'match_id': None,
       u'min_lots': None,
       u'order_id': 4,
@@ -145,13 +140,11 @@ class TestCase(RestTestCase):
       u'posn_lots': None,
       u'ref': None,
       u'resd_lots': 5,
-      u'settl_date': 20140302,
       u'side': u'Buy',
       u'state': u'New',
       u'ticks': 12343
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
       u'exec_cost': 0,
@@ -161,7 +154,7 @@ class TestCase(RestTestCase):
       u'last_ticks': None,
       u'liq_ind': None,
       u'lots': 3,
-      u'market_id': 82255,
+      u'market_id': self.eurusd_id,
       u'match_id': None,
       u'min_lots': None,
       u'order_id': 3,
@@ -169,13 +162,11 @@ class TestCase(RestTestCase):
       u'posn_lots': None,
       u'ref': None,
       u'resd_lots': 3,
-      u'settl_date': 20140302,
       u'side': u'Buy',
       u'state': u'New',
       u'ticks': 12344
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
       u'exec_cost': 0,
@@ -185,7 +176,7 @@ class TestCase(RestTestCase):
       u'last_ticks': None,
       u'liq_ind': None,
       u'lots': 3,
-      u'market_id': 82255,
+      u'market_id': self.eurusd_id,
       u'match_id': None,
       u'min_lots': None,
       u'order_id': 2,
@@ -193,13 +184,11 @@ class TestCase(RestTestCase):
       u'posn_lots': None,
       u'ref': None,
       u'resd_lots': 3,
-      u'settl_date': 20140302,
       u'side': u'Sell',
       u'state': u'New',
       u'ticks': 12346
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
       u'exec_cost': 0,
@@ -209,7 +198,7 @@ class TestCase(RestTestCase):
       u'last_ticks': None,
       u'liq_ind': None,
       u'lots': 5,
-      u'market_id': 82255,
+      u'market_id': self.eurusd_id,
       u'match_id': None,
       u'min_lots': None,
       u'order_id': 1,
@@ -217,7 +206,6 @@ class TestCase(RestTestCase):
       u'posn_lots': None,
       u'ref': None,
       u'resd_lots': 5,
-      u'settl_date': 20140302,
       u'side': u'Sell',
       u'state': u'New',
       u'ticks': 12347
@@ -231,7 +219,6 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
       u'exec_cost': 0,
@@ -241,7 +228,7 @@ class TestCase(RestTestCase):
       u'last_ticks': None,
       u'liq_ind': None,
       u'lots': 5,
-      u'market_id': 82255,
+      u'market_id': self.eurusd_id,
       u'match_id': None,
       u'min_lots': None,
       u'order_id': 4,
@@ -249,13 +236,11 @@ class TestCase(RestTestCase):
       u'posn_lots': None,
       u'ref': None,
       u'resd_lots': 5,
-      u'settl_date': 20140302,
       u'side': u'Buy',
       u'state': u'New',
       u'ticks': 12343
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
       u'exec_cost': 0,
@@ -265,7 +250,7 @@ class TestCase(RestTestCase):
       u'last_ticks': None,
       u'liq_ind': None,
       u'lots': 3,
-      u'market_id': 82255,
+      u'market_id': self.eurusd_id,
       u'match_id': None,
       u'min_lots': None,
       u'order_id': 3,
@@ -273,13 +258,11 @@ class TestCase(RestTestCase):
       u'posn_lots': None,
       u'ref': None,
       u'resd_lots': 3,
-      u'settl_date': 20140302,
       u'side': u'Buy',
       u'state': u'New',
       u'ticks': 12344
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
       u'exec_cost': 0,
@@ -289,7 +272,7 @@ class TestCase(RestTestCase):
       u'last_ticks': None,
       u'liq_ind': None,
       u'lots': 3,
-      u'market_id': 82255,
+      u'market_id': self.eurusd_id,
       u'match_id': None,
       u'min_lots': None,
       u'order_id': 2,
@@ -297,13 +280,11 @@ class TestCase(RestTestCase):
       u'posn_lots': None,
       u'ref': None,
       u'resd_lots': 3,
-      u'settl_date': 20140302,
       u'side': u'Sell',
       u'state': u'New',
       u'ticks': 12346
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
       u'exec_cost': 0,
@@ -313,7 +294,7 @@ class TestCase(RestTestCase):
       u'last_ticks': None,
       u'liq_ind': None,
       u'lots': 5,
-      u'market_id': 82255,
+      u'market_id': self.eurusd_id,
       u'match_id': None,
       u'min_lots': None,
       u'order_id': 1,
@@ -321,7 +302,6 @@ class TestCase(RestTestCase):
       u'posn_lots': None,
       u'ref': None,
       u'resd_lots': 5,
-      u'settl_date': 20140302,
       u'side': u'Sell',
       u'state': u'New',
       u'ticks': 12347
@@ -335,7 +315,6 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'instr': u'GBPUSD',
       u'cpty': None,
       u'created': self.now,
       u'exec_cost': 0,
@@ -345,7 +324,7 @@ class TestCase(RestTestCase):
       u'last_ticks': None,
       u'liq_ind': None,
       u'lots': 3,
-      u'market_id': 147791,
+      u'market_id': self.gbpusd_id,
       u'match_id': None,
       u'min_lots': None,
       u'order_id': 2,
@@ -353,13 +332,11 @@ class TestCase(RestTestCase):
       u'posn_lots': None,
       u'ref': None,
       u'resd_lots': 3,
-      u'settl_date': 20140302,
       u'side': u'Buy',
       u'state': u'New',
       u'ticks': 15344
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'GBPUSD',
       u'cpty': None,
       u'created': self.now,
       u'exec_cost': 0,
@@ -369,7 +346,7 @@ class TestCase(RestTestCase):
       u'last_ticks': None,
       u'liq_ind': None,
       u'lots': 3,
-      u'market_id': 147791,
+      u'market_id': self.gbpusd_id,
       u'match_id': None,
       u'min_lots': None,
       u'order_id': 1,
@@ -377,13 +354,11 @@ class TestCase(RestTestCase):
       u'posn_lots': None,
       u'ref': None,
       u'resd_lots': 3,
-      u'settl_date': 20140302,
       u'side': u'Sell',
       u'state': u'New',
       u'ticks': 15346
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
       u'exec_cost': 0,
@@ -393,7 +368,7 @@ class TestCase(RestTestCase):
       u'last_ticks': None,
       u'liq_ind': None,
       u'lots': 5,
-      u'market_id': 82255,
+      u'market_id': self.eurusd_id,
       u'match_id': None,
       u'min_lots': None,
       u'order_id': 4,
@@ -401,7 +376,6 @@ class TestCase(RestTestCase):
       u'posn_lots': None,
       u'ref': None,
       u'resd_lots': 5,
-      u'settl_date': 20140302,
       u'side': u'Buy',
       u'state': u'New',
       u'ticks': 12343
@@ -415,7 +389,6 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
       u'exec_cost': 0,
@@ -425,7 +398,7 @@ class TestCase(RestTestCase):
       u'last_ticks': None,
       u'liq_ind': None,
       u'lots': 5,
-      u'market_id': 82255,
+      u'market_id': self.eurusd_id,
       u'match_id': None,
       u'min_lots': None,
       u'order_id': 4,
@@ -433,13 +406,11 @@ class TestCase(RestTestCase):
       u'posn_lots': None,
       u'ref': None,
       u'resd_lots': 5,
-      u'settl_date': 20140302,
       u'side': u'Buy',
       u'state': u'New',
       u'ticks': 12343
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
       u'exec_cost': 0,
@@ -449,7 +420,7 @@ class TestCase(RestTestCase):
       u'last_ticks': None,
       u'liq_ind': None,
       u'lots': 3,
-      u'market_id': 82255,
+      u'market_id': self.eurusd_id,
       u'match_id': None,
       u'min_lots': None,
       u'order_id': 3,
@@ -457,13 +428,11 @@ class TestCase(RestTestCase):
       u'posn_lots': None,
       u'ref': None,
       u'resd_lots': 3,
-      u'settl_date': 20140302,
       u'side': u'Buy',
       u'state': u'New',
       u'ticks': 12344
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
       u'exec_cost': 0,
@@ -473,7 +442,7 @@ class TestCase(RestTestCase):
       u'last_ticks': None,
       u'liq_ind': None,
       u'lots': 3,
-      u'market_id': 82255,
+      u'market_id': self.eurusd_id,
       u'match_id': None,
       u'min_lots': None,
       u'order_id': 2,
@@ -481,7 +450,6 @@ class TestCase(RestTestCase):
       u'posn_lots': None,
       u'ref': None,
       u'resd_lots': 3,
-      u'settl_date': 20140302,
       u'side': u'Sell',
       u'state': u'New',
       u'ticks': 12346
@@ -504,7 +472,6 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'instr': u'GBPUSD',
       u'cpty': None,
       u'created': self.now,
       u'exec_cost': 0,
@@ -514,7 +481,7 @@ class TestCase(RestTestCase):
       u'last_ticks': None,
       u'liq_ind': None,
       u'lots': 3,
-      u'market_id': 147791,
+      u'market_id': self.gbpusd_id,
       u'match_id': None,
       u'min_lots': None,
       u'order_id': 2,
@@ -522,13 +489,11 @@ class TestCase(RestTestCase):
       u'posn_lots': None,
       u'ref': None,
       u'resd_lots': 3,
-      u'settl_date': 20140302,
       u'side': u'Buy',
       u'state': u'New',
       u'ticks': 15344
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'GBPUSD',
       u'cpty': None,
       u'created': self.now,
       u'exec_cost': 0,
@@ -538,7 +503,7 @@ class TestCase(RestTestCase):
       u'last_ticks': None,
       u'liq_ind': None,
       u'lots': 3,
-      u'market_id': 147791,
+      u'market_id': self.gbpusd_id,
       u'match_id': None,
       u'min_lots': None,
       u'order_id': 1,
@@ -546,13 +511,11 @@ class TestCase(RestTestCase):
       u'posn_lots': None,
       u'ref': None,
       u'resd_lots': 3,
-      u'settl_date': 20140302,
       u'side': u'Sell',
       u'state': u'New',
       u'ticks': 15346
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
       u'exec_cost': 0,
@@ -562,7 +525,7 @@ class TestCase(RestTestCase):
       u'last_ticks': None,
       u'liq_ind': None,
       u'lots': 5,
-      u'market_id': 82255,
+      u'market_id': self.eurusd_id,
       u'match_id': None,
       u'min_lots': None,
       u'order_id': 4,
@@ -570,13 +533,11 @@ class TestCase(RestTestCase):
       u'posn_lots': None,
       u'ref': None,
       u'resd_lots': 5,
-      u'settl_date': 20140302,
       u'side': u'Buy',
       u'state': u'New',
       u'ticks': 12343
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
       u'exec_cost': 0,
@@ -586,7 +547,7 @@ class TestCase(RestTestCase):
       u'last_ticks': None,
       u'liq_ind': None,
       u'lots': 3,
-      u'market_id': 82255,
+      u'market_id': self.eurusd_id,
       u'match_id': None,
       u'min_lots': None,
       u'order_id': 3,
@@ -594,13 +555,11 @@ class TestCase(RestTestCase):
       u'posn_lots': None,
       u'ref': None,
       u'resd_lots': 3,
-      u'settl_date': 20140302,
       u'side': u'Buy',
       u'state': u'New',
       u'ticks': 12344
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
       u'exec_cost': 0,
@@ -610,7 +569,7 @@ class TestCase(RestTestCase):
       u'last_ticks': None,
       u'liq_ind': None,
       u'lots': 3,
-      u'market_id': 82255,
+      u'market_id': self.eurusd_id,
       u'match_id': None,
       u'min_lots': None,
       u'order_id': 2,
@@ -618,13 +577,11 @@ class TestCase(RestTestCase):
       u'posn_lots': None,
       u'ref': None,
       u'resd_lots': 3,
-      u'settl_date': 20140302,
       u'side': u'Sell',
       u'state': u'New',
       u'ticks': 12346
     }, {
       u'accnt': u'MARAYL',
-      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
       u'exec_cost': 0,
@@ -634,7 +591,7 @@ class TestCase(RestTestCase):
       u'last_ticks': None,
       u'liq_ind': None,
       u'lots': 5,
-      u'market_id': 82255,
+      u'market_id': self.eurusd_id,
       u'match_id': None,
       u'min_lots': None,
       u'order_id': 1,
@@ -642,7 +599,6 @@ class TestCase(RestTestCase):
       u'posn_lots': None,
       u'ref': None,
       u'resd_lots': 5,
-      u'settl_date': 20140302,
       u'side': u'Sell',
       u'state': u'New',
       u'ticks': 12347
