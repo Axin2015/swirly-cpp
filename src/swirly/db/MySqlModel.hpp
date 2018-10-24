@@ -41,7 +41,7 @@ class SWIRLY_API MySqlModel : public Model {
   protected:
     void do_read_asset(const ModelCallback<AssetPtr>& cb) const override;
 
-    void do_read_product(const ModelCallback<ProductPtr>& cb) const override;
+    void do_read_instr(const ModelCallback<InstrPtr>& cb) const override;
 
     void do_read_market(const ModelCallback<MarketPtr>& cb) const override;
 

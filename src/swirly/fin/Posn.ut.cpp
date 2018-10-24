@@ -36,23 +36,19 @@ BOOST_AUTO_TEST_CASE(PosnSetCase)
     using PosnSet = IdSet<Posn, MarketIdTraits<Posn>>;
     PosnSet s;
 
-    PosnPtr posn1{&*s.emplace("MARAYL"sv, MarketId, "EURUSD"sv, SettlDay)};
+    PosnPtr posn1{&*s.emplace("MARAYL"sv, MarketId)};
     BOOST_TEST(posn1->ref_count() == 2);
-    BOOST_TEST(posn1->product() == "EURUSD"sv);
-    BOOST_TEST(posn1->settl_day() == SettlDay);
     BOOST_TEST(s.find(MarketId) != s.end());
 
     // Duplicate.
-    PosnPtr posn2{&*s.emplace("MARAYL"sv, MarketId, "EURUSD"sv, SettlDay)};
+    PosnPtr posn2{&*s.emplace("MARAYL"sv, MarketId)};
     BOOST_TEST(posn2->ref_count() == 3);
     BOOST_TEST(posn2 == posn1);
 
     // Replace.
-    PosnPtr posn3{&*s.emplace_or_replace("MARAYL"sv, MarketId, "EURUSD"sv, SettlDay)};
+    PosnPtr posn3{&*s.emplace_or_replace("MARAYL"sv, MarketId)};
     BOOST_TEST(posn3->ref_count() == 2);
     BOOST_TEST(posn3 != posn1);
-    BOOST_TEST(posn3->product() == "EURUSD"sv);
-    BOOST_TEST(posn3->settl_day() == SettlDay);
 }
 
 BOOST_AUTO_TEST_CASE(PosnCloseLong)
@@ -60,7 +56,7 @@ BOOST_AUTO_TEST_CASE(PosnCloseLong)
     constexpr auto SettlDay = ymd_to_jd(2014, 3, 14);
     constexpr auto MarketId = to_market_id(1_id32, SettlDay);
 
-    Posn posn{"MARAYL"sv, MarketId, "EURUSD"sv, SettlDay};
+    Posn posn{"MARAYL"sv, MarketId};
 
     posn.add_trade(Side::Buy, 10_lts, 2_tks);
     BOOST_TEST(posn.buy_lots() == 10_lts);
@@ -100,7 +96,7 @@ BOOST_AUTO_TEST_CASE(PosnCloseShort)
     constexpr auto SettlDay = ymd_to_jd(2014, 3, 14);
     constexpr auto MarketId = to_market_id(1_id32, SettlDay);
 
-    Posn posn{"MARAYL"sv, MarketId, "EURUSD"sv, SettlDay};
+    Posn posn{"MARAYL"sv, MarketId};
 
     posn.add_trade(Side::Sell, 10_lts, 2_tks);
     BOOST_TEST(posn.buy_lots() == 0_lts);

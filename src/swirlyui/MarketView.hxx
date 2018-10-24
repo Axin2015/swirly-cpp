@@ -26,8 +26,8 @@ class QModelIndex;
 namespace swirly {
 namespace ui {
 
-class Product;
-class ProductModel;
+class Instr;
+class InstrModel;
 class Market;
 class MarketForm;
 class MarketModel;
@@ -36,16 +36,16 @@ class MarketView : public QWidget {
     Q_OBJECT
 
   public:
-    MarketView(ProductModel& product_model, MarketModel& model, QWidget* parent = nullptr,
+    MarketView(InstrModel& instr_model, MarketModel& model, QWidget* parent = nullptr,
                Qt::WindowFlags f = Qt::WindowFlags{});
     ~MarketView() override;
 
-    void set_fields(const QString& product_symbol, QDate settl_date, std::optional<Lots> lots,
+    void set_fields(const QString& instr_symbol, QDate settl_date, std::optional<Lots> lots,
                     std::optional<Ticks> ticks);
 
   signals:
-    void create_market(const Product& product, QDate settl_date);
-    void create_order(const Product& product, QDate settl_date, const QString& ref, Side side,
+    void create_market(const Instr& instr, QDate settl_date);
+    void create_order(const Instr& instr, QDate settl_date, const QString& ref, Side side,
                       Lots lots, Ticks ticks);
 
   private slots:

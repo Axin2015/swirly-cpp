@@ -53,7 +53,7 @@ void Market::to_dsv(ostream& os, char delim) const
 {
     OStreamJoiner osj{os, delim};
     osj << id_ //
-        << product_;
+        << instr_;
     if (settl_day_ != 0_jd) {
         osj << jd_to_iso(settl_day_);
     } else {
@@ -74,8 +74,8 @@ void Market::to_dsv(ostream& os, char delim) const
 
 void Market::to_json(ostream& os) const
 {
-    os << "{\"id\":" << id_             //
-       << ",\"product\":\"" << product_ //
+    os << "{\"id\":" << id_         //
+       << ",\"instr\":\"" << instr_ //
        << "\",\"settl_date\":";
     if (settl_day_ != 0_jd) {
         os << jd_to_iso(settl_day_);

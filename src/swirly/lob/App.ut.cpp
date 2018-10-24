@@ -77,12 +77,12 @@ BOOST_FIXTURE_TEST_CASE(AppAssets, Fixture)
     BOOST_TEST(it->type() == AssetType::Ccy);
 }
 
-BOOST_FIXTURE_TEST_CASE(AppProducts, Fixture, *utf::tolerance(0.0000001))
+BOOST_FIXTURE_TEST_CASE(AppInstrs, Fixture, *utf::tolerance(0.0000001))
 {
-    BOOST_TEST(distance(app.products().begin(), app.products().end()) == 21);
+    BOOST_TEST(distance(app.instrs().begin(), app.instrs().end()) == 21);
 
-    auto it = app.products().find("EURUSD"sv);
-    BOOST_TEST(it != app.products().end());
+    auto it = app.instrs().find("EURUSD"sv);
+    BOOST_TEST(it != app.instrs().end());
     BOOST_TEST(it->id() == 1_id32);
     BOOST_TEST(it->symbol() == "EURUSD"sv);
     BOOST_TEST(it->display() == "EURUSD"sv);
@@ -109,7 +109,7 @@ BOOST_FIXTURE_TEST_CASE(AppMarkets, Fixture)
     BOOST_TEST(it != app.markets().end());
     BOOST_TEST(it->id() == MarketId);
 
-    BOOST_TEST(it->product() == "EURUSD"sv);
+    BOOST_TEST(it->instr() == "EURUSD"sv);
     BOOST_TEST(it->settl_day() == SettlDay);
     BOOST_TEST(it->state() == 0x1U);
 }
@@ -122,24 +122,25 @@ BOOST_FIXTURE_TEST_CASE(AppMarket, Fixture)
     auto& market = app.market(MarketId);
     BOOST_TEST(market.id() == MarketId);
 
-    BOOST_TEST(market.product() == "EURUSD"sv);
+    BOOST_TEST(market.instr() == "EURUSD"sv);
     BOOST_TEST(market.settl_day() == SettlDay);
     BOOST_TEST(market.state() == 0x1U);
 }
 
 BOOST_FIXTURE_TEST_CASE(AppCreateMarket, Fixture)
 {
-    const Product& product = app.product("USDJPY"sv);
-    const auto market_id = to_market_id(product.id(), SettlDay);
+    const Instr& instr = app.instr("USDJPY"sv);
+    const auto market_id = to_market_id(instr.id(), SettlDay);
 
     // Settl-day before bus-day.
-    BOOST_CHECK_THROW(app.create_market(now, product, Today - 1_jd, 0x1), InvalidException);
+    BOOST_CHECK_THROW(app.create_market(now, market_id, instr, Today - 1_jd, 0x1),
+                      InvalidException);
 
-    auto& market = app.create_market(now, product, SettlDay, 0x1);
+    auto& market = app.create_market(now, market_id, instr, SettlDay, 0x1);
 
     BOOST_TEST(market.id() == market_id);
 
-    BOOST_TEST(market.product() == "USDJPY"sv);
+    BOOST_TEST(market.instr() == "USDJPY"sv);
     BOOST_TEST(market.settl_day() == SettlDay);
     BOOST_TEST(market.state() == 0x1U);
 
@@ -149,20 +150,21 @@ BOOST_FIXTURE_TEST_CASE(AppCreateMarket, Fixture)
     BOOST_TEST(&*it == &market);
 
     // Already exists.
-    BOOST_CHECK_THROW(app.create_market(now, product, SettlDay, 0x1), AlreadyExistsException);
+    BOOST_CHECK_THROW(app.create_market(now, market_id, instr, SettlDay, 0x1),
+                      AlreadyExistsException);
 }
 
 BOOST_FIXTURE_TEST_CASE(AppUpdateMarket, Fixture)
 {
-    const Product& product = app.product("USDJPY"sv);
-    const auto market_id = to_market_id(product.id(), SettlDay);
-    auto& market = app.create_market(now, product, SettlDay, 0x1);
+    const Instr& instr = app.instr("USDJPY"sv);
+    const auto market_id = to_market_id(instr.id(), SettlDay);
+    auto& market = app.create_market(now, market_id, instr, SettlDay, 0x1);
 
     app.update_market(now, market, 0x2);
 
     BOOST_TEST(market.id() == market_id);
 
-    BOOST_TEST(market.product() == "USDJPY"sv);
+    BOOST_TEST(market.instr() == "USDJPY"sv);
     BOOST_TEST(market.settl_day() == SettlDay);
     BOOST_TEST(market.state() == 0x2U);
 }
@@ -170,8 +172,8 @@ BOOST_FIXTURE_TEST_CASE(AppUpdateMarket, Fixture)
 BOOST_FIXTURE_TEST_CASE(AppCreateOrder, Fixture)
 {
     auto& sess = app.sess("MARAYL"sv);
-    const Product& product = app.product("EURUSD"sv);
-    const auto market_id = to_market_id(product.id(), SettlDay);
+    const Instr& instr = app.instr("EURUSD"sv);
+    const auto market_id = to_market_id(instr.id(), SettlDay);
     auto& market = app.market(market_id);
 
     Response resp;
@@ -182,8 +184,6 @@ BOOST_FIXTURE_TEST_CASE(AppCreateOrder, Fixture)
 
     ConstOrderPtr order{resp.orders().front()};
     BOOST_TEST(order->market_id() == market.id());
-    BOOST_TEST(order->product() == product.symbol());
-    BOOST_TEST(order->settl_day() == SettlDay);
     BOOST_TEST(order->id() == 1_id64);
     BOOST_TEST(order->accnt() == sess.accnt());
     BOOST_TEST(order->ref().empty());

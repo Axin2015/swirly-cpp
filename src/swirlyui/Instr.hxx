@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYUI_PRODUCT_HXX
-#define SWIRLYUI_PRODUCT_HXX
+#ifndef SWIRLYUI_INSTR_HXX
+#define SWIRLYUI_INSTR_HXX
 
 #include "Types.hxx"
 
@@ -28,10 +28,11 @@ class QJsonObject;
 
 namespace swirly {
 namespace ui {
-namespace product {
+namespace instr {
 
 enum class Column : int { //
     CheckState,           //
+    Id,                   //
     Symbol,               //
     Display,              //
     BaseAsset,            //
@@ -46,24 +47,25 @@ enum class Column : int { //
 };
 constexpr int ColumnCount{unbox(Column::MaxLots) + 1};
 
-} // namespace product
+} // namespace instr
 
 // Cheap copies.
-class Product {
+class Instr {
   public:
-    Product(const QString& symbol, const QString& display, const QString& base_asset,
-            const QString& term_ccy, int lot_numer, int lot_denom, int tick_numer, int tick_denom,
-            int pip_dp, Lots min_lots, Lots max_lots)
-    : impl_{std::make_shared<const Impl>(symbol, display, base_asset, term_ccy, lot_numer,
+    Instr(Id32 id, const QString& symbol, const QString& display, const QString& base_asset,
+          const QString& term_ccy, int lot_numer, int lot_denom, int tick_numer, int tick_denom,
+          int pip_dp, Lots min_lots, Lots max_lots)
+    : impl_{std::make_shared<const Impl>(id, symbol, display, base_asset, term_ccy, lot_numer,
                                          lot_denom, tick_numer, tick_denom, pip_dp, min_lots,
                                          max_lots)}
     {
     }
-    Product() = default;
-    ~Product() = default;
+    Instr() = default;
+    ~Instr() = default;
 
-    static Product from_json(const QJsonObject& obj);
+    static Instr from_json(const QJsonObject& obj);
 
+    const Id32 id() const noexcept { return impl_->id; }
     const QString& symbol() const noexcept { return impl_->symbol; }
     const QString& display() const noexcept { return impl_->display; }
     const QString& base_asset() const noexcept { return impl_->base_asset; }
@@ -82,11 +84,12 @@ class Product {
 
   private:
     struct Impl {
-        Impl(const QString& symbol, const QString& display, const QString& base_asset,
+        Impl(Id32 id, const QString& symbol, const QString& display, const QString& base_asset,
              const QString& term_ccy, int lot_numer, int lot_denom, int tick_numer, int tick_denom,
              int pip_dp, Lots min_lots, Lots max_lots);
         Impl() = default;
         ~Impl() = default;
+        Id32 id{};
         QString symbol{};
         QString display{};
         QString base_asset{};
@@ -111,64 +114,64 @@ class Product {
     std::shared_ptr<const Impl> impl_{empty()};
 };
 
-QDebug operator<<(QDebug debug, const Product& product);
+QDebug operator<<(QDebug debug, const Instr& instr);
 
-inline bool is_modified(const Product& prev, const Product& next) noexcept
+inline bool is_modified(const Instr& prev, const Instr& next) noexcept
 {
     // Immutable.
     return false;
 }
 
-inline Lots qty_to_lots(double qty, const Product& product) noexcept
+inline Lots qty_to_lots(double qty, const Instr& instr) noexcept
 {
-    return swirly::qty_to_lots(qty, product.qty_inc());
+    return swirly::qty_to_lots(qty, instr.qty_inc());
 }
 
-inline double lots_to_qty(Lots lots, const Product& product) noexcept
+inline double lots_to_qty(Lots lots, const Instr& instr) noexcept
 {
-    return swirly::lots_to_qty(lots, product.qty_inc());
+    return swirly::lots_to_qty(lots, instr.qty_inc());
 }
 
-inline QString lots_to_qty_string(Lots lots, const Product& product)
+inline QString lots_to_qty_string(Lots lots, const Instr& instr)
 {
-    const auto qty = lots_to_qty(lots, product);
-    return QString::number(qty, 'f', product.qty_dp());
+    const auto qty = lots_to_qty(lots, instr);
+    return QString::number(qty, 'f', instr.qty_dp());
 }
 
-inline Ticks price_to_ticks(double price, const Product& product) noexcept
+inline Ticks price_to_ticks(double price, const Instr& instr) noexcept
 {
-    return swirly::price_to_ticks(price, product.price_inc());
+    return swirly::price_to_ticks(price, instr.price_inc());
 }
 
-inline double ticks_to_price(Ticks ticks, const Product& product) noexcept
+inline double ticks_to_price(Ticks ticks, const Instr& instr) noexcept
 {
-    return swirly::ticks_to_price(ticks, product.price_inc());
+    return swirly::ticks_to_price(ticks, instr.price_inc());
 }
 
-inline QString ticks_to_price_string(Ticks ticks, const Product& product)
+inline QString ticks_to_price_string(Ticks ticks, const Instr& instr)
 {
-    const auto price = ticks_to_price(ticks, product);
-    return QString::number(price, 'f', product.price_dp());
+    const auto price = ticks_to_price(ticks, instr);
+    return QString::number(price, 'f', instr.price_dp());
 }
 
-inline double ticks_to_avg_price(Lots lots, Cost cost, const Product& product) noexcept
+inline double ticks_to_avg_price(Lots lots, Cost cost, const Instr& instr) noexcept
 {
     double ticks = 0;
     if (lots != 0_lts) {
         ticks = fract_to_real(cost.count(), lots.count());
     }
-    return ticks * product.price_inc();
+    return ticks * instr.price_inc();
 }
 
-inline QString ticks_to_avg_price_string(Lots lots, Cost cost, const Product& product)
+inline QString ticks_to_avg_price_string(Lots lots, Cost cost, const Instr& instr)
 {
-    const auto price = ticks_to_avg_price(lots, cost, product);
-    return QString::number(price, 'f', product.price_dp() + 1);
+    const auto price = ticks_to_avg_price(lots, cost, instr);
+    return QString::number(price, 'f', instr.price_dp() + 1);
 }
 
 } // namespace ui
 } // namespace swirly
 
-Q_DECLARE_METATYPE(swirly::ui::Product)
+Q_DECLARE_METATYPE(swirly::ui::Instr)
 
-#endif // SWIRLYUI_PRODUCT_HXX
+#endif // SWIRLYUI_INSTR_HXX

@@ -25,7 +25,7 @@ class TestCase(RestTestCase):
         with Client() as client:
           client.set_time(self.now)
 
-          self.create_market(client, 'EURUSD', 20140302)
+          self.eurusd_id = self.create_market(client, 'EURUSD', 20140302)
 
           self.check_auth(client)
 
@@ -35,19 +35,19 @@ class TestCase(RestTestCase):
   def check_auth(self, client):
     client.set_auth(None, 0x1)
 
-    resp = client.send('POST', '/api/sess/trade/EURUSD/20140302')
+    resp = client.send('POST', '/api/sess/trade/' + str(self.eurusd_id))
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
     client.set_auth('ADMIN', ~0x1 & 0x7fffffff)
 
-    resp = client.send('POST', '/api/sess/trade/EURUSD/20140302')
+    resp = client.send('POST', '/api/sess/trade/' + str(self.eurusd_id))
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
   def create_deposit(self, client):
     client.set_admin()
-    resp = client.send('POST', '/api/sess/trade/EURUSD/20140302',
+    resp = client.send('POST', '/api/sess/trade/' + str(self.eurusd_id),
                        accnt = 'MARAYL',
                        ref = 'test1',
                        side = 'Buy',
@@ -57,7 +57,6 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'product': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
       u'exec_cost': 0,
@@ -67,7 +66,7 @@ class TestCase(RestTestCase):
       u'last_ticks': 0,
       u'liq_ind': None,
       u'lots': 10,
-      u'market_id': 82255,
+      u'market_id': self.eurusd_id,
       u'match_id': None,
       u'min_lots': 1,
       u'order_id': 0,
@@ -75,7 +74,6 @@ class TestCase(RestTestCase):
       u'posn_lots': 0,
       u'ref': u'test1',
       u'resd_lots': 0,
-      u'settl_date': 20140302,
       u'side': u'Buy',
       u'state': u'Trade',
       u'ticks': 0
@@ -83,7 +81,7 @@ class TestCase(RestTestCase):
 
   def create_withdraw(self, client):
     client.set_admin()
-    resp = client.send('POST', '/api/sess/trade/EURUSD/20140302',
+    resp = client.send('POST', '/api/sess/trade/' + str(self.eurusd_id),
                        accnt = 'MARAYL',
                        ref = 'test1',
                        side = 'Sell',
@@ -93,7 +91,6 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'product': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
       u'exec_cost': 0,
@@ -103,7 +100,7 @@ class TestCase(RestTestCase):
       u'last_ticks': 0,
       u'liq_ind': None,
       u'lots': 10,
-      u'market_id': 82255,
+      u'market_id': self.eurusd_id,
       u'match_id': None,
       u'min_lots': 1,
       u'order_id': 0,
@@ -111,7 +108,6 @@ class TestCase(RestTestCase):
       u'posn_lots': 10,
       u'ref': u'test1',
       u'resd_lots': 0,
-      u'settl_date': 20140302,
       u'side': u'Sell',
       u'state': u'Trade',
       u'ticks': 0

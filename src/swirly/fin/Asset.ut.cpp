@@ -30,7 +30,8 @@ BOOST_AUTO_TEST_CASE(AssetToStringCase)
     Asset asset{1_id32, "GBP"sv, "United Kingdom, Pounds"sv, AssetType::Ccy};
 
     BOOST_TEST(to_string(asset) == //
-               "{\"symbol\":\"GBP\""
+               "{\"id\":1"
+               ",\"symbol\":\"GBP\""
                ",\"display\":\"United Kingdom, Pounds\""
                ",\"type\":\"Ccy\""
                "}");

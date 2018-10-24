@@ -14,17 +14,18 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "ProductModel.hxx"
+#include "InstrModel.hxx"
 
 namespace swirly {
 namespace ui {
-using namespace product;
+using namespace instr;
 using namespace std;
 
-ProductModel::ProductModel(QObject* parent)
+InstrModel::InstrModel(QObject* parent)
 : TableModel{parent}
 {
     header_[unbox(Column::CheckState)] = tr("");
+    header_[unbox(Column::Id)] = tr("Id");
     header_[unbox(Column::Symbol)] = tr("Symbol");
     header_[unbox(Column::Display)] = tr("Display");
     header_[unbox(Column::BaseAsset)] = tr("Base Asset");
@@ -38,9 +39,9 @@ ProductModel::ProductModel(QObject* parent)
     header_[unbox(Column::MaxLots)] = tr("Max Lots");
 }
 
-ProductModel::~ProductModel() = default;
+InstrModel::~InstrModel() = default;
 
-QVariant ProductModel::data(const QModelIndex& index, int role) const
+QVariant InstrModel::data(const QModelIndex& index, int role) const
 {
     QVariant var{};
     if (!index.isValid()) {
@@ -55,42 +56,45 @@ QVariant ProductModel::data(const QModelIndex& index, int role) const
             break;
         }
     } else if (role == Qt::DisplayRole) {
-        const auto& product = value_at(index.row());
+        const auto& instr = value_at(index.row());
         switch (box<Column>(index.column())) {
         case Column::CheckState:
             break;
+        case Column::Id:
+            var = to_variant(instr.id());
+            break;
         case Column::Symbol:
-            var = product.symbol();
+            var = instr.symbol();
             break;
         case Column::Display:
-            var = product.display();
+            var = instr.display();
             break;
         case Column::BaseAsset:
-            var = product.base_asset();
+            var = instr.base_asset();
             break;
         case Column::TermCcy:
-            var = product.term_ccy();
+            var = instr.term_ccy();
             break;
         case Column::LotNumer:
-            var = product.lot_numer();
+            var = instr.lot_numer();
             break;
         case Column::LotDenom:
-            var = product.lot_denom();
+            var = instr.lot_denom();
             break;
         case Column::TickNumer:
-            var = product.tick_numer();
+            var = instr.tick_numer();
             break;
         case Column::TickDenom:
-            var = product.tick_denom();
+            var = instr.tick_denom();
             break;
         case Column::PipDp:
-            var = product.pip_dp();
+            var = instr.pip_dp();
             break;
         case Column::MinLots:
-            var = to_variant(product.min_lots());
+            var = to_variant(instr.min_lots());
             break;
         case Column::MaxLots:
-            var = to_variant(product.max_lots());
+            var = to_variant(instr.max_lots());
             break;
         }
     } else if (role == Qt::TextAlignmentRole) {
@@ -103,6 +107,7 @@ QVariant ProductModel::data(const QModelIndex& index, int role) const
         case Column::TermCcy:
             var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
             break;
+        case Column::Id:
         case Column::LotNumer:
         case Column::LotDenom:
         case Column::TickNumer:
@@ -119,7 +124,7 @@ QVariant ProductModel::data(const QModelIndex& index, int role) const
     return var;
 }
 
-QVariant ProductModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant InstrModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     QVariant var{};
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
@@ -128,17 +133,17 @@ QVariant ProductModel::headerData(int section, Qt::Orientation orientation, int 
     return var;
 }
 
-Product ProductModel::find(const QString& symbol) const
+Instr InstrModel::find(const QString& symbol) const
 {
-    Product product;
+    Instr instr;
     auto it = rows_.find(symbol);
     if (it != rows_.end()) {
-        product = it->second.value();
+        instr = it->second.value();
     }
-    return product;
+    return instr;
 }
 
-int ProductModel::index_of(const QString& symbol) const
+int InstrModel::index_of(const QString& symbol) const
 {
     int i{-1};
     auto it = rows_.find(symbol);

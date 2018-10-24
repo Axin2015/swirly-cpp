@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Product.hpp"
+#include "Instr.hpp"
 
 #include <swirly/fin/Conv.hpp>
 
@@ -24,11 +24,11 @@ namespace swirly {
 inline namespace fin {
 using namespace std;
 
-static_assert(sizeof(Product) <= 4 * 64, "no greater than specified cache-lines");
+static_assert(sizeof(Instr) <= 4 * 64, "no greater than specified cache-lines");
 
-Product::Product(Id32 id, Symbol symbol, string_view display, Symbol base_asset, Symbol term_ccy,
-                 int lot_numer, int lot_denom, int tick_numer, int tick_denom, int pip_dp,
-                 Lots min_lots, Lots max_lots) noexcept
+Instr::Instr(Id32 id, Symbol symbol, string_view display, Symbol base_asset, Symbol term_ccy,
+             int lot_numer, int lot_denom, int tick_numer, int tick_denom, int pip_dp,
+             Lots min_lots, Lots max_lots) noexcept
 : id_{id}
 , symbol_{symbol}
 , display_{display}
@@ -48,13 +48,13 @@ Product::Product(Id32 id, Symbol symbol, string_view display, Symbol base_asset,
 {
 }
 
-Product::~Product() = default;
+Instr::~Instr() = default;
 
-Product::Product(const Product&) = default;
+Instr::Instr(const Instr&) = default;
 
-Product::Product(Product&&) = default;
+Instr::Instr(Instr&&) = default;
 
-void Product::to_dsv(ostream& os, char delim) const
+void Instr::to_dsv(ostream& os, char delim) const
 {
     OStreamJoiner osj{os, delim};
     osj << id_         //
@@ -71,9 +71,10 @@ void Product::to_dsv(ostream& os, char delim) const
         << max_lots_;
 }
 
-void Product::to_json(ostream& os) const
+void Instr::to_json(ostream& os) const
 {
-    os << "{\"symbol\":\"" << symbol_           //
+    os << "{\"id\":" << id_                     //
+       << ",\"symbol\":\"" << symbol_           //
        << "\",\"display\":\"" << display_       //
        << "\",\"base_asset\":\"" << base_asset_ //
        << "\",\"term_ccy\":\"" << term_ccy_     //

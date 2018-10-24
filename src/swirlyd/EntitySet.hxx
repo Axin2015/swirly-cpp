@@ -27,13 +27,13 @@ class EntitySet {
   public:
     enum : int {
         Asset = 1 << 0,
-        Product = 1 << 1,
+        Instr = 1 << 1,
         Market = 1 << 2,
         Order = 1 << 3,
         Exec = 1 << 4,
         Trade = 1 << 5,
         Posn = 1 << 6,
-        RecMask = Asset | Product,
+        RecMask = Asset | Instr,
         AccntMask = Market | Order | Exec | Trade | Posn
     };
 
@@ -62,7 +62,7 @@ class EntitySet {
     int get() const noexcept { return bs_; }
     bool many() const noexcept { return (bs_ & (bs_ - 1)) != 0; }
     bool asset() const noexcept { return (bs_ & Asset) != 0; }
-    bool product() const noexcept { return (bs_ & Product) != 0; }
+    bool instr() const noexcept { return (bs_ & Instr) != 0; }
     bool market() const noexcept { return (bs_ & Market) != 0; }
     bool order() const noexcept { return (bs_ & Order) != 0; }
     bool exec() const noexcept { return (bs_ & Exec) != 0; }

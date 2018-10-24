@@ -35,12 +35,11 @@ class SWIRLY_API Exec
 , public Request
 , public MemAlloc {
   public:
-    Exec(WallTime created, Symbol accnt, Id64 market_id, Symbol product, JDay settl_day, Id64 id,
-         Id64 order_id, std::string_view ref, State state, Side side, Lots lots, Ticks ticks,
-         Lots resd_lots, Lots exec_lots, Cost exec_cost, Lots last_lots, Ticks last_ticks,
-         Lots min_lots, Id64 match_id, Lots posn_lots, Cost posn_cost, LiqInd liq_ind,
-         Symbol cpty) noexcept
-    : Request{created, accnt, market_id, product, settl_day, id, ref, side, lots}
+    Exec(WallTime created, Symbol accnt, Id64 market_id, Id64 id, Id64 order_id,
+         std::string_view ref, State state, Side side, Lots lots, Ticks ticks, Lots resd_lots,
+         Lots exec_lots, Cost exec_cost, Lots last_lots, Ticks last_ticks, Lots min_lots,
+         Id64 match_id, Lots posn_lots, Cost posn_cost, LiqInd liq_ind, Symbol cpty) noexcept
+    : Request{created, accnt, market_id, id, ref, side, lots}
     , order_id_{order_id}
     , state_{state}
     , ticks_{ticks}

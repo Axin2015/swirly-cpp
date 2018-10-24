@@ -35,7 +35,7 @@ constexpr auto SelectSql = //
     "SELECT id, symbol, display, type_id FROM asset_t"sv;
 } // namespace asset
 
-namespace product {
+namespace instr {
 enum : int {
     Id,        //
     Symbol,    //
@@ -53,13 +53,13 @@ enum : int {
 
 constexpr auto SelectSql =                                                    //
     "SELECT id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom," //
-    " tick_numer, tick_denom, pip_dp, min_lots, max_lots FROM product_v"sv;
-} // namespace product
+    " tick_numer, tick_denom, pip_dp, min_lots, max_lots FROM instr_v"sv;
+} // namespace instr
 
 namespace market {
 enum : int {   //
     Id,        //
-    Product,   //
+    Instr,     //
     SettlDay,  //
     State,     //
     LastLots,  //
@@ -68,12 +68,12 @@ enum : int {   //
     MaxId      //
 };
 
-constexpr auto SelectSql =                                                           //
-    "SELECT id, product, settl_day, state, last_time, last_lots, last_ticks, max_id" //
+constexpr auto SelectSql =                                                         //
+    "SELECT id, instr, settl_day, state, last_time, last_lots, last_ticks, max_id" //
     " FROM market_v"sv;
 
-constexpr auto InsertSql =                                 //
-    "INSERT INTO market_t (id, product, settl_day, state)" //
+constexpr auto InsertSql =                               //
+    "INSERT INTO market_t (id, instr, settl_day, state)" //
     " VALUES (?, ?, ?, ?)"sv;
 
 constexpr auto UpdateSql =          //
@@ -87,8 +87,6 @@ enum : int {   //
     Modified,  //
     Accnt,     //
     MarketId,  //
-    Product,   //
-    SettlDay,  //
     Id,        //
     Ref,       //
     State,     //
@@ -104,9 +102,9 @@ enum : int {   //
 };
 
 constexpr auto SelectSql
-    = "SELECT"                                                                                //
-      " created, modified, accnt, market_id, product, settl_day, id, ref, state_id, side_id," //
-      " lots, ticks, resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots"        //
+    = "SELECT"                                                                   //
+      " created, modified, accnt, market_id, id, ref, state_id, side_id, lots,"  //
+      " ticks, resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots" //
       " FROM order_t WHERE resd_lots > 0;"sv;
 } // namespace order
 
@@ -115,8 +113,6 @@ enum : int {   //
     Created,   //
     Accnt,     //
     MarketId,  //
-    Product,   //
-    SettlDay,  //
     Id,        //
     OrderId,   //
     Ref,       //
@@ -138,18 +134,18 @@ enum : int {   //
 };
 
 constexpr auto SelectSql
-    = "SELECT"                                                                                //
-      " created, accnt, market_id, product, settl_day, id, order_id, ref, state_id, side_id," //
-      " lots, ticks, resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots,"       //
-      " match_id, posn_lots, posn_cost, liq_ind_id, cpty"                                     //
+    = "SELECT"                                                                    //
+      " created, accnt, market_id, id, order_id, ref, state_id, side_id, lots,"   //
+      " ticks, resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots," //
+      " match_id, posn_lots, posn_cost, liq_ind_id, cpty"                         //
       " FROM exec_t WHERE created > ? ORDER BY seq_id DESC;"sv;
 
 constexpr auto InsertSql
-    = "INSERT INTO exec_t ("                                                                 //
-      "created, accnt, market_id, product, settl_day, id, order_id, ref, state_id, side_id," //
-      " lots, ticks, resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots,"      //
-      " match_id, posn_lots, posn_cost, liq_ind_id, cpty"                                    //
-      ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"sv;
+    = "INSERT INTO exec_t ("                                                      //
+      "created, accnt, market_id, id, order_id, ref, state_id, side_id, lots,"    //
+      " ticks, resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots," //
+      " match_id, posn_lots, posn_cost, liq_ind_id, cpty"                         //
+      ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"sv;
 
 constexpr auto UpdateSql =          //
     "UPDATE exec_t SET archive = ?" //
@@ -161,8 +157,6 @@ enum : int {   //
     Created,   //
     Accnt,     //
     MarketId,  //
-    Product,   //
-    SettlDay,  //
     Id,        //
     OrderId,   //
     Ref,       //
@@ -183,10 +177,10 @@ enum : int {   //
 };
 
 constexpr auto SelectSql
-    = "SELECT"                                                                              //
-      " created, accnt, market_id, product, settl_day, id, order_id, ref, side_id, lots,"   //
-      " ticks, resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots, match_id," //
-      " posn_lots, posn_cost, liq_ind_id, cpty"                                             //
+    = "SELECT"                                                                       //
+      " created, accnt, market_id, id, order_id, ref, side_id, lots, ticks,"         //
+      " resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots, match_id," //
+      " posn_lots, posn_cost, liq_ind_id, cpty"                                      //
       " FROM exec_t WHERE state_id = 4 AND archive IS NULL;"sv;
 } // namespace trade
 
@@ -194,15 +188,13 @@ namespace posn {
 enum : int {  //
     Accnt,    //
     MarketId, //
-    Product,  //
-    SettlDay, //
     Side,     //
     Lots,     //
     Cost      //
 };
 
 constexpr auto SelectSql = //
-    "SELECT accnt, market_id, product, settl_day, side_id, lots, cost FROM posn_v;"sv;
+    "SELECT accnt, market_id, side_id, lots, cost FROM posn_v;"sv;
 } // namespace posn
 
 } // namespace db

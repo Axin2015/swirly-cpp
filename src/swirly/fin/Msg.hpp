@@ -31,7 +31,7 @@ enum class MsgType : int { CreateMarket, UpdateMarket, CreateExec, ArchiveTrade 
 
 struct SWIRLY_PACKED CreateMarket {
     Id64 id;
-    char product[MaxSymbol];
+    char instr[MaxSymbol];
     JDay settl_day;
     MarketState state;
 };
@@ -46,8 +46,6 @@ static_assert(std::is_pod_v<UpdateMarket>);
 struct SWIRLY_PACKED CreateExec {
     char accnt[MaxSymbol];
     Id64 market_id;
-    char product[MaxSymbol];
-    JDay settl_day;
     Id64 id;
     Id64 order_id;
     char ref[MaxRef];
@@ -88,7 +86,7 @@ struct SWIRLY_PACKED Msg {
     };
 };
 static_assert(std::is_pod_v<Msg>);
-static_assert(sizeof(Msg) == 252, "must be specific size");
+static_assert(sizeof(Msg) == 232, "must be specific size");
 
 } // namespace fin
 } // namespace swirly

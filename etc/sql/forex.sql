@@ -91,106 +91,106 @@ INSERT INTO asset_t (id, symbol, display, type_id)
        VALUES (22, 'ZAR', 'South Africa, Rand', 3)
 ;
 
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (1, 'AUDUSD', 'AUDUSD', 'AUD', 'USD', 1000000, 1, 1, 10000, 4, 1, 10)
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (2, 'EURCHF', 'EURCHF', 'EUR', 'CHF', 1000000, 1, 1, 10000, 4, 1, 10)
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (3, 'EURCZK', 'EURCZK', 'EUR', 'CZK', 1000000, 1, 1, 100, 2, 1, 10)
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (4, 'EURDKK', 'EURDKK', 'EUR', 'DKK', 1000000, 1, 1, 1000, 3, 1, 10)
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (5, 'EURGBP', 'EURGBP', 'EUR', 'GBP', 1000000, 1, 1, 10000, 4, 1, 10)
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (6, 'EURHUF', 'EURHUF', 'EUR', 'HUF', 1000000, 1, 1, 100, 2, 1, 10)
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (7, 'EURJPY', 'EURJPY', 'EUR', 'JPY', 1000000, 1, 1, 100, 2, 1, 10)
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (8, 'EURNOK', 'EURNOK', 'EUR', 'NOK', 1000000, 1, 1, 1000, 3, 1, 10)
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (9, 'EURPLN', 'EURPLN', 'EUR', 'PLN', 1000000, 1, 1, 1000, 3, 1, 10)
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (10, 'EURRON', 'EURRON', 'EUR', 'RON', 1000000, 1, 1, 1000, 3, 1, 10)
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (11, 'EURSEK', 'EURSEK', 'EUR', 'SEK', 1000000, 1, 1, 1000, 3, 1, 10)
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (12, 'EURUSD', 'EURUSD', 'EUR', 'USD', 1000000, 1, 1, 10000, 4, 1, 10)
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (13, 'GBPUSD', 'GBPUSD', 'GBP', 'USD', 1000000, 1, 1, 10000, 4, 1, 10)
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (14, 'NZDUSD', 'NZDUSD', 'NZD', 'USD', 1000000, 1, 1, 10000, 4, 1, 10)
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (15, 'USDCAD', 'USDCAD', 'USD', 'CAD', 1000000, 1, 1, 10000, 4, 1, 10)
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (16, 'USDCHF', 'USDCHF', 'USD', 'CHF', 1000000, 1, 1, 10000, 4, 1, 10)
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (17, 'USDHKD', 'USDHKD', 'USD', 'HKD', 1000000, 1, 1, 1000, 3, 1, 10)
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (18, 'USDILS', 'USDILS', 'USD', 'ILS', 1000000, 1, 1, 1000, 3, 1, 10)
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (19, 'USDJPY', 'USDJPY', 'USD', 'JPY', 1000000, 1, 1, 100, 2, 1, 10)
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (20, 'USDMXN', 'USDMXN', 'USD', 'MXN', 1000000, 1, 1, 1000, 3, 1, 10)
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (21, 'USDSGD', 'USDSGD', 'USD', 'SGD', 1000000, 1, 1, 10000, 4, 1, 10)
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (22, 'USDTHB', 'USDTHB', 'USD', 'THB', 1000000, 1, 1, 100, 2, 1, 10)
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (23, 'USDTRY', 'USDTRY', 'USD', 'TRY', 1000000, 1, 1, 1000, 4, 1, 10)
 ;
-INSERT INTO product_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, base_asset, term_ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (24, 'USDZAR', 'USDZAR', 'USD', 'ZAR', 1000000, 1, 1, 1000, 3, 1, 10)
 ;
 
 -- Example cash market.
-INSERT INTO market_t (id, product, settl_day, state)
-       VALUES ((SELECT (id << 16) FROM product_t WHERE symbol = 'EURUSD'), 'EURUSD', NULL, 0)
+INSERT INTO market_t (id, instr, settl_day, state)
+       VALUES ((SELECT (id << 16) FROM instr_t WHERE symbol = 'EURUSD'), 'EURUSD', NULL, 0)
 ;
 
 COMMIT

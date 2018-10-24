@@ -17,7 +17,7 @@
 #ifndef SWIRLYUI_ORDER_HXX
 #define SWIRLYUI_ORDER_HXX
 
-#include "Product.hxx"
+#include "Market.hxx"
 
 namespace swirly {
 namespace ui {
@@ -29,7 +29,7 @@ enum class Column : int { //
     Modified,             //
     Accnt,                //
     MarketId,             //
-    Product,              //
+    Instr,                //
     SettlDate,            //
     Id,                   //
     Ref,                  //
@@ -50,22 +50,22 @@ constexpr int ColumnCount{unbox(Column::MinLots) + 1};
 
 class Order {
   public:
-    Order(const QDateTime& created, const QDateTime& modified, const QString& accnt, Id64 market_id,
-          const Product& product, QDate settl_date, Id64 id, const QString& ref, State state,
-          Side side, Lots lots, Ticks ticks, Lots resd_lots, Lots exec_lots, Cost exec_cost,
-          Lots last_lots, Ticks last_ticks, Lots min_lots);
+    Order(const QDateTime& created, const QDateTime& modified, const QString& accnt,
+          const Market& market, Id64 id, const QString& ref, State state, Side side, Lots lots,
+          Ticks ticks, Lots resd_lots, Lots exec_lots, Cost exec_cost, Lots last_lots,
+          Ticks last_ticks, Lots min_lots);
     Order() = default;
     ~Order() = default;
 
-    static Order from_json(const Product& product, const QJsonObject& obj);
+    static Order from_json(const Market& market, const QJsonObject& obj);
 
-    OrderKey key() const noexcept { return {market_id_, id_}; }
+    OrderKey key() const noexcept { return {market_.id(), id_}; }
     const QDateTime& created() const noexcept { return created_; }
     const QDateTime& modified() const noexcept { return modified_; }
     const QString& accnt() const noexcept { return accnt_; }
-    Id64 market_id() const noexcept { return market_id_; }
-    const Product& product() const noexcept { return product_; }
-    QDate settl_date() const noexcept { return settl_date_; }
+    const Market& market() const noexcept { return market_; }
+    const Instr& instr() const noexcept { return market_.instr(); }
+    QDate settl_date() const noexcept { return market_.settl_date(); }
     Id64 id() const noexcept { return id_; }
     const QString& ref() const noexcept { return ref_; }
     State state() const noexcept { return state_; }
@@ -84,9 +84,7 @@ class Order {
     QDateTime created_{};
     QDateTime modified_{};
     QString accnt_{};
-    Id64 market_id_{};
-    Product product_{};
-    QDate settl_date_{};
+    Market market_{};
     Id64 id_{};
     QString ref_{};
     State state_{};

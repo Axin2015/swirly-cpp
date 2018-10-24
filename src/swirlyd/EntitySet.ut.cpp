@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(EntitySetZeroCase)
     const auto es = EntitySet::parse(""sv);
     BOOST_TEST(!es.many());
     BOOST_TEST(!es.asset());
-    BOOST_TEST(!es.product());
+    BOOST_TEST(!es.instr());
     BOOST_TEST(!es.market());
 
     // End.
@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE(EntitySetOneCase)
     auto es = EntitySet::parse("assets"sv);
     BOOST_TEST(!es.many());
     BOOST_TEST(es.asset());
-    BOOST_TEST(!es.product());
+    BOOST_TEST(!es.instr());
     BOOST_TEST(!es.market());
 
     // First.
@@ -56,10 +56,10 @@ BOOST_AUTO_TEST_CASE(EntitySetOneCase)
 
 BOOST_AUTO_TEST_CASE(EntitySetTwoCase)
 {
-    auto es = EntitySet::parse("assets,products"sv);
+    auto es = EntitySet::parse("assets,instrs"sv);
     BOOST_TEST(es.many());
     BOOST_TEST(es.asset());
-    BOOST_TEST(es.product());
+    BOOST_TEST(es.instr());
     BOOST_TEST(!es.market());
 
     // First.
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(EntitySetTwoCase)
 
     // Second.
     BOOST_TEST(!es.empty());
-    BOOST_TEST(es.pop() == EntitySet::Product);
+    BOOST_TEST(es.pop() == EntitySet::Instr);
 
     // End.
     BOOST_TEST(es.empty());
@@ -76,10 +76,10 @@ BOOST_AUTO_TEST_CASE(EntitySetTwoCase)
 
 BOOST_AUTO_TEST_CASE(EntitySetThreeCase)
 {
-    auto es = EntitySet::parse("markets,products,assets"sv);
+    auto es = EntitySet::parse("markets,instrs,assets"sv);
     BOOST_TEST(es.many());
     BOOST_TEST(es.asset());
-    BOOST_TEST(es.product());
+    BOOST_TEST(es.instr());
     BOOST_TEST(es.market());
 
     // First.
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(EntitySetThreeCase)
 
     // Second.
     BOOST_TEST(!es.empty());
-    BOOST_TEST(es.pop() == EntitySet::Product);
+    BOOST_TEST(es.pop() == EntitySet::Instr);
 
     // Third.
     BOOST_TEST(!es.empty());
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE(EntitySetTrailingCase)
     auto es = EntitySet::parse("markets,"sv);
     BOOST_TEST(!es.many());
     BOOST_TEST(!es.asset());
-    BOOST_TEST(!es.product());
+    BOOST_TEST(!es.instr());
     BOOST_TEST(es.market());
 
     // First.

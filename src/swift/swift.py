@@ -283,19 +283,20 @@ class RestTestCase(unittest.TestCase):
   def setUp(self):
       self.maxDiff = None
 
-  def create_market(self, client, product, settl_date):
+  def create_market(self, client, instr, settl_date):
     client.set_admin()
     resp = client.send('POST', '/api/market',
-                       product = product,
+                       instr = instr,
                        settl_date = settl_date,
                        state = 0)
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
+    return int(resp.content['id'])
 
-  def create_order(self, client, accnt, product, settl_date, side, lots, ticks):
+  def create_order(self, client, accnt, market_id, side, lots, ticks):
     client.set_trader(accnt)
-    resp = client.send('POST', '/api/sess/order/' + product + '/' + str(settl_date),
+    resp = client.send('POST', '/api/sess/order/' + str(market_id),
                        side = side,
                        lots = lots,
                        ticks = ticks)

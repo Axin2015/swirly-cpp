@@ -31,12 +31,10 @@ inline namespace fin {
 
 class SWIRLY_API Posn : public RefCount<Posn, ThreadUnsafePolicy> {
   public:
-    Posn(Symbol accnt, Id64 market_id, Symbol product, JDay settl_day, Lots buy_lots, Cost buy_cost,
-         Lots sell_lots, Cost sell_cost) noexcept
+    Posn(Symbol accnt, Id64 market_id, Lots buy_lots, Cost buy_cost, Lots sell_lots,
+         Cost sell_cost) noexcept
     : accnt_{accnt}
     , market_id_{market_id}
-    , product_{product}
-    , settl_day_{settl_day}
     , buy_lots_{buy_lots}
     , buy_cost_{buy_cost}
     , sell_lots_{sell_lots}
@@ -44,8 +42,8 @@ class SWIRLY_API Posn : public RefCount<Posn, ThreadUnsafePolicy> {
     , open_cost_{buy_cost - sell_cost}
     {
     }
-    Posn(Symbol accnt, Id64 market_id, Symbol product, JDay settl_day) noexcept
-    : Posn{accnt, market_id, product, settl_day, 0_lts, 0_cst, 0_lts, 0_cst}
+    Posn(Symbol accnt, Id64 market_id) noexcept
+    : Posn{accnt, market_id, 0_lts, 0_cst, 0_lts, 0_cst}
     {
     }
     ~Posn();
@@ -69,8 +67,6 @@ class SWIRLY_API Posn : public RefCount<Posn, ThreadUnsafePolicy> {
 
     auto accnt() const noexcept { return accnt_; }
     auto market_id() const noexcept { return market_id_; }
-    auto product() const noexcept { return product_; }
-    auto settl_day() const noexcept { return settl_day_; }
     auto buy_lots() const noexcept { return buy_lots_; }
     auto buy_cost() const noexcept { return buy_cost_; }
     auto sell_lots() const noexcept { return sell_lots_; }
@@ -112,8 +108,6 @@ class SWIRLY_API Posn : public RefCount<Posn, ThreadUnsafePolicy> {
   private:
     const Symbol accnt_;
     const Id64 market_id_;
-    const Symbol product_;
-    JDay settl_day_;
     Lots buy_lots_;
     Cost buy_cost_;
     Lots sell_lots_;

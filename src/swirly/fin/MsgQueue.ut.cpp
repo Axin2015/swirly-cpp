@@ -177,7 +177,7 @@ BOOST_FIXTURE_TEST_CASE(MsgQueueCreateMarket, Fixture)
     const auto& body = msg.create_market;
 
     BOOST_CHECK_EQUAL(body.id, MarketId);
-    BOOST_CHECK_EQUAL(strncmp(body.product, "EURUSD", sizeof(body.product)), 0);
+    BOOST_CHECK_EQUAL(strncmp(body.instr, "EURUSD", sizeof(body.instr)), 0);
     BOOST_CHECK_EQUAL(body.settl_day, SettlDay);
     BOOST_CHECK_EQUAL(body.state, 0x1U);
 }
@@ -199,14 +199,13 @@ BOOST_FIXTURE_TEST_CASE(MsgQueueUpdateMarket, Fixture)
 BOOST_FIXTURE_TEST_CASE(MsgQueueCreateExec, Fixture)
 {
     ConstExecPtr execs[2];
-    execs[0] = make_intrusive<Exec>(Now, "MARAYL"sv, MarketId, "EURUSD"sv, SettlDay, 1_id64, 2_id64,
-                                    "REF"sv, State::New, Side::Buy, 10_lts, 12345_tks, 10_lts,
-                                    0_lts, 0_cst, 0_lts, 0_tks, 1_lts, 0_id64, 0_lts, 0_cst,
-                                    LiqInd::None, Symbol{});
-    execs[1] = make_intrusive<Exec>(Now + 1ms, "MARAYL"sv, MarketId, "EURUSD"sv, SettlDay, 3_id64,
-                                    2_id64, "REF"sv, State::Trade, Side::Buy, 10_lts, 12345_tks,
-                                    5_lts, 5_lts, 61725_cst, 5_lts, 12345_tks, 1_lts, 4_id64, 0_lts,
-                                    0_cst, LiqInd::Maker, "GOSAYL"sv);
+    execs[0] = make_intrusive<Exec>(Now, "MARAYL"sv, MarketId, 1_id64, 2_id64, "REF"sv, State::New,
+                                    Side::Buy, 10_lts, 12345_tks, 10_lts, 0_lts, 0_cst, 0_lts,
+                                    0_tks, 1_lts, 0_id64, 0_lts, 0_cst, LiqInd::None, Symbol{});
+    execs[1] = make_intrusive<Exec>(Now + 1ms, "MARAYL"sv, MarketId, 3_id64, 2_id64, "REF"sv,
+                                    State::Trade, Side::Buy, 10_lts, 12345_tks, 5_lts, 5_lts,
+                                    61725_cst, 5_lts, 12345_tks, 1_lts, 4_id64, 0_lts, 0_cst,
+                                    LiqInd::Maker, "GOSAYL"sv);
     mq.create_exec(execs);
     {
         Msg msg;
@@ -217,8 +216,6 @@ BOOST_FIXTURE_TEST_CASE(MsgQueueCreateExec, Fixture)
 
         BOOST_CHECK_EQUAL(strncmp(body.accnt, "MARAYL", sizeof(body.accnt)), 0);
         BOOST_CHECK_EQUAL(body.market_id, MarketId);
-        BOOST_CHECK_EQUAL(strncmp(body.product, "EURUSD", sizeof(body.product)), 0);
-        BOOST_CHECK_EQUAL(body.settl_day, SettlDay);
         BOOST_CHECK_EQUAL(body.id, 1_id64);
         BOOST_CHECK_EQUAL(body.order_id, 2_id64);
         BOOST_CHECK_EQUAL(strncmp(body.ref, "REF", sizeof(body.ref)), 0);
@@ -246,8 +243,6 @@ BOOST_FIXTURE_TEST_CASE(MsgQueueCreateExec, Fixture)
         const auto& body = msg.create_exec;
 
         BOOST_CHECK_EQUAL(body.market_id, MarketId);
-        BOOST_CHECK_EQUAL(strncmp(body.product, "EURUSD", sizeof(body.product)), 0);
-        BOOST_CHECK_EQUAL(body.settl_day, SettlDay);
         BOOST_CHECK_EQUAL(body.id, 3_id64);
         BOOST_CHECK_EQUAL(body.order_id, 2_id64);
         BOOST_CHECK_EQUAL(strncmp(body.accnt, "MARAYL", sizeof(body.accnt)), 0);

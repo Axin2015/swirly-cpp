@@ -25,7 +25,7 @@ namespace swirly {
 namespace ui {
 
 class AssetView;
-class ProductView;
+class InstrView;
 class MarketView;
 
 class MainWindow : public QMainWindow {
@@ -41,8 +41,8 @@ class MainWindow : public QMainWindow {
   private slots:
     void slot_ref_data_complete();
     void slot_service_error(const QString& error);
-    void slot_create_market(const Product& product, QDate settl_date);
-    void slot_create_order(const Product& product, QDate settl_date, const QString& ref, Side side,
+    void slot_create_market(const Instr& instr, QDate settl_date);
+    void slot_create_order(const Instr& instr, QDate settl_date, const QString& ref, Side side,
                            Lots lots, Ticks ticks);
     void slot_cancel_orders(const OrderKeys& keys);
     void slot_about();
@@ -56,7 +56,7 @@ class MainWindow : public QMainWindow {
 
     HttpClient client_;
     AssetView* asset_view_{nullptr};
-    ProductView* product_view_{nullptr};
+    InstrView* instr_view_{nullptr};
     MarketView* market_view_{nullptr};
 };
 

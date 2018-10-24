@@ -27,9 +27,8 @@ BOOST_AUTO_TEST_SUITE(LevelSuite)
 
 BOOST_AUTO_TEST_CASE(LevelSetCase)
 {
-    const Order order{{},     {},    "MARAYL"sv, 1_id64,    "EURUSD"sv, 0_jd,
-                      0_id64, ""sv,  State::New, Side::Buy, 10_lts,     12345_tks,
-                      0_lts,  0_lts, 0_cst,      0_lts,     0_tks,      0_lts};
+    const Order order{{},     {},        "MARAYL"sv, 1_id64, 0_id64, ""sv,  State::New, Side::Buy,
+                      10_lts, 12345_tks, 0_lts,      0_lts,  0_cst,  0_lts, 0_tks,      0_lts};
 
     LevelSet s;
 

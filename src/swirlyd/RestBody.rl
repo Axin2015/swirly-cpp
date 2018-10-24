@@ -75,20 +75,16 @@ namespace {
     )
   ) >beginStr;
 
-  action nullSymbol {
-    fields_ &= ~Symbol;
-    symbol_.len = 0;
+  action nullId {
+    fields_ &= ~Id;
+    id_ = 0_id64;
   }
-  action beginSymbol {
-    str_.len = &symbol_.len;
-    str_.buf = symbol_.buf;
-    str_.max = MaxSymbol;
+  action endId {
+    fields_ |= Id;
+    id_ = swirly::Id64{num()};
   }
-  action endSymbol {
-    fields_ |= Symbol;
-  }
-  symbol = 'null' %nullSymbol
-    | str >beginSymbol %endSymbol;
+  id = 'null' %nullId
+    | num %endId;
 
   action nullAccnt {
     fields_ &= ~Accnt;
@@ -105,20 +101,20 @@ namespace {
   accnt = 'null' %nullAccnt
     | str >beginAccnt %endAccnt;
 
-  action nullProduct {
-    fields_ &= ~Product;
-    product_.len = 0;
+  action nullInstr {
+    fields_ &= ~Instr;
+    instr_.len = 0;
   }
-  action beginProduct {
-    str_.len = &product_.len;
-    str_.buf = product_.buf;
+  action beginInstr {
+    str_.len = &instr_.len;
+    str_.buf = instr_.buf;
     str_.max = MaxSymbol;
   }
-  action endProduct {
-    fields_ |= Product;
+  action endInstr {
+    fields_ |= Instr;
   }
-  product = 'null' %nullProduct
-    | str >beginProduct %endProduct;
+  instr = 'null' %nullInstr
+    | str >beginInstr %endInstr;
 
   action nullSettlDate {
     fields_ &= ~SettlDate;
@@ -239,9 +235,9 @@ namespace {
   colon = space* ':' space*;
   comma = space* ',' space*;
 
-  pair = '"symbol"'i colon symbol
+  pair = '"id"'i colon id
     | '"accnt"'i colon accnt
-    | '"product"'i colon product
+    | '"instr"'i colon instr
     | '"settl_date"'i colon settlDate
     | '"ref"'i colon ref
     | '"state"'i colon state
@@ -277,9 +273,9 @@ void RestBody::reset(bool clear) noexcept
   }
   fields_ = 0;
 
-  symbol_.len = 0;
+  id_ = 0_id64;
   accnt_.len = 0;
-  product_.len = 0;
+  instr_.len = 0;
   settl_date_ = 0_ymd;
   ref_.len = 0;
   state_ = 0;

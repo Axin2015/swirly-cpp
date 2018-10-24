@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(MarketToStringCase)
 
     BOOST_TEST(to_string(market) == //
                "{\"id\":1"
-               ",\"product\":\"EURUSD\""
+               ",\"instr\":\"EURUSD\""
                ",\"settl_date\":20140314"
                ",\"state\":1"
                ",\"last_time\":null"
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(MarketToStringNullCase)
 
     BOOST_TEST(to_string(market) == //
                "{\"id\":1"
-               ",\"product\":\"EURUSD\""
+               ",\"instr\":\"EURUSD\""
                ",\"settl_date\":null"
                ",\"state\":1"
                ",\"last_time\":null"

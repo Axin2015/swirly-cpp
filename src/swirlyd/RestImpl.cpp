@@ -89,12 +89,12 @@ void RestImpl::get_ref_data(CyclTime now, EntitySet es, ostream& out) const
         get_asset(now, out);
         ++i;
     }
-    if (es.product()) {
+    if (es.instr()) {
         if (i > 0) {
             out << ',';
         }
-        out << "\"products\":";
-        get_product(now, out);
+        out << "\"instrs\":";
+        get_instr(now, out);
         ++i;
     }
     if (es.market()) {
@@ -126,20 +126,20 @@ void RestImpl::get_asset(CyclTime now, Symbol symbol, ostream& out) const
     out << *it;
 }
 
-void RestImpl::get_product(CyclTime now, ostream& out) const
+void RestImpl::get_instr(CyclTime now, ostream& out) const
 {
-    const auto& products = lob_app_.products();
+    const auto& instrs = lob_app_.instrs();
     out << '[';
-    copy(products.begin(), products.end(), OStreamJoiner{out, ','});
+    copy(instrs.begin(), instrs.end(), OStreamJoiner{out, ','});
     out << ']';
 }
 
-void RestImpl::get_product(CyclTime now, Symbol symbol, ostream& out) const
+void RestImpl::get_instr(CyclTime now, Symbol symbol, ostream& out) const
 {
-    const auto& products = lob_app_.products();
-    auto it = products.find(symbol);
-    if (it == products.end()) {
-        throw NotFoundException{err_msg() << "product '" << symbol << "' does not exist"};
+    const auto& instrs = lob_app_.instrs();
+    auto it = instrs.find(symbol);
+    if (it == instrs.end()) {
+        throw NotFoundException{err_msg() << "instr '" << symbol << "' does not exist"};
     }
     out << *it;
 }
@@ -197,19 +197,9 @@ void RestImpl::get_market(CyclTime now, std::ostream& out) const
     out << ']';
 }
 
-void RestImpl::get_market(CyclTime now, Symbol product, std::ostream& out) const
+void RestImpl::get_market(CyclTime now, Id64 market_id, std::ostream& out) const
 {
-    const auto& markets = lob_app_.markets();
-    out << '[';
-    copy_if(markets.begin(), markets.end(), OStreamJoiner{out, ','},
-            [product](const auto& market) { return market.product() == product; });
-    out << ']';
-}
-
-void RestImpl::get_market(CyclTime now, Symbol product, IsoDate settl_date, std::ostream& out) const
-{
-    const auto id = to_market_id(lob_app_.product(product).id(), settl_date);
-    out << lob_app_.market(id);
+    out << lob_app_.market(market_id);
 }
 
 void RestImpl::get_order(CyclTime now, Symbol accnt, std::ostream& out) const
@@ -217,22 +207,9 @@ void RestImpl::get_order(CyclTime now, Symbol accnt, std::ostream& out) const
     do_get_order(lob_app_.sess(accnt), out);
 }
 
-void RestImpl::get_order(CyclTime now, Symbol accnt, Symbol product, ostream& out) const
+void RestImpl::get_order(CyclTime now, Symbol accnt, Id64 market_id, ostream& out) const
 {
     const auto& sess = lob_app_.sess(accnt);
-    const auto& orders = sess.orders();
-    out << '[';
-    copy_if(orders.begin(), orders.end(), OStreamJoiner{out, ','},
-            [product](const auto& order) { return order.product() == product; });
-    out << ']';
-}
-
-void RestImpl::get_order(CyclTime now, Symbol accnt, Symbol product_symbol, IsoDate settl_date,
-                         ostream& out) const
-{
-    const auto& sess = lob_app_.sess(accnt);
-    const auto& product = lob_app_.product(product_symbol);
-    const auto market_id = to_market_id(product.id(), settl_date);
     const auto& orders = sess.orders();
     out << '[';
     copy_if(orders.begin(), orders.end(), OStreamJoiner{out, ','},
@@ -240,12 +217,9 @@ void RestImpl::get_order(CyclTime now, Symbol accnt, Symbol product_symbol, IsoD
     out << ']';
 }
 
-void RestImpl::get_order(CyclTime now, Symbol accnt, Symbol product_symbol, IsoDate settl_date,
-                         Id64 id, ostream& out) const
+void RestImpl::get_order(CyclTime now, Symbol accnt, Id64 market_id, Id64 id, ostream& out) const
 {
     const auto& sess = lob_app_.sess(accnt);
-    const auto& product = lob_app_.product(product_symbol);
-    const auto market_id = to_market_id(product.id(), settl_date);
     const auto& orders = sess.orders();
     auto it = orders.find(market_id, id);
     if (it == orders.end()) {
@@ -264,22 +238,9 @@ void RestImpl::get_trade(CyclTime now, Symbol accnt, std::ostream& out) const
     do_get_trade(lob_app_.sess(accnt), out);
 }
 
-void RestImpl::get_trade(CyclTime now, Symbol accnt, Symbol product, std::ostream& out) const
+void RestImpl::get_trade(CyclTime now, Symbol accnt, Id64 market_id, std::ostream& out) const
 {
     const auto& sess = lob_app_.sess(accnt);
-    const auto& trades = sess.trades();
-    out << '[';
-    copy_if(trades.begin(), trades.end(), OStreamJoiner{out, ','},
-            [product](const auto& trade) { return trade.product() == product; });
-    out << ']';
-}
-
-void RestImpl::get_trade(CyclTime now, Symbol accnt, Symbol product_symbol, IsoDate settl_date,
-                         std::ostream& out) const
-{
-    const auto& sess = lob_app_.sess(accnt);
-    const auto& product = lob_app_.product(product_symbol);
-    const auto market_id = to_market_id(product.id(), settl_date);
     const auto& trades = sess.trades();
     out << '[';
     copy_if(trades.begin(), trades.end(), OStreamJoiner{out, ','},
@@ -287,12 +248,10 @@ void RestImpl::get_trade(CyclTime now, Symbol accnt, Symbol product_symbol, IsoD
     out << ']';
 }
 
-void RestImpl::get_trade(CyclTime now, Symbol accnt, Symbol product_symbol, IsoDate settl_date,
-                         Id64 id, std::ostream& out) const
+void RestImpl::get_trade(CyclTime now, Symbol accnt, Id64 market_id, Id64 id,
+                         std::ostream& out) const
 {
     const auto& sess = lob_app_.sess(accnt);
-    const auto& product = lob_app_.product(product_symbol);
-    const auto market_id = to_market_id(product.id(), settl_date);
     const auto& trades = sess.trades();
     auto it = trades.find(market_id, id);
     if (it == trades.end()) {
@@ -306,69 +265,52 @@ void RestImpl::get_posn(CyclTime now, Symbol accnt, std::ostream& out) const
     do_get_posn(lob_app_.sess(accnt), out);
 }
 
-void RestImpl::get_posn(CyclTime now, Symbol accnt, Symbol product, std::ostream& out) const
+void RestImpl::get_posn(CyclTime now, Symbol accnt, Id64 market_id, std::ostream& out) const
 {
     const auto& sess = lob_app_.sess(accnt);
-    const auto& posns = sess.posns();
-    out << '[';
-    copy_if(posns.begin(), posns.end(), OStreamJoiner{out, ','},
-            [product](const auto& posn) { return posn.product() == product; });
-    out << ']';
-}
-
-void RestImpl::get_posn(CyclTime now, Symbol accnt, Symbol product_symbol, IsoDate settl_date,
-                        std::ostream& out) const
-{
-    const auto& sess = lob_app_.sess(accnt);
-    const auto& product = lob_app_.product(product_symbol);
-    const auto market_id = to_market_id(product.id(), settl_date);
     const auto& posns = sess.posns();
     auto it = posns.find(market_id);
     if (it == posns.end()) {
-        throw NotFoundException{err_msg() << "posn for '" << product << "' on " << settl_date
-                                          << " does not exist"};
+        throw NotFoundException{err_msg()
+                                << "posn for market '" << market_id << "' does not exist"};
     }
     out << *it;
 }
 
-void RestImpl::post_market(CyclTime now, Symbol product_symbol, IsoDate settl_date,
+void RestImpl::post_market(CyclTime now, Id64 id, Symbol instr_symbol, IsoDate settl_date,
                            MarketState state, std::ostream& out)
 {
-    const auto& product = lob_app_.product(product_symbol);
+    const auto& instr = lob_app_.instr(instr_symbol);
     const auto settl_day = maybe_iso_to_jd(settl_date);
-    const auto& market = lob_app_.create_market(now, product, settl_day, state);
+    if (id == 0_id64) {
+        // Backwards compatibility.
+        id = to_market_id(instr.id(), settl_day);
+    }
+    const auto& market = lob_app_.create_market(now, id, instr, settl_day, state);
     out << market;
 }
 
-void RestImpl::put_market(CyclTime now, Symbol product_symbol, IsoDate settl_date,
-                          MarketState state, std::ostream& out)
+void RestImpl::put_market(CyclTime now, Id64 id, MarketState state, std::ostream& out)
 {
-    const auto& product = lob_app_.product(product_symbol);
-    const auto id = to_market_id(product.id(), settl_date);
     const auto& market = lob_app_.market(id);
     lob_app_.update_market(now, market, state);
     out << market;
 }
 
-void RestImpl::post_order(CyclTime now, Symbol accnt, Symbol product_symbol, IsoDate settl_date,
-                          std::string_view ref, Side side, Lots lots, Ticks ticks, Lots min_lots,
-                          std::ostream& out)
+void RestImpl::post_order(CyclTime now, Symbol accnt, Id64 market_id, std::string_view ref,
+                          Side side, Lots lots, Ticks ticks, Lots min_lots, std::ostream& out)
 {
     const auto& sess = lob_app_.sess(accnt);
-    const auto& product = lob_app_.product(product_symbol);
-    const auto market_id = to_market_id(product.id(), settl_date);
     const auto& market = lob_app_.market(market_id);
     Response resp;
     lob_app_.create_order(now, sess, market, ref, side, lots, ticks, min_lots, resp);
     out << resp;
 }
 
-void RestImpl::put_order(CyclTime now, Symbol accnt, Symbol product_symbol, IsoDate settl_date,
-                         ArrayView<Id64> ids, Lots lots, std::ostream& out)
+void RestImpl::put_order(CyclTime now, Symbol accnt, Id64 market_id, ArrayView<Id64> ids, Lots lots,
+                         std::ostream& out)
 {
     const auto& sess = lob_app_.sess(accnt);
-    const auto& product = lob_app_.product(product_symbol);
-    const auto market_id = to_market_id(product.id(), settl_date);
     const auto& market = lob_app_.market(market_id);
     Response resp;
     if (lots > 0_lts) {
@@ -387,13 +329,11 @@ void RestImpl::put_order(CyclTime now, Symbol accnt, Symbol product_symbol, IsoD
     out << resp;
 }
 
-void RestImpl::post_trade(CyclTime now, Symbol accnt, Symbol product_symbol, IsoDate settl_date,
-                          std::string_view ref, Side side, Lots lots, Ticks ticks, LiqInd liq_ind,
-                          Symbol cpty, std::ostream& out)
+void RestImpl::post_trade(CyclTime now, Symbol accnt, Id64 market_id, std::string_view ref,
+                          Side side, Lots lots, Ticks ticks, LiqInd liq_ind, Symbol cpty,
+                          std::ostream& out)
 {
     const auto& sess = lob_app_.sess(accnt);
-    const auto& product = lob_app_.product(product_symbol);
-    const auto market_id = to_market_id(product.id(), settl_date);
     const auto& market = lob_app_.market(market_id);
     auto trades = lob_app_.create_trade(now, sess, market, ref, side, lots, ticks, liq_ind, cpty);
     out << '[' << *trades.first;
@@ -403,12 +343,9 @@ void RestImpl::post_trade(CyclTime now, Symbol accnt, Symbol product_symbol, Iso
     out << ']';
 }
 
-void RestImpl::delete_trade(CyclTime now, Symbol accnt, Symbol product_symbol, IsoDate settl_date,
-                            ArrayView<Id64> ids)
+void RestImpl::delete_trade(CyclTime now, Symbol accnt, Id64 market_id, ArrayView<Id64> ids)
 {
     const auto& sess = lob_app_.sess(accnt);
-    const auto& product = lob_app_.product(product_symbol);
-    const auto market_id = to_market_id(product.id(), settl_date);
     lob_app_.archive_trade(now, sess, market_id, ids);
 }
 

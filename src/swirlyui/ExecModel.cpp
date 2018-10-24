@@ -30,7 +30,7 @@ ExecModel::ExecModel(QObject* parent)
     header_[unbox(Column::Created)] = tr("Created");
     header_[unbox(Column::Accnt)] = tr("Accnt");
     header_[unbox(Column::MarketId)] = tr("Market Id");
-    header_[unbox(Column::Product)] = tr("Product");
+    header_[unbox(Column::Instr)] = tr("Instr");
     header_[unbox(Column::SettlDate)] = tr("Settl Date");
     header_[unbox(Column::Id)] = tr("Id");
     header_[unbox(Column::OrderId)] = tr("Order Id");
@@ -88,10 +88,10 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
             var = exec.accnt();
             break;
         case Column::MarketId:
-            var = to_variant(exec.market_id());
+            var = to_variant(exec.market().id());
             break;
-        case Column::Product:
-            var = exec.product().symbol();
+        case Column::Instr:
+            var = exec.instr().symbol();
             break;
         case Column::SettlDate:
             var = exec.settl_date();
@@ -116,7 +116,7 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
             break;
         case Column::Price:
             if (exec.lots() != 0_lts) {
-                var = ticks_to_price_string(exec.ticks(), exec.product());
+                var = ticks_to_price_string(exec.ticks(), exec.instr());
             }
             break;
         case Column::ResdLots:
@@ -126,14 +126,14 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
             var = to_variant(exec.exec_lots());
             break;
         case Column::AvgPrice:
-            var = ticks_to_avg_price_string(exec.exec_lots(), exec.exec_cost(), exec.product());
+            var = ticks_to_avg_price_string(exec.exec_lots(), exec.exec_cost(), exec.instr());
             break;
         case Column::LastLots:
             var = to_variant(exec.last_lots());
             break;
         case Column::LastPrice:
             if (exec.last_lots() != 0_lts) {
-                var = ticks_to_price_string(exec.last_ticks(), exec.product());
+                var = ticks_to_price_string(exec.last_ticks(), exec.instr());
             }
             break;
         case Column::MinLots:
@@ -176,7 +176,7 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
             var = QVariant{Qt::AlignRight | Qt::AlignVCenter};
             break;
         case Column::Accnt:
-        case Column::Product:
+        case Column::Instr:
         case Column::Ref:
         case Column::State:
         case Column::Side:
@@ -204,7 +204,7 @@ void ExecModel::update_row(uint64_t tag, const Exec& exec)
 {
     // Linear search is acceptable on small circular buffer.
     auto it = find_if(rows_.begin(), rows_.end(), [&exec](const auto& row) {
-        return row.value().market_id() == exec.market_id() && row.value().id() == exec.id();
+        return row.value().market().id() == exec.market().id() && row.value().id() == exec.id();
     });
 
     if (it != rows_.end()) {

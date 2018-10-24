@@ -46,7 +46,7 @@ class SWIRLY_API Model {
     Model& operator=(Model&&) noexcept = default;
 
     void read_asset(const ModelCallback<AssetPtr>& cb) const { do_read_asset(cb); }
-    void read_product(const ModelCallback<ProductPtr>& cb) const { do_read_product(cb); }
+    void read_instr(const ModelCallback<InstrPtr>& cb) const { do_read_instr(cb); }
     void read_market(const ModelCallback<MarketPtr>& cb) const { do_read_market(cb); }
     void read_order(const ModelCallback<OrderPtr>& cb) const { do_read_order(cb); }
     void read_exec(WallTime since, const ModelCallback<ExecPtr>& cb) const
@@ -62,7 +62,7 @@ class SWIRLY_API Model {
   protected:
     virtual void do_read_asset(const ModelCallback<AssetPtr>& cb) const = 0;
 
-    virtual void do_read_product(const ModelCallback<ProductPtr>& cb) const = 0;
+    virtual void do_read_instr(const ModelCallback<InstrPtr>& cb) const = 0;
 
     virtual void do_read_market(const ModelCallback<MarketPtr>& cb) const = 0;
 

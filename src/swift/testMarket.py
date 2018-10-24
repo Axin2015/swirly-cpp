@@ -25,31 +25,30 @@ class TestCase(RestTestCase):
         with Client() as client:
           client.set_time(self.now)
 
-          self.create_market(client, 'EURUSD', 20140302)
-          self.create_market(client, 'GBPUSD', 20140302)
-          self.create_market(client, 'GBPUSD', 20140402)
-          self.create_market(client, 'USDCHF', 20140302)
+          self.eurusd_id = self.create_market(client, 'EURUSD', 20140302)
+          self.gbpusd_id = self.create_market(client, 'GBPUSD', 20140302)
+          self.gbpusd2_id = self.create_market(client, 'GBPUSD', 20140402)
+          self.usdchf_id = self.create_market(client, 'USDCHF', 20140302)
 
-          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Sell', 7, 12348)
-          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Sell', 5, 12347)
-          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Sell', 3, 12346)
-          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 3, 12344)
-          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 5, 12343)
-          self.create_order(client, 'MARAYL', 'EURUSD', 20140302, 'Buy', 7, 12343)
+          self.create_order(client, 'MARAYL', self.eurusd_id, 'Sell', 7, 12348)
+          self.create_order(client, 'MARAYL', self.eurusd_id, 'Sell', 5, 12347)
+          self.create_order(client, 'MARAYL', self.eurusd_id, 'Sell', 3, 12346)
+          self.create_order(client, 'MARAYL', self.eurusd_id, 'Buy', 3, 12344)
+          self.create_order(client, 'MARAYL', self.eurusd_id, 'Buy', 5, 12343)
+          self.create_order(client, 'MARAYL', self.eurusd_id, 'Buy', 7, 12343)
 
-          self.create_order(client, 'MARAYL', 'GBPUSD', 20140302, 'Sell', 5, 15346)
-          self.create_order(client, 'MARAYL', 'GBPUSD', 20140302, 'Sell', 3, 15346)
-          self.create_order(client, 'MARAYL', 'GBPUSD', 20140302, 'Buy', 3, 15344)
-          self.create_order(client, 'MARAYL', 'GBPUSD', 20140302, 'Buy', 5, 15343)
+          self.create_order(client, 'MARAYL', self.gbpusd_id, 'Sell', 5, 15346)
+          self.create_order(client, 'MARAYL', self.gbpusd_id, 'Sell', 3, 15346)
+          self.create_order(client, 'MARAYL', self.gbpusd_id, 'Buy', 3, 15344)
+          self.create_order(client, 'MARAYL', self.gbpusd_id, 'Buy', 5, 15343)
 
-          self.create_order(client, 'MARAYL', 'GBPUSD', 20140402, 'Sell', 7, 15347)
-          self.create_order(client, 'MARAYL', 'GBPUSD', 20140402, 'Buy', 7, 15342)
+          self.create_order(client, 'MARAYL', self.gbpusd2_id, 'Sell', 7, 15347)
+          self.create_order(client, 'MARAYL', self.gbpusd2_id, 'Buy', 7, 15342)
 
-          self.create_order(client, 'MARAYL', 'USDCHF', 20140302, 'Sell', 3, 9346)
-          self.create_order(client, 'MARAYL', 'USDCHF', 20140302, 'Buy', 3, 9344)
+          self.create_order(client, 'MARAYL', self.usdchf_id, 'Sell', 3, 9346)
+          self.create_order(client, 'MARAYL', self.usdchf_id, 'Buy', 3, 9344)
 
           self.get_all(client)
-          self.get_by_product(client)
           self.get_by_market(client)
 
       with Server(db_file, self.now) as server:
@@ -57,7 +56,6 @@ class TestCase(RestTestCase):
           client.set_time(self.now)
 
           self.get_all(client)
-          self.get_by_product(client)
           self.get_by_market(client)
 
   def get_all(self, client):
@@ -70,8 +68,8 @@ class TestCase(RestTestCase):
       u'bid_count': [1, 2, None],
       u'bid_lots': [3, 12, None],
       u'bid_ticks': [12344, 12343, None],
-      u'product': u'EURUSD',
-      u'id': 82255,
+      u'instr': u'EURUSD',
+      u'id': self.eurusd_id,
       u'last_lots': None,
       u'last_ticks': None,
       u'last_time': None,
@@ -84,8 +82,8 @@ class TestCase(RestTestCase):
       u'bid_count': [1, 1, None],
       u'bid_lots': [3, 5, None],
       u'bid_ticks': [15344, 15343, None],
-      u'product': u'GBPUSD',
-      u'id': 147791,
+      u'instr': u'GBPUSD',
+      u'id': self.gbpusd_id,
       u'last_lots': None,
       u'last_ticks': None,
       u'last_time': None,
@@ -98,8 +96,8 @@ class TestCase(RestTestCase):
       u'bid_count': [1, None, None],
       u'bid_lots': [7, None, None],
       u'bid_ticks': [15342, None, None],
-      u'product': u'GBPUSD',
-      u'id': 147822,
+      u'instr': u'GBPUSD',
+      u'id': self.gbpusd2_id,
       u'last_lots': None,
       u'last_ticks': None,
       u'last_time': None,
@@ -112,8 +110,8 @@ class TestCase(RestTestCase):
       u'bid_count': [1, None, None],
       u'bid_lots': [3, None, None],
       u'bid_ticks': [9344, None, None],
-      u'product': u'USDCHF',
-      u'id': 213327,
+      u'instr': u'USDCHF',
+      u'id': self.usdchf_id,
       u'last_lots': None,
       u'last_ticks': None,
       u'last_time': None,
@@ -124,45 +122,9 @@ class TestCase(RestTestCase):
       u'state': 0
     }], resp.content)
 
-  def get_by_product(self, client):
-    client.set_anon()
-    resp = client.send('GET', '/api/market/GBPUSD')
-
-    self.assertEqual(200, resp.status)
-    self.assertEqual('OK', resp.reason)
-    self.assertListEqual([{
-      u'bid_count': [1, 1, None],
-      u'bid_lots': [3, 5, None],
-      u'bid_ticks': [15344, 15343, None],
-      u'product': u'GBPUSD',
-      u'id': 147791,
-      u'last_lots': None,
-      u'last_ticks': None,
-      u'last_time': None,
-      u'offer_count': [2, None, None],
-      u'offer_lots': [8, None, None],
-      u'offer_ticks': [15346, None, None],
-      u'settl_date': 20140302,
-      u'state': 0
-    }, {
-      u'bid_count': [1, None, None],
-      u'bid_lots': [7, None, None],
-      u'bid_ticks': [15342, None, None],
-      u'product': u'GBPUSD',
-      u'id': 147822,
-      u'last_lots': None,
-      u'last_ticks': None,
-      u'last_time': None,
-      u'offer_count': [1, None, None],
-      u'offer_lots': [7, None, None],
-      u'offer_ticks': [15347, None, None],
-      u'settl_date': 20140402,
-      u'state': 0
-    }], resp.content)
-
   def get_by_market(self, client):
     client.set_anon()
-    resp = client.send('GET', '/api/market/GBPUSD/20140302')
+    resp = client.send('GET', '/api/market/' + str(self.gbpusd_id))
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -170,8 +132,8 @@ class TestCase(RestTestCase):
       u'bid_count': [1, 1, None],
       u'bid_lots': [3, 5, None],
       u'bid_ticks': [15344, 15343, None],
-      u'product': u'GBPUSD',
-      u'id': 147791,
+      u'instr': u'GBPUSD',
+      u'id': self.gbpusd_id,
       u'last_lots': None,
       u'last_ticks': None,
       u'last_time': None,
